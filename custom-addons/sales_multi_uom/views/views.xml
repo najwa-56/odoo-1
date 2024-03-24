@@ -1,0 +1,55 @@
+<?xml version="1.0"?>
+<odoo>
+    <data>
+        <record model="ir.ui.view" id="product_normal_form_view">
+            <field name="name">product.product.view.form.easy</field>
+            <field name="model">product.product</field>
+            <field name="inherit_id" ref="product.product_normal_form_view"/>
+            <field name="arch" type="xml">
+                <notebook position="inside">
+                    <page name="barcode_options" string="Multi UOM">
+                        <group col="1">
+                            <field name='sales_multi_uom_id'>
+                                <tree editable="bottom">
+                                    <field name="name"/>
+                                    <field name="qty"/>
+                                    <field name="price"/>
+                                    <field name="unit"/>
+                                </tree>
+                            </field>
+                            <field name="selected_uom_ids" widget="many2many_tags"/>
+                        </group>
+                    </page>
+                </notebook>
+            </field>
+        </record>
+        <record id="view_order_form" model="ir.ui.view">
+            <field name="name">sale.order.form</field>
+            <field name="model">sale.order</field>
+            <field name="inherit_id" ref="sale.view_order_form"/>
+            <field name="arch" type="xml">
+                <xpath expr="//field[@name='order_line']/tree/field[@name='product_uom_qty']" position="after">
+                    <field name="selected_uom_ids" invisible="1"/>
+                    <field name="sales_multi_uom_id"
+                           attrs="{'readonly': [('state', 'in', ('sale','done', 'cancel'))]}"/>
+                </xpath>
+                <xpath expr="//field[@name='order_line']/form/group/group/field[@name='product_id']" position="after">
+                    <field name="selected_uom_ids" invisible="1"/>
+                    
+                    <field name="sales_multi_uom_id"
+                           attrs="{'readonly': [('state', 'in', ('sale','done', 'cancel'))]}"/>
+                </xpath>
+            </field>
+        </record>
+        <record id="invoice_form" model="ir.ui.view">
+            <field name="name">account.move.form</field>
+            <field name="model">account.move</field>
+            <field name="inherit_id" ref="account.view_move_form"/>
+            <field name="arch" type="xml">
+                <xpath expr="//field[@name='invoice_line_ids']/tree/field[@name='quantity']" position="after">
+                    <field name="sales_multi_uom_id"/>
+                </xpath>
+            </field>
+        </record>
+    </data>
+</odoo>

@@ -1,0 +1,2 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+wv_sales_multi_uom_id,wv_sales_multi_uom,model_wv_sales_multi_uom,,1,1,1,1
