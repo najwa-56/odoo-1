@@ -1,6 +1,6 @@
 {
     'name': "mandob sales order",
-    "version": "1",
+    "version": "1.0",
     'summary': """editing""",
     'description': '''editing''',
     'sequence': 1,
