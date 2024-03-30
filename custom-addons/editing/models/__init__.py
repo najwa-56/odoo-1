@@ -1,0 +1,1 @@
+from . import your_custom_class
