@@ -1,0 +1,186 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+    <t t-name="activity_dashboard_table.dashboard">
+      <div class="modal" tabindex="-1" role="dialog">
+        <div class="modal-dialog" role="document">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title">Activity Feedback</h5>
+              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+              <div class="form-group">
+                <input type="hidden" id="popup_activity_id" name="popup_activity_id" />
+                <label for="activity_feedback">Feedback</label>
+                <textarea class="form-control rounded-0" id="activity_feedback" name="activity_feedback"></textarea>
+              </div>
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="popup-action-done btn btn-primary" id="popup_action_done" t-on-click="_onClickDonePopup">Done</button>
+              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+          </div>
+        </div>
+      </div>
+      <t t-set="data_dict_act" t-value="getTempActValue"/>
+      
+        <t t-foreach="data_dict_act" t-as="v" t-key="v_index">
+          <div class="accordion px-0 px-lg-4 rounded"
+                        t-attf-id="accordionPanelsStayOpen#{v.status_name}#{v.stage_id}"
+                        style="margin-bottom: 10px;">
+                        <div class="accordion-item shadow ">
+                            <h2 class="accordion-header"
+                                t-attf-id="panelsStayOpen-headingOne#{v.status_name}#{v.stage_id}">
+                                <button class="accordion-button" type="button"
+                                    data-bs-toggle="collapse"
+                                    t-attf-data-bs-target="#panelsStayOpen-collapseOne#{v.stage_id}"
+                                    aria-expanded="true" aria-controls="panelsStayOpen-collapseOne">
+                                    <b>
+                                        <span>
+                                            <t t-esc="v.status_name" />
+                                        </span>
+                                    </b>
+
+                                   
+                                </button>
+
+
+                            </h2>
+                            <div t-attf-id="panelsStayOpen-collapseOne#{v.stage_id}"
+                                class="accordion-collapse collapse sh_activity_table"
+                                t-attf-aria-labelledby="panelsStayOpen-headingOne#{v.status_name}#{v.stage_id}">
+                                <div class="accordion-body">
+                                  <!-- <div class="o-pager d-flex w-100 justify-content-end">
+                                    <Pager 
+                                        t-if="state.pagerProps.total"
+                                        offset="state.pagerProps.offset"
+                                        limit="state.pagerProps.limit"
+                                        total="state.pagerProps.total"
+                                        onUpdate.bind="onUpdatePager"
+                                        isEditable="true" />
+                                </div>  -->
+                                  <table class="table table-bordered table-hover">
+                                    <thead>
+                                      
+                                      <tr>
+                                        <th scope="col">Name</th>
+                                        <th scope="col">Activity</th>
+                                        <th scope="col">Assigned To</th>
+                                        <th scope="col">Supervisor</th>
+                                        <th scope="col">Deadline Date</th>
+                                        <th scope="col">Action</th>
+                                      </tr>
+                                    </thead>
+                                    <tbody>
+                                      <t t-if="v.activitiy_data.length > 0">
+                                        <t t-foreach="v.activitiy_data" t-as="value" t-key="value_index">
+                                          <tr>
+                                            
+                                            <td><t t-esc="value[0]"/></td>
+                                            <td><t t-esc="value[1]"/></td>
+                                            <td><t t-esc="value[2]"/></td>
+                                            <td><t t-esc="value[3]"/></td>
+                                            <td><t t-esc="value[4]"/></td>
+                                            <td><input type="hidden" id="activity_id" name="activity_id" t-att-value="value[5]"/>
+                                              <t t-set="backend_url" t-value="'/web#view_type=form&amp;model=mail.activity&amp;id=' + value[5]"/>
+                                              <t t-set="origin_url" t-value="'/web#view_type=form&amp;model='+value[7]+'&amp;id='+value[8]"/>
+                                                <t t-if="value[6] =='today' or value[6] == 'overdue' or value[6] == 'planned'">
+                                                  <button style="margin-right:5px;cursor: pointer;" class="p-1 btn btn-success mark-done" t-on-click="_onClickDone">Mark As Done</button>
+                                                  <button style="margin-right:5px;cursor: pointer;" class="p-1 btn btn-success mark-cancel" t-on-click="_onClickCancel">Cancel</button>
+                                                  <a t-att-href="backend_url"  
+                                                    style="margin-right:5px;font-family: inherit;line-height: 1.5;"
+                                                    target="_blank"
+                                                    class="btn btn-success mark-view p-1 oi o_external_button fw-bold" 
+                                                    tabindex="-1" 
+                                                    draggable="false" 
+                                                    aria-label="Internal link" 
+                                                    data-tooltip="Open/Edit Activity in New Window" 
+                                                    title="View/Edit">
+                                                    View/Edit
+                                                  </a>
+                                                  <a t-att-href="origin_url"  
+                                                    style="margin-right:5px;font-family: inherit;line-height: 1.5;"
+                                                    target="_blank"
+                                                    class="btn btn-success mark-origin p-1 oi o_external_button fw-bold" 
+                                                    tabindex="-1" 
+                                                    draggable="false" 
+                                                    aria-label="Internal link" 
+                                                    data-tooltip="Open Origin in New Window" 
+                                                    title="Origin">
+                                                    Origin
+                                                  </a>
+                                                </t>
+                                                <t t-elif="value[6] == 'cancel'">
+                                                  <a t-att-href="backend_url"
+                                                    style="margin-right:5px;font-family: inherit;line-height: 1.5;"  
+                                                    target="_blank"
+                                                    class="btn btn-success mark-view p-1 oi o_external_button fw-bold" 
+                                                    tabindex="-1" 
+                                                    draggable="false" 
+                                                    aria-label="Internal link" 
+                                                    data-tooltip="Open/Edit Activity in New Window" 
+                                                    title="View/Edit">
+                                                    View/Edit
+                                                  </a>
+                                                  <button style="margin-right:5px;cursor: pointer;" class="btn btn-success mark-unarchive" t-on-click="_onClickUnarchive">Unarchive</button>
+                                                  <a t-att-href="origin_url"  
+                                                    style="margin-right:5px;font-family: inherit;line-height: 1.5;"
+                                                    target="_blank"
+                                                    class="btn btn-success mark-origin p-1 oi o_external_button fw-bold" 
+                                                    tabindex="-1" 
+                                                    draggable="false" 
+                                                    aria-label="Internal link" 
+                                                    data-tooltip="Open Origin in New Window" 
+                                                    title="Origin">
+                                                    Origin
+                                                  </a>
+                                                </t>
+                                                <t t-elif="value[6] == 'done'">
+                                                  <a t-att-href="backend_url"  
+                                                    style="margin-right:5px;font-family: inherit;line-height: 1.5;"  
+                                                    target="_blank"
+                                                    class="btn btn-success mark-view p-1 oi o_external_button fw-bold" 
+                                                    tabindex="-1" 
+                                                    draggable="false" 
+                                                    aria-label="Internal link" 
+                                                    data-tooltip="Open/Edit Activity in New Window" 
+                                                    title="View/Edit">
+                                                    View/Edit
+                                                  </a>
+                                                  <a t-att-href="origin_url"  
+                                                    style="margin-right:5px;font-family: inherit;line-height: 1.5;"
+                                                    target="_blank"
+                                                    class="btn btn-success mark-origin p-1 oi o_external_button fw-bold" 
+                                                    tabindex="-1" 
+                                                    draggable="false" 
+                                                    aria-label="Internal link" 
+                                                    data-tooltip="Open Origin in New Window" 
+                                                    title="Origin">
+                                                    Origin
+                                                  </a>
+                                                </t>
+                                            </td>
+                                            
+                                          </tr>
+                                        </t>
+                                      </t>
+                                      <t t-else="">
+                                        <tr>
+                                          <td colspan="6">
+                                            No Any Data Available
+                                          </td>
+                                        </tr>
+                                      </t>
+                                      
+                                    </tbody>
+                                  </table> 
+                                  </div>
+                            </div>
+                        </div>
+                            
+      </div>
+             
+        </t>
+        
+    </t>
+</templates>

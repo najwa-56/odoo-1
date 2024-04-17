@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <record id="sh_action_activity_dashboard" model="ir.actions.client">
+        <field name="name">Activity Dashboard</field>
+        <field name="tag">action_activity_dashboard</field>
+        <field name="params">{'state': {}}</field>
+    </record>
+    <menuitem id="sh_menu_activity_dashboard" name="Dashboard" action="sh_action_activity_dashboard" parent="sh_activity_dashboard" sequence="1" />   
+</odoo>

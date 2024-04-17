@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+	<data>
+		<record id="sh_activity_config_view" model="ir.ui.view">
+			<field name="name">res.config.settings</field>
+			<field name="model">res.config.settings</field>
+			<field name="inherit_id" ref="sh_activity_base.sh_res_config_settings_mail_activity_form_inherit" />
+			<field name="arch" type="xml">
+				<xpath expr="//app[@name='sh_activity_base']" position="inside">                
+					<block title="Multi Users in Activity Configuration">
+						<setting>                        
+							<field name="sh_display_multi_user" />                    								                                                                                        
+						</setting>                    
+					</block>
+					<!-- <block title="Dashboard Configuration">
+						<setting>                        
+							<field name="sh_planned_table" />                    								                                                                                        
+						</setting>
+						<setting>
+							<field name="sh_all_table"></field>
+						</setting>                    
+					</block>
+					<block>
+						<setting>                        
+							<field name="sh_completed_table" />                    								                                                                                        
+						</setting>
+						<setting>
+							<field name="sh_due_table"></field>
+						</setting>    
+					</block>
+					<block>
+						<setting>
+							<field name="sh_cancel_table"></field>
+						</setting>
+						<setting>
+							<button name="action_update_activity_data" type="object" string="Update Old Activity Data" class="btn btn-primary"/>
+						</setting>
+					</block> -->
+				    <block title="Display Dashboard Counter and Data Table Configuration">
+						<setting>                        
+							<field name="sh_display_all_activities_counter" />              								                                                                                        
+						</setting>   
+						<setting>
+							<field name="sh_display_all_activities_table" />
+						</setting>                 
+					</block>  
+					<block>
+						<setting>
+							<field name="sh_display_planned_activities_counter"></field>
+						</setting>
+						<setting>
+							<field name="sh_display_planned_activities_table"></field>
+						</setting>
+					</block>  
+					<block>
+						<setting>
+							<field name="sh_display_completed_activities_counter"></field>							
+						</setting>
+						<setting>
+							<field name="sh_display_completed_activities_table"></field>							
+						</setting>
+					</block>
+					<block>
+						<setting>
+							<field name="sh_display_overdue_activities_counter"></field>							
+						</setting>
+						<setting>
+							<field name="sh_display_overdue_activities_table"></field>							
+						</setting>
+					</block>   
+					<block>
+						<setting>
+							<field name="sh_display_cancelled_activities_counter"></field>							
+						</setting>
+						<setting>
+							<field name="sh_display_cancelled_activities_table"></field>							
+						</setting>
+					</block>  
+					<block title="Activity Reminder Configuration">
+						<setting>                        
+							<field name="sh_display_activity_reminder" />                								                                                                                        
+						</setting>  
+						<setting>
+							<button name="%(sh_activities_management.sh_activity_alarm_action)d" icon="fa-arrow-right" type="action" string="Configure Activity Alarm" class="btn-link"/>
+						</setting>                  
+					</block>    
+					<block title="Activity Document Model Configuration">
+						<setting>                        
+							<field name="sh_document_model" />                								                                                                                        
+						</setting>  
+						<setting invisible="sh_document_model == False">
+							<field name="sh_document_model_ids" class="oe_inline" widget="many2many_tags" required="sh_document_model == True"/>
+						</setting>                  
+					</block>                          
+				</xpath>
+			</field>
+		</record>
+		<menuitem id="menu_config_activity" name="Settings" parent="sh_activities_management.menu_config" sequence="3" action="sh_activity_base.activity_config_settings_action" groups="base.group_system,sh_activities_management.group_activity_manager" />
+	</data>
+</odoo>

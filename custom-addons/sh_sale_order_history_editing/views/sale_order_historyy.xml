@@ -1,0 +1,151 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<odoo>
+ <!--show field to enter the number of quantity aljard inhert from order_line-->
+    <record model="ir.ui.view" id="sale_order_view_inherit">
+    <field name="name">sale.order.view.inherit1</field>
+    <field name="model">sale.order</field>
+    <field name="inherit_id" ref="sale.view_order_form"/>
+    <field name="arch" type="xml">
+        <xpath expr="/form/sheet/notebook/page/field[@name='order_line']/tree/field[@name='name']" position="after">
+            <field name="aljard"/>
+
+        </xpath>
+        <!--  <xpath expr="/form/sheet/notebook/page/field[@name='order_line']/tree/field[@name='name']" position="after">
+            <field name="alsarf"/>
+        </xpath>
+        <xpath expr="/form/sheet/notebook/page/field[@name='order_line']/tree/field[@name='name']" position="after">
+            <field name="multiplied_field"/>
+        </xpath>
+        <xpath expr="//group[@name='sale_total']" position="inside">
+                <field name="total_multiplied_field"/>
+            </xpath>-->
+         <!--To hide kanban view from phone and make just tree view-->
+         <xpath expr="/form/sheet/notebook/page/field[@name='order_line']"  position="attributes">
+          <attribute name="mode">tree</attribute>
+        </xpath>
+
+    </field>
+</record>
+
+ <!--show field total_multiplied_field_sale_order in account move form -->
+<!--
+    <record id="view_account_move_line_form_inherit" model="ir.ui.view">
+    <field name="name">account.move.line.form.inherit</field>
+    <field name="model">account.move</field>
+    <field name="inherit_id" ref="account.view_move_form"/>
+    <field name="arch" type="xml">
+
+        <xpath expr="//group[@col='12' and @class='oe_invoice_lines_tab']/group[@colspan='4']" position="inside">
+            <group class="oe_subtotal_footer oe_right">
+                  attrs="{'invisible': ['|', ('move_type', 'not in', ('out_invoice', 'out_refund', 'in_invoice', 'in_refund', 'out_receipt', 'in_receipt')),
+                                              ('payment_state' ,'=', 'invoicing_legacy')]}"-->
+<!--
+            <field name="sale_order_id" widget="many2one" options="{'no_create_edit': True}" domain="[('state','=','sale')]" context="{'default_state': 'sale'}" invisible="1"/>
+            <field name="total_multiplied_field_sale_order"/>
+            </group>
+        </xpath>
+
+        <xpath expr="//group/group[@id='header_left_group']/field[@name='partner_id']" position="after">
+             <group>
+                <field name="sum_total_balance" widget="monetary" options="{'currency_field': 'currency_id'}"/>
+
+             </group>
+        </xpath>
+
+    </field>
+</record>
+        -->
+
+
+
+     <!---->
+
+
+
+
+
+         <!-- step2 window action -->
+
+        <record id="sale_order_history_report_action" model="ir.actions.act_window">
+        <field name="name">تقارير الجرد</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">sale.order.history</field>
+        <field name="view_mode">tree,form</field>
+        <field name="context">{}</field>
+        </record>
+
+
+        <!-- step 1 menu-->
+      <menuitem id="sale_order_history_report"
+                    name=" تقارير الجرد"
+                    action="sale_order_history_report_action"
+                    sequence="1"/>
+
+       <!-- step3 tree -->
+        <record id="sh_sale_order_historyy_tree" model="ir.ui.view">
+        <field name="name">sale.order.history.tree</field>
+        <field name="model">sale.order.history</field>
+        <field name="arch" type="xml">
+
+            <tree sample="1"
+                decoration-info="invoice_status == 'to invoice'"
+                decoration-muted="status == 'cancel'" >
+                            <field name="partner_id" string="العميل" optional="show" />
+                            <field name="order_id" string="رقم الفاتورة" optional="show" />
+                            <field name="date_order" string="التاريخ" optional="show" />
+                            <field name="name" invisible="1" />
+                            <field name="product_id" string="المنتج" optional="show" />
+                            <field name="product_uom_qty" string="الكمية" optional="show" decoration-success="product_uom_qty &gt;=0"/>
+                            <field name="product_uom" string="الوحدة" optional="show" />
+                            <field name="product_uom_qtyy" string="الجرد" optional="show" decoration-warning="product_uom_qtyy &gt;=0"/>
+                           <field name="alsarf" string="الصرف" optional="show" decoration-danger="alsarf &lt;0" />
+                           <field name="invoice_status"
+                            decoration-success="invoice_status == 'invoiced'"
+                            decoration-info="invoice_status == 'to invoice'"
+                            decoration-warning="invoice_status == 'upselling'"
+                            widget="badge" optional="show"/>
+                            <field name="status" optional="show"/>
+                        </tree>
+        </field>
+    </record>
+
+
+
+
+        <!-- step4 search 1-by field 2-group by -->
+        <record id="sh_sale_order_historyy_search" model="ir.ui.view">
+        <field name="name">sale.order.history.search</field>
+        <field name="model">sale.order.history</field>
+        <field name="arch" type="xml">
+
+
+            <search>
+                 <!-- search by field -->
+                            <field name="partner_id" string="partner_id"/>
+                            <field name="so_id" string="Sale Order"/>
+                            <field name="date_order" string="Order Date"/>
+                            <field name="product_id" string="product" />
+                            <field name="product_uom_qty" string="product qty"/>
+                            <field name="product_uom" string="Unit"/>
+                            <field name="product_uom_qtyy" string="الجرد" />
+                            <field name="alsarf" string="الصرف"/>
+                 <!-- search by group by -->
+                <group expand="0" string="Group by">
+                   <filter string="partner_id" name="partner_id_group" context="{'group_by':'partner_id'}"/>
+                    <filter string="Sale Order" name="so_id_group" context="{'group_by':'so_id'}"/>
+                    <filter string="Order Date" name="date_order" context="{'group_by':'date_order'}"/>
+                    <filter string="product" name="product_id" context="{'group_by':'product_id'}"/>
+                    <filter string="product qty" name="product_uom_qty" context="{'group_by':'product_uom_qty'}"/>
+                    <filter string="Unit" name="product_uom" context="{'group_by':'product_uom'}"/>
+                    <filter string="الجرد" name="product_uom_qtyy" context="{'group_by':'product_uom_qtyy'}"/>
+                    <filter string="الصرف" name="alsarf" context="{'group_by':'alsarf'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+
+
+
+</odoo>

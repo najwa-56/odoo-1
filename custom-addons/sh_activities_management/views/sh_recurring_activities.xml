@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="sh_recurring_activities_view_form" model="ir.ui.view">
+        <field name="name">Recurring Activities</field>
+        <field name="model">sh.recurring.activities</field>
+        <field name="arch" type="xml">
+            <form string="">
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="reference" />                        
+                        </group>
+                        <group>
+                            <field name="activity_id" required="1"/>
+                            <field name="user_id" required="1"/>                                                        
+                        </group>                        
+                    </group>
+                    <group>
+                        <field name="summary" />
+                        <field name="description" />
+                    </group>
+                    <notebook>
+                        <page name="recurrent" string="Repetation">
+                            <group>
+                                <group>
+                                    <label for="interval"/>
+                                    <div class="o_row">
+                                        <field name="interval" required="1"/>
+                                        <field name="rrule_type" required="1"/>
+                                    </div>
+                                    <label string="Until" for="end_type"/>
+                                    <div class="o_row">
+                                        <field name="end_type" required="1"/>
+                                        <field name="count" invisible="end_type != 'count'" required="end_type == 'count'" />
+                                        <field name="until" invisible="end_type != 'end_date'" required="end_type == 'end_date'"/>
+                                    </div>
+                                </group>
+                                <group>
+                                    
+                                    <field name="mo" invisible="rrule_type !='weekly'" />
+                                    <field name="tu" invisible="rrule_type !='weekly'" />
+                                    <field name="we" invisible="rrule_type !='weekly'" />
+                                    <field name="th" invisible="rrule_type !='weekly'" />
+                                    <field name="fr" invisible="rrule_type !='weekly'" />
+                                    <field name="sa" invisible="rrule_type !='weekly'" />                                    
+                                    <field name="su" invisible="rrule_type !='weekly'" />
+                                    <label string="Day of Month" for="month_by" invisible="rrule_type !='weekly'" />                                   
+                                        <field name="month_by" invisible="rrule_type !='monthly'" required="rrule_type == 'monthly'"/>
+                                        <field name="day" invisible="rrule_type !='monthly' or month_by != 'date'" required="rrule_type == 'monthly' and month_by == 'date'" />
+                                        <field name="byday" string="The" invisible="rrule_type !='monthly' or month_by != 'day'" required="rrule_type == 'monthly' and month_by == 'day'"/>
+                                        <field name="weekday" invisible="rrule_type !='monthly' or month_by != 'day'" required="rrule_type == 'monthly' and month_by == 'day'" />                                    
+                                    <label string="Month of Year" for="month_year" invisible="rrule_type !='yearly'" />
+                                    <div class="o_row" invisible="rrule_type !='yearly'">
+                                        <field name="month_year" invisible="rrule_type !='yearly'" required="rrule_type == 'yearly'"/>
+                                        <field name="day" invisible="rrule_type !='yearly'" required="month_year != False and rrule_type == 'yearly'"/>
+                                        Day
+                                    </div>                                                      
+                                </group>
+                            </group>                          
+                        </page>
+                    </notebook>                 
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="sh_recurring_activities_view_tree" model="ir.ui.view">
+        <field name="name">Recurring Activities</field>
+        <field name="model">sh.recurring.activities</field>
+        <field name="arch" type="xml">
+            <tree>
+                <field name="reference" />
+            </tree>
+        </field>
+    </record>
+
+    <record id="sh_recurring_activities_action" model="ir.actions.act_window">
+        <field name="name">Recurring Activities</field>
+        <field name="res_model">sh.recurring.activities</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+
+</odoo>

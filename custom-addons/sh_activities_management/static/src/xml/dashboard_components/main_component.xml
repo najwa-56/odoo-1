@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+    <t t-name="activity_main_dashboard.dashboard">
+        
+        <section id="dashboard_header_filter" class="counter-area" style="min-width: 100% !important; width: 100% !important;overflow: auto;height: 100%;">
+            <div class="container">
+                <div class="o_control_panel d-flex flex-column gap-3 gap-lg-1 px-3 pt-2 pb-3" data-command-category="actions">
+					<div class="o_control_panel_main d-flex row">
+						<div class="o_control_panel_breadcrumbs d-flex align-items-center gap-1 order-0 h-lg-100 col-lg-3">
+							<div class="o_breadcrumb d-flex gap-1 text-truncate">
+								<div class="o_last_breadcrumb_item active d-flex fs-4 min-w-0 align-items-center" style="font-size: 1.875rem !important;">
+									<strong class="min-w-0 text-truncate">Activity Dashboard</strong>
+								</div>
+								<div class="o_control_panel_breadcrumbs_actions d-inline-flex"></div>
+							</div>
+							<span class="d-none d-xl-block me-auto"></span>
+						</div>
+						<div class="o_control_panel_actions" style='width:auto;'>
+							<div class="o-filter-value d-flex align-items-start w-100" t-if="is_system_user">
+								<div class="w-100 border-success rounded">
+									<Many2XAutocomplete t-props="many2XAutocompletePropsModel" />
+								</div>
+							</div>
+							<div class="o-filter-value d-flex align-items-start w-100" t-if="is_activity_supervisor">
+								<div class="w-100 border-success rounded">
+									<Many2XAutocomplete t-props="many2XAutocompletePropsUser" />
+								</div>
+							</div>
+							<div class="o-filter-value d-flex align-items-start w-100" t-if="is_activity_manager">
+								<div class="w-100 border-success rounded">
+									<Many2XAutocomplete t-props="many2XAutocompletePropsSuperUser" />
+								</div>
+							</div>
+							<div class="o-filter-value d-flex align-items-start w-100">
+								<div class="w-100 border-success rounded">
+									<Many2XAutocomplete t-props="many2XAutocompletePropsActivityType" />
+								</div>
+							</div>
+							<div class="o-filter-value d-flex align-items-start w-auto">
+								<div class="w-100">
+									<select class="data_filter_values_date o_input me-3" required="true" t-on-click="_onchangefilter">
+										<option value="all" selected="True">Select Date</option>
+										<option value="today">Today</option>
+										<option value="yesterday">Yesterday</option>
+										<option value="weekly">Current Week</option>
+										<option value="prev_week">Previous Week</option>
+										<option value="monthly">Current Month</option>
+										<option value="prev_month">Previous Month</option>
+										<option value="cur_year">Current Year</option>
+										<option value="prev_year">Previous Year</option>
+										<option value="custom">Custom</option>
+									</select>
+								</div>
+							</div>
+						</div>
+						<div class='d-flex' style='width: 20%;' t-if="state.date_options_value == 'custom'">
+							<DateTimeInput type="'date'" placeholder="'Start Date'" onChange="(date) => this.UpdateStartDates(date)"/>
+							<DateTimeInput type="'date'" placeholder="'End Date'" onChange="(date) => this.UpdateEndDates(date)"/>
+						</div>
+					</div>
+				</div>
+
+            <section id="dashboard_counter" class="counter-area" style="min-width: 100% !important; width: 100% !important;">
+                <!-- <ActivityCardsDashboardView /> -->
+                <ActivityCardsDashboardView/>
+                <hr/>	
+                <ActivityTableDashboardView/>			
+            </section>
+            </div>
+            </section>
+        </t>
+    </templates>

@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<templates>
+    <t t-name="sh_activities_management.RKTable" owl="1">
+        <div
+            t-on-dragover.prevent="()=>{}"
+            t-on-dragleave="props.hideZone"
+            t-on-drop.prevent="onDrop">
+            <!-- <i class="fa fa-upload fa-10x"></i> -->
+            <h1>
+                HELLO WORLD
+                <t t-esc="props.stage"/>
+
+                111
+                <t t-esc="state.activitytype"/>
+                222
+            </h1>
+        </div>
+    </t>
+
+    </templates>
