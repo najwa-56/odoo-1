@@ -5,6 +5,7 @@ from freezegun import freeze_time
 from dateutil.relativedelta import relativedelta
 
 from odoo import Command
+from odoo.exceptions import UserError
 from odoo.tests import tagged
 
 from odoo.addons.hr_holidays.tests.common import TestHrHolidaysCommon
@@ -40,6 +41,29 @@ class TestAccrualAllocations(TestHrHolidaysCommon):
                        SET create_date = '%s'
                        WHERE id = %s
                        """ % (date, allocation_id))
+
+    def test_consistency_between_cap_accrued_time_and_maximum_leave(self):
+        accrual_plan = self.env['hr.leave.accrual.plan'].with_context(tracking_disable=True).create({
+            'name': 'Accrual Plan For Test',
+            'level_ids': [(0, 0, {
+                'start_count': 1,
+                'start_type': 'day',
+                'added_value': 1,
+                'added_value_type': 'day',
+                'frequency': 'hourly',
+                'cap_accrued_time': True,
+                'maximum_leave': 10000
+            })],
+        })
+        level = accrual_plan.level_ids
+        level.maximum_leave = 10
+        self.assertEqual(accrual_plan.level_ids.maximum_leave, 10)
+
+        with self.assertRaises(UserError):
+            level.maximum_leave = 0
+
+        level.cap_accrued_time = False
+        self.assertEqual(accrual_plan.level_ids.maximum_leave, 0)
 
     def test_frequency_hourly_calendar(self):
         with freeze_time("2017-12-5"):
@@ -1542,3 +1566,82 @@ class TestAccrualAllocations(TestHrHolidaysCommon):
             accrual_allocation._update_accrual()
             self.assertEqual(accrual_allocation.number_of_days, 31.0,
                 "the amount shouldn't have changed after running the cron")
+
+    def test_accrual_creation_for_history(self):
+        accrual_plan = self.env['hr.leave.accrual.plan'].with_context(tracking_disable=True).create({
+            'name': 'Monthly accrual',
+            'carryover_date': 'year_start',
+            'accrued_gain_time': 'end',
+            'level_ids': [(0, 0, {
+                'added_value_type': 'day',
+                'start_count': 0,
+                'start_type': 'day',
+                'added_value': 1,
+                'frequency': 'monthly',
+                'first_day_display': 'last',
+                'cap_accrued_time': False,
+                'action_with_unused_accruals': 'lost',
+            })],
+        })
+        with freeze_time('2024-03-02'):
+            accrual_allocation = self.env['hr.leave.allocation'].new({
+                'name': 'History allocation',
+                'holiday_status_id': self.leave_type.id,
+                'date_from': '2024-03-01',
+                'employee_id': self.employee_emp.id,
+                'allocation_type': 'accrual',
+                'accrual_plan_id': accrual_plan.id,
+            })
+            # As the duration is set to an onchange, we need to force that onchange to run
+            accrual_allocation._onchange_date_from()
+            self.assertAlmostEqual(accrual_allocation.number_of_days, 0, places=0)
+
+            # Yearly Report lost
+            accrual_allocation.write({'date_from': '2022-01-01'})
+            accrual_allocation._onchange_date_from()
+            self.assertAlmostEqual(accrual_allocation.number_of_days, 2, places=0)
+
+            # Update date_to
+            accrual_allocation.write({'date_to': '2022-12-31'})
+            accrual_allocation._onchange_date_from()
+            self.assertAlmostEqual(accrual_allocation.number_of_days, 12, places=0)
+
+    def test_accrual_with_report_creation_for_history(self):
+        accrual_plan = self.env['hr.leave.accrual.plan'].with_context(tracking_disable=True).create({
+            'name': 'Monthly accrual',
+            'carryover_date': 'year_start',
+            'accrued_gain_time': 'end',
+            'level_ids': [(0, 0, {
+                'added_value_type': 'day',
+                'start_count': 0,
+                'start_type': 'day',
+                'added_value': 1,
+                'frequency': 'monthly',
+                'first_day_display': 'last',
+                'cap_accrued_time': False,
+                'action_with_unused_accruals': 'maximum',
+                'postpone_max_days': 5
+            })],
+        })
+        with freeze_time('2024-03-02'):
+            accrual_allocation = self.env['hr.leave.allocation'].new({
+                'name': 'History allocation',
+                'holiday_status_id': self.leave_type.id,
+                'date_from': '2024-03-01',
+                'employee_id': self.employee_emp.id,
+                'allocation_type': 'accrual',
+                'accrual_plan_id': accrual_plan.id,
+            })
+            # As the duration is set to an onchange, we need to force that onchange to run
+            accrual_allocation._onchange_date_from()
+            self.assertAlmostEqual(accrual_allocation.number_of_days, 0, places=0)
+
+            # Yearly Report capped to 5 after 2022 and after 2023
+            accrual_allocation.write({'date_from': '2022-01-01'})
+            accrual_allocation._onchange_date_from()
+            self.assertAlmostEqual(accrual_allocation.number_of_days, 7, places=0)
+
+            # Update date_to
+            accrual_allocation.write({'date_to': '2022-12-31'})
+            accrual_allocation._onchange_date_from()
+            self.assertAlmostEqual(accrual_allocation.number_of_days, 12, places=0)

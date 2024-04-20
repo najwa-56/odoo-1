@@ -7507,7 +7507,7 @@ msgstr ""
 "Het voegt ook blacklist-beheer toe aan de telefoon via een specifiek modelopslag\n"
 "telefoonnummers op de blacklist.\n"
 "\n"
-"Het voegt mail.thread.phone mixin toe die de sanitaire voorzieningen en blacklist van . afhandelt\n"
+"Het voegt een mail.thread.phone-mix toe die het opschonen en de zwarte lijst afhandelt\n"
 "neemt nummers op. "
 
 #. module: base
@@ -12337,7 +12337,7 @@ msgid ""
 "'many2many'\">to</span>"
 msgstr ""
 "<span invisible=\"evaluation_type != 'value' or update_field_type == "
-"'many2many'\">om</span>"
+"'many2many'\">naar</span>"
 
 #. module: base
 #: model_terms:ir.ui.view,arch_db:base.reset_view_arch_wizard_view
@@ -20483,7 +20483,7 @@ msgstr "Buitendienst - Verkoop Abonnement"
 #. module: base
 #: model:ir.module.module,shortdesc:base.module_industry_fsm_report
 msgid "Field Service Reports"
-msgstr "Field Service Rapport"
+msgstr "Buitendienstrapportage"
 
 #. module: base
 #: model:ir.module.module,shortdesc:base.module_industry_fsm_sale_report
@@ -31742,7 +31742,7 @@ msgstr "Roemeense SAF-T-export"
 #. module: base
 #: model:ir.module.category,name:base.module_category_services_room
 msgid "Room"
-msgstr "Kamer"
+msgstr "Ruimte"
 
 #. module: base
 #: model:ir.model.fields,field_description:base.field_res_company__root_id
@@ -32386,6 +32386,12 @@ msgstr "Geplande acties"
 #: model:ir.ui.menu,name:base.ir_cron_trigger_menu
 msgid "Scheduled Actions Triggers"
 msgstr "Geplande acties Triggers"
+
+#. module: base
+#: code:addons/base/models/ir_cron.py:0
+#, python-format
+msgid "Scheduled action disabled"
+msgstr "Geplande actie uitgeschakeld"
 
 #. module: base
 #: model:ir.model.fields,field_description:base.field_ir_cron__user_id
@@ -36051,6 +36057,16 @@ msgid "Those modules cannot be uninstalled: %s"
 msgstr "Deze modules kunnen niet worden verwijderd: %s"
 
 #. module: base
+#: code:addons/base/models/ir_cron.py:0
+#, python-format
+msgid ""
+"This scheduled action has been disabled because its interval number is not a"
+" strictly positive value."
+msgstr ""
+"Deze geplande actie is uitgeschakeld omdat het intervalnummer geen strikt "
+"positieve waarde is."
+
+#. module: base
 #: model:ir.model.fields,field_description:base.field_res_lang__thousands_sep
 msgid "Thousands Separator"
 msgstr "Duizend scheidingsteken"
@@ -38616,6 +38632,18 @@ msgstr ""
 #, python-format
 msgid "You cannot delete the %s record."
 msgstr "Je kan het record %s niet verwijderen."
+
+#. module: base
+#. odoo-python
+#: code:addons/base/models/res_users.py:0
+#, python-format
+msgid ""
+"You cannot delete the admin user because it is utilized in various places "
+"(such as security configurations,...). Instead, archive it."
+msgstr ""
+"Je kunt de admin-gebruiker niet verwijderen omdat deze op verschillende "
+"plaatsen wordt gebruikt (zoals in beveiligingsconfiguraties,...). Archiveer "
+"het in plaats daarvan."
 
 #. module: base
 #. odoo-python

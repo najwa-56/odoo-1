@@ -92,8 +92,9 @@ class AccountJournal(models.Model):
     default_account_id = fields.Many2one(
         comodel_name='account.account', check_company=True, copy=False, ondelete='restrict',
         string='Default Account',
-        domain="[('deprecated', '=', False),"
-               "'|', ('account_type', '=', default_account_type), ('account_type', 'not in', ('asset_receivable', 'liability_payable'))]")
+        domain="[('deprecated', '=', False), ('account_type', '=like', default_account_type)]",
+    )
+
     suspense_account_id = fields.Many2one(
         comodel_name='account.account', check_company=True, ondelete='restrict', readonly=False, store=True,
         compute='_compute_suspense_account_id',
@@ -300,15 +301,12 @@ class AccountJournal(models.Model):
         default_account_id_types = {
             'bank': 'asset_cash',
             'cash': 'asset_cash',
-            'sale': 'income',
-            'purchase': 'expense'
+            'sale': 'income%',
+            'purchase': 'expense%',
         }
 
         for journal in self:
-            if journal.type in default_account_id_types:
-                journal.default_account_type = default_account_id_types[journal.type]
-            else:
-                journal.default_account_type = False
+            journal.default_account_type = default_account_id_types.get(journal.type, '%')
 
     @api.depends('type', 'currency_id')
     def _compute_inbound_payment_method_line_ids(self):
@@ -544,14 +542,14 @@ class AccountJournal(models.Model):
                     if bank_account.partner_id != company.partner_id:
                         raise UserError(_("The partners of the journal's company and the related bank account mismatch."))
             if 'restrict_mode_hash_table' in vals and not vals.get('restrict_mode_hash_table'):
-                journal_entry = self.env['account.move'].sudo().search([('journal_id', '=', self.id), ('state', '=', 'posted'), ('secure_sequence_number', '!=', 0)], limit=1)
+                journal_entry = self.env['account.move'].sudo().search([('journal_id', '=', journal.id), ('state', '=', 'posted'), ('secure_sequence_number', '!=', 0)], limit=1)
                 if journal_entry:
                     field_string = self._fields['restrict_mode_hash_table'].get_description(self.env)['string']
                     raise UserError(_("You cannot modify the field %s of a journal that already has accounting entries.", field_string))
         result = super(AccountJournal, self).write(vals)
 
         # Ensure alias coherency when changing type
-        if 'type' in vals:
+        if 'type' in vals and not self._context.get('account_journal_skip_alias_sync'):
             for journal in self:
                 alias_vals = journal._alias_get_creation_values()
                 alias_vals = {
@@ -670,7 +668,15 @@ class AccountJournal(models.Model):
             if not has_liquidity_accounts:
                 default_account_code = self.env['account.account']._search_new_account_code(company, digits, liquidity_account_prefix)
                 default_account_vals = self._prepare_liquidity_account_vals(company, default_account_code, vals)
-                vals['default_account_id'] = self.env['account.account'].create(default_account_vals).id
+                default_account = self.env['account.account'].create(default_account_vals)
+                self.env['ir.model.data']._update_xmlids([
+                    {
+                        'xml_id': f"account.{str(company.id)}_{journal_type}_journal_default_account_{default_account.id}",
+                        'record': default_account,
+                        'noupdate': True,
+                    }
+                ])
+                vals['default_account_id'] = default_account.id
             if journal_type in ('cash', 'bank') and not has_profit_account:
                 vals['profit_account_id'] = company.default_cash_difference_income_account_id.id
             if journal_type in ('cash', 'bank') and not has_loss_account:
@@ -705,6 +711,10 @@ class AccountJournal(models.Model):
             # Create the bank_account_id if necessary
             if journal.type == 'bank' and not journal.bank_account_id and vals.get('bank_acc_number'):
                 journal.set_bank_account(vals.get('bank_acc_number'), vals.get('bank_id'))
+
+            # Create the secure_sequence_id if necessary
+            if journal.restrict_mode_hash_table and not journal.secure_sequence_id:
+                journal._create_secure_sequence(['secure_sequence_id'])
 
         return journals
 

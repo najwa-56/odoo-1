@@ -7,7 +7,7 @@
 # Hamid Ahmadimoghaddam, 2023
 # Mostafa Barmshory <mostafa.barmshory@gmail.com>, 2023
 # mohammad rahmani <mohammadrahmani2o0@gmail.com>, 2023
-# fardin mardani, 2023
+# fardin mardani <fmardani0@gmail.com>, 2023
 # Hamid Reza Kaveh <hamidrkp@riseup.net>, 2023
 # hamid hvbnet <hvbnet@yahoo.com>, 2023
 # Arash Sardari <arashss77@gmail.com>, 2023
@@ -18,11 +18,12 @@
 # Yousef Shadmanesh <y.shadmanesh@gmail.com>, 2023
 # Maziar Niaki <maziarmn@gmail.com>, 2023
 # Faraz Sadri Alamdari <ifarazir@gmail.com>, 2023
-# Hanna Kheradroosta, 2023
 # Mohammad Tahmasebi <hit.tah75@gmail.com>, 2023
 # Martin Trigaux, 2023
-# Hamed Mohammadi <hamed@dehongi.com>, 2023
 # Sahar Daraye <sahar.daraye.1369@gmail.com>, 2024
+# Hamed Mohammadi <hamed@dehongi.com>, 2024
+# Hanna Kheradroosta, 2024
+# pfp pfp <pfpour@yahoo.com>, 2024
 # 
 msgid ""
 msgstr ""
@@ -30,7 +31,7 @@ msgstr ""
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2024-01-29 10:46+0000\n"
 "PO-Revision-Date: 2023-10-26 23:09+0000\n"
-"Last-Translator: Sahar Daraye <sahar.daraye.1369@gmail.com>, 2024\n"
+"Last-Translator: pfp pfp <pfpour@yahoo.com>, 2024\n"
 "Language-Team: Persian (https://app.transifex.com/odoo/teams/41243/fa/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -1050,6 +1051,15 @@ msgstr ""
 #, python-format
 msgid "Add start date"
 msgstr ""
+
+#. module: web
+#. odoo-javascript
+#: code:addons/web/static/src/views/fields/boolean_favorite/boolean_favorite_field.xml:0
+#: code:addons/web/static/src/views/fields/boolean_favorite/boolean_favorite_field.xml:0
+#: code:addons/web/static/src/views/fields/boolean_favorite/boolean_favorite_field.xml:0
+#, python-format
+msgid "Add to Favorites"
+msgstr "افزودن به محبوبها"
 
 #. module: web
 #. odoo-javascript
@@ -3514,7 +3524,7 @@ msgstr ""
 #: code:addons/web/static/src/views/fields/datetime/datetime_field.js:0
 #: code:addons/web/static/src/views/fields/datetime/datetime_field.js:0
 #, python-format
-msgid "ISO-formatted date (e.g. \"2018-12-31\") or \"today\"."
+msgid "ISO-formatted date (e.g. \"2018-12-31\") or \"%s\"."
 msgstr ""
 
 #. module: web
@@ -5005,6 +5015,13 @@ msgstr "حالت فعال نیست، کلیک کنید برای تغییر آن"
 
 #. module: web
 #. odoo-javascript
+#: code:addons/web/static/src/views/fields/many2many_binary/many2many_binary_field.js:0
+#, python-format
+msgid "Number of files"
+msgstr ""
+
+#. module: web
+#. odoo-javascript
 #: code:addons/web/static/src/core/emoji_picker/emoji_data.js:0
 #: code:addons/web/static/src/core/emoji_picker/emoji_data.js:0
 #, python-format
@@ -6010,6 +6027,15 @@ msgstr ""
 #, python-format
 msgid "Remove field"
 msgstr ""
+
+#. module: web
+#. odoo-javascript
+#: code:addons/web/static/src/views/fields/boolean_favorite/boolean_favorite_field.xml:0
+#: code:addons/web/static/src/views/fields/boolean_favorite/boolean_favorite_field.xml:0
+#: code:addons/web/static/src/views/fields/boolean_favorite/boolean_favorite_field.xml:0
+#, python-format
+msgid "Remove from Favorites"
+msgstr "حذف از علایق"
 
 #. module: web
 #. odoo-javascript
@@ -14615,7 +14641,7 @@ msgstr ""
 #: code:addons/web/static/src/core/emoji_picker/emoji_data.js:0
 #, python-format
 msgid "entry"
-msgstr ""
+msgstr "مورد"
 
 #. module: web
 #. odoo-javascript

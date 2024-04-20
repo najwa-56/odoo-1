@@ -334,3 +334,97 @@ registry.category("web_tour.tours").add('PosLoyaltyTour10', {
             PosLoyalty.isRewardButtonHighlighted(false),
         ].flat(),
 });
+
+registry.category("web_tour.tours").add('PosLoyaltyTour11.1', {
+    test: true,
+    url: '/pos/web',
+    steps: () =>
+        [
+            ProductScreen.clickHomeCategory(),
+            ProductScreen.confirmOpeningPopup(),
+
+            ProductScreen.clickPartnerButton(),
+            ProductScreen.clickCustomer('AAA Partner'),
+            PosLoyalty.customerIs('AAA Partner'),
+            ProductScreen.addOrderline('Product Test', '3'),
+            ProductScreen.totalAmountIs('150.00'),
+            PosLoyalty.isRewardButtonHighlighted(false),
+            PosLoyalty.finalizeOrder('Cash', '150'),
+        ].flat(),
+});
+
+registry.category("web_tour.tours").add('PosLoyaltyTour11.2', {
+    test: true,
+    url: '/pos/web',
+    steps: () =>
+        [
+            ProductScreen.clickPartnerButton(),
+            ProductScreen.clickCustomer('AAA Partner'),
+            PosLoyalty.customerIs('AAA Partner'),
+            ProductScreen.clickDisplayedProduct('Product Test'),
+            ProductScreen.totalAmountIs('50.00'),
+            PosLoyalty.isRewardButtonHighlighted(false),
+            PosLoyalty.enterCode('123456'),
+            PosLoyalty.isRewardButtonHighlighted(true),
+            PosLoyalty.clickRewardButton(),
+            SelectionPopup.clickItem('Free Product'),
+            PosLoyalty.hasRewardLine('Free Product', '-1.00'),
+            PosLoyalty.isRewardButtonHighlighted(true),
+            PosLoyalty.clickRewardButton(),
+            SelectionPopup.clickItem('Free Product'),
+            PosLoyalty.hasRewardLine('Free Product', '-2.00'),
+            PosLoyalty.isRewardButtonHighlighted(true),
+            PosLoyalty.clickRewardButton(),
+            SelectionPopup.clickItem('Free Product'),
+            PosLoyalty.hasRewardLine('Free Product', '-3.00'),
+            PosLoyalty.isRewardButtonHighlighted(false),
+            ProductScreen.totalAmountIs('50.00'),
+            PosLoyalty.finalizeOrder('Cash', '50'),
+        ].flat(),
+});
+
+registry.category("web_tour.tours").add('PosLoyaltyTour12', {
+    test: true,
+    url: '/pos/web',
+    steps: () =>
+        [
+            ProductScreen.confirmOpeningPopup(),
+            ProductScreen.clickHomeCategory(),
+            ProductScreen.addOrderline('Free Product A', '2'),
+            ProductScreen.clickDisplayedProduct('Free Product A'),
+            ProductScreen.totalAmountIs('2.00'),
+            PosLoyalty.hasRewardLine('Free Product', '-1.00'),
+            ProductScreen.addOrderline('Free Product B', '2'),
+            ProductScreen.clickDisplayedProduct('Free Product B'),
+            ProductScreen.totalAmountIs('4.00'),
+            PosLoyalty.hasRewardLine('Free Product', '-2.00'),
+            ProductScreen.clickDisplayedProduct('Free Product B'),
+            ProductScreen.clickDisplayedProduct('Free Product B'),
+            ProductScreen.clickDisplayedProduct('Free Product B'),
+            ProductScreen.selectedOrderlineHas("Free Product B", "6.00"),
+            ProductScreen.totalAmountIs('6.00'),
+            PosLoyalty.hasRewardLine('Free Product', '-3.00'),
+        ].flat(),
+});
+
+registry.category("web_tour.tours").add('PosLoyaltyMinAmountAndSpecificProductTour', {
+    test: true,
+    url: '/pos/web',
+    steps: () =>
+        [
+            ProductScreen.clickHomeCategory(),
+            ProductScreen.confirmOpeningPopup(),
+
+            ProductScreen.clickDisplayedProduct('Product A'),
+            ProductScreen.selectedOrderlineHas('Product A', '1.00', '20.00'),
+            PosLoyalty.orderTotalIs('20.00'),
+
+            ProductScreen.clickDisplayedProduct('Product B'),
+            ProductScreen.selectedOrderlineHas('Product B', '1.00', '30.00'),
+            PosLoyalty.orderTotalIs('50.00'),
+
+            ProductScreen.clickDisplayedProduct('Product A'),
+            ProductScreen.selectedOrderlineHas('Product A', '2.00', '40.00'),
+            PosLoyalty.orderTotalIs('66.00'),
+        ].flat(),
+});

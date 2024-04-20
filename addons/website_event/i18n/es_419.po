@@ -3,9 +3,9 @@
 # 	* website_event
 # 
 # Translators:
-# Fernanda Alvarez, 2023
 # Iran Villalobos López, 2023
 # Lucia Pacheco, 2024
+# Fernanda Alvarez, 2024
 # Wil Odoo, 2024
 # Patricia Gutiérrez Capetillo <pagc@odoo.com>, 2024
 # 
@@ -410,6 +410,16 @@ msgid "Cards"
 msgstr "Tarjetas"
 
 #. module: website_event
+#: model_terms:ir.ui.view,arch_db:website_event.snippet_options
+msgid "Card design"
+msgstr "Diseño de la tarjeta"
+
+#. module: website_event
+#: model_terms:ir.ui.view,arch_db:website_event.snippet_options
+msgid "Template badge"
+msgstr "Plantilla del gafete"
+
+#. module: website_event
 #: model_terms:ir.ui.view,arch_db:website_event.display_timer_alert_widget
 #: model_terms:ir.ui.view,arch_db:website_event.index_topbar
 #: model_terms:ir.ui.view,arch_db:website_event.modal_ticket_registration
@@ -629,7 +639,7 @@ msgstr "Respuesta a la pregunta del evento"
 #. module: website_event
 #: model:ir.model,name:website_event.model_event_registration
 msgid "Event Registration"
-msgstr "Registro del evento"
+msgstr "Registro al evento"
 
 #. module: website_event
 #: model:ir.model,name:website_event.model_event_registration_answer
@@ -1247,6 +1257,11 @@ msgstr "Regresar a la lista de eventos"
 #: model:ir.model.fields,field_description:website_event.field_event_event__is_seo_optimized
 msgid "SEO optimized"
 msgstr "Optimizado para SEO"
+
+#. module: website_event
+#: model_terms:ir.ui.view,arch_db:website_event.event_description_full
+msgid "Share"
+msgstr "Compartir"
 
 #. module: website_event
 #: model_terms:ir.ui.view,arch_db:website_event.event_description_full

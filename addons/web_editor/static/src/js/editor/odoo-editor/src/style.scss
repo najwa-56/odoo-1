@@ -283,11 +283,11 @@
         width: 19px;
         height: 19px;
         padding: 0;
-        margin-right: 3px;
+        margin-inline-end: 3px;
         margin-bottom: 3px;
 
         &:last-of-type {
-            margin-right: 0;
+            margin-inline-end: 0;
         }
         &.active {
             background-color: var(--oeTablepicker-color-accent, $o-brand-primary);
@@ -336,6 +336,7 @@
     max-height: 40vh;
     box-sizing: border-box;
     box-shadow: $box-shadow;
+    min-width: max-content;
 
     ::-webkit-scrollbar {
         background: transparent;

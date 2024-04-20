@@ -29147,33 +29147,33 @@ msgstr "Contabilidade"
 #: model:ir.model.fields,field_description:base.field_ir_actions_report__paperformat_id
 #: model:ir.ui.menu,name:base.paper_format_menuitem
 msgid "Paper Format"
-msgstr "Formato de papel"
+msgstr "Formato da folha"
 
 #. module: base
 #: model:ir.model,name:base.model_report_paperformat
 msgid "Paper Format Config"
-msgstr "Config. de formato de papel"
+msgstr "Configuração do formato da folha"
 
 #. module: base
 #: model:ir.actions.act_window,name:base.paper_format_action
 msgid "Paper Format General Configuration"
-msgstr "Configuração geral do formato de papel"
+msgstr "Configuração geral de formato da folha"
 
 #. module: base
 #: model:ir.model.fields,field_description:base.field_res_company__paperformat_id
 msgid "Paper format"
-msgstr "Formato de papel"
+msgstr "Formato da folha"
 
 #. module: base
 #: model_terms:ir.ui.view,arch_db:base.paperformat_view_form
 #: model_terms:ir.ui.view,arch_db:base.paperformat_view_tree
 msgid "Paper format configuration"
-msgstr "Configuração de formato de papel"
+msgstr "Configuração de formato da folha"
 
 #. module: base
 #: model:ir.model.fields,field_description:base.field_report_paperformat__format
 msgid "Paper size"
-msgstr "Tamanho do papel"
+msgstr "Tamanho da folha"
 
 #. module: base
 #: model:res.country,name:base.pg
@@ -32077,6 +32077,12 @@ msgstr "Ações agendadas"
 #: model:ir.ui.menu,name:base.ir_cron_trigger_menu
 msgid "Scheduled Actions Triggers"
 msgstr "Acionadores de ações agendadas"
+
+#. module: base
+#: code:addons/base/models/ir_cron.py:0
+#, python-format
+msgid "Scheduled action disabled"
+msgstr "Ação programada desativada"
 
 #. module: base
 #: model:ir.model.fields,field_description:base.field_ir_cron__user_id
@@ -35731,6 +35737,16 @@ msgid "Those modules cannot be uninstalled: %s"
 msgstr "Esses módulos não podem ser desinstalados: %s"
 
 #. module: base
+#: code:addons/base/models/ir_cron.py:0
+#, python-format
+msgid ""
+"This scheduled action has been disabled because its interval number is not a"
+" strictly positive value."
+msgstr ""
+"Essa ação agendada foi desativada porque seu número de intervalo não é um "
+"valor estritamente positivo."
+
+#. module: base
 #: model:ir.model.fields,field_description:base.field_res_lang__thousands_sep
 msgid "Thousands Separator"
 msgstr "Separador de milhares"
@@ -38297,6 +38313,17 @@ msgstr ""
 #, python-format
 msgid "You cannot delete the %s record."
 msgstr "Você não pode deletar o registro %s."
+
+#. module: base
+#. odoo-python
+#: code:addons/base/models/res_users.py:0
+#, python-format
+msgid ""
+"You cannot delete the admin user because it is utilized in various places "
+"(such as security configurations,...). Instead, archive it."
+msgstr ""
+"Não é possível excluir o usuário admin porque ele é utilizado em vários "
+"lugares (como configurações de segurança etc.) Em vez disso, arquive-o."
 
 #. module: base
 #. odoo-python

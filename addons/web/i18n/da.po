@@ -4,7 +4,6 @@
 # 
 # Translators:
 # Lucas Holm, 2023
-# Ejner Sønniksen <ejner@vkdata.dk>, 2023
 # Morten Schou <ms@msteknik.dk>, 2023
 # Pernille Kristensen <pernillekristensen1994@gmail.com>, 2023
 # Hans Henrik Gabelgaard <hhg@gabelgaard.org>, 2023
@@ -15,6 +14,7 @@
 # Mads Søndergaard, 2023
 # Morten Paaske, 2024
 # lhmflexerp <lhm@flexerp.dk>, 2024
+# Ejner Sønniksen <ejner@vkdata.dk>, 2024
 # Sanne Kristensen <sanne@vkdata.dk>, 2024
 # Martin Trigaux, 2024
 # 
@@ -1052,6 +1052,15 @@ msgstr ""
 #, python-format
 msgid "Add start date"
 msgstr "Tilføj start dato"
+
+#. module: web
+#. odoo-javascript
+#: code:addons/web/static/src/views/fields/boolean_favorite/boolean_favorite_field.xml:0
+#: code:addons/web/static/src/views/fields/boolean_favorite/boolean_favorite_field.xml:0
+#: code:addons/web/static/src/views/fields/boolean_favorite/boolean_favorite_field.xml:0
+#, python-format
+msgid "Add to Favorites"
+msgstr "Føj til favoritter"
 
 #. module: web
 #. odoo-javascript
@@ -3546,7 +3555,7 @@ msgstr "ILY"
 #: code:addons/web/static/src/views/fields/datetime/datetime_field.js:0
 #: code:addons/web/static/src/views/fields/datetime/datetime_field.js:0
 #, python-format
-msgid "ISO-formatted date (e.g. \"2018-12-31\") or \"today\"."
+msgid "ISO-formatted date (e.g. \"2018-12-31\") or \"%s\"."
 msgstr ""
 
 #. module: web
@@ -5049,6 +5058,13 @@ msgstr "Ikke aktiv tilstand, klik for at ændre"
 
 #. module: web
 #. odoo-javascript
+#: code:addons/web/static/src/views/fields/many2many_binary/many2many_binary_field.js:0
+#, python-format
+msgid "Number of files"
+msgstr ""
+
+#. module: web
+#. odoo-javascript
 #: code:addons/web/static/src/core/emoji_picker/emoji_data.js:0
 #: code:addons/web/static/src/core/emoji_picker/emoji_data.js:0
 #, python-format
@@ -5465,6 +5481,8 @@ msgstr "Adgangskode"
 #: model_terms:ir.ui.view,arch_db:web.report_invoice_wizard_preview
 msgid "Payment Communication: <b><span>INV/2023/00003</span></b>"
 msgstr ""
+"Anvend venligst følgende oplysninger ved betaling: "
+"<b><span>INV/2023/00003</span></b>"
 
 #. module: web
 #. odoo-javascript
@@ -5777,7 +5795,7 @@ msgstr "Statuslinje"
 #: code:addons/web/static/src/views/view_components/column_progress.xml:0
 #, python-format
 msgid "Progress bar"
-msgstr ""
+msgstr "Statuslinje"
 
 #. module: web
 #. odoo-javascript
@@ -6059,6 +6077,15 @@ msgstr ""
 #, python-format
 msgid "Remove field"
 msgstr "Fjern felt"
+
+#. module: web
+#. odoo-javascript
+#: code:addons/web/static/src/views/fields/boolean_favorite/boolean_favorite_field.xml:0
+#: code:addons/web/static/src/views/fields/boolean_favorite/boolean_favorite_field.xml:0
+#: code:addons/web/static/src/views/fields/boolean_favorite/boolean_favorite_field.xml:0
+#, python-format
+msgid "Remove from Favorites"
+msgstr "Fjern fra favoritter"
 
 #. module: web
 #. odoo-javascript

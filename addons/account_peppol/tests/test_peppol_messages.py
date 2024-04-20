@@ -1,9 +1,8 @@
-# -*- coding: utf-8 -*
-
+import json
 from base64 import b64encode
 from contextlib import contextmanager
 from freezegun import freeze_time
-from unittest.mock import Mock, patch
+from requests import Session, PreparedRequest, Response
 
 from odoo.addons.account.tests.test_account_move_send import TestAccountMoveSendCommon
 from odoo.exceptions import UserError
@@ -15,7 +14,6 @@ ID_CLIENT = 'xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx'
 FAKE_UUID = ['yyyyyyyy-yyyy-yyyy-yyyy-yyyyyyyyyyyy',
              'zzzzzzzz-zzzz-zzzz-zzzz-zzzzzzzzzzzz']
 FILE_PATH = 'account_peppol/tests/assets'
-
 
 @freeze_time('2023-01-01')
 @tagged('-at_install', 'post_install')
@@ -83,8 +81,8 @@ class TestPeppolMessage(TestAccountMoveSendCommon):
             ],
         })
 
-    @contextmanager
-    def _patch_peppol_requests(self, error=False):
+    @classmethod
+    def _get_mock_data(cls, error=False):
         proxy_documents = {
             FAKE_UUID[0]: {
                 'accounting_supplier_party': False,
@@ -107,10 +105,10 @@ class TestPeppolMessage(TestAccountMoveSendCommon):
         }
 
         responses = {
-            '/peppol/1/send_document': {'result': {
+            '/api/peppol/1/send_document': {'result': {
                 'messages': [{'message_uuid': FAKE_UUID[0]}]}},
-            '/peppol/1/ack': {'result': {}},
-            '/peppol/1/get_all_documents': {'result': {
+            '/api/peppol/1/ack': {'result': {}},
+            '/api/peppol/1/get_all_documents': {'result': {
                 'messages': [
                     {
                         'accounting_supplier_party': '0208:2718281828',
@@ -127,29 +125,45 @@ class TestPeppolMessage(TestAccountMoveSendCommon):
                 ],
             }}
         }
+        return proxy_documents, responses
 
-        def _mocked_post(url, *args, **kwargs):
-            response = Mock()
-            response.status_code = 200
-            url = url.split('api')[1]
-            if url.endswith('api/peppol/1/send_document'):
-                if not kwargs['json']['params']['documents']:
-                    raise UserError('No documents were provided')
+    @contextmanager
+    def _set_context(self, other_context):
+        previous_context = self.env.context
+        self.env.context = dict(previous_context, **other_context)
+        yield self
+        self.env.context = previous_context
 
-            if url == '/peppol/1/get_document':
-                uuid = kwargs['json']['params']['message_uuids'][0]
-                response.json = lambda: {
-                    'result': {uuid: proxy_documents[uuid]}}
-                return response
-
-            if url not in responses:
-                raise Exception(f'Unexpected request: {url}')
-            response.json = lambda: responses[url]
-
+    @classmethod
+    def _request_handler(cls, s: Session, r: PreparedRequest, /, **kw):
+        response = Response()
+        response.status_code = 200
+        if r.url.endswith('iso6523-actorid-upis%3A%3A0208%3A0477472701'):
+            response._content = b'<?xml version=\'1.0\' encoding=\'UTF-8\'?>\n<smp:ServiceGroup xmlns:wsa="http://www.w3.org/2005/08/addressing" xmlns:id="http://busdox.org/transport/identifiers/1.0/" xmlns:ds="http://www.w3.org/2000/09/xmldsig#" xmlns:smp="http://busdox.org/serviceMetadata/publishing/1.0/"><id:ParticipantIdentifier scheme="iso6523-actorid-upis">0208:0477472701</id:ParticipantIdentifier></smp:ServiceGroup>'
+            return response
+        if r.url.endswith('iso6523-actorid-upis%3A%3A0208%3A3141592654'):
+            response.status_code = 404
+            return response
+        if r.url.endswith('iso6523-actorid-upis%3A%3A0208%3A2718281828'):
+            response._content = b'<?xml version=\'1.0\' encoding=\'UTF-8\'?>\n<smp:ServiceGroup xmlns:wsa="http://www.w3.org/2005/08/addressing" xmlns:id="http://busdox.org/transport/identifiers/1.0/" xmlns:ds="http://www.w3.org/2000/09/xmldsig#" xmlns:smp="http://busdox.org/serviceMetadata/publishing/1.0/"><id:ParticipantIdentifier scheme="iso6523-actorid-upis">0208:2718281828</id:ParticipantIdentifier></smp:ServiceGroup>'
             return response
 
-        with patch('odoo.addons.account_edi_proxy_client.models.account_edi_proxy_user.requests.post', side_effect=_mocked_post):
-            yield
+        proxy_documents, responses = cls._get_mock_data(cls.env.context.get('error'))
+        url = r.path_url
+        body = json.loads(r.body)
+        if url == '/api/peppol/1/send_document':
+            if not body['params']['documents']:
+                raise UserError('No documents were provided')
+
+        if url == '/api/peppol/1/get_document':
+            uuid = body['params']['message_uuids'][0]
+            response.json = lambda: {'result': {uuid: proxy_documents[uuid]}}
+            return response
+
+        if url not in responses:
+            return super()._request_handler(s, r, **kw)
+        response.json = lambda: responses[url]
+        return response
 
     def test_attachment_placeholders(self):
         move = self.create_move(self.valid_partner)
@@ -206,8 +220,7 @@ class TestPeppolMessage(TestAccountMoveSendCommon):
             checkbox_ubl_cii_xml=True,
             checkbox_send_peppol=True,
         )
-
-        with self._patch_peppol_requests(error=True):
+        with self._set_context({'error': True}):
             wizard.action_send_and_print()
 
             self.env['account_edi_proxy_client.user']._cron_peppol_get_message_status()
@@ -225,11 +238,10 @@ class TestPeppolMessage(TestAccountMoveSendCommon):
             checkbox_send_peppol=True,
         )
 
-        with self._patch_peppol_requests():
-            wizard.action_send_and_print()
+        wizard.action_send_and_print()
 
-            self.env['account_edi_proxy_client.user']._cron_peppol_get_message_status()
-            self.assertEqual(move.peppol_move_state, 'done')
+        self.env['account_edi_proxy_client.user']._cron_peppol_get_message_status()
+        self.assertEqual(move.peppol_move_state, 'done')
 
     def test_send_success_message(self):
         # should be able to send valid invoices correctly
@@ -244,16 +256,15 @@ class TestPeppolMessage(TestAccountMoveSendCommon):
             checkbox_send_peppol=True,
         )
 
-        with self._patch_peppol_requests():
-            wizard.action_send_and_print()
+        wizard.action_send_and_print()
 
-            self.env['account_edi_proxy_client.user']._cron_peppol_get_message_status()
-            self.assertRecordValues(
-                move, [{
-                    'peppol_move_state': 'done',
-                    'peppol_message_uuid': FAKE_UUID[0],
-                }])
-            self.assertTrue(bool(move.ubl_cii_xml_id))
+        self.env['account_edi_proxy_client.user']._cron_peppol_get_message_status()
+        self.assertRecordValues(move, [{
+                'peppol_move_state': 'done',
+                'peppol_message_uuid': FAKE_UUID[0],
+            }],
+        )
+        self.assertTrue(bool(move.ubl_cii_xml_id))
 
     def test_send_invalid_edi_user(self):
         # an invalid edi user should not be able to send invoices via peppol
@@ -270,7 +281,7 @@ class TestPeppolMessage(TestAccountMoveSendCommon):
 
     def test_receive_error_peppol(self):
         # an error peppol message should be created
-        with self._patch_peppol_requests(error=True):
+        with self._set_context({'error': True}):
             self.env['account_edi_proxy_client.user']._cron_peppol_get_new_documents()
 
             move = self.env['account.move'].search([('peppol_message_uuid', '=', FAKE_UUID[1])])
@@ -282,12 +293,37 @@ class TestPeppolMessage(TestAccountMoveSendCommon):
 
     def test_receive_success_peppol(self):
         # a correct move should be created
-        with self._patch_peppol_requests():
-            self.env['account_edi_proxy_client.user']._cron_peppol_get_new_documents()
+        self.env['account_edi_proxy_client.user']._cron_peppol_get_new_documents()
 
-            move = self.env['account.move'].search([('peppol_message_uuid', '=', FAKE_UUID[1])])
-            self.assertRecordValues(
-                move, [{
-                    'peppol_move_state': 'done',
-                    'move_type': 'in_invoice',
-                }])
+        move = self.env['account.move'].search([('peppol_message_uuid', '=', FAKE_UUID[1])])
+        self.assertRecordValues(
+            move, [{
+                'peppol_move_state': 'done',
+                'move_type': 'in_invoice',
+            }])
+
+    def test_validate_partner(self):
+        new_partner = self.env['res.partner'].create({
+            'name': 'Deanna Troi',
+            'city': 'Namur',
+            'country_id': self.env.ref('base.be').id,
+        })
+        self.assertRecordValues(
+            new_partner, [{
+                'account_peppol_verification_label': 'not_verified',
+                'account_peppol_is_endpoint_valid': False,
+                'peppol_eas': '0208',
+                'peppol_endpoint': False,
+            }])
+
+        new_partner.peppol_endpoint = '0477472701'
+        self.assertRecordValues(
+            new_partner, [{
+                'account_peppol_verification_label': 'valid',
+                'account_peppol_is_endpoint_valid': True,  # should validate automatically
+                'peppol_eas': '0208',
+                'peppol_endpoint': '0477472701',
+            }])
+
+        new_partner.ubl_cii_format = False
+        self.assertFalse(new_partner.account_peppol_is_endpoint_valid)

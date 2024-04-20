@@ -6,6 +6,8 @@
 # Manuela Silva <mmsrs@sky.com>, 2023
 # Marcelo Pereira, 2023
 # Wil Odoo, 2023
+# Marta Marouço, 2024
+# Samuel Afonso, 2024
 # Rita Bastos, 2024
 # 
 msgid ""
@@ -480,7 +482,7 @@ msgstr ""
 #. module: hr
 #: model:ir.model.fields,field_description:hr.field_mail_activity_plan_template__responsible_type
 msgid "Assignment"
-msgstr ""
+msgstr "Atribuição"
 
 #. module: hr
 #: model:ir.model.fields,field_description:hr.field_hr_department__message_attachment_count
@@ -1735,7 +1737,7 @@ msgstr "Empregos"
 #. module: hr
 #: model:ir.model.fields,field_description:hr.field_hr_employee__lang
 msgid "Lang"
-msgstr ""
+msgstr "Idioma"
 
 #. module: hr
 #: model_terms:ir.ui.view,arch_db:hr.res_users_view_form_profile
@@ -1885,7 +1887,7 @@ msgstr ""
 #. module: hr
 #: model_terms:ir.ui.view,arch_db:hr.print_employee_badge
 msgid "Marc Demo"
-msgstr ""
+msgstr "Marc Demo"
 
 #. module: hr
 #: model:ir.model.fields,field_description:hr.field_hr_employee__marital

@@ -56,7 +56,7 @@ class StockMoveLine(models.Model):
     date = fields.Datetime('Date', default=fields.Datetime.now, required=True)
     owner_id = fields.Many2one(
         'res.partner', 'From Owner',
-        check_company=True,
+        check_company=True, index='btree_not_null',
         help="When validating the transfer, the products will be taken from this owner.")
     location_id = fields.Many2one(
         'stock.location', 'From', domain="[('usage', '!=', 'view')]", check_company=True, required=True,
@@ -408,9 +408,10 @@ class StockMoveLine(models.Model):
             for ml in self:
                 if ml.product_id.type != 'product' or ml.state == 'done':
                     continue
-                if 'quantity' in vals:
-                    new_reserved_qty = ml.product_uom_id._compute_quantity(
-                        vals['quantity'], ml.product_id.uom_id, rounding_method='HALF-UP')
+                if 'quantity' in vals or 'product_uom_id' in vals:
+                    new_ml_uom = updates.get('product_uom_id', ml.product_uom_id)
+                    new_reserved_qty = new_ml_uom._compute_quantity(
+                        vals.get('quantity', ml.quantity), ml.product_id.uom_id, rounding_method='HALF-UP')
                     # Make sure `reserved_uom_qty` is not negative.
                     if float_compare(new_reserved_qty, 0, precision_rounding=ml.product_id.uom_id.rounding) < 0:
                         raise UserError(_('Reserving a negative quantity is not allowed.'))
@@ -428,7 +429,7 @@ class StockMoveLine(models.Model):
                         lot=updates.get('lot_id', ml.lot_id), package=updates.get('package_id', ml.package_id),
                         owner=updates.get('owner_id', ml.owner_id))
 
-                if 'quantity' in vals and vals['quantity'] != ml.quantity:
+                if ('quantity' in vals and vals['quantity'] != ml.quantity) or 'product_uom_id' in vals:
                     moves_to_recompute_state |= ml.move_id
 
         # When editing a done move line, the reserved availability of a potential chained move is impacted. Take care of running again `_action_assign` on the concerned moves.
@@ -744,6 +745,24 @@ class StockMoveLine(models.Model):
         self.env['stock.move.line'].browse(to_unlink_candidate_ids).unlink()
         move_to_reassign._action_assign()
 
+    def _get_aggregated_properties(self, move_line=False, move=False):
+        move = move or move_line.move_id
+        uom = move.product_uom or move_line.product_uom_id
+        name = move.product_id.display_name
+        description = move.description_picking
+        if description == name or description == move.product_id.name:
+            description = False
+        product = move.product_id
+        line_key = f'{product.id}_{product.display_name}_{description or ""}_{uom.id}_{move.product_packaging_id or ""}'
+        return {
+            'line_key': line_key,
+            'name': name,
+            'description': description,
+            'product_uom': uom,
+            'move': move,
+            'packaging': move.product_packaging_id,
+        }
+
     def _get_aggregated_product_quantities(self, **kwargs):
         """ Returns a dictionary of products (key = id+name+description+uom+packaging) and corresponding values of interest.
 
@@ -755,17 +774,6 @@ class StockMoveLine(models.Model):
         returns: dictionary {product_id+name+description+uom+packaging: {product, name, description, quantity, product_uom, packaging}, ...}
         """
         aggregated_move_lines = {}
-
-        def get_aggregated_properties(move_line=False, move=False):
-            move = move or move_line.move_id
-            uom = move.product_uom or move_line.product_uom_id
-            name = move.product_id.display_name
-            description = move.description_picking
-            if description == name or description == move.product_id.name:
-                description = False
-            product = move.product_id
-            line_key = f'{product.id}_{product.display_name}_{description or ""}_{uom.id}_{move.product_packaging_id or ""}'
-            return (line_key, name, description, uom, move.product_packaging_id)
 
         def _compute_packaging_qtys(aggregated_move_lines):
             # Needs to be computed after aggregation of line qtys
@@ -785,7 +793,8 @@ class StockMoveLine(models.Model):
         for move_line in self:
             if kwargs.get('except_package') and move_line.result_package_id:
                 continue
-            line_key, name, description, uom, packaging = get_aggregated_properties(move_line=move_line)
+            aggregated_properties = self._get_aggregated_properties(move_line=move_line)
+            line_key, uom = aggregated_properties['line_key'], aggregated_properties['product_uom']
             quantity = move_line.product_uom_id._compute_quantity(move_line.quantity, uom)
             if line_key not in aggregated_move_lines:
                 qty_ordered = None
@@ -794,22 +803,19 @@ class StockMoveLine(models.Model):
                     # Filters on the aggregation key (product, description and uom) to add the
                     # quantities delayed to backorders to retrieve the original ordered qty.
                     following_move_lines = backorders.move_line_ids.filtered(
-                        lambda ml: get_aggregated_properties(move=ml.move_id)[0] == line_key
+                        lambda ml: self._get_aggregated_properties(move=ml.move_id)['line_key'] == line_key
                     )
                     qty_ordered += sum(following_move_lines.move_id.mapped('product_uom_qty'))
                     # Remove the done quantities of the other move lines of the stock move
                     previous_move_lines = move_line.move_id.move_line_ids.filtered(
-                        lambda ml: get_aggregated_properties(move=ml.move_id)[0] == line_key and ml.id != move_line.id
+                        lambda ml: self._get_aggregated_properties(move=ml.move_id)['line_key'] == line_key and ml.id != move_line.id
                     )
                     qty_ordered -= sum([m.product_uom_id._compute_quantity(m.quantity, uom) for m in previous_move_lines])
                 aggregated_move_lines[line_key] = {
-                    'name': name,
-                    'description': description,
+                    **aggregated_properties,
                     'quantity': quantity,
                     'qty_ordered': qty_ordered or quantity,
-                    'product_uom': uom,
                     'product': move_line.product_id,
-                    'packaging': packaging,
                 }
             else:
                 aggregated_move_lines[line_key]['qty_ordered'] += quantity
@@ -824,18 +830,16 @@ class StockMoveLine(models.Model):
             if not (empty_move.state == "cancel" and empty_move.product_uom_qty
                     and float_is_zero(empty_move.quantity, precision_rounding=empty_move.product_uom.rounding)):
                 continue
-            line_key, name, description, uom, packaging = get_aggregated_properties(move=empty_move)
+            aggregated_properties = self._get_aggregated_properties(move=empty_move)
+            line_key = aggregated_properties['line_key']
 
             if line_key not in aggregated_move_lines:
                 qty_ordered = empty_move.product_uom_qty
                 aggregated_move_lines[line_key] = {
-                    'name': name,
-                    'description': description,
+                    **aggregated_properties,
                     'quantity': False,
                     'qty_ordered': qty_ordered,
-                    'product_uom': uom,
                     'product': empty_move.product_id,
-                    'packaging': packaging,
                 }
             else:
                 aggregated_move_lines[line_key]['qty_ordered'] += empty_move.product_uom_qty

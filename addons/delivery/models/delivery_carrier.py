@@ -191,6 +191,12 @@ class DeliveryCarrier(models.Model):
         self.ensure_one()
         return self.delivery_type
 
+    def _apply_margins(self, price):
+        self.ensure_one()
+        if self.delivery_type == 'fixed':
+            return float(price)
+        return float(price) * (1.0 + self.margin) + self.fixed_margin
+
     # -------------------------- #
     # API for external providers #
     # -------------------------- #
@@ -220,7 +226,7 @@ class DeliveryCarrier(models.Model):
                 product_currency=company.currency_id
             )
             # apply margin on computed price
-            res['price'] = float(res['price']) * (1.0 + self.margin) + self.fixed_margin
+            res['price'] = self._apply_margins(res['price'])
             # save the real price in case a free_over rule overide it to 0
             res['carrier_price'] = res['price']
             # free when order is large enough
@@ -327,7 +333,7 @@ class DeliveryCarrier(models.Model):
         self.ensure_one()
         self = self.sudo()
         order = order.sudo()
-        total = weight = volume = quantity = 0
+        total = weight = volume = quantity = wv = 0
         total_delivery = 0.0
         for line in order.order_line:
             if line.state == 'cancel':
@@ -341,6 +347,7 @@ class DeliveryCarrier(models.Model):
             qty = line.product_uom._compute_quantity(line.product_uom_qty, line.product_id.uom_id)
             weight += (line.product_id.weight or 0.0) * qty
             volume += (line.product_id.volume or 0.0) * qty
+            wv += (line.product_id.weight or 0.0) * (line.product_id.volume or 0.0) * qty
             quantity += qty
         total = (order.amount_total or 0.0) - total_delivery
 
@@ -350,7 +357,7 @@ class DeliveryCarrier(models.Model):
         # 2- saved weight to use on sale order
         # 3- total order line weight as fallback
         weight = self.env.context.get('order_weight') or order.shipping_weight or weight
-        return self._get_price_from_picking(total, weight, volume, quantity)
+        return self.with_context(wv=wv)._get_price_from_picking(total, weight, volume, quantity)
 
     def _get_price_dict(self, total, weight, volume, quantity):
         '''Hook allowing to retrieve dict to be used in _get_price_from_picking() function.
@@ -359,7 +366,7 @@ class DeliveryCarrier(models.Model):
             'price': total,
             'volume': volume,
             'weight': weight,
-            'wv': volume * weight,
+            'wv': self.env.context.get('wv') or volume * weight,
             'quantity': quantity
         }
 

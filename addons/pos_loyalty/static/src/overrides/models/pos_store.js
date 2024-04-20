@@ -9,6 +9,7 @@ import { TextInputPopup } from "@point_of_sale/app/utils/input_popups/text_input
 import { Domain, InvalidDomainError } from "@web/core/domain";
 import { PosLoyaltyCard } from "@pos_loyalty/overrides/models/loyalty";
 
+const { DateTime } = luxon;
 const COUPON_CACHE_MAX_SIZE = 4096; // Maximum coupon cache size, prevents long run memory issues and (to some extent) invalid data
 
 patch(PosStore.prototype, {
@@ -95,7 +96,18 @@ patch(PosStore.prototype, {
                 return false;
             }
             const trimmedCode = code.trim();
-            if (trimmedCode && trimmedCode.startsWith("044")) {
+            let nomenclatureRules = this.barcodeReader.parser.nomenclature.rules;
+            if (this.barcodeReader.fallbackParser) {
+                nomenclatureRules = nomenclatureRules.concat(
+                    this.barcodeReader.fallbackParser.nomenclature.rules
+                );
+            }
+            const couponRules = nomenclatureRules.filter((rule) => rule.type === "coupon");
+            const isValidCoupon = couponRules.some((rule) => {
+                let patterns = rule.pattern.split("|");
+                return patterns.some((pattern) => trimmedCode.startsWith(pattern));
+            });
+            if (isValidCoupon) {
                 // check if the code exist in the database
                 // if so, use its balance, otherwise, use the unit price of the gift card product
                 const fetchedGiftCard = await this.orm.searchRead(
@@ -267,8 +279,11 @@ patch(PosStore.prototype, {
 
         for (const program of this.programs) {
             this.program_by_id[program.id] = program;
+            if (program.date_from) {
+                program.date_from = DateTime.fromISO(program.date_from);
+            }
             if (program.date_to) {
-                program.date_to = new Date(program.date_to);
+                program.date_to = DateTime.fromISO(program.date_to);
             }
             program.rules = [];
             program.rewards = [];

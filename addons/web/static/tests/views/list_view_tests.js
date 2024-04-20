@@ -2141,6 +2141,62 @@ QUnit.module("Views", (hooks) => {
         }
     );
 
+    QUnit.test(
+        "basic grouped list rendering 4 cols with aggregates, selector and openFormView",
+        async function (assert) {
+            await makeView({
+                type: "list",
+                resModel: "foo",
+                serverData,
+                arch: `
+                    <tree open_form_view="True">
+                        <field name="datetime"/>
+                        <field name="int_field" sum="Sum1"/>
+                        <field name="bar"/>
+                        <field name="qux" sum="Sum2" optional="hide"/>
+                    </tree>`,
+                groupBy: ["bar"],
+            });
+
+            assert.strictEqual(
+                target.querySelector(".o_group_header th").getAttribute("colspan"),
+                "2"
+            );
+            assert.strictEqual(
+                target.querySelector(".o_group_header th:last-child").getAttribute("colspan"),
+                "2"
+            );
+        }
+    );
+
+    QUnit.test(
+        "basic grouped list rendering 4 cols with aggregates, selector, optional and openFormView",
+        async function (assert) {
+            await makeView({
+                type: "list",
+                resModel: "foo",
+                serverData,
+                arch: `
+                    <tree open_form_view="True">
+                        <field name="datetime"/>
+                        <field name="int_field" sum="Sum1"/>
+                        <field name="bar"/>
+                        <field name="qux" sum="Sum2" optional="show"/>
+                    </tree>`,
+                groupBy: ["bar"],
+            });
+
+            assert.strictEqual(
+                target.querySelector(".o_group_header th").getAttribute("colspan"),
+                "2"
+            );
+            assert.strictEqual(
+                target.querySelector(".o_group_header th:last-child").getAttribute("colspan"),
+                "1"
+            );
+        }
+    );
+
     QUnit.test("group a list view with the aggregable field 'value'", async function (assert) {
         serverData.models.foo.fields.value = {
             string: "Value",
@@ -6752,6 +6808,23 @@ QUnit.module("Views", (hooks) => {
             target.querySelector(".o_group_header:first-of-type .o_pager_limit").innerText,
             "2"
         );
+    });
+
+    QUnit.test("multi-level grouped list, pager inside a group", async function (assert) {
+        serverData.models.foo.records.forEach((r) => (r.bar = true));
+        await makeView({
+            type: "list",
+            resModel: "foo",
+            serverData,
+            arch: '<tree limit="2" groups_limit="3"><field name="foo"/><field name="bar"/></tree>',
+            groupBy: ["bar", "foo"],
+        });
+
+        assert.containsOnce(target, ".o_group_header");
+
+        await click(target.querySelector(".o_group_header"));
+        assert.containsN(target, ".o_group_header", 4);
+        assert.containsNone(target, ".o_group_header:first-of-type .o_group_name .o_pager");
     });
 
     QUnit.test("count_limit attrs set in arch", async function (assert) {
@@ -11509,7 +11582,10 @@ QUnit.module("Views", (hooks) => {
                     </tree>`,
                 mockRPC(route, args) {
                     if (args.method === "write") {
-                        assert.deepEqual(args.args, [[1, 2], { date_start: "2021-04-01",  date_end: "2017-01-26"}]);
+                        assert.deepEqual(args.args, [
+                            [1, 2],
+                            { date_start: "2021-04-01", date_end: "2017-01-26" },
+                        ]);
                     }
                 },
             });
@@ -13039,10 +13115,9 @@ QUnit.module("Views", (hooks) => {
             await editInput(target, ".o_field_many2one input", "abcdef");
             await nextTick();
 
-            // simulate focus out
-            await triggerEvent(target, ".o_field_many2one input", "blur");
+            await click(target, ".o_m2o_dropdown_option_create_edit");
 
-            assert.containsOnce(target, ".modal", "should ask confirmation to create a record");
+            assert.containsOnce(target, ".modal", "should show dialog to create the record");
             assert.containsOnce(target, ".o_data_row", "the row should still be there");
         }
     );
@@ -16733,13 +16808,9 @@ QUnit.module("Views", (hooks) => {
 
         const input = target.querySelector(".o_data_row .o_data_cell input");
         await editInput(input, null, "aaa");
-        await triggerEvents(input, null, ["keyup", "blur"]);
-        document.body.click();
+        await triggerEvents(input, null, ["keyup"]);
+        await triggerHotkey("tab");
         await nextTick();
-        assert.containsOnce(target, ".modal", "the quick_create modal should appear");
-
-        await click(target.querySelector(".modal .btn-primary"));
-        await click(target.querySelector(".o_list_view"));
         assert.strictEqual(
             target.getElementsByClassName("o_data_cell")[0].innerHTML,
             "aaa",
@@ -19970,4 +20041,101 @@ QUnit.module("Views", (hooks) => {
             assert.verifySteps(["switch to form - resId: 5 activeIds: 5,1,2,3,4"]);
         }
     );
+
+    QUnit.test(
+        "onchange should only be called once after pressing enter on a field",
+        async function (assert) {
+            serverData.models.foo.onchanges = {
+                foo(record) {
+                    if (record.foo) {
+                        record.int_field = 1;
+                    }
+                },
+            };
+            await makeView({
+                type: "list",
+                resModel: "foo",
+                serverData,
+                arch: `
+                <tree editable="top">
+                    <field name="foo"/>
+                    <field name="int_field"/>
+                </tree>`,
+                async mockRPC(_, { method }) {
+                    if (method === "onchange") {
+                        assert.step(method);
+                    }
+                },
+            });
+            await click(target.querySelector(".o_data_cell"));
+            target.querySelector(".o_field_widget[name=foo] input").value = "1";
+            await triggerEvents(target, ".o_field_widget[name=foo] input", [
+                ["keydown", { key: "Enter" }],
+                ["change"],
+            ]);
+            await nextTick();
+            assert.verifySteps(["onchange"], "There should only be one onchange call");
+        }
+    );
+
+    QUnit.test("list: remove a record from sorted recordlist", async function (assert) {
+        assert.expect(7);
+
+        serverData.models.foo.records = [{ id: 1, o2m: [1, 2, 3, 4, 5, 6] }];
+        serverData.models.bar.fields = {
+            ...serverData.models.bar.fields,
+            name: { string: "Name", type: "char", sortable: true },
+            city: { string: "City", type: "boolean", default: false },
+        };
+
+        serverData.models.bar.records = [
+            { id: 1, name: "a", city: true },
+            { id: 2, name: "b" },
+            { id: 3, name: "c" },
+            { id: 4, name: "d" },
+            { id: 5, name: "e" },
+            { id: 6, name: "f", city: true },
+        ];
+        await makeView({
+            type: "form",
+            resModel: "foo",
+            serverData,
+            resId: 1,
+            mode: "edit",
+            arch: `
+                <form>
+                    <sheet>
+                        <field name="o2m">
+                            <tree limit="2">
+                                <field name="id"/>
+                                <field name="name" required="not city"/>
+                                <field name="city"/>
+                            </tree>
+                        </field>
+                    </sheet>
+                </form>`,
+        });
+
+        // 4 th (1 for delete button, 3 for columns)
+        assert.containsN(target, "th", 4, "should have 3 columns and delete buttons");
+
+        assert.containsN(target, "tbody tr.o_data_row", 2, "should have 2 rows");
+        assert.containsOnce(target, "th.o_column_sortable", "should have 1 sortable column");
+        const getColNames = () =>
+            getNodesTextContent(document.querySelectorAll('.o_data_cell[name="name"'));
+        assert.deepEqual(getColNames(), ["a", "b"], "Should be sorted by id asc");
+        // sort by name desc
+        await click(target, "th.o_column_sortable[data-name=name]");
+        await click(target, "th.o_column_sortable[data-name=name]");
+        assert.deepEqual(getColNames(), ["f", "e"], "Should be sorted by name desc");
+        // remove second record
+        await click(target.querySelectorAll(".o_list_record_remove")[1]);
+        assert.deepEqual(getColNames(), ["f", "d"], "Should be sorted by name desc");
+        // check if the record is removed
+        assert.strictEqual(
+            target.querySelector(".o_list_view .o_pager_counter").textContent,
+            "1-2 / 5",
+            "pager should be updated to 1-2 / 5"
+        );
+    });
 });

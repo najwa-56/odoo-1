@@ -3,7 +3,7 @@
 # 	* website_event
 # 
 # Translators:
-# Wil Odoo, 2023
+# Wil Odoo, 2024
 # Malaz Abuidris <msea@odoo.com>, 2024
 # 
 msgid ""
@@ -398,6 +398,16 @@ msgstr "إلغاء"
 #: model_terms:ir.ui.view,arch_db:website_event.snippet_options
 msgid "Cards"
 msgstr "البطاقات"
+
+#. module: website_event
+#: model_terms:ir.ui.view,arch_db:website_event.snippet_options
+msgid "Card design"
+msgstr "تصميم البطاقة "
+
+#. module: website_event
+#: model_terms:ir.ui.view,arch_db:website_event.snippet_options
+msgid "Template badge"
+msgstr "شارة القالب "
 
 #. module: website_event
 #: model_terms:ir.ui.view,arch_db:website_event.display_timer_alert_widget
@@ -1232,6 +1242,11 @@ msgstr "العودة إلى قائمة الفعاليات."
 #: model:ir.model.fields,field_description:website_event.field_event_event__is_seo_optimized
 msgid "SEO optimized"
 msgstr "تم تحسين محركات البحث"
+
+#. module: website_event
+#: model_terms:ir.ui.view,arch_db:website_event.event_description_full
+msgid "Share"
+msgstr "مشاركة"
 
 #. module: website_event
 #: model_terms:ir.ui.view,arch_db:website_event.event_description_full

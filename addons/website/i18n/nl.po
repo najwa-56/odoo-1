@@ -1534,7 +1534,7 @@ msgstr ""
 #. module: website
 #: model_terms:ir.ui.view,arch_db:website.s_picture
 msgid "A punchy Headline"
-msgstr "Een treffende kop"
+msgstr "Een treffende titel"
 
 #. module: website
 #: model_terms:ir.ui.view,arch_db:website.bs_debug_view
@@ -3251,7 +3251,7 @@ msgstr "Kleren"
 #: code:addons/website/static/src/client_actions/configurator/configurator.xml:0
 #, python-format
 msgid "Clothes, Marketing, ..."
-msgstr ""
+msgstr "Kleding, marketing, ..."
 
 #. module: website
 #: model_terms:ir.ui.view,arch_db:website.res_config_settings_view_form
@@ -3955,6 +3955,13 @@ msgstr "Standaard"
 #: model_terms:ir.ui.view,arch_db:website.res_config_settings_view_form
 msgid "Default Access Rights"
 msgstr "Standaard toegangsrechten"
+
+#. module: website
+#. odoo-javascript
+#: code:addons/website/static/src/snippets/s_searchbar/options.js:0
+#, python-format
+msgid "Default Input Style"
+msgstr "Standaard invoerstijl"
 
 #. module: website
 #: model:ir.model.fields,field_description:website.field_website__default_lang_id
@@ -7291,7 +7298,10 @@ msgid "Library"
 msgstr "Bibliotheek"
 
 #. module: website
+#. odoo-javascript
+#: code:addons/website/static/src/snippets/s_searchbar/options.js:0
 #: model_terms:ir.ui.view,arch_db:website.s_faq_collapse_options
+#, python-format
 msgid "Light"
 msgstr "Licht"
 
@@ -10971,8 +10981,11 @@ msgid "Structure"
 msgstr "Structuur"
 
 #. module: website
+#. odoo-javascript
+#: code:addons/website/static/src/snippets/s_searchbar/options.js:0
 #: model_terms:ir.ui.view,arch_db:website.s_tabs_options
 #: model_terms:ir.ui.view,arch_db:website.snippet_options
+#, python-format
 msgid "Style"
 msgstr "Stijl"
 
@@ -11261,6 +11274,8 @@ msgid ""
 "The company %(company_name)r cannot be archived because it has a linked website %(website_name)r.\n"
 "Change that website's company first."
 msgstr ""
+"Het bedrijf %(company_name)r kan niet worden gearchiveerd omdat het een gekoppelde website %(website_name)r heeft.\n"
+"Wijzig eerst het bedrijf van die website."
 
 #. module: website
 #: model_terms:ir.ui.view,arch_db:website.res_config_settings_view_form
@@ -13407,6 +13422,17 @@ msgstr ""
 #, python-format
 msgid "You cannot duplicate this field."
 msgstr "Je kan dit veld niet dupliceren."
+
+#. module: website
+#: code:addons/website/models/website_menu.py:0
+#, python-format
+msgid ""
+"You cannot delete this website menu as this serves as the default parent "
+"menu for new websites (e.g., /shop, /event, ...)."
+msgstr ""
+"Je kunt dit websitemenu niet verwijderen, aangezien dit fungeert als het "
+"standaard bovenliggende menu voor nieuwe websites (bijvoorbeeld /shop, "
+"/event, ...)."
 
 #. module: website
 #. odoo-python

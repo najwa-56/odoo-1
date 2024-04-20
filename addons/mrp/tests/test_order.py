@@ -2897,6 +2897,23 @@ class TestMrpOrder(TestMrpCommon):
         self.assertEqual(wo.state, 'cancel', 'Workorders should be cancelled.')
         self.assertTrue(mo.workorder_ids.time_ids.date_end, 'The timers must stop after the cancellation of the MO')
 
+    def test_manual_duration(self):
+        production_form = Form(self.env['mrp.production'])
+        production_form.product_id = self.bom_4.product_id
+        production_form.bom_id = self.bom_4
+        production_form.product_qty = 1
+        production_form.product_uom_id = self.bom_4.product_id.uom_id
+
+        production = production_form.save()
+        production.action_confirm()
+
+        production_form = Form(production)
+        production_form.qty_producing = 1
+        production = production_form.save()
+        production.button_mark_done()
+
+        self.assertEqual(production.duration, production.workorder_ids.duration_expected)
+
     def test_starting_wo_twice(self):
         """
             Check that the work order is started only once when clicking the start button several times.
@@ -3371,6 +3388,34 @@ class TestMrpOrder(TestMrpCommon):
             ('warehouse_id.company_id', 'in', mo_2.company_id.ids),
         ], ['company_id'], load=False, limit=1)
         self.assertEqual(mo_2.picking_type_id.id, picking_type_company[0]['id'])
+
+    def test_onchange_picking_type_id_and_name(self):
+        """
+        Test that when changing the operation type, the name of the MO should be changed too
+        """
+        picking_type_1 = self.env['stock.picking.type'].create({
+            'name': 'new_picking_type_1',
+            'code': 'mrp_operation',
+            'sequence_code': 'PT1',
+            'default_location_src_id': self.stock_location_components.id,
+            'default_location_dest_id': self.env.ref('stock.stock_location_stock').id,
+            'warehouse_id': self.warehouse_1.id,
+        })
+        picking_type_2 = picking_type_1.copy({
+            'name': 'new_picking_type_2',
+            'sequence_code': 'PT2'
+        })
+        mo_form = Form(self.env['mrp.production'])
+        mo_form.product_id = self.product_1
+        mo_form.picking_type_id = picking_type_1
+        mo = mo_form.save()
+        self.assertEqual(mo.name, "BWH/PT1/00001")
+        mo.picking_type_id = picking_type_2
+        self.assertEqual(mo.name, "BWH/PT2/00001")
+        mo.picking_type_id = picking_type_1
+        self.assertEqual(mo.name, "BWH/PT1/00002")
+        mo.picking_type_id = picking_type_1
+        self.assertEqual(mo.name, "BWH/PT1/00002")
 
     def test_onchange_bom_ids_and_picking_type(self):
         warehouse01 = self.env['stock.warehouse'].search([('company_id', '=', self.env.company.id)], limit=1)
@@ -3900,3 +3945,58 @@ class TestMrpOrder(TestMrpCommon):
 
         self.assertEqual(wos[0].date_finished, dt + timedelta(hours=1, minutes=1))
         self.assertEqual(wos[1].date_finished, dt + timedelta(hours=1, minutes=2))
+
+    def test_update_workcenter_adapt_finish_date(self):
+        """
+        Test that changing the workcenter of a workorder will adapt the end date to make
+        sure the duration expected is respected
+        """
+        self.workcenter_4 = self.env['mrp.workcenter'].create({
+            'name': 'Test workcenter',
+        })
+
+        self.workcenter_5 = self.env['mrp.workcenter'].create({
+            'name': 'Test workcenter',
+        })
+
+        operation = self.env['mrp.routing.workcenter'].create({
+            'name': 'Test order',
+            'workcenter_id': self.workcenter_4.id,
+            'bom_id': self.bom_1.id,
+            'time_cycle_manual': 30,
+        })
+
+        mo = self.env['mrp.production'].create({
+            'product_id': self.product.id,
+            'product_uom_id': self.bom_1.product_uom_id.id,
+        })
+
+        dt = datetime(2024, 1, 17, 11)
+        wo = self.env['mrp.workorder'].create([
+            {
+                'name': 'Test order',
+                'workcenter_id': self.workcenter_4.id,
+                'product_uom_id': self.bom_1.product_uom_id.id,
+                'production_id': mo.id,
+                'duration_expected': 30.0,
+                'date_start': dt,
+                'operation_id': operation.id,
+            }
+        ])
+        self.assertEqual(wo.date_start, dt)
+        self.assertEqual(wo.date_finished, dt + timedelta(hours=1, minutes=30))
+
+        # We change the date finished and make sure the duration expected is adapted
+        wo.write({
+            'date_finished': dt + timedelta(hours=2),
+        })
+        self.assertEqual(wo.duration_expected, 60.0)
+
+        # We change the workcenter and make sure the duration expected and the date finish
+        # is adapted accordingly
+        wo.write({
+            'workcenter_id': self.workcenter_5.id,
+        })
+        self.assertEqual(wo.duration_expected, 30.0)
+        self.assertEqual(wo.date_start, dt)
+        self.assertEqual(wo.date_finished, dt + timedelta(hours=1, minutes=30))

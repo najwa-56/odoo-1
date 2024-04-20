@@ -17,15 +17,40 @@
 
 from odoo.tools.parse_version import parse_version
 
+
+def _local_load_region(code):
+    __import__("region_%s" % code, globals(), locals(),
+        fromlist=["PHONE_METADATA_%s" % code], level=1)
+
+
 try:
     import phonenumbers
     # MONKEY PATCHING phonemetadata of Ivory Coast if phonenumbers is too old
     if parse_version('7.6.1') <= parse_version(phonenumbers.__version__) < parse_version('8.12.32'):
-        def _local_load_region(code):
-            __import__("region_%s" % code, globals(), locals(),
-                fromlist=["PHONE_METADATA_%s" % code], level=1)
         # loading updated region_CI.py from current directory
         # https://github.com/daviddrysdale/python-phonenumbers/blob/v8.12.32/python/phonenumbers/data/region_CI.py
         phonenumbers.phonemetadata.PhoneMetadata.register_region_loader('CI', _local_load_region)
+    # MONKEY PATCHING phonemetadata of Mauritius if phonenumbers is too old
+    if parse_version(phonenumbers.__version__) < parse_version('8.12.13'):
+        # loading updated region_MU.py from current directory
+        # https://github.com/daviddrysdale/python-phonenumbers/blob/v8.13.31/python/phonenumbers/data/region_MU.py
+        phonenumbers.phonemetadata.PhoneMetadata.register_region_loader('MU', _local_load_region)
+    # MONKEY PATCHING phonemetadata of Panama if phonenumbers is too old
+    if parse_version(phonenumbers.__version__) < parse_version('8.12.43'):
+        # region_PA.py in the current directory was copied from external source:
+        # https://github.com/daviddrysdale/python-phonenumbers/blob/v8.12.43/python/phonenumbers/data/region_PA.py
+        phonenumbers.phonemetadata.PhoneMetadata.register_region_loader('PA', _local_load_region)
+    # MONKEY PATCHING phonemetadata to fix Brazilian phonenumbers following 2016 changes
+    def _hook_load_region(code):
+        phonenumbers.data._load_region(code)
+        if code == 'BR':
+            phonenumbers.data.region_BR.PHONE_METADATA_BR.intl_number_format.append(
+                phonenumbers.phonemetadata.NumberFormat(
+                    pattern='(\\d{2})(\\d{4})(\\d{4})',
+                    format='\\1 9\\2-\\3',
+                    leading_digits_pattern=['(?:[14689][1-9]|2[12478]|3[1-578]|5[13-5]|7[13-579][689])'],
+                )
+            )
+    phonenumbers.phonemetadata.PhoneMetadata.register_region_loader('BR', _hook_load_region)
 except ImportError:
     pass

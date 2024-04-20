@@ -87,7 +87,7 @@ msgstr ""
 #: code:addons/mail_plugin/controllers/mail_plugin.py:0
 #, python-format
 msgid "Bad Email."
-msgstr "Mal email."
+msgstr "Correo electrónico erróneo."
 
 #. module: mail_plugin
 #. odoo-javascript
@@ -594,8 +594,8 @@ msgid ""
 "Oops, looks like you have exhausted your free enrichment requests. Please "
 "log in to try again."
 msgstr ""
-"Oops, parece que has agotado tus peticiones de enriquecimiento gratis. Por "
-"favor, inicie sesión para intentarlo de nuevo."
+"¡Uy! Parece que ha agotado sus solicitudes de enriquecimiento gratuito. Por "
+"favor, conéctese para intentarlo de nuevo."
 
 #. module: mail_plugin
 #. odoo-javascript

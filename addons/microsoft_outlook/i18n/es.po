@@ -102,7 +102,7 @@ msgid ""
 "You will be redirected to the Outlook login page to accept the permissions."
 msgstr ""
 "Conecte su cuenta personal de Outlook mediante OAuth. \n"
-"Se le redirigirá a la página de inicio de sesión de Outlook para aceptar los permisos."
+"Se le redireccionará a la página de inicio de sesión de Outlook para aceptar los permisos."
 
 #. module: microsoft_outlook
 #: model_terms:ir.ui.view,arch_db:microsoft_outlook.microsoft_outlook_oauth_error
@@ -122,7 +122,7 @@ msgstr "ID de su aplicación de Outlook"
 #. module: microsoft_outlook
 #: model:ir.model,name:microsoft_outlook.model_fetchmail_server
 msgid "Incoming Mail Server"
-msgstr "Servidor de correo entrante"
+msgstr "Servidor de correo de entrada"
 
 #. module: microsoft_outlook
 #. odoo-python

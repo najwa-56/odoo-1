@@ -373,12 +373,13 @@ export class Orderline extends PosModel {
         if (options.json) {
             try {
                 this.init_from_JSON(options.json);
-            } catch {
+            } catch (error) {
                 console.error(
                     "ERROR: attempting to recover product ID",
                     options.json.product_id[0],
                     "not available in the point of sale. Correct the product or clean the browser cache."
                 );
+                throw error;
             }
             return;
         }
@@ -1093,24 +1094,35 @@ export class Orderline extends PosModel {
     isPartOfCombo() {
         return Boolean(this.comboParent || this.comboLines?.length);
     }
-    findAttribute(values) {
+    findAttribute(values, customAttributes) {
         const listOfAttributes = [];
-        Object.values(this.pos.attributes_by_ptal_id).filter(
-            (attribute) => {
+        const addedPtal_id = [];
+        for (const value of values){
+            for (const ptal_id of this.pos.ptal_ids_by_ptav_id[value]){
+                if (addedPtal_id.includes(ptal_id)){
+                    continue;
+                }
+                const attribute = this.pos.attributes_by_ptal_id[ptal_id]
                 const attFound = attribute.values.filter((target) => {
                     return Object.values(values).includes(target.id);
+                }).map(att => ({...att})); // make a copy
+                attFound.forEach((att) => {
+                    if (att.is_custom) {
+                        customAttributes.forEach((customAttribute) => {
+                            if (att.id === customAttribute.custom_product_template_attribute_value_id) {
+                                att.name = customAttribute.value;
+                            }
+                        });
+                    }
                 });
-                if (attFound.length > 0) {
-                    const modifiedAttribute = {
-                        ...attribute,
-                        valuesForOrderLine: attFound,
-                    };
-                    listOfAttributes.push(modifiedAttribute);
-                    return true;
-                }
-                return false;
+                const modifiedAttribute = {
+                    ...attribute,
+                    valuesForOrderLine: attFound,
+                };
+                listOfAttributes.push(modifiedAttribute);
+                addedPtal_id.push(ptal_id);
             }
-        );
+        }
         return listOfAttributes;
     }
     getDisplayData() {
@@ -1133,7 +1145,7 @@ export class Orderline extends PosModel {
                 this.getUnitDisplayPriceBeforeDiscount()
             ),
             attributes: this.attribute_value_ids
-                ? this.findAttribute(this.attribute_value_ids)
+                ? this.findAttribute(this.attribute_value_ids, this.custom_attribute_value_ids)
                 : [],
         };
     }
@@ -2797,5 +2809,8 @@ export class Order extends PosModel {
     }
     _generateTicketCode() {
         return random5Chars();
+    }
+    _getOrderOptions() {
+        return {};
     }
 }

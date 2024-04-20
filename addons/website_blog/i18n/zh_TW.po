@@ -2190,7 +2190,7 @@ msgstr "旅行"
 #. module: website_blog
 #: model_terms:ir.ui.view,arch_db:website_blog.opt_blog_post_share_links_display
 msgid "Twitter"
-msgstr "推特"
+msgstr "Twitter"
 
 #. module: website_blog
 #: model_terms:ir.ui.view,arch_db:website_blog.posts_loop
@@ -2239,7 +2239,7 @@ msgstr "在當前網站可見"
 #. module: website_blog
 #: model_terms:ir.ui.view,arch_db:website_blog.blog_post_content
 msgid "WRITE HERE OR DRAG BUILDING BLOCKS"
-msgstr ""
+msgstr "在此處書寫，或拖放內容方塊"
 
 #. module: website_blog
 #: model:ir.model,name:website_blog.model_website

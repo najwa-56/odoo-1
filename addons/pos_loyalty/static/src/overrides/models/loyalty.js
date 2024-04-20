@@ -7,6 +7,7 @@ import { _t } from "@web/core/l10n/translation";
 import { patch } from "@web/core/utils/patch";
 import { ConfirmPopup } from "@point_of_sale/app/utils/confirm_popup/confirm_popup";
 
+const { DateTime } = luxon;
 const mutex = new Mutex(); // Used for sequential cache updates
 const updateRewardsMutex = new Mutex();
 
@@ -695,10 +696,10 @@ patch(Order.prototype, {
         if (program.is_nominative && !this.get_partner()) {
             return false;
         }
-        if (program.date_from && program.date_from > new Date()) {
+        if (program.date_from && program.date_from.startOf('day') > DateTime.now()) {
             return false;
         }
-        if (program.date_to && program.date_to < new Date()) {
+        if (program.date_to && program.date_to.endOf('day') < DateTime.now()) {
             return false;
         }
         if (program.limit_usage && program.total_order_count >= program.max_usage) {
@@ -720,26 +721,31 @@ patch(Order.prototype, {
      */
     pointsForPrograms(programs) {
         pointsForProgramsCountedRules = {};
-        const totalTaxed = this.get_total_with_tax();
-        const totalUntaxed = this.get_total_without_tax();
-        const totalsPerProgram = Object.fromEntries(
-            programs.map((program) => [program.id, { untaxed: totalUntaxed, taxed: totalTaxed }])
-        );
         const orderLines = this.get_orderlines();
+        const linesPerRule = {};
         for (const line of orderLines) {
-            if (!line.reward_id) {
+            const reward = line.reward_id
+              ? this.pos.reward_by_id[line.reward_id]
+              : undefined;
+            const isDiscount = reward && reward.reward_type === "discount";
+            const rewardProgram = reward && reward.program_id;
+            // Skip lines for automatic discounts.
+            if (isDiscount && rewardProgram.trigger === "auto") {
                 continue;
             }
-            const reward = this.pos.reward_by_id[line.reward_id];
-            if (reward.reward_type !== "discount") {
-                continue;
-            }
-            const rewardProgram = reward.program_id;
             for (const program of programs) {
-                // Remove automatic discount and this program's discounts from the totals.
-                if (program.id === rewardProgram.id || rewardProgram.trigger === "auto") {
-                    totalsPerProgram[program.id]["taxed"] -= line.get_price_with_tax();
-                    totalsPerProgram[program.id]["untaxed"] -= line.get_price_without_tax();
+                // Skip lines for the current program's discounts.
+                if (isDiscount && rewardProgram.id === program.id) {
+                    continue;
+                }
+                for (const rule of program.rules) {
+                    // Skip lines to which the rule doesn't apply.
+                    if (rule.any_product || rule.valid_product_ids.has(line.get_product().id)) {
+                        if (!linesPerRule[rule.id]) {
+                            linesPerRule[rule.id] = [];
+                        }
+                        linesPerRule[rule.id].push(line);
+                    }
                 }
             }
         }
@@ -754,12 +760,16 @@ patch(Order.prototype, {
                 ) {
                     continue;
                 }
-                const amountCheck =
-                    (rule.minimum_amount_tax_mode === "incl" &&
-                        totalsPerProgram[program.id]["taxed"]) ||
-                    totalsPerProgram[program.id]["untaxed"];
+                const linesForRule = linesPerRule[rule.id] ? linesPerRule[rule.id] : [];
+                const amountWithTax = linesForRule.reduce(
+                    (sum, line) => sum + line.get_price_with_tax(), 0
+                );
+                const amountWithoutTax = linesForRule.reduce(
+                    (sum, line) => sum + line.get_price_without_tax(), 0
+                );
+                const amountCheck = (rule.minimum_amount_tax_mode === 'incl' && amountWithTax)
+                    || amountWithoutTax;
                 if (rule.minimum_amount > amountCheck) {
-                    // NOTE: big doutes par rapport au fait de compter tous les produits
                     continue;
                 }
                 let totalProductQty = 0;
@@ -1354,8 +1364,9 @@ patch(Order.prototype, {
         for (const line of this.get_orderlines()) {
             if (line.get_product().id === product.id) {
                 available += line.get_quantity();
-            } else if (line.reward_product_id === product.id) {
+            } else if (reward.reward_product_ids.includes(line.reward_product_id)) {
                 if (line.reward_id == reward.id) {
+                    remainingPoints += line.points_cost;
                     claimed += line.get_quantity();
                 } else {
                     shouldCorrectRemainingPoints = true;
@@ -1364,7 +1375,7 @@ patch(Order.prototype, {
         }
         let freeQty;
         if (reward.program_id.trigger == "auto") {
-            if (this._isRewardProductPartOfRules(reward, product)) {
+            if (this._isRewardProductPartOfRules(reward, product) && reward.program_id.applies_on !== 'future') {
                 // OPTIMIZATION: Pre-calculate the factors for each reward-product combination during the loading.
                 // For points not based on quantity, need to normalize the points to compute free quantity.
                 const appliedRulesIds = this.couponPointChanges[coupon_id].appliedRules;
@@ -1421,7 +1432,7 @@ patch(Order.prototype, {
     },
     _computePotentialFreeProductQty(reward, product, remainingPoints) {
         if (reward.program_id.trigger == "auto") {
-            if (this._isRewardProductPartOfRules(reward, product)) {
+            if (this._isRewardProductPartOfRules(reward, product) && reward.program_id.applies_on !== 'future') {
                 const line = this.get_orderlines().find(
                     (line) => line.reward_product_id === product.id
                 );
@@ -1507,6 +1518,12 @@ patch(Order.prototype, {
         let claimableRewards = null;
         let coupon = null;
         if (rule) {
+            if (rule.program_id.date_from && this.date_order < rule.program_id.date_from.startOf("day")) {
+                return _t("That promo code program is not yet valid.");
+            }
+            if (rule.program_id.date_to && this.date_order > rule.program_id.date_to.endOf("day")) {
+                return _t("That promo code program is expired.")
+            }
             const program_pricelists = rule.program_id.pricelist_ids;
             if (
                 program_pricelists.length > 0 &&

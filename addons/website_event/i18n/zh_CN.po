@@ -4,8 +4,8 @@
 # 
 # Translators:
 # 山西清水欧度(QQ:54773801) <54773801@qq.com>, 2023
-# Wil Odoo, 2024
 # Chloe Wang, 2024
+# Wil Odoo, 2024
 # 湘子 南 <1360857908@qq.com>, 2024
 # 
 msgid ""
@@ -399,6 +399,16 @@ msgstr "取消"
 #: model_terms:ir.ui.view,arch_db:website_event.snippet_options
 msgid "Cards"
 msgstr "卡片"
+
+#. module: website_event
+#: model_terms:ir.ui.view,arch_db:website_event.snippet_options
+msgid "Card design"
+msgstr "卡片设计"
+
+#. module: website_event
+#: model_terms:ir.ui.view,arch_db:website_event.snippet_options
+msgid "Template badge"
+msgstr "模板徽标"
 
 #. module: website_event
 #: model_terms:ir.ui.view,arch_db:website_event.display_timer_alert_widget
@@ -1227,6 +1237,11 @@ msgstr "返回到事件列表。"
 #: model:ir.model.fields,field_description:website_event.field_event_event__is_seo_optimized
 msgid "SEO optimized"
 msgstr "SEO优化"
+
+#. module: website_event
+#: model_terms:ir.ui.view,arch_db:website_event.event_description_full
+msgid "Share"
+msgstr "分享"
 
 #. module: website_event
 #: model_terms:ir.ui.view,arch_db:website_event.event_description_full

@@ -1779,7 +1779,7 @@ msgstr "指示列入黑名单的经净化电话号码是否为手机号码。有
 #. module: crm
 #: model_terms:ir.ui.view,arch_db:crm.crm_lead_view_form
 msgid "Internal Notes"
-msgstr "内部凭单"
+msgstr "备注"
 
 #. module: crm
 #: model:ir.model.fields,help:crm.field_res_config_settings__crm_auto_assignment_interval_type
@@ -2687,7 +2687,7 @@ msgid ""
 "Odoo helps you keep track of your sales pipeline to follow\n"
 "                    up potential sales and better forecast your future revenues."
 msgstr ""
-"ERP 帮助您跟踪流水线，\n"
+"ERP 帮助您跟踪销售管道，\n"
 "                    关注潜在销售机会，更好地预测未来收入."
 
 #. module: crm

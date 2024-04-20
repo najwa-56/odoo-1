@@ -282,12 +282,13 @@ class AccountPayment(models.Model):
         else:
             return self._get_aml_default_display_name_list()
 
-    def _prepare_move_line_default_vals(self, write_off_line_vals=None):
+    def _prepare_move_line_default_vals(self, write_off_line_vals=None, force_balance=None):
         ''' Prepare the dictionary to create the default account.move.lines for the current payment.
         :param write_off_line_vals: Optional list of dictionaries to create a write-off account.move.line easily containing:
             * amount:       The amount to be added to the counterpart amount.
             * name:         The label to set on the line.
             * account_id:   The account on which create the write-off.
+        :param force_balance: Optional balance.
         :return: A list of python dictionary to be passed to the account.move.line's 'create' method.
         '''
         self.ensure_one()
@@ -312,12 +313,16 @@ class AccountPayment(models.Model):
         else:
             liquidity_amount_currency = 0.0
 
-        liquidity_balance = self.currency_id._convert(
-            liquidity_amount_currency,
-            self.company_id.currency_id,
-            self.company_id,
-            self.date,
-        )
+        if not write_off_line_vals and force_balance is not None:
+            sign = 1 if liquidity_amount_currency > 0 else -1
+            liquidity_balance = sign * abs(force_balance)
+        else:
+            liquidity_balance = self.currency_id._convert(
+                liquidity_amount_currency,
+                self.company_id.currency_id,
+                self.company_id,
+                self.date,
+            )
         counterpart_amount_currency = -liquidity_amount_currency - write_off_amount_currency
         counterpart_balance = -liquidity_balance - write_off_balance
         currency_id = self.currency_id.id
@@ -683,6 +688,8 @@ class AccountPayment(models.Model):
         for pay in self:
             if not pay.payment_method_line_id:
                 raise ValidationError(_("Please define a payment method line on your payment."))
+            elif pay.payment_method_line_id.journal_id and pay.payment_method_line_id.journal_id != pay.journal_id:
+                raise ValidationError(_("The selected payment method is not available for this payment, please select the payment method again."))
 
     # -------------------------------------------------------------------------
     # LOW-LEVEL METHODS
@@ -690,7 +697,7 @@ class AccountPayment(models.Model):
 
     def new(self, values=None, origin=None, ref=None):
         payment = super().new(values, origin, ref)
-        if not payment.journal_id and not payment.default_get(['journal_id']):  # might not be computed because declared by inheritance
+        if not any(values.values()) and not payment.journal_id and not payment.default_get(['journal_id']):  # might not be computed because declared by inheritance
             payment.move_id.payment_id = payment
             payment.move_id._compute_journal_id()
         return payment
@@ -699,11 +706,15 @@ class AccountPayment(models.Model):
     def create(self, vals_list):
         # OVERRIDE
         write_off_line_vals_list = []
+        force_balance_vals_list = []
 
         for vals in vals_list:
 
             # Hack to add a custom write-off line.
             write_off_line_vals_list.append(vals.pop('write_off_line_vals', None))
+
+            # Hack to force a custom balance.
+            force_balance_vals_list.append(vals.pop('force_balance', None))
 
             # Force the move_type to avoid inconsistency with residual 'default_move_type' inside the context.
             vals['move_type'] = 'entry'
@@ -715,8 +726,6 @@ class AccountPayment(models.Model):
         } for vals in vals_list])
 
         for i, pay in enumerate(payments):
-            write_off_line_vals = write_off_line_vals_list[i]
-
             # Write payment_id on the journal entry plus the fields being stored in both models but having the same
             # name, e.g. partner_bank_id. The ORM is currently not able to perform such synchronization and make things
             # more difficult by creating related fields on the fly to handle the _inherits.
@@ -728,7 +737,13 @@ class AccountPayment(models.Model):
                     to_write[k] = v
 
             if 'line_ids' not in vals_list[i]:
-                to_write['line_ids'] = [(0, 0, line_vals) for line_vals in pay._prepare_move_line_default_vals(write_off_line_vals=write_off_line_vals)]
+                to_write['line_ids'] = [
+                    Command.create(line_vals)
+                    for line_vals in pay._prepare_move_line_default_vals(
+                        write_off_line_vals=write_off_line_vals_list[i],
+                        force_balance=force_balance_vals_list[i],
+                    )
+                ]
 
             pay.move_id.write(to_write)
             self.env.add_to_compute(self.env['account.move']._fields['name'], pay.move_id)

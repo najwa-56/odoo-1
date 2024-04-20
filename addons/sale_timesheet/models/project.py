@@ -583,7 +583,7 @@ class ProjectTask(models.Model):
         for task in self:
             task.analytic_account_active = task.analytic_account_active or task.so_analytic_account_id.active
 
-    @api.depends('partner_id.commercial_partner_id', 'sale_line_id.order_partner_id', 'parent_id.sale_line_id', 'project_id.sale_line_id', 'allow_billable')
+    @api.depends('partner_id', 'sale_line_id.order_partner_id', 'parent_id.sale_line_id', 'project_id.sale_line_id', 'allow_billable')
     def _compute_sale_line(self):
         super()._compute_sale_line()
         for task in self:
@@ -608,7 +608,7 @@ class ProjectTask(models.Model):
         domain = [
             ('company_id', '=?', self.company_id.id),
             ('is_service', '=', True),
-            ('order_partner_id', 'child_of', self.partner_id.commercial_partner_id.id),
+            ('order_partner_id', 'child_of', self.partner_id.commercial_partner_id.ids),
             ('is_expense', '=', False),
             ('state', '=', 'sale'),
             ('remaining_hours', '>', 0),

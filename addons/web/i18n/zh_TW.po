@@ -3,7 +3,9 @@
 # 	* web
 # 
 # Translators:
-# Wil Odoo, 2023
+# Alvin Wu <Alvin.Wu.work@gmail.com>, 2024
+# Martin Trigaux, 2024
+# Wil Odoo, 2024
 # Tony Ng, 2024
 # 
 msgid ""
@@ -1045,6 +1047,15 @@ msgstr "添加 qweb 指令上下文"
 #, python-format
 msgid "Add start date"
 msgstr "加入開始日期"
+
+#. module: web
+#. odoo-javascript
+#: code:addons/web/static/src/views/fields/boolean_favorite/boolean_favorite_field.xml:0
+#: code:addons/web/static/src/views/fields/boolean_favorite/boolean_favorite_field.xml:0
+#: code:addons/web/static/src/views/fields/boolean_favorite/boolean_favorite_field.xml:0
+#, python-format
+msgid "Add to Favorites"
+msgstr "添加到最愛"
 
 #. module: web
 #. odoo-javascript
@@ -3518,8 +3529,8 @@ msgstr "ILY"
 #: code:addons/web/static/src/views/fields/datetime/datetime_field.js:0
 #: code:addons/web/static/src/views/fields/datetime/datetime_field.js:0
 #, python-format
-msgid "ISO-formatted date (e.g. \"2018-12-31\") or \"today\"."
-msgstr "ISO 格式日期（例如 \"2018-12-31\"）或 \"今天\"。"
+msgid "ISO-formatted date (e.g. \"2018-12-31\") or \"%s\"."
+msgstr ""
 
 #. module: web
 #. odoo-javascript
@@ -5014,6 +5025,13 @@ msgstr "處於歸檔狀態，點選以更改它"
 
 #. module: web
 #. odoo-javascript
+#: code:addons/web/static/src/views/fields/many2many_binary/many2many_binary_field.js:0
+#, python-format
+msgid "Number of files"
+msgstr ""
+
+#. module: web
+#. odoo-javascript
 #: code:addons/web/static/src/core/emoji_picker/emoji_data.js:0
 #: code:addons/web/static/src/core/emoji_picker/emoji_data.js:0
 #, python-format
@@ -5119,7 +5137,7 @@ msgstr "Odoo錯誤"
 #: code:addons/web/static/src/core/errors/error_dialogs.js:0
 #, python-format
 msgid "Odoo Network Error"
-msgstr "Odoo 網路錯誤"
+msgstr "Odoo 網絡錯誤"
 
 #. module: web
 #. odoo-javascript
@@ -5547,7 +5565,7 @@ msgstr "請選擇要儲存成匯出列表的欄位..."
 #, python-format
 msgid ""
 "Please use the copy button to report the error to your support service."
-msgstr "請使用複製按鈕將錯誤報告給您的支援服務。"
+msgstr "請使用複製按鈕，向你的技術支援服務報告此錯誤。"
 
 #. module: web
 #. odoo-javascript
@@ -5733,7 +5751,7 @@ msgstr "進度條"
 #: code:addons/web/static/src/views/view_components/column_progress.xml:0
 #, python-format
 msgid "Progress bar"
-msgstr ""
+msgstr "進度列"
 
 #. module: web
 #. odoo-javascript
@@ -6019,6 +6037,15 @@ msgstr "移除屬性"
 #, python-format
 msgid "Remove field"
 msgstr "移除欄位"
+
+#. module: web
+#. odoo-javascript
+#: code:addons/web/static/src/views/fields/boolean_favorite/boolean_favorite_field.xml:0
+#: code:addons/web/static/src/views/fields/boolean_favorite/boolean_favorite_field.xml:0
+#: code:addons/web/static/src/views/fields/boolean_favorite/boolean_favorite_field.xml:0
+#, python-format
+msgid "Remove from Favorites"
+msgstr "從最愛移除"
 
 #. module: web
 #. odoo-javascript
@@ -21752,7 +21779,7 @@ msgstr "月經"
 #: code:addons/web/static/src/webclient/menus/menu_providers.js:0
 #, python-format
 msgid "menus"
-msgstr ""
+msgstr "選單"
 
 #. module: web
 #. odoo-javascript
@@ -23246,7 +23273,7 @@ msgstr ""
 #: code:addons/web/static/src/webclient/user_menu/user_menu_items.xml:0
 #, python-format
 msgid "on any screen to show shortcut overlays and"
-msgstr ""
+msgstr "在任何螢幕上，以顯示捷徑覆蓋提示，以及"
 
 #. module: web
 #. odoo-javascript
@@ -24308,7 +24335,7 @@ msgstr "人"
 #: code:addons/web/static/src/core/emoji_picker/emoji_data.js:0
 #, python-format
 msgid "person biking"
-msgstr ""
+msgstr "騎行的人"
 
 #. module: web
 #. odoo-javascript
@@ -24316,7 +24343,7 @@ msgstr ""
 #: code:addons/web/static/src/core/emoji_picker/emoji_data.js:0
 #, python-format
 msgid "person bouncing ball"
-msgstr ""
+msgstr "玩球的人"
 
 #. module: web
 #. odoo-javascript
@@ -24324,7 +24351,7 @@ msgstr ""
 #: code:addons/web/static/src/core/emoji_picker/emoji_data.js:0
 #, python-format
 msgid "person bowing"
-msgstr ""
+msgstr "鞠躬的人"
 
 #. module: web
 #. odoo-javascript
@@ -24340,7 +24367,7 @@ msgstr "打側手翻"
 #: code:addons/web/static/src/core/emoji_picker/emoji_data.js:0
 #, python-format
 msgid "person climbing"
-msgstr ""
+msgstr "攀爬的人"
 
 #. module: web
 #. odoo-javascript
@@ -24348,7 +24375,7 @@ msgstr ""
 #: code:addons/web/static/src/core/emoji_picker/emoji_data.js:0
 #, python-format
 msgid "person facepalming"
-msgstr ""
+msgstr "捂著臉的人"
 
 #. module: web
 #. odoo-javascript
@@ -24356,7 +24383,7 @@ msgstr ""
 #: code:addons/web/static/src/core/emoji_picker/emoji_data.js:0
 #, python-format
 msgid "person fencing"
-msgstr ""
+msgstr "擊劍的人"
 
 #. module: web
 #. odoo-javascript
@@ -24364,7 +24391,7 @@ msgstr ""
 #: code:addons/web/static/src/core/emoji_picker/emoji_data.js:0
 #, python-format
 msgid "person frowning"
-msgstr ""
+msgstr "皺眉頭的人"
 
 #. module: web
 #. odoo-javascript
@@ -28097,7 +28124,7 @@ msgstr "滑杆"
 #: code:addons/web/static/src/core/emoji_picker/emoji_data.js:0
 #, python-format
 msgid "slightly frowning face"
-msgstr ""
+msgstr "微微皺眉表情"
 
 #. module: web
 #. odoo-javascript
@@ -28105,7 +28132,7 @@ msgstr ""
 #: code:addons/web/static/src/core/emoji_picker/emoji_data.js:0
 #, python-format
 msgid "slightly smiling face"
-msgstr ""
+msgstr "微微淺笑表情"
 
 #. module: web
 #. odoo-javascript
@@ -28119,7 +28146,7 @@ msgstr ""
 #: code:addons/web/static/src/core/emoji_picker/emoji_data.js:0
 #, python-format
 msgid "slipper"
-msgstr ""
+msgstr "拖鞋"
 
 #. module: web
 #. odoo-javascript
@@ -28142,7 +28169,7 @@ msgstr "老虎機/角子機"
 #: code:addons/web/static/src/core/emoji_picker/emoji_data.js:0
 #, python-format
 msgid "sloth"
-msgstr ""
+msgstr "樹獺"
 
 #. module: web
 #. odoo-javascript
@@ -28164,7 +28191,7 @@ msgstr ""
 #: code:addons/web/static/src/core/emoji_picker/emoji_data.js:0
 #, python-format
 msgid "small"
-msgstr ""
+msgstr "細小"
 
 #. module: web
 #. odoo-javascript
@@ -28172,14 +28199,14 @@ msgstr ""
 #: code:addons/web/static/src/core/emoji_picker/emoji_data.js:0
 #, python-format
 msgid "small airplane"
-msgstr ""
+msgstr "小飛機"
 
 #. module: web
 #. odoo-javascript
 #: code:addons/web/static/src/core/emoji_picker/emoji_data.js:0
 #, python-format
 msgid "small amount"
-msgstr ""
+msgstr "少量"
 
 #. module: web
 #. odoo-javascript
@@ -28223,14 +28250,14 @@ msgstr ""
 #: code:addons/web/static/src/core/emoji_picker/emoji_data.js:0
 #, python-format
 msgid "smiling cat face with heart eyes"
-msgstr ""
+msgstr "微笑、心形眼睛的貓臉"
 
 #. module: web
 #. odoo-javascript
 #: code:addons/web/static/src/core/emoji_picker/emoji_data.js:0
 #, python-format
 msgid "smiling cat face with heart-eyes"
-msgstr ""
+msgstr "微笑、心形眼睛的貓臉"
 
 #. module: web
 #. odoo-javascript
@@ -28260,7 +28287,7 @@ msgstr ""
 #: code:addons/web/static/src/core/emoji_picker/emoji_data.js:0
 #, python-format
 msgid "smiling face with heart eyes"
-msgstr ""
+msgstr "微笑、心形眼睛的臉"
 
 #. module: web
 #. odoo-javascript
@@ -28292,7 +28319,7 @@ msgstr ""
 #: code:addons/web/static/src/core/emoji_picker/emoji_data.js:0
 #, python-format
 msgid "smiling face with open hands"
-msgstr ""
+msgstr "微笑的臉，張開雙手"
 
 #. module: web
 #. odoo-javascript
@@ -28300,7 +28327,7 @@ msgstr ""
 #: code:addons/web/static/src/core/emoji_picker/emoji_data.js:0
 #, python-format
 msgid "smiling face with smiling eyes"
-msgstr ""
+msgstr "微笑的臉和微笑的眼睛"
 
 #. module: web
 #. odoo-javascript
@@ -28581,7 +28608,7 @@ msgstr ""
 #: code:addons/web/static/src/core/emoji_picker/emoji_data.js:0
 #, python-format
 msgid "sorry"
-msgstr ""
+msgstr "抱歉"
 
 #. module: web
 #. odoo-javascript
@@ -30419,7 +30446,7 @@ msgstr ""
 #: code:addons/web/static/src/webclient/user_menu/user_menu_items.xml:0
 #, python-format
 msgid "to trigger a shortcut."
-msgstr ""
+msgstr "以觸發捷徑。"
 
 #. module: web
 #. odoo-javascript

@@ -6,10 +6,10 @@
 # Jiří Podhorecký, 2023
 # Ivana Bartonkova, 2023
 # Tomáš Píšek, 2024
-# Vojtech Smolka, 2024
 # Wil Odoo, 2024
 # Aleš Fiala <f.ales1@seznam.cz>, 2024
 # Katerina Horylova, 2024
+# Vojtech Smolka, 2024
 # Jakub Smolka, 2024
 # 
 msgid ""
@@ -457,7 +457,7 @@ msgstr "<i class=\"fa fa-warning\"/>&amp;nbsp;"
 #. module: project
 #: model_terms:ir.ui.view,arch_db:project.project_sharing_project_task_view_form
 msgid "<i class=\"oi oi-arrow-right me-1\"/>Back to edit mode"
-msgstr "<i class=\"oi oi-arrow-right me-1\"/>Back to edit mode"
+msgstr "<i class=\"oi oi-arrow-right me-1\"/>Zpět do režimu úprav"
 
 #. module: project
 #: model_terms:ir.ui.view,arch_db:project.view_task_kanban
@@ -4285,7 +4285,7 @@ msgstr "Bezpečnostní token"
 #: model_terms:ir.ui.view,arch_db:project.project_share_wizard_view_form
 #, python-format
 msgid "Send"
-msgstr "Odchozí"
+msgstr "Odeslat"
 
 #. module: project
 #: model:ir.actions.act_window,name:project.action_send_mail_project_project

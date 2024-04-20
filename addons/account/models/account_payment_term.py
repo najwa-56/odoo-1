@@ -26,7 +26,7 @@ class AccountPaymentTerm(models.Model):
     company_id = fields.Many2one('res.company', string='Company')
     fiscal_country_codes = fields.Char(compute='_compute_fiscal_country_codes')
     sequence = fields.Integer(required=True, default=10)
-    currency_id = fields.Many2one('res.currency', default=lambda self: self.env.company.currency_id, store=True)
+    currency_id = fields.Many2one('res.currency', compute="_compute_currency_id")
 
     display_on_invoice = fields.Boolean(string='Show installment dates', default=True)
     example_amount = fields.Monetary(currency_field='currency_id', default=1000, store=False, readonly=True)
@@ -50,6 +50,12 @@ class AccountPaymentTerm(models.Model):
         for record in self:
             allowed_companies = record.company_id or self.env.companies
             record.fiscal_country_codes = ",".join(allowed_companies.mapped('account_fiscal_country_id.code'))
+
+    @api.depends_context('company')
+    @api.depends('company_id')
+    def _compute_currency_id(self):
+        for payment_term in self:
+            payment_term.currency_id = payment_term.company_id.currency_id or self.env.company.currency_id
 
     def _get_amount_due_after_discount(self, total_amount, untaxed_amount):
         self.ensure_one()
@@ -277,12 +283,6 @@ class AccountPaymentTermLine(models.Model):
         for term_line in self:
             if term_line.value == 'percent' and (term_line.value_amount < 0.0 or term_line.value_amount > 100.0):
                 raise ValidationError(_('Percentages on the Payment Terms lines must be between 0 and 100.'))
-
-    @api.constrains('nb_days')
-    def _check_positive(self):
-        for term_line in self:
-            if term_line.nb_days < 0:
-                raise ValidationError(_('The Months and Days of the Payment Terms lines must be positive.'))
 
     @api.depends('payment_id')
     def _compute_days(self):

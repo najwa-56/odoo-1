@@ -227,6 +227,23 @@
             trigger: "iframe .s_website_form_field:contains('Test conditional visibility') .s_website_form_field_description",
             isCheck: true,
         },
+        // Check that visibility condition is deleted on dependency type change.
+        ...addCustomField("char", "text", "dependent", false, {visibility: CONDITIONALVISIBILITY}),
+        ...addCustomField("selection", "radio", "dependency", false),
+        ...selectFieldByLabel("dependent"),
+        ...selectButtonByData('data-set-visibility-dependency="dependency"'),
+        ...selectFieldByLabel("dependency"),
+        ...selectButtonByData('data-custom-field="char"'),
+        ...selectFieldByLabel("dependent"),
+        {
+            content: "Open the select",
+            trigger: 'we-select:has(we-button[data-set-visibility="visible"]) we-toggler',
+        },
+        {
+            content: "Check that the field no longer has conditional visibility",
+            trigger: "we-select we-button[data-set-visibility='visible'].active",
+            isCheck: true,
+        },
 
         ...addExistingField('date', 'text', 'Test Date', true),
 
@@ -459,6 +476,16 @@
         ...addCustomField("char", "text", "field C", false),
         ...selectFieldByLabel("field B"),
         ...selectButtonByText(CONDITIONALVISIBILITY),
+        ...selectButtonByText(CONDITIONALVISIBILITY),
+        {
+            content: "Check that there is a comparator after two clicks on 'Visible only if'",
+            trigger: "[data-attribute-name='visibilityComparator']",
+            run: function () {
+                if (!this.$anchor[0].querySelector("we-button.active")) {
+                    console.error("A default comparator should be set");
+                }
+            },
+        },
         ...selectButtonByData('data-set-visibility-dependency="field C"'),
         ...selectButtonByData('data-select-data-attribute="set"'),
         ...wTourUtils.clickOnSave(),
@@ -532,6 +559,62 @@
             trigger: '[data-field-name="email_to"] input',
             run: 'text test@test.test',
         },
+        // Test a field visibility when it's tied to another Date [Time] field
+        // being set.
+        ...addCustomField("char", "text", "field D", false, { visibility: CONDITIONALVISIBILITY }),
+        ...addCustomField("date", "text", "field E", false),
+        ...selectFieldByLabel("field D"),
+        ...selectButtonByData('data-set-visibility-dependency="field E"'),
+        ...selectButtonByData('data-select-data-attribute="after"'),
+        {
+            content: "Enter a date in the date input",
+            trigger: "[data-name='hidden_condition_additional_date'] input",
+            run: "text 03/28/2017",
+        },
+        ...wTourUtils.clickOnSave(),
+        {
+            content: "Enter an invalid date in field E",
+            trigger: `iframe ${triggerFieldByLabel("field E")} input`,
+            run() {
+                this.$anchor[0].value = "25071981";
+                this.$anchor[0].dispatchEvent(new InputEvent("input", {bubbles: true}));
+                // Adds a delay to let the input code run.
+                setTimeout(() => {
+                    this.$anchor[0].classList.add("invalidDate");
+                }, 500);
+            },
+        },
+        {
+            content: "Enter an valid date in field E",
+            trigger: `iframe ${triggerFieldByLabel("field E")} input.invalidDate`,
+            run() {
+                this.$anchor[0].classList.remove("invalidDate");
+                this.$anchor[0].value = "07/25/1981";
+                this.$anchor[0].dispatchEvent(new InputEvent("input", {bubbles: true}));
+                // Adds a delay to let the input code run.
+                setTimeout(() => {
+                    this.$anchor[0].classList.add("validDate");
+                }, 500);
+            },
+        },
+        {
+            content: "Click to open the date picker popover from field E",
+            trigger: `iframe ${triggerFieldByLabel("field E")} input.validDate`,
+            run(actions) {
+                this.$anchor[0].classList.remove("validDate");
+                actions.click();
+            },
+        },
+        {
+            content: "Select today's date from the date picker",
+            trigger: "iframe .o_datetime_picker .o_date_item_cell.o_today",
+        },
+        {
+            content: "Check that field D is visible",
+            trigger: `iframe .s_website_form:has(${triggerFieldByLabel("field D")}:visible)`,
+            isCheck: true,
+        },
+        ...wTourUtils.clickOnEditAndWaitEditMode(),
         // The next four calls to "addCustomField" are there to ensure such
         // characters do not make the form editor crash.
         ...addCustomField("char", "text", "''", false),

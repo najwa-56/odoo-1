@@ -31,8 +31,9 @@
 # Óscar Fonseca <tecnico@pyming.com>, 2024
 # Iván Infantes Castarnado, 2024
 # Carles Antoli <carlesantoli@hotmail.com>, 2024
-# Josep Anton Belchi, 2024
 # Quim - eccit <quim@eccit.com>, 2024
+# Josep Anton Belchi, 2024
+# Santiago Payà <santiagopim@gmail.com>, 2024
 # 
 msgid ""
 msgstr ""
@@ -40,7 +41,7 @@ msgstr ""
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2024-02-26 12:42+0000\n"
 "PO-Revision-Date: 2023-10-26 23:09+0000\n"
-"Last-Translator: Quim - eccit <quim@eccit.com>, 2024\n"
+"Last-Translator: Santiago Payà <santiagopim@gmail.com>, 2024\n"
 "Language-Team: Catalan (https://app.transifex.com/odoo/teams/41243/ca/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -665,7 +666,7 @@ msgstr ""
 "\n"
 "- *Comptabilitat > Configuració > Pagaments > Comptes bancaris*\n"
 "\n"
-"    El compte apareixerà a la llista com el nom de la revista.\n"
+"    El compte apareixerà a la llista com el nom del diari.\n"
 "\n"
 "    L'edició mostrarà el **Número de compte**. Això és important ja que és utilitzat per\n"
 "    el procés ABA.\n"
@@ -3583,14 +3584,14 @@ msgstr ""
 "Funcional\n"
 "----------\n"
 "\n"
-"Ser capaç de crear revistes a Odoo per crear factures electròniques dels clients i informar després a AFIP (via webservices).\n"
+"Ser capaç de crear diaris a Odoo per crear factures electròniques dels clients i informar després a AFIP (via webservices).\n"
 "Les opcions disponibles són:\n"
 "\n"
 "    * Factura electrònica - Servei web\n"
 "    * Val d'exportació - Servei web\n"
 "    * Fiança Fiscal Electrònica - Servei Web\n"
 "\n"
-"A les revistes electròniques si valides una factura aquesta es validarà tant a Odoo com a AFIP. Aquesta validació és\n"
+"Als diaris electrònics si valides una factura aquesta es validarà tant a Odoo com a AFIP. Aquesta validació és\n"
 "fet al moment i rebem l'estat \"aprovat/aprovat amb observació/rebutjat\" de l'AFIP. Si la factura ha sigut\n"
 "rebutjat per AFIP no es publicarà al sistema i es mostrarà un missatge emergent amb el detall de l'error (motius del rebuig)\n"
 "rebem i una PISTA sobre quin podria ser el problema.\n"
@@ -3598,7 +3599,7 @@ msgstr ""
 "Amb finalitats d'auditoria i resolució de problemes també afegim un menú \"Consultar Factura en AFIP\" que ens permet consultar prèviament les factures.\n"
 "enviat a AFIP i l'últim número utilitzat com a suport per a qualsevol possible problema en la sincronització de seqüències entre Odoo i AFIP.\n"
 "\n"
-"    NOTA: des de la vista de formulari de la revista, podem forçar una sincronització entre les seqüències odoo amb cadascun dels tipus de document \n"
+"    NOTA: des de la vista de formulari del diari, podem forçar una sincronització entre les seqüències odoo amb cadascun dels tipus de document \n"
 "    amb els últims números registrats a l'AFIP.\n"
 "\n"
 "Des de les factures de proveïdors, hem afegit una funcionalitat que es pot configurar a la configuració de comptabilitat per poder verificar\n"
@@ -3631,7 +3632,7 @@ msgstr ""
 "\n"
 "    2.3. Establiu el número de TPV AFIP i l'adreça de TPV AFIP tenint en compte el que heu configurat al vostre Portal AFIP.\n"
 "\n"
-"    NOTA: Podeu utilitzar el botó \"Comprovar TPV AFIP disponible\" al formulari de la revista per corroborar el que s'ha d'utilitzar per crear els diaris.\n"
+"    NOTA: Podeu utilitzar el botó \"Comprovar TPV AFIP disponible\" al formulari del diari per corroborar el que s'ha d'utilitzar per crear els diaris.\n"
 "\n"
 "Per obtenir més informació sobre la factura electrònica argentina, si us plau, aneu a http://www.afip.gob.ar/fe/ayuda.asp\n"
 "\n"
@@ -3678,7 +3679,7 @@ msgstr ""
 "\n"
 "Aquest mòdul està pensat per ser ampliat per localitzacions per tal de gestionar aquests tipus de documents i és una informació essencial que s'ha de mostrar en els informes impresos i que cal identificar fàcilment, tant dins del conjunt de factures com de moviments de comptes.\n"
 "\n"
-"Cada tipus de document té les seves pròpies regles i número de seqüència, aquest últim s'integra amb el número de factura i la seqüència del diari per tal de ser fàcil per a l'usuari de la localització. Per donar suport o no aquest tipus de document, una revista té una nova opció que permet utilitzar o no el document.\n"
+"Cada tipus de document té les seves pròpies regles i número de seqüència, aquest últim s'integra amb el número de factura i la seqüència del diari per tal de ser fàcil per a l'usuari de la localització. Per donar suport o no aquest tipus de document, un diari té una nova opció que permet utilitzar o no el document.\n"
 "\n"
 "Tècnic\n"
 "---------\n"
@@ -9100,7 +9101,7 @@ msgstr "9. %w ==&gt; 5 (divendres és el 6è dia)"
 #. module: base
 #: model_terms:ir.ui.view,arch_db:base.view_partner_form
 msgid "<b invisible=\"not is_company\">Address</b>"
-msgstr ""
+msgstr "<b invisible=\"not is_company\">Adreça</b>"
 
 #. module: base
 #: model_terms:ir.ui.view,arch_db:base.view_server_action_form
@@ -9470,7 +9471,7 @@ msgstr "<strong>C</strong>"
 #. module: base
 #: model_terms:ir.ui.view,arch_db:base.report_irmodulereference
 msgid "<strong>Dependencies:</strong>"
-msgstr ""
+msgstr "<strong>Dependències:</strong>"
 
 #. module: base
 #: model_terms:ir.ui.view,arch_db:base.view_res_company_kanban
@@ -9511,7 +9512,7 @@ msgstr "<strong>Etiqueta</strong>"
 #. module: base
 #: model_terms:ir.ui.view,arch_db:base.report_irmodulereference
 msgid "<strong>Menu:</strong>"
-msgstr ""
+msgstr "<strong>Menú:</strong>"
 
 #. module: base
 #: model_terms:ir.ui.view,arch_db:base.report_irmodeloverview
@@ -9544,7 +9545,7 @@ msgstr "<strong>R</strong>"
 #. module: base
 #: model_terms:ir.ui.view,arch_db:base.report_irmodulereference
 msgid "<strong>Reports:</strong>"
-msgstr ""
+msgstr "<strong>Informes:</strong>"
 
 #. module: base
 #: model_terms:ir.ui.view,arch_db:base.report_irmodeloverview
@@ -9594,7 +9595,7 @@ msgstr "<strong>U</strong>"
 #. module: base
 #: model_terms:ir.ui.view,arch_db:base.report_irmodulereference
 msgid "<strong>View:</strong>"
-msgstr ""
+msgstr "<strong>Vista:</strong>"
 
 #. module: base
 #: model_terms:ir.ui.view,arch_db:base.report_irmodeloverview
@@ -10217,7 +10218,7 @@ msgstr "Transferències automàtiques del compte"
 #. module: base
 #: model:ir.module.module,shortdesc:base.module_account_bank_statement_import
 msgid "Account Bank Statement Import"
-msgstr "Compte de l'import de l'extracte bancari "
+msgstr "Importació de l'extracte bancari del compte"
 
 #. module: base
 #: model:ir.module.module,shortdesc:base.module_account_accountant_batch_payment
@@ -10777,7 +10778,7 @@ msgstr "Afegeix vistes i ajustos a l'esdeveniment"
 #. module: base
 #: model:ir.model.fields.selection,name:base.selection__ir_actions_server__update_m2m_operation__add
 msgid "Adding"
-msgstr ""
+msgstr "Afegint"
 
 #. module: base
 #: model:ir.module.module,summary:base.module_pos_self_order
@@ -11477,7 +11478,7 @@ msgstr "Anguilla"
 #: code:addons/base/models/res_partner.py:0
 #, python-format
 msgid "Another partner already has this barcode"
-msgstr ""
+msgstr "Aquest codi de barres ja el té un altre partner"
 
 #. module: base
 #: model:res.country,name:base.aq
@@ -12361,7 +12362,7 @@ msgstr "Arquitectura de vista base"
 #. module: base
 #: model:ir.module.module,shortdesc:base.module_base_import
 msgid "Base import"
-msgstr "Import Base "
+msgstr "Importació Base "
 
 #. module: base
 #: model:ir.module.module,shortdesc:base.module_base_import_module
@@ -12520,7 +12521,7 @@ msgstr ""
 #. module: base
 #: model:ir.module.module,shortdesc:base.module_l10n_be_coda
 msgid "Belgium - Import Bank CODA Statements"
-msgstr "Bèlgica - Importa les declaracions de CODA del Banc"
+msgstr "Bèlgica - Importeu extractes bancaris CODA"
 
 #. module: base
 #: model:ir.module.module,shortdesc:base.module_l10n_be_soda
@@ -12713,7 +12714,7 @@ msgstr "Illa Bouvet"
 #: model_terms:ir.ui.view,arch_db:base.view_company_form
 #, python-format
 msgid "Branches"
-msgstr ""
+msgstr "Branques"
 
 #. module: base
 #: model:res.country,name:base.br
@@ -13684,7 +13685,7 @@ msgstr "Vista de company "
 msgid "Collect payments from your customers through SEPA direct debit."
 msgstr ""
 "Reculli els pagaments dels seus clients a través de la domiciliació bancària"
-" SÀPIGA."
+" SEPA."
 
 #. module: base
 #: model:res.country,name:base.co
@@ -15413,7 +15414,7 @@ msgstr "Tema del lloc web predeterminat"
 #. module: base
 #: model:ir.module.module,shortdesc:base.module_account_tax_python
 msgid "Define Taxes as Python Code"
-msgstr "Definir imposts com a Codi Phyton "
+msgstr "Definir imposts com a codi Python "
 
 #. module: base
 #: model_terms:ir.ui.view,arch_db:base.module_form
@@ -18537,7 +18538,7 @@ msgstr "CC Global"
 #. module: base
 #: model_terms:ir.ui.view,arch_db:base.view_rule_search
 msgid "Group-based"
-msgstr ""
+msgstr "Basat en grups"
 
 #. module: base
 #. odoo-python
@@ -25999,7 +26000,7 @@ msgstr "Localizació de nomina dels sous"
 #. module: base
 #: model:ir.module.module,shortdesc:base.module_account_peppol
 msgid "Peppol"
-msgstr ""
+msgstr "Peppol"
 
 #. module: base
 #: model:res.country,name:base.pe
@@ -27312,7 +27313,7 @@ msgstr "Taxes"
 #: model:ir.model.fields,field_description:base.field_ir_rule__perm_read
 #: model_terms:ir.ui.view,arch_db:base.view_rule_search
 msgid "Read"
-msgstr ""
+msgstr "Llegir"
 
 #. module: base
 #: model:ir.model.fields,field_description:base.field_ir_model_access__perm_read
@@ -27579,7 +27580,7 @@ msgstr "Elimina l'acció contextual relacionada amb aquest informe"
 #. module: base
 #: model:ir.model.fields.selection,name:base.selection__ir_actions_server__update_m2m_operation__remove
 msgid "Removing"
-msgstr ""
+msgstr "Eliminant"
 
 #. module: base
 #: model:ir.module.module,shortdesc:base.module_sale_renting
@@ -28516,6 +28517,12 @@ msgid "Scheduled Actions Triggers"
 msgstr "Activadors d'accions programades"
 
 #. module: base
+#: code:addons/base/models/ir_cron.py:0
+#, python-format
+msgid "Scheduled action disabled"
+msgstr ""
+
+#. module: base
 #: model:ir.model.fields,field_description:base.field_ir_cron__user_id
 msgid "Scheduler User"
 msgstr "Usuari del planificador"
@@ -28880,6 +28887,12 @@ msgid ""
 "emails are compromised. Once verified, you can activate the ability to send "
 "money."
 msgstr ""
+"L'enviament de factures falses amb comptes bancaris fraudulents és una "
+"pràctica comuna de phishing. Per a protegir-vos, és important verificar "
+"sempre els comptes bancaris nous, preferiblement trucant al proveïdor, ja "
+"que el phishing normalment succeeix quan s'han compromés els correus "
+"electrònics. Un cop verificat el compte, podeu activar la funció d'enviar "
+"diners."
 
 #. module: base
 #: model:res.country,name:base.sn
@@ -29198,7 +29211,7 @@ msgstr "Plantilles de signatura de Documents"
 #. module: base
 #: model:ir.module.module,shortdesc:base.module_auth_signup
 msgid "Signup"
-msgstr "Registra't"
+msgstr "Registre d'usuaris"
 
 #. module: base
 #: model:ir.module.module,summary:base.module_pos_discount
@@ -32096,6 +32109,14 @@ msgid "Those modules cannot be uninstalled: %s"
 msgstr "Aquests complements no es poden desinstal·lar: %s"
 
 #. module: base
+#: code:addons/base/models/ir_cron.py:0
+#, python-format
+msgid ""
+"This scheduled action has been disabled because its interval number is not a"
+" strictly positive value."
+msgstr ""
+
+#. module: base
 #: model:ir.model.fields,field_description:base.field_res_lang__thousands_sep
 msgid "Thousands Separator"
 msgstr "Separador de milers"
@@ -32255,7 +32276,7 @@ msgstr "Per retornar una acció, assigneu: <code>acció = {...}</code>"
 #: model:ir.module.category,name:base.module_category_productivity_to-do
 #: model:ir.module.module,shortdesc:base.module_project_todo
 msgid "To-Do"
-msgstr ""
+msgstr "Per fer"
 
 #. module: base
 #: model_terms:ir.ui.view,arch_db:base.ir_actions_todo_tree
@@ -32747,7 +32768,7 @@ msgstr "No puc trobar Wkhtmltopdf en aquest sistema. El PDF no pot ser creat."
 #: code:addons/base/models/ir_fields.py:0
 #, python-format
 msgid "Unable to import field type '%s'  "
-msgstr ""
+msgstr "No es pot importar el tipus de camp '%s'  "
 
 #. module: base
 #. odoo-python
@@ -32821,7 +32842,7 @@ msgstr "Desinstal·la el mòdul"
 #: model:ir.model.fields.selection,name:base.selection__ir_module_module_dependency__state__uninstallable
 #: model:ir.model.fields.selection,name:base.selection__ir_module_module_exclusion__state__uninstallable
 msgid "Uninstallable"
-msgstr "Desinstalable"
+msgstr "No instal·lable"
 
 #. module: base
 #: model_terms:ir.ui.view,arch_db:base.view_base_module_uninstall
@@ -34248,8 +34269,8 @@ msgid ""
 "Wkhtmltopdf failed (error code: %s). Memory limit too low or maximum file "
 "number of subprocess reached. Message : %s"
 msgstr ""
-"Wkhtmltopdf falló (código de error: %s). Límite de memoria demasiado bajo o "
-"número de archivo máximo de subproceso alcanzado. Mensaje: %s"
+"Wkhtmltopdf ha fallat (codi d'error: %s). Límit de memòria massa baix o "
+"màxim nombre d'arxius de subprocés superat. Missatge: %s"
 
 #. module: base
 #. odoo-python
@@ -34319,7 +34340,7 @@ msgstr ""
 #: model:ir.model.fields,field_description:base.field_ir_rule__perm_write
 #: model_terms:ir.ui.view,arch_db:base.view_rule_search
 msgid "Write"
-msgstr ""
+msgstr "Escriure"
 
 #. module: base
 #: model:ir.model.fields,field_description:base.field_ir_model_access__perm_write
@@ -34634,6 +34655,15 @@ msgstr "No podeu esborrar el registre %s."
 
 #. module: base
 #. odoo-python
+#: code:addons/base/models/res_users.py:0
+#, python-format
+msgid ""
+"You cannot delete the admin user because it is utilized in various places "
+"(such as security configurations,...). Instead, archive it."
+msgstr ""
+
+#. module: base
+#. odoo-python
 #: code:addons/base/models/res_lang.py:0
 #, python-format
 msgid ""
@@ -34808,7 +34838,7 @@ msgstr "compte"
 #. module: base
 #: model:ir.module.module,shortdesc:base.module_account_qr_code_emv
 msgid "account_qr_code_emv"
-msgstr ""
+msgstr "account_qr_code_emv"
 
 #. module: base
 #: model:ir.model.fields,field_description:base.field_ir_asset__active
@@ -34876,7 +34906,7 @@ msgstr "escollir"
 #: code:addons/base/models/ir_rule.py:0
 #, python-format
 msgid "create"
-msgstr ""
+msgstr "crear"
 
 #. module: base
 #. odoo-python
@@ -35290,7 +35320,7 @@ msgstr "pos_account_reports"
 #. module: base
 #: model:ir.module.module,shortdesc:base.module_pos_mrp
 msgid "pos_mrp"
-msgstr ""
+msgstr "pos_mrp"
 
 #. module: base
 #: model:ir.module.module,summary:base.module_hr_expense_predict_product
@@ -35346,7 +35376,7 @@ msgstr "selecció"
 #. module: base
 #: model:ir.model.fields.selection,name:base.selection__ir_actions_server__value_field_to_show__selection_value
 msgid "selection_value"
-msgstr ""
+msgstr "selection_value"
 
 #. module: base
 #: model:ir.module.category,name:base.module_category_services_sales_subscriptions
@@ -35480,12 +35510,12 @@ msgstr "cert"
 #: code:addons/base/models/ir_rule.py:0
 #, python-format
 msgid "unlink"
-msgstr ""
+msgstr "desenllaça"
 
 #. module: base
 #: model:ir.model.fields.selection,name:base.selection__ir_actions_server__value_field_to_show__update_boolean_value
 msgid "update_boolean_value"
-msgstr ""
+msgstr "update_boolean_value"
 
 #. module: base
 #: model:ir.model.fields.selection,name:base.selection__ir_actions_server__value_field_to_show__value

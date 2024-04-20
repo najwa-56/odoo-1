@@ -39,7 +39,7 @@ class Applicant(models.Model):
         inverse='_inverse_partner_email', store=True, index='trigram')
     email_normalized = fields.Char(index='trigram')  # inherited via mail.thread.blacklist
     probability = fields.Float("Probability")
-    partner_id = fields.Many2one('res.partner', "Contact", copy=False)
+    partner_id = fields.Many2one('res.partner', "Contact", copy=False, index='btree_not_null')
     create_date = fields.Datetime("Applied on", readonly=True)
     stage_id = fields.Many2one('hr.recruitment.stage', 'Stage', ondelete='restrict', tracking=True,
                                compute='_compute_stage', store=True, readonly=False,
@@ -413,7 +413,8 @@ class Applicant(models.Model):
         return res
 
     def _email_is_blacklisted(self, mail):
-        return mail in [m.strip() for m in self.env['ir.config_parameter'].sudo().get_param('hr_recruitment.blacklisted_emails', '').split(',')]
+        normalized_mail = tools.email_normalize(mail)
+        return normalized_mail in [m.strip() for m in self.env['ir.config_parameter'].sudo().get_param('hr_recruitment.blacklisted_emails', '').split(',')]
 
     def get_empty_list_help(self, help_message):
         if 'active_id' in self.env.context and self.env.context.get('active_model') == 'hr.job':
@@ -445,17 +446,6 @@ class Applicant(models.Model):
             and not self.user_has_groups('hr_recruitment.group_hr_recruitment_user'):
             view_id = self.env.ref('hr_recruitment.hr_applicant_view_form_interviewer').id
         return super().get_view(view_id, view_type, **options)
-
-    def _notify_get_recipients(self, message, msg_vals, **kwargs):
-        """
-            Do not notify members of the Recruitment Interviewer group that are not part of
-            Recruitment User group as well, as this
-            might leak some data they shouldn't have access to.
-        """
-        recipients = super()._notify_get_recipients(message, msg_vals, **kwargs)
-        interviewer_group = self.env.ref('hr_recruitment.group_hr_recruitment_interviewer').id
-        user_group = self.env.ref('hr_recruitment.group_hr_recruitment_user').id
-        return [recipient for recipient in recipients if not (interviewer_group in recipient['groups'] and user_group not in recipient['groups'])]
 
     def action_makeMeeting(self):
         """ This opens Meeting's calendar view to schedule meeting on current applicant
@@ -610,10 +600,12 @@ class Applicant(models.Model):
         defaults = {
             'name': msg.get('subject') or _("No Subject"),
             'partner_name': partner_name or email_from_normalized,
-            'partner_id': msg.get('author_id', False),
         }
         if msg.get('from') and not self._email_is_blacklisted(msg.get('from')):
             defaults['email_from'] = msg.get('from')
+            defaults['partner_id'] = msg.get('author_id', False)
+        if msg.get('email_from') and self._email_is_blacklisted(msg.get('email_from')):
+            del msg['email_from']
         if msg.get('priority'):
             defaults['priority'] = msg.get('priority')
         if stage and stage.id:
@@ -687,6 +679,7 @@ class Applicant(models.Model):
             'work_email': self.department_id.company_id.email or self.email_from, # To have a valid email address by default
             'work_phone': self.department_id.company_id.phone,
             'applicant_id': self.ids,
+            'private_phone': self.partner_phone or self.partner_mobile
         }
 
     def _update_employee_from_applicant(self):

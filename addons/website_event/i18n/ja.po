@@ -3,8 +3,8 @@
 # 	* website_event
 # 
 # Translators:
-# Wil Odoo, 2024
 # Ryoko Tsuda <ryoko@quartile.co>, 2024
+# Wil Odoo, 2024
 # Junko Augias, 2024
 # 
 msgid ""
@@ -318,7 +318,7 @@ msgstr "回答"
 #: model_terms:ir.ui.view,arch_db:website_event.event_registration_answer_view_pivot
 #: model_terms:ir.ui.view,arch_db:website_event.event_registration_answer_view_tree
 msgid "Answer Breakdown"
-msgstr "回答ブレークダウン"
+msgstr "回答内訳"
 
 #. module: website_event
 #: model:ir.model.fields,field_description:website_event.field_event_question__answer_ids
@@ -397,6 +397,16 @@ msgstr "取消"
 #: model_terms:ir.ui.view,arch_db:website_event.snippet_options
 msgid "Cards"
 msgstr "カード"
+
+#. module: website_event
+#: model_terms:ir.ui.view,arch_db:website_event.snippet_options
+msgid "Card design"
+msgstr "カードデザイン"
+
+#. module: website_event
+#: model_terms:ir.ui.view,arch_db:website_event.snippet_options
+msgid "Template badge"
+msgstr "テンプレートバッジ"
 
 #. module: website_event
 #: model_terms:ir.ui.view,arch_db:website_event.display_timer_alert_widget
@@ -1226,6 +1236,11 @@ msgstr "イベントリストに戻る。"
 #: model:ir.model.fields,field_description:website_event.field_event_event__is_seo_optimized
 msgid "SEO optimized"
 msgstr "SEO最適化済"
+
+#. module: website_event
+#: model_terms:ir.ui.view,arch_db:website_event.event_description_full
+msgid "Share"
+msgstr "共有"
 
 #. module: website_event
 #: model_terms:ir.ui.view,arch_db:website_event.event_description_full

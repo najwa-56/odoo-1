@@ -29,6 +29,15 @@ class AccountMoveSend(models.TransientModel):
         values['send_peppol'] = self.checkbox_send_peppol
         return values
 
+    @api.model
+    def _get_wizard_vals_restrict_to(self, only_options):
+        # EXTENDS 'account'
+        values = super()._get_wizard_vals_restrict_to(only_options)
+        return {
+            'checkbox_send_peppol': False,
+            **values,
+        }
+
     # -------------------------------------------------------------------------
     # COMPUTE METHODS
     # -------------------------------------------------------------------------
@@ -36,7 +45,7 @@ class AccountMoveSend(models.TransientModel):
     @api.depends('enable_peppol')
     def _compute_checkbox_send_peppol(self):
         for wizard in self:
-            wizard.checkbox_send_peppol = wizard.enable_peppol
+            wizard.checkbox_send_peppol = wizard.enable_peppol and not wizard.peppol_warning
 
     @api.depends('checkbox_send_peppol')
     def _compute_checkbox_ubl_cii_xml(self):
@@ -138,7 +147,6 @@ class AccountMoveSend(models.TransientModel):
 
                 partner = invoice.partner_id.commercial_partner_id
                 if not partner.peppol_eas or not partner.peppol_endpoint:
-                    # should never happen but in case it does, we need to handle it
                     invoice.peppol_move_state = 'error'
                     invoice_data['error'] = _('The partner is missing Peppol EAS and/or Endpoint identifier.')
                     continue
@@ -167,25 +175,26 @@ class AccountMoveSend(models.TransientModel):
                 f"{edi_user._get_server_url()}/api/peppol/1/send_document",
                 params=params,
             )
-            if response.get('error'):
-                # at the moment the only error that can happen here is ParticipantNotReady error
-                for invoice, invoice_data in invoices_data_peppol.items():
-                    invoice.peppol_move_state = 'error'
-                    invoice_data['error'] = response['error']['message']
         except AccountEdiProxyError as e:
             for invoice, invoice_data in invoices_data_peppol.items():
                 invoice.peppol_move_state = 'error'
                 invoice_data['error'] = e.message
         else:
-            # the response only contains message uuids,
-            # so we have to rely on the order to connect peppol messages to account.move
-            invoices = self.env['account.move']
-            for i, (invoice, invoice_data) in enumerate(invoices_data_peppol.items()):
-                invoice.peppol_message_uuid = response['messages'][i]['message_uuid']
-                invoice.peppol_move_state = 'processing'
-                invoices |= invoice
-            log_message = _('The document has been sent to the Peppol Access Point for processing')
-            invoices._message_log_batch(bodies=dict((invoice.id, log_message) for invoice in invoices_data_peppol))
+            if response.get('error'):
+                # at the moment the only error that can happen here is ParticipantNotReady error
+                for invoice, invoice_data in invoices_data_peppol.items():
+                    invoice.peppol_move_state = 'error'
+                    invoice_data['error'] = response['error']['message']
+            else:
+                # the response only contains message uuids,
+                # so we have to rely on the order to connect peppol messages to account.move
+                invoices = self.env['account.move']
+                for message, (invoice, invoice_data) in zip(response['messages'], invoices_data_peppol.items()):
+                    invoice.peppol_message_uuid = message['message_uuid']
+                    invoice.peppol_move_state = 'processing'
+                    invoices |= invoice
+                log_message = _('The document has been sent to the Peppol Access Point for processing')
+                invoices._message_log_batch(bodies=dict((invoice.id, log_message) for invoice in invoices))
 
         if self._can_commit():
             self._cr.commit()

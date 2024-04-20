@@ -46,12 +46,14 @@ from . import test_search
 from . import test_split_table
 from . import test_sql
 from . import test_translate
+from . import test_tz
 # from . import test_uninstall  # loop
 from . import test_user_has_group
 from . import test_views
 from . import test_xmlrpc
 from . import test_res_company
 from . import test_res_currency
+from . import test_res_country
 from . import test_res_partner
 from . import test_res_partner_bank
 from . import test_res_users

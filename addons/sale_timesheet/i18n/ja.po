@@ -3,8 +3,8 @@
 # 	* sale_timesheet
 # 
 # Translators:
-# Ryoko Tsuda <ryoko@quartile.co>, 2023
 # Wil Odoo, 2024
+# Ryoko Tsuda <ryoko@quartile.co>, 2024
 # Junko Augias, 2024
 # 
 msgid ""
@@ -320,7 +320,7 @@ msgstr "コンフィグ設定"
 #. module: sale_timesheet
 #: model_terms:ir.ui.view,arch_db:sale_timesheet.res_config_settings_view_form
 msgid "Configure your services"
-msgstr "サービス製品を設定する"
+msgstr "サービスプロダクトを設定"
 
 #. module: sale_timesheet
 #: model:ir.model.fields,field_description:sale_timesheet.field_project_sale_line_employee_map__cost
@@ -801,7 +801,7 @@ msgstr "オーダ済時間、"
 msgid ""
 "Percentage of time delivered compared to the prepaid amount that must be "
 "reached for the upselling opportunity activity to be triggered."
-msgstr "アップセリング案件の活動がトリガされるために到達しなければならない前払金額と比較した配信時間のパーセンテージ。"
+msgstr "アップセリング案件の活動がトリガーされるために到達しなければならない前払金額と比較した配信時間のパーセンテージ。"
 
 #. module: sale_timesheet
 #: model:ir.model.fields,field_description:sale_timesheet.field_project_project__pricing_type
@@ -1231,7 +1231,7 @@ msgstr "時間請求"
 #. module: sale_timesheet
 #: model_terms:ir.ui.view,arch_db:sale_timesheet.product_template_view_search_sale_timesheet
 msgid "Time-based services"
-msgstr "時間制のサービス"
+msgstr "時間基準のサービス"
 
 #. module: sale_timesheet
 #: model:ir.actions.act_window,name:sale_timesheet.timesheet_action_from_plan

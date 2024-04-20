@@ -651,16 +651,16 @@ class TestResMixin(TestResourceCommon):
     def test_adjust_calendar_timezone_before(self):
         # Calendar:
         # Every day 8-16
-        self.jean.tz = 'Japan'
+        self.jean.tz = 'Asia/Tokyo'
         self.calendar_jean.tz = 'Europe/Brussels'
 
         result = self.jean._adjust_to_calendar(
-            datetime_tz(2020, 4, 1, 0, 0, 0, tzinfo='Japan'),
-            datetime_tz(2020, 4, 1, 23, 59, 59, tzinfo='Japan'),
+            datetime_tz(2020, 4, 1, 0, 0, 0, tzinfo='Asia/Tokyo'),
+            datetime_tz(2020, 4, 1, 23, 59, 59, tzinfo='Asia/Tokyo'),
         )
         self.assertEqual(result[self.jean], (
-            datetime_tz(2020, 4, 1, 8, 0, 0, tzinfo='Japan'),
-            datetime_tz(2020, 4, 1, 16, 0, 0, tzinfo='Japan'),
+            datetime_tz(2020, 4, 1, 8, 0, 0, tzinfo='Asia/Tokyo'),
+            datetime_tz(2020, 4, 1, 16, 0, 0, tzinfo='Asia/Tokyo'),
         ), "It should have found a starting time the 1st")
 
     def test_adjust_calendar_timezone_after(self):
@@ -1386,3 +1386,18 @@ class TestResource(TestResourceCommon):
         """
         self.env.company.resource_calendar_id = self.two_weeks_resource
         self.env['res.company'].create({'name': 'New Company'})
+
+    def test_empty_working_hours_for_two_weeks_resource(self):
+        resource = self._define_calendar_2_weeks(
+            'Two weeks resource',
+            [],
+            'Europe/Brussels'
+        )
+        resource_attendance = self.env['resource.calendar.attendance'].create({
+            'name': 'test',
+            'calendar_id': self.calendar_jean.id,
+            'hour_from': 0,
+            'hour_to': 0
+        })
+        resource_hour = resource._get_hours_per_day(resource_attendance)
+        self.assertEqual(resource_hour, 0.0)

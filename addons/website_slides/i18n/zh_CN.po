@@ -5,9 +5,9 @@
 # Translators:
 # 山西清水欧度(QQ:54773801) <54773801@qq.com>, 2023
 # Yazi Tian, 2024
-# 湘子 南 <1360857908@qq.com>, 2024
 # Wil Odoo, 2024
 # Chloe Wang, 2024
+# 湘子 南 <1360857908@qq.com>, 2024
 # Jeffery CHEN <jeffery9@gmail.com>, 2024
 # 
 msgid ""
@@ -1765,7 +1765,7 @@ msgstr "一个很棒的主标题"
 #. module: website_slides
 #: model:ir.model.fields,field_description:website_slides.field_slide_channel__slide_category_ids
 msgid "Categories"
-msgstr "电商品类"
+msgstr "类别"
 
 #. module: website_slides
 #: model:ir.model.fields,field_description:website_slides.field_slide_slide__slide_category
@@ -4607,7 +4607,7 @@ msgstr "不支持操作"
 #: code:addons/website_slides/controllers/mail.py:0
 #, python-format
 msgid "Only a single review can be posted per course."
-msgstr ""
+msgstr "每门课程只能发布一个评论."
 
 #. module: website_slides
 #: model:ir.model.fields,help:website_slides.field_slide_channel_invite__lang

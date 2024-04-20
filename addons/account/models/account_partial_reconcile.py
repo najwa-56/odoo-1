@@ -18,7 +18,7 @@ class AccountPartialReconcile(models.Model):
         index=True, required=True)
     full_reconcile_id = fields.Many2one(
         comodel_name='account.full.reconcile',
-        string="Full Reconcile", copy=False)
+        string="Full Reconcile", copy=False, index='btree_not_null')
     exchange_move_id = fields.Many2one(comodel_name='account.move', index='btree_not_null')
 
     # ==== Currency fields ====
@@ -271,12 +271,15 @@ class AccountPartialReconcile(models.Model):
                 if source_line.currency_id != counterpart_line.currency_id:
                     # When the invoice and the payment are not sharing the same foreign currency, the rate is computed
                     # on-the-fly using the payment date.
-                    payment_rate = self.env['res.currency']._get_conversion_rate(
-                        counterpart_line.company_currency_id,
-                        source_line.currency_id,
-                        counterpart_line.company_id,
-                        payment_date,
-                    )
+                    if 'forced_rate_from_register_payment' in self._context:
+                        payment_rate = self._context['forced_rate_from_register_payment']
+                    else:
+                        payment_rate = self.env['res.currency']._get_conversion_rate(
+                            counterpart_line.company_currency_id,
+                            source_line.currency_id,
+                            counterpart_line.company_id,
+                            payment_date,
+                        )
                 elif rate_amount:
                     payment_rate = rate_amount_currency / rate_amount
                 else:

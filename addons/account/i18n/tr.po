@@ -11209,6 +11209,15 @@ msgstr "Lütfen ödemenizde bir ödeme yöntemi satırı tanımlayın."
 
 #. module: account
 #. odoo-python
+#: code:addons/account/models/account_payment.py:0
+#, python-format
+msgid ""
+"The selected payment method is not available for this payment, please select"
+" the payment method again."
+msgstr ""
+
+#. module: account
+#. odoo-python
 #: code:addons/account/models/company.py:0
 #, python-format
 msgid ""
@@ -16820,6 +16829,15 @@ msgid ""
 msgstr ""
 "Zaten bir sıra numarası tükettiğinden ve zincirdeki son giriş olmadığı için "
 "bu girişi silemezsiniz. Onun yerine geri dönmelisin."
+
+#. module: account
+#. odoo-python
+#: code:addons/account/models/ir_actions_report.py:0
+#, python-format
+msgid ""
+"You cannot delete this report (%s), it is used by the accounting PDF "
+"generation engine."
+msgstr ""
 
 #. module: account
 #. odoo-python

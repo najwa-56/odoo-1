@@ -221,7 +221,7 @@ class SaleAdvancePaymentInv(models.TransientModel):
 
             invoice = self.env['account.move'].sudo().create(
                 self._prepare_invoice_values(order, down_payment_lines)
-            ).with_user(self.env.uid)  # Unsudo the invoice after creation
+            )
 
             # Ensure the invoice total is exactly the expected fixed amount.
             if self.advance_payment_method == 'fixed':
@@ -255,6 +255,9 @@ class SaleAdvancePaymentInv(models.TransientModel):
                                 remaining -= amt
                                 line_commands.append(Command.update(line.id, {attr: line[attr] + amt * sign}))
                         invoice.line_ids = line_commands
+
+            # Unsudo the invoice after creation if not already sudoed
+            invoice = invoice.sudo(self.env.su)
 
             poster = self.env.user._is_internal() and self.env.user.id or SUPERUSER_ID
             invoice.with_user(poster).message_post_with_source(
@@ -359,8 +362,11 @@ class SaleAdvancePaymentInv(models.TransientModel):
                 'product_uom_qty': 0.0,
                 'price_unit': 0.0,
             })
-            downpayment_line_map[grouping_key]['price_unit'] += \
-                order.currency_id.round(price_subtotal * percentage)
+            downpayment_line_map[grouping_key]['price_unit'] += price_subtotal
+        for key in downpayment_line_map:
+            downpayment_line_map[key]['price_unit'] = \
+                order.currency_id.round(downpayment_line_map[key]['price_unit'] * percentage)
+
 
         return list(downpayment_line_map.values())
 

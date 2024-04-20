@@ -332,7 +332,7 @@ msgstr "Etiqueta de devolución"
 #. module: stock_delivery
 #: model:ir.model,name:stock_delivery.model_stock_return_picking
 msgid "Return Picking"
-msgstr "Albarán de devolución"
+msgstr "Recolección de devolución"
 
 #. module: stock_delivery
 #: model:ir.model.fields,field_description:stock_delivery.field_delivery_carrier__route_ids
@@ -591,6 +591,19 @@ msgid "Weight:"
 msgstr "Peso:"
 
 #. module: stock_delivery
+#. odoo-python
+#: code:addons/stock_delivery/models/stock_picking.py:0
+#, python-format
+msgid ""
+"You cannot pack products into the same package when they have different "
+"carriers (i.e. check that all of their transfers have a carrier assigned and"
+" are using the same carrier)."
+msgstr ""
+"No es posible empaquetar productos en el mismo paquete si tienen distintos "
+"transportistas. Compruebe que todos sus traslados tienen un transportista "
+"asignado y que usan el mismo."
+
+#. module: stock_delivery
 #: model_terms:ir.ui.view,arch_db:stock_delivery.delivery_tracking_url_warning_form
 msgid "You have multiple tracker links, they are available in the chatter."
 msgstr ""
@@ -605,7 +618,7 @@ msgid ""
 "this order."
 msgstr ""
 "El método de envío no tiene redirección al sitio web del transportista para "
-"realizar el seguimiento de este pedido."
+"realizar el seguimiento de esta orden."
 
 #. module: stock_delivery
 #: model:ir.ui.menu,name:stock_delivery.menu_delivery_zip_prefix
