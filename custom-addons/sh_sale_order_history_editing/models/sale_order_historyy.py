@@ -187,7 +187,7 @@ class AccountMove(models.Model):
         for move in self:
             move.sum_total_balance = total_balance_sum
     #
-"""
+
 class AccountPayment(models.Model):
     _inherit = 'account.payment'
 
@@ -196,19 +196,22 @@ class AccountPayment(models.Model):
         # Call the original create method
         payment = super(AccountPayment, self).create(vals)
 
-        # Subtract amount_company_currency_signed from sum_total_balance
         if payment.partner_id:
+            # Calculate the total amount_company_currency_signed to subtract
+            amount_to_subtract = payment.amount_company_currency_signed
+
+            # Find all account moves related to the payment's partner
             moves_with_same_partner = self.env['account.move'].search([
                 ('partner_id', '=', payment.partner_id.id),
             ])
 
-            total_balance_sum = sum(moves_with_same_partner.mapped('total_balance'))
-
+            # Update the sum_total_balance field in related moves
             for move_with_same_partner in moves_with_same_partner:
-                move_with_same_partner.sum_total_balance -= payment.amount_company_currency_signed
+                move_with_same_partner.sum_total_balance -= amount_to_subtract
 
         return payment
-"""
+
+
 
 class SaleOrder(models.Model):
     _inherit = "sale.order"
