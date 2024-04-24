@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<odoo>
+    <data>
+
+
+
+    <record id="delivery_route_form_inherited" model="ir.ui.view">
+    <field name="name">Delivery Route Inherited</field>
+    <field name="model">delivery.route</field>
+    <field name="inherit_id" ref="customer_route_management.delivery_route_view_form"/>
+    <field name="arch" type="xml">
+        <data>
+            <xpath expr="//notebook" position="inside">
+                <page string="المسارات" groups="customer_route_management_editing.group_rout_user">
+                    <field name="route_line_ids"  >
+                        <tree  delete="false" create="false" string="Route Liness test" limit="1" >
+
+                            <field name="sequence" widget="handle" create="True"/>
+                            <field name="route"/>
+                            <button name="move_record_to_last"
+                                    string="منجز "
+                                    class="btn-primary"
+                                    style="background-color: red; border-radius: 50%; padding: 10px;"
+                                    type="object"
+                            />
+
+                        </tree>
+                    </field>
+                </page>
+            </xpath>
+        </data>
+    </field>
+    </record>
+
+
+
+
+          <!-- adding chatter to delivery route -->
+        <record id="delivery_route_chatter" model="ir.ui.view">
+            <field name="name">Delivery Route chatter</field>
+            <field name="model">delivery.route</field>
+            <field name="inherit_id" ref="customer_route_management.delivery_route_view_form"/>
+            <field name="arch" type="xml">
+                 <xpath expr="//form/sheet" position="after">
+                     <div class="oe_chatter">
+                         <field name="message_follower_ids" groups="base.group_user"/>
+                         <field name="activity_ids"/>
+                         <field name="message_ids" disabled_upload ="True" />
+                     </div>
+                 </xpath>
+            </field>
+        </record>
+
+     <!--thise view hide "creat invoice " button from qutation creat invoice and view just "create and veiw invoces button"-->
+
+
+        <!-- <record id="view_sale_advance_payment_inv_inherited" model="ir.ui.view">
+         <field name="name">Invoice Orders Inherited</field>
+         <field name="model">sale.advance.payment.inv</field>
+         <field name="inherit_id" ref="sale.view_sale_advance_payment_inv"/>
+         <field name="arch" type="xml">
+            <data>
+             <xpath expr="//button[@name='action_create_invoice']" position="attributes">
+                   <attribute name="invisible">1</attribute>
+               </xpath>
+            </data>
+         </field>
+       </record>-->
+
+
+    </data>
+</odoo>
