@@ -41,7 +41,11 @@ class SaleOrderHistory(models.Model):
     product_id = fields.Many2one(
         "product.product",
         related="name.product_id",
-        readonly=True
+        readonly=True,
+
+         # we Add this line to store the related field value in the database
+        store=True,
+
     )
     pricelist_id = fields.Many2one(
         "product.pricelist",
@@ -115,7 +119,7 @@ class SaleOrderHistory(models.Model):
 
         if self.product_uom:
             vals.update({"product_uom": self.product_uom.id})
-       
+
 
         # context = self._context.get('params')
         # vals.update({"order_id": context.get('id')})
@@ -143,16 +147,20 @@ class SaleOrderHistory(models.Model):
 class SaleOrder(models.Model):
     _inherit = "sale.order"
 
-    is_order_history_line_update = fields.Boolean(
-        string='Update History Lines',
-        compute='_compute_sale_order_history', store=True
-    )
+   # we edit this filed
+    # is_order_history_line_update = fields.Boolean(
+     #   string='Update History Lines',
+     #   compute='_compute_sale_order_history', store=True
+   # )
 
     order_history_line = fields.One2many(
         "sale.order.history",
         "order_id",
         string="Order History",
-        # compute="_compute_sale_order_history",
+
+
+        compute="_compute_sale_order_history",   # we edit this filed
+
     )
 
     enable_reorder = fields.Boolean(
@@ -263,7 +271,7 @@ class SaleOrder(models.Model):
                         for rec in record.order_line:
 
                             sale_ordr_line.append((0, 0, {
-                                # "order_id":record.id,
+                                 "order_id":record.id,
                                 "so_id": record.name,
                                 "name": rec.id,
                                 'date_order': record.date_order,
@@ -281,8 +289,11 @@ class SaleOrder(models.Model):
     def _compute_sale_order_history(self):
         for vals in self:
             vals.order_history_line = None
-            if vals.is_order_history_line_update:
-                vals.is_order_history_line_update = False
+
+            # we edit this filed
+            #  if vals.is_order_history_line_update:
+             #   vals.is_order_history_line_update = False
+
             if vals.partner_id:
                 partners = []
                 domain = []
@@ -324,8 +335,11 @@ class SaleOrder(models.Model):
                     history_domain.append(
                         ('order_id.partner_id', 'in', partners),)
 
-                if vals.id:
-                    domain.append(("id", "!=", vals.id))
+                    # we edit this filed
+                #if vals.id:
+
+
+                  #  domain.append(("id", "!=", vals.id))
 
                 sale_order_search = self.env["sale.order"].search(
                     domain,
@@ -345,8 +359,12 @@ class SaleOrder(models.Model):
                         if record.order_line:
                             for rec in record.order_line:
                                 if rec.id in history_ids.name.ids:
-                                    if not vals.is_order_history_line_update:
-                                        vals.is_order_history_line_update = True
+
+                                    # we edit this filed
+
+                                    # if not vals.is_order_history_line_update:
+                                      #  vals.is_order_history_line_update = True
+
                                     vals.order_history_line = [
                                         (6, 0, history_ids.ids)]
                                 else:

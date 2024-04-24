@@ -6,9 +6,12 @@
         <field name="model">sale.order</field>
         <field name="inherit_id" ref="sale.view_order_form" />
         <field name="arch" type="xml">
+
+           <!-- edited from us ...
             <field name='partner_id' position='after'>
                 <field name='is_order_history_line_update' invisible='1'/>
-            </field>
+            </field>-->
+
             <xpath expr="//page[1]" position="after">
                 <page string="Order History">
                 	<field name="enable_reorder" invisible="1" />

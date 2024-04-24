@@ -37,22 +37,21 @@
     <field name="arch" type="xml">
 
         <xpath expr="//group[@col='12' and @class='oe_invoice_lines_tab']/group[@colspan='4']" position="inside">
-            <group class="oe_subtotal_footer oe_right">
-                  attrs="{'invisible': ['|', ('move_type', 'not in', ('out_invoice', 'out_refund', 'in_invoice', 'in_refund', 'out_receipt', 'in_receipt')),
-                                              ('payment_state' ,'=', 'invoicing_legacy')]}"
+           <group class="oe_subtotal_footer oe_right" >
+       <!--attrs="{'invisible': [('move_type', 'not in', ('out_invoice', 'out_refund', 'in_invoice', 'in_refund', 'out_receipt', 'in_receipt'))]}"-->
 
             <field name="sale_order_id" widget="many2one" options="{'no_create_edit': True}" domain="[('state','=','sale')]" context="{'default_state': 'sale'}" invisible="1"/>
             <field name="total_multiplied_field_sale_order"/>
             </group>
         </xpath>
-
+<!--
         <xpath expr="//group/group[@id='header_left_group']/field[@name='partner_id']" position="after">
              <group>
                 <field name="sum_total_balance" widget="monetary" options="{'currency_field': 'currency_id'}"/>
 
              </group>
         </xpath>
-
+-->
     </field>
 </record>
 

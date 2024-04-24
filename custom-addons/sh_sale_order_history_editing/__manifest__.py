@@ -4,7 +4,7 @@
     "author": "Softhealer Technologies",
     "website": "https://www.softhealer.com",
     "license": "OPL-1",
-    "version": "16.0.4",
+    "version": "0.0.1",
     "support": "support@softhealer.com",
     "category": "Sales",
     "summary": "Generate Customer Sales Order History Last Sales Order History sale history sales history SO Reorder Product Lines Client Quotation History From SO Last Sale Order History Search Customer Last Quote History Quotation History Odoo",
@@ -19,7 +19,7 @@ Last Sales Order History Module, SO Reorder Product Lines,
 Client Quotation History, Find History From SO App,
 Get Last Sale Order History Application, Search Customer Last Quote History Odoo.
 """,
-    "depends": ["sale_management"],
+    "depends": ["sale_management","account"],
     "data": [
 
         "views/sale_order_historyy.xml",

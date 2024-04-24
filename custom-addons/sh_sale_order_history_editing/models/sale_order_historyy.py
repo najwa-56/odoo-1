@@ -154,7 +154,7 @@ class AccountMove(models.Model):
     #--------------------------------------------------
     # the way to show to balance of each invoice
     # --------------------------------------------------
-
+    """
     total_balance = fields.Float(
         string='Total Balance',
         compute='_compute_total_balance',
@@ -180,13 +180,14 @@ class AccountMove(models.Model):
 
 
     # to find total_balance for all invoice
-    @api.depends('total_balance')
+   
+    # @api.depends('total_balance')
     def _compute_sum_total_balance(self):
         all_moves = self.env['account.move'].search([])
         total_balance_sum = sum(all_moves.mapped('total_balance'))
         for move in self:
             move.sum_total_balance = total_balance_sum
-    #
+    #####
 
 class AccountPayment(models.Model):
     _inherit = 'account.payment'
@@ -197,7 +198,7 @@ class AccountPayment(models.Model):
         payment = super(AccountPayment, self).create(vals)
 
         if payment.partner_id:
-            # Calculate the total amount_company_currency_signed to subtract
+            # Calculate the amount_company_currency_signed to subtract
             amount_to_subtract = payment.amount_company_currency_signed
 
             # Find all account moves related to the payment's partner
@@ -212,6 +213,7 @@ class AccountPayment(models.Model):
         return payment
 
 
+"""
 
 class SaleOrder(models.Model):
     _inherit = "sale.order"
