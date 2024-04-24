@@ -14,12 +14,12 @@
             <field name="sequence" eval="10" />
         </record>
 
-       <!-- <record id="menu_main_task" model="ir.ui.menu">
+        <record id="menu_main_task" model="ir.ui.menu">
             <field name="name">المسارات</field>
-            <field name="parent_id" ref=" " />
-            <field name="action" ref=" " />
+            <field name="parent_id" ref="sh_activities_management.sh_activity_dashboard"/>
+            <field name="action" ref="customer_route_management.delivery_route_action" />
             <field name="sequence" eval="10" />
-        </record> -->
+        </record>
     <record id="menu_mhamhy" model="ir.ui.menu">
     <field name="name">مهامي</field>
     <field name="action" ref="sh_activities_management.sh_action_my_activities" />
