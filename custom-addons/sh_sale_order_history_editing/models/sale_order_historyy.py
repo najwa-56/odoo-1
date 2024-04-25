@@ -193,7 +193,7 @@ class AccountMove(models.Model):
 
             # Update the sum_total_balance for the current account move
             move.sum_total_balance = total_balance_sum
-
+'''
 class AccountPayment(models.Model):
     _inherit = 'account.payment'
 
@@ -215,7 +215,7 @@ class AccountPayment(models.Model):
 
         return payment
 
-
+'''
 class SaleOrder(models.Model):
     _inherit = "sale.order"
     #--------------------------------------------------------------
