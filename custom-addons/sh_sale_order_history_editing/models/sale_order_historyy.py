@@ -151,10 +151,12 @@ class AccountMove(models.Model):
 
         return result
 
+
+
     #--------------------------------------------------
     # the way to show to balance of each invoice
     # --------------------------------------------------
-    """
+
     total_balance = fields.Float(
         string='Total Balance',
         compute='_compute_total_balance',
@@ -178,16 +180,19 @@ class AccountMove(models.Model):
             total_balance = sum(move.mapped('total_multiplied_field_sale_order'))
             move.total_balance = total_balance
 
-
-    # to find total_balance for all invoice
-   
-    # @api.depends('total_balance')
+    @api.depends('total_balance')
     def _compute_sum_total_balance(self):
-        all_moves = self.env['account.move'].search([])
-        total_balance_sum = sum(all_moves.mapped('total_balance'))
         for move in self:
+            # Filter account moves based on the partner_id
+            moves_with_same_partner = self.env['account.move'].search([
+                ('partner_id', '=', move.partner_id.id),
+            ])
+
+            # Calculate the total_balance for the filtered account moves
+            total_balance_sum = sum(moves_with_same_partner.mapped('total_balance'))
+
+            # Update the sum_total_balance for the current account move
             move.sum_total_balance = total_balance_sum
-    #####
 
 class AccountPayment(models.Model):
     _inherit = 'account.payment'
@@ -197,23 +202,19 @@ class AccountPayment(models.Model):
         # Call the original create method
         payment = super(AccountPayment, self).create(vals)
 
+        # Subtract amount_company_currency_signed from sum_total_balance
         if payment.partner_id:
-            # Calculate the amount_company_currency_signed to subtract
-            amount_to_subtract = payment.amount_company_currency_signed
-
-            # Find all account moves related to the payment's partner
             moves_with_same_partner = self.env['account.move'].search([
                 ('partner_id', '=', payment.partner_id.id),
             ])
 
-            # Update the sum_total_balance field in related moves
+            total_balance_sum = sum(moves_with_same_partner.mapped('total_balance'))
+
             for move_with_same_partner in moves_with_same_partner:
-                move_with_same_partner.sum_total_balance -= amount_to_subtract
+                move_with_same_partner.sum_total_balance -= payment.amount_company_currency_signed
 
         return payment
 
-
-"""
 
 class SaleOrder(models.Model):
     _inherit = "sale.order"

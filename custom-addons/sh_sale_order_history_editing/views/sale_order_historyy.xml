@@ -44,14 +44,15 @@
             <field name="total_multiplied_field_sale_order"/>
             </group>
         </xpath>
-<!--
+
         <xpath expr="//group/group[@id='header_left_group']/field[@name='partner_id']" position="after">
              <group>
+                 <field name="total_balance" widget="monetary" options="{'currency_field': 'currency_id'}" invisible="1"/>
                 <field name="sum_total_balance" widget="monetary" options="{'currency_field': 'currency_id'}"/>
 
              </group>
         </xpath>
--->
+
     </field>
 </record>
 
