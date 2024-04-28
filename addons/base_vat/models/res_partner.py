@@ -1,6 +1,5 @@
 import datetime
 import string
-import zeep
 import re
 import stdnum
 from stdnum.eu.vat import check_vies
@@ -11,6 +10,7 @@ from stdnum import luhn
 import logging
 
 from odoo import api, models, fields, tools, _
+from odoo.tools import zeep
 from odoo.tools.misc import ustr
 from odoo.exceptions import ValidationError
 
@@ -769,7 +769,7 @@ class ResPartner(models.Model):
 
         # VAT is only digits and of the right length, check the Luhn checksum.
         try:
-            luhn.validate(vat[0:9])
+            luhn.validate(vat[0:9] if len(vat) == 15 else vat[1:10])
         except (InvalidFormat, InvalidChecksum):
             return False
 

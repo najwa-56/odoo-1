@@ -721,7 +721,7 @@ class StockMove(TransactionCase):
         self.assertEqual(move1.quantity, 0.0)
         self.assertEqual(len(move1.move_line_ids), 0)
         self.assertEqual(self.env['stock.quant']._get_available_quantity(self.product_serial, self.stock_location, strict=True), 1.0)
-        self.assertEqual(self.env['stock.quant']._get_available_quantity(self.product_serial, self.stock_location, lot_id=lot1, strict=True), 2.0)
+        self.assertEqual(self.env['stock.quant']._get_available_quantity(self.product_serial, self.stock_location, lot_id=lot1, strict=False), 2.0)
 
     def test_putaway_1(self):
         """ Receive products from a supplier. Check that putaway rules are rightly applied on
@@ -4971,6 +4971,44 @@ class StockMove(TransactionCase):
 
         self.assertEqual(self.env['stock.quant']._get_available_quantity(product01, self.stock_location), 1)
         self.assertEqual(self.env['stock.quant']._get_available_quantity(product02, self.stock_location), 1)
+
+    def test_scrap_9_with_delivery(self):
+        """
+        Scrap the product of a reserved move line and check that the picking can
+        correctly mark as done after the scrap.
+        """
+        # 10 units are available in stock
+        self.env['stock.quant']._update_available_quantity(self.product, self.stock_location, 10)
+        picking = self.env['stock.picking'].create({
+            'name': 'A single picking with one move to scrap',
+            'location_id': self.stock_location.id,
+            'location_dest_id': self.customer_location.id,
+            'picking_type_id': self.env.ref('stock.picking_type_out').id,
+        })
+        move1 = self.env['stock.move'].create({
+            'name': 'A move to confirm and scrap its product',
+            'location_id': self.stock_location.id,
+            'location_dest_id': self.customer_location.id,
+            'product_id': self.product.id,
+            'product_uom_qty': 9.0,
+            'picking_id': picking.id,
+        })
+        move1._action_confirm()
+        move1._action_assign()
+        self.assertEqual(move1.quantity, 9)
+
+        # scrap a unit
+        scrap = self.env['stock.scrap'].create({
+            'product_id': self.product.id,
+            'product_uom_id': self.product.uom_id.id,
+            'scrap_qty': 1,
+            'picking_id': picking.id,
+        })
+        scrap.action_validate()
+
+        self.assertEqual(scrap.state, 'done')
+        picking.button_validate()
+        self.assertEqual(picking.state, 'done')
 
     def test_in_date_1(self):
         """ Check that moving a tracked quant keeps the incoming date.
