@@ -27,5 +27,5 @@
         'web.assets_frontend': [
 
         ],
-        },        
+        },
 }

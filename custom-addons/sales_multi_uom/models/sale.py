@@ -9,7 +9,7 @@ from odoo.exceptions import UserError
 
 class wv_sales_multi_uom(models.Model):
     _name = 'wv.sales.multi.uom'
-
+    _description = 'Sales Multi UOM'
     name = fields.Char("Name", required=True)
     qty = fields.Float("Quantity", required=True)
     price = fields.Float("Price Unit", required=True)

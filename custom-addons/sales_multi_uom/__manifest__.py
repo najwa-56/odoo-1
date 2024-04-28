@@ -8,6 +8,7 @@
     'author': 'Webveer',
     'summary': "",
     'description': """
+    'license': 'AGPL-3', 
 
 =======================
 
