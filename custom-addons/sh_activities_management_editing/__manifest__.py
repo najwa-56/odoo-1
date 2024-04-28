@@ -16,7 +16,7 @@
         'portal'
     ],
     'data': [
-       'activity_menu_dashboard.xml'
+       'views/activity_menu_dashboard.xml'
     ],
     'images': [ ],
 
@@ -27,5 +27,5 @@
         'web.assets_frontend': [
 
         ],
-        },
+        },        
 }

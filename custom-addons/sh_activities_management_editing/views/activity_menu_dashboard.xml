@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+       <record id="menu_main_task" model="ir.ui.menu">
+            <field name="name">المهام الرئيسية</field>
+            <field name="parent_id" ref="sh_activities_management.sh_activity_dashboard" />
+            <field name="action" ref="mail.mail_activity_type_action" />
+            <field name="sequence" eval="10" />
+       </record>
+
+       <record id="menu_aljard_report" model="ir.ui.menu">
+            <field name="name">تقارير الجرد</field>
+            <field name="parent_id" ref="sh_activities_management.sh_activity_dashboard" />
+            <field name="action" ref="sh_sale_order_history_editing.sale_order_history_report_action" />
+            <field name="sequence" eval="10" />
+        </record>
+
+       <record id="menu_main_task" model="ir.ui.menu">
+            <field name="name">المسارات</field>
+            <field name="parent_id" ref="sh_activities_management.sh_activity_dashboard"/>
+            <field name="action" ref="customer_route_management.delivery_route_action" />
+            <field name="sequence" eval="10" />
+        </record>
+
+
+        <record id="menu_mhamhy" model="ir.ui.menu">
+            <field name="name">مهامي</field>
+            <field name="action" ref="sh_activities_management.sh_action_my_activities" />
+            <field name="sequence" eval="1" />
+       </record>
+
+        <!-- changing name of button origion-->
+        <record id="activity_view_tree_inherit" model="ir.ui.view">
+            <field name="name">sh.mail.activity.view.tree.inh</field>
+            <field name="model">mail.activity</field>
+            <field name="inherit_id" ref="sh_activities_management.sh_mail_activity_view_tree" />
+            <field name="arch" type="xml">
+                <!-- Find the button and change its name -->
+                <xpath expr="//button[@name='action_view_activity']" position="attributes">
+                    <attribute name="string">تنفيذ</attribute>
+                </xpath>
+
+                <xpath expr="//button[@name='action_view_activity']" position="after">
+                    <button string="إنهاء" name="action_done" type="object" class="btn btn-primary" context="{'mail_activity_quick_update': True}"/>
+                </xpath>
+
+
+            </field>
+        </record>
+
+
+
+</odoo>
