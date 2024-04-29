@@ -361,11 +361,11 @@ class ResPartner(models.Model):
     )
     latest_followup_date = fields.Date(
         compute='_get_latest', string="Latest Follow-up Date", compute_sudo=True,
-        help="Latest date that the follow-up level of the partner was changed", store=True 
+        help="Latest date that the follow-up level of the partner was changed"
     )
     latest_followup_level_id = fields.Many2one(
         'followup.line', compute='_get_latest', compute_sudo=True,
-        string="Latest Follow-up Level", help="The maximum follow-up level", store=True
+        string="Latest Follow-up Level", help="The maximum follow-up level"
     )
 
     latest_followup_sequence = fields.Integer(
