@@ -29,16 +29,13 @@ class RouteLines(models.Model):
     # we add charter to this addons to add it to sh_actitivty_management
     # changing name of field route
     route = fields.Char(string='المسارات')
-    statuss_checkbox = fields.Boolean(string='Status Checkbox')
-    sequence = fields.Integer(string='Sequence')
+
 
     @api.onchange('statuss_checkbox')
     def move_record_to_last(self):
         for record in self:
             record.write({'sequence': 9999})
 
-    def button_action(self):
-        self.move_record_to_last()
 
 class Chatterr(models.Model):
     _name = 'route.line'

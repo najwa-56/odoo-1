@@ -17,7 +17,7 @@
 
                             <field name="sequence" widget="handle" create="True"/>
                             <field name="route"/>
-                            <button name="button_action"
+                            <button name="move_record_to_last"
                                     string="منجز "
                                     class="btn-primary"
                                     style="background-color: red; border-radius: 50%; padding: 10px;"
