@@ -4,7 +4,33 @@
 
 
 
-   
+    <record id="delivery_route_form_inherited" model="ir.ui.view">
+    <field name="name">Delivery Route Inherited</field>
+    <field name="model">delivery.route</field>
+    <field name="inherit_id" ref="customer_route_management.delivery_route_view_form"/>
+    <field name="arch" type="xml">
+        <data>
+            <xpath expr="//notebook" position="inside">
+                <page string="المسارات" groups="customer_route_management_editing.group_rout_user">
+                    <field name="route_line_ids"  >
+                        <tree  delete="false" create="false" string="Route Liness test" limit="1" >
+
+                            <field name="sequence" widget="handle" create="True"/>
+                            <field name="route"/>
+                            <button name="move_record_to_last"
+                                    string="منجز "
+                                    class="btn-primary"
+                                    style="background-color: red; border-radius: 50%; padding: 10px;"
+                                    type="object"
+                            />
+
+                        </tree>
+                    </field>
+                </page>
+            </xpath>
+        </data>
+    </field>
+    </record>
 
 
 
