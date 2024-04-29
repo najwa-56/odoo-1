@@ -30,12 +30,6 @@ class RouteLines(models.Model):
     route = fields.Char(string='المسارات')
 
 
-    @api.onchange('statuss_checkbox')
-    def move_record_to_last(self):
-        for record in self:
-            record.write({'sequence': 9999})
-
-
 class Chatterr(models.Model):
     _name = 'route.line'
     _inherit = ['route.line', 'mail.thread', 'mail.activity.mixin']
