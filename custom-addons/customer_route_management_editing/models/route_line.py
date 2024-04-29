@@ -25,7 +25,6 @@ from odoo import models, fields, api
 class RouteLines(models.Model):
     _inherit = 'route.line'
 
-
     # we add charter to this addons to add it to sh_actitivty_management
     # changing name of field route
     route = fields.Char(string='المسارات')
