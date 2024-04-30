@@ -9,11 +9,6 @@ class SaleOrderHistory(models.Model):
         related="name.order_id.partner_id", store=True
     )
 
-    invoice_status = fields.Selection(
-        "sale.order",
-        string="Invoice Status",
-        related="name.order_id.invoice_status",
-        store=True)
     # adding customer
 
     # adding الجرد
@@ -166,7 +161,7 @@ class AccountMove(models.Model):
     )
 
     sum_total_balance = fields.Float(
-        string='Total Balance',
+        string=' sum Total Balance',
         compute='_compute_sum_total_balance',
         store=True,
         readonly=True,
@@ -193,7 +188,7 @@ class AccountMove(models.Model):
 
             # Update the sum_total_balance for the current account move
             move.sum_total_balance = total_balance_sum
-'''
+
 class AccountPayment(models.Model):
     _inherit = 'account.payment'
 
@@ -215,7 +210,7 @@ class AccountPayment(models.Model):
 
         return payment
 
-'''
+
 class SaleOrder(models.Model):
     _inherit = "sale.order"
     #--------------------------------------------------------------

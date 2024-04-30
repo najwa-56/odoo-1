@@ -35,7 +35,8 @@ class SaleOrderHistory(models.Model):
         readonly=True
     )
     status = fields.Selection(
-        string="Status", related="name.order_id.state", readonly=True)
+        string="Status", related="name.order_id.state", readonly=True, store=True)
+    #we add stor=True for status
     date_order = fields.Datetime("Date", )
     so_id = fields.Char("Sale Order")
     product_id = fields.Many2one(
