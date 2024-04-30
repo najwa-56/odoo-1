@@ -29,6 +29,7 @@ class RouteLines(models.Model):
     # we add charter to this addons to add it to sh_actitivty_management
     #changing name of field route
     route = fields.Char(string='المسارات')
+    statuss_checkbox=fields.Boolean("")
 
     @api.onchange('statuss_checkbox')
     def move_record_to_last(self):

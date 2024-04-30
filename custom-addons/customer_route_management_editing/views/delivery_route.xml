@@ -15,7 +15,8 @@
                     <field name="route_line_ids"  >
                         <tree  delete="false" create="false" string="Route Liness test" limit="1" >
 
-                            <field name="sequence" widget="handle" create="True"/>
+                                <field name="sequence" string="" invisible="1"/>
+                           <field name="statuss_checkbox" string="" invisible="1"/>
                             <field name="route"/>
                             <button name="move_record_to_last"
                                     string="منجز "
