@@ -33,7 +33,7 @@ class RouteLines(models.Model):
     @api.onchange('statuss_checkbox')
     def move_record_to_last(self):
         for record in self:
-            record.write({'sequence': 9999})
+            record.write({'sequence':9999})
 
 
 class Chatterr(models.Model):
