@@ -175,19 +175,21 @@ class AccountMove(models.Model):
             total_balance = sum(move.mapped('total_multiplied_field_sale_order'))
             move.total_balance = total_balance
 
+
     @api.depends('total_balance')
     def _compute_sum_total_balance(self):
         for move in self:
-            # Filter account moves based on the partner_id
+            # Find all moves with the same partner created before the current move
             moves_with_same_partner = self.env['account.move'].search([
                 ('partner_id', '=', move.partner_id.id),
+                ('id', '<=', move.id),
             ])
 
-            # Calculate the total_balance for the filtered account moves
+            # Calculate the total balance sum for all moves with the same partner
             total_balance_sum = sum(moves_with_same_partner.mapped('total_balance'))
 
-            # Update the sum_total_balance for the current account move
-            move.sum_total_balance = total_balance_sum
+            # Update the sum_total_balance for the current account move and all previous moves
+            moves_with_same_partner.write({'sum_total_balance': total_balance_sum})
 
 class AccountPayment(models.Model):
     _inherit = 'account.payment'
