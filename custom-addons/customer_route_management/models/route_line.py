@@ -29,7 +29,7 @@ class RouteLines(models.Model):
     _rec_name = 'route'
     _order = 'sequence'
 
-    sequence = fields.Integer(default=10)
+    sequence = fields.Integer(string='User Sequence',default=10)
     route = fields.Char(string='Routes', help="Route of corresponding"
                                               " route line.")
     company_id = fields.Many2one(

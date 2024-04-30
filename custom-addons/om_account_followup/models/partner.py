@@ -369,7 +369,7 @@ class ResPartner(models.Model):
     )
 
     latest_followup_sequence = fields.Integer(
-        'Sequence',
+        string='Latest Followup Sequence',
         help="Gives the sequence order when displaying a list of follow-up lines.", default=0
     )
     latest_followup_level_id_without_lit = fields.Many2one(
