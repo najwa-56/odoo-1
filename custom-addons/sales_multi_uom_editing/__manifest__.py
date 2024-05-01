@@ -17,7 +17,7 @@
     'data': [
         'views/views.xml',
     ],
-
+    'license': 'LGPL-3',
     'installable': True,
     'website': '',
     'auto_install': False,
