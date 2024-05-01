@@ -181,7 +181,7 @@ class AccountMove(models.Model):
                 # Find all moves with the same partner created before the current move
                 moves_with_same_partner = self.env['account.move'].search([
                     ('partner_id', '=', move.partner_id.id),
-                    ('id', '<=', move.id),
+                    ('id', '<', move.id),
                 ])
 
                 # Calculate the total balance sum for all moves with the same partner
