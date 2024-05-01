@@ -21,7 +21,7 @@
     <field name="arch" type="xml">
         <data>
         <xpath expr="//tree" position="inside">
-               <button name="%(new_act_res_partner_2_sale_order)d" string="بيع   " class="btn-primary" style="background-color: red; border-radius: 50%; padding: 10px;" type="action" icon="fa-file-text-o" context="{'search_default_quotation': 1, 'default_type': 'quotation', 'default_partner_id': active_id}"/>
+               <button name="%(new_act_res_partner_2_sale_order)d" string="بيع   " class="btn-primary" style="background-color: red; border-radius: 50%; padding: 10px;" type="action" icon="fa-file-text-o" context="{'search_default_quotation': 1, 'default_type': 'quotation', 'default_partner_id': active_id and active_id or False}"/>
                <!--   <button name="open_map" string="الخريطة" class="btn-primary" style="background-color: red; border-radius: 50%; padding: 10px;" type="object"/>-->
                <button name="action_view_partner_invoices_custom" string="الفواتير الغير مسددة" class="btn-primary" style="background-color: red; border-radius: 50%; padding: 10px;" type="object"/>
          </xpath>
