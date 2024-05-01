@@ -30,14 +30,12 @@
             <field name="arch" type="xml">
                 <xpath expr="//field[@name='order_line']/tree/field[@name='product_uom_qty']" position="after">
                     <field name="selected_uom_ids" invisible="1"/>
-                    <field name="sales_multi_uom_id"
-                           attrs="{'readonly': [('state', 'in', ('sale','done', 'cancel'))]}"/>
+                    <field name="sales_multi_uom_id" readonly="state in ('sale','done', 'cancel')"/>
                 </xpath>
                 <xpath expr="//field[@name='order_line']/form/group/group/field[@name='product_id']" position="after">
                     <field name="selected_uom_ids" invisible="1"/>
                     
-                    <field name="sales_multi_uom_id"
-                           attrs="{'readonly': [('state', 'in', ('sale','done', 'cancel'))]}"/>
+                    <field name="sales_multi_uom_id" readonly="state in ('sale','done', 'cancel')"/>
                 </xpath>
             </field>
         </record>

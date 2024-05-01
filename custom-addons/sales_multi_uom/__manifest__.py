@@ -7,13 +7,7 @@
     'sequence': 6,
     'author': 'Webveer',
     'summary': "",
-    'description': """
-    'license': 'AGPL-3', 
-
-=======================
-
-
-""",
+    'description': """=======================""",
     'depends': ['sale_management'],
     'data': [
         'security/ir.model.access.csv',
@@ -26,6 +20,7 @@
     'images': [
         'static/description/custom.jpg',
     ],
+    'license': 'LGPL-3',
     'installable': True,
     'website': '',
     'auto_install': False,
