@@ -175,8 +175,6 @@ class AccountMove(models.Model):
             total_balance = sum(move.mapped('total_multiplied_field_sale_order'))
             move.total_balance = total_balance
 
-
-
         @api.depends('total_balance')
         def _compute_sum_total_balance(self):
             for move in self:
