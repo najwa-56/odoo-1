@@ -106,7 +106,7 @@
                                     required="not display_type"/>
                             </tree>
                         </field>
-                        </page>
+                    </page>
                     <page string="Optional Products" name="optional_products">
                         <field name="sale_order_template_option_ids">
                           <tree string="Quotation Template Lines" editable="bottom">
