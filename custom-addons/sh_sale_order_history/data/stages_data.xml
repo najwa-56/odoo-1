@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo noupdate="1">
+    <record id="so_stage_0" model="sale.order.stages">
+        <field name="sequence">0</field>
+        <field name="name">Quotation</field>
+        <field name="stage_key">draft</field>
+        <field name="color">1</field>
+    </record>
+    <record id="so_stage_1" model="sale.order.stages">
+        <field name="sequence">1</field>
+        <field name="name">Quotation Sent</field>
+        <field name="stage_key">sent</field>
+        <field name="color">2</field>
+    </record>
+    <record id="so_stage_2" model="sale.order.stages">
+        <field name="sequence">2</field>
+        <field name="name">Sale Order</field>
+        <field name="stage_key">sale</field>
+        <field name="color">3</field>
+    </record>
+    <!-- <record id="so_stage_3" model="sale.order.stages">
+        <field name="sequence">3</field>
+        <field name="name">Locked</field>
+        <field name="stage_key">done</field>
+        <field name="color">4</field>
+    </record> -->
+    <record id="so_stage_4" model="sale.order.stages">
+        <field name="sequence">4</field>
+        <field name="name">Cancelled</field>
+        <field name="stage_key">cancel</field>
+        <field name="color">5</field>
+    </record>
+</odoo>
