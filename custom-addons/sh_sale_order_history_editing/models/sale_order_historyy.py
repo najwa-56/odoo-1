@@ -194,22 +194,7 @@ class AccountMove(models.Model):
             for prev_move in moves_with_same_partner:
                 prev_move.sum_total_balance = total_balance_sum
 
-    @api.model
-    def create(self, vals):
-        # Call the original create method
-        move = super(AccountMove, self).create(vals)
 
-        # Subtract amount_total from sum_total_balance
-        if move.partner_id:
-            moves_with_same_partner = self.env['account.move'].search([
-                ('partner_id', '=', move.partner_id.id),
-                ('id', '<=', move.id),
-            ])
-
-            for prev_move in moves_with_same_partner:
-                prev_move.sum_total_balance -= move.amount_total
-
-        return move
 
 
 
@@ -230,6 +215,26 @@ class AccountMove(models.Model):
 '''
 
 
+
+class AccountPayment(models.Model):
+    _inherit = 'account.payment'
+
+    @api.model
+    def create(self, vals):
+        # Call the original create method
+        payment = super(AccountPayment, self).create(vals)
+
+        # Subtract amount_company_currency_signed from sum_total_balance
+        if payment.partner_id:
+            moves_with_same_partner = self.env['account.move'].search([
+                ('partner_id', '=', payment.partner_id.id),
+                ('id', '<=', payment.id),
+            ])
+
+            for move_with_same_partner in moves_with_same_partner:
+                move_with_same_partner.sum_total_balance -= payment.amount_company_currency_signed
+
+        return payment
 
 
 class SaleOrder(models.Model):

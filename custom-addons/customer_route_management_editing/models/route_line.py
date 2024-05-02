@@ -25,16 +25,16 @@ from odoo import models, fields, api
 class RouteLines(models.Model):
     _inherit = 'route.line'
 
+
     # we add charter to this addons to add it to sh_actitivty_management
-    # changing name of field route
+    #changing name of field route
     route = fields.Char(string='المسارات')
     statuss_checkbox=fields.Boolean("")
-
 
     @api.onchange('statuss_checkbox')
     def move_record_to_last(self):
         for record in self:
-            record.write({'sequence': 9999})
+            record.write({'sequence':9999})
 
 
 class Chatterr(models.Model):
