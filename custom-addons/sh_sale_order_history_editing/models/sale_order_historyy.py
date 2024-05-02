@@ -225,9 +225,8 @@ class AccountPayment(models.Model):
         if payment.partner_id:
             moves_with_same_partner = self.env['account.move'].search([
                 ('partner_id', '=', payment.partner_id.id),
+                ('id', '<=', payment.id),
             ])
-
-            total_balance_sum = sum(moves_with_same_partner.mapped('total_balance'))
 
             for move_with_same_partner in moves_with_same_partner:
                 move_with_same_partner.sum_total_balance -= payment.amount_company_currency_signed
