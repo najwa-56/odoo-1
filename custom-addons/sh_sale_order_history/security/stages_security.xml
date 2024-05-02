@@ -1,9 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<odoo>
-    <record model="ir.rule" id="sh_sale_stages_comp_rule">
-        <field name="name">Sale Order Stages multi-company</field>
-        <field name="model_id" ref="model_sale_order_stages" />
-        <field name="global" eval="True" />
-        <field name="domain_force">['|',('company_id','=',False),('company_id', 'in', company_ids)]</field>
-    </record>
-</odoo>
