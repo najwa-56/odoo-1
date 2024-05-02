@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="sh_sale_order_stages_tree_view" model="ir.ui.view">
+        <field name="name">sale.order.stages.tree</field>
+        <field name="model">sale.order.stages</field>
+        <field name="arch" type="xml">
+            <tree editable="bottom">
+                <field name="sequence" widget="handle" />
+                <field name="name" />
+                <field name="stage_key" />
+                <field name="color" widget="color_picker" />
+                <field name="company_id" options="{'no_create': True}" groups="base.group_multi_company" />
+            </tree>
+        </field>
+    </record>
+
+    <record id="sh_sale_order_stages_action" model="ir.actions.act_window">
+        <field name="name">Sale Order Stages</field>
+        <field name="res_model">sale.order.stages</field>
+        <field name="view_mode">tree</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Create new Stages for Sale Order
+            </p>
+            <p>
+                Create Stages that fit your business to better manage and track your Sale Order.
+            </p>
+        </field>
+    </record>
+
+    <menuitem id="sh_sale_stages_menu" name="Sale Order Stages" action="sh_sale_order_history.sh_sale_order_stages_action" parent="sale.menu_sale_config" groups="base.group_user" />
+</odoo>
