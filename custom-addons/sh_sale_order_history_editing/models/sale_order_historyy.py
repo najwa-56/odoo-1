@@ -234,6 +234,9 @@ class AccountPayment(models.Model):
             for move_with_same_partner in moves_with_same_partner:
                 move_with_same_partner.sum_total_balance -= payment.amount_company_currency_signed
 
+                # Trigger recomputation of sum_total_balance for related moves
+                move_with_same_partner._compute_sum_total_balance()
+
         return payment
 
 
