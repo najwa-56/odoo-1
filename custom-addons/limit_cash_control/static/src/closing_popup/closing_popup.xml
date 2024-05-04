@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates id="template" xml:space="preserve">
+    <t t-name="ClosePosPopupAuto" t-inherit="point_of_sale.ClosePosPopup" t-inherit-mode="extension" owl="1">
+        <xpath expr="//main" position="attributes">
+            <attribute name="t-if">!pos.config.hide_closing</attribute>
+        </xpath>
+        <xpath expr="//main" position="after">
+            <t t-if="pos.config.hide_closing">
+                <main class="modal-body">
+                    <div class="notes-container d-flex flex-column flex-sm-row gap-3 border-top mt-3 pt-3">
+                        <div class="opening-notes-container d-flex flex-column flex-grow-1 align-items-start" t-if="props.opening_notes" >
+                            <label class="form-label" for="props.opening_notes">Opening note</label>
+                            <textarea class="opening-notes form-control" id="props.opening_notes">
+                                <t t-esc="props.opening_notes"/>
+                            </textarea>
+                        </div>
+                        <div class="closing-notes-container d-flex flex-column flex-grow-1 align-items-start">
+                            <label class="form-label" for="closingNotes">Closing note</label>
+                            <textarea class="closing-notes form-control" id="closingNotes" placeholder="Add a closing note..." t-model="state.notes"/>
+                        </div>
+                    </div>
+                </main>
+            </t>
+        </xpath>
+    </t>
+</templates>
