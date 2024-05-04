@@ -178,33 +178,15 @@ class AccountMove(models.Model):
             total_balance = sum(move.mapped('total_multiplied_field_sale_order'))
             move.total_balance = total_balance
 
-    @api.depends('total_balance')
-    def _compute_sum_total_balance(self):
-        for move in self:
-            # Find all moves with the same partner created before the current move
-            moves_with_same_partner = self.env['account.move'].search([
-                ('partner_id', '=', move.partner_id.id),
-                ('id', '<=', move.id),
-            ])
-
-            # Calculate the total balance sum for all moves with the same partner
-            total_balance_sum = sum(moves_with_same_partner.mapped('total_balance'))
-
-            # Update the sum_total_balance for all previous moves
-            for prev_move in moves_with_same_partner:
-                prev_move.sum_total_balance = total_balance_sum
 
 
-
-
-
-''''
     @api.depends('total_balance')
     def _compute_sum_total_balance(self):
         for move in self:
             # Filter account moves based on the partner_id
             moves_with_same_partner = self.env['account.move'].search([
                 ('partner_id', '=', move.partner_id.id),
+                ('id', '<=', move.id),
             ])
 
             # Calculate the total_balance for the filtered account moves
@@ -212,7 +194,7 @@ class AccountMove(models.Model):
 
             # Update the sum_total_balance for the current account move
             move.sum_total_balance = total_balance_sum
-'''
+
 
 
 
@@ -233,10 +215,7 @@ class AccountPayment(models.Model):
 
             for move_with_same_partner in moves_with_same_partner:
                 move_with_same_partner.sum_total_balance -= payment.amount_company_currency_signed
-
-                # Trigger recomputation of sum_total_balance for related moves
-                move_with_same_partner._compute_sum_total_balance()
-
+                
         return payment
 
 
