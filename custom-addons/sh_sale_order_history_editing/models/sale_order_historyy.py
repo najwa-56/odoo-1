@@ -212,7 +212,7 @@ class AccountPayment(models.Model):
             if payment.partner_id:
                 moves_with_same_partner = self.env['account.move'].search([
                     ('partner_id', '=', payment.partner_id.id),
-                ])
+                ],limit=1)
 
                 for move_with_same_partner in moves_with_same_partner:
                     # Check if the move is already in the dictionary
