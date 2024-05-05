@@ -200,6 +200,7 @@ class AccountMove(models.Model):
 class AccountPayment(models.Model):
     _inherit = 'account.payment'
 
+
     def write(self, vals):
         # Call the original write method
         result = super(AccountPayment, self).write(vals)
@@ -213,10 +214,14 @@ class AccountPayment(models.Model):
                 ])
 
                 for move_with_same_partner in moves_with_same_partner:
-                    move_with_same_partner.sum_total_balance -= payment.amount_company_currency_signed
+                    # Check if subtracting the payment amount will result in a negative balance
+                    if move_with_same_partner.sum_total_balance >= payment.amount_company_currency_signed:
+                        move_with_same_partner.sum_total_balance -= payment.amount_company_currency_signed
+                    else:
+                        # If the result will be negative, set sum_total_balance to 0
+                        move_with_same_partner.sum_total_balance = 0
 
         return result
-
 
 
 class SaleOrder(models.Model):
