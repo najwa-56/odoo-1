@@ -178,22 +178,23 @@ class AccountMove(models.Model):
             total_balance = sum(move.mapped('total_multiplied_field_sale_order'))
             move.total_balance = total_balance
 
-
-
     @api.depends('total_balance')
     def _compute_sum_total_balance(self):
         for move in self:
-            # Filter account moves based on the partner_id
+            # Find all moves with the same partner
             moves_with_same_partner = self.env['account.move'].search([
                 ('partner_id', '=', move.partner_id.id),
             ])
 
-            # Calculate the total_balance for the filtered account moves
+            # Calculate the total_balance for all moves with the same partner
             total_balance_sum = sum(moves_with_same_partner.mapped('total_balance'))
 
             # Update the sum_total_balance for the current account move
             move.sum_total_balance = total_balance_sum
 
+            # Update the sum_total_balance for all related invoice records
+            for related_move in moves_with_same_partner:
+                related_move.sum_total_balance = total_balance_sum
 
 
 class AccountPayment(models.Model):
@@ -203,30 +204,16 @@ class AccountPayment(models.Model):
         # Call the original write method
         result = super(AccountPayment, self).write(vals)
 
-        # Dictionary to store the total amount to subtract for each invoice
-        invoice_amounts_to_subtract = {}
-
         # Iterate through each payment
         for payment in self:
             # Subtract amount_company_currency_signed from sum_total_balance
             if payment.partner_id:
                 moves_with_same_partner = self.env['account.move'].search([
                     ('partner_id', '=', payment.partner_id.id),
-                ],limit=1)
+                ])
 
                 for move_with_same_partner in moves_with_same_partner:
-                    # Check if the move is already in the dictionary
-                    if move_with_same_partner.id in invoice_amounts_to_subtract:
-                        # If yes, add the amount to subtract
-                        invoice_amounts_to_subtract[move_with_same_partner.id] -= payment.amount_company_currency_signed
-                    else:
-                        # If no, initialize the amount to subtract
-                        invoice_amounts_to_subtract[move_with_same_partner.id] = -payment.amount_company_currency_signed
-
-        # Update sum_total_balance for each invoice with the calculated amounts
-        for move_id, amount_to_subtract in invoice_amounts_to_subtract.items():
-            move = self.env['account.move'].browse(move_id)
-            move.sum_total_balance += amount_to_subtract
+                    move_with_same_partner.sum_total_balance -= payment.amount_company_currency_signed
 
         return result
 
