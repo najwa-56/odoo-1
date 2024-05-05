@@ -200,6 +200,25 @@ class AccountMove(models.Model):
 class AccountPayment(models.Model):
     _inherit = 'account.payment'
 
+    @api.model
+    def create(self, vals):
+        # Call the original create method
+        payment = super(AccountPayment, self).create(vals)
+
+        # Subtract amount_company_currency_signed from sum_total_balance
+        if payment.partner_id:
+            moves_with_same_partner = self.env['account.move'].search([
+                ('partner_id', '=', payment.partner_id.id),
+                ('id', '<=', payment.id),
+            ])
+
+            for move_with_same_partner in moves_with_same_partner:
+                move_with_same_partner.sum_total_balance -= payment.amount_company_currency_signed
+
+            # Update the sum_total_balance for all related invoices
+            moves_with_same_partner._compute_sum_total_balance()
+
+        return payment
 
     def write(self, vals):
         # Call the original write method
@@ -214,14 +233,13 @@ class AccountPayment(models.Model):
                 ])
 
                 for move_with_same_partner in moves_with_same_partner:
-                    # Check if subtracting the payment amount will result in a negative balance
-                    if move_with_same_partner.sum_total_balance >= payment.amount_company_currency_signed:
-                        move_with_same_partner.sum_total_balance -= payment.amount_company_currency_signed
-                    else:
-                        # If the result will be negative, set sum_total_balance to 0
-                        move_with_same_partner.sum_total_balance = 0
+                    move_with_same_partner.sum_total_balance -= payment.amount_company_currency_signed
+
+                # Update the sum_total_balance for all related invoices
+                moves_with_same_partner._compute_sum_total_balance()
 
         return result
+
 
 
 class SaleOrder(models.Model):
