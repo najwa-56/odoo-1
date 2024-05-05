@@ -196,7 +196,7 @@ class AccountMove(models.Model):
             for related_move in moves_with_same_partner:
                 related_move.sum_total_balance = total_balance_sum
 
-''''
+
 class AccountPayment(models.Model):
     _inherit = 'account.payment'
 
@@ -216,7 +216,7 @@ class AccountPayment(models.Model):
                     move_with_same_partner.sum_total_balance -= payment.amount_company_currency_signed
 
         return result
-'''
+
 
 
 class SaleOrder(models.Model):
