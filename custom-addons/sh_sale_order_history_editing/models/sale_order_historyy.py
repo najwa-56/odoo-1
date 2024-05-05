@@ -203,6 +203,9 @@ class AccountPayment(models.Model):
         # Call the original write method
         result = super(AccountPayment, self).write(vals)
 
+        # Dictionary to store the total amount to subtract for each invoice
+        invoice_amounts_to_subtract = {}
+
         # Iterate through each payment
         for payment in self:
             # Subtract amount_company_currency_signed from sum_total_balance
@@ -212,7 +215,18 @@ class AccountPayment(models.Model):
                 ])
 
                 for move_with_same_partner in moves_with_same_partner:
-                    move_with_same_partner.sum_total_balance -= payment.amount_company_currency_signed
+                    # Check if the move is already in the dictionary
+                    if move_with_same_partner.id in invoice_amounts_to_subtract:
+                        # If yes, add the amount to subtract
+                        invoice_amounts_to_subtract[move_with_same_partner.id] -= payment.amount_company_currency_signed
+                    else:
+                        # If no, initialize the amount to subtract
+                        invoice_amounts_to_subtract[move_with_same_partner.id] = -payment.amount_company_currency_signed
+
+        # Update sum_total_balance for each invoice with the calculated amounts
+        for move_id, amount_to_subtract in invoice_amounts_to_subtract.items():
+            move = self.env['account.move'].browse(move_id)
+            move.sum_total_balance += amount_to_subtract
 
         return result
 
