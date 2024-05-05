@@ -186,7 +186,6 @@ class AccountMove(models.Model):
             # Filter account moves based on the partner_id
             moves_with_same_partner = self.env['account.move'].search([
                 ('partner_id', '=', move.partner_id.id),
-                ('id', '<=', move.id),
             ])
 
             # Calculate the total_balance for the filtered account moves
@@ -210,12 +209,11 @@ class AccountPayment(models.Model):
         if payment.partner_id:
             moves_with_same_partner = self.env['account.move'].search([
                 ('partner_id', '=', payment.partner_id.id),
-                ('id', '<=', payment.id),
             ])
 
             for move_with_same_partner in moves_with_same_partner:
                 move_with_same_partner.sum_total_balance -= payment.amount_company_currency_signed
-                
+
         return payment
 
 
