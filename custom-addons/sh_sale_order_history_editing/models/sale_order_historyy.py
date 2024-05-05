@@ -196,26 +196,25 @@ class AccountMove(models.Model):
 
 
 
-
 class AccountPayment(models.Model):
     _inherit = 'account.payment'
 
-    @api.model
-    def create(self, vals):
-        # Call the original create method
-        payment = super(AccountPayment, self).create(vals)
+    def write(self, vals):
+        # Call the original write method
+        result = super(AccountPayment, self).write(vals)
 
-        # Subtract amount_company_currency_signed from sum_total_balance
-        if payment.partner_id:
-            moves_with_same_partner = self.env['account.move'].search([
-                ('partner_id', '=', payment.partner_id.id),
-            ])
+        # Iterate through each payment
+        for payment in self:
+            # Subtract amount_company_currency_signed from sum_total_balance
+            if payment.partner_id:
+                moves_with_same_partner = self.env['account.move'].search([
+                    ('partner_id', '=', payment.partner_id.id),
+                ])
 
-            for move_with_same_partner in moves_with_same_partner:
-                move_with_same_partner.sum_total_balance -= payment.amount_company_currency_signed
+                for move_with_same_partner in moves_with_same_partner:
+                    move_with_same_partner.sum_total_balance -= payment.amount_company_currency_signed
 
-        return payment
-
+        return result
 
 class SaleOrder(models.Model):
     _inherit = "sale.order"
