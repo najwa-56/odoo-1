@@ -1,0 +1,26 @@
+<odoo>
+    <data>
+        <!--Field "arabic" does not exist in model "res.company"-->
+        <record id="res_company_inherit_form" model="ir.ui.view">
+            <field name="name">res.company.inherit.form</field>
+            <field name="inherit_id" ref="base.view_company_form"/>
+            <field name="model">res.company</field>
+            <field type="xml" name="arch">
+                <xpath expr="//field[@name='name']" position="after">
+                </xpath>
+            </field>
+        </record>
+
+        <!--Field "arabic_name" does not exist in model "res.partner"-->
+        <record id="view_partner_form_report" model="ir.ui.view">
+            <field name="name">res.partner.inherit.form</field>
+            <field name="inherit_id" ref="base.view_partner_form"/>
+            <field name="model">res.partner</field>
+            <field type="xml" name="arch">
+                <xpath expr="//field[@name='name']" position="after">
+                </xpath>
+            </field>
+        </record>
+
+    </data>
+</odoo>
