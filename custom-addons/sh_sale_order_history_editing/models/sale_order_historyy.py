@@ -195,45 +195,7 @@ class AccountMove(models.Model):
             # Update the sum_total_balance for all related invoice records
             moves_with_same_partner.write({'sum_total_balance': total_balance_sum})
 
-''''
-class AccountPayment(models.Model):
-    _inherit = 'account.payment'
 
-    @api.model
-    def create(self, vals):
-        payment = super(AccountPayment, self).create(vals)
-
-        if payment.partner_id:
-            moves_with_same_partner = self.env['account.move'].search([
-                ('partner_id', '=', payment.partner_id.id),
-                ('id', '<=', payment.id),
-            ])
-
-            for move_with_same_partner in moves_with_same_partner:
-                if payment.payment_type in ['inbound', 'transfer']:
-                    move_with_same_partner.sum_total_balance += payment.amount_company_currency_signed
-                else:
-                    move_with_same_partner.sum_total_balance -= payment.amount_company_currency_signed
-
-        return payment
-
-    def write(self, vals):
-        result = super(AccountPayment, self).write(vals)
-
-        for payment in self:
-            if payment.partner_id:
-                moves_with_same_partner = self.env['account.move'].search([
-                    ('partner_id', '=', payment.partner_id.id),
-                ])
-
-                for move_with_same_partner in moves_with_same_partner:
-                    if payment.payment_type in ['inbound', 'transfer']:
-                        move_with_same_partner.sum_total_balance += payment.amount_company_currency_signed
-                    else:
-                        move_with_same_partner.sum_total_balance -= payment.amount_company_currency_signed
-
-        return result
-'''
 
 class SaleOrder(models.Model):
     _inherit = "sale.order"
