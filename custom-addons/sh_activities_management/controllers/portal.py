@@ -28,7 +28,7 @@ DummyAttendance = namedtuple(
 
 class ActivityRequestChatterController(PortalChatter):
 
-    @http.route('/mail/chatter_post', type='json', methods=['POST'], auth='public', website=True)
+    @http.route('/mail/chatter_post', type='http', methods=['POST'], auth='public', website=True)
     def portal_chatter_post(self, res_model, res_id, message, **kw):
         res = super(ActivityRequestChatterController, self).portal_chatter_post(
             res_model, res_id, message, **kw)
