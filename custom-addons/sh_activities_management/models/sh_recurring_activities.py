@@ -60,7 +60,7 @@ class RecurringActivities(models.Model):
     _rec_name = 'reference'
 
     reference = fields.Reference(string='Related Document',
-                                 selection='_reference_models',required="1")
+                                 selection='_reference_models',required=True)
     start_after_days = fields.Integer("Starts From")
     recurrency = fields.Boolean('Recurrent', help="Recurrent Activity")
     interval = fields.Integer(

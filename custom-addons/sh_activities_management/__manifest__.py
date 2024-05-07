@@ -58,5 +58,6 @@
             'sh_activities_management/static/src/js/portal.js',            
         ],
         },
+    'sh.recurring.activities.reference.required': True,
 
 }
