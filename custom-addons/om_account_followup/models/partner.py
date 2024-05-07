@@ -361,11 +361,11 @@ class ResPartner(models.Model):
     )
     latest_followup_date = fields.Date(
         compute='_get_latest', string="Latest Follow-up Date", compute_sudo=True,
-        help="Latest date that the follow-up level of the partner was changed",store=False,
+        help="Latest date that the follow-up level of the partner was changed",
     )
     latest_followup_level_id = fields.Many2one(
         'followup.line', compute='_get_latest', compute_sudo=True,
-        string="Latest Follow-up Level", help="The maximum follow-up level",store=False,
+        string="Latest Follow-up Level", help="The maximum follow-up level",
     )
 
     latest_followup_sequence = fields.Integer(
@@ -373,7 +373,7 @@ class ResPartner(models.Model):
         help="Gives the sequence order when displaying a list of follow-up lines.", default=0
     )
     latest_followup_level_id_without_lit = fields.Many2one(
-        'followup.line', compute='_get_latest', store=True, compute_sudo=True,
+        'followup.line', compute='_get_latest', compute_sudo=True,
         string="Latest Follow-up Level without litigation",
         help="The maximum follow-up level without taking into "
              "account the account move lines with litigation")
