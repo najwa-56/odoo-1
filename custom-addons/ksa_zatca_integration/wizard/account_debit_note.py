@@ -7,7 +7,7 @@ class AccountDebitNote(models.TransientModel):
     _inherit = "account.debit.note"
 
     # KSA-10
-    reason = fields.Char(string='Reason', required=0,
+    reason = fields.Char(string='Reason', required=False,
                          help="Reasons as per Article 40 (paragraph 1) of KSA VAT regulations")
 
     def _prepare_default_values(self, move):
