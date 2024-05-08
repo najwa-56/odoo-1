@@ -7,6 +7,8 @@ import { jsonrpc } from "@web/core/network/rpc_service";
 import { _t } from "@web/core/l10n/translation";
 
 export class Ksdashboardtile extends Component{
+    file_type_magic_word= {'/': 'jpg','R': 'gif','i': 'png','P': 'svg+xml'}
+
     setup(){
         var self = this;
         this._rpc = useService("rpc");

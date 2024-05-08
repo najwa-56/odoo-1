@@ -90,7 +90,7 @@
                     </div>
                 </t>
                 <div class="welcome_note">
-                    <h3>Welcome <span><t t-esc="state.ks_user_name"/></span> <img src="ks_dashboard_ninja/static/description/images/hand_wave.png" class="img-fluid" alt="" /></h3>
+                    <h3>Welcome <span><t t-esc="state.ks_user_name"/></span> <img src="ks_dashboard_ninja/static/images/hand_wave.png" class="img-fluid" alt="" /></h3>
                 </div>
             </div>
 
@@ -100,7 +100,7 @@
                     <div class="ks_dashboard_top_settings dropdown d-none d-lg-block">
                         <button id='ks_ai_item_dash' class="btn btn-primary mr-1"
                                 t-on-click="kscreateaiitem">
-                            <img src="/ks_dashboard_ninja/static/description/images/icons/generate-ai.svg" alt=""/>
+                            <img src="/ks_dashboard_ninja/static/images/icons/generate-ai.svg" alt=""/>
                             <span class="fa fa-lg"/>
                             Generate with AI
                             <span class="caret"/>
@@ -258,12 +258,12 @@
                     </div>
                         <button class="btn btn btn-primary" id="ks_import_item" data-toggle="tooltip" t-on-click="ksImportItemJson"
                                 data-placement="top" title="Import-item">
-                            <img src="ks_dashboard_ninja/static/description/images/icons/import-btn.svg" alt=""/>
+                            <img src="ks_dashboard_ninja/static/images/icons/import-btn.svg" alt=""/>
                         </button>
                         <button id="ks_dashboard_layout_edit" t-on-click="onKsEditLayoutClick"
                                 class="btn btn-primary ks_dashboard_edit_layout ks_edit_layout"
                                 data-toggle="tooltip" data-placement="top" title="Edit Layout">
-                            <img src="/ks_dashboard_ninja/static/description/images/icons/edit-btn.svg" alt=""/>
+                            <img src="/ks_dashboard_ninja/static/images/icons/edit-btn.svg" alt=""/>
                         </button>
 
                     <!-- This should only be shown on : Edit Mode Layout-->

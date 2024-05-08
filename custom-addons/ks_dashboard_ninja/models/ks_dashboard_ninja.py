@@ -239,7 +239,7 @@ class KsDashboardNinjaBoard(models.Model):
         dashboard_data = {
             'name': ks_dashboard_rec.name,
             'multi_layouts': ks_dashboard_rec.multi_layouts,
-            'ks_company_id': self.env.company.id,
+            'ks_company_id': self._context.get('allowed_company_ids')[0],
             'ks_dashboard_manager': has_group_ks_dashboard_manager,
             'ks_dashboard_list': self.search_read([], ['id', 'name']),
             'ks_dashboard_start_date': self._context.get('ksDateFilterStartDate', False) or self.browse(

@@ -61,7 +61,7 @@
 
                         <button type="button" title="Customize Item"
                                 class="ks_dashboard_item_customize ks_dashboard_item_fa_con d-block d-sm-none"
-                                t-att-style="'color:'+ ks_rgba_button_color + ';'">
+                                t-att-style="'color:'+ ks_rgba_button_color + ';'" t-att-data-item-id="item.id">
                             <i class="fa fa-pencil"/>
                         </button>
                         <button type="button" title="Remove Item"
@@ -80,12 +80,12 @@
                                 <div role="menu" class="dropdown-menu dropdown-menu-right ks_chart_inner_min_width">
                                     <!--Dynamic Rendering-->
                                     <div class="ks_chart_export_menu">
-                                        <div class="ks_dashboard_item_customize ks_chart_export_menu_item" t-att-data-item-id="item_id"
+                                        <div class="ks_dashboard_item_customize ks_chart_export_menu_item" t-att-data-item-id="item.id"
                                              data-format="chart_xls">
                                             <i class="fa fa-pencil"></i>
                                             <span>Customize Item</span>
                                         </div>
-                                        <div class="ks_dashboard_item_delete ks_chart_export_menu_item" t-att-data-item-id="item_id"
+                                        <div class="ks_dashboard_item_delete ks_chart_export_menu_item" t-att-data-item-id="item.id"
                                              data-format="chart_xls">
                                             <i class="fa fa-times"></i>
                                             <span>Remove Item</span>
@@ -245,7 +245,7 @@
 
                         <button type="button" title="Customize Item"
                                 class="ks_dashboard_item_customize ks_dashboard_item_fa_con d-block d-sm-none"
-                                t-att-style="'color:'+ ks_rgba_button_color + ';'">
+                                t-att-style="'color:'+ ks_rgba_button_color + ';'" t-att-data-item-id="item.id">
                             <i class="fa fa-pencil"/>
                         </button>
                         <button type="button" title="Remove Item"
@@ -264,12 +264,12 @@
                                 <div role="menu" class="dropdown-menu dropdown-menu-right ks_chart_inner_min_width">
                                     <!--Dynamic Rendering-->
                                     <div class="ks_chart_export_menu">
-                                        <div class="ks_dashboard_item_customize ks_chart_export_menu_item" t-att-data-item-id="item_id"
+                                        <div class="ks_dashboard_item_customize ks_chart_export_menu_item" t-att-data-item-id="item.id"
                                              data-format="chart_xls">
                                             <i class="fa fa-pencil"></i>
                                             <span>Customize Item</span>
                                         </div>
-                                        <div class="ks_dashboard_item_delete ks_chart_export_menu_item" t-att-data-item-id="item_id"
+                                        <div class="ks_dashboard_item_delete ks_chart_export_menu_item" t-att-data-item-id="item.id"
                                              data-format="chart_xls">
                                             <i class="fa fa-times"></i>
                                             <span>Remove Item</span>
@@ -387,7 +387,7 @@
 
                         <button type="button" title="Customize Item"
                                 class="ks_dashboard_item_customize ks_dashboard_item_fa_con d-block d-sm-none"
-                                t-att-style="'color:'+ ks_rgba_button_color + ';'">
+                                t-att-style="'color:'+ ks_rgba_button_color + ';'" t-att-data-item-id="item.id">
                             <i class="fa fa-pencil"/>
                         </button>
                         <button type="button" title="Remove Item"
@@ -408,12 +408,12 @@
                                 <div role="menu" class="dropdown-menu dropdown-menu-right ks_chart_inner_min_width">
                                     <!--Dynamic Rendering-->
                                     <div class="ks_chart_export_menu">
-                                        <div class="ks_dashboard_item_customize ks_chart_export_menu_item" t-att-data-item-id="item_id"
+                                        <div class="ks_dashboard_item_customize ks_chart_export_menu_item" t-att-data-item-id="item.id"
                                              data-format="chart_xls">
                                             <i class="fa fa-pencil"></i>
                                             <span>Customize Item</span>
                                         </div>
-                                        <div class="ks_dashboard_item_delete ks_chart_export_menu_item" t-att-data-item-id="item_id"
+                                        <div class="ks_dashboard_item_delete ks_chart_export_menu_item" t-att-data-item-id="item.id"
                                              data-format="chart_xls">
                                             <i class="fa fa-times"></i>
                                             <span>Remove Item</span>
@@ -572,7 +572,7 @@
 
                         <button type="button" title="Customize Item"
                                 class="ks_dashboard_item_customize ks_dashboard_item_fa_con d-block d-sm-none"
-                                t-att-style="'color:'+ ks_rgba_button_color + ';'">
+                                t-att-style="'color:'+ ks_rgba_button_color + ';'" t-att-data-item-id="item.id">
                             <i class="fa fa-pencil"/>
                         </button>
                         <button type="button" title="Remove Item"
@@ -591,12 +591,12 @@
                                 <div role="menu" class="dropdown-menu dropdown-menu-right ks_chart_inner_min_width">
                                     <!--Dynamic Rendering-->
                                     <div class="ks_chart_export_menu">
-                                        <div class="ks_dashboard_item_customize ks_chart_export_menu_item" t-att-data-item-id="item_id"
+                                        <div class="ks_dashboard_item_customize ks_chart_export_menu_item" t-att-data-item-id="item.id"
                                              data-format="chart_xls">
                                             <i class="fa fa-pencil"></i>
                                             <span>Customize Item</span>
                                         </div>
-                                        <div class="ks_dashboard_item_delete ks_chart_export_menu_item" t-att-data-item-id="item_id"
+                                        <div class="ks_dashboard_item_delete ks_chart_export_menu_item" t-att-data-item-id="item.id"
                                              data-format="chart_xls">
                                             <i class="fa fa-times"></i>
                                             <span>Remove Item</span>
@@ -734,7 +734,7 @@
 
                         <button type="button" title="Customize Item"
                                 class="ks_dashboard_item_customize ks_dashboard_item_fa_con d-block d-sm-none"
-                                t-att-style="'color:'+ ks_rgba_button_color + ';'">
+                                t-att-style="'color:'+ ks_rgba_button_color + ';'" t-att-data-item-id="item.id">
                             <i class="fa fa-pencil"/>
                         </button>
                         <button type="button" title="Remove Item"
@@ -753,12 +753,12 @@
                                 <div role="menu" class="dropdown-menu dropdown-menu-right ks_chart_inner_min_width">
                                     <!--Dynamic Rendering-->
                                     <div class="ks_chart_export_menu">
-                                        <div class="ks_dashboard_item_customize ks_chart_export_menu_item" t-att-data-item-id="item_id"
+                                        <div class="ks_dashboard_item_customize ks_chart_export_menu_item" t-att-data-item-id="item.id"
                                              data-format="chart_xls">
                                             <i class="fa fa-pencil"></i>
                                             <span>Customize Item</span>
                                         </div>
-                                        <div class="ks_dashboard_item_delete ks_chart_export_menu_item" t-att-data-item-id="item_id"
+                                        <div class="ks_dashboard_item_delete ks_chart_export_menu_item" t-att-data-item-id="item.id"
                                              data-format="chart_xls">
                                             <i class="fa fa-times"></i>
                                             <span>Remove Item</span>
@@ -898,7 +898,7 @@
 
                         <button type="button" title="Customize Item"
                                 class="ks_dashboard_item_customize ks_dashboard_item_fa_con d-block d-sm-none"
-                                t-att-style="'color:'+ ks_rgba_button_color + ';'">
+                                t-att-style="'color:'+ ks_rgba_button_color + ';'" t-att-data-item-id="item.id">
                             <i class="fa fa-pencil"/>
                         </button>
                         <button type="button" title="Remove Item"
@@ -919,12 +919,12 @@
                                 <div role="menu" class="dropdown-menu dropdown-menu-right ks_chart_inner_min_width">
                                     <!--Dynamic Rendering-->
                                     <div class="ks_chart_export_menu">
-                                        <div class="ks_dashboard_item_customize ks_chart_export_menu_item" t-att-data-item-id="item_id"
+                                        <div class="ks_dashboard_item_customize ks_chart_export_menu_item" t-att-data-item-id="item.id"
                                              data-format="chart_xls">
                                             <i class="fa fa-pencil"></i>
                                             <span>Customize Item</span>
                                         </div>
-                                        <div class="ks_dashboard_item_delete ks_chart_export_menu_item" t-att-data-item-id="item_id"
+                                        <div class="ks_dashboard_item_delete ks_chart_export_menu_item" t-att-data-item-id="item.id"
                                              data-format="chart_xls">
                                             <i class="fa fa-times"></i>
                                             <span>Remove Item</span>

@@ -566,7 +566,7 @@ class KsDashboardNinjaItems(models.Model):
     ks_domain_extension_2 = fields.Char('KPI Domain Extension')
     # hide legend
     ks_hide_legend = fields.Boolean('Show Legend', help="Hide all legend from the chart item", default=False)
-    ks_radial_legend = fields.Boolean('Show Legend', help="Hide all legend from the chart item", default=False)
+    ks_radial_legend = fields.Boolean('Show Radial Legend', help="Hide all legend from the chart item", default=False)
     ks_data_calculation_type = fields.Selection([('custom', 'Default Query'),
                                                  ('query', 'Custom Query')], string="Data Calculation Type",
                                                 default="custom",
@@ -611,7 +611,7 @@ class KsDashboardNinjaItems(models.Model):
     #                                                          "('ttype','=','integer'),('ttype','=','float'),"
     #                                                          "('ttype','=','monetary')]",
     #                                                   string="Measure Y")
-    ks_is_scatter_group = fields.Boolean(string="Group By")
+    ks_is_scatter_group = fields.Boolean(string="Scatter Group By")
     ks_scatter_measure_y_id = fields.Many2one('ir.model.fields',
                                               domain="[('model_id','=',ks_model_id),('name','!=','id'),('name','!=','sequence'),"
                                                      "('store','=',True),'|','|',"
@@ -663,7 +663,7 @@ class KsDashboardNinjaItems(models.Model):
     upload_excel = fields.Binary(string='Upload Excel File', attachment=False)
     ks_csv_field = fields.Binary(string='Upload CSV File', attachment=False)
     ks_group_by_lines = fields.One2many('ks.dashboard.group.by', 'ks_dashboard_group_by_id', string="Group By Lines")
-    ks_csv_group_by_lines = fields.One2many('ks.dashboard.csv.group.by', 'ks_dashboard_csv_group_by_id', string="Group By Lines")
+    ks_csv_group_by_lines = fields.One2many('ks.dashboard.csv.group.by', 'ks_dashboard_csv_group_by_id', string="CSV Group By Lines")
     filename = fields.Char(string='Filename')
     name_seq = fields.Char(help="Sequential Queue ID", copy=False)
     excel_bool = fields.Boolean(string='Excel Bool')
@@ -2049,6 +2049,9 @@ class KsDashboardNinjaItems(models.Model):
             ks_date_domain = []
 
         proper_domain = safe_eval(ks_domain) if ks_domain else []
+        if rec.ks_company_id:
+            ks_company_domain = [('company_id','=',rec.ks_company_id.id)]
+            proper_domain.extend(ks_company_domain)
         if ks_date_domain:
             proper_domain.extend(ks_date_domain)
         if rec.ks_domain_extension:
@@ -3680,6 +3683,9 @@ class KsDashboardNinjaItems(models.Model):
         proper_domain = safe_eval(ks_domain_2) if ks_domain_2 else []
         if ks_date_domain:
             proper_domain.extend(ks_date_domain)
+        if rec.ks_company_id:
+            ks_company_domain = [('company_id','=',rec.ks_company_id.id)]
+            proper_domain.extend(ks_company_domain)
         if rec.ks_domain_extension_2:
             ks_domain_extension = rec.ks_convert_domain_extension(rec.ks_domain_extension_2, rec)
             proper_domain.extend(ks_domain_extension)
@@ -3726,8 +3732,8 @@ class KsDashboardNinjaItems(models.Model):
             if all(measure_field in res for measure_field in ks_chart_measure_field):
                 if ks_chart_groupby_type == "relational_type":
                     if res[ks_chart_groupby_field]:
-                        ks_chart_data['groupByIds'].append(res[ks_chart_groupby_field][0])
-                        label = res[ks_chart_groupby_field][1]
+                        ks_chart_data['groupByIds'].append(res[ks_chart_groupby_field])
+                        label = res[ks_chart_groupby_field]
                     else:
                         label = res[ks_chart_groupby_field]
                 elif ks_chart_groupby_type == "selection":

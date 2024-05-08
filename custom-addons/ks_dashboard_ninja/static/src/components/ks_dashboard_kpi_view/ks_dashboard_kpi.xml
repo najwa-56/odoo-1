@@ -67,7 +67,7 @@
                     </t>
                 </div>
 <!--                for ai dashboard-->
-                <img src="ks_dashboard_ninja/static/description/images/selected.svg" class="ks_img_display d-none" width="30"/>
+                <img src="ks_dashboard_ninja/static/images/selected.svg" class="ks_img_display d-none" width="30"/>
 <!---->
                 <div class="ks_dashboard_item_button_container ks_dropdown_container ks_dashboard_item_header_l6 ks_dashboard_item_header_hover"
                      t-att-data-item_id="state.item_info_kpi1.item.id">
@@ -112,7 +112,7 @@
 
                         <button type="button" title="Customize Item"
                                 class="ks_dashboard_item_customize ks_dashboard_item_fa_con d-block d-sm-none"
-                                t-att-style="'color:'+ state.item_info_kpi1.ks_rgba_button_color + ';'">
+                                t-att-style="'color:'+ state.item_info_kpi1.ks_rgba_button_color + ';'" t-att-data-item-id="state.item_info_kpi1.item.id">
                             <i class="fa fa-pencil"/>
                         </button>
                         <button type="button" title="Remove Item"
@@ -132,13 +132,13 @@
                                     <!--Dynamic Rendering-->
                                 <div class="ks_chart_export_menu">
                                     <div class="ks_dashboard_item_customize ks_chart_export_menu_item"
-                                         t-att-data-item-id="state.item_info_kpi1.item_id"
+                                         t-att-data-item-id="state.item_info_kpi1.item.id"
                                          data-format="chart_xls">
                                         <i class="fa fa-pencil"></i>
                                         <span>Customize Item</span>
                                     </div>
                                     <div class="ks_dashboard_item_delete ks_chart_export_menu_item"
-                                         t-att-data-item-id="state.item_info_kpi1.item_id"
+                                         t-att-data-item-id="state.item_info_kpi1.item.id"
                                          data-format="chart_xls">
                                             <i class="fa fa-times"></i>
                                         <span>Remove Item</span>
@@ -302,7 +302,7 @@
 
                         <button type="button" title="Customize Item"
                                 class="ks_dashboard_item_customize ks_dashboard_item_fa_con d-block d-sm-none"
-                                t-att-style="'color:'+ state.item_info_kpi3.ks_rgba_button_color + ';'">
+                                t-att-style="'color:'+ state.item_info_kpi3.ks_rgba_button_color + ';'" t-att-data-item-id="state.item_info_kpi3.item.id">
                             <i class="fa fa-pencil"/>
                         </button>
                         <button type="button" title="Remove Item"
@@ -321,12 +321,12 @@
                                 <div role="menu" class="dropdown-menu dropdown-menu-right ks_chart_inner_min_width">
                                     <!--Dynamic Rendering-->
                                     <div class="ks_chart_export_menu">
-                                        <div class="ks_dashboard_item_customize ks_chart_export_menu_item" t-att-data-item-id="state.item_info_kpi3.item_id"
+                                        <div class="ks_dashboard_item_customize ks_chart_export_menu_item" t-att-data-item-id="state.item_info_kpi3.item.id"
                                              data-format="chart_xls">
                                             <i class="fa fa-pencil"></i>
                                             <span>Customize Item</span>
                                         </div>
-                                        <div class="ks_dashboard_item_delete ks_chart_export_menu_item" t-att-data-item-id="state.item_info_kpi3.item_id"
+                                        <div class="ks_dashboard_item_delete ks_chart_export_menu_item" t-att-data-item-id="state.item_info_kpi3.item.id"
                                              data-format="chart_xls">
                                             <i class="fa fa-times"></i>
                                             <span>Remove Item</span>
@@ -493,7 +493,7 @@
 
                         <button type="button" title="Customize Item"
                                 class="ks_dashboard_item_customize ks_dashboard_item_fa_con d-block d-sm-none"
-                                t-att-style="'color:'+ state.item_info_kpi2.ks_rgba_button_color + ';'">
+                                t-att-style="'color:'+ state.item_info_kpi2.ks_rgba_button_color + ';'" t-att-data-item-id="state.item_info_kpi2.item.id">
                             <i class="fa fa-pencil"/>
                         </button>
                         <button type="button" title="Remove Item"
@@ -512,12 +512,12 @@
                                 <div role="menu" class="dropdown-menu dropdown-menu-right ks_chart_inner_min_width">
                                     <!--Dynamic Rendering-->
                                     <div class="ks_chart_export_menu">
-                                        <div class="ks_dashboard_item_customize ks_chart_export_menu_item" t-att-data-item-id="state.item_info_kpi2.item_id"
+                                        <div class="ks_dashboard_item_customize ks_chart_export_menu_item" t-att-data-item-id="state.item_info_kpi2.item.id"
                                              data-format="chart_xls">
                                             <i class="fa fa-pencil"></i>
                                             <span>Customize Item</span>
                                         </div>
-                                        <div class="ks_dashboard_item_delete ks_chart_export_menu_item" t-att-data-item-id="state.item_info_kpi2.item_id"
+                                        <div class="ks_dashboard_item_delete ks_chart_export_menu_item" t-att-data-item-id="state.item_info_kpi2.item.id"
                                              data-format="chart_xls">
                                             <i class="fa fa-times"></i>
                                             <span>Remove Item</span>

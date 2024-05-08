@@ -25,7 +25,7 @@
                     <t t-else="">
                         <div class="createAI-card" t-on-click="_onResponseSelect">
                             <div class="ai-thum-img">
-                                <img t-att-src="'ks_dashboard_ninja/static/description/images/'+val['type']+'-chart.svg'"
+                                <img t-att-src="'ks_dashboard_ninja/static/images/'+val['type']+'-chart.svg'"
                                      alt=""/>
                             </div>
                             <div class="ai-title">
