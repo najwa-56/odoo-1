@@ -210,8 +210,6 @@ class SaleOrder(models.Model):
     def _compute_total_multiplied_field(self):
         for order in self:
             total_before_tax = sum(order.order_line.mapped('multiplied_field'))
-            tax_percentage = 0.15  # 15% tax
 
-            # Calculate the total including tax
-            order.total_multiplied_field = total_before_tax * (1 + tax_percentage)
+            order.total_multiplied_field = total_before_tax
     #-----------------------------------------------------------------------
