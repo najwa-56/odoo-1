@@ -69,7 +69,7 @@ Dashboard Ninja v16.0,
 
 	'currency': 'EUR',
 
-	'price': '415.35',
+	'price': '422.35',
 
 	'website': 'https://store.ksolves.com/',
 
@@ -78,7 +78,7 @@ Dashboard Ninja v16.0,
 	'live_test_url': 'https://dashboardninja17.ksolves.net/',
 
 	'category': 'Services',
-	'version': '17.0.1.7.6',
+	'version': '17.0.1.8.3',
 
 	'support': 'sales@ksolves.com',
 

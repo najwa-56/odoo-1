@@ -11,10 +11,11 @@ patch(FormViewDialog.prototype, {
             super.setup()
         },
         _mounted(){
+        if (this.props.context && this.props.context.hasOwnProperty('ks_form_view')){
             if (this.props.context.ks_form_view == true){
                 $('body').addClass('ks_dn_create_chart')
             }
-
+        }
         },
 
     });

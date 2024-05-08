@@ -9,7 +9,7 @@
                 <t t-if="val.Tech_name == props.record.data.ks_dashboard_item_type">
                     <div class="chart-card active" t-on-click="onselectitemtype">
                         <div class="chart-thum">
-                            <img t-att-src="'ks_dashboard_ninja/static/description/images/'+val['name']+'.svg'"
+                            <img t-att-src="'ks_dashboard_ninja/static/images/'+val['name']+'.svg'"
                                  alt="image"/>
                         </div>
                         <div class="chart-content">
@@ -20,7 +20,7 @@
                 <t t-else="">
                     <div class="chart-card" t-on-click="onselectitemtype">
                         <div class="chart-thum">
-                            <img t-att-src="'ks_dashboard_ninja/static/description/images/'+val['name']+'.svg'"
+                            <img t-att-src="'ks_dashboard_ninja/static/images/'+val['name']+'.svg'"
                                  alt="image"/>
                         </div>
                         <div class="chart-content">

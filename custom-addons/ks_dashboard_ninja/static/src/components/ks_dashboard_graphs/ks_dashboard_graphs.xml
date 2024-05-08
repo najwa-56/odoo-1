@@ -41,7 +41,7 @@
                             </t>
                     </div>
                     <!--                    </div>-->
-                    <img src="ks_dashboard_ninja/static/description/images/selected.svg" class="ks_img_display d-none"
+                    <img src="ks_dashboard_ninja/static/images/selected.svg" class="ks_img_display d-none"
                          width="30"/>
                     <!--  Dashboard Item Move/Copy Feature -->
                     <div class="ks_dashboard_item_button_container ks_dropdown_container ks_dashboard_item_header ks_dashboard_item_header_hover chart_button_container d-md-flex d-none"
@@ -117,7 +117,7 @@
                             </button>
 
                             <button class="ks_dashboard_item_customize d-block d-sm-none" title="Customize Item"
-                                    type="button">
+                                    type="button" t-att-data-item-id="chart_id">
                                 <i class="fa fa-pencil"/>
                             </button>
 
@@ -185,7 +185,7 @@
                                 More Info
                         </a>
                         </t>
-                                <a class="dropdown-item ks_dashboard_item_customize">
+                                <a class="dropdown-item ks_dashboard_item_customize" t-att-data-item-id="chart_id">
                             <i class="fa fa-pencil"></i>
                                     Customize Item
                          </a>

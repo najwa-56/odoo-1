@@ -65,8 +65,7 @@ class KsListViewPreview extends Component{
                 for (var j = 0; j < list_view_data.data_rows[0]["data"].length; j++) {
                     if (typeof(list_view_data.data_rows[i].data[j]) === "number" || list_view_data.data_rows[i].data[j]) {
                         if (typeof(list_view_data.data_rows[i].data[j]) === "number") {
-                           let parsedDate = parseDateTime(date,{format: "MM-dd-yyyy HH:mm:ss"});
-                            list_view_data.data_rows[j]["data"][index] = formatDateTime(parsedDate, { format: localization.dateTimeFormat })
+                           list_view_data.data_rows[i].data[j] = formatFloat(list_view_data.data_rows[i].data[j],{digits: [0, field.ks_precision_digits]})
                         }
                     } else {
                         list_view_data.data_rows[i].data[j] = "";

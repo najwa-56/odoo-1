@@ -194,11 +194,12 @@ export class KsDashboardNinja extends Component {
                 var $ks_preview = $('#' + item[i].id)
                 if ($ks_preview.length) {
                     if (item[i].id in self.gridstackConfig) {
-                         self.grid.addWidget($ks_preview[0], {x:self.gridstackConfig[item[i].id].x, y:self.gridstackConfig[item[i].id].y, w:self.gridstackConfig[item[i].id].w, h: self.gridstackConfig[item[i].id].h, autoPosition:false, minW:2, maxW:null, minH:2, maxH:null, id:item[i].id});
+                        var min_width = graphs.includes(item[i].ks_dashboard_item_type)? 3:2
+                         self.grid.addWidget($ks_preview[0], {x:self.gridstackConfig[item[i].id].x, y:self.gridstackConfig[item[i].id].y, w:self.gridstackConfig[item[i].id].w, h: self.gridstackConfig[item[i].id].h, autoPosition:false, minW:min_width, maxW:null, minH:2, maxH:null, id:item[i].id});
                     } else if ( graphs.includes (item[i].ks_dashboard_item_type)) {
                          self.grid.addWidget($ks_preview[0], {x:0, y:0, w:5, h:5,autoPosition:true,minW:4,maxW:null,minH:3,maxH:null, id :item[i].id});
                     }else{
-                        self.grid.addWidget($ks_preview[0], {x:0, y:0, w:3, h:2,autoPosition:true,minW:2,maxW:null,minH:2,maxH:2,id:item[i].id});
+                        self.grid.addWidget($ks_preview[0], {x:0, y:0, w:3, h:2,autoPosition:true,minW:3,maxW:null,minH:2,maxH:2,id:item[i].id});
                     }
                 }
             }
@@ -215,6 +216,7 @@ export class KsDashboardNinja extends Component {
         Object.values(ks_element.querySelectorAll(".ks_chart_image_export")).map((item) => { item.addEventListener('click', this.ksChartExportimage.bind(this))})
         Object.values(ks_element.querySelectorAll(".ks_chart_json_export")).map((item) => { item.addEventListener('click', this.ksItemExportJson.bind(this))})
         Object.values(ks_element.querySelectorAll(".ks_dashboard_quick_edit_action_popup")).map((item) => { item.addEventListener('click', this.onEditItemTypeClick.bind(this))})
+        Object.values(ks_element.querySelectorAll(".ks_dashboard_item_customize")).map((item) => { item.addEventListener('click', this.onEditItemTypeClick.bind(this))})
         Object.values(ks_element.querySelectorAll(".ks_dashboard_menu_container")).map((item) => { item.addEventListener('click', this.stoppropagation.bind(this))})
         Object.values(ks_element.querySelectorAll(".ks_item_description")).map((item) => { item.addEventListener('click', this.stoppropagation.bind(this))})
         Object.values(ks_element.querySelectorAll(".ks_item_click")).map((item) => { item.addEventListener('click', this._onKsItemClick.bind(this))})
@@ -234,7 +236,8 @@ export class KsDashboardNinja extends Component {
         if(self.dn_state['user_context']['ksDateFilterSelection'] !== undefined && self.ksDateFilterSelection !== 'l_none'){
             context = self.dn_state['user_context']
         }
-        return Object.assign(context, session.user_context);
+        var ks_new_obj = {...session.user_context,...{allowed_company_ids:this.env.services.company.activeCompanyIds}}
+        return Object.assign(context, ks_new_obj);
     }
 
     ks_fetch_data(){
@@ -539,7 +542,7 @@ export class KsDashboardNinja extends Component {
             var self = this;
             var item_id = e.currentTarget.dataset.itemId;
             var item_data = self.ks_dashboard_data.ks_item_data[item_id];
-            var groupBy = item_data.ks_chart_groupby_type === 'relational_type' ? item_data.ks_chart_relation_groupby_name : item_data.ks_chart_relation_groupby_name + ':' + item_data.ks_chart_date_groupby;
+            var groupBy = item_data.ks_chart_groupby_type === 'date_type' ? item_data.ks_chart_relation_groupby_name + ':' + item_data.ks_chart_date_groupby : item_data.ks_chart_relation_groupby_name;
             var domain = JSON.parse(item_data.ks_chart_data).previous_domain
 
             if (item_data.ks_show_records) {
@@ -647,7 +650,7 @@ export class KsDashboardNinja extends Component {
             if (e.target.title != "Customize Item") {
                 var item_id = parseInt(e.currentTarget.firstElementChild.id);
                 var item_data = self.ks_dashboard_data.ks_item_data[item_id];
-                if (item_data && item_data.ks_show_records) {
+                if (item_data && item_data.ks_show_records && item_data.ks_data_calculation_type != 'query') {
 
                     if (item_data.action) {
                         if (!item_data.ks_is_client_action){

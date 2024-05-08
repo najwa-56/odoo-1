@@ -429,13 +429,13 @@
 .ks_dn_create_chart .o-autocomplete input,
 .ks_dn_create_chart .o_field_selection select,
 body:not(.o_touch_device) .o_field_selection:not(:hover):not(:focus-within) select:not(:hover) {
-    background: var(--ks-dn-transparent) url('/ks_dashboard_ninja/static/description/images/icons/dropdown-icon.svg') no-repeat 96% center / 25px !important;
+    background: var(--ks-dn-transparent) url('/ks_dashboard_ninja/static/images/icons/dropdown-icon.svg') no-repeat 96% center / 25px !important;
 }
 
 [data-color-mode="ks-dn-dark"] .ks_dn_create_chart .o-autocomplete input,
 [data-color-mode="ks-dn-dark"] .ks_dn_create_chart .o_technical_modal .o_field_selection select,
 [data-color-mode="ks-dn-dark"] body:not(.o_touch_device) .o_field_selection:not(:hover):not(:focus-within) select:not(:hover) {
-    background: var(--ks-dn-dark-controls) url('/ks_dashboard_ninja/static/description/images/icons/dropdown-icon-light.svg') no-repeat 96% center / 25px !important;
+    background: var(--ks-dn-dark-controls) url('/ks_dashboard_ninja/static/images/icons/dropdown-icon-light.svg') no-repeat 96% center / 25px !important;
     color: var(--ks-body-text-color) !important;
     border-color: var(--ks-dn-dark-bg) !important;
 }
@@ -633,14 +633,14 @@ body:not(.o_touch_device) .o_field_selection:not(:hover):not(:focus-within) sele
 
 .ks-generateAI-body .o_inner_group.grid.col-lg-6 .o_cell .ks_input_custom input {
     width: 225px;
-    background: var(--ks-dn-white) url('/ks_dashboard_ninja/static/description/images/icons/Search.svg') no-repeat 10px center;
+    background: var(--ks-dn-white) url('/ks_dashboard_ninja/static/images/icons/Search.svg') no-repeat 10px center;
     border: solid 1px var(--ks-dn-gray-50);
     padding-left: 30px !important;
     color: var(--ks-dn-black-600) !important;
 }
 
 [data-color-mode="ks-dn-dark"] .ks-generateAI-body .o_inner_group.grid.col-lg-6 .o_cell .ks_input_custom input {
-    background: var(--ks-dn-dark-controls) url('/ks_dashboard_ninja/static/description/images/icons/Search-light.svg') no-repeat 10px center;
+    background: var(--ks-dn-dark-controls) url('/ks_dashboard_ninja/static/images/icons/Search-light.svg') no-repeat 10px center;
 }
 
 .ks-generateAI-body .o_inner_group.grid.col-lg-6 .o_cell .o_field_many2one_selection .o_input_dropdown .o-autocomplete {

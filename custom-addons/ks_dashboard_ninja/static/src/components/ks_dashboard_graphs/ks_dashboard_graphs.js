@@ -118,6 +118,9 @@ export class Ksdashboardgraph extends Component{
 //            $('ks_info').hide();
 //        }
         }else{
+         if (this.item.ks_data_calculation_type === 'query'){
+                $(this.ks_gridstack_container.el).find(".ks_dashboard_item_chart_info").addClass('d-none');
+          }
         $(this.ks_gridstack_container.el).addClass('ks_dashboarditem_id');
         $(this.ks_gridstack_container.el).find(".ks_dashboard_item_button_container").addClass("ks_funnel_item_container")
         if (this.item.ks_dashboard_item_type =="ks_funnel_chart"){
@@ -1558,9 +1561,8 @@ export class Ksdashboardgraph extends Component{
         let domain = [];
         let partner_domain = [];
         var partners = [];
-        if (map_data.groupByIds){
+        if (map_data.groupByIds?.length){
             partners = map_data['partner']
-        }
         var partners_query = [];
         partners_query = map_data['ks_partners_map']
         var ks_labels = map_data['labels'];
@@ -1805,7 +1807,11 @@ export class Ksdashboardgraph extends Component{
             // Make stuff animate on load
             chart.appear(1000, 100);
             this.chart_container[item.id] = chart;
-//                $ks_map_view_tmpl.find('.ks_li_' + item.ks_flower_item_color).addClass('ks_date_filter_selected');
+//               $ks_map_view_tmpl.find('.ks_li_' + item.ks_flower_item_color).addClass('ks_date_filter_selected');
+
+        }else{
+            $ks_map_view_tmpl.find('.ks_map_card_body').append($("<div class='map_text'>").text("No Data Available."))
+        }
         }else{
             $ks_map_view_tmpl.find('.ks_map_card_body').append($("<div class='map_text'>").text("No Data Available."))
         }

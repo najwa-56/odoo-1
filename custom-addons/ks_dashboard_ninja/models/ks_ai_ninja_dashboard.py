@@ -14,7 +14,7 @@ class KsDashboardNInjaAI(models.TransientModel):
     ks_type = fields.Selection([('ks_model', 'Model'), ('ks_keyword', 'Keywords')],
                                string="Ks AI Type", default='ks_model')
 
-    ks_import_model_id = fields.Many2one('ir.model', string='Model',
+    ks_import_model_id = fields.Many2one('ir.model', string='Model ID',
                                   domain="[('access_ids','!=',False),('transient','=',False),"
                                          "('model','not ilike','base_import%'),('model','not ilike','ir.%'),"
                                          "('model','not ilike','web_editor.%'),('model','not ilike','web_tour.%'),"
