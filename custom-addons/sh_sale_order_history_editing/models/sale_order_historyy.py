@@ -15,8 +15,11 @@ class SaleOrderHistory(models.Model):
     product_uom_qtyy = fields.Float(
         "الجرد",
         related="name.aljard",
-        store=True
+        readonly=True,
+        store=True,
     )
+
+    total_multiplied_field=fields.Float("total_multiplied_field",related="order_id.total_multiplied_field",store=True)
 
     #alsarf
     alsarf = fields.Float("الصرف", compute="_compute_alsarf",store=True)
@@ -89,26 +92,27 @@ class SaleOrderLine(models.Model):
      #_______________________________________________________________
      #The create and write methods in the SaleOrderLine model are modified to trigger the computation of the total in the sale.order model
      # whenever a new record is created or an existing record is modified.
-    @api.model
+    @api.model_create_multi
     def create(self, values):
         # Call the parent create method
         record = super(SaleOrderLine, self).create(values)
 
         # Call the method to update the total in sale order
-        if record.order_id:
-            record.order_id._compute_total_multiplied_field()
+        if record.order_history_line.order_id:
+            record.order_history_line.order_id.total_multiplied_field
 
         return record
+
+    @api.model_create_multi
     def write(self, values):
         # Call the parent write method
         result = super(SaleOrderLine, self).write(values)
 
         # Call the method to update the total in sale order
-        if self.order_id:
-           self.order_id._compute_total_multiplied_field()
+        if self.order_history_line.order_id:
+            self.order_history_line.order_id.total_multiplied_field
 
         return result
-
 
 class AccountMove(models.Model):
     _inherit = "account.move"
