@@ -4,6 +4,7 @@ from cryptography import x509
 from odoo.tools.float_utils import float_round
 from odoo.tools import mute_logger
 import lxml.etree as ET
+import datetime
 import binascii
 import requests
 import logging
@@ -80,9 +81,9 @@ class AccountMove(models.Model):
     ksa_note = fields.Char(size=1000, required=0)
 
     # Never show these fields on front
-    is_zatca = fields.Boolean(related="company_id.is_zatca")
-    is_self_billed = fields.Boolean(related="company_id.is_self_billed")
-    l10n_sa_phase1_end_date = fields.Date(related="company_id.l10n_sa_phase1_end_date")
+    is_zatca = fields.Boolean(related="company_id.parent_is_zatca")
+    is_self_billed = fields.Boolean(related="company_id.parent_root_id.is_self_billed")
+    l10n_sa_phase1_end_date = fields.Date(related="company_id.parent_root_id.l10n_sa_phase1_end_date")
     zatca_unique_seq = fields.Char(readonly=1, copy=False)
     zatca_icv_counter = fields.Char(readonly=1, copy=False)
     invoice_uuid = fields.Char('zatca uuid', readonly=1, copy=False)
@@ -90,11 +91,11 @@ class AccountMove(models.Model):
     zatca_invoice_hash_hex = fields.Char(readonly=1, copy=False)
     zatca_hash_invoice = fields.Binary("ZATCA generated invoice for hash", attachment=True, readonly=1, copy=False)
     zatca_hash_invoice_name = fields.Char(readonly=1, copy=False)
-    l10n_sa_response_datetime = fields.Datetime(string='Confirmation Date ', readonly=True, copy=False)
+    l10n_sa_response_datetime = fields.Datetime(string='Response DateTime', readonly=True, copy=False)
 
     def _compute_zatca_onboarding_status(self):
         for record in self:
-            com = record.company_id.sudo()
+            com = record.company_id.parent_root_id.sudo()
             if (com.is_zatca and com.zatca_onboarding_status and
                     (not record.zatca_compliance_invoices_api or
                      ("Onboarding failed, restart process !!" not in record.zatca_compliance_invoices_api
@@ -150,7 +151,7 @@ class AccountMove(models.Model):
             record.l10n_is_self_billed_invoice = 0
 
     def get_signature(self, conf=0):
-        conf = self.company_id.sudo() if not conf else conf
+        conf = self.company_id.parent_root_id.sudo() if not conf else conf
 
         # STEP # 3 in "5. Signing Process"
         # in https://zatca.gov.sa/ar/E-Invoicing/Introduction/Guidelines/Documents/E-invoicing%20Detailed%20Technical%20Guidelines.pdf
@@ -290,7 +291,7 @@ class AccountMove(models.Model):
         if len(missing_product_fields) > 0:
             message += ' , '.join(missing_product_fields) + _("are missing.") + '\n'
 
-        company_data = self._get_zatca_partner_data() if self.l10n_is_self_billed_invoice else self._get_zatca_company_data(self.company_id)
+        company_data = self._get_zatca_partner_data() if self.l10n_is_self_billed_invoice else self._get_zatca_company_data(self.company_id.parent_root_id)
         company_fields = [company_data["district"]['field'], company_data["city"]['field'], company_data["street"]['field'], 'building_no', 'zip', 'vat']
         company_fields += ["buyer_identification", "buyer_identification_no"] if self.l10n_is_self_billed_invoice else ['license', 'license_no']
         company_fields_ids = ['country_id']
@@ -322,10 +323,10 @@ class AccountMove(models.Model):
         if message != "":
             raise exceptions.ValidationError(message)
 
-    def _get_partner_comapny(self, company_id):
+    def _get_partner_comapny(self, company_id, no_parent=0):
         if self.l10n_is_self_billed_invoice:
             self_company = company_id
-            partner_id = company_id
+            partner_id = company_id.parent_root_id
             company_id = self.partner_id
             license = self.partner_id.buyer_identification
             license_no = self.partner_id.buyer_identification_no
@@ -333,17 +334,17 @@ class AccountMove(models.Model):
             buyer_identification_no = self_company.license_no
         else:
             partner_id = self.partner_id
-            company_id = company_id
             buyer_identification = self.partner_id.buyer_identification
             buyer_identification_no = self.partner_id.buyer_identification_no
             license = company_id.license
             license_no = company_id.license_no
+            company_id = company_id.parent_root_id
 
         return partner_id, company_id, buyer_identification, buyer_identification_no, license, license_no
 
     def tax_invoice_validations(self):
         message = "For tax invoice \n"
-        conf = self.company_id.sudo()
+        conf = self.company_id.parent_root_id.sudo()
         partner_id, company_id, buyer_identification, buyer_identification_no, license, license_no = self._get_partner_comapny(self.company_id)
 
         if (not (buyer_identification and buyer_identification_no) and not (partner_id.vat)):
@@ -357,7 +358,7 @@ class AccountMove(models.Model):
             if not (buyer_identification or buyer_identification_no):
                 message += _("buyer_identification is required for exports invoice") + "\n"
 
-        partner_data = self._get_zatca_company_data(self.company_id) if self.l10n_is_self_billed_invoice else self._get_zatca_partner_data()
+        partner_data = self._get_zatca_company_data(self.company_id.parent_root_id) if self.l10n_is_self_billed_invoice else self._get_zatca_partner_data()
         partner_fields = [partner_data["city"]['field'], partner_data["street"]['field'], 'zip']
         partner_fields_ids = ['country_id']
         if partner_id.country_id.code == 'SA':
@@ -457,9 +458,9 @@ class AccountMove(models.Model):
     @mute_logger('Zatca Debugger for account.move :')
     def create_xml_file(self, previous_hash=0, pos_refunded_order_id=0):
         amount_verification = 0  # for debug mode
-        conf = self.company_id.sudo()
-        conf_company = self._get_zatca_partner_data() if self.l10n_is_self_billed_invoice else self._get_zatca_company_data(self.company_id)
-        conf_partner = self._get_zatca_company_data(self.company_id) if self.l10n_is_self_billed_invoice else self._get_zatca_partner_data()
+        conf = self.company_id.parent_root_id.sudo()
+        conf_company = self._get_zatca_partner_data() if self.l10n_is_self_billed_invoice else self._get_zatca_company_data(self.company_id.parent_root_id)
+        conf_partner = self._get_zatca_company_data(self.company_id.parent_root_id) if self.l10n_is_self_billed_invoice else self._get_zatca_partner_data()
         if not conf.is_zatca:
             raise exceptions.AccessDenied(_("Zatca is not activated."))
         # No longer needed
@@ -490,6 +491,8 @@ class AccountMove(models.Model):
             if bt_25.l10n_sa_invoice_type != self.l10n_sa_invoice_type:
                 self.l10n_sa_invoice_type = bt_25.l10n_sa_invoice_type
                 raise exceptions.ValidationError(_("Mismatched Invoice Type for original and associated invoice."))
+            if not bt_25.l10n_sa_confirmation_datetime:
+                bt_25.l10n_sa_confirmation_datetime = datetime.datetime.combine(bt_25.invoice_date, datetime.time(0, 0))
 
         is_tax_invoice = 1 if self.l10n_sa_invoice_type == 'Standard' else 0
         if is_tax_invoice:
@@ -822,13 +825,13 @@ class AccountMove(models.Model):
                 # bg_23_list = ["O"]  # BR-O-01
 
             def next_invoice_line_id(invoice_line_id):
-                id = self.env['ir.sequence'].with_company(self.company_id).next_by_code('zatca.move.line.seq')
+                id = self.env['ir.sequence'].with_company(self.company_id.parent_root_id).next_by_code('zatca.move.line.seq')
                 if invoice_line_id.sudo().search([('zatca_id', '=', id)]).id:
                     id = next_invoice_line_id(invoice_line_id)
                 return id
             # seq check
             sequence = self.env['ir.sequence'].search([('code', '=', 'zatca.move.line.seq'),
-                                                       ('company_id', 'in', [self.company_id.id, False])],
+                                                       ('company_id', 'in', [self.company_id.parent_root_id.id, False])],
                                                       order='company_id', limit=1)
             if not sequence:
                 raise exceptions.MissingError(_("Sequence") + " 'zatca.move.line.seq' " + _("not found for this company"))
@@ -1007,7 +1010,7 @@ class AccountMove(models.Model):
         _logger.info("ZATCA: Invoice & its hash generated for invoice " + str(self.name))
 
     def get_AccountingSupplierParty(self, company_id):
-        conf_company = self._get_zatca_partner_data() if self.l10n_is_self_billed_invoice else self._get_zatca_company_data(company_id)
+        conf_company = self._get_zatca_partner_data() if self.l10n_is_self_billed_invoice else self._get_zatca_company_data(company_id.parent_root_id)
         partner_id, company_id, buyer_identification, buyer_identification_no, license, license_no = self._get_partner_comapny(company_id)
         bt_31 = company_id.vat
 
@@ -1113,7 +1116,7 @@ class AccountMove(models.Model):
         # link = "https://gw-fatoora.zatca.gov.sa/e-invoicing/developer-portal"
         endpoint = '/compliance/invoices'
 
-        conf = self.company_id.sudo() if not auto_compliance else kwargs.get('conf')
+        conf = self.company_id.parent_root_id.sudo() if not auto_compliance else kwargs.get('conf')
         if not conf.is_zatca:
             raise exceptions.AccessDenied(_("Zatca is not activated."))
         link = conf.zatca_link
@@ -1286,7 +1289,7 @@ class AccountMove(models.Model):
         # link = "https://gw-fatoora.zatca.gov.sa/e-invoicing/developer-portal"
         endpoint = '/invoices/clearance/single'
 
-        conf = self.company_id.sudo()
+        conf = self.company_id.parent_root_id.sudo()
         if not conf.is_zatca:
             raise exceptions.AccessDenied(_("Zatca is not activated."))
         link = conf.zatca_link
@@ -1400,7 +1403,7 @@ class AccountMove(models.Model):
         # link = "https://gw-fatoora.zatca.gov.sa/e-invoicing/developer-portal"
         endpoint = '/invoices/reporting/single'
 
-        conf = self.company_id.sudo()
+        conf = self.company_id.parent_root_id.sudo()
         if not conf.is_zatca:
             raise exceptions.AccessDenied(_("Zatca is not activated."))
         link = conf.zatca_link
@@ -1627,7 +1630,7 @@ class AccountMove(models.Model):
         try:
             for record in self:
                 qr_code_str = ''
-                conf_company = self._get_zatca_partner_data() if self.l10n_is_self_billed_invoice else self._get_zatca_company_data(self.company_id)
+                conf_company = self._get_zatca_partner_data() if self.l10n_is_self_billed_invoice else self._get_zatca_company_data(self.company_id.parent_root_id)
                 partner_id, company_id, buyer_identification, buyer_identification_no, license, license_no = self._get_partner_comapny(record.company_id)
 
                 if record.l10n_sa_confirmation_datetime and company_id.vat:
@@ -1643,7 +1646,7 @@ class AccountMove(models.Model):
                     invoice_hash = get_qr_encoding(6, record.zatca_invoice_hash)
                     ecdsa_signature = get_qr_encoding(7, signature_value)
 
-                    conf = self.company_id.sudo()
+                    conf = self.company_id.parent_root_id.sudo()
                     _zatca.info("zatca_cert_public_key:: %s", conf.zatca_cert_public_key)
                     cert_pub_key = base64.b64decode(conf.zatca_cert_public_key)
                     _zatca.info("cert_pub_key:: %s", cert_pub_key)
@@ -1755,14 +1758,14 @@ class AccountMove(models.Model):
     def action_post(self):
         res = super().action_post()
         for record in self:
-            conf = record.company_id.sudo()
+            conf = record.company_id.parent_root_id.sudo()
             if (conf.is_zatca
                     and ((not conf.is_self_billed and record.move_type in ['out_invoice', 'out_refund']) or
                          (conf.is_self_billed and record.move_type in ['out_invoice', 'out_refund', 'in_invoice', 'in_refund']) )
                     and record.l10n_sa_invoice_type and record.l10n_sa_phase1_end_date and record.invoice_date > record.l10n_sa_phase1_end_date):
                 if (record.move_type in ['in_invoice', 'in_refund'] and record.l10n_is_self_billed_invoice) or record.move_type in ['out_invoice', 'out_refund']:
                     record.create_xml_file()
-                    if record.company_id.zatca_send_from_pos:
+                    if record.company_id.parent_root_id.zatca_send_from_pos:
                         if not record.zatca_onboarding_status:
                             record.send_for_compliance()
                         elif record.l10n_sa_invoice_type == 'Standard':
@@ -1777,7 +1780,7 @@ class AccountMove(models.Model):
         super()._compute_show_delivery_date()
         for move in self:
             if move.country_code == 'SA':
-                conf = move.company_id.sudo()
+                conf = move.company_id.parent_root_id.sudo()
                 move.show_delivery_date = ((not conf.is_self_billed and move.move_type in ['out_invoice', 'out_refund'])
                                            or (conf.is_self_billed and move.move_type in ['out_invoice', 'out_refund', 'in_invoice', 'in_refund']))
 
@@ -1807,7 +1810,7 @@ class AccountMove(models.Model):
         return super(AccountMove, self).button_cancel()
 
     def l10n_sa_prohibited_exception(self):
-        conf = self.company_id.sudo()
+        conf = self.company_id.parent_root_id.sudo()
         if (conf.is_zatca and ((not conf.is_self_billed and self.move_type in ['out_invoice', 'out_refund'])
                or (conf.is_self_billed and self.move_type in ['out_invoice', 'out_refund', 'in_invoice', 'in_refund']))
                 and self.l10n_sa_phase1_end_date and self.invoice_date > self.l10n_sa_phase1_end_date):

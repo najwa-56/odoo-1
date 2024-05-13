@@ -33,13 +33,13 @@
                     </t>
 
                     <t t-set="conf_partner"
-                       t-value="doc._get_zatca_company_data(doc.company_id) if doc.l10n_is_self_billed_invoice else doc._get_zatca_partner_data()"/>
+                       t-value="doc._get_zatca_company_data(doc.company_id.parent_root_id) if doc.l10n_is_self_billed_invoice else doc._get_zatca_partner_data()"/>
                     <t t-set="conf_company"
-                       t-value="doc._get_zatca_partner_data() if doc.l10n_is_self_billed_invoice else doc._get_zatca_company_data(doc.company_id)"/>
+                       t-value="doc._get_zatca_partner_data() if doc.l10n_is_self_billed_invoice else doc._get_zatca_company_data(doc.company_id.parent_root_id)"/>
                     <t t-set="partner_id"
-                       t-value="doc.company_id if doc.l10n_is_self_billed_invoice else doc.partner_id"/>
+                       t-value="doc.company_id.parent_root_id if doc.l10n_is_self_billed_invoice else doc.partner_id"/>
                     <t t-set="_company_id"
-                       t-value="doc.partner_id if doc.l10n_is_self_billed_invoice else doc.company_id"/>
+                       t-value="doc.partner_id if doc.l10n_is_self_billed_invoice else doc.company_id.parent_root_id"/>
                     <t t-set="buyer_identification"
                        t-value="doc.company_id.license if doc.l10n_is_self_billed_invoice else doc.partner_id.buyer_identification"/>
                     <t t-set="buyer_identification_no"
@@ -835,7 +835,7 @@
                                             </td>
                                             <td class="second_table" style="text-align:right;">
                                                 <span t-esc="abs(doc.amount_tax_signed)"
-                                                      t-options='{"widget": "monetary", "display_currency": doc.company_id.currency_id}'/>
+                                                      t-options='{"widget": "monetary", "display_currency": doc.company_id.parent_root_id.currency_id}'/>
                                             </td>
                                         </tr>
                                         <tr>

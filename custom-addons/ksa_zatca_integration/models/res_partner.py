@@ -5,7 +5,7 @@ from odoo import fields, models, exceptions, api, _
 class ResPartner(models.Model):
     _inherit = 'res.partner'
 
-    is_zatca = fields.Boolean(related="company_id.is_zatca")
+    is_zatca = fields.Boolean(related="company_id.parent_is_zatca")
     building_no = fields.Char('Building Number', help="https://splonline.com.sa/en/national-address-1/")
     additional_no = fields.Char('Additional Number', help="https://splonline.com.sa/en/national-address-1/")
     district = fields.Char('District')

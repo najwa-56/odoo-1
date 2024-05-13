@@ -108,20 +108,20 @@
                 </t>
 
                 <t t-set="conf_partner"
-                   t-value="doc._get_zatca_company_data(doc.company_id) if doc.l10n_is_self_billed_invoice else doc._get_zatca_partner_data()"/>
+                   t-value="doc._get_zatca_company_data(doc.company_id.parent_root_id) if doc.l10n_is_self_billed_invoice else doc._get_zatca_partner_data()"/>
                 <t t-set="conf_company"
-                   t-value="doc._get_zatca_partner_data() if doc.l10n_is_self_billed_invoice else doc._get_zatca_company_data(doc.company_id)"/>
+                   t-value="doc._get_zatca_partner_data() if doc.l10n_is_self_billed_invoice else doc._get_zatca_company_data(doc.company_id.parent_root_id)"/>
 
                 <div dir="ltr">
                     <div class="pos-receipt page_block"
                          style="text-align: left;padding-bottom: 0px;display: inline-block;overflow: hidden;">
-                        <t t-if="doc.company_id.logo">
-                            <img t-attf-src="data:image/*;base64,{{doc.company_id.logo}}"
+                        <t t-if="doc.company_id.parent_root_id.logo">
+                            <img t-attf-src="data:image/*;base64,{{doc.company_id.parent_root_id.logo}}"
                                  style="max-height:500px; max-width:50%;display: block;margin: 0 auto;"
                                  t-options='{"widget": "image"}'/>
                             <br/>
                         </t>
-                        <t t-if="not doc.company_id.logo">
+                        <t t-if="not doc.company_id.parent_root_id.logo">
                             <h2 style="text-align: center;" class="pos-receipt-center-align">
                                 <t t-esc="conf_company['name']['value']"/>
                             </h2>
@@ -242,7 +242,7 @@
                                     </td>
                                     <td>
                                         <span class="data_column">
-                                            <t t-esc="doc.company_id.vat"/>
+                                            <t t-esc="doc.company_id.parent_root_id.vat"/>
                                         </span>
                                     </td>
                                     <td>
@@ -257,21 +257,21 @@
                                     </td>
                                     <td>
                                         <span class="data_column">
-                                            <t t-esc="doc.company_id.building_no"/>,
+                                            <t t-esc="doc.company_id.parent_root_id.building_no"/>,
                                             <t t-esc="conf_company['street']['value']"/>
                                             <t t-if="conf_company['street2']['value']"><t
                                                     t-esc="conf_company['street2']['value']"/>,
                                             </t>
-                                            <t t-if="doc.company_id.additional_no"><t
-                                                    t-esc="doc.company_id.additional_no"/>,
+                                            <t t-if="doc.company_id.parent_root_id.additional_no"><t
+                                                    t-esc="doc.company_id.parent_root_id.additional_no"/>,
                                             </t>
                                             <t t-esc="conf_company['district']['value']"/>,
-                                            <t t-esc="doc.company_id.zip"/>,
+                                            <t t-esc="doc.company_id.parent_root_id.zip"/>,
                                             <t t-esc="conf_company['city']['value']"/>,
                                             <t t-if="conf_company['state_id_name']['value']"><t
                                                     t-esc="conf_company['state_id_name']['value']"/>,
                                             </t>
-                                            <t t-esc="doc.company_id.country_id.name"/>
+                                            <t t-esc="doc.company_id.parent_root_id.country_id.name"/>
                                         </span>
                                     </td>
                                     <td>
@@ -436,7 +436,7 @@
                                     </td>
                                     <td class="right_column">
                                         <span t-esc="abs(doc.amount_tax_signed)"
-                                              t-options='{"widget": "monetary", "display_currency": doc.company_id.currency_id}'/>
+                                              t-options='{"widget": "monetary", "display_currency": doc.company_id.parent_root_id.currency_id}'/>
                                     </td>
                                     <td class="right_column arabic_label">
                                         <span>إجمالي ﻤﺒﻠﻎ ضريبة القيمة المضافة</span>

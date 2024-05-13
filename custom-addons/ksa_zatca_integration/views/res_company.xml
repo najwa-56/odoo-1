@@ -61,7 +61,8 @@
                 </xpath>
                 <xpath expr="//notebook" position="inside">
                     <page id="zatca_configurations" string="Zatca Configurations"
-                          groups="ksa_zatca_integration.l10n_sa_group_zatca_user">
+                          groups="ksa_zatca_integration.l10n_sa_group_zatca_user"
+                          invisible="parent_id">
                         <div class="app_settings_block" data-string="ZATCA" string="ZATCA"
                              data-key="ZATCA">
                             <h2>ZATCA</h2>

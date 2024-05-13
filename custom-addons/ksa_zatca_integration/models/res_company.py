@@ -61,7 +61,7 @@ class ResCompany(models.Model):
     def constrains_brksa64(self):
         for record in self:
             # if record._context.get('params', False) and record._context['params'].get('model', False) == 'res.company':
-            if record.is_zatca:
+            if record.parent_is_zatca:
                 # BR-KSA-37
                 if len(str(record.sanitize_int(record.building_no))) != 4:
                     raise exceptions.ValidationError(_('Building Number must be exactly 4 digits'))
@@ -72,6 +72,8 @@ class ResCompany(models.Model):
                     raise exceptions.ValidationError(_('Individual Vat must be exactly 10 digits'))
 
     is_zatca = fields.Boolean()
+    parent_is_zatca = fields.Boolean(compute="_compute_zatca_parent_id", compute_sudo=True)
+    parent_root_id = fields.Many2one('res.company', compute='_compute_zatca_parent_id', compute_sudo=True)
     is_self_billed = fields.Boolean("Self Billed")
 
     zatca_certificate_status = fields.Boolean()
@@ -122,6 +124,13 @@ class ResCompany(models.Model):
     zatca_prod_private_key = fields.Char()
     zatca_cert_public_key = fields.Char()
     zatca_csr_base64 = fields.Char()
+
+    @api.onchange('parent_id')
+    @api.depends('parent_id')
+    def _compute_zatca_parent_id(self):
+        for record in self:
+            record.parent_is_zatca = record.parent_ids.filtered(lambda x: not x.parent_id).is_zatca or record.is_zatca
+            record.parent_root_id = record.parent_ids.filtered(lambda x: not x.parent_id) or record
 
     @api.onchange('vat')
     @api.depends('vat', 'is_zatca')
@@ -618,7 +627,7 @@ class ResCompany(models.Model):
             if recompute_phase1_ending_date:
                 records = self.env['account.move'].sudo().search([('company_id', '=', self.id)])
                 records._compute_l10n_sa_zatca_status()
-            if record.is_zatca:
+            if record.parent_is_zatca:
                 if len(str(record.vat)) != 15:
                     raise exceptions.ValidationError('Vat must be exactly 15 digits')
                 if str(record.vat)[0] != '3' or str(record.vat)[-1] != '3':

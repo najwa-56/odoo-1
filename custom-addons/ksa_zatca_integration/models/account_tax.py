@@ -24,7 +24,7 @@ arabic_tax = {
 class AccountTax(models.Model):
     _inherit = 'account.tax'
 
-    is_zatca = fields.Boolean(related="company_id.is_zatca")
+    is_zatca = fields.Boolean(related="company_id.parent_is_zatca")
     classified_tax_category = fields.Selection([("E", "E"), ("S", "S"), ("Z", "Z"),
                                                 ("O", "O")], 'Tax Category', default="S", required=1)
     tax_exemption_selection = fields.Selection([
