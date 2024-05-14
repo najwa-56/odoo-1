@@ -322,7 +322,7 @@
         <field name="res_model">mail.activity</field>
         <field name="view_mode">pivot,graph</field>
     </record>
-
+<!--
     <record id="sh_action_my_activities" model="ir.actions.act_window">
         <field name="name">My Activities</field>
         <field name="res_model">mail.activity</field>
@@ -335,6 +335,18 @@
                 (0, 0, {'view_mode': 'calendar', 'view_id': ref('sh_mail_schedule_activity_view_calendar')}),
                 (0, 0, {'view_mode': 'graph', 'view_id': ref('sh_mail_schedule_activity_view_graph')})]" />
         <field name="domain">['|',('user_id', '=', uid),('sh_user_ids', 'in', [uid])]</field>
+    </record>-->
+
+    <record id="sh_action_my_activities" model="ir.actions.act_window">
+        <field name="name">My Activities</field>
+        <field name="res_model">mail.activity</field>
+        <field name="view_mode">tree,form</field>
+        <field name="view_ids" eval="[(5, 0, 0),
+            	(0, 0, {'view_mode': 'tree', 'view_id': ref('sh_mail_activity_view_tree')}),
+                (0,0,{'view_mode':'form','view_id':ref('mail.mail_activity_view_form')}),
+                ]" />
+        <field name="domain">['|',('user_id', '=', uid),('sh_user_ids', 'in', [uid])] </field>
+
     </record>
 
     <record id="sh_supervisor_activity_action" model="ir.actions.act_window">
