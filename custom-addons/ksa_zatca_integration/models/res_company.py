@@ -44,7 +44,7 @@ class ResCompany(models.Model):
                                 ('MOM', 'Momrah license'), ('MLS', 'MHRSD license'),
                                 ('SAG', 'MISA license'), ('OTH', 'Other OD'),
                                 ('700', '700 Number')],
-                               default='CRN', required=0, string="License",
+                               default='CRN', required=False, string="License",
                                help="In case multiple IDs exist then one of the above must be entered")
     license_no = fields.Char(string="License Number (Other seller ID)", required=0)
 
