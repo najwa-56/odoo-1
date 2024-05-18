@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+	<template id="report_footer_custom" >
+        <div class="footer">
+            <t t-if="o and 'company_id' in o">
+                <t t-set="company" t-value="o.company_id"></t>
+            </t>
+            <t t-if="not o or not 'company_id' in o">
+                <t t-set="company" t-value="res_company"></t>
+            </t>
+            <div class="text-center" style="border-top: 1px solid black;">
+                <ul class="list-inline mb4">
+                    <li t-if="company.phone">Phone: <span t-field="company.phone"/> |</li>
+                    <li t-if="company.email">Email: <span t-field="company.email"/> |</li>
+                    <li t-if="company.website">Web: <span t-field="company.website"/></li>
+                </ul>
+            </div>
+		</div>
+	</template>
+</odoo>

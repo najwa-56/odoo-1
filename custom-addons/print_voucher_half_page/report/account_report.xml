@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+	<data>
+	
+		<record id="paperformat_half_page" model="report.paperformat">
+            <field name="name">A4 Half Page</field>
+            <field name="default" eval="True" />
+            <field name="format">A4</field>
+            <field name="page_height">0</field>
+            <field name="page_width">0</field>
+            <field name="orientation">Portrait</field>
+            <field name="margin_top">40</field>
+            <field name="margin_bottom">158</field>
+            <field name="margin_left">7</field>
+            <field name="margin_right">7</field>
+            <field name="header_line" eval="False" />
+            <field name="header_spacing">35</field>
+            <field name="dpi">90</field>
+        </record>
+
+		<record id="account_voucher_half_page" model="ir.actions.report">
+            <field name="name">Voucher A4 Half</field>
+            <field name="model">account.payment</field>
+            <field name="report_type">qweb-pdf</field>
+            <field name="report_name">print_voucher_half_page.report_voucher_half_page</field>
+            <field name="report_file">print_voucher_half_page.report_voucher_half_page</field>
+            <field name="print_report_name">'Payment Voucher'</field>
+            <field name="binding_model_id" ref="print_voucher_half_page.model_account_payment"/>
+            <field name="binding_type">report</field>
+            <field name="paperformat_id" ref="print_voucher_half_page.paperformat_half_page"/>
+        </record>
+	
+
+
+
+
+		<record id="account_voucher_a4_full" model="ir.actions.report">
+            <field name="name">Voucher A4 Full</field>
+            <field name="model">account.payment</field>
+            <field name="report_type">qweb-pdf</field>
+            <field name="report_name">print_voucher_half_page.report_voucher_full_page</field>
+            <field name="report_file">print_voucher_half_page.report_voucher_full_page</field>
+            <field name="print_report_name">'Payment Voucher'</field>
+            <field name="binding_model_id" ref="print_voucher_half_page.model_account_payment"/>
+            <field name="binding_type">report</field>
+        </record>
+	</data>
+</odoo>
