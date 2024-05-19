@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+	<data>
+		
+		<record model="ir.ui.view" id="parnter_ledger_view">
+			<field name="name">parnter.ledger.view</field>
+			<field name="model">res.partner</field>
+			<field name="inherit_id" ref="account.view_partner_property_form"/>
+			<field name="arch" type="xml">
+				<xpath expr="//page[@name='accounting_disabled']" position="after">
+					<page string="Partner Ledger">
+						<group>
+						        <field name="customer_rank" invisible="1"/>
+						        <field name="supplier_rank" invisible="1"/>
+						        <field style="font-size:14px" name="debit" invisible="customer_rank > 0"/>
+						        <field style="font-size:14px" name="credit" invisible="supplier_rank > 0"/>
+								<field style="font-size:14px" name="balance"/>
+							
+								
+						</group>
+						<group string="Entries" />
+						<field name="journal_item_ids" nolabel="1" >
+							<tree>
+								<field name="date"/>
+								<field name="name"/>
+								<field name="ref"/>
+								<field name="debit" sum="Total Debit"/>
+								<field name="credit" sum="Total Credit"/>
+								<field name="balance" sum="aaaa"/>
+							</tree>
+						</field>
+					</page>
+				</xpath>
+			</field>
+		</record>
+		
+		
+	</data>
+</odoo>
