@@ -77,7 +77,7 @@ class ResCompany(models.Model):
     is_self_billed = fields.Boolean("Self Billed")
 
     zatca_certificate_status = fields.Boolean()
-    zatca_icv_counter = fields.Char(default=1, readonly=1)
+    zatca_icv_counter = fields.Char(default=1, readonly=True)
 
     zatca_status = fields.Char()
     zatca_onboarding_status = fields.Boolean()
