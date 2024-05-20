@@ -30,17 +30,17 @@ message = "Based on the VAT regulation, after issuing an invoice, it is prohibit
 class AccountMove(models.Model):
     _inherit = "account.move"
 
-    zatca_hash_cleared_invoice = fields.Binary("cleared invoice returned from ZATCA", attachment=True, readonly=1, copy=False)
+    zatca_hash_cleared_invoice = fields.Binary("cleared invoice returned from ZATCA", attachment=True, readonly=True, copy=False)
     zatca_hash_cleared_invoice_name = fields.Char(copy=False)
 
-    pdf_report = fields.Binary(attachment=True, readonly=1, copy=False)
-    zatca_invoice = fields.Binary("generated invoice for ZATCA", attachment=True, readonly=1, copy=False)
+    pdf_report = fields.Binary(attachment=True, readonly=True, copy=False)
+    zatca_invoice = fields.Binary("generated invoice for ZATCA", attachment=True, readonly=True, copy=False)
     zatca_invoice_name = fields.Char(copy=False)
     credit_debit_reason = fields.Char(string="Reasons for issuance of credit / debit note", copy=False,
                                    help="Reasons as per Article 40 (paragraph 1) of KSA VAT regulations")
     invoice_date = fields.Date(string='Invoice/Bill Date', readonly=True, index=True, copy=False,
                                states={'draft': [('readonly', False)]}, default=lambda self: fields.Datetime.now().date())
-    zatca_compliance_invoices_api = fields.Html(readonly=1, copy=False)
+    zatca_compliance_invoices_api = fields.Html(readonly=True, copy=False)
 
     def _default_l10n_sa_invoice_type_is_readonly(self):
         return 1 if self.env.company.sudo().zatca_invoice_type != "Standard & Simplified" else 0
@@ -78,19 +78,19 @@ class AccountMove(models.Model):
                                                string="Payment Means Code",
                                                help='The means, expressed as code, for how a payment is expected to be or has been settled.'
                                                     '(subset of UNTDID 4461)')
-    ksa_note = fields.Char(size=1000, required=0)
+    ksa_note = fields.Char(size=1000, required=False)
 
     # Never show these fields on front
     is_zatca = fields.Boolean(related="company_id.parent_is_zatca")
     is_self_billed = fields.Boolean(related="company_id.parent_root_id.is_self_billed")
     l10n_sa_phase1_end_date = fields.Date(related="company_id.parent_root_id.l10n_sa_phase1_end_date")
-    zatca_unique_seq = fields.Char(readonly=1, copy=False)
-    zatca_icv_counter = fields.Char(readonly=1, copy=False)
-    invoice_uuid = fields.Char('zatca uuid', readonly=1, copy=False)
-    zatca_invoice_hash = fields.Char(readonly=1, copy=False)
-    zatca_invoice_hash_hex = fields.Char(readonly=1, copy=False)
-    zatca_hash_invoice = fields.Binary("ZATCA generated invoice for hash", attachment=True, readonly=1, copy=False)
-    zatca_hash_invoice_name = fields.Char(readonly=1, copy=False)
+    zatca_unique_seq = fields.Char(readonly=True, copy=False)
+    zatca_icv_counter = fields.Char(readonly=True, copy=False)
+    invoice_uuid = fields.Char('zatca uuid', readonly=True, copy=False)
+    zatca_invoice_hash = fields.Char(readonly=True, copy=False)
+    zatca_invoice_hash_hex = fields.Char(readonly=True, copy=False)
+    zatca_hash_invoice = fields.Binary("ZATCA generated invoice for hash", attachment=True, readonly=True, copy=False)
+    zatca_hash_invoice_name = fields.Char(readonly=True, copy=False)
     l10n_sa_response_datetime = fields.Datetime(string='Response DateTime', readonly=True, copy=False)
 
     def _compute_zatca_onboarding_status(self):
@@ -104,10 +104,10 @@ class AccountMove(models.Model):
             else:
                 record.zatca_onboarding_status = 0
 
-    zatca_onboarding_status = fields.Boolean(readonly=1, compute="_compute_zatca_onboarding_status", copy=False)
+    zatca_onboarding_status = fields.Boolean(readonly=True, compute="_compute_zatca_onboarding_status", copy=False)
 
     l10n_sa_qr_code_str = fields.Char(string='Zatka QR Code ', copy=False)
-    sa_qr_code_str = fields.Char(string='Zatka QR Code', copy=False, readonly=1)
+    sa_qr_code_str = fields.Char(string='Zatka QR Code', copy=False, readonly=True)
     # l10n_sa_is_tax_invoice = fields.Boolean(readonly=1, copy=False)
 
     @api.depends('zatca_compliance_invoices_api', 'l10n_sa_confirmation_datetime')
@@ -129,7 +129,7 @@ class AccountMove(models.Model):
                 else:
                     res.l10n_sa_zatca_status = 'N/A'
 
-    l10n_sa_zatca_status = fields.Char("E-Invoice status", copy=False, readonly=1, store=True,
+    l10n_sa_zatca_status = fields.Char("E-Invoice status", copy=False, readonly=True, store=True,
                                        compute="_compute_l10n_sa_zatca_status")
 
     @api.onchange('partner_id')
