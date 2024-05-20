@@ -26,7 +26,7 @@ class AccountTax(models.Model):
 
     is_zatca = fields.Boolean(related="company_id.parent_is_zatca")
     classified_tax_category = fields.Selection([("E", "E"), ("S", "S"), ("Z", "Z"),
-                                                ("O", "O")], 'Tax Category', default="S", required=1)
+                                                ("O", "O")], 'Tax Category', default="S", required=True)
     tax_exemption_selection = fields.Selection([
                                            # Tax Category E
                                            ("VATEX-SA-29", "Financial services mentioned in Article 29 of the VAT Regulations"),
@@ -50,8 +50,8 @@ class AccountTax(models.Model):
                                                             "(Tax Category O)"),
                                            ],
                                           string="Tax exemption Reason Text")
-    tax_exemption_code = fields.Char("Tax exemption Reason Code", readonly=1)
-    tax_exemption_text = fields.Char("Tax exemption Reason Text ", readonly=0)
+    tax_exemption_code = fields.Char("Tax exemption Reason Code", readonly=True)
+    tax_exemption_text = fields.Char("Tax exemption Reason Text ", readonly=False)
 
     @api.onchange('classified_tax_category')
     def _onchange_classified_tax_category(self):

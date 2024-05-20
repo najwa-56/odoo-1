@@ -88,7 +88,7 @@ class ResCompany(models.Model):
     # Required fields
     zatca_link = fields.Char("Api Link", default="https://gw-fatoora.zatca.gov.sa/e-invoicing/developer-portal")
     api_type = fields.Selection([('Sandbox', 'Sandbox'), ('Simulation', 'Simulation'), ('Live', 'Live')],
-                                default='Sandbox', required=1)
+                                default='Sandbox', required=True)
 
     is_group_vat = fields.Boolean("Is Group Vat", compute="_compute_is_group_vat", store=True)
     csr_common_name = fields.Char("Common Name")  # CN
@@ -101,7 +101,7 @@ class ResCompany(models.Model):
     csr_invoice_type = fields.Char("Invoice Type")  # title
     zatca_invoice_type = fields.Selection([('Standard', 'Standard'), ('Simplified', 'Simplified'),
                                            ('Standard & Simplified', 'Standard & Simplified')],
-                                          default='Standard', required=1)
+                                          default='Standard', required=True)
     csr_location_address = fields.Char("Location")  # registeredAddress
     csr_industry_business_category = fields.Char("Industry ")  # BusinessCategory
 
