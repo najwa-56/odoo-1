@@ -46,7 +46,7 @@ class ResCompany(models.Model):
                                 ('700', '700 Number')],
                                default='CRN', required=False, string="License",
                                help="In case multiple IDs exist then one of the above must be entered")
-    license_no = fields.Char(string="License Number (Other seller ID)", required=0)
+    license_no = fields.Char(string="License Number (Other seller ID)", required=False)
 
     building_no = fields.Char(related='partner_id.building_no', readonly=False)
     additional_no = fields.Char(related='partner_id.additional_no', readonly=False)
