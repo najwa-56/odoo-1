@@ -29,7 +29,7 @@ export default class PrintActionHandler {
   }
 
   _getReportUrl(action, type, env) {
-    let url = `/report/${type}/${action.report_name}`;
+    let url = `${window.location.origin}/report/${type}/${action.report_name}`;
     const actionContext = action.context || {};
 
     if (action.data && JSON.stringify(action.data) !== "{}") {
