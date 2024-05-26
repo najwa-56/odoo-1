@@ -32,5 +32,5 @@ Get Last Sale Order History Application, Search Customer Last Quote History Odoo
     "installable": True,
     "application": True,
     "price": 15,
-    "currency": "EUR"
+    "currency": "EUR",
 }

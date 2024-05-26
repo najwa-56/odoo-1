@@ -10,24 +10,24 @@
                     color: white;
                     }
                     .data_column{
-                    font-size:10px !important;
+                    font-size:15px !important;
                     }
                     .label_column.arabic_label{
                     text-align:right;
-                    font-size:9px !important;
+                    font-size:14px !important;
                     float:right;
                     }
                     .label_column{
-                    font-size:10px;
+                    font-size:15px;
                     font-weight:bold
                     }
                     .total_table td.right_column.arabic_label, .reason_table span.right_column.arabic_label{
-                    font-size:9px !important;
+                    font-size:14px !important;
                     font-weight:bold;
                     }
                     .total_table td.right_column, .reason_table span.right_column{
                     text-align:right;
-                    font-size:10px;
+                    font-size:15px;
                     padding: 5px 0;
                     }
                     .reason_table span.right_column{
@@ -38,13 +38,13 @@
                     }
                     .total_table td.left_column{
                     text-align:left;
-                    font-size:10px;
+                    font-size:15px;
                     padding: 5px 0;
                     font-weight:bold;
                     }
                     .reason_table span.left_column{
                     text-align:left;
-                    font-size:9px;
+                    font-size:14px;
                     padding: 5px 0;
                     font-weight:bold;
                     }
@@ -52,7 +52,7 @@
                     background-color: white;
                     font-family: 'Arial';
                     text-align:center;
-                    font-size: 14px;
+                    font-size: 21px;
                     width: 300px;
                     padding:0;
                     margin:0;
@@ -73,7 +73,7 @@
                     }
                     .invline_data{
                     text-align:left;
-                    font-size:10px;
+                    font-size:15px;
                     padding: 1px 0;
                     }
                 </style>
