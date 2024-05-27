@@ -28,7 +28,7 @@
                         /* Adjust the container size */
                         .page {
                             width: 15cm;
-                            height: 15cm;
+                            height: 16cm;
                             margin: 0;
                             padding: 0;
                         }
@@ -905,8 +905,8 @@
                                     </td>
                                 </tr>
                             </table>
-                        </t>
-                          </div>
+                         </t>
+                        </div>
                     </div>
                 </t>
             </t>
