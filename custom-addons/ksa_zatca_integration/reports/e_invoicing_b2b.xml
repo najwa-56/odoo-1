@@ -4,7 +4,7 @@
         <t t-call="web.html_container">
             <t t-foreach="docs" t-as="doc">
                 <t t-call="web.external_layout">
-                    <style>
+                   <!-- <style>
                         .head{ margin-top: 0; }
                         .lable_bold { font-weight: bold; }
                         .main_table td:nth-child(1) {white-space: nowrap;}
@@ -18,7 +18,36 @@
                         border-collapse: collapse;
                         font-size:10px;
                         }
+                    </style>-->
+                     <style>
+                        /* Set the paper size */
+                        @page {
+                            size: 10cm 12cm;
+                            margin: 0;
+                        }
+                        /* Adjust the container size */
+                        .page {
+                            width: 10cm;
+                            height: 12cm;
+                            margin: 0;
+                            padding: 0;
+                        }
+                        /* Additional styling */
+                        .head { margin-top: 0; }
+                        .lable_bold { font-weight: bold; }
+                        .main_table td:nth-child(1) {white-space: nowrap;}
+                        .main_table td:nth-child(3) {white-space: nowrap;}
+                        .left_column {text-align:left;}
+                        .total_table {white-space: nowrap;}
+                        .right_column {text-align:right;}
+                        .second_table {
+                            padding: 2px;
+                            border: 1px solid black;
+                            border-collapse: collapse;
+                            font-size: 10px;
+                        }
                     </style>
+
                     <t t-if="doc.debit_origin_id">
                         <t t-set="invoice_type" t-value="'Debit Note'"/>
                         <t t-set="invoice_type_ar" t-value="'اشعار ﻣﺪﻳﻦ'"/>
@@ -57,6 +86,7 @@
                     </h2>
                     <div dir="ltr">
                         <div class="page row">
+                             <div class="page">
                             <div class="col-8">
                                 <table style="margin-top:5px;" class="main_table second_table" width="100%">
                                     <col style="width:15%"/>
@@ -216,6 +246,7 @@
                                 <img style="text-align:center;width:200px;max-height:200px;float:right;margin-top:-10px;padding-top:0px;"
                                      alt="Barcode" t-att-src="doc.get_qrcode()"/>
                             </div>
+                             </div>
                         </div>
                         <table style="margin-top:5px;" width="100%">
                             <col style="width:11%"/>
