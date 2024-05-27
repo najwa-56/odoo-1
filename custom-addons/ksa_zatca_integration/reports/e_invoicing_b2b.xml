@@ -759,7 +759,7 @@
                 <div t-field="doc.ksa_note"/>
             </t>
         </div>
-        <div class="col-8">
+        <div class="col-8" style="margin: 0 auto; text-align: center;">
             <table class="second_table total_table" width="100%">
                                         <col style="width:25%"/>
                                         <col style="width:55%"/>
