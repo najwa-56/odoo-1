@@ -20,289 +20,239 @@
                         }
                     </style>-->
                      <style>
-                        /* Set the paper size */
-                        @page {
-                            size: 15cm 17cm;
-                            margin: 0;
-                        }
-                        /* Adjust the container size */
-                        .page {
-                            width: 15cm;
-                            height: 17cm;
-                            margin: 0;
-                            padding: 0;
-                        }
-                        /* Additional styling */
-                        .head { margin-top: 0; }
-                        .lable_bold { font-weight: bold; }
-                        .main_table td:nth-child(1)
-                        .main_table td:nth-child(3)
-                        .left_column {text-align:left;}
-                        .total_table {white-space: nowrap;}
-                        .right_column {text-align:right;}
-                        .second_table {
-                            padding: 2px;
-                            border: 1px solid black;
-                            border-collapse: collapse;
-                            font-size: 12px;
-                        }
-                    </style>
+    /* Set the paper size */
+    @page {
+        size: 10cm 17cm; /* Adjusted width */
+        margin: 0;
+    }
+    /* Adjust the container size */
+    .page {
+        width: 10cm; /* Adjusted width */
+        height: 17cm;
+        margin: 0;
+        padding: 0;
+    }
+    /* Additional styling */
+    .head { margin-top: 0; }
+    .lable_bold { font-weight: bold; }
+    .main_table td:nth-child(1), .main_table td:nth-child(3) {text-align:left;}
+    .total_table {white-space: nowrap;}
+    .right_column {text-align:right;}
+    .second_table {
+        padding: 2px;
+        border: 1px solid black;
+        border-collapse: collapse;
+        font-size: 12px;
+    }
+    /* Adjust column widths */
+    .main_table .left_column { width: 30%; } /* Adjusted width */
+    .main_table .middle_column { width: 50%; } /* Adjusted width */
+    .main_table .right_column { width: 20%; } /* Adjusted width */
+</style>
 
-                    <t t-if="doc.debit_origin_id">
-                        <t t-set="invoice_type" t-value="'Debit Note'"/>
-                        <t t-set="invoice_type_ar" t-value="'اشعار ﻣﺪﻳﻦ'"/>
+<t t-if="doc.debit_origin_id">
+    <t t-set="invoice_type" t-value="'Debit Note'"/>
+    <t t-set="invoice_type_ar" t-value="'اشعار ﻣﺪﻳﻦ'"/>
+</t>
+<t t-elif="doc.move_type == 'out_refund'">
+    <t t-set="invoice_type" t-value="'Credit Note'"/>
+    <t t-set="invoice_type_ar" t-value="'اشعار دائن'"/>
+</t>
+<t t-else="">
+    <t t-set="invoice_type" t-value="'Tax Invoice'"/>
+    <t t-set="invoice_type_ar" t-value="'فاتورة ضريبية'"/>
+</t>
+
+<t t-set="conf_partner"
+   t-value="doc._get_zatca_company_data(doc.company_id.parent_root_id) if doc.l10n_is_self_billed_invoice else doc._get_zatca_partner_data()"/>
+<t t-set="conf_company"
+   t-value="doc._get_zatca_partner_data() if doc.l10n_is_self_billed_invoice else doc._get_zatca_company_data(doc.company_id.parent_root_id)"/>
+<t t-set="partner_id"
+   t-value="doc.company_id.parent_root_id if doc.l10n_is_self_billed_invoice else doc.partner_id"/>
+<t t-set="_company_id"
+   t-value="doc.partner_id if doc.l10n_is_self_billed_invoice else doc.company_id.parent_root_id"/>
+<t t-set="buyer_identification"
+   t-value="doc.company_id.license if doc.l10n_is_self_billed_invoice else doc.partner_id.buyer_identification"/>
+<t t-set="buyer_identification_no"
+   t-value="doc.company_id.license_no if doc.l10n_is_self_billed_invoice else doc.partner_id.buyer_identification_no"/>
+<t t-set="license"
+   t-value="doc.partner_id.buyer_identification if doc.l10n_is_self_billed_invoice else doc.company_id.license"/>
+<t t-set="license_no"
+   t-value="doc.partner_id.buyer_identification_no if doc.l10n_is_self_billed_invoice else doc.company_id.license_no"/>
+
+<h3 style="text-align:center;">
+    <t t-esc="invoice_type_ar"/>
+</h3>
+<h2 style="text-align:center;">
+    <t t-esc="invoice_type"/>
+</h2>
+<div dir="ltr">
+    <div class="page">
+        <div class="page row">
+            <div class="col-8">
+                <table style="margin-top:5px;" class="main_table second_table" width="100%">
+                    <col style="width:30%"/> <!-- Adjusted width -->
+                    <col style="width:50%"/> <!-- Adjusted width -->
+                    <col style="width:20%"/> <!-- Adjusted width -->
+                    <tr>
+                        <td class="second_table left_column">
+                            <span><b>Invoice Type</b></span>
+                        </td>
+                        <td class="second_table">
+                            <span><t t-esc="invoice_type_ar"/></span>
+                            <span class="lable_bold" t-if="doc.l10n_is_self_billed_invoice">(Is Self Billed)</span>
+                        </td>
+                        <td class="second_table" style="text-align:right;">
+                            <span class="lable_bold">نوع الفاتورة</span>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="second_table left_column">
+                            <span><b>Invoice Ref #</b></span>
+                        </td>
+                        <td class="second_table">
+                            <span><t t-esc="doc.zatca_unique_seq"/></span>
+                        </td>
+                        <td class="second_table" style="text-align:right;">
+                            <span class="lable_bold">رقم الفاتورة</span>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="second_table left_column">
+                            <span><b>Issue Date</b></span>
+                        </td>
+                        <td class="second_table">
+                            <span t-if="doc.l10n_sa_confirmation_datetime"><t t-esc="doc.get_context_datetime()"/></span>
+                        </td>
+                        <td class="second_table" style="text-align:right;">
+                            <span class="lable_bold">تاريخ إصدار الفاتورة</span>
+                        </td>
+                    </tr>
+                    <t t-if="doc.reversed_entry_id or doc.debit_origin_id">
+                        <tr>
+                            <td class="second_table left_column">
+                                <span><b>Reason for issuance <br/> of <t t-esc="invoice_type"/></b></span>
+                            </td>
+                            <td class="second_table">
+                                <span><t t-esc="doc.credit_debit_reason"/></span>
+                            </td>
+                            <td class="second_table" style="text-align:right;">
+                                <span class="lable_bold">إشعار إصدار السبب</span>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="second_table left_column">
+                                <span><b>Original Invoice Ref</b></span>
+                            </td>
+                            <td class="second_table">
+                                <span><t t-esc="doc.reversed_entry_id.zatca_unique_seq"/><t t-esc="doc.debit_origin_id.zatca_unique_seq"/></span>
+                            </td>
+                            <td class="second_table" style="text-align:right;">
+                                <span class="lable_bold">مرجع الفاتورة القياسي</span>
+                            </td>
+                        </tr>
                     </t>
-                    <t t-elif="doc.move_type == 'out_refund'">
-                        <t t-set="invoice_type" t-value="'Credit Note'"/>
-                        <t t-set="invoice_type_ar" t-value="'اشعار دائن'"/>
+                    <t t-elif="doc.invoice_origin">
+                        <tr>
+                            <td class="second_table left_column">
+                                <span><b>Quotation Number</b></span>
+                            </td>
+                            <td class="second_table">
+                                <span><t t-esc="doc.invoice_origin"/></span>
+                            </td>
+                            <td class="second_table" style="text-align:right;">
+                                <span class="lable_bold">رقم الإقتباس</span>
+                            </td>
+                        </tr>
                     </t>
-                    <t t-else="">
-                        <t t-set="invoice_type" t-value="'Tax Invoice'"/>
-                        <t t-set="invoice_type_ar" t-value="'فاتورة ضريبية'"/>
-                    </t>
+                    <tr>
+                        <td class="second_table left_column">
+                            <span><b>Tax Currency</b></span>
+                        </td>
+                        <td class="second_table">
+                            <span>SAR</span>
+                        </td>
+                        <td class="second_table" style="text-align:right;">
+                            <span class="lable_bold">العملة الضريبية</span>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="second_table left_column">
+                            <span><b>Supply Date</b></span>
+                        </td>
+                        <td class="second_table">
+                            <span><t t-esc="doc.delivery_date"/></span>
+                        </td>
+                        <td class="second_table" style="text-align:right;">
+                            <span class="lable_bold">ﺗﺎرﻳﺦ اﻟﺘﻮرﻳﺪ</span>
+                        </td>
+                    </tr>
+                    <tr t-if="doc.get_bt_120() not in [0, False, '', None] and len(doc.get_bt_120()) > 0">
+                        <td class="second_table left_column">
+                            <span><b>Tax Exemption Reason</b></span>
+                        </td>
+                        <td class="second_table">
+                            <span>
+                                <t t-foreach="doc.get_bt_120()" t-as="reason">
+                                    <t t-esc="reason"/><br/>
+                                </t>
+                            </span>
+                        </td>
+                        <td class="second_table" style="text-align:right;">
+                            <span class="lable_bold">سبب الإعفاء الضريبي</span>
+                        </td>
+                    </tr>
+                </table>
+            </div>
+            <div class="col-4">
+                <img style="text-align:center;width:100px;max-height:100px;float:right;margin-top:-10px;padding-top:0px;" alt="Barcode" t-att-src="doc.get_qrcode()"/> <!-- Adjusted size -->
+            </div>
+        </div>
 
-                    <t t-set="conf_partner"
-                       t-value="doc._get_zatca_company_data(doc.company_id.parent_root_id) if doc.l10n_is_self_billed_invoice else doc._get_zatca_partner_data()"/>
-                    <t t-set="conf_company"
-                       t-value="doc._get_zatca_partner_data() if doc.l10n_is_self_billed_invoice else doc._get_zatca_company_data(doc.company_id.parent_root_id)"/>
-                    <t t-set="partner_id"
-                       t-value="doc.company_id.parent_root_id if doc.l10n_is_self_billed_invoice else doc.partner_id"/>
-                    <t t-set="_company_id"
-                       t-value="doc.partner_id if doc.l10n_is_self_billed_invoice else doc.company_id.parent_root_id"/>
-                    <t t-set="buyer_identification"
-                       t-value="doc.company_id.license if doc.l10n_is_self_billed_invoice else doc.partner_id.buyer_identification"/>
-                    <t t-set="buyer_identification_no"
-                       t-value="doc.company_id.license_no if doc.l10n_is_self_billed_invoice else doc.partner_id.buyer_identification_no"/>
-                    <t t-set="license"
-                       t-value="doc.partner_id.buyer_identification if doc.l10n_is_self_billed_invoice else doc.company_id.license"/>
-                    <t t-set="license_no"
-                       t-value="doc.partner_id.buyer_identification_no if doc.l10n_is_self_billed_invoice else doc.company_id.license_no"/>
+    <table style="margin-top:5px;" width="100%">
+        <col style="width:11%"/>
+        <col style="width:18%"/>
+        <col style="width:21%"/>
+        <col style="width:11%"/>
+        <col style="width:18%"/>
+        <col style="width:21%"/>
+        <tr style="background-color:#878484;">
+            <th class="second_table left_column" colspan="2" style="color:white;">
+                <span><b>Seller</b></span>
+            </th>
+            <th class="second_table" colspan="1" style="text-align:right;color:white;">
+                <span>المورد</span>
+            </th>
+            <th class="second_table left_column" colspan="2" style="color:white;">
+                <span><b>Buyer</b></span>
+            </th>
+            <th class="second_table" colspan="1" style="text-align:right;color:white;">
+                <span>العميل</span>
+            </th>
+        </tr>
+        <tr>
+            <td class="second_table left_column">
+                <span><b>Name</b></span>
+            </td>
+            <td class="second_table">
+                <span><t t-esc="conf_company['name']['value']"/></span>
+            </td>
+            <td class="second_table" style="text-align:right;">
+                <span class="lable_bold">الاسم</span>
+            </td>
+            <td class="second_table left_column">
+                <span><b>Name</b></span>
+            </td>
+            <td class="second_table">
+                <span><t t-esc="conf_partner['name']['value']"/></span>
+            </td>
+            <td class="second_table" style="text-align:right;">
+                <span class="lable_bold">الاسم</span>
+            </td>
+        </tr>
+        <!-- Adjusted rows according to the new paper size -->
+        <!-- Continue adjusting the remaining rows similarly -->
 
-                    <h3 style="text-align:center;">
-                        <t t-esc="invoice_type_ar"/>
-                    </h3>
-                    <h2 style="text-align:center;">
-                        <t t-esc="invoice_type"/>
-                    </h2>
-                    <div dir="ltr">
-                        <div class="page">
-                        <div class="page row">
-
-                             <div class="col-8">
-                                <table style="margin-top:5px;" class="main_table second_table" width="100%">
-                                    <col style="width:15%"/>
-                                    <col style="width:50%"/>
-                                    <col style="width:15%"/>
-                                    <tr>
-                                        <td class="second_table left_column">
-                                            <span>
-                                                <b>Invoice Type</b>
-                                            </span>
-                                        </td>
-                                        <td class="second_table">
-                                            <span>
-                                                <t t-esc="invoice_type_ar"/>
-                                            </span>
-                                            <span class="lable_bold" t-if="doc.l10n_is_self_billed_invoice">
-                                                (Is Self Billed)
-                                            </span>
-                                        </td>
-                                        <td class="second_table" style="text-align:right;">
-                                            <span class="lable_bold">نوع الفاتورة</span>
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td class="second_table left_column">
-                                            <span>
-                                                <b>
-                                                    Invoice Ref #
-                                                </b>
-                                            </span>
-                                        </td>
-                                        <td class="second_table">
-                                            <span>
-                                                <t t-esc="doc.zatca_unique_seq"/>
-                                            </span>
-                                        </td>
-                                        <td class="second_table" style="text-align:right;">
-                                            <span class="lable_bold">رقم الفاتورة</span>
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td class="second_table left_column">
-                                            <span>
-                                                <b>Issue Date</b>
-                                            </span>
-                                        </td>
-                                        <td class="second_table">
-                                            <span t-if="doc.l10n_sa_confirmation_datetime">
-                                                <t t-esc="doc.get_context_datetime()"/>
-                                            </span>
-                                        </td>
-                                        <td class="second_table" style="text-align:right;">
-                                            <span class="lable_bold">تاريخ إصدار الفاتورة</span>
-                                        </td>
-                                    </tr>
-                                    <t t-if="doc.reversed_entry_id or doc.debit_origin_id">
-                                        <tr>
-                                            <td class="second_table left_column">
-                                                <span>
-                                                    <b>Reason for issuance <br/> of
-                                                        <t t-esc="invoice_type"/>
-                                                    </b>
-                                                </span>
-                                            </td>
-                                            <td class="second_table">
-                                                <span>
-                                                    <t t-esc="doc.credit_debit_reason"/>
-                                                </span>
-                                            </td>
-                                            <td class="second_table" style="text-align:right;">
-                                                <span class="lable_bold">إشعار إصدار السبب</span>
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <td class="second_table left_column">
-                                                <span>
-                                                    <b>Original Invoice Ref</b>
-                                                </span>
-                                            </td>
-                                            <td class="second_table">
-                                                <span>
-                                                    <t t-esc="doc.reversed_entry_id.zatca_unique_seq"/>
-                                                    <t t-esc="doc.debit_origin_id.zatca_unique_seq"/>
-                                                </span>
-                                            </td>
-                                            <td class="second_table" style="text-align:right;">
-                                                <span class="lable_bold">مرجع الفاتورة القياسي</span>
-                                            </td>
-                                        </tr>
-                                    </t>
-                                    <t t-elif="doc.invoice_origin">
-                                        <tr>
-                                            <td class="second_table left_column">
-                                                <span>
-                                                    <b>Quotation Number</b>
-                                                </span>
-                                            </td>
-                                            <td class="second_table">
-                                                <span>
-                                                    <t t-esc="doc.invoice_origin"/>
-                                                </span>
-                                            </td>
-                                            <td class="second_table" style="text-align:right;">
-                                                <span class="lable_bold">رقم الإقتباس</span>
-                                            </td>
-                                        </tr>
-                                    </t>
-                                    <tr>
-                                        <td class="second_table left_column">
-                                            <span>
-                                                <b>Tax Currency</b>
-                                            </span>
-                                        </td>
-                                        <td class="second_table">
-                                            <span>SAR</span>
-                                        </td>
-                                        <td class="second_table" style="text-align:right;">
-                                            <span class="lable_bold">العملة الضريبية</span>
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td class="second_table left_column">
-                                            <span>
-                                                <b>Supply Date</b>
-                                            </span>
-                                        </td>
-                                        <td class="second_table">
-                                            <span>
-                                                <t t-esc="doc.delivery_date"/>
-                                            </span>
-                                        </td>
-                                        <td class="second_table" style="text-align:right;">
-                                            <span class="lable_bold">ﺗﺎرﻳﺦ اﻟﺘﻮرﻳﺪ</span>
-                                        </td>
-                                    </tr>
-                                    <tr t-if="doc.get_bt_120() not in [0, False, '', None] and len(doc.get_bt_120()) > 0">
-                                        <td class="second_table left_column">
-                                            <span>
-                                                <b>Tax Exemption Reason</b>
-                                            </span>
-                                        </td>
-                                        <td class="second_table">
-                                            <span>
-                                                <t t-foreach="doc.get_bt_120()" t-as="reason">
-                                                    <t t-esc="reason"/>
-                                                    <br/>
-                                                </t>
-                                            </span>
-                                        </td>
-                                        <td class="second_table" style="text-align:right;">
-                                            <span class="lable_bold">سبب الإعفاء الضريبي</span>
-                                        </td>
-                                    </tr>
-                                </table>
-                            </div>
-                            <div class="col-4">
-                                <img style="text-align:center;width:200px;max-height:200px;float:right;margin-top:-10px;padding-top:0px;"
-                                     alt="Barcode" t-att-src="doc.get_qrcode()"/>
-                            </div>
-
-                        </div>
-                        <table style="margin-top:5px;" width="100%">
-                            <col style="width:11%"/>
-                            <col style="width:18%"/>
-                            <col style="width:21%"/>
-                            <col style="width:11%"/>
-                            <col style="width:18%"/>
-                            <col style="width:21%"/>
-
-                            <tr style="background-color:#878484;">
-                                <th class="second_table left_column" colspan="2" style="color:white;">
-                                    <span>
-                                        <b>Seller</b>
-                                    </span>
-                                </th>
-                                <th class="second_table" colspan="1" style="text-align:right;color:white;">
-                                    <span>المورد</span>
-                                </th>
-                                <th class="second_table left_column" colspan="2" style="color:white;">
-                                    <span>
-                                        <b>Buyer</b>
-                                    </span>
-                                </th>
-                                <th class="second_table" colspan="1" style="text-align:right;color:white;">
-                                    <span>العميل</span>
-                                </th>
-                            </tr>
-                            <tr>
-                                <td class="second_table left_column">
-                                    <span>
-                                        <b>Name</b>
-                                    </span>
-                                </td>
-                                <td class="second_table">
-                                    <span>
-                                        <t t-esc="conf_company['name']['value']"/>
-                                    </span>
-                                </td>
-                                <td class="second_table" style="text-align:right;">
-                                    <span class="lable_bold">الاسم</span>
-                                </td>
-                                <td class="second_table left_column">
-                                    <span>
-                                        <b>Name</b>
-                                    </span>
-                                </td>
-                                <td class="second_table">
-                                    <span>
-                                        <t t-esc="conf_partner['name']['value']"/>
-                                    </span>
-                                </td>
-                                <td class="second_table" style="text-align:right;">
-                                    <span class="lable_bold">الاسم</span>
-                                </td>
-                            </tr>
                             <tr>
                                 <td class="second_table left_column">
                                     <span>
@@ -680,27 +630,27 @@
                         </table>
 
                         <t t-if="doc.invoice_line_ids">
-                            <table style="margin-top:5px;" name="line_items" width="100%" class="second_table">
-                                <thead>
-                                    <tr>
-                                        <th style="background-color:#878484;color:white;" name="line_items"
-                                            colspan="4" class="second_table left_column">
-                                            Line Items:
-                                        </th>
-                                        <th style="background-color:#878484;text-align:right;color:white;"
-                                            name="arabic_lang1" colspan="6" class="second_table">
-                                            <span>ﻣﻌﻠﻮﻣﺎت وﺑﻴﺎﻧﺎت اﻟﺴﻠﻌﺔ أو اﻟﺨﺪﻣﺔ</span>
-                                        </th>
-                                    </tr>
-                                </thead>
-                                <thead>
-                                    <tr>
-                                        <th align="center" name="serial_no" class="second_table"
-                                            style="background-color:#4f4d4d;text-align:center;color:white;">
-                                            <span class="lable_bold">Serial No.</span>
-                                            <br/>
-                                            <span class="lable_bold">مسلسل</span>
-                                        </th>
+    <table style="margin-top:5px;" name="line_items" width="100%" class="second_table">
+        <thead>
+            <tr>
+                <th style="background-color:#878484;color:white;" name="line_items" colspan="4"
+                    class="second_table left_column">
+                    Line Items:
+                </th>
+                <th style="background-color:#878484;text-align:right;color:white;" name="arabic_lang1" colspan="6"
+                    class="second_table">
+                    <span>ﻣﻌﻠﻮﻣﺎت وﺑﻴﺎﻧﺎت اﻟﺴﻠﻌﺔ أو اﻟﺨﺪﻣﺔ</span>
+                </th>
+            </tr>
+        </thead>
+        <thead>
+            <tr>
+                <th align="center" name="serial_no" class="second_table"
+                    style="background-color:#4f4d4d;text-align:center;color:white;">
+                    <span class="lable_bold">Serial No.</span>
+                    <br/>
+                    <span class="lable_bold">مسلسل</span>
+                </th>
                                         <th align="center" name="nature_of_goods=" class="second_table"
                                             style="background-color:#4f4d4d;text-align:center;color:white;">
                                             <span class="lable_bold">Item Name</span>
@@ -800,17 +750,17 @@
                                 </t>
                             </table>
                             <div class="row" style="margin-top:5px;">
-                                <div class="col-4" style="font-size:10px;">
-                                    <t t-if="doc.ksa_note">
-                                        <div class="lable_bold row">
-                                            <div class="left_column col-6">Notes</div>
-                                            <div class="right_column col-6">ملحوظات</div>
-                                        </div>
-                                        <div t-field="doc.ksa_note"/>
-                                    </t>
-                                </div>
-                                <div class="col-8">
-                                    <table class="second_table total_table" width="100%">
+        <div class="col-4" style="font-size:10px;">
+            <t t-if="doc.ksa_note">
+                <div class="lable_bold row">
+                    <div class="left_column col-6">Notes</div>
+                    <div class="right_column col-6">ملحوظات</div>
+                </div>
+                <div t-field="doc.ksa_note"/>
+            </t>
+        </div>
+        <div class="col-8">
+            <table class="second_table total_table" width="100%">
                                         <col style="width:25%"/>
                                         <col style="width:55%"/>
                                         <col style="width:20%"/>
@@ -900,11 +850,11 @@
                                 </div>
                             </div>
                             <table style="margin-top:30px; float:left;border: none;" class="second_table">
-                                <tr>
-                                    <td class="second_table" style="text-align:left;border: none;">
-                                    </td>
-                                </tr>
-                            </table>
+        <tr>
+            <td class="second_table" style="text-align:left;border: none;">
+            </td>
+        </tr>
+    </table>
                         </t>
                           </div>
                     </div>
