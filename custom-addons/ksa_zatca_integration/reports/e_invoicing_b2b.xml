@@ -41,10 +41,10 @@
                         .total_table {white-space: nowrap;}
                         .right_column {text-align:right;}
                         .second_table {
-                            padding: 0;
+                            padding: 2px;
                             border: 1px solid black;
                             border-collapse: collapse;
-                            font-size: 10px;
+                            font-size: 13px;
                         }
                     </style>
 
@@ -85,8 +85,7 @@
                         <t t-esc="invoice_type"/>
                     </h2>
                     <div dir="ltr">
-
-                          <div class="page row">
+                        <div class="page row">
 
                              <div class="col-8">
                                 <table style="margin-top:5px;" class="main_table second_table" width="100%">
@@ -248,9 +247,10 @@
                                      alt="Barcode" t-att-src="doc.get_qrcode()"/>
                             </div>
 
-                         </div>
+                        </div>
+
                         <div class="page">
-                         <table style="margin-top:5px;" width="100%">
+                        <table style="margin-top:5px;" width="100%">
                             <col style="width:11%"/>
                             <col style="width:18%"/>
                             <col style="width:21%"/>
@@ -678,9 +678,9 @@
                                     </td>
                                 </t>
                             </tr>
-                         </table>
+                        </table>
 
-                         <t t-if="doc.invoice_line_ids">
+                        <t t-if="doc.invoice_line_ids">
                             <table style="margin-top:5px;" name="line_items" width="100%" class="second_table">
                                 <thead>
                                     <tr>
@@ -835,10 +835,10 @@
                                             <td class="second_table left_column">
                                                 <span class="lable_bold">Total (Excluding VAT)</span>
                                             </td>
-                                            <td class="second_table" style="text-align:left;">
+                                            <td class="second_table" style="text-align:right;">
                                                 <span class="lable_bold">(الإجمالي (غيرشاملة ضريبة القيمة المضافة</span>
                                             </td>
-                                            <td class="second_table" style="text-align:left;">
+                                            <td class="second_table" style="text-align:right;">
                                                 <span t-esc="doc.amount_untaxed"
                                                       t-options='{"widget": "monetary", "display_currency": doc.currency_id}'/>
                                             </td>
@@ -847,12 +847,12 @@
                                             <td class="second_table left_column">
                                                 <span class="lable_bold">Total VAT</span>
                                             </td>
-                                            <td class="second_table" style="text-align:left;">
+                                            <td class="second_table" style="text-align:right;">
                                                 <span class="lable_bold">
                                                     إجمالي ﻤﺒﻠﻎ ضريبة القيمة المضافة
                                                 </span>
                                             </td>
-                                            <td class="second_table" style="text-align:left;">
+                                            <td class="second_table" style="text-align:right;">
                                                 <span t-esc="doc.amount_tax"
                                                       t-options='{"widget": "monetary", "display_currency": doc.currency_id}'/>
                                             </td>
@@ -861,12 +861,12 @@
                                             <td class="second_table left_column">
                                                 <span class="lable_bold">Total VAT (SAR)</span>
                                             </td>
-                                            <td class="second_table" style="text-align:left;">
+                                            <td class="second_table" style="text-align:right;">
                                                 <span class="lable_bold">
                                                     إجمالي ﻤﺒﻠﻎ ضريبة القيمة المضافة
                                                 </span>
                                             </td>
-                                            <td class="second_table" style="text-align:left;">
+                                            <td class="second_table" style="text-align:right;">
                                                 <span t-esc="abs(doc.amount_tax_signed)"
                                                       t-options='{"widget": "monetary", "display_currency": doc.company_id.parent_root_id.currency_id}'/>
                                             </td>
@@ -875,12 +875,12 @@
                                             <td class="second_table left_column">
                                                 <span class="lable_bold">Total Amount</span>
                                             </td>
-                                            <td class="second_table" style="text-align:left;">
+                                            <td class="second_table" style="text-align:right;">
                                                 <span class="lable_bold">
                                                     (إﺟﻤﺎﻟﻲ ﻘﻴﻤﺔ اﻟﻔﺎﺗﻮرة (ﺷﺎﻣﻞ ﺿﺮﻳﺒﺔ اﻟﻘﻴﻤﺔ اﻟﻤﻀﺎﻓﺔ
                                                 </span>
                                             </td>
-                                            <td class="second_table" style="text-align:left;">
+                                            <td class="second_table" style="text-align:right;">
                                                 <span t-esc="doc.amount_total"
                                                       t-options='{"widget": "monetary", "display_currency": doc.currency_id}'/>
                                             </td>
@@ -889,10 +889,10 @@
                                             <td class="second_table left_column">
                                                 <span class="lable_bold">Amount Due</span>
                                             </td>
-                                            <td class="second_table" style="text-align:left;">
+                                            <td class="second_table" style="text-align:right;">
                                                 <span class="lable_bold">المبلغ المتبقي</span>
                                             </td>
-                                            <td class="second_table" style="text-align:left;">
+                                            <td class="second_table" style="text-align:right;">
                                                 <span t-esc="doc.amount_residual"
                                                       t-options='{"widget": "monetary", "display_currency": doc.currency_id}'/>
                                             </td>
@@ -906,7 +906,7 @@
                                     </td>
                                 </tr>
                             </table>
-                         </t>
+                        </t>
                         </div>
                     </div>
                 </t>
