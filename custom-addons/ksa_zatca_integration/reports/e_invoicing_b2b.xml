@@ -27,8 +27,8 @@
                         }
                         /* Adjust the container size */
                         .page {
-                            width: 13cm;
-                            height: 20cm;
+                            width: 14cm;
+                            height: 25cm;
                             margin: 0;
                             padding: 0;
                         }
