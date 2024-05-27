@@ -85,9 +85,10 @@
                         <t t-esc="invoice_type"/>
                     </h2>
                     <div dir="ltr">
+                        <div class="page">
                         <div class="page row">
-                             <div class="page">
-                            <div class="col-8">
+
+                             <div class="col-8">
                                 <table style="margin-top:5px;" class="main_table second_table" width="100%">
                                     <col style="width:15%"/>
                                     <col style="width:50%"/>
@@ -246,7 +247,7 @@
                                 <img style="text-align:center;width:200px;max-height:200px;float:right;margin-top:-10px;padding-top:0px;"
                                      alt="Barcode" t-att-src="doc.get_qrcode()"/>
                             </div>
-                             </div>
+
                         </div>
                         <table style="margin-top:5px;" width="100%">
                             <col style="width:11%"/>
@@ -905,6 +906,7 @@
                                 </tr>
                             </table>
                         </t>
+                          </div>
                     </div>
                 </t>
             </t>
