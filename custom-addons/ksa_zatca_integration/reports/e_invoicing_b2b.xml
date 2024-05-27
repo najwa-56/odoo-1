@@ -760,7 +760,7 @@
             </t>
         </div>
         <div class="col-8 text-center" >
-            <table class="second_table total_table" width="100%">
+            <table class="second_table total_table" >
                                         <col style="width:25%"/>
                                         <col style="width:25%"/>
                                         <col style="width:20%"/>
