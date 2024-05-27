@@ -84,8 +84,9 @@
                     <h2 style="text-align:center;">
                         <t t-esc="invoice_type"/>
                     </h2>
-                    <div dir="ltr">
-                        <div class="page">
+                    <div class="page">
+                     <div dir="ltr">
+
                         <div class="page row">
 
                              <div class="col-8">
@@ -906,7 +907,8 @@
                                 </tr>
                             </table>
                         </t>
-                          </div>
+
+                    </div>
                     </div>
                 </t>
             </t>
