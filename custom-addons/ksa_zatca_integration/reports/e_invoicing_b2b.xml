@@ -22,13 +22,13 @@
                      <style>
                         /* Set the paper size */
                         @page {
-                            size: 12cm 14cm;
+                            size: 13cm 15cm;
                             margin: 0;
                         }
                         /* Adjust the container size */
                         .page {
-                            width: 12cm;
-                            height: 14cm;
+                            width: 13cm;
+                            height: 20cm;
                             margin: 0;
                             padding: 0;
                         }
