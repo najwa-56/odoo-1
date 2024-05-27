@@ -28,7 +28,7 @@
                         /* Adjust the container size */
                         .page {
                             width: 15cm;
-                            height: 25cm;
+                            height: 17cm;
                             margin: 0;
                             padding: 0;
                         }
@@ -36,7 +36,7 @@
                         .head { margin-top: 0; }
                         .lable_bold { font-weight: bold; }
                         .main_table td:nth-child(1)
-                        .main_table td:nth-child(3) 
+                        .main_table td:nth-child(3)
                         .left_column {text-align:left;}
                         .total_table {white-space: nowrap;}
                         .right_column {text-align:right;}
