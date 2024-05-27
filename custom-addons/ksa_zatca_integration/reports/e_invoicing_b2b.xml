@@ -27,7 +27,7 @@
                         }
                         /* Adjust the container size */
                         .page {
-                            width: 16cm;
+                            width: 15cm;
                             height: 25cm;
                             margin: 0;
                             padding: 0;
@@ -35,8 +35,8 @@
                         /* Additional styling */
                         .head { margin-top: 0; }
                         .lable_bold { font-weight: bold; }
-                        .main_table td:nth-child(1) {white-space: nowrap;}
-                        .main_table td:nth-child(3) {white-space: nowrap;}
+                        .main_table td:nth-child(1)
+                        .main_table td:nth-child(3) 
                         .left_column {text-align:left;}
                         .total_table {white-space: nowrap;}
                         .right_column {text-align:right;}
@@ -44,7 +44,7 @@
                             padding: 2px;
                             border: 1px solid black;
                             border-collapse: collapse;
-                            font-size: 10px;
+                            font-size: 12px;
                         }
                     </style>
 
