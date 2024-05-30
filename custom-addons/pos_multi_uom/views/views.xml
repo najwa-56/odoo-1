@@ -97,7 +97,7 @@
 
         <!-- Menu Item Definition -->
         <menuitem id="menu_product_product_tree"
-                  name="الوحدات المتعددة"
+                  name="الوحدات المتعددة "
                   action="action_product_product_tree"
                   parent="sale.product_menu_catalog"
                   sequence="10"/>
