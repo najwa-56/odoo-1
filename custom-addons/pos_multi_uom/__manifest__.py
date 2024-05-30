@@ -9,7 +9,7 @@
     'summary': 'Pos multi UOM allows you to sell one products in different unit of measure.',
     'description': "Pos multi UOM allows you to sell one products in different unit of measure.",
      'license': 'AGPL-3',
-    'depends': ['point_of_sale'],
+    'depends': ['point_of_sale','sale'],
     'data': [
         'security/ir.model.access.csv',
         'views/views.xml',
