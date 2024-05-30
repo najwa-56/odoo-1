@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="test_model_wizard_view_form" model="ir.ui.view">
+        <field name="name">import.uom.wizard.form</field>
+        <field name="model">import.uom</field>
+        <field name="arch" type="xml">
+            <form string="UOM">
+                <group>
+                    <group>
+                        <field name="file" filename="file_name"/>
+                        <field name="file_name" invisible="1"/>
+                    </group>
+                </group>
+                <p>
+                    <b>You can download demo file click on following button:</b>
+                    <br />
+                    <button name="download_sample_attachment" type="object" string="Download Sample"
+                        class="oe_highlight" />
+                </p>
+                <footer>
+                    <button name="import_xls" string="Import" type="object" />
+                    <button string="Cancel" class="btn-secondary" special="cancel" data-hotkey="z" />
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <record id="test_model_wizard_action" model="ir.actions.act_window">
+        <field name="name">Import UOM</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">import.uom</field>
+        <field name="view_mode">form</field>
+        <field name="view_id" ref="test_model_wizard_view_form" />
+        <field name="target">new</field>
+    </record>
+
+    <menuitem
+        id="import_uom_menu"
+        name="Import UOM"
+        action="test_model_wizard_action"
+        parent="sale.menu_sale_config" />
+
+</odoo>

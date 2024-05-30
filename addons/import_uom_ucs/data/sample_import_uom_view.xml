@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="ir_attachment_sample_import_uom_xls" model="ir.attachment">
+        <field name="name">sample_import_uom.xlsx</field>
+        <field name="datas" type="base64" file="import_uom_ucs/data/sample_import_uom.xlsx" />
+        <field name="res_model">import.uom</field>
+        <field name="public">True</field>
+    </record>
+</odoo>

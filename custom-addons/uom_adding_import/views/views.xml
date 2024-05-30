@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <data>
+        <!-- Inherit the existing tree view -->
+        <record id="uom_uom_tree_view_inherit" model="ir.ui.view">
+    <field name="name">uom.uom.tree.inherit</field>
+    <field name="model">uom.uom</field>
+    <field name="inherit_id" ref="uom.product_uom_tree_view"/>
+    <field name="arch" type="xml">
+        <xpath expr="//tree" position="attributes">
+            <attribute name="create">true</attribute>
+        </xpath>
+    </field>
+</record>
+
+    </data>
+</odoo>
