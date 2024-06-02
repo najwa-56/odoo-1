@@ -1,0 +1,12 @@
+<odoo>
+    <data>
+        <record id="ks_access_company_transfer" model="ir.rule">
+            <field name="name">Multi Company Transfer</field>
+            <field name="model_id" ref="model_multicompany_transfer_stock"/>
+            <field eval="True" name="global"/>
+            <field name="domain_force">['|','|','|',('ks_transfer_to','=',False),
+                ('ks_transfer_to','in',company_ids),('ks_transfer_from','=',False),
+                ('ks_transfer_from','in',company_ids)]</field>
+        </record>
+    </data>
+</odoo>

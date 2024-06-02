@@ -1,0 +1,148 @@
+<odoo>
+    <record model="ir.actions.act_window" id="ks_action_ks_multi_company_inventory_transfer">
+        <field name="name">Multi Company Inventory Transfer</field>
+        <field name="res_model">multicompany.transfer.stock</field>
+<!--        <field name="view_type">form</field>-->
+        <field name="view_mode">tree,form</field>
+    </record>
+
+
+    <record id="vehicle_soft_transfer_menu" model="ir.ui.menu">
+        <field name="name">Inventory Transfer</field>
+        <field name="action" ref="ks_action_ks_multi_company_inventory_transfer"/>
+        <field name="parent_id" ref="stock.menu_stock_warehouse_mgmt"/>
+        <field name="sequence">30</field>
+    </record>
+
+    <record id="vehicle_soft_payment_transfer_form" model="ir.ui.view">
+        <field name="name">Multi Company Inventory Transfer</field>
+        <field name="model">multicompany.transfer.stock</field>
+        <field name="arch" type="xml">
+            <form>
+                <header>
+                    <button name="ks_check_availability" type="object" string="Check Availability" class="btn-primary"
+                            invisible="state in ('in_progress', 'posted')"/>
+                    <button name="ks_confirm_inventory_transfer" type="object" string="Confirm" class="btn-primary"
+                            invisible="state in ('draft', 'posted')"/>
+                    <button name="ks_unreserve_move_lines" type="object" string="Unreserve"
+                            invisible="state in ('draft', 'posted')"/>
+                    <field name="state" widget="statusbar"/>
+                </header>
+                <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button class="oe_highlights" name="ks_button_inventory_entries" string="Inventory Movements"
+                                type="object"
+                                invisible="state != 'posted'" icon="fa-bars"/>
+                    </div>
+                    <group>
+                        <div class="oe_title">
+                            <h1>
+                                <field name="name"/>
+                            </h1>
+                        </div>
+                    </group>
+                    <group>
+                        <group>
+                            <field name="ks_transfer_from" readonly="state in ('in_progress', 'posted')"
+                                   options="{'no_create_edit':True}"/>
+                            <field name="ks_transfer_from_location" domain="[('company_id','=',ks_transfer_from)]"
+                                   readonly="state in ('in_progress', 'posted')" options="{'no_create_edit':True}"/>
+                            <field name="ks_schedule_date" readonly="state in 'posted'"
+                            />
+                            <field name="ks_memo_for_transfer" readonly="state in 'posted'"
+                            />
+                        </group>
+                        <group>
+                            <field name="ks_transfer_to"
+                                   readonly="state in 'posted'"
+                                   options="{'no_create_edit':True}"
+                            />
+                            <field name="ks_transfer_to_location" domain="[('company_id','=',ks_transfer_to)]"
+                                   readonly="state in 'posted'"
+                                   options="{'no_create_edit':True}"/>
+                        </group>
+                    </group>
+                    <field name="ks_multicompany_transfer_stock_ids" readonly="state in ('in_progress', 'posted')">
+                        <tree editable="bottom">
+                            <field name="ks_product_id"/>
+                            <field name="ks_tracking" invisible="1"/>
+                            <field name="state" invisible="1"/>
+                            <field name="ks_product_uom_type" readonly="True" force_save="True"/>
+                            <field name="ks_qty_available" readonly="1" force_save="True"/>
+                            <field name="ks_qty_transfer"/>
+                            <field name="ks_reserved_availability"/>
+                            <field name="ks_quantity_done"/>
+                            <button name="ks_action_show_move_line_details" title="Assign Serial/lot Numbers" type="object" icon="fa-list"
+                                width="0.1" options='{"warn": true}' invisible="ks_tracking == None or state in ('draft', 'posted')"/>
+                        </tree>
+                    </field>
+                </sheet>
+                <div class="oe_chatter">
+                    <field name="message_follower_ids" widget="mail_followers"/>
+                    <field name="activity_ids" widget="mail_activity"/>
+                    <field name="message_ids" widget="mail_thread"/>
+                </div>
+            </form>
+        </field>
+    </record>
+
+    <record id="vehicle_soft_payment_transfer_tree" model="ir.ui.view">
+        <field name="name">Multi Company Inventory Transfer</field>
+        <field name="model">multicompany.transfer.stock</field>
+        <field name="arch" type="xml">
+            <tree>
+                <field name="ks_transfer_from" string="Branch From"/>
+                <field name="ks_transfer_from_location" string="Account From"/>
+                <field name="ks_transfer_to" string="Branch To"/>
+                <field name="ks_schedule_date"/>
+                <field name="ks_memo_for_transfer"/>
+            </tree>
+        </field>
+    </record>
+
+     <record id="ks_view_stock_move_line_details" model="ir.ui.view">
+            <field name="name">transfer.stock.move.operations.form</field>
+            <field name="model">multicompany.transfer.stock.line</field>
+            <field name="priority">1000</field>
+            <field name="arch" type="xml">
+                <form string="Move Detail">
+                    <group>
+                        <group>
+                            <field name="ks_product_id" readonly="1"/>
+                            <field name="ks_company_id" invisible="1"/>
+                            <field name="state" invisible="1"/>
+                            <label for="ks_quantity_done"/>
+                            <div class="o_row">
+                                <span>
+                                    <field name="ks_quantity_done" readonly="1" nolabel="1"/>
+                                </span>
+                                <span>/</span>
+                                <span>
+                                    <field name="ks_reserved_availability" nolabel="1"/>
+                                </span>
+                                <span>
+                                    <field name="ks_product_uom_type" readonly="1" nolabel="1"/>
+                                </span>
+                            </div>
+                        </group>
+                    </group>
+                    <field name="ks_move_line_ids" string="Add Serial/lot Numbers"
+                          readonly="state == 'posted'"
+                           context="{'default_product_id': ks_product_id, 'default_ks_company_id': ks_company_id}">
+                        <tree editable="bottom" create="false" delete="false">
+                            <field name="ks_product_id" readonly="1"/>
+                            <field name="ks_company_id" invisible="1"/>
+                            <field name="ks_product_uom_id" invisible="1"/>
+                            <field name="ks_lot_id" groups="stock.group_production_lot" context="{'default_product_id': ks_product_id, 'default_company_id': ks_company_id}"/>
+                            <field name="ks_product_uom_qty" readonly="1"/>
+                            <field name="ks_qty_done" readonly="1"/>
+                        </tree>
+                    </field>
+                    <footer class="oe_edit_only">
+                        <button string="Confirm" special="save" class="oe_highlight" close="1"/>
+                        <button string="Discard" special="cancel" close="1"/>
+                    </footer>
+                </form>
+            </field>
+        </record>
+</odoo>
