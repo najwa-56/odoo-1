@@ -74,8 +74,7 @@ class PurchaseOrderLine(models.Model):
 	def write(self, vals):
 		res = super(PurchaseOrderLine, self).write(vals)
 		if 'multi_discount' in vals:
-			for sale_id in self:
-				sale_id.get_multi_discount()
+			self.get_multi_discount()
 		return res
 
 	@api.depends('discount')
