@@ -96,12 +96,5 @@ class PurchaseOrderLine(models.Model):
 		return self.price_unit	
 
 	def _get_stock_move_price_unit(self):
-		price_unit = False
 		price = self.recalculate_amount()
-		if price != self.price_unit:
-			price_unit = self.price_unit
-			self.price_unit = price
-		price = super(PurchaseOrderLine, self)._get_stock_move_price_unit()
-		if price_unit:
-			self.price_unit = price_unit
 		return price
