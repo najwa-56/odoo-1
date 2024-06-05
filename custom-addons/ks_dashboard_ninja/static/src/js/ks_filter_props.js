@@ -311,6 +311,9 @@ return KsFilterProps.include({
     },
 
     _ksRenderDateTimeFilterInput: function(operator, field_type){
+
+        moment.locale('ar-sa');
+
         var $value_container = $(QWeb.render('ks_dn_custom_domain_input_date'));
         switch(field_type) {
             case 'date':
@@ -324,7 +327,7 @@ return KsFilterProps.include({
                     var $date_time_picker_2 = new(datepicker.DateWidget)(this);
                     $date_time_picker_2.appendTo($value_container).then((function() {
                         $date_time_picker_2.$el.addClass("ks_dn_filter_second_date_time_widget o_input");
-                        $date_time_picker_2.setValue(moment());
+                    $date_time_picker_2.setValue(moment().format('YYYY-MM-DD'));
                     }).bind(this));
                 }
                 break;
@@ -332,14 +335,14 @@ return KsFilterProps.include({
                 var $date_time_picker = new(datepicker.DateTimeWidget)(this);
                 $date_time_picker.appendTo($value_container).then((function() {
                     $date_time_picker.$el.addClass("ks_dn_filter_first_date_time_widget o_input");
-                    $date_time_picker.setValue(moment('00:00:00', 'hh:mm:ss'));
+                $date_time_picker.setValue(moment().startOf('day').format('YYYY-MM-DD HH:mm:ss'));
                 }).bind(this));
 
                 if (operator.symbol === 'between') {
                     var $date_time_picker_2 = new(datepicker.DateTimeWidget)(this);
                     $date_time_picker_2.appendTo($value_container).then((function() {
                         $date_time_picker_2.$el.addClass("ks_dn_filter_second_date_time_widget o_input");
-                        $date_time_picker_2.setValue(moment('23:59:59', 'hh:mm:ss'));
+                    $date_time_picker_2.setValue(moment().endOf('day').format('YYYY-MM-DD HH:mm:ss'));
                     }).bind(this));
                 }
                 break;
