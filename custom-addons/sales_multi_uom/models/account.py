@@ -11,14 +11,13 @@ class AccountInvoiceLine(models.Model):
 
     @api.onchange('product_id')
     def _onchange_product_id(self):
-        super(AccountInvoiceLine, self)._onchange_product_id()
-        # result['domain']['sales_multi_uom_id'] = [('product_id', '=', self.product_id.id)]
-        # return result
-        result = {}
+        # Check if the super class has the method _onchange_product_id
+        if hasattr(super(AccountInvoiceLine, self), '_onchange_product_id'):
+            super(AccountInvoiceLine, self)._onchange_product_id()
 
-        result.update({
+        result = {
             'domain': {'sales_multi_uom_id': [('product_id', '=', self.product_id.id)]},
-        })
+        }
         print("Result", result)
         return result
 
