@@ -86,3 +86,18 @@ class PurchaseOrderLine(models.Model):
 			po_line_id = self.env['purchase.order.line'].browse(po_line)
 			move_line_vals.update({'discount':po_line_id.discount, 'multi_discount':po_line_id.multi_discount})
 		return move_line_vals
+
+class PurchaseOrder(models.Model):
+    _inherit = 'purchase.order'
+
+    def button_confirm(self):
+        res = super(PurchaseOrder, self).button_confirm()
+        self.update_product_cost()
+        return res
+
+    def update_product_cost(self):
+        for order in self:
+            for line in order.order_line:
+                if line.discount > 0:
+                    new_cost = line.price_unit * (1 - line.discount / 100)
+                    line.product_id.standard_price = new_cost
