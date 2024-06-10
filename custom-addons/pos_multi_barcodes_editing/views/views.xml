@@ -31,5 +31,18 @@
                   parent="sale.product_menu_catalog"
                   sequence="10"/>
 
+          <!-- Inherit the existing product.product.tree view -->
+        <record id="product_product_tree_view_inherit2" model="ir.ui.view">
+            <field name="name">product.product.tree.inherit.multi.uom</field>
+            <field name="model">product.product</field>
+            <field name="inherit_id" ref="product.product_product_tree_view"/>
+            <field name="arch" type="xml">
+                <!-- Use xpath to locate the position after the 'name' field -->
+                <xpath expr="//field[@name='name']" position="after">
+                    <field name='pos_multi_barcode_option' widget="many2many_tags" />
+                </xpath>
+            </field>
+        </record>
+
     </data>
 </odoo>
