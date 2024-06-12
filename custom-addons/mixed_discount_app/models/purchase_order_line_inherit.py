@@ -77,17 +77,17 @@ class PurchaseOrderLine(models.Model):
 			self.get_multi_discount()
 		return res
 
-	@api.depends('discount')
-	def _compute_amount(self):
-		for sale_id in self:
-			price_unit = False
-			price = sale_id.recalculate_amount()
-			if price != sale_id.price_unit:
-				price_unit = sale_id.price_unit
-				sale_id.price_unit = price
-			super(PurchaseOrderLine, sale_id)._compute_amount()
-			if price_unit:
-				sale_id.price_unit = price_unit
+#	@api.depends('discount')
+#	def _compute_amount(self):
+	#	for sale_id in self:
+		#	price_unit = False
+		#	price = sale_id.recalculate_amount()
+		#	if price != sale_id.price_unit:
+			#	price_unit = sale_id.price_unit
+			#	sale_id.price_unit = price
+		#	super(PurchaseOrderLine, sale_id)._compute_amount()
+		#	if price_unit:
+			#	sale_id.price_unit = price_unit
 
 	def recalculate_amount(self):
 		self.ensure_one()
