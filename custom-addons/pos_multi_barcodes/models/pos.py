@@ -15,13 +15,13 @@ class pos_multi_barcode_opt(models.Model):
     name = fields.Char('Barcode',required=True)
     qty = fields.Float("Quantity")
     price = fields.Float("Price")
-    unit = fields.Many2one("uom.uom",string="Unit")
+    unit_bar = fields.Many2one("uom.uom",string="Unit")
     product_id = fields.Many2one("product.product",string="Product")
 
 
-    @api.onchange('unit')
+    @api.onchange('unit_bar')
     def unit_id_change(self):
-        domain = {'unit': [('category_id', '=', self.product_id.uom_id.category_id.id)]}        
+        domain = {'unit_bar': [('category_id', '=', self.product_id.uom_id.category_id.id)]}
         return {'domain': domain}
 
 
@@ -92,11 +92,11 @@ class PosSession(models.Model):
         return result
 
     def _loader_params_pos_multi_barcode_options(self):
-        return {'search_params': {'domain': [], 'fields': ['name','product_id','qty','price','unit'], 'load': False}}
+        return {'search_params': {'domain': [], 'fields': ['name','product_id','qty','price','unit_bar'], 'load': False}}
 
     def _get_pos_ui_pos_multi_barcode_options(self, params):
         result = self.env['pos.multi.barcode.options'].search_read(**params['search_params'])
         for res in result:
-            uom_id = self.env['uom.uom'].browse(res['unit'])
-            res['unit'] = [uom_id.id,uom_id.name] 
+            uom_id = self.env['uom.uom'].browse(res['unit_bar'])
+            res['unit_bar'] = [uom_id.id,uom_id.name]
         return result
