@@ -117,7 +117,7 @@ patch(ProductScreen.prototype, {
                 if(pos_multi_op[i].name == code.code){
                     line.set_quantity(pos_multi_op[i].qty);
                     line.set_unit_price(pos_multi_op[i].price);
-                    line.set_pro_uom(pos_multi_op[i].unit_bar[0]);
+                    line.set_pro_uom(pos_multi_op[i].unit[0]);
                     line.price_manually_set = true;
                 }
             }

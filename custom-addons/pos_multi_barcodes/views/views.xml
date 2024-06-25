@@ -13,7 +13,7 @@
                                 <field name="name"/>
                                 <field name="qty"/>
                                 <field name="price"/>
-                                <field name="unit_bar"/>
+                                <field name="unit"/>
                             </tree>
                         </field>
                     </page>
