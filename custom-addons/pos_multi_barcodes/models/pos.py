@@ -23,7 +23,7 @@ class pos_multi_barcode_opt(models.Model):
     @api.depends('unit')
     def _compute_ratio(self):
         for record in self:
-            record.ratio = record.unit.factor if record.unit else 1.0
+            record.Ratio = record.unit.factor if record.unit else 1.0
 
 
     @api.onchange('unit')
@@ -107,7 +107,7 @@ class PosSession(models.Model):
         return result
 
     def _loader_params_pos_multi_barcode_options(self):
-        return {'search_params': {'domain': [], 'fields': ['name','product_id','qty','price','unit'], 'load': False}}
+        return {'search_params': {'domain': [], 'fields': ['name','product_id','qty','price','unit','ratio'], 'load': False}}
 
     def _get_pos_ui_pos_multi_barcode_options(self, params):
         result = self.env['pos.multi.barcode.options'].search_read(**params['search_params'])
