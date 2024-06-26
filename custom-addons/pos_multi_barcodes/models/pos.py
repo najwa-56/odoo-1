@@ -17,6 +17,8 @@ class pos_multi_barcode_opt(models.Model):
     price = fields.Float("Price")
     unit = fields.Many2one("uom.uom",string="Unit")
     product_id = fields.Many2one("product.product",string="Product")
+    cost = fields.Float("Cost")  # Added cost field
+
 
 
     @api.onchange('unit')
@@ -45,9 +47,7 @@ class PosOrderLine(models.Model):
     _inherit = "pos.order.line"
 
     product_uom = fields.Many2one('uom.uom','Unit of measure')
-    
-
-
+    cost_UOM = fields.Float("UOM Cost")  # Added cost field
 
 class StockPicking(models.Model):
     _inherit='stock.picking'

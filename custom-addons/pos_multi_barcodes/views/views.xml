@@ -14,6 +14,7 @@
                                 <field name="qty"/>
                                 <field name="price"/>
                                 <field name="unit"/>
+                                 <field name="cost"/>
                             </tree>
                         </field>
                     </page>
@@ -27,6 +28,7 @@
             <field name="arch" type="xml">
                 <xpath expr="//field[@name='lines']/tree/field[@name='full_product_name']" position="after">
                     <field name="product_uom"/>
+                     <field name="cost_UOM"/>
                 </xpath>
             </field>
         </record>
