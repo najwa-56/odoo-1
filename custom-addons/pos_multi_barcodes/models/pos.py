@@ -17,7 +17,6 @@ class pos_multi_barcode_opt(models.Model):
     price = fields.Float("Price")
     unit = fields.Many2one("uom.uom",string="Unit")
     product_id = fields.Many2one("product.product",string="Product")
-    cost = fields.Float("Cost")  # Added cost field
 
     @api.onchange('unit')
     def unit_id_change(self):
