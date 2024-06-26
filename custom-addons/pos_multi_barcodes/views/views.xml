@@ -14,7 +14,6 @@
                                 <field name="qty"/>
                                 <field name="price"/>
                                 <field name="unit"/>
-                                 <field name="Ratio"/>
                                  <field name="cost"/>
                             </tree>
                         </field>
