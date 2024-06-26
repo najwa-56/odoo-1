@@ -38,6 +38,7 @@ class product_product(models.Model):
     pos_multi_barcode_option = fields.One2many('pos.multi.barcode.options','product_id',string='Barcodes')
     barcode_options = fields.Text("New Barcode", compute="_compute_barcode_options")
 
+
     def _compute_barcode_options(self):
         for record in self:
             if record.pos_multi_barcode_option:
@@ -53,6 +54,7 @@ class product_product(models.Model):
             for barcode_option in product.pos_multi_barcode_option:
                 cost_with_ratio = product.standard_price * barcode_option.Ratio
                 barcode_option.cost = cost_with_ratio
+                _logger.info(f"Computed cost with ratio for Barcode {barcode_option.name}: {cost_with_ratio}")
 
 class PosOrderLine(models.Model):
     _inherit = "pos.order.line"
