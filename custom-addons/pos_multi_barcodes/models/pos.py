@@ -47,7 +47,16 @@ class PosOrderLine(models.Model):
     _inherit = "pos.order.line"
 
     product_uom = fields.Many2one('uom.uom','Unit of measure')
-    cost_UOM = fields.Float("UOM Cost")  # Added cost field
+    cost_UOM = fields.Float("UOM Cost", compute="_compute_cost", store=True)  # Added cost field with compute method
+
+    @api.depends('product_id')
+    def _compute_cost(self):
+        for line in self:
+            barcode_option = self.env['pos.multi.barcode.options'].search([
+                ('product_id', '=', line.product_id.id)
+            ], limit=1)
+            line.cost = barcode_option.cost if barcode_option else 0.0
+
 
 class StockPicking(models.Model):
     _inherit='stock.picking'
