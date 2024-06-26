@@ -23,7 +23,7 @@ class pos_multi_barcode_opt(models.Model):
     @api.depends('unit')
     def _compute_ratio(self):
         for record in self:
-            record.Ratio = record.unit.Ratio if record.unit else 1.0
+            record.Ratio = record.unit.ratio if record.unit else 1.0
 
 
     @api.onchange('unit')
