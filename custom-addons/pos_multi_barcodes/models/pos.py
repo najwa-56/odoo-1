@@ -16,15 +16,8 @@ class pos_multi_barcode_opt(models.Model):
     qty = fields.Float("Quantity")
     price = fields.Float("Price")
     unit = fields.Many2one("uom.uom",string="Unit")
-    Ratio = fields.Float("Ratio", compute="_compute_ratio", store=False)  # Ratio field  # Related field to the ratio in uom.uom
     product_id = fields.Many2one("product.product",string="Product")
     cost = fields.Float("Cost")  # Added cost field
-
-    @api.depends('unit')
-    def _compute_ratio(self):
-        for record in self:
-            record.Ratio = record.unit.ratio if record.unit else 1.0
-
 
     @api.onchange('unit')
     def unit_id_change(self):
@@ -49,18 +42,21 @@ class product_product(models.Model):
             else:
                 record.barcode_options = json.dumps([])
 
-    def compute_cost_with_ratio(self):
-        for product in self:
-            for barcode_option in product.pos_multi_barcode_option:
-                cost_with_ratio = product.standard_price * barcode_option.Ratio
-                barcode_option.cost = cost_with_ratio
-                _logger.info(f"Computed cost with ratio for Barcode {barcode_option.name}: {cost_with_ratio}")
 
 class PosOrderLine(models.Model):
     _inherit = "pos.order.line"
 
     product_uom = fields.Many2one('uom.uom','Unit of measure')
     cost_UOM = fields.Float("UOM Cost", compute="_compute_cost", store=True)  # Added cost field with compute method
+    Ratio = fields.Float("Ratio", compute="_compute_ratio", store=False)  # Ratio field  # Related field to the ratio in uom.uom
+
+    @api.depends('product_uom')
+    def _compute_ratio(self):
+        for record in self:
+            record.Ratio = record.product_uom.ratio if record.product_uom else 1.0
+
+
+
 
     @api.depends('product_id')
     def _compute_cost(self):
