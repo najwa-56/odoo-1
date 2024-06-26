@@ -29,7 +29,7 @@
                 <xpath expr="//field[@name='lines']/tree/field[@name='full_product_name']" position="after">
                     <field name="product_uom"/>
                      <field name="Ratio"/>
-                     <field name="total_cost"/>
+                     <field name="Cost1"/>
                 </xpath>
             </field>
         </record>
