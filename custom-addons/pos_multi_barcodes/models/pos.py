@@ -55,7 +55,7 @@ class PosOrderLine(models.Model):
             barcode_option = self.env['pos.multi.barcode.options'].search([
                 ('product_id', '=', line.product_id.id)
             ], limit=1)
-            line.cost_UOM = barcode_option.cost_UOM if barcode_option else 0.0
+            line.cost_UOM = barcode_option.cost if barcode_option else 0.0
 
 
 class StockPicking(models.Model):
