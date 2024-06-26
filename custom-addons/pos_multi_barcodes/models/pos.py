@@ -45,6 +45,37 @@ class PosOrderLine(models.Model):
     _inherit = "pos.order.line"
 
     product_uom = fields.Many2one('uom.uom','Unit of measure')
+    total_cost = fields.Float('Total Cost', compute='_compute_total_cost_and_margin', store=True)
+    margin = fields.Float('Margin', compute='_compute_total_cost_and_margin', store=True)
+
+    @api.depends('price_unit', 'qty', 'product_uom')
+    def _compute_total_cost_and_margin(self):
+        for line in self:
+            if line.product_uom:
+                multi_barcode_option = self.env['pos.multi.barcode.options'].search([
+                    ('product_id', '=', line.product_id.id),
+                    ('unit', '=', line.product_uom.id)
+                ], limit=1)
+                if multi_barcode_option:
+                    line.total_cost = multi_barcode_option.price * line.qty
+                    line.margin = (line.price_unit - multi_barcode_option.price) * line.qty
+                else:
+                    line.total_cost = line.product_id.standard_price * line.qty
+                    line.margin = (line.price_unit - line.product_id.standard_price) * line.qty
+            else:
+                line.total_cost = line.product_id.standard_price * line.qty
+                line.margin = (line.price_unit - line.product_id.standard_price) * line.qty
+
+    @api.model
+    def create(self, vals):
+        line = super(PosOrderLine, self).create(vals)
+        line._compute_total_cost_and_margin()
+        return line
+
+    def write(self, vals):
+        result = super(PosOrderLine, self).write(vals)
+        self._compute_total_cost_and_margin()
+        return result
 
 
 
