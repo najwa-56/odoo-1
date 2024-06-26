@@ -47,24 +47,35 @@ class PosOrderLine(models.Model):
     _inherit = "pos.order.line"
 
     product_uom = fields.Many2one('uom.uom','Unit of measure')
-    cost_UOM = fields.Float("UOM Cost", compute="_compute_cost", store=True)  # Added cost field with compute method
+   # cost_UOM = fields.Float("UOM Cost", compute="_compute_cost", store=True)  # Added cost field with compute method
     Ratio = fields.Float("Ratio", compute="_compute_ratio", store=False)  # Ratio field  # Related field to the ratio in uom.uom
+    total_cost = fields.Float("Total Cost", compute="_compute_total_cost", store=True)  # Field to store the computed total cost
+
 
     @api.depends('product_uom')
     def _compute_ratio(self):
         for record in self:
             record.Ratio = record.product_uom.ratio if record.product_uom else 1.0
 
+    @api.depends('Ratio', 'total_cost')
+    def _compute_total_cost(self):
+        for record in self:
+            record.total_cost = record.Ratio * record.total_cost
+
+    # Example of method to update total_cost
+    def update_total_cost(self):
+        for record in self:
+            # Perform any logic to update total_cost here if needed
+            record.total_cost = record.Ratio * record.total_cost
 
 
-
-    @api.depends('product_id')
-    def _compute_cost(self):
-        for line in self:
-            barcode_option = self.env['pos.multi.barcode.options'].search([
-                ('product_id', '=', line.product_id.id)
-            ], limit=1)
-            line.cost_UOM = barcode_option.cost if barcode_option else 0.0
+  # @api.depends('product_id')
+  #  def _compute_cost(self):
+      #  for line in self:
+         #   barcode_option = self.env['pos.multi.barcode.options'].search([
+           #     ('product_id', '=', line.product_id.id)
+         #   ], limit=1)
+         #   line.cost_UOM = barcode_option.cost if barcode_option else 0.0
 
 
 class StockPicking(models.Model):
