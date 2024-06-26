@@ -48,6 +48,14 @@ class PosOrderLine(models.Model):
 
     product_uom = fields.Many2one('uom.uom','Unit of measure')
     cost_UOM = fields.Float("UOM Cost", compute="_compute_cost", store=True)  # Added cost field with compute method
+    Ratio = fields.Float("Ratio", compute="_compute_ratio", store=False)  # Ratio field  # Related field to the ratio in uom.uom
+
+    @api.depends('product_uom')
+    def _compute_ratio(self):
+        for record in self:
+            record.Ratio = record.product_uom.ratio if record.product_uom else 1.0
+
+
 
 
     @api.depends('product_id')
@@ -103,7 +111,7 @@ class PosSession(models.Model):
         return result
 
     def _loader_params_pos_multi_barcode_options(self):
-        return {'search_params': {'domain': [], 'fields': ['name','product_id','qty','price','unit','ratio'], 'load': False}}
+        return {'search_params': {'domain': [], 'fields': ['name','product_id','qty','price','unit'], 'load': False}}
 
     def _get_pos_ui_pos_multi_barcode_options(self, params):
         result = self.env['pos.multi.barcode.options'].search_read(**params['search_params'])
