@@ -20,11 +20,10 @@ class pos_multi_barcode_opt(models.Model):
     product_id = fields.Many2one("product.product",string="Product")
     cost = fields.Float("Cost")  # Added cost field
 
-
     @api.depends('unit')
     def _compute_ratio(self):
         for record in self:
-            record.ratio = record.unit.ratio if record.unit else 1.0
+            record.ratio = record.unit.factor if record.unit else 1.0
 
 
     @api.onchange('unit')
