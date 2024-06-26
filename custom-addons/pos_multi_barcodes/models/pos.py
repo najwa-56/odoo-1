@@ -48,6 +48,12 @@ class product_product(models.Model):
             else:
                 record.barcode_options = json.dumps([])
 
+    def compute_cost_with_ratio(self):
+        for product in self:
+            for barcode_option in product.pos_multi_barcode_option:
+                cost_with_ratio = product.standard_price * barcode_option.Ratio
+                barcode_option.cost = cost_with_ratio
+
 class PosOrderLine(models.Model):
     _inherit = "pos.order.line"
 
