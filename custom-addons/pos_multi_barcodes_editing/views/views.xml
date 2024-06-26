@@ -12,6 +12,7 @@
                     <field name="name"/>
                     <field name="unit" required="True"/>
                     <field name="price"/>
+                     <field name="qty"/>
                     <field name="product_id"/>
                 </tree>
             </field>
