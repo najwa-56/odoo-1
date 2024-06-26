@@ -17,7 +17,6 @@ class pos_multi_barcode_opt(models.Model):
     price = fields.Float("Price")
     unit = fields.Many2one("uom.uom",string="Unit")
     Ratio = fields.Float("Ratio", related='unit.ratio', store=False)  # Related field to the ratio in uom.uom
-
     product_id = fields.Many2one("product.product",string="Product")
     cost = fields.Float("Cost")  # Added cost field
 
