@@ -56,41 +56,7 @@
         </record>
 
 
-        <record id="product_template_only_form_view_inherit" model="ir.ui.view">
-    <field name="name">product.template.view.form.custom</field>
-    <field name="model">product.template</field>
-    <field name="inherit_id" ref="product.product_template_only_form_view" />
-    <field name="arch" type="xml">
-        <xpath expr="//div[@name='options']" position="inside">
-            <!-- Add your custom fields or modifications here -->
-            <field name="has_multi_uom"/>
-            <label for="has_multi_uom"/>
-        </xpath>
-        <xpath expr="//notebook/page[@name='extra_ingredients']" position="inside">
-            <!-- Extend or modify existing fields within the notebook/page -->
-            <field name="multi_uom_ids">
-                <tree editable="bottom">
-                    <field name="multi_uom_id" required="True"/>
-                    <field name="barcode"/>
-                    <field name="sequence"/>
-                    <field name="price"/>
-                </tree>
-            </field>
-        </xpath>
-    </field>
-
-            <record id="action_view_product_template_custom_form" model="ir.actions.act_window">
-    <field name="name">Custom Product Template Form</field>
-    <field name="res_model">product.template</field>
-    <field name="view_mode">form</field>
-    <field name="view_id" ref="product_template_only_form_view_inherit"/>
-       </record>
-
-<menuitem id="menu_custom_product_template" name="Custom Product Template" parent="base.menu_inventory_management" action="action_view_product_template_custom_form"/>
-
-</record>
-
-
+      
 
 
     </data>
