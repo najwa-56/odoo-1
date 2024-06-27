@@ -48,7 +48,6 @@ class PosOrderLine(models.Model):
     product_uom = fields.Many2one('uom.uom','Unit of measure')
    # cost_UOM = fields.Float("UOM Cost", compute="_compute_cost", store=True)  # Added cost field with compute method
     Ratio = fields.Float("Ratio", compute="_compute_ratio", store=False)  # Ratio field  # Related field to the ratio in uom.uom
-    Cost1 = fields.Float("Total Cost", compute="_compute_total_cost", store=True)  # Field to store the computed total cost
 
 
     @api.depends('product_uom')
@@ -61,7 +60,10 @@ class PosOrderLine(models.Model):
         for record in self:
             record.total_cost = record.Ratio * record.total_cost
 
-
+    # Method to trigger the computation of total cost
+    @api.onchange('Ratio')
+    def _onchange_ratio(self):
+        self._compute_total_cost()
 
 
   # @api.depends('product_id')
