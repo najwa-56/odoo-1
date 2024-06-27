@@ -45,26 +45,25 @@ class product_product(models.Model):
 class PosOrderLine(models.Model):
     _inherit = "pos.order.line"
 
-    product_uom = fields.Many2one('uom.uom', 'Unit of measure')
-    Ratio = fields.Float("Ratio", compute="_compute_ratio", store=True)
-    initial_cost = fields.Float(string='Initial Cost', digits='Product Price', readonly=False)
-    total_cost = fields.Float(string='Total cost', digits='Product Price', readonly=False,
-                              compute='_compute_total_cost', store=True)
+    product_uom = fields.Many2one('uom.uom','Unit of measure')
+   # cost_UOM = fields.Float("UOM Cost", compute="_compute_cost", store=True)  # Added cost field with compute method
+    Ratio = fields.Float("Ratio", compute="_compute_ratio", store=False)  # Ratio field  # Related field to the ratio in uom.uom
+    total_cost = fields.Float(string='Total cost', digits='Product Price', readonly=True,compute="_compute_total_cost")
+
+
 
     @api.depends('product_uom')
     def _compute_ratio(self):
         for record in self:
             record.Ratio = record.product_uom.ratio if record.product_uom else 1.0
 
-    @api.depends('Ratio', 'initial_cost')
+    @api.depends('Ratio')
     def _compute_total_cost(self):
         for record in self:
-            record.total_cost = record.initial_cost * record.Ratio if record.Ratio else record.initial_cost
+            record.total_cost = record.Ratio * record.total_cost
 
-    @api.onchange('product_uom')
-    def _onchange_product_uom(self):
-        self._compute_ratio()
-        self._compute_total_cost()
+
+
 
   # @api.depends('product_id')
   #  def _compute_cost(self):
