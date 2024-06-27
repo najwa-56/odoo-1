@@ -1,0 +1,14 @@
+<odoo>
+    <data>
+        <record id="view_company_form" model="ir.ui.view">
+            <field name="name">res.company</field>
+            <field name="model">res.company</field>
+            <field name="inherit_id" ref="ksa_zatca_integration.view_company_form"/>
+            <field name="arch" type="xml">
+                <xpath expr="//field[@name='zatca_send_from_pos']" position="after">
+                    <field name="zatca_pos_pay"/>
+                </xpath>
+            </field>
+        </record>
+    </data>
+</odoo>
