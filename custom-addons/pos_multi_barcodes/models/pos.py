@@ -48,7 +48,6 @@ class PosOrderLine(models.Model):
     product_uom = fields.Many2one('uom.uom','Unit of measure')
    # cost_UOM = fields.Float("UOM Cost", compute="_compute_cost", store=True)  # Added cost field with compute method
     Ratio = fields.Float("Ratio", compute="_compute_ratio", store=False)  # Ratio field  # Related field to the ratio in uom.uom
-    total_cost = fields.Float(string='Total cost', digits='Product Price', readonly=True,compute="_compute_total_cost")
 
 
 
@@ -57,13 +56,14 @@ class PosOrderLine(models.Model):
         for record in self:
             record.Ratio = record.product_uom.ratio if record.product_uom else 1.0
 
-    @api.depends('Ratio')
-    def _compute_total_cost(self):
-        for record in self:
-            record.total_cost = record.Ratio * record.total_cost
-
-
-
+    def _compute_total_cost(self, stock_moves=None):
+        """
+        Compute the total cost of the order lines and multiply by the ratio.
+        :param stock_moves: recordset of `stock.move`, used for fifo/avco lines
+        """
+        super(PosOrderLine, self)._compute_total_cost(stock_moves)
+        for line in self:
+            line.total_cost = line.total_cost * line.Ratio if line.Ratio else line.total_cost
 
   # @api.depends('product_id')
   #  def _compute_cost(self):
