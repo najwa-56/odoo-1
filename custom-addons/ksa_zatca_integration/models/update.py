@@ -1,4 +1,4 @@
-from odoo import api, fields, models, exceptions, _
+from odoo import fields, models
 import logging
 
 _zatca = logging.getLogger('Zatca Debugger for account.move :')
@@ -14,6 +14,7 @@ class AccountMoveUpdate(models.Model):
     _inherit = 'account.move'
 
     invoice_multi_currency_id = fields.Char()
+    zatca_onboarding_status = fields.Boolean()
 
 
 class ResPartnerUpdate(models.Model):

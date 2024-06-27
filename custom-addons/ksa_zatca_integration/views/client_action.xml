@@ -4,6 +4,7 @@
             <field name="name">Zatca Dashboard</field>
             <field name="tag">zatca_main_dashboard</field>
         </record>
+
         <menuitem id="zatca_dashboard_menuitem"
                   name="Zatca Dashboard"
                   parent="account.menu_finance_configuration"

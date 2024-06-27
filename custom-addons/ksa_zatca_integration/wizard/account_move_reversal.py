@@ -1,6 +1,4 @@
-from odoo import api, fields, models, exceptions, _
-from decimal import Decimal
-import uuid
+from odoo import fields, models
 
 
 class AccountMoveReversal(models.TransientModel):

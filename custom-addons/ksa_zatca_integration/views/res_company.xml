@@ -56,9 +56,6 @@
                 <xpath expr="//field[@name='country_id']" position="attributes">
                     <attribute name="required">1</attribute>
                 </xpath>
-                <xpath expr="//field[@name='state_id']" position="attributes">
-                    <attribute name="required">country_id_name == 'Saudi Arabia' and is_zatca</attribute>
-                </xpath>
                 <xpath expr="//notebook" position="inside">
                     <page id="zatca_configurations" string="Zatca Configurations"
                           groups="ksa_zatca_integration.l10n_sa_group_zatca_user"
@@ -125,7 +122,7 @@
                                             <field name="industry_id" required="is_zatca"/>
                                             <field name="is_self_billed"/>
                                             <field name="zatca_send_from_pos" force_save="1"/>
-                                            <field name="csr_otp" force_save="1"/>
+                                            <field name="csr_otp" force_save="1" invisible="api_type == 'Sandbox'"/>
                                         </group>
                                     </group>
                                     <group style="padding-top: 25px;">

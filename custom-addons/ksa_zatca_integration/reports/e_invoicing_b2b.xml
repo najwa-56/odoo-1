@@ -647,7 +647,11 @@
                             </tr>
                         </table>
 
-                        <t t-if="doc.invoice_line_ids">
+                        <t t-if="not doc._is_downpayment()"
+                           t-set="invoice_line_ids" t-value="doc.invoice_line_ids.filtered(lambda x: x.display_type not in ['line_section', 'line_note'] and not x.sale_line_ids.is_downpayment)"/>
+                        <t t-else=""
+                           t-set="invoice_line_ids" t-value="doc.invoice_line_ids.filtered(lambda x: x.display_type not in ['line_section', 'line_note'])"/>
+                        <t t-if="invoice_line_ids">
                             <table style="margin-top:5px;" name="line_items" width="100%" class="second_table">
                                 <thead>
                                     <tr>
@@ -723,8 +727,9 @@
                                 <t t-set="serial_counter" t-value="0"/>
                                 <t t-set="tot_discount" t-value="0"/>
 
-                                <t t-foreach="doc.invoice_line_ids" t-as="line">
+                                <t t-foreach="invoice_line_ids" t-as="line">
                                     <t t-set="serial_counter" t-value="serial_counter+1"/>
+                                    <t t-set="bt_141" t-value="doc.get_bt_141(line.zatca_id)"/>
                                     <tr>
                                         <td class="second_table" style="text-align:center;">
                                             <t t-esc="serial_counter"/>
@@ -767,113 +772,127 @@
                                     </tr>
                                 </t>
                             </table>
-                            <div class="row" style="margin-top:5px;">
-                                <div class="col-4" style="font-size:10px;">
-                                    <t t-if="doc.ksa_note">
-                                        <div class="lable_bold row">
-                                            <div class="left_column col-6">Notes</div>
-                                            <div class="right_column col-6">ملحوظات</div>
-                                        </div>
-                                        <div t-field="doc.ksa_note"/>
-                                    </t>
-                                </div>
-                                <div class="col-8">
-                                    <table class="second_table total_table" width="100%">
-                                        <col style="width:25%"/>
-                                        <col style="width:55%"/>
-                                        <col style="width:20%"/>
-                                        <thead>
-                                            <tr>
-                                                <th style="background-color:#878484;color:white;"
-                                                    name="total_amounts" class="second_table left_column">
-                                                    <span class="lable_bold">Total Amount</span>
-                                                </th>
-                                                <th style="background-color:#878484;color:white;text-align:right;"
-                                                    name="arabic_lang" class="second_table">
-                                                    <span class="lable_bold">إجمالي المبالغ</span>
-                                                </th>
-                                                <th style="background-color:#878484;" name="nothing"
-                                                    class="second_table">
-                                                    <span></span>
-                                                </th>
-                                            </tr>
-                                        </thead>
-                                        <tr>
-                                            <td class="second_table left_column">
-                                                <span class="lable_bold">Total (Excluding VAT)</span>
-                                            </td>
-                                            <td class="second_table" style="text-align:right;">
-                                                <span class="lable_bold">(الإجمالي (غيرشاملة ضريبة القيمة المضافة</span>
-                                            </td>
-                                            <td class="second_table" style="text-align:right;">
-                                                <span t-esc="doc.amount_untaxed"
-                                                      t-options='{"widget": "monetary", "display_currency": doc.currency_id}'/>
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <td class="second_table left_column">
-                                                <span class="lable_bold">Total VAT</span>
-                                            </td>
-                                            <td class="second_table" style="text-align:right;">
-                                                <span class="lable_bold">
-                                                    إجمالي ﻤﺒﻠﻎ ضريبة القيمة المضافة
-                                                </span>
-                                            </td>
-                                            <td class="second_table" style="text-align:right;">
-                                                <span t-esc="doc.amount_tax"
-                                                      t-options='{"widget": "monetary", "display_currency": doc.currency_id}'/>
-                                            </td>
-                                        </tr>
-                                        <tr t-if="doc.currency_id.name != 'SAR'">
-                                            <td class="second_table left_column">
-                                                <span class="lable_bold">Total VAT (SAR)</span>
-                                            </td>
-                                            <td class="second_table" style="text-align:right;">
-                                                <span class="lable_bold">
-                                                    إجمالي ﻤﺒﻠﻎ ضريبة القيمة المضافة
-                                                </span>
-                                            </td>
-                                            <td class="second_table" style="text-align:right;">
-                                                <span t-esc="abs(doc.amount_tax_signed)"
-                                                      t-options='{"widget": "monetary", "display_currency": doc.company_id.parent_root_id.currency_id}'/>
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <td class="second_table left_column">
-                                                <span class="lable_bold">Total Amount</span>
-                                            </td>
-                                            <td class="second_table" style="text-align:right;">
-                                                <span class="lable_bold">
-                                                    (إﺟﻤﺎﻟﻲ ﻘﻴﻤﺔ اﻟﻔﺎﺗﻮرة (ﺷﺎﻣﻞ ﺿﺮﻳﺒﺔ اﻟﻘﻴﻤﺔ اﻟﻤﻀﺎﻓﺔ
-                                                </span>
-                                            </td>
-                                            <td class="second_table" style="text-align:right;">
-                                                <span t-esc="doc.amount_total"
-                                                      t-options='{"widget": "monetary", "display_currency": doc.currency_id}'/>
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <td class="second_table left_column">
-                                                <span class="lable_bold">Amount Due</span>
-                                            </td>
-                                            <td class="second_table" style="text-align:right;">
-                                                <span class="lable_bold">المبلغ المتبقي</span>
-                                            </td>
-                                            <td class="second_table" style="text-align:right;">
-                                                <span t-esc="doc.amount_residual"
-                                                      t-options='{"widget": "monetary", "display_currency": doc.currency_id}'/>
-                                            </td>
-                                        </tr>
-                                    </table>
-                                </div>
-                            </div>
-                            <table style="margin-top:30px; float:left;border: none;" class="second_table">
-                                <tr>
-                                    <td class="second_table" style="text-align:left;border: none;">
-                                    </td>
-                                </tr>
-                            </table>
                         </t>
+                        <div class="row" style="margin-top:5px;">
+                            <div class="col-4" style="font-size:10px;">
+<!--                                    <t t-if="doc.ksa_note">-->
+<!--                                        <div class="lable_bold row">-->
+<!--                                            <div class="left_column col-6">Notes</div>-->
+<!--                                            <div class="right_column col-6">ملحوظات</div>-->
+<!--                                        </div>-->
+<!--                                        <div t-field="doc.ksa_note"/>-->
+<!--                                    </t>-->
+                            </div>
+                            <div class="col-8">
+                                <table class="second_table total_table" width="100%">
+                                    <col style="width:25%"/>
+                                    <col style="width:55%"/>
+                                    <col style="width:20%"/>
+                                    <thead>
+                                        <tr>
+                                            <th style="background-color:#878484;color:white;"
+                                                name="total_amounts" class="second_table left_column">
+                                                <span class="lable_bold">Total Amount</span>
+                                            </th>
+                                            <th style="background-color:#878484;color:white;text-align:right;"
+                                                name="arabic_lang" class="second_table">
+                                                <span class="lable_bold">إجمالي المبالغ</span>
+                                            </th>
+                                            <th style="background-color:#878484;" name="nothing"
+                                                class="second_table">
+                                                <span></span>
+                                            </th>
+                                        </tr>
+                                    </thead>
+                                    <tr>
+                                        <td class="second_table left_column">
+                                            <span class="lable_bold">Total (Excluding VAT)</span>
+                                        </td>
+                                        <td class="second_table" style="text-align:right;">
+                                            <span class="lable_bold">(الإجمالي (غيرشاملة ضريبة القيمة المضافة</span>
+                                        </td>
+                                        <td class="second_table" style="text-align:right;">
+                                            <span t-esc="doc.get_bt_109()"
+                                                  t-options='{"widget": "monetary", "display_currency": doc.currency_id}'/>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td class="second_table left_column">
+                                            <span class="lable_bold">Total VAT</span>
+                                        </td>
+                                        <td class="second_table" style="text-align:right;">
+                                            <span class="lable_bold">
+                                                إجمالي ﻤﺒﻠﻎ ضريبة القيمة المضافة
+                                            </span>
+                                        </td>
+                                        <td class="second_table" style="text-align:right;">
+                                            <span t-esc="doc.get_bt_110()"
+                                                  t-options='{"widget": "monetary", "display_currency": doc.currency_id}'/>
+                                        </td>
+                                    </tr>
+                                    <tr t-if="doc.currency_id.name != 'SAR'">
+                                        <td class="second_table left_column">
+                                            <span class="lable_bold">Total VAT (SAR)</span>
+                                        </td>
+                                        <td class="second_table" style="text-align:right;">
+                                            <span class="lable_bold">
+                                                إجمالي ﻤﺒﻠﻎ ضريبة القيمة المضافة
+                                            </span>
+                                        </td>
+                                        <td class="second_table" style="text-align:right;">
+                                            <span t-esc="doc.get_bt_111()"
+                                                  t-options='{"widget": "monetary", "display_currency": doc.company_id.parent_root_id.currency_id}'/>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td class="second_table left_column">
+                                            <span class="lable_bold">Total Amount</span>
+                                        </td>
+                                        <td class="second_table" style="text-align:right;">
+                                            <span class="lable_bold">
+                                                (إﺟﻤﺎﻟﻲ ﻘﻴﻤﺔ اﻟﻔﺎﺗﻮرة (ﺷﺎﻣﻞ ﺿﺮﻳﺒﺔ اﻟﻘﻴﻤﺔ اﻟﻤﻀﺎﻓﺔ
+                                            </span>
+                                        </td>
+                                        <td class="second_table" style="text-align:right;">
+                                            <span t-esc="doc.get_bt_112()"
+                                                  t-options='{"widget": "monetary", "display_currency": doc.currency_id}'/>
+                                        </td>
+                                    </tr>
+                                    <t t-set="bt_114" t-value="doc.get_bt_114()"/>
+                                    <tr t-if="bt_114">
+                                        <td class="second_table left_column">
+                                            <span class="lable_bold">Payable Rounding Amount</span>
+                                        </td>
+                                        <td class="second_table" style="text-align:right;">
+                                            <span class="lable_bold">
+                                            </span>
+                                        </td>
+                                        <td class="second_table" style="text-align:right;">
+                                            <span t-esc="bt_114"
+                                                  t-options='{"widget": "monetary", "display_currency": doc.currency_id}'/>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td class="second_table left_column">
+                                            <span class="lable_bold">Amount Due</span>
+                                        </td>
+                                        <td class="second_table" style="text-align:right;">
+                                            <span class="lable_bold">المبلغ المتبقي</span>
+                                        </td>
+                                        <td class="second_table" style="text-align:right;">
+                                            <span t-esc="doc.get_bt_115()"
+                                                  t-options='{"widget": "monetary", "display_currency": doc.currency_id}'/>
+                                        </td>
+                                    </tr>
+                                </table>
+                            </div>
+                        </div>
+                        <table style="margin-top:30px; float:left;border: none;" class="second_table">
+                            <tr>
+                                <td class="second_table" style="text-align:left;border: none;">
+                                </td>
+                            </tr>
+                        </table>
                     </div>
                 </t>
             </t>

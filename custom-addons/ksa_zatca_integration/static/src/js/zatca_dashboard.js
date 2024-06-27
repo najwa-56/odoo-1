@@ -26,6 +26,7 @@ export class MainDashboard extends Component {
                 self.getTransmissionsToday();
                 self.getInvoicesThisYear();
                 self.getTaxAmountThisYear();
+                self.getPostedInvoices();
             });
         });
     }
@@ -82,7 +83,29 @@ export class MainDashboard extends Component {
             }
         }
     }
+    async getPostedInvoices() {
+        var yearlyRecords = await this.getThisYearRecords();
+            if (yearlyRecords) {
+            var invoiceCount = 0;
+            var standardCount = 0;
+            var simplifiedCount = 0;
+            yearlyRecords.forEach(record => {
+                    if (record.state == 'posted' && record.zatca_invoice == false)
+                    {
+                    invoiceCount++;
+                    if (record.l10n_sa_invoice_type === 'Standard') {
+                            standardCount++;
+                        } else if (record.l10n_sa_invoice_type === 'Simplified') {
+                            simplifiedCount++;
+                        }
+                    }
+                });
 
+               $('#posted_invoice').text(invoiceCount);
+                $('#standard_posted_invoice').text("Standard: " + standardCount);
+                $('#simplified_posted_invoice').text("Simplified: " + simplifiedCount);
+            }
+        }
     async getCompany() {
         var domain = [['is_zatca', '=', true]];
         var company = await this.orm.call('res.company', 'search_read', [domain], {fields: ['id']});
@@ -108,7 +131,7 @@ export class MainDashboard extends Component {
             //     ['l10n_sa_response_datetime', '>=', startOfYear.toISOString()],
             //     ['l10n_sa_response_datetime', '<=', endOfYear.toISOString()]];
 
-            var records = await this.orm.call('account.move', 'search_read', [domain], {fields: ['l10n_sa_invoice_type', 'l10n_sa_zatca_status', 'amount_tax_signed']});
+            var records = await this.orm.call('account.move', 'search_read', [domain], {fields: ['l10n_sa_invoice_type', 'l10n_sa_zatca_status', 'amount_tax_signed', 'state', 'zatca_invoice']});
             return records
 
         } else

@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 from odoo import fields, models, exceptions, api, _
 from .compliance import Standard, Simplified
+from odoo.tools import mute_logger
 import lxml.etree as ET
 import requests
 import base64
@@ -44,9 +45,9 @@ class ResCompany(models.Model):
                                 ('MOM', 'Momrah license'), ('MLS', 'MHRSD license'),
                                 ('SAG', 'MISA license'), ('OTH', 'Other OD'),
                                 ('700', '700 Number')],
-                               default='CRN', required=False, string="License",
+                               required=0, string="License",
                                help="In case multiple IDs exist then one of the above must be entered")
-    license_no = fields.Char(string="License Number (Other seller ID)", required=False)
+    license_no = fields.Char(string="License Number (Other seller ID)", required=0)
 
     building_no = fields.Char(related='partner_id.building_no', readonly=False)
     additional_no = fields.Char(related='partner_id.additional_no', readonly=False)
@@ -77,18 +78,16 @@ class ResCompany(models.Model):
     is_self_billed = fields.Boolean("Self Billed")
 
     zatca_certificate_status = fields.Boolean()
-    zatca_icv_counter = fields.Char(default=1, readonly=True)
+    zatca_icv_counter = fields.Char(default=1, readonly=1)
 
     zatca_status = fields.Char()
     zatca_onboarding_status = fields.Boolean()
     zatca_on_board_status_details = fields.Char()
     l10n_sa_phase1_end_date = fields.Date("Phase 1 ending date")
-    # zatca_pih = fields.Char(default='NWZlY2ViNjZmZmM4NmYzOGQ5NTI3ODZjNmQ2OTZjNzljMmRiYzIzOWRkNGU5MWI0NjcyOWQ3M2EyN2ZiNTdlOQ==')
 
     # Required fields
-    zatca_link = fields.Char("Api Link", default="https://gw-fatoora.zatca.gov.sa/e-invoicing/developer-portal")
-    api_type = fields.Selection([('Sandbox', 'Sandbox'), ('Simulation', 'Simulation'), ('Live', 'Live')],
-                                default='Sandbox', required=True)
+    zatca_link = fields.Char("Api Link")
+    api_type = fields.Selection([('Sandbox', 'Sandbox'), ('Simulation', 'Simulation'), ('Live', 'Live')])
 
     is_group_vat = fields.Boolean("Is Group Vat", compute="_compute_is_group_vat", store=True)
     csr_common_name = fields.Char("Common Name")  # CN
@@ -100,13 +99,13 @@ class ResCompany(models.Model):
     # csr_country_name = fields.Char("Country Name", required="1")  # C
     csr_invoice_type = fields.Char("Invoice Type")  # title
     zatca_invoice_type = fields.Selection([('Standard', 'Standard'), ('Simplified', 'Simplified'),
-                                           ('Standard & Simplified', 'Standard & Simplified')],
-                                          default='Standard', required=True)
+                                           ('Standard & Simplified', 'Standard & Simplified')])
     csr_location_address = fields.Char("Location")  # registeredAddress
     csr_industry_business_category = fields.Char("Industry ")  # BusinessCategory
 
     csr_otp = fields.Char("Otp")
     zatca_send_from_pos = fields.Boolean('Send to Zatca on Post invoice')
+    zatca_pos_pay = fields.Boolean('Show POS payments in pos receipts')
 
     zatca_is_sandbox = fields.Boolean('Testing ? (to check simplified invoices)')
     zatca_is_fatoora_simulation_portal = fields.Boolean('FATOORA Simulation Portal')
@@ -140,6 +139,7 @@ class ResCompany(models.Model):
             if record.is_zatca and len(str(record.vat)) > 10 and int(record.vat[10]) == 1:
                 record.is_group_vat = 1
 
+    @mute_logger('Zatca Debugger for account.move :')
     def auto_compliance(self):
         # x = base64.b64encode(bytes(ubl_2_1, 'utf-8')).decode()
         # ecdsa_signature = "zatca_l10n_sa_ecdsa_signature".encode()
@@ -150,6 +150,9 @@ class ResCompany(models.Model):
 
         conf = self.sudo()
         move = self.env['account.move'].sudo()
+
+        if not conf.is_zatca:
+            raise exceptions.AccessDenied(_("Zatca is not activated."))
 
         if conf.zatca_status in ["production credentials received", "production credentials renewed."]:
             raise exceptions.AccessError(_("auto_compliance already done."))
@@ -207,7 +210,7 @@ class ResCompany(models.Model):
                     invoice_uuid = xml_file.find("//{urn:oasis:names:specification:ubl:schema:xsd:CommonBasicComponents-2}UUID").text
                     zdate = xml_file.find("//{urn:oasis:names:specification:ubl:schema:xsd:CommonBasicComponents-2}IssueDate").text
                     ztime = xml_file.find("//{urn:oasis:names:specification:ubl:schema:xsd:CommonBasicComponents-2}IssueTime").text
-                    bt_112 = xml_file.find("//{urn:oasis:names:specification:ubl:schema:xsd:CommonBasicComponents-2}TaxInclusiveAmount").text
+                    bt_115 = xml_file.find("//{urn:oasis:names:specification:ubl:schema:xsd:CommonBasicComponents-2}PayableAmount").text
                     bt_110 = xml_file.find("//{urn:oasis:names:specification:ubl:schema:xsd:CommonBasicComponents-2}TaxAmount").text
                     timestamp_enc = zdate + "T" + ztime
 
@@ -215,7 +218,7 @@ class ResCompany(models.Model):
                         signature_value = move.apply_signature(conf, auto_compliance=1, zatca_invoice_hash=zatca_invoice_hash)
                         invoice = invoice.replace('zatca_signature_hash', str(base_64_5))
                         invoice = invoice.replace('zatca_signature_value', str(signature_value))
-                        qr_code = move.compliance_qr_code(conf, bt_112, bt_110, zatca_invoice_hash, signature_value, timestamp_enc)
+                        qr_code = move.compliance_qr_code(conf, bt_115, bt_110, zatca_invoice_hash, signature_value, timestamp_enc)
                         invoice = invoice.replace("l10n_zatca_qr", str(qr_code))
 
                     invoice = invoice.replace('zatca_invoice_hash', str(zatca_invoice_hash))
@@ -264,6 +267,7 @@ class ResCompany(models.Model):
         if conf.api_type == 'Sandbox':
             conf.zatca_is_sandbox = True
             conf.zatca_link = 'https://gw-fatoora.zatca.gov.sa/e-invoicing/developer-portal'
+            conf.csr_otp = 12345
         elif conf.api_type == 'Simulation':
             conf.zatca_link = 'https://gw-fatoora.zatca.gov.sa/e-invoicing/simulation'
             conf.zatca_is_fatoora_simulation_portal = True
@@ -284,14 +288,14 @@ class ResCompany(models.Model):
                 certificateTemplateName = "ASN1:PRINTABLESTRING:ZATCA-Code-Signing"
 
             # zatca fields
-            conf_name = (conf.name).encode('utf-8') if len((conf.name).encode('utf-8')) < 64 else (conf.name).encode('utf-8')[0:64]
+            conf_name = conf.name[0:64]
             conf.csr_common_name = (odoo.release.description + odoo.release.version.replace("+e", "e") + "-" + str(self.id)).replace(" ", '').replace("e", '').replace("+", '').replace("_", '')
-            conf.csr_serial_number = ("1-Odoo|2-17|3-%s_%s_%s" % (odoo.release.version.replace('17.0', '').replace("+e", "e").replace("-", ""), self.id,str(uuid.uuid4()).replace("-", ""))).encode('utf-8')
+            conf.csr_serial_number = ("1-Odoo|2-17|3-%s_%s_%s" % (odoo.release.version.replace('17.0', '').replace("+e", "e").replace("-", ""), self.id, str(uuid.uuid4()).replace("-", ""))).encode('utf-8')
             conf.csr_organization_unit_name = conf.csr_individual_vat if conf.is_group_vat else conf_name
             conf.csr_organization_name = conf_name
             conf.csr_invoice_type = '1000' if conf.zatca_invoice_type == 'Standard' else ('0100' if conf.zatca_invoice_type == 'Simplified' else '1100')
-            conf.csr_location_address = (self.env['ir.config_parameter'].sudo().get_param('web.base.url')).encode('utf-8')
-            conf.csr_industry_business_category = (conf.partner_id.industry_id.name or "IT").encode('utf-8')
+            conf.csr_location_address = self.env['ir.config_parameter'].sudo().get_param('web.base.url')
+            conf.csr_industry_business_category = conf.partner_id.industry_id.name or "IT"
 
             config_cnf = '''
                 oid_section = OIDs
@@ -307,6 +311,7 @@ class ResCompany(models.Model):
                 default_md = sha256
                 req_extensions = req_ext
                 distinguished_name = dn
+                utf8 = yes
 
                 [ dn ]
                 C = ''' + str(conf.country_id.code) + '''
@@ -385,7 +390,6 @@ class ResCompany(models.Model):
                         'invoice': 0,
                     }
                 }
-                message = "Standard & its associated invoices and Simplified & its associated invoices"
                 message = "Standard: invoice, debit, credit, \nSimplified: invoice, debit, credit, "
                 qty = 6
             elif csr_invoice_type[0:2] == '10':
@@ -396,7 +400,6 @@ class ResCompany(models.Model):
                         'invoice': 0,
                     }
                 }
-                message = "Standard & its associated invoices"
                 message = "Standard: invoice, debit, credit, "
             elif csr_invoice_type[0:2] == '01':
                 zatca_on_board_status_details = {
@@ -406,7 +409,6 @@ class ResCompany(models.Model):
                         'invoice': 0,
                     }
                 }
-                message = "Simplified & its associated invoices"
                 message = "Simplified: invoice, debit, credit, "
             else:
                 raise exceptions.ValidationError(_("Invalid Invoice Type defined."))
@@ -416,7 +418,7 @@ class ResCompany(models.Model):
         except Exception as e:
             if 'odoo.exceptions' in str(type(e)):
                 raise e
-            raise exceptions.AccessError(_("Server Error, Contact administrator."))
+            raise exceptions.AccessError(_("Server Error, Contact administrator.") + "\n" + str(e))
         finally:
             # For security purpose, files should not exist out of odoo
             os.system('''rm  /tmp/zatcaprivatekey.pem''')
@@ -426,12 +428,12 @@ class ResCompany(models.Model):
             os.system('''rm  /tmp/zatca_taxpayper.csr''')
             os.system('''rm  /tmp/zatca_taxpayper_64.csr''')
 
-        self.compliance_api(auto_compliance=auto_compliance)
+        self.compliance_api()
         conf.csr_otp = None
         # self.compliance_api('/production/csids', 1)
         #     CNF, PEM, CSR created
 
-    def compliance_api(self, endpoint='/compliance', renew=0, auto_compliance=0):
+    def compliance_api(self, endpoint='/compliance', renew=0):
         # link = "https://gw-fatoora.zatca.gov.sa/e-invoicing/developer-portal"
         conf = self.sudo()
         link = conf.zatca_link
@@ -533,6 +535,8 @@ class ResCompany(models.Model):
             conf.zatca_bsToken = zatca_sdk_bsToken
             conf.zatca_reqID = 'N/A'
             conf.zatca_secret = zatca_sdk_secret
+            conf.csr_certificate = base64.b64decode(conf.zatca_bsToken)
+            self.register_certificate()
         else:
             self.compliance_api('/production/csids', 0)
         conf.zatca_status = 'production credentials received.'
@@ -548,6 +552,8 @@ class ResCompany(models.Model):
             conf.zatca_bsToken = zatca_sdk_bsToken
             conf.zatca_reqID = 'N/A'
             conf.zatca_secret = zatca_sdk_secret
+            conf.csr_certificate = base64.b64decode(conf.zatca_bsToken)
+            self.register_certificate()
         else:
             self.compliance_api('/production/csids', 1)
         conf.zatca_status = 'production credentials renewed.'
@@ -624,9 +630,9 @@ class ResCompany(models.Model):
                 recompute_phase1_ending_date = 0
         res = super(ResCompany, self).write(vals)
         for record in self:
-            if recompute_phase1_ending_date:
-                records = self.env['account.move'].sudo().search([('company_id', '=', self.id)])
-                records._compute_l10n_sa_zatca_status()
+            # if recompute_phase1_ending_date:
+            #     records = self.env['account.move'].sudo().search([('company_id', '=', self.id)])
+            #     records._compute_l10n_sa_zatca_status()
             if record.parent_is_zatca:
                 if len(str(record.vat)) != 15:
                     raise exceptions.ValidationError('Vat must be exactly 15 digits')

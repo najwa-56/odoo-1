@@ -1,9 +1,7 @@
-from odoo import api, fields, models, exceptions, _
 from odoo.tools.pdf import OdooPdfFileReader, OdooPdfFileWriter
+from odoo import fields, models, exceptions, _
 from odoo.tools.float_utils import float_round
 from odoo.tools import mute_logger
-from odoo.http import request
-from datetime import timedelta
 import lxml.etree as ET
 import logging
 import base64
@@ -17,6 +15,7 @@ class AccountMoveReport(models.Model):
     _inherit = 'account.move'
 
     def get_context_datetime(self):
+        # %H:%M can be removed.
         return fields.Datetime.context_timestamp(self.with_context(tz='Asia/Riyadh'), self.l10n_sa_confirmation_datetime).strftime('%Y-%m-%d %H:%M')
 
     def get_tax_amount(self):
@@ -50,11 +49,7 @@ class AccountMoveReport(models.Model):
                 _zatca.exception("Error while converting to PDF/A: %s", e)
 
             content = self.env['ir.qweb']._render('account_edi_ubl_cii.account_invoice_pdfa_3_facturx_metadata',
-                {
-                    'title': self.name,
-                    'date': fields.Date.context_today(self),
-                },
-            )
+                                                  {'title': self.name, 'date': fields.Date.context_today(self)})
             writer.add_file_metadata(content.encode())
 
             pdf_stream.close()
@@ -65,13 +60,23 @@ class AccountMoveReport(models.Model):
             # writer_buffer.close()
         return collected_streams
 
+    def get_zatca_onboarding_status(self):
+        com = self.company_id.parent_root_id.sudo()
+        if (com.is_zatca and com.zatca_onboarding_status and
+                (not self.zatca_compliance_invoices_api or
+                 ("Onboarding failed, restart process !!" not in self.zatca_compliance_invoices_api
+                  and "Onboarding in progress" not in self.zatca_compliance_invoices_api))):
+            return 1
+        else:
+            return 0
+
     def print_einv_b2b(self):
         is_tax_invoice = 1 if self.l10n_sa_invoice_type == 'Standard' else 0
         if not is_tax_invoice:
             raise exceptions.MissingError(_("Not a standard invoice."))
         if not self.zatca_invoice:
             raise exceptions.MissingError(_("Xml not created yet."))
-        if not self.zatca_onboarding_status:
+        if not self.get_zatca_onboarding_status():
             raise exceptions.MissingError(_("Qr code can't be created with CCSID."))
         if not self.zatca_hash_cleared_invoice:
             raise exceptions.MissingError(_("Cleared invoice from zatca is required."))
@@ -83,7 +88,7 @@ class AccountMoveReport(models.Model):
             raise exceptions.MissingError(_("Not a simplified invoice."))
         if not self.zatca_invoice:
             raise exceptions.MissingError(_("Xml not created yet."))
-        if not self.zatca_onboarding_status:
+        if not self.get_zatca_onboarding_status():
             raise exceptions.MissingError(_("Qr code can't be created with CCSID."))
         return self.env.ref('ksa_zatca_integration.report_e_invoicing_b2c').report_action(self)
 
@@ -109,6 +114,48 @@ class AccountMoveReport(models.Model):
         }
         return other_id.get(eng, 'error')
 
+    def get_bt_109(self):
+        invoice = base64.b64decode(self.zatca_invoice).decode()
+        xml_file = ET.fromstring(invoice).getroottree()
+        legal_monetary_total = xml_file.find('./{urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-2}LegalMonetaryTotal')
+        bt_109 = legal_monetary_total.find('.//{urn:oasis:names:specification:ubl:schema:xsd:CommonBasicComponents-2}TaxExclusiveAmount')
+        return float(bt_109.text) if float(bt_109.text) else 0
+
+    def get_bt_112(self):
+        invoice = base64.b64decode(self.zatca_invoice).decode()
+        xml_file = ET.fromstring(invoice).getroottree()
+        legal_monetary_total = xml_file.find('./{urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-2}LegalMonetaryTotal')
+        bt_112 = legal_monetary_total.find('.//{urn:oasis:names:specification:ubl:schema:xsd:CommonBasicComponents-2}TaxInclusiveAmount')
+        return float(bt_112.text) if float(bt_112.text) else 0
+
+    def get_bt_111(self):
+        invoice = base64.b64decode(self.zatca_invoice).decode()
+        xml_file = ET.fromstring(invoice).getroottree()
+        legal_monetary_total = xml_file.findall('./{urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-2}TaxTotal')
+        bt_111 = legal_monetary_total[-1].find('.//{urn:oasis:names:specification:ubl:schema:xsd:CommonBasicComponents-2}TaxAmount')
+        return float(bt_111.text) if float(bt_111.text) else 0
+
+    def get_bt_110(self):
+        invoice = base64.b64decode(self.zatca_invoice).decode()
+        xml_file = ET.fromstring(invoice).getroottree()
+        legal_monetary_total = xml_file.findall('./{urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-2}TaxTotal')
+        bt_110 = legal_monetary_total[0].find('.//{urn:oasis:names:specification:ubl:schema:xsd:CommonBasicComponents-2}TaxAmount')
+        return float(bt_110.text) if float(bt_110.text) else 0
+
+    def get_bt_114(self):
+        invoice = base64.b64decode(self.zatca_invoice).decode()
+        xml_file = ET.fromstring(invoice).getroottree()
+        legal_monetary_total = xml_file.find('./{urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-2}LegalMonetaryTotal')
+        bt_114 = legal_monetary_total.find('.//{urn:oasis:names:specification:ubl:schema:xsd:CommonBasicComponents-2}PayableRoundingAmount')
+        return float(bt_114.text) if bt_114 is not None else 0
+
+    def get_bt_115(self):
+        invoice = base64.b64decode(self.zatca_invoice).decode()
+        xml_file = ET.fromstring(invoice).getroottree()
+        legal_monetary_total = xml_file.find('./{urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-2}LegalMonetaryTotal')
+        bt_115 = legal_monetary_total.find('.//{urn:oasis:names:specification:ubl:schema:xsd:CommonBasicComponents-2}PayableAmount')
+        return float(bt_115.text) if float(bt_115.text) else 0
+
     def get_bt_131(self, id):
         id = str(int(id))
         invoice = base64.b64decode(self.zatca_invoice).decode()
@@ -123,7 +170,6 @@ class AccountMoveReport(models.Model):
         id = str(int(id))
         invoice = base64.b64decode(self.zatca_invoice).decode()
         xml_file = ET.fromstring(invoice).getroottree()
-        # LineExtensionAmount
         bt_136_find = "//{urn:oasis:names:specification:ubl:schema:xsd:CommonBasicComponents-2}ID[.='" + str(id) + "']"
         bt_126 = xml_file.find(bt_136_find).getparent()
         bg_27 = bt_126.find('{urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-2}AllowanceCharge')
@@ -132,11 +178,21 @@ class AccountMoveReport(models.Model):
         bt_136 = bg_27.find('{urn:oasis:names:specification:ubl:schema:xsd:CommonBasicComponents-2}Amount')
         return float(bt_136.text) if float(bt_136.text) else 0
 
+    def get_bt_141(self, id):
+        invoice = base64.b64decode(self.zatca_invoice).decode()
+        xml_file = ET.fromstring(invoice).getroottree()
+        bt_141_find = "//{urn:oasis:names:specification:ubl:schema:xsd:CommonBasicComponents-2}ID[.='" + str(id) + "']"
+        bt_126 = xml_file.find(bt_141_find).getparent()
+        bg_27 = bt_126.find('{urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-2}AllowanceCharge')
+        if bg_27 is None:
+            return 0.0
+        bt_141 = bg_27.find('{urn:oasis:names:specification:ubl:schema:xsd:CommonBasicComponents-2}Amount')
+        return float(bt_141.text) if float(bt_141.text) else 0
+
     def get_bt_146(self, id):
         id = str(int(id))
         invoice = base64.b64decode(self.zatca_invoice).decode()
         xml_file = ET.fromstring(invoice).getroottree()
-        # LineExtensionAmount
         bt_136_find = "//{urn:oasis:names:specification:ubl:schema:xsd:CommonBasicComponents-2}ID[.='" + str(id) + "']"
         bt_126 = xml_file.find(bt_136_find).getparent()
         bg_29 = bt_126.find('{urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-2}Price')
@@ -172,7 +228,7 @@ class AccountMoveReport(models.Model):
             bg_20 = bg_31.find('{urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-2}ClassifiedTaxCategory')
             bt_152 = bg_20.find('{urn:oasis:names:specification:ubl:schema:xsd:CommonBasicComponents-2}Percent')
             bt_152 = 0 if bt_152 is None else (float(bt_152.text) if float(bt_152.text) else 0)
-            ksa_11 = float('{:0.2f}'.format(float_round(bt_131 * bt_152/100, precision_rounding=0.01)))  #BR-KSA-50
+            ksa_11 = float('{:0.2f}'.format(float_round(bt_131 * bt_152 / 100, precision_rounding=0.01)))  # BR-KSA-50
             ksa_12 = float('{:0.2f}'.format(float_round(bt_131 + ksa_11, precision_rounding=0.01)))  # BR-KSA-51
             return ksa_12
         ksa_12 = tax_total.find('{urn:oasis:names:specification:ubl:schema:xsd:CommonBasicComponents-2}RoundingAmount')
@@ -204,7 +260,7 @@ class AccountMoveReport(models.Model):
         # x = img
         if not self.zatca_invoice:
             raise exceptions.MissingError(_("Xml not created yet."))
-        if not self.zatca_onboarding_status:
+        if not self.get_zatca_onboarding_status():
             raise exceptions.MissingError(_("Qr code can't be created with CCSID."))
 
         self._compute_qr_code_str()
@@ -216,12 +272,11 @@ class AccountMoveReport(models.Model):
         def image_to_byte_array(image: Image) -> bytes:
             # BytesIO is a fake file stored in memory
             buffered = io.BytesIO()
-            # image.save expects a file as a argument, passing a bytes io ins
+            # image.save expects a file as an argument, passing a bytes io ins
             image.save(buffered, format=image.format)
             # Turn the BytesIO object back into a bytes object
-            imgByteArr = buffered.getvalue()
             img_str = base64.b64encode(buffered.getvalue())
             return img_str
 
-        _zatca.info("image_to_byte_array(qr).decode():: %s",image_to_byte_array(qr).decode())
+        _zatca.info("image_to_byte_array(qr).decode():: %s", image_to_byte_array(qr).decode())
         return "data:image/png;base64," + image_to_byte_array(qr).decode()

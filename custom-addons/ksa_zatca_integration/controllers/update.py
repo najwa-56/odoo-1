@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from odoo.http import request, route, Controller
+from odoo.http import request, Controller
 import lxml.etree as ET
 from odoo import http
 import base64

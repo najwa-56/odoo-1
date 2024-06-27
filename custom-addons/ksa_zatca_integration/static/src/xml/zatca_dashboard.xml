@@ -124,6 +124,23 @@
                         </div>
                     </div>
             </div>
+            <div class="row mt-5">
+                <div class="col-md-3 stretch-card mb-4">
+                    <div class="card-dashboard card-green">
+                        <div class="small_card-body">
+                            <h3 style="color:white; font-weight:bold;"
+                                class="mb-4">Invoices Posted(Not send to Zatca)</h3>
+                            <h3 style="color:white;" class="fs-30 mb-2">
+                                <span id="posted_invoice"></span>
+                            </h3>
+                            <br/>
+                            <span style="color:white;" id="simplified_posted_invoice"></span>
+                            <br/>
+                            <span style="color:white;" id="standard_posted_invoice"></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
     </t>
 </templates>

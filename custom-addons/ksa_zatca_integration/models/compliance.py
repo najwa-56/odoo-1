@@ -55,7 +55,7 @@ class Standard:
                 Y2FjOkl0ZW0+CiAgICAgICAgICAgICAgICA8Y2FjOlByaWNlPgogICAgICAgICAgICAgICAgICAgIDxjYmM6UHJpY2VBbW91bnQgY3VycmVuY3lJRD0iU0FSIj4xMS4zNDwvY2JjOlByaWNlQW1vdW50PgogICAgICAgICAgIC
                 AgICAgICAgIDxjYmM6QmFzZVF1YW50aXR5IHVuaXRDb2RlPSJQQ0UiPjE8L2NiYzpCYXNlUXVhbnRpdHk+CiAgICAgICAgICAgICAgICA8L2NhYzpQcmljZT4KICAgICAgICAgICAgPC9jYWM6SW52b2ljZUxpbmU+CiAgICAg
                 ICAgPC9JbnZvaWNlPg=="""
-        return xml.replace('\n','')
+        return xml.replace('\n', '')
 
     def credit(self):
         xml = """CiAgICAgICAgPEludm9pY2UgeG1sbnM9InVybjpvYXNpczpuYW1lczpzcGVjaWZpY2F0aW9uOnVibDpzY2hlbWE6eHNkOkludm9pY2UtMiIKICAgICAgICAgICAgICAgICB4bWxuczpjYWM9InVybjpvYXNpczpuYW1lczpzcG
@@ -115,7 +115,7 @@ class Standard:
                 ICA8L2NhYzpDbGFzc2lmaWVkVGF4Q2F0ZWdvcnk+CiAgICAgICAgICAgICAgICA8L2NhYzpJdGVtPgogICAgICAgICAgICAgICAgPGNhYzpQcmljZT4KICAgICAgICAgICAgICAgICAgICA8Y2JjOlByaWNlQW1vdW50IGN1cn
                 JlbmN5SUQ9IlNBUiI+MTEuMzQ8L2NiYzpQcmljZUFtb3VudD4KICAgICAgICAgICAgICAgICAgICA8Y2JjOkJhc2VRdWFudGl0eSB1bml0Q29kZT0iUENFIj4xPC9jYmM6QmFzZVF1YW50aXR5PgogICAgICAgICAgICAgICAg
                 PC9jYWM6UHJpY2U+CiAgICAgICAgICAgIDwvY2FjOkludm9pY2VMaW5lPgogICAgICAgIDwvSW52b2ljZT4="""
-        return xml.replace('\n','')
+        return xml.replace('\n', '')
 
     def debit(self):
         xml = """CiAgICAgICAgPEludm9pY2UgeG1sbnM9InVybjpvYXNpczpuYW1lczpzcGVjaWZpY2F0aW9uOnVibDpzY2hlbWE6eHNkOkludm9pY2UtMiIKICAgICAgICAgICAgICAgICB4bWxuczpjYWM9InVybjpvYXNpczpuYW1lczpzcG
@@ -175,7 +175,8 @@ class Standard:
                 Q2xhc3NpZmllZFRheENhdGVnb3J5PgogICAgICAgICAgICAgICAgPC9jYWM6SXRlbT4KICAgICAgICAgICAgICAgIDxjYWM6UHJpY2U+CiAgICAgICAgICAgICAgICAgICAgPGNiYzpQcmljZUFtb3VudCBjdXJyZW5jeUlEPS
                 JTQVIiPjM0LjA8L2NiYzpQcmljZUFtb3VudD4KICAgICAgICAgICAgICAgICAgICA8Y2JjOkJhc2VRdWFudGl0eSB1bml0Q29kZT0iUENFIj4xPC9jYmM6QmFzZVF1YW50aXR5PgogICAgICAgICAgICAgICAgPC9jYWM6UHJp
                 Y2U+CiAgICAgICAgICAgIDwvY2FjOkludm9pY2VMaW5lPgogICAgICAgIDwvSW52b2ljZT4="""
-        return xml.replace('\n','')
+        return xml.replace('\n', '')
+
 
 class Simplified:
     def invoice(self):
@@ -217,7 +218,7 @@ class Simplified:
                 AgICAgICAgICAgICAgPGNhYzpQcmljZT4KICAgICAgICAgICAgICAgICAgICA8Y2JjOlByaWNlQW1vdW50IGN1cnJlbmN5SUQ9IlNBUiI+MjIuMDwvY2JjOlByaWNlQW1vdW50PgogICAgICAgICAgICAgICAgICAgIDxjYmM6
                 QmFzZVF1YW50aXR5IHVuaXRDb2RlPSJQQ0UiPjE8L2NiYzpCYXNlUXVhbnRpdHk+CiAgICAgICAgICAgICAgICA8L2NhYzpQcmljZT4KICAgICAgICAgICAgPC9jYWM6SW52b2ljZUxpbmU+CiAgICAgICAgPC9JbnZvaWNlPg
                 =="""
-        return xml.replace('\n','')
+        return xml.replace('\n', '')
 
     def credit(self):
         xml = """CiAgICAgICAgPEludm9pY2UgeG1sbnM9InVybjpvYXNpczpuYW1lczpzcGVjaWZpY2F0aW9uOnVibDpzY2hlbWE6eHNkOkludm9pY2UtMiIKICAgICAgICAgICAgICAgICB4bWxuczpjYWM9InVybjpvYXNpczpuYW1lczpzcG
@@ -261,7 +262,7 @@ class Simplified:
                 bGFzc2lmaWVkVGF4Q2F0ZWdvcnk+CiAgICAgICAgICAgICAgICA8L2NhYzpJdGVtPgogICAgICAgICAgICAgICAgPGNhYzpQcmljZT4KICAgICAgICAgICAgICAgICAgICA8Y2JjOlByaWNlQW1vdW50IGN1cnJlbmN5SUQ9Il
                 NBUiI+MjIuMDwvY2JjOlByaWNlQW1vdW50PgogICAgICAgICAgICAgICAgICAgIDxjYmM6QmFzZVF1YW50aXR5IHVuaXRDb2RlPSJQQ0UiPjE8L2NiYzpCYXNlUXVhbnRpdHk+CiAgICAgICAgICAgICAgICA8L2NhYzpQcmlj
                 ZT4KICAgICAgICAgICAgPC9jYWM6SW52b2ljZUxpbmU+CiAgICAgICAgPC9JbnZvaWNlPg=="""
-        return xml.replace('\n','')
+        return xml.replace('\n', '')
 
     def debit(self):
         xml = """CiAgICAgICAgPEludm9pY2UgeG1sbnM9InVybjpvYXNpczpuYW1lczpzcGVjaWZpY2F0aW9uOnVibDpzY2hlbWE6eHNkOkludm9pY2UtMiIKICAgICAgICAgICAgICAgICB4bWxuczpjYWM9InVybjpvYXNpczpuYW1lczpzcG
@@ -305,4 +306,4 @@ class Simplified:
                 YXNzaWZpZWRUYXhDYXRlZ29yeT4KICAgICAgICAgICAgICAgIDwvY2FjOkl0ZW0+CiAgICAgICAgICAgICAgICA8Y2FjOlByaWNlPgogICAgICAgICAgICAgICAgICAgIDxjYmM6UHJpY2VBbW91bnQgY3VycmVuY3lJRD0iU0
                 FSIj4xLjA8L2NiYzpQcmljZUFtb3VudD4KICAgICAgICAgICAgICAgICAgICA8Y2JjOkJhc2VRdWFudGl0eSB1bml0Q29kZT0iUENFIj4xPC9jYmM6QmFzZVF1YW50aXR5PgogICAgICAgICAgICAgICAgPC9jYWM6UHJpY2U+
                 CiAgICAgICAgICAgIDwvY2FjOkludm9pY2VMaW5lPgogICAgICAgIDwvSW52b2ljZT4="""
-        return xml.replace('\n','')
+        return xml.replace('\n', '')
