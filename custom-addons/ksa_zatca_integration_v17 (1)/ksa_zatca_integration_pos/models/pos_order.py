@@ -12,15 +12,6 @@ class PosOrder(models.Model):
     account_move_state = fields.Selection(string='Status ', related='account_move.state')
     l10n_sa_invoice_type = fields.Selection(string="Invoice Type", related='account_move.l10n_sa_invoice_type')
 
-    @api.model
-    def _order_fields(self, ui_order):
-        res = super(PosOrder, self)._order_fields(ui_order)
-        # res.update({'optical_reference': ui_order.get('optical_reference')})
-        return res
-
-    def send_for_compliance(self):
-        self.account_move.send_for_compliance()
-
     def send_for_reporting(self):
         self.account_move.send_for_reporting(no_xml_generate=1)
 

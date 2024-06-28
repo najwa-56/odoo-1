@@ -3,94 +3,6 @@
     <template id="report_e_invoicing_b2c_template">
         <t t-foreach="docs" t-as="doc">
             <t t-call="web.basic_layout">
-                <style>
-                    hr{
-                    opacity: 1;
-                    border-top: 1px solid rgba(0, 0, 0, 0.1);
-                    color: white;
-                    }
-                    .data_column{
-                    font-size:10px !important;
-                    }
-                    .label_column.arabic_label{
-                    text-align:right;
-                    font-size:9px !important;
-                    float:right;
-                    }
-                    .label_column{
-                    font-size:10px;
-                    font-weight:bold
-                    }
-                    .total_table td.right_column.arabic_label, .reason_table span.right_column.arabic_label{
-                    font-size:9px !important;
-                    font-weight:bold;
-                    }
-                    .total_table td.right_column, .reason_table span.right_column{
-                    text-align:right;
-                    font-size:10px;
-                    padding: 5px 0;
-                    }
-                    .reason_table span.right_column{
-                    float: right;
-                    }
-                    .reason_table span.data_column{
-                    padding: 5px 15px
-                    }
-                    .total_table td.left_column{
-                    text-align:left;
-                    font-size:10px;
-                    padding: 5px 0;
-                    font-weight:bold;
-                    }
-                    .reason_table span.left_column{
-                    text-align:left;
-                    font-size:9px;
-                    padding: 5px 0;
-                    font-weight:bold;
-                    }
-                    .page_block{
-                    background-color: white;
-                    font-family: 'Arial';
-                    text-align:center;
-                    font-size: 14px;
-                    width: 300px;
-                    padding:0;
-                    margin:0;
-                    }
-                    #phase2qrcode{
-                    text-align:center;
-                    width:250px;
-                    max-height:250px
-                    }
-                    table#invline{
-
-                    }
-                    .invline_column{
-                    border-bottom:1pt dashed black;
-                    vertical-align:bottom;
-                    margin-bottom:5pt;
-                    padding-bottom:3pt;
-                    }
-                    .invline_data{
-                    text-align:left;
-                    font-size:10px;
-                    padding: 1px 0;
-                    }
-                </style>
-                <style type="text/css">
-                    <![CDATA[
-                        @font-face {
-                            font-family: 'Arial';
-                            font-weight: bold;
-                            font-style: bold;
-                            src: url('/tax_reports/static/src/fonts/arial.ttf')
-                            format('truetype');
-                        }
-                        tr,td {
-                            font-family: 'Arial';
-                        }
-                    ]]>
-                </style>
                 <t t-if="doc_model == 'pos.order'">
                     <t t-set="doc" t-value="doc.account_move"/>
                 </t>
@@ -114,6 +26,94 @@
 
                 <div dir="ltr">
                     <div class="pos-receipt page_block">
+                        <style>
+                            hr{
+                            opacity: 1;
+                            border-top: 1px solid rgba(0, 0, 0, 0.1);
+                            color: white;
+                            }
+                            .data_column{
+                            font-size:10px !important;
+                            }
+                            .label_column.arabic_label{
+                            text-align:right;
+                            font-size:9px !important;
+                            float:right;
+                            }
+                            .label_column{
+                            font-size:10px;
+                            font-weight:bold
+                            }
+                            .total_table td.right_column.arabic_label, .reason_table span.right_column.arabic_label{
+                            font-size:9px !important;
+                            font-weight:bold;
+                            }
+                            .total_table td.right_column, .reason_table span.right_column{
+                            text-align:right;
+                            font-size:10px;
+                            padding: 5px 0;
+                            }
+                            .reason_table span.right_column{
+                            float: right;
+                            }
+                            .reason_table span.data_column{
+                            padding: 5px 15px
+                            }
+                            .total_table td.left_column{
+                            text-align:left;
+                            font-size:10px;
+                            padding: 5px 0;
+                            font-weight:bold;
+                            }
+                            .reason_table span.left_column{
+                            text-align:left;
+                            font-size:9px;
+                            padding: 5px 0;
+                            font-weight:bold;
+                            }
+                            .page_block{
+                            background-color: white;
+                            font-family: 'Arial';
+                            text-align:center;
+                            font-size: 14px;
+                            width: 300px;
+                            padding:0;
+                            margin:0;
+                            }
+                            #phase2qrcode{
+                            text-align:center;
+                            width:250px;
+                            max-height:250px
+                            }
+                            table#invline{
+
+                            }
+                            .invline_column{
+                            border-bottom:1pt dashed black;
+                            vertical-align:bottom;
+                            margin-bottom:5pt;
+                            padding-bottom:3pt;
+                            }
+                            .invline_data{
+                            text-align:left;
+                            font-size:10px;
+                            padding: 1px 0;
+                            }
+                        </style>
+                        <style type="text/css">
+                            <![CDATA[
+                                @font-face {
+                                    font-family: 'Arial';
+                                    font-weight: bold;
+                                    font-style: bold;
+                                    src: url('/tax_reports/static/src/fonts/arial.ttf')
+                                    format('truetype');
+                                }
+                                tr,td {
+                                    font-family: 'Arial';
+                                }
+                            ]]>
+                        </style>
                         <div class="pos-receipt page_block"
                              style="text-align: left;padding-bottom: 0px;display: inline-block;overflow: hidden;">
                             <t t-if="doc.company_id.parent_root_id.logo">

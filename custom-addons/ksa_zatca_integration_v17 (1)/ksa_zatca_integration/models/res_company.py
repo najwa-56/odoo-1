@@ -105,6 +105,8 @@ class ResCompany(models.Model):
 
     csr_otp = fields.Char("Otp")
     zatca_send_from_pos = fields.Boolean('Send to Zatca on Post invoice')
+    parent_zatca_send_from_pos = fields.Boolean('Send to Zatca on Post invoice',
+                                                compute="_compute_zatca_parent_id", store=True)
     zatca_pos_pay = fields.Boolean('Show POS payments in pos receipts')
 
     zatca_is_sandbox = fields.Boolean('Testing ? (to check simplified invoices)')
@@ -130,6 +132,8 @@ class ResCompany(models.Model):
         for record in self:
             record.parent_is_zatca = record.parent_ids.filtered(lambda x: not x.parent_id).is_zatca or record.is_zatca
             record.parent_root_id = record.parent_ids.filtered(lambda x: not x.parent_id) or record
+            for res in record.child_ids + record:
+                res.parent_zatca_send_from_pos = res.parent_root_id.zatca_send_from_pos
 
     @api.onchange('vat')
     @api.depends('vat', 'is_zatca')
