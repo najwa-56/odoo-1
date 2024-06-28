@@ -110,7 +110,6 @@ patch(ProductScreen.prototype, {
     }
 });
 
-
 patch(Orderline.prototype, {
     setup() {
         super.setup(...arguments);
