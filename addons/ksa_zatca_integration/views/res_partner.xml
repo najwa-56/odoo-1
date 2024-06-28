@@ -1,0 +1,44 @@
+<odoo>
+    <data>
+        <record id="view_partner_form" model="ir.ui.view">
+            <field name="name">res.partner</field>
+            <field name="model">res.partner</field>
+            <field name="inherit_id" ref="base.view_partner_form"/>
+            <field name="arch" type="xml">
+                <xpath expr="//field[@name='name']" position="after">
+                    <field name="country_id_name" invisible="1"/>
+                    <field name="is_zatca" invisible="1"/>
+                </xpath>
+                <xpath expr="//field[@name='vat']" position="after">
+                    <field name="buyer_identification"
+                           groups="ksa_zatca_integration.l10n_sa_group_zatca_user"/>
+                    <field name="buyer_identification_no"
+                           groups="ksa_zatca_integration.l10n_sa_group_zatca_user"/>
+                </xpath>
+                <xpath expr="//field[@name='street2']" position="after">
+                    <field name="building_no" placeholder="Building Number" class="o_address_city" style="width: 41%;"
+                           required="country_id_name == 'Saudi Arabia' and is_zatca"/>
+                    <field name="additional_no" placeholder="Additional Number" style="width: 57%;"
+                           invisible="country_id_name != 'Saudi Arabia'"/>
+                    <field name="district" placeholder="District" class="o_address_street"
+                           required="country_id_name == 'Saudi Arabia' and is_zatca"/>
+                </xpath>
+                <xpath expr="//field[@name='street']" position="attributes">
+                    <attribute name="required">country_id != 'Saudi Arabia' and is_zatca</attribute>
+                </xpath>
+                <xpath expr="//field[@name='city']" position="attributes">
+                    <attribute name="required">country_id != 'Saudi Arabia' and is_zatca</attribute>
+                </xpath>
+                <xpath expr="//field[@name='zip']" position="attributes">
+                    <attribute name="required">country_id_name == 'Saudi Arabia' and is_zatca</attribute>
+                </xpath>
+                <!--                <xpath expr="//field[@name='country_id']" position="attributes">-->
+                <!--                    <attribute name="required">1</attribute>-->
+                <!--                </xpath>-->
+                <!--                <xpath expr="//field[@name='state_id']" position="attributes">-->
+                <!--                    <attribute name="attrs">{'required': [('country_id_name', '=', 'Saudi Arabia')]}</attribute>-->
+                <!--                </xpath>-->
+            </field>
+        </record>
+    </data>
+</odoo>

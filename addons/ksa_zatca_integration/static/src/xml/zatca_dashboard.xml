@@ -1,0 +1,146 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates id="template" xml:space="preserve">
+    <t t-name="zatca.DashboardMain">
+        <div class="oh_dashboards">
+            <div class="container-fluid o_hr_dashboard" style="padding-left:0; padding-right:0;">
+                <t t-call="zatca.MainDashboard"/>
+            </div>
+        </div>
+    </t>
+    <t t-name="zatca.MainDashboard">
+        <div class="o_card_parent">
+            <h2 style="font-weight: bold;">Zatca Dashboard</h2>
+            <div class="row mt-5">
+                <div class="col-md-3 stretch-card mb-4">
+                        <div class="card-dashboard card-DarkBlue">
+                            <div class="small_card-body">
+                                <h3 style="color:white; font-weight:bold;" class="mb-4">Last Transmission Today</h3>
+                                <h3 style="color: white;" class="fs-30 mb-2">
+                                    <span id="last_transmission_name"></span>
+                                </h3>
+                                <br/>
+                                <span style="color:white;" id="last_transmission_date_time"></span>
+                            </div>
+                        </div>
+                    </div>
+                <div class="col-md-3 stretch-card mb-4">
+                        <div class="card-dashboard card-red">
+                            <div class="small_card-body">
+                                <h3 style="color:white;" class="mb-4">Transmissions Today</h3>
+                                <h3 style="color:white;" class="fs-30 mb-2">
+                                    <span id="transmissions_today"></span>
+                                </h3>
+                                <br/>
+                                <span style="color:white;" id="simplified_today"></span>
+                                <br/>
+                                <span style="color:white;" id="standard_today"></span>
+                            </div>
+                        </div>
+                    </div>
+                <div class="col-md-3 stretch-card mb-4">
+                        <div class="card-dashboard card-DarkBlue">
+                            <div class="small_card-body">
+                                <h3 style="color:white; font-weight:bold;" class="mb-4">Transmissions Success Today</h3>
+                                <h3 style="color:white;" class="fs-30 mb-2">
+                                    <span id="transmissions_success_today">3</span>
+                                </h3>
+                                <br/>
+                                <span style="color:white;">By Zatca</span>
+                            </div>
+                        </div>
+                    </div>
+                <div class="col-md-3 stretch-card mb-4">
+                        <div class="card-dashboard card-green">
+                            <div class="small_card-body">
+                                <h3 style="color:white; font-weight:bold;" class="mb-4">Transmissions Failed Today</h3>
+                                <h3 style="color:white;" class="fs-30 mb-2">
+                                    <span id="transmissions_failed_today">2</span>
+                                </h3>
+                                <br/>
+                                <span style="color:white;">By Zatca</span>
+                            </div>
+                        </div>
+                    </div>
+            </div>
+            <div class="row mt-5">
+                <div class="col-md-3 stretch-card mb-4">
+                        <div class="card-dashboard card-light-maroon">
+                            <div class="small_card-body">
+                                <h3 style="color:white; font-weight:bold;" class="mb-4">Invoices This Year</h3>
+                                <h3 style="color:white;" class="fs-30 mb-2">
+                                    <span id="invoices_yearly"></span>
+                                </h3>
+                                <br/>
+                                <span style="color:white;" id="simplified_yearly"></span>
+                                <br/>
+                                <span style="color:white;" id="standard_yearly"></span>
+                            </div>
+                        </div>
+                    </div>
+                <div class="col-md-3 stretch-card mb-4">
+                        <div class="card-dashboard card-sky-blue">
+                            <div class="small_card-body">
+                                <h3 style="color:white; font-weight:bold;" class="mb-4">Invoices Approved This Year</h3>
+                                <h3 style="color:white;" class="fs-30 mb-2">
+                                    <span id="yearly_approved"></span>
+                                </h3>
+                                <br/>
+                                <span style="color:white;" id="yearly_approved_simplified"></span>
+                                <br/>
+                                <span style="color:white;" id="yearly_approved_standard"></span>
+                            </div>
+                        </div>
+                    </div>
+                <div class="col-md-3 stretch-card mb-4">
+                        <div class="card-dashboard card-gray">
+                            <div class="small_card-body">
+                                <h3 style="color:white; font-weight:bold;" class="mb-4">Tax Amount This Year</h3>
+                                <h3 style="color:white;" class="fs-30 mb-2">
+                                    <span id="tax_amount_yearly"></span>
+                                </h3>
+                                <br/>
+                                <span style="color:white;" id="simplified_tax_amount"></span>
+                                <br/>
+                                <span style="color:white;" id="standard_tax_amount"></span>
+                                <!--                                <span style="color:white;">23/03/2024</span>-->
+                            </div>
+                        </div>
+                    </div>
+                <div class="col-md-3 stretch-card mb-4">
+                        <div class="card-dashboard card-light-orange">
+                            <div class="small_card-body">
+                                <h3 style="color:white; font-weight:bold;"
+                                    class="mb-4">Tax Amount Approved This Year</h3>
+                                <h3 style="color:white;" class="fs-30 mb-2">
+                                    <span id="tax_approved_yearly"></span>
+                                </h3>
+                                <br/>
+                                <span style="color:white;"
+                                      id="simplified_tax_approved_yearly"></span>
+                                <br/>
+                                <span style="color:white;" id="standard_tax_approved_yearly"></span>
+                                <!--                                <span style="color:white;">23/03/2024</span>-->
+                            </div>
+                        </div>
+                    </div>
+            </div>
+            <div class="row mt-5">
+                <div class="col-md-3 stretch-card mb-4">
+                    <div class="card-dashboard card-green">
+                        <div class="small_card-body">
+                            <h3 style="color:white; font-weight:bold;"
+                                class="mb-4">Invoices Posted(Not send to Zatca)</h3>
+                            <h3 style="color:white;" class="fs-30 mb-2">
+                                <span id="posted_invoice"></span>
+                            </h3>
+                            <br/>
+                            <span style="color:white;" id="simplified_posted_invoice"></span>
+                            <br/>
+                            <span style="color:white;" id="standard_posted_invoice"></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </t>
+</templates>

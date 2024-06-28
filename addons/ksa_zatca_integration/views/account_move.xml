@@ -1,0 +1,172 @@
+<odoo>
+    <data>
+        <record id="view_invoice_tree" model="ir.ui.view">
+            <field name="name">account.move</field>
+            <field name="model">account.move</field>
+            <field name="inherit_id" ref="account.view_invoice_tree"/>
+            <field name="arch" type="xml">
+                <field name="state" position="after">
+                    <field name="is_zatca" invisible="1" column_invisible="True"/>
+                    <field name="l10n_sa_zatca_status" widget="badge"
+                           decoration-success="l10n_sa_zatca_status in ['REPORTED','CLEARED']"
+                           decoration-danger="l10n_sa_zatca_status in ['Error in reporting', 'Error in clearance']"
+                           invisible="context.get('default_move_type') not in ('out_invoice', 'out_refund') or not is_zatca"
+                           groups="ksa_zatca_integration.l10n_sa_group_zatca_user"/>
+                </field>
+            </field>
+        </record>
+        <record id="account_move_view" model="ir.ui.view">
+            <field name="name">account.move</field>
+            <field name="model">account.move</field>
+            <field name="inherit_id" ref="account.view_move_form"/>
+            <field name="arch" type="xml">
+                <xpath expr="//header" position="inside">
+                    <field name="l10n_sa_invoice_type_is_readonly" invisible="1"/>
+                    <field name="zatca_compliance_invoices_api" invisible="1"/>
+                    <field name="l10n_is_self_billed_invoice" invisible="1"/>
+                    <field name="l10n_sa_phase1_end_date" invisible="1"/>
+                    <field name="l10n_sa_invoice_type" invisible="1"/>
+                    <field name="zatca_status_code" invisible="1"/>
+                    <field name="is_self_billed" invisible="1"/>
+                    <field name="zatca_invoice" invisible="1"/>
+                    <field name="is_zatca" invisible="1"/>
+
+                    <button name="send_for_clearance" type="object" string="Send to Zatca for Clearance"
+                            class="oe_highlight"
+                            invisible="not is_zatca or state != 'posted' or l10n_sa_invoice_type != 'Standard' or zatca_compliance_invoices_api not in [0, None, '', False] 
+                                        or (not is_self_billed and move_type not in ['out_invoice', 'out_refund'])
+                                        or (is_self_billed and move_type not in ['out_invoice', 'out_refund', 'in_invoice', 'in_refund'])
+                                        or (not l10n_is_self_billed_invoice and move_type in ['in_invoice', 'in_refund'])"
+                            groups="ksa_zatca_integration.l10n_sa_group_zatca_user"/>
+                    <button name="send_for_reporting" type="object" string="Send to Zatca for Reporting"
+                            class="oe_highlight"
+                            invisible="not is_zatca or state != 'posted' or l10n_sa_invoice_type != 'Simplified' or zatca_compliance_invoices_api not in [0, None, '', False] 
+                                        or (not is_self_billed and move_type not in ['out_invoice', 'out_refund'])
+                                        or (is_self_billed and move_type not in ['out_invoice', 'out_refund', 'in_invoice', 'in_refund'])
+                                        or (not l10n_is_self_billed_invoice and move_type in ['in_invoice', 'in_refund'])"
+                            groups="ksa_zatca_integration.l10n_sa_group_zatca_user"/>
+                    <!--                    Resend in case of 400-->
+                    <button name="send_for_clearance" type="object" string="ReSend to Zatca for Clearance"
+                            class="oe_highlight"
+                            invisible="not is_zatca or state != 'posted'  or l10n_sa_invoice_type != 'Standard' or zatca_status_code != '400'
+                                        or (not is_self_billed and move_type not in ['out_invoice', 'out_refund'])
+                                        or (is_self_billed and move_type not in ['out_invoice', 'out_refund', 'in_invoice', 'in_refund'])
+                                        or (not l10n_is_self_billed_invoice and move_type in ['in_invoice', 'in_refund'])"
+                            context="{'xml_generate': 1}" groups="ksa_zatca_integration.l10n_sa_group_zatca_user"/>
+                    <button name="send_for_reporting" type="object" string="ReSend to Zatca for Reporting"
+                            class="oe_highlight"
+                            invisible="not is_zatca or state != 'posted'  or l10n_sa_invoice_type != 'Simplified' or zatca_status_code != '400'
+                                        or (not is_self_billed and move_type not in ['out_invoice', 'out_refund'])
+                                        or (is_self_billed and move_type not in ['out_invoice', 'out_refund', 'in_invoice', 'in_refund'])
+                                        or (not l10n_is_self_billed_invoice and move_type in ['in_invoice', 'in_refund'])"
+                            context="{'xml_generate': 1}" groups="ksa_zatca_integration.l10n_sa_group_zatca_user"/>
+
+                    <!--                    <button name="zatca_response" type="object"-->
+                    <!--                            string="View API response"-->
+                    <!--                            class="oe_highlight"-->
+                    <!--                            attrs="{'invisible':[('zatca_compliance_invoices_api','in', [0, None, '', False])]}"/>-->
+                </xpath>
+                <field name="payment_reference" position="after">
+                    <field name="l10n_payment_means_code"
+                           readonly="state != 'draft'"
+                           required="is_zatca and invoice_date > l10n_sa_phase1_end_date"
+                           invisible="not is_zatca
+                                        or (not is_self_billed and move_type not in ['out_invoice', 'out_refund'])
+                                        or (is_self_billed and move_type not in ['out_invoice', 'out_refund', 'in_invoice', 'in_refund'])
+                                        or (not l10n_is_self_billed_invoice and move_type in ['in_invoice', 'in_refund'])"
+                           groups="ksa_zatca_integration.l10n_sa_group_zatca_user"/>
+                </field>
+                <xpath expr="//notebook" position="before">
+                    <group name="zatca fields" string="Zatca Fields"
+                           invisible="not is_zatca
+                                        or (not is_self_billed and move_type not in ['out_invoice', 'out_refund'])
+                                        or (is_self_billed and move_type not in ['out_invoice', 'out_refund', 'in_invoice', 'in_refund'])"
+                           groups="ksa_zatca_integration.l10n_sa_group_zatca_user">
+                        <group>
+                            <field name="l10n_sa_remaining_time"
+                                   invisible="not l10n_sa_remaining_time"/>
+                            <field name="l10n_sa_invoice_type"
+                                   required="is_zatca and invoice_date > l10n_sa_phase1_end_date"
+                                   readonly="state != 'draft' or l10n_sa_invoice_type_is_readonly"
+                                   invisible="not l10n_is_self_billed_invoice and move_type in ['in_invoice', 'in_refund']"/>
+                            <field name="l10n_is_third_party_invoice" readonly="state != 'draft'"
+                                   invisible="not l10n_is_self_billed_invoice and move_type in ['in_invoice', 'in_refund']"/>
+                            <field name="l10n_is_exports_invoice" readonly="state != 'draft'"
+                                   invisible="l10n_sa_invoice_type == 'Simplified' or (not l10n_is_self_billed_invoice and move_type in ['in_invoice', 'in_refund'])"/>
+                        </group>
+                        <group>
+                            <field name="l10n_is_nominal_invoice" readonly="state != 'draft'"
+                                   invisible="not l10n_is_self_billed_invoice and move_type in ['in_invoice', 'in_refund']"/>
+                            <field name="l10n_is_summary_invoice" readonly="state != 'draft'"
+                                   invisible="not l10n_is_self_billed_invoice and move_type in ['in_invoice', 'in_refund']"/>
+                            <field name="l10n_is_self_billed_invoice" readonly="state != 'draft'"
+                                   invisible="l10n_is_exports_invoice or l10n_sa_invoice_type == 'Simplified'"/>
+                        </group>
+                    </group>
+                    <p invisible="not is_zatca or not is_self_billed or (is_self_billed and move_type not in ['in_invoice', 'in_refund'])">
+                        only <b>Is Self Billed invoices</b> will be send to zatca.
+                    </p>
+                </xpath>
+                <xpath expr="//notebook" position="inside">
+                    <page string="Zatca Response"
+                          invisible="not zatca_invoice
+                                        or (not is_self_billed and move_type not in ['out_invoice', 'out_refund'])
+                                        or (is_self_billed and move_type not in ['out_invoice', 'out_refund', 'in_invoice', 'in_refund'])
+                                        or (not l10n_is_self_billed_invoice and move_type in ['in_invoice', 'in_refund'])"
+                          groups="ksa_zatca_integration.l10n_sa_group_zatca_user">
+                        <!--                        <field name="l10n_sa_qr_code_str"/>-->
+                        <!--                        <hr style="border: 1px solid black;"/>-->
+                        <!--                        <field name="sa_qr_code_str"/>-->
+                        <!--                        <hr style="border: 1px solid black;"/>-->
+                        <group col="2">
+                            <field name="zatca_invoice" filename="zatca_invoice_name"
+                                   invisible="not zatca_invoice"/>
+                            <field name="zatca_invoice_name" invisible="1"/>
+                            <field name="zatca_hash_cleared_invoice_name" invisible="1"/>
+                            <field name="zatca_hash_cleared_invoice" filename="zatca_hash_cleared_invoice_name"
+                                   invisible="not zatca_hash_cleared_invoice or l10n_sa_invoice_type == 'Simplified'"/>
+                        </group>
+                        <hr style="border: 1px solid black;"/>
+                        <field name="zatca_compliance_invoices_api"/>
+                    </page>
+                </xpath>
+                <xpath expr="//field[@name='amount_residual']" position="after">
+                    <field name="amount_tax_signed" class="oe_subtotal_footer_separator" string="Taxes (SAR)"
+                           invisible="currency_id == 'SAR' or not zatca_invoice"/>
+                </xpath>
+                <xpath expr="//group[hasclass('oe_invoice_lines_tab')]" position="after">
+                    <group>
+                        <field name="ksa_note" readonly="state != 'draft'"
+                               invisible="not is_zatca
+                                        or (not is_self_billed and move_type not in ['out_invoice', 'out_refund'])
+                                        or (is_self_billed and move_type not in ['out_invoice', 'out_refund', 'in_invoice', 'in_refund'])
+                                        or (not l10n_is_self_billed_invoice and move_type in ['in_invoice', 'in_refund'])"
+                               groups="ksa_zatca_integration.l10n_sa_group_zatca_user"/>
+                    </group>
+                </xpath>
+            </field>
+        </record>
+        <record id="zatca_response" model="ir.ui.view">
+            <field name="name">account.move</field>
+            <field name="model">account.move</field>
+            <field name="priority" eval="1000"/>
+            <field name="arch" type="xml">
+                <form>
+                    <sheet>
+                        <field name="zatca_compliance_invoices_api"/>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+        <record id="view_account_invoice_filter" model="ir.ui.view">
+            <field name="name">account.invoice.select</field>
+            <field name="model">account.move</field>
+            <field name="inherit_id" ref="account.view_account_invoice_filter"/>
+            <field name="arch" type="xml">
+                <group position="inside">
+                    <filter name="l10n_sa_zatca_status" string="E-Invoice status" context="{'group_by':'l10n_sa_zatca_status'}"/>
+                </group>
+            </field>
+        </record>
+    </data>
+</odoo>
