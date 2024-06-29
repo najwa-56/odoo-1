@@ -13,7 +13,6 @@ import { AbstractAwaitablePopup } from "@point_of_sale/app/popup/abstract_awaita
 import { onMounted, useRef, useState } from "@odoo/owl";
 import { PosDB } from "@point_of_sale/app/store/db";
 import { Order, Orderline, Payment } from "@point_of_sale/app/store/models";
-import { TicketScreen } from 'point_of_sale.TicketScreen';
 import {
     formatFloat,
     roundDecimals as round_di,
@@ -267,6 +266,7 @@ export class RefundButton extends Component {
     setup() {
         this.pos = usePos();
     }
+
     click() {
         const order = this.pos.get_order();
         const partner = order.get_partner();
@@ -278,9 +278,9 @@ export class RefundButton extends Component {
         });
     }
 }
-
 ProductScreen.addControlButton({
     component: ChangeUOMButton,
+    component: RefundButton,
     condition: function() {
         return this.pos.config.allow_multi_uom;
     },
