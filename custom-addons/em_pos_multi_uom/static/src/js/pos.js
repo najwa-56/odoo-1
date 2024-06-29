@@ -274,7 +274,6 @@ export class RefundButton extends Component {
         this.pos.showScreen("TicketScreen", {
             ui: { filter: "SYNCED", searchDetails },
             destinationOrder: order,
-            multiUomData: this.pos.em_uom_list, // Pass the multi UOM data
         });
     }
 }
