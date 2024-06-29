@@ -192,6 +192,7 @@ patch(Orderline.prototype, {
         }
     }
 });
+
 export class MulitUOMWidget extends AbstractAwaitablePopup {
     static template = "em_pos_multi_uom.MulitUOMWidget";
     static defaultProps = {
@@ -201,22 +202,25 @@ export class MulitUOMWidget extends AbstractAwaitablePopup {
         body: "",
     };
 
+    /**
+     * @param {Object} props
+     * @param {string} props.startingValue
+     */
     setup() {
         super.setup();
-        this.state = useState({ selectedUOMId: this.props.startingValue });
+        this.state = useState({ inputValue: this.props.startingValue });
+        // this.inputRef = useRef("input");
+        // onMounted(this.onMounted);
     }
-
-    multi_uom_button(event) {
+    multi_uom_button(event){
+        // const value = $(event.target).html();
         var uom_id = $(event.target).data('uom_id');
         var price = $(event.target).data('price');
         var line = this.env.services.pos.get_order().get_selected_orderline();
-        if (line) {
+        if(line){
             line.set_unit_price(price);
             line.set_product_uom(uom_id);
             line.price_manually_set = true;
-
-            // Store selected UOM ID in the state
-            this.state.selectedUOMId = uom_id;
         }
         this.cancel();
     }
@@ -255,41 +259,28 @@ export class ChangeUOMButton extends Component {
         // }
     }
 }
+
 export class RefundButton extends Component {
     static template = "point_of_sale.RefundButton";
 
     setup() {
-        this.pos = usePos();
+        this.pos = usePos(); // Assuming usePos is used to fetch POS instance
     }
 
     async click() {
         const order = this.pos.get_order();
-        const selectedOrderline = order.get_selected_orderline();
+        if (!order) {
+            console.error("Order is not defined."); // Check if order is defined
+            return;
+        }
+
         const partner = order.get_partner();
         const searchDetails = partner ? { fieldName: "PARTNER", searchTerm: partner.name } : {};
-
-        // Get UOM and price information
-        const selectedUOMId = selectedOrderline ? selectedOrderline.wvproduct_uom.id : null;
-        const selectedPrice = selectedOrderline ? selectedOrderline.get_price_with_tax() : 0;
-
-        // Show UOM selection popup before proceeding with refund
-        const { confirmed, payload: inputUOMId } = await this.popup.add(MulitUOMWidget, {
-            startingValue: selectedUOMId,
-            title: _t("Select UOM for Refund"),
-            modifiers_list: this.pos.em_uom_list,
+        this.pos.showScreen("TicketScreen", {
+            ui: { filter: "SYNCED", searchDetails },
+            destinationOrder: order,
+            multiUomData: this.pos.em_uom_list, // Ensure em_uom_list is available
         });
-
-        // If user confirms, proceed with refund
-        if (confirmed && selectedOrderline) {
-            // Perform refund using selected UOM and price
-            this.pos.showScreen("TicketScreen", {
-                ui: { filter: "SYNCED", searchDetails },
-                destinationOrder: order,
-                multiUomData: this.pos.em_uom_list, // Pass the multi UOM data
-                selectedUOMId: inputUOMId, // Pass selected UOM ID to TicketScreen
-                selectedPrice: selectedPrice, // Pass selected price to TicketScreen
-            });
-        }
     }
 }
 

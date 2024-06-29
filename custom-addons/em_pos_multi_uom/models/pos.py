@@ -118,6 +118,7 @@ class PosOrder(models.Model):
         result['product_uom_id'] = order_line.product_uom.id or order_line.product_uom_id.id
         return result
 
+
 class PosOrderLine(models.Model):
     _inherit = "pos.order.line"
 
