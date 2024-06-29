@@ -267,6 +267,6 @@ ProductScreen.addControlButton({
     condition: function() {
         return this.pos.config.allow_multi_uom;
     },
-    key: 'ChangeUOMButton', // Unique key for ChangeUOMButton
+    //key: 'ChangeUOMButton', // Unique key for ChangeUOMButton
 });
 
