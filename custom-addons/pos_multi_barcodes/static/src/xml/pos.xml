@@ -1,13 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<templates id="template" xml:space="preserve" inherit_id="point_of_sale.ProductScreen" >
+<templates id="template" xml:space="preserve">
 
-    <t t-foreach="buttons" t-as="button" t-key="button.id">
-        <!-- Ensure each button has a unique identifier -->
-        <div class="button-item">
-            <button t-name="button.template" class="btn btn-primary">
-                <!-- Render button content -->
-            </button>
-        </div>
-    </t>
 </templates>
 
