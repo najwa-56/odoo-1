@@ -150,24 +150,8 @@ class PosOrderLine(models.Model):
             res['product_uom'] = orderline.product_uom_id.id;
         return res
 
-    def _create_account_move_line(self, move):
-        """
-        Create or update account.move.line records based on pos.order.line.
-        """
-        move_lines = []
-        for line in self:
-            move_line = {
-                'product_id': line.product_id.id,
-                'name': line.name or line.product_id.name,
-                'quantity': line.qty,
-                'price_unit': line.price_unit,
-                'move_id': move.id,
-                'product_uom_id': line.product_uom.id or line.product_id.uom_id.id,
-                # Other fields you need to populate
-            }
-            move_lines.append((0, 0, move_line))
-        move.write({'line_ids': move_lines})
-        
+
+
 
     def _launch_stock_rule_from_pos_order_lines(self):
 
@@ -217,6 +201,24 @@ class AccountMoveLine(models.Model):
     _inherit = 'account.move.line'
 
     product_uom = fields.Many2one('uom.uom', string='Unit of Measure')
+
+    def _create_account_move_line(self, move):
+        """
+        Create or update account.move.line records based on pos.order.line.
+        """
+        move_lines = []
+        for line in self:
+            move_line = {
+                'product_id': line.product_id.id,
+                'name': line.name or line.product_id.name,
+                'quantity': line.qty,
+                'price_unit': line.price_unit,
+                'move_id': move.id,
+                'product_uom_id': line.product_uom.id or line.product_id.uom_id.id,
+                # Other fields you need to populate
+            }
+            move_lines.append((0, 0, move_line))
+        move.write({'line_ids': move_lines})
 
 
 class StockPicking(models.Model):
