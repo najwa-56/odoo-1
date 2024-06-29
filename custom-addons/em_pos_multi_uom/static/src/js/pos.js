@@ -259,7 +259,23 @@ export class ChangeUOMButton extends Component {
         // }
     }
 }
+export class RefundButton extends Component {
+    static template = "point_of_sale.RefundButton";
 
+    setup() {
+        this.pos = usePos();
+    }
+    click() {
+        const order = this.pos.get_order();
+        const partner = order.get_partner();
+        const searchDetails = partner ? { fieldName: "PARTNER", searchTerm: partner.name } : {};
+        this.pos.showScreen("TicketScreen", {
+            ui: { filter: "SYNCED", searchDetails },
+            destinationOrder: order,
+            multiUomData: this.pos.em_uom_list, // Pass the multi UOM data
+        });
+    }
+}
 
 ProductScreen.addControlButton({
     component: ChangeUOMButton,
