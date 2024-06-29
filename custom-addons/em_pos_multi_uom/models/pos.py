@@ -203,10 +203,13 @@ class AccountMoveLine(models.Model):
     product_uom = fields.Many2one('uom.uom', 'Unit of measure', related='pos_order_line_id.product_uom', store=True)
     pos_order_line_id = fields.Many2one('pos.order.line', 'POS Order Line')
 
-    @api.depends('pos_order_line_id.product_uom')
-    def _compute_product_uom(self):
-        for line in self:
-            line.product_uom = line.pos_order_line_id.product_uom if line.pos_order_line_id else False
+    def _export_for_ui(self, orderline):
+        res = super(PosOrderLine, self)._export_for_ui(orderline)
+        if orderline.product_uom:
+            res['product_uom'] = orderline.product_uom.id;
+        else:
+            res['product_uom'] = orderline.product_uom_id.id;
+        return res
 
 
 class StockPicking(models.Model):
