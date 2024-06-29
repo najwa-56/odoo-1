@@ -42,7 +42,6 @@ patch(PosDB.prototype, {
     }
 });
 
-
 patch(ProductScreen.prototype, {
     async _barcodeProductAction(code) {
         const product = await this._getProductByBarcode(code);
@@ -75,37 +74,28 @@ patch(ProductScreen.prototype, {
                 merge: false,
             });
         }
-
-        // Check if em_uom_list is defined
-        if (this.env.pos.em_uom_list && Array.isArray(this.env.pos.em_uom_list)) {
-            const pos_multi_op = this.env.pos.em_uom_list;
-            let is_multi_uom = false;
-            let unit_price = 0;
-
-            for (let i = 0; i < pos_multi_op.length; i++) {
-                if (pos_multi_op[i].barcode === code.base_code) {
+         this.currentOrder.add_product(product, options);
+            var line = this.currentOrder.get_last_orderline();
+            var pos_multi_op = this.pos.em_uom_list;
+            var is_multi_uom = false;
+            var unit_price = 0;
+            for(var i=0;i<pos_multi_op.length;i++){
+                if(pos_multi_op[i].barcode == code.base_code){
                     unit_price = pos_multi_op[i].price;
                     is_multi_uom = true;
                     Object.assign(options, {
                         price: pos_multi_op[i].price,
                         extras: {
-                            wvproduct_uom: this.env.pos.units_by_id[pos_multi_op[i].multi_uom_id[0]],
+                            wvproduct_uom: this.pos.units_by_id[pos_multi_op[i].multi_uom_id[0]],
                         },
                     });
                 }
             }
-
-            this.currentOrder.add_product(product, options);
-
-            if (is_multi_uom) {
-                const line = this.currentOrder.selected_orderline;
+            this.currentOrder.add_product(product,  options)
+            if(is_multi_uom){
+                var line = this.currentOrder.selected_orderline;
                 line.set_unit_price(unit_price);
             }
-        } else {
-            console.error('em_uom_list is not defined or not an array');
-            // Handle the case where em_uom_list is not available
-        }
-
         this.numberBuffer.reset();
     }
 });
