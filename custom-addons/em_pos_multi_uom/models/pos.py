@@ -211,7 +211,11 @@ class AccountMoveLine(models.Model):
     @api.depends('pos_order_line_id.product_uom')
     def _compute_product_uom(self):
         for line in self:
-            line.product_uom = line.pos_order_line_id.product_uom if line.pos_order_line_id else False
+            if line.pos_order_line_id:
+                line.product_uom = line.pos_order_line_id.product_uom
+            else:
+                line.product_uom = False
+                
 class StockPicking(models.Model):
     _inherit='stock.picking'
 
