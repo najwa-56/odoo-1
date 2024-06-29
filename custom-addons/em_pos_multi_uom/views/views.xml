@@ -56,33 +56,17 @@
             </field>
         </record>
 
-         <!-- Invoice Line Form View -->
-        <record id="view_move_form" model="ir.ui.view">
-        <field name="name">account.move.line.form</field>
-        <field name="model">account.move.line</field>
+        <record id="view_move_form_inherit-uom" model="ir.ui.view">
+        <field name="model">account.move</field>
+        <field name="inherit_id" ref="account.view_move_form"/>
         <field name="arch" type="xml">
-            <form string="Journal Entry Line">
-                <group>
-                    <field name="company_id" invisible="1"/> <!-- Add company_id field here -->
-                    <field name="product_id"/>
-                    <field name="product_uom"/>
-                </group>
-            </form>
+            <xpath expr="//field[@name='invoice_line_ids']/tree//field[@name='discount']" position="after">
+                <field name="product_uom" />
+            </xpath>
+
+
         </field>
     </record>
-
-    <record id="view_move_tree" model="ir.ui.view">
-        <field name="name">account.move.line.tree</field>
-        <field name="model">account.move.line</field>
-        <field name="arch" type="xml">
-            <tree string="Journal Entry Lines">
-                <field name="product_id"/>
-                <field name="product_uom"/>
-            </tree>
-        </field>
-    </record>
-
-
 
 
                 <!-- test -->
