@@ -192,7 +192,6 @@ patch(Orderline.prototype, {
         }
     }
 });
-
 export class MulitUOMWidget extends AbstractAwaitablePopup {
     static template = "em_pos_multi_uom.MulitUOMWidget";
     static defaultProps = {
@@ -208,19 +207,27 @@ export class MulitUOMWidget extends AbstractAwaitablePopup {
      */
     setup() {
         super.setup();
-        this.state = useState({ inputValue: this.props.startingValue });
+        this.state = useState({
+            inputValue: this.props.startingValue,
+            selectedUOMId: null, // Store selected UOM ID
+            selectedPrice: null, // Store selected price (if needed)
+        });
         // this.inputRef = useRef("input");
         // onMounted(this.onMounted);
     }
-    multi_uom_button(event){
-        // const value = $(event.target).html();
+
+    multi_uom_button(event) {
         var uom_id = $(event.target).data('uom_id');
         var price = $(event.target).data('price');
         var line = this.env.services.pos.get_order().get_selected_orderline();
-        if(line){
+        if (line) {
             line.set_unit_price(price);
             line.set_product_uom(uom_id);
             line.price_manually_set = true;
+
+            // Store selected UOM ID for later use
+            this.state.selectedUOMId = uom_id;
+            this.state.selectedPrice = price;
         }
         this.cancel();
     }
@@ -259,26 +266,32 @@ export class ChangeUOMButton extends Component {
         // }
     }
 }
-
 export class RefundButton extends Component {
     static template = "point_of_sale.RefundButton";
 
     setup() {
         this.pos = usePos();
-
     }
 
     click() {
         const order = this.pos.get_order();
         const partner = order.get_partner();
         const searchDetails = partner ? { fieldName: "PARTNER", searchTerm: partner.name } : {};
+
+        // Retrieve selected UOM and price from MulitUOMWidget if available
+        const selectedUOMId = this.pos.selectedUOMId || null; // Modify based on where you store the selected UOM
+        const selectedPrice = this.pos.selectedPrice || null; // Modify based on where you store the selected price
+
         this.pos.showScreen("TicketScreen", {
             ui: { filter: "SYNCED", searchDetails },
             destinationOrder: order,
             multiUomData: this.pos.em_uom_list, // Pass the multi UOM data
+            selectedUOMId: selectedUOMId, // Pass selected UOM ID to TicketScreen
+            selectedPrice: selectedPrice, // Pass selected price (if needed) to TicketScreen
         });
     }
 }
+
 
 ProductScreen.addControlButton({
     component: ChangeUOMButton,
