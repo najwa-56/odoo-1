@@ -13,6 +13,11 @@ import { AbstractAwaitablePopup } from "@point_of_sale/app/popup/abstract_awaita
 import { onMounted, useRef, useState } from "@odoo/owl";
 import { PosDB } from "@point_of_sale/app/store/db";
 import { Order, Orderline, Payment } from "@point_of_sale/app/store/models";
+import { Component, usePos, useService } from 'point_of_sale.framework';
+import { patch } from 'web.utils';
+import { Orderline } from 'point_of_sale.models';
+import { AbstractAwaitablePopup } from 'point_of_sale.popups';
+import { _t } from 'web.core';
 import { TicketScreen } from 'point_of_sale.TicketScreen';
 
 import {
