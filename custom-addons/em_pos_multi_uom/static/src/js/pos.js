@@ -285,3 +285,10 @@ ProductScreen.addControlButton({
         return this.pos.config.allow_multi_uom;
     },
 });
+
+ProductScreen.addControlButton({
+    component: RefundButton,
+    condition: function() {
+        return this.pos.config.allow_multi_uom;
+    },
+});
