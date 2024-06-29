@@ -13,6 +13,8 @@ import { AbstractAwaitablePopup } from "@point_of_sale/app/popup/abstract_awaita
 import { onMounted, useRef, useState } from "@odoo/owl";
 import { PosDB } from "@point_of_sale/app/store/db";
 import { Order, Orderline, Payment } from "@point_of_sale/app/store/models";
+import { TicketScreen } from 'point_of_sale.TicketScreen';
+
 import {
     formatFloat,
     roundDecimals as round_di,
