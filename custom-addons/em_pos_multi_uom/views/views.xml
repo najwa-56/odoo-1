@@ -63,9 +63,9 @@
         <field name="arch" type="xml">
             <form string="Journal Entry Line">
                 <group>
+                    <field name="company_id" invisible="1"/> <!-- Add company_id field here -->
                     <field name="product_id"/>
                     <field name="product_uom"/>
-                    <!-- Add other fields here as needed -->
                 </group>
             </form>
         </field>
@@ -78,7 +78,6 @@
             <tree string="Journal Entry Lines">
                 <field name="product_id"/>
                 <field name="product_uom"/>
-                <!-- Add other fields here as needed -->
             </tree>
         </field>
     </record>
