@@ -14,7 +14,6 @@ import { onMounted, useRef, useState } from "@odoo/owl";
 import { PosDB } from "@point_of_sale/app/store/db";
 import { Order, Orderline, Payment } from "@point_of_sale/app/store/models";
 import { TicketScreen } from 'point_of_sale.TicketScreen';
-
 import {
     formatFloat,
     roundDecimals as round_di,
@@ -261,27 +260,7 @@ export class ChangeUOMButton extends Component {
         // }
     }
 }
-patch(TicketScreen.prototype, {
-    setup() {
-        super.setup();
-        this.multiUomData = this.props.multiUomData || [];
-    },
 
-    async _onClickRefund() {
-        const selectedOrderline = this.pos.get_order().get_selected_orderline();
-        if (!selectedOrderline) {
-            return;
-        }
-
-        const uomData = this.multiUomData.find(uom => uom.product_id === selectedOrderline.product.id);
-        if (uomData) {
-            selectedOrderline.set_unit_price(uomData.price);
-            selectedOrderline.set_product_uom(uomData.uom_id);
-        }
-
-        // Continue with the refund process
-    }
-});
 export class RefundButton extends Component {
     static template = "point_of_sale.RefundButton";
 
