@@ -265,6 +265,7 @@ export class RefundButton extends Component {
 
     setup() {
         this.pos = usePos();
+
     }
 
     click() {
@@ -284,9 +285,13 @@ ProductScreen.addControlButton({
     condition: function() {
         return this.pos.config.allow_multi_uom;
     },
+    key: 'ChangeUOMButton', // Unique key for ChangeUOMButton
 });
 
 ProductScreen.addControlButton({
     component: RefundButton,
-    
+    condition: function() {
+        return this.pos.config.allow_multi_uom;
+    },
+    key: 'RefundButton', // Unique key for RefundButton
 });
