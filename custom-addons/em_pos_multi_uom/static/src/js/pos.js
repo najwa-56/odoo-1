@@ -260,43 +260,6 @@ export class ChangeUOMButton extends Component {
     }
 }
 
-export class RefundButton extends Component {
-    static template = "em_pos_multi_uom.RefundButtonTemplate";
-
-    setup() {
-        this.pos = usePos();
-        this.popup = useService("popup");
-    }
-
-    async onClick() {
-        const selectedOrderline = this.pos.get_order().get_selected_orderline();
-        if (!selectedOrderline) {
-            return;
-        }
-
-        const em_uom_list = this.pos.em_uom_list;
-        const product = selectedOrderline.get_product();
-        const uom_id = selectedOrderline.get_unit().id;
-
-        const refundOrder = this.pos.get_order();
-        const refundLine = new refundOrder.Orderline({}, {
-            product: product,
-            quantity: -selectedOrderline.quantity,
-            price: selectedOrderline.price,
-            uom_id: uom_id,
-        });
-
-        refundOrder.add_orderline(refundLine);
-        this.pos.get_order().remove_orderline(selectedOrderline);
-    }
-}
-
-ProductScreen.addControlButton({
-    component: RefundButton,
-    condition: function() {
-        return this.pos.config.allow_multi_uom;
-    },
-});
 
 ProductScreen.addControlButton({
     component: ChangeUOMButton,
