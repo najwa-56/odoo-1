@@ -278,14 +278,16 @@ export class RefundButton extends Component {
         });
     }
 }
+
 ProductScreen.addControlButton({
-    component: RefundButton,
+    component: ChangeUOMButton,
     condition: function() {
         return this.pos.config.allow_multi_uom;
     },
 });
+
 ProductScreen.addControlButton({
-    component: ChangeUOMButton,
+    component: RefundButton,
     condition: function() {
         return this.pos.config.allow_multi_uom;
     },
