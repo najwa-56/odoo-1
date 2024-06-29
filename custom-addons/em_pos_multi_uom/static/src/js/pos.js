@@ -260,29 +260,6 @@ export class ChangeUOMButton extends Component {
     }
 }
 
-export class RefundButton extends Component {
-    static template = "point_of_sale.RefundButton";
-
-    setup() {
-        this.pos = usePos(); // Assuming usePos is used to fetch POS instance
-    }
-
-    async click() {
-        const order = this.pos.get_order();
-        if (!order) {
-            console.error("Order is not defined."); // Check if order is defined
-            return;
-        }
-
-        const partner = order.get_partner();
-        const searchDetails = partner ? { fieldName: "PARTNER", searchTerm: partner.name } : {};
-        this.pos.showScreen("TicketScreen", {
-            ui: { filter: "SYNCED", searchDetails },
-            destinationOrder: order,
-            multiUomData: this.pos.em_uom_list, // Ensure em_uom_list is available
-        });
-    }
-}
 
 
 ProductScreen.addControlButton({
@@ -293,10 +270,3 @@ ProductScreen.addControlButton({
     key: 'ChangeUOMButton', // Unique key for ChangeUOMButton
 });
 
-ProductScreen.addControlButton({
-    component: RefundButton,
-    condition: function() {
-        return this.pos.config.allow_multi_uom;
-    },
-    key: 'RefundButton', // Unique key for RefundButton
-});
