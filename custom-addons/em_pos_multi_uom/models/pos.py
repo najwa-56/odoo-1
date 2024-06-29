@@ -116,8 +116,14 @@ class PosOrder(models.Model):
     def _prepare_invoice_line(self, order_line):
         result = super()._prepare_invoice_line(order_line)
         result['product_uom_id'] = order_line.product_uom.id or order_line.product_uom_id.id
-        result['multi_uom_id'] = order_line.multi_uom_id.id
         return result
+
+    def _prepare_invoice_vals(self):
+        invoice_vals = super(PosOrder, self)._prepare_invoice_vals()
+        invoice_vals.update({
+            'invoice_line_ids': self._prepare_invoice_lines(),
+        })
+        return invoice_vals
 
 
 class PosOrderLine(models.Model):
@@ -132,6 +138,11 @@ class PosOrderLine(models.Model):
         else:
             res['product_uom'] = orderline.product_uom_id.id;
         return res
+
+    def _prepare_invoice_line(self):
+        invoice_line_vals = super(PosOrderLine, self)._prepare_invoice_line()
+        invoice_line_vals['product_uom'] = self.product_uom.id or self.product_uom_id.id
+        return invoice_line_vals
 
 
     def _launch_stock_rule_from_pos_order_lines(self):
@@ -177,6 +188,11 @@ class PosOrderLine(models.Model):
                     moves._add_mls_related_to_order(lines, are_qties_done=False)
                     moves._recompute_state()
         return True
+
+class AccountMoveLine(models.Model):
+    _inherit = 'account.move.line'
+
+    product_uom = fields.Many2one('uom.uom', string='Unit of Measure')
 
 class StockPicking(models.Model):
     _inherit='stock.picking'
