@@ -113,8 +113,8 @@ class ProductTemplate(models.Model):
 class PosOrder(models.Model):
     _inherit = "pos.order"
 
-    def _prepare_invoice_lines(self, order_line):
-        result = super()._prepare_invoice_lines(order_line)
+    def _prepare_invoice_line(self, order_line):
+        result = super()._prepare_invoice_line(order_line)
         result['product_uom_id'] = order_line.product_uom.id or order_line.product_uom_id.id
         result['multi_uom_id'] = order_line.multi_uom_id.id
         return result
