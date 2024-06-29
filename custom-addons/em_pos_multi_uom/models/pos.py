@@ -200,9 +200,7 @@ class PosOrderLine(models.Model):
 class AccountMoveLine(models.Model):
     _inherit = 'account.move.line'
 
-    product_uom = fields.Many2one('uom.uom', string='Unit of Measure')
-
-
+    product_uom = fields.Many2one('uom.uom', 'Unit of Measure', related='product_id.uom_id', readonly=True)
 
 class StockPicking(models.Model):
     _inherit='stock.picking'
