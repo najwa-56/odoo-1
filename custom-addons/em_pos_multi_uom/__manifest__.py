@@ -8,7 +8,7 @@
     'author': 'ErpMstar Solutions',
     'summary': 'Allows you to sell one products in different unit of measure.',
     'description': "Allows you to sell one products in different unit of measure.",
-    'depends': ['point_of_sale'],
+    'depends': ['point_of_sale','account'],
     'data': [
         'security/ir.model.access.csv',
         'views/views.xml',
