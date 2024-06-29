@@ -56,7 +56,8 @@
             </field>
         </record>
 
-         <record id="view_invoice_line_form_inherit_product_uom" model="ir.ui.view">
+         <!-- Invoice Line Form View -->
+        <record id="view_invoice_line_form_inherit_product_uom" model="ir.ui.view">
             <field name="name">account.move.line.form.product.uom</field>
             <field name="model">account.move.line</field>
             <field name="inherit_id" ref="account.view_move_line_form"/>
