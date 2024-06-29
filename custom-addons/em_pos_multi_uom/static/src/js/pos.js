@@ -201,19 +201,9 @@ export class MulitUOMWidget extends AbstractAwaitablePopup {
         body: "",
     };
 
-    /**
-     * @param {Object} props
-     * @param {string} props.startingValue
-     */
     setup() {
         super.setup();
-        this.state = useState({
-            inputValue: this.props.startingValue,
-            selectedUOMId: null, // Store selected UOM ID
-            selectedPrice: null, // Store selected price (if needed)
-        });
-        // this.inputRef = useRef("input");
-        // onMounted(this.onMounted);
+        this.state = useState({ selectedUOMId: this.props.startingValue });
     }
 
     multi_uom_button(event) {
@@ -225,9 +215,8 @@ export class MulitUOMWidget extends AbstractAwaitablePopup {
             line.set_product_uom(uom_id);
             line.price_manually_set = true;
 
-            // Store selected UOM ID for later use
+            // Store selected UOM ID in the state
             this.state.selectedUOMId = uom_id;
-            this.state.selectedPrice = price;
         }
         this.cancel();
     }
@@ -273,22 +262,34 @@ export class RefundButton extends Component {
         this.pos = usePos();
     }
 
-    click() {
+    async click() {
         const order = this.pos.get_order();
+        const selectedOrderline = order.get_selected_orderline();
         const partner = order.get_partner();
         const searchDetails = partner ? { fieldName: "PARTNER", searchTerm: partner.name } : {};
 
-        // Retrieve selected UOM and price from MulitUOMWidget if available
-        const selectedUOMId = this.pos.selectedUOMId || null; // Modify based on where you store the selected UOM
-        const selectedPrice = this.pos.selectedPrice || null; // Modify based on where you store the selected price
+        // Get UOM and price information
+        const selectedUOMId = selectedOrderline ? selectedOrderline.wvproduct_uom.id : null;
+        const selectedPrice = selectedOrderline ? selectedOrderline.get_price_with_tax() : 0;
 
-        this.pos.showScreen("TicketScreen", {
-            ui: { filter: "SYNCED", searchDetails },
-            destinationOrder: order,
-            multiUomData: this.pos.em_uom_list, // Pass the multi UOM data
-            selectedUOMId: selectedUOMId, // Pass selected UOM ID to TicketScreen
-            selectedPrice: selectedPrice, // Pass selected price (if needed) to TicketScreen
+        // Show UOM selection popup before proceeding with refund
+        const { confirmed, payload: inputUOMId } = await this.popup.add(MulitUOMWidget, {
+            startingValue: selectedUOMId,
+            title: _t("Select UOM for Refund"),
+            modifiers_list: this.pos.em_uom_list,
         });
+
+        // If user confirms, proceed with refund
+        if (confirmed && selectedOrderline) {
+            // Perform refund using selected UOM and price
+            this.pos.showScreen("TicketScreen", {
+                ui: { filter: "SYNCED", searchDetails },
+                destinationOrder: order,
+                multiUomData: this.pos.em_uom_list, // Pass the multi UOM data
+                selectedUOMId: inputUOMId, // Pass selected UOM ID to TicketScreen
+                selectedPrice: selectedPrice, // Pass selected price to TicketScreen
+            });
+        }
     }
 }
 
