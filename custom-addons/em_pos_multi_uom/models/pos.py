@@ -200,8 +200,21 @@ class PosOrderLine(models.Model):
 class AccountMoveLine(models.Model):
     _inherit = 'account.move.line'
 
-    product_uom = fields.Many2one('uom.uom', 'Unit of Measure', related='product_id.uom_id', readonly=True)
+    pos_order_line_id = fields.Many2one('pos.order.line', 'POS Order Line')
 
+    product_uom = fields.Many2one(
+        'uom.uom', 'Unit of Measure',
+        compute='_compute_product_uom',
+        store=True,
+        related='pos_order_line_id.product_uom',
+        readonly=True,
+        )
+
+    @api.depends('pos_order_line_id')
+    def _compute_product_uom(self):
+        for line in self:
+            line.product_uom = line.pos_order_line_id.product_uom
+            
 class StockPicking(models.Model):
     _inherit='stock.picking'
 
