@@ -1,6 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
     <data>
-
+ <template id="report_invoice_document_inherit">
+            <xpath expr="//td[@class='product_name']" position="after">
+                <td>
+                    <span t-field="line.product_uom.name"/>
+                </td>
+            </xpath>
+        </template>
     </data>
 </odoo>

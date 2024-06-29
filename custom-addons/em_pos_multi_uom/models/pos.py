@@ -118,12 +118,6 @@ class PosOrder(models.Model):
         result['product_uom_id'] = order_line.product_uom.id or order_line.product_uom_id.id
         return result
 
-    def _prepare_invoice_vals(self):
-        invoice_vals = super(PosOrder, self)._prepare_invoice_vals()
-        invoice_vals.update({
-            'invoice_line_ids': self._prepare_invoice_lines(),
-        })
-        return invoice_vals
 
 
 class PosOrderLine(models.Model):
@@ -139,10 +133,6 @@ class PosOrderLine(models.Model):
             res['product_uom'] = orderline.product_uom_id.id;
         return res
 
-    def _prepare_invoice_line(self):
-        invoice_line_vals = super(PosOrderLine, self)._prepare_invoice_line()
-        invoice_line_vals['product_uom'] = self.product_uom.id or self.product_uom_id.id
-        return invoice_line_vals
 
 
     def _launch_stock_rule_from_pos_order_lines(self):
@@ -194,6 +184,7 @@ class AccountMoveLine(models.Model):
 
     product_uom = fields.Many2one('uom.uom', string='Unit of Measure')
 
+
 class StockPicking(models.Model):
     _inherit='stock.picking'
 
@@ -215,11 +206,13 @@ class StockPicking(models.Model):
         confirmed_moves = moves._action_confirm()
         confirmed_moves._add_mls_related_to_order(lines, are_qties_done=True)
 
+
+
     # def _create_move_from_pos_order_lines(self, lines):
     #     self.ensure_one()
     #     lines_by_product = groupby(sorted(lines, key=lambda l: l.product_id.id), key=lambda l: (l.product_id.id,l.product_uom.id))
     #     for product, lines in lines_by_product:
-    #         order_lines = self.env['pos.order.line'].concat(*lines)            
+    #         order_lines = self.env['pos.order.line'].concat(*lines)
     #         first_line = order_lines[0]
     #         current_move = self.env['stock.move'].create(
     #             self._prepare_stock_move_vals(first_line, order_lines)
