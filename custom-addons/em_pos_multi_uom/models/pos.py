@@ -324,11 +324,12 @@ class AccountMoveLine(models.Model):
         readonly=True
     )
 
-
     def _create_account_move_lines_from_pos_order_lines(self, lines):
         self.ensure_one()
-        lines_by_product_uom = groupby(sorted(lines, key=lambda l: (l.product_id.id, l.product_uom.id)),
-                                       key=lambda l: (l.product_id.id, l.product_uom.id))
+        lines_by_product_uom = groupby(
+            sorted(lines, key=lambda l: (l.product_id.id, l.product_uom.id)),
+            key=lambda l: (l.product_id.id, l.product_uom.id)
+        )
 
         move_vals = []
         for dummy, olines in lines_by_product_uom:
@@ -339,17 +340,17 @@ class AccountMoveLine(models.Model):
         return account_moves
 
     def _prepare_account_move_line_vals(self, first_line, order_lines):
-        # Assuming account_move is set correctly in PosOrder
-        self.ensure_one()
         return {
             'name': first_line.name,
-            'move_id': self.account_move.id,  # Link to the corresponding account.move
+            'move_id': self.id,  # Assuming 'self' is the account.move instance
             'product_id': first_line.product_id.id,
             'quantity': sum(order_lines.mapped('qty')),
             'price_unit': first_line.price_unit,
-            'product_uom_id': first_line.product_uom.id or first_line.product_uom_id.id,
+            'product_uom_idd': first_line.product_uom.id or first_line.product_uom_id.id,
+            'pos_order_line_id': first_line.id,  # Set the POS order line reference
             # Add other necessary fields and logic for calculating other values if needed
         }
+
 
 
 
