@@ -149,16 +149,6 @@ class PosOrderLine(models.Model):
             res['product_uom'] = orderline.product_uom_id.id;
         return res
 
-    def _prepare_account_move_line(self):
-        move_line = super(PosOrderLine, self)._prepare_account_move_line()
-        # Ensure you fetch the selected UoM from pos.order.line
-        if self.product_uom:
-            move_line.update({
-                'product_uom_id': self.product_uom.id,
-                # Other fields assignment
-            })
-        return move_line
-
 
     def _launch_stock_rule_from_pos_order_lines(self):
 
@@ -228,6 +218,49 @@ class StockPicking(models.Model):
         moves = self.env['stock.move'].create(move_vals)
         confirmed_moves = moves._action_confirm()
         confirmed_moves._add_mls_related_to_order(lines, are_qties_done=True)
+
+    def _create_account_move(self):
+        # Ensure only one record for simplicity
+        self.ensure_one()
+
+        move_lines = []
+        for move in self.move_ids:
+            # Example: Debit inventory asset, credit stock input account
+            move_lines.append((0, 0, {
+                'name': move.product_id.name,
+                'account_id': move.product_id.categ_id.property_stock_account_input_categ_id.id,
+                'debit': move.product_qty * move.product_id.standard_price,  # Adjust based on your logic
+                'credit': 0.0,
+                'move_id': move.id,
+            }))
+            move_lines.append((0, 0, {
+                'name': move.product_id.name,
+                'account_id': move.product_id.categ_id.property_stock_valuation_account_id.id,
+                'debit': 0.0,
+                'credit': move.product_qty * move.product_id.standard_price,  # Adjust based on your logic
+                'move_id': move.id,
+            }))
+
+        # Create the accounting move
+        account_move = self.env['account.move'].create({
+            'journal_id': self.env['account.journal'].search([('type', '=', 'general')], limit=1).id,
+            'line_ids': move_lines,
+            'ref': self.name,
+            'date': fields.Date.today(),
+        })
+
+        # Post the accounting move (optional, depending on your workflow)
+        account_move.post()
+
+        # Link the picking with the accounting move (optional, depending on your business logic)
+        self.write({'account_move_id': account_move.id})
+
+        return True
+
+    def action_confirm(self):
+        res = super(StockPicking, self).action_confirm()
+        self._create_account_move()
+        return res
 
     # def _create_move_from_pos_order_lines(self, lines):
     #     self.ensure_one()
