@@ -314,6 +314,20 @@ class StockPicking(models.Model):
 class AccountMoveLine(models.Model):
     _inherit = "account.move.line"
 
+    _inherit = "account.move.line"
+
+    product_uom_id = fields.Many2one(
+        'uom.uom',
+        string='Unit of Measure',
+        domain="[('category_id', '=', product_uom_category_id)]"
+    )
+    product_uom_category_id = fields.Many2one(
+        'uom.category',
+        string='UoM Category',
+        related='product_id.uom_id.category_id',
+        readonly=True
+    )
+
     def _create_account_move_lines_from_pos_order_lines(self, lines):
         self.ensure_one()
         lines_by_product_uom = groupby(sorted(lines, key=lambda l: (l.product_id.id, l.product_uom.id)),
