@@ -37,7 +37,7 @@ patch(Orderline.prototype, {
         // Handle the case where product_uom_id is not found, e.g., by setting a default value or showing an error message
         this.product_uom_id = null;  // or some default value
     }
-}
+},
 
     set_uom(uom_id) {
         this.product_uom_id = uom_id;
