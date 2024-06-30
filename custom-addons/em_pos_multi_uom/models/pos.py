@@ -285,6 +285,11 @@ class StockPicking(models.Model):
     #                         self.env['stock.move.line'].create(ml_vals)
     #         else:
     #             current_move.quantity_done = abs(sum(order_lines.mapped('qty')))
+class AccountMoveLine(models.Model):
+    _inherit = "account.move.line"
+
+    product_uom_id = fields.Many2one('uom.uom', string='Unit of Measure')
+
 
 class PosSession(models.Model):
     _inherit = 'pos.session'
