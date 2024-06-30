@@ -125,23 +125,6 @@ class PosOrderLine(models.Model):
 
     product_uom = fields.Many2one('uom.uom','Unit of measure')
 
-    Ratio = fields.Float("Ratio", compute="_compute_ratio",
-                         store=False)  # Ratio field  # Related field to the ratio in uom.uom
-
-    @api.depends('product_uom')
-    def _compute_ratio(self):
-        for record in self:
-            record.Ratio = record.product_uom.ratio if record.product_uom else 1.0
-
-    def _compute_total_cost(self, stock_moves=None):
-        """
-        Compute the total cost of the order lines and multiply by the ratio.
-        :param stock_moves: recordset of `stock.move`, used for fifo/avco lines
-        """
-        super(PosOrderLine, self)._compute_total_cost(stock_moves)
-        for line in self:
-            line.total_cost = line.total_cost * line.Ratio if line.Ratio else line.total_cost
-
     def _export_for_ui(self, orderline):
         res = super(PosOrderLine, self)._export_for_ui(orderline)
         if orderline.product_uom:
@@ -149,7 +132,6 @@ class PosOrderLine(models.Model):
         else:
             res['product_uom'] = orderline.product_uom_id.id;
         return res
-
 
 
 
@@ -218,8 +200,6 @@ class StockPicking(models.Model):
         moves = self.env['stock.move'].create(move_vals)
         confirmed_moves = moves._action_confirm()
         confirmed_moves._add_mls_related_to_order(lines, are_qties_done=True)
-
-
 
     # def _create_move_from_pos_order_lines(self, lines):
     #     self.ensure_one()

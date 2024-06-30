@@ -261,12 +261,9 @@ export class ChangeUOMButton extends Component {
 }
 
 
-
 ProductScreen.addControlButton({
     component: ChangeUOMButton,
     condition: function() {
         return this.pos.config.allow_multi_uom;
     },
-    //key: 'ChangeUOMButton', // Unique key for ChangeUOMButton
 });
-
