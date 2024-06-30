@@ -141,23 +141,17 @@ class PosOrderLine(models.Model):
         for line in self:
             line.total_cost = line.total_cost * line.Ratio if line.Ratio else line.total_cost
 
-    def _create_account_move_line(self, orderline):
-        account_move = self.env['account.move'].create({
-            'name': 'Your Move Name',  # Example: Could be a meaningful name for the move
-            'journal_id': orderline.order_id.journal_id.id,  # Assuming journal_id is required
-            'date': fields.Date.today(),  # Set the date of the move
+    def _prepare_account_move_line(self):
+        self.ensure_one()
+        return {
+            'name': self.name,
+            'move_id': self.order_id.account_move.id,  # Assuming account_move is set correctly in PosOrder
+            'product_id': self.product_id.id,
+            'quantity': self.qty,
+            'price_unit': self.price_unit,
+            'product_uom_id': self.product_uom.id or self.product_uom_id.id,
             # Add other necessary fields
-        })
-        # Create or update account move and move lines based on the POS order line
-        account_move_line = self.env['account.move.line'].create({
-            'name': orderline.name,
-            'move_id': account_move.id,  # Replace with the actual move id you create
-            'product_id': orderline.product_id.id,
-            'quantity': orderline.qty,
-            'price_unit': orderline.price_unit,
-            # Add other necessary fields
-        })
-        return account_move_line
+        }
 
     def _export_for_ui(self, orderline):
         res = super(PosOrderLine, self)._export_for_ui(orderline)
@@ -165,9 +159,6 @@ class PosOrderLine(models.Model):
             res['product_uom'] = orderline.product_uom.id;
         else:
             res['product_uom'] = orderline.product_uom_id.id;
-        return res
-
-        self._create_account_move_line(orderline)
         return res
 
 
