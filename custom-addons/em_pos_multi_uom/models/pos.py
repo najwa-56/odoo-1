@@ -315,6 +315,15 @@ class StockPicking(models.Model):
 class AccountMove(models.Model):
     _inherit = "account.move"
 
+    pos_order_line_idd = fields.Many2one('pos.order.line', string='POS Order Line')
+    product_uom_idd = fields.Many2one(
+        'uom.uom',
+        string='Unit of Measure',
+        related='pos_order_line_idd.product_uom',
+        store=True,
+        readonly=True
+    )
+
 class AccountMoveLine(models.Model):
     _inherit = "account.move.line"
 
