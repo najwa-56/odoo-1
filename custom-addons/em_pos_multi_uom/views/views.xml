@@ -56,7 +56,8 @@
             </field>
         </record>
 
-        <record id="view_move_form_inherit" model="ir.ui.view">
+        <record id="view_move_form_inheritt" model="ir.ui.view">
+            <field name="name">account.move.form.inherit.product.uom</field>
         <field name="model">account.move</field>
         <field name="inherit_id" ref="account.view_move_form"/>
         <field name="arch" type="xml">

@@ -120,44 +120,32 @@ class PosOrder(models.Model):
         result['product_uom_id'] = order_line.product_uom.id or order_line.product_uom_id.id
         return result
 
-    def _create_account_move_from_pos_order_lines(self, lines):
-        # Create the account.move if it doesn't exist
-        if not self.account_move:
-            move_vals = {
-                'name': self.name,
-                'journal_id': self.session_id.config_id.journal_id.id,
-                'date': self.date_order,
-                'ref': self.name,
-                'line_ids': [],
-            }
-            account_move = self.env['account.move'].create(move_vals)
-            self.account_move = account_move
-        else:
-            account_move = self.account_move
-
-        # Create account.move.line records
+    def _create_account_move_lines_from_pos_order_lines(self, lines):
+        move_vals = []
         lines_by_product_uom = groupby(
             sorted(lines, key=lambda l: (l.product_id.id, l.product_uom.id)),
             key=lambda l: (l.product_id.id, l.product_uom.id)
         )
 
-        move_lines_vals = []
         for dummy, olines in lines_by_product_uom:
             order_lines = self.env['pos.order.line'].concat(*olines)
-            move_lines_vals.append(self._prepare_account_move_line_vals(order_lines[0], order_lines, account_move.id))
+            move_vals.append(self._prepare_account_move_line_vals(order_lines[0], order_lines))
 
-        self.env['account.move.line'].create(move_lines_vals)
+        account_moves = self.env['account.move.line'].create(move_vals)
+        return account_moves
 
-    def _prepare_account_move_line_vals(self, first_line, order_lines, account_move_id):
-        return {
+    def _prepare_account_move_line_vals(self, first_line, order_lines):
+        _logger.info("Preparing account move line values for POS order line ID: %s", first_line.id)
+        vals = {
             'name': first_line.name,
-            'move_id': account_move_id,
+            'move_id': self.env['account.move'].browse(self._context.get('default_move_id')).id,
             'product_id': first_line.product_id.id,
             'quantity': sum(order_lines.mapped('qty')),
             'price_unit': first_line.price_unit,
-            'product_uom_id': first_line.product_uom.id or first_line.product_uom_id.id,
-            # Add other necessary fields and logic for calculating other values if needed
+            'pos_order_line_id': first_line.id,
         }
+        _logger.info("Prepared Account Move Line Vals: %s", vals)
+        return vals
 
 class PosOrderLine(models.Model):
     _inherit = "pos.order.line"
@@ -312,17 +300,6 @@ class StockPicking(models.Model):
     #         else:
     #             current_move.quantity_done = abs(sum(order_lines.mapped('qty')))
 
-class AccountMove(models.Model):
-    _inherit = "account.move"
-
-    pos_order_line_idd = fields.Many2one('pos.order.line', string='POS Order Line')
-    product_uom_idd = fields.Many2one(
-        'uom.uom',
-        string='Unit of Measure',
-        related='pos_order_line_idd.product_uom',
-        store=True,
-        readonly=True
-    )
 
 class AccountMoveLine(models.Model):
     _inherit = "account.move.line"
@@ -337,32 +314,7 @@ class AccountMoveLine(models.Model):
         readonly=True
     )
 
-    def _create_account_move_lines_from_pos_order_lines(self, lines):
-        self.ensure_one()
-        lines_by_product_uom = groupby(
-            sorted(lines, key=lambda l: (l.product_id.id, l.product_uom.id)),
-            key=lambda l: (l.product_id.id, l.product_uom.id)
-        )
 
-        move_vals = []
-        for dummy, olines in lines_by_product_uom:
-            order_lines = self.env['pos.order.line'].concat(*olines)
-            move_vals.append(self._prepare_account_move_line_vals(order_lines[0], order_lines))
-
-        account_moves = self.env['account.move.line'].create(move_vals)
-        return account_moves
-
-    def _prepare_account_move_line_vals(self, first_line, order_lines):
-        return {
-            'name': first_line.name,
-            'move_id': self.id,  # Assuming 'self' is the account.move instance
-            'product_id': first_line.product_id.id,
-            'quantity': sum(order_lines.mapped('qty')),
-            'price_unit': first_line.price_unit,
-            'product_uom_idd': first_line.product_uom.id or first_line.product_uom_id.id,
-            'pos_order_line_id': first_line.id,  # Set the POS order line reference
-            # Add other necessary fields and logic for calculating other values if needed
-        }
 
 
 
