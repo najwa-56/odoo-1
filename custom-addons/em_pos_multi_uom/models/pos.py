@@ -309,7 +309,7 @@ class AccountMoveLine(models.Model):
     product_uom_idd = fields.Many2one(
         'uom.uom',
         string='Unit of Measure',
-        related='pos_order_line_id.product_uom',
+        compute='_compute_product_uom_idd',
         store=True,
         readonly=True
     )
