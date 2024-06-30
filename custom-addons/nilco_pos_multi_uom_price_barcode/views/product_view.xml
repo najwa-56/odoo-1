@@ -42,7 +42,7 @@
             <field name="name">product_multi_uom_price</field>
             <field name="res_model">product.multi.uom.price</field>
             <field name="view_mode">tree,form</field>
-            <field name="view_id" ref="product_product_tree_view"/>
+            <field name="view_id" ref="product_template_form_view_merged"/>
         </record>
 
         <!-- Menu Item Definition -->
