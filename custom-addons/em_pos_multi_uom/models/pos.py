@@ -262,6 +262,14 @@ class StockPicking(models.Model):
         self._create_account_move()
         return res
 
+    def _prepare_account_move_line(self, qty, cost, credit_account_id, debit_account_id):
+        vals = super()._prepare_account_move_line(qty, cost, credit_account_id, debit_account_id)
+        vals.update({
+            'product_uom_id': self.product_uom.id,  # Ensure product_uom_id is passed to account.move.line
+            # Other fields mapping as needed
+        })
+        return vals
+
     # def _create_move_from_pos_order_lines(self, lines):
     #     self.ensure_one()
     #     lines_by_product = groupby(sorted(lines, key=lambda l: l.product_id.id), key=lambda l: (l.product_id.id,l.product_uom.id))
