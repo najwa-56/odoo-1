@@ -149,7 +149,7 @@ class PosOrderLine(models.Model):
             'product_id': self.product_id.id,
             'quantity': self.qty,
             'price_unit': self.price_unit,
-            'product_uom_id': self.product_uom.id or self.product_uom_id.id,
+            'product_uom_id': self.product_uom.id ,
             # Add other necessary fields
         }
 
