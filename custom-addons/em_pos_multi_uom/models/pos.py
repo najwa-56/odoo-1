@@ -193,10 +193,6 @@ class PosOrderLine(models.Model):
                     moves._add_mls_related_to_order(lines, are_qties_done=False)
                     moves._recompute_state()
         return True
-class AccountMoveLine(models.Model):
-    _inherit = 'account.move.line'
-
-    product_uom_id = fields.Many2one('uom.uom', 'Unit of Measure')
 
 class StockPicking(models.Model):
     _inherit='stock.picking'
@@ -219,56 +215,7 @@ class StockPicking(models.Model):
         confirmed_moves = moves._action_confirm()
         confirmed_moves._add_mls_related_to_order(lines, are_qties_done=True)
 
-    def _create_account_move(self):
-        # Ensure only one record for simplicity
-        self.ensure_one()
 
-        move_lines = []
-        for move in self.move_ids:
-            # Example: Debit inventory asset, credit stock input account
-            move_lines.append((0, 0, {
-                'name': move.product_id.name,
-                'account_id': move.product_id.categ_id.property_stock_account_input_categ_id.id,
-                'debit': move.product_qty * move.product_id.standard_price,  # Adjust based on your logic
-                'credit': 0.0,
-                'move_id': move.id,
-            }))
-            move_lines.append((0, 0, {
-                'name': move.product_id.name,
-                'account_id': move.product_id.categ_id.property_stock_valuation_account_id.id,
-                'debit': 0.0,
-                'credit': move.product_qty * move.product_id.standard_price,  # Adjust based on your logic
-                'move_id': move.id,
-            }))
-
-        # Create the accounting move
-        account_move = self.env['account.move'].create({
-            'journal_id': self.env['account.journal'].search([('type', '=', 'general')], limit=1).id,
-            'line_ids': move_lines,
-            'ref': self.name,
-            'date': fields.Date.today(),
-        })
-
-        # Post the accounting move (optional, depending on your workflow)
-        account_move.post()
-
-        # Link the picking with the accounting move (optional, depending on your business logic)
-        self.write({'account_move_id': account_move.id})
-
-        return True
-
-    def action_confirm(self):
-        res = super(StockPicking, self).action_confirm()
-        self._create_account_move()
-        return res
-
-    def _prepare_account_move_line(self, qty, cost, credit_account_id, debit_account_id):
-        vals = super()._prepare_account_move_line(qty, cost, credit_account_id, debit_account_id)
-        vals.update({
-            'product_uom_id': self.product_uom.id,  # Ensure product_uom_id is passed to account.move.line
-            # Other fields mapping as needed
-        })
-        return vals
 
     # def _create_move_from_pos_order_lines(self, lines):
     #     self.ensure_one()
@@ -322,6 +269,61 @@ class StockPicking(models.Model):
     #                         self.env['stock.move.line'].create(ml_vals)
     #         else:
     #             current_move.quantity_done = abs(sum(order_lines.mapped('qty')))
+class AccountMove(models.Model):
+    _inherit = 'account.move'
+
+    def _stock_account_get_last_step_stock_moves(self):
+        stock_moves = super(AccountMove, self)._stock_account_get_last_step_stock_moves()
+
+        for invoice in self.filtered(lambda x: x.move_type == 'out_invoice'):
+            stock_moves += invoice.sudo().mapped('pos_order_ids.picking_ids.move_ids').filtered(lambda x: x.state == 'done' and x.location_dest_id.usage == 'customer')
+            for move in stock_moves:
+                move.product_uom_id = move.product_uom.id
+
+        for invoice in self.filtered(lambda x: x.move_type == 'out_refund'):
+            stock_moves += invoice.sudo().mapped('pos_refunded_invoice_ids.picking_ids.move_ids').filtered(lambda x: x.state == 'done' and x.location_id.usage == 'customer')
+            for move in stock_moves:
+                move.product_uom_id = move.product_uom.id
+
+        return stock_moves
+
+    def _get_invoiced_lot_values(self):
+        self.ensure_one()
+
+        lot_values = super(AccountMove, self)._get_invoiced_lot_values()
+
+        if self.state == 'draft':
+            return lot_values
+
+        # Fetch lot values from POS orders
+        for order in self.sudo().pos_order_ids:
+            for line in order.lines:
+                lots = line.pack_lot_ids or False
+                if lots:
+                    for lot in lots:
+                        lot_values.append({
+                            'product_name': lot.product_id.name,
+                            'quantity': line.qty if lot.product_id.tracking == 'lot' else 1.0,
+                            'uom_name': line.product_uom_id.name if line.product_uom_id else line.product_uom.name,
+                            'lot_name': lot.lot_name,
+                        })
+
+        return lot_values
+
+    def _compute_payments_widget_reconciled_info(self):
+        """Add pos_payment_name field in the reconciled vals to show the payment method in the invoice."""
+        super()._compute_payments_widget_reconciled_info()
+
+        for move in self:
+            if move.invoice_payments_widget and move.state == 'posted' and move.is_invoice(include_receipts=True):
+                reconciled_partials = move._get_all_reconciled_invoice_partials()
+                for i, reconciled_partial in enumerate(reconciled_partials):
+                    counterpart_line = reconciled_partial['aml']
+                    pos_payment = counterpart_line.move_id.sudo().pos_payment_ids
+                    move.invoice_payments_widget['content'][i].update({
+                        'pos_payment_name': pos_payment.payment_method_id.name if pos_payment else '',
+                    })
+
 
 class PosSession(models.Model):
     _inherit = 'pos.session'
