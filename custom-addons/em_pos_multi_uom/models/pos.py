@@ -161,6 +161,8 @@ class PosOrderLine(models.Model):
             res['product_uom'] = orderline.product_uom.id;
         else:
             res['product_uom'] = orderline.product_uom_id.id;
+
+            self._prepare_account_move_line(orderline)
         return res
 
 
