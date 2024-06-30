@@ -323,10 +323,6 @@ class AccountMoveLine(models.Model):
                 line.product_uom_idd = False
 
 
-
-
-
-
 class PosSession(models.Model):
     _inherit = 'pos.session'
 
