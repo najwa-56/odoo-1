@@ -149,7 +149,7 @@ class PosOrderLine(models.Model):
             'product_id': self.product_id.id,
             'quantity': self.qty,
             'price_unit': self.price_unit,
-            'product_uom_id': self.product_uom.id,  # Ensure correct field name is used
+            'product_uom': self.product_uom.id or self.product_uom_id.id,
             # Add other necessary fields
         }
 
@@ -161,6 +161,8 @@ class PosOrderLine(models.Model):
             res['product_uom'] = orderline.product_uom.id;
         else:
             res['product_uom'] = orderline.product_uom_id.id;
+
+            self._prepare_account_move_line(orderline)
         return res
 
 
