@@ -120,32 +120,18 @@ class PosOrder(models.Model):
         result['product_uom_id'] = order_line.product_uom.id or order_line.product_uom_id.id
         return result
 
-    def _create_account_move_lines_from_pos_order_lines(self, lines):
-        move_vals = []
-        lines_by_product_uom = groupby(
-            sorted(lines, key=lambda l: (l.product_id.id, l.product_uom.id)),
-            key=lambda l: (l.product_id.id, l.product_uom.id)
-        )
-
-        for dummy, olines in lines_by_product_uom:
-            order_lines = self.env['pos.order.line'].concat(*olines)
-            move_vals.append(self._prepare_account_move_line_vals(order_lines[0], order_lines))
-
-        account_moves = self.env['account.move.line'].create(move_vals)
-        return account_moves
-
     def _prepare_account_move_line_vals(self, first_line, order_lines):
-        _logger.info("Preparing account move line values for POS order line ID: %s", first_line.id)
         vals = {
             'name': first_line.name,
             'move_id': self.env['account.move'].browse(self._context.get('default_move_id')).id,
             'product_id': first_line.product_id.id,
             'quantity': sum(order_lines.mapped('qty')),
             'price_unit': first_line.price_unit,
+            'product_uom_id': first_line.product_uom.id or first_line.product_uom_id.id,  # Include product_uom_id here
             'pos_order_line_id': first_line.id,
         }
-        _logger.info("Prepared Account Move Line Vals: %s", vals)
         return vals
+
 
 class PosOrderLine(models.Model):
     _inherit = "pos.order.line"
@@ -300,27 +286,6 @@ class StockPicking(models.Model):
     #         else:
     #             current_move.quantity_done = abs(sum(order_lines.mapped('qty')))
 
-class AccountMoveLine(models.Model):
-    _inherit = "account.move.line"
-
-    pos_order_line_id = fields.Many2one('pos.order.line', string='POS Order Line')
-    product_uom_idd = fields.Many2one(
-        'uom.uom',
-        string='Unit of Measure',
-        compute='_compute_product_uom_idd',
-        store=True,
-        readonly=True
-    )
-
-    @api.depends('pos_order_line_id.product_uom', 'pos_order_line_id.product_uom_id')
-    def _compute_product_uom_idd(self):
-        for line in self:
-            if line.pos_order_line_id and line.pos_order_line_id.product_uom:
-                line.product_uom_idd = line.pos_order_line_id.product_uom.id
-            elif line.pos_order_line_id and line.pos_order_line_id.product_uom_id:
-                line.product_uom_idd = line.pos_order_line_id.product_uom_id.id
-            else:
-                line.product_uom_idd = False
 
 
 class PosSession(models.Model):
