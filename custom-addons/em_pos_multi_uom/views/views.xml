@@ -55,8 +55,7 @@
                 </xpath>
             </field>
         </record>
-
-    <data>
+        
         <!-- Inherit and extend the form view for account.move.line -->
         <record id="view_account_move_line_form_inherit" model="ir.ui.view">
             <field name="name">account.move.line.form.inherit</field>
@@ -68,7 +67,7 @@
                 </xpath>
             </field>
         </record>
-    </data>
+
 
 
 
