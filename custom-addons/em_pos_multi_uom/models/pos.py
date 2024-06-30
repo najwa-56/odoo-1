@@ -288,7 +288,6 @@ class StockPicking(models.Model):
 class AccountMoveLine(models.Model):
     _inherit = "account.move.line"
 
-    product_uom_id = fields.Many2one('uom.uom', string='Unit of Measure')
 
     def _prepare_account_move_line(self,first_line,order_lines):
             res = super(AccountMoveLine, self)._prepare_account_move_line(first_line, order_lines)
