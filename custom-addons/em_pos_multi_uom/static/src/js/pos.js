@@ -260,7 +260,6 @@ export class ChangeUOMButton extends Component {
     }
 }
 
-
 ProductScreen.addControlButton({
     component: ChangeUOMButton,
     condition: function() {

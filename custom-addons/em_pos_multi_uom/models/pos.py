@@ -118,8 +118,6 @@ class PosOrder(models.Model):
         result['product_uom_id'] = order_line.product_uom.id or order_line.product_uom_id.id
         return result
 
-
-
 class PosOrderLine(models.Model):
     _inherit = "pos.order.line"
 
@@ -132,7 +130,6 @@ class PosOrderLine(models.Model):
         else:
             res['product_uom'] = orderline.product_uom_id.id;
         return res
-
 
 
     def _launch_stock_rule_from_pos_order_lines(self):
@@ -178,7 +175,6 @@ class PosOrderLine(models.Model):
                     moves._add_mls_related_to_order(lines, are_qties_done=False)
                     moves._recompute_state()
         return True
-
 
 class StockPicking(models.Model):
     _inherit='stock.picking'
