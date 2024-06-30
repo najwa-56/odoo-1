@@ -141,12 +141,33 @@ class PosOrderLine(models.Model):
         for line in self:
             line.total_cost = line.total_cost * line.Ratio if line.Ratio else line.total_cost
 
+    def _create_account_move_line(self, orderline):
+        account_move = self.env['account.move'].create({
+            'name': 'Your Move Name',  # Example: Could be a meaningful name for the move
+            'journal_id': orderline.order_id.journal_id.id,  # Assuming journal_id is required
+            'date': fields.Date.today(),  # Set the date of the move
+            # Add other necessary fields
+        })
+        # Create or update account move and move lines based on the POS order line
+        account_move_line = self.env['account.move.line'].create({
+            'name': orderline.name,
+            'move_id': account_move.id,  # Replace with the actual move id you create
+            'product_id': orderline.product_id.id,
+            'quantity': orderline.qty,
+            'price_unit': orderline.price_unit,
+            # Add other necessary fields
+        })
+        return account_move_line
+
     def _export_for_ui(self, orderline):
         res = super(PosOrderLine, self)._export_for_ui(orderline)
         if orderline.product_uom:
             res['product_uom'] = orderline.product_uom.id;
         else:
             res['product_uom'] = orderline.product_uom_id.id;
+        return res
+
+        self._create_account_move_line(orderline)
         return res
 
 
@@ -269,61 +290,6 @@ class StockPicking(models.Model):
     #                         self.env['stock.move.line'].create(ml_vals)
     #         else:
     #             current_move.quantity_done = abs(sum(order_lines.mapped('qty')))
-class AccountMove(models.Model):
-    _inherit = 'account.move'
-
-    def _stock_account_get_last_step_stock_moves(self):
-        stock_moves = super(AccountMove, self)._stock_account_get_last_step_stock_moves()
-
-        for invoice in self.filtered(lambda x: x.move_type == 'out_invoice'):
-            stock_moves += invoice.sudo().mapped('pos_order_ids.picking_ids.move_ids').filtered(lambda x: x.state == 'done' and x.location_dest_id.usage == 'customer')
-            for move in stock_moves:
-                move.product_uom_id = move.product_uom.id
-
-        for invoice in self.filtered(lambda x: x.move_type == 'out_refund'):
-            stock_moves += invoice.sudo().mapped('pos_refunded_invoice_ids.picking_ids.move_ids').filtered(lambda x: x.state == 'done' and x.location_id.usage == 'customer')
-            for move in stock_moves:
-                move.product_uom_id = move.product_uom.id
-
-        return stock_moves
-
-    def _get_invoiced_lot_values(self):
-        self.ensure_one()
-
-        lot_values = super(AccountMove, self)._get_invoiced_lot_values()
-
-        if self.state == 'draft':
-            return lot_values
-
-        # Fetch lot values from POS orders
-        for order in self.sudo().pos_order_ids:
-            for line in order.lines:
-                lots = line.pack_lot_ids or False
-                if lots:
-                    for lot in lots:
-                        lot_values.append({
-                            'product_name': lot.product_id.name,
-                            'quantity': line.qty if lot.product_id.tracking == 'lot' else 1.0,
-                            'uom_name': line.product_uom_id.name if line.product_uom_id else line.product_uom.name,
-                            'lot_name': lot.lot_name,
-                        })
-
-        return lot_values
-
-    def _compute_payments_widget_reconciled_info(self):
-        """Add pos_payment_name field in the reconciled vals to show the payment method in the invoice."""
-        super()._compute_payments_widget_reconciled_info()
-
-        for move in self:
-            if move.invoice_payments_widget and move.state == 'posted' and move.is_invoice(include_receipts=True):
-                reconciled_partials = move._get_all_reconciled_invoice_partials()
-                for i, reconciled_partial in enumerate(reconciled_partials):
-                    counterpart_line = reconciled_partial['aml']
-                    pos_payment = counterpart_line.move_id.sudo().pos_payment_ids
-                    move.invoice_payments_widget['content'][i].update({
-                        'pos_payment_name': pos_payment.payment_method_id.name if pos_payment else '',
-                    })
-
 
 class PosSession(models.Model):
     _inherit = 'pos.session'
