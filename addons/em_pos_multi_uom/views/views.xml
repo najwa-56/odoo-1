@@ -1,0 +1,127 @@
+<?xml version="1.0"?>
+<odoo>
+    <data>
+        <record id="res_config_settings_view_form" model="ir.ui.view">
+            <field name="name">res.config.settings.view.form.inherit.pos_hr</field>
+            <field name="model">res.config.settings</field>
+            <field name="inherit_id" ref="point_of_sale.res_config_settings_view_form"/>
+            <field name="arch" type="xml">
+                <xpath expr="//block[@id='pos_interface_section']" position='inside'>
+                    <div class="col-xs-12 col-md-6 o_setting_box">
+                        <div class="o_setting_left_pane">
+                            <field name="allow_multi_uom"/>
+                        </div>
+                        <div class="o_setting_right_pane">
+                            <label for="allow_multi_uom"/>
+                        </div>
+                    </div>
+                </xpath>
+            </field>
+        </record>
+
+        <record model="ir.ui.view" id="product_template_only_form_view">
+            <field name="name">product.template.view.form.easy</field>
+            <field name="model">product.template</field>
+            <field name="inherit_id" ref="product.product_template_only_form_view" />
+            <field name="arch" type="xml">
+                <div name="options" position="inside">
+                    <span class="d-inline-block">
+                        <field name="has_multi_uom"/>
+                        <label for="has_multi_uom"/>
+                    </span>
+                </div>
+                <notebook position="inside">
+                    <page name="extra_ingredients" string="Extra Products">
+                        <field name="multi_uom_ids">
+                            <tree editable="bottom">
+                                <field name="multi_uom_id" required="True"/>
+                                <field name="barcode"/>
+                                <field name="sequence"/>
+                                <field name="price"/>
+                            </tree>
+                        </field>
+                    </page>
+                </notebook>
+            </field>
+        </record>
+        <record id="view_pos_pos_form" model="ir.ui.view">
+            <field name="name">pos.order.form</field>
+            <field name="model">pos.order</field>
+            <field name="inherit_id" ref="point_of_sale.view_pos_pos_form" />
+            <field name="arch" type="xml">
+                <xpath expr="//field[@name='lines']/tree/field[@name='full_product_name']" position="after">
+                    <field name="product_uom"/>
+                    <field name="Ratio"/>
+                </xpath>
+            </field>
+        </record>
+
+      <record id="view_move_form_inheritt" model="ir.ui.view">
+        <field name="model">account.move</field>
+        <field name="inherit_id" ref="account.view_move_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='invoice_line_ids']/tree//field[@name='discount']" position="after">
+                <field name="product_uom_id" />
+            </xpath>
+
+
+        </field>
+    </record>
+
+
+
+
+                <!-- test -->
+        <!-- Inherit the existing product.product.tree view -->
+        <record id="product_product_tree_view_inherit" model="ir.ui.view">
+            <field name="name">product.product.tree.inherit.multi.uom</field>
+            <field name="model">product.product</field>
+            <field name="inherit_id" ref="product.product_template_tree_view"/>
+            <field name="arch" type="xml">
+                <!-- Use xpath to locate the position after the 'name' field -->
+                <xpath expr="//field[@name='name']" position="after">
+                    <field name='has_multi_uom' />
+                </xpath>
+            </field>
+        </record>
+
+
+
+        <!-- tessssst-->
+
+
+
+
+
+        <!-- Tree View Definition -->
+        <record model="ir.ui.view" id="product_product_tree_view">
+            <field name="name">product.product.tree.view</field>
+            <field name="model">product.multi.uom</field>
+            <field name="arch" type="xml">
+                <tree editable="bottom">
+                    <field name="product_tmp_id"/>
+                    <field name="multi_uom_id" required="True"/>
+                    <field name="sequence"/>
+                    <field name="price"/>
+                </tree>
+            </field>
+        </record>
+
+        <!-- Action Definition -->
+        <record id="action_product_product_tree" model="ir.actions.act_window">
+            <field name="name">Products</field>
+            <field name="res_model">product.multi.uom</field>
+            <field name="view_mode">tree,form</field>
+            <field name="view_id" ref="product_product_tree_view"/>
+        </record>
+
+        <!-- Menu Item Definition -->
+        <menuitem id="menu_product_product_tree"
+                  name="الوحدات المتعددة "
+                  action="action_product_product_tree"
+                  parent="sale.product_menu_catalog"
+                  sequence="10"/>
+
+
+    </data>
+</odoo>
