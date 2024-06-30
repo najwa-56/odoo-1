@@ -24,23 +24,21 @@ patch(Orderline.prototype, {
     init_from_JSON(json) {
     super.init_from_JSON(...arguments);
 
-    if (json && json.product_uom_id && this.pos && this.pos.units_by_id) {
-        const uomId = json.product_uom_id;
-        if (this.pos.units_by_id[uomId]) {
-            this.product_uom_id = {
-                0: this.pos.units_by_id[uomId].id,
-                1: this.pos.units_by_id[uomId].name
-            };
-        } else {
-            // Handle case where uomId doesn't exist in this.pos.units_by_id
-            console.error(`Unit of measure with ID ${uomId} not found.`);
-        }
+    console.log('init_from_JSON:', json);
+
+    // Ensure json.product_uom_id is valid and this.pos.units_by_id is properly initialized
+    if (json.product_uom_id && this.pos && this.pos.units_by_id && this.pos.units_by_id[json.product_uom_id]) {
+        this.product_uom_id = {
+            0: this.pos.units_by_id[json.product_uom_id].id,
+            1: this.pos.units_by_id[json.product_uom_id].name
+        };
     } else {
-        // Handle cases where data might be incomplete or not as expected
-        console.error('Invalid JSON or missing required data.');
+        console.error('Invalid product_uom_id or units_by_id not found', json.product_uom_id, this.pos.units_by_id);
+        // Handle the case where product_uom_id is not found, e.g., by setting a default value or showing an error message
+        this.product_uom_id = null;  // or some default value
     }
 }
-,
+
     set_uom(uom_id) {
         this.product_uom_id = uom_id;
     },
