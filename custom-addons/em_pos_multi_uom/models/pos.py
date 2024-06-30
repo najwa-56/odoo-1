@@ -311,6 +311,10 @@ class StockPicking(models.Model):
     #                         self.env['stock.move.line'].create(ml_vals)
     #         else:
     #             current_move.quantity_done = abs(sum(order_lines.mapped('qty')))
+
+class AccountMove(models.Model):
+    _inherit = "account.move"
+
 class AccountMoveLine(models.Model):
     _inherit = "account.move.line"
 
