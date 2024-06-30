@@ -111,7 +111,8 @@ def test_get_data(self, template_code):
         }
     }
 
-def _tax_vals(name, amount, tax_tag_id=None, children_tax_xmlids=None, active=True):
+
+def _tax_vals(name, amount, tax_tag_id=None, children_tax_xmlids=None, active=True, tax_scope="consu"):
     tag_command = [Command.set([tax_tag_id])] if tax_tag_id else None
     tax_vals = {
         'name': name,
@@ -119,6 +120,7 @@ def _tax_vals(name, amount, tax_tag_id=None, children_tax_xmlids=None, active=Tr
         'amount_type': 'percent' if not children_tax_xmlids else 'group',
         'tax_group_id': 'tax_group_taxes',
         'active': active,
+        'tax_scope': tax_scope
     }
     if children_tax_xmlids:
         tax_vals.update({'children_tax_ids': [Command.set(children_tax_xmlids)]})
@@ -385,6 +387,11 @@ class TestChartTemplate(TransactionCase):
             data['account.tax']['test_tax_1_template']['amount'] = 40
             return data
 
+        def local_get_data2(self, template_code):
+            data = test_get_data(self, template_code)
+            data['account.tax']['test_tax_1_template']['amount'] = 15
+            return data
+
         tax_1_existing = self.env['account.tax'].search([('company_id', '=', self.company_1.id), ('name', '=', "Tax 1")])
         with patch.object(AccountChartTemplate, '_get_chart_template_data', side_effect=local_get_data, autospec=True):
             self.env['account.chart.template'].try_loading('test', company=self.company_1, install_demo=False)
@@ -392,6 +399,16 @@ class TestChartTemplate(TransactionCase):
         tax_1_new = self.env['account.tax'].search([('company_id', '=', self.company_1.id), ('name', '=', "Tax 1")])
         self.assertEqual(tax_1_old, tax_1_existing, "Old tax still exists but with a different name.")
         self.assertEqual(len(tax_1_new), 1, "New tax have been created with the original name.")
+
+        with patch.object(AccountChartTemplate, '_get_chart_template_data', side_effect=local_get_data2, autospec=True):
+            self.env['account.chart.template'].try_loading('test', company=self.company_1, install_demo=False)
+        tax_1_old_first = self.env['account.tax'].search([('company_id', '=', self.company_1.id), ('name', '=', "[old] Tax 1")])
+        tax_1_old_second = self.env['account.tax'].search([('company_id', '=', self.company_1.id), ('name', '=', "[old1] Tax 1")])
+        tax_1_latest = self.env['account.tax'].search([('company_id', '=', self.company_1.id), ('name', '=', "Tax 1")])
+
+        self.assertEqual(tax_1_old, tax_1_old_first, "Old renamed tax is still the same.")
+        self.assertEqual(tax_1_old_second, tax_1_new, "Outdated tax is renamed again.")
+        self.assertEqual(len(tax_1_latest), 1, "New tax have been created with the original name.")
 
     def test_update_taxes_multi_company(self):
         """ In a multi-company environment all companies should be correctly updated."""
@@ -854,3 +871,14 @@ class TestChartTemplate(TransactionCase):
         self.assertEqual(2, len(accounts))
         self.assertEqual(self.env.ref('account.account_tag_investing'), accounts[0].tag_ids)
         self.assertEqual({'Test account tag', 'Test account tag 2'}, set(accounts[1].tag_ids.mapped("name")))
+
+    def test_chart_template_company_without_country(self):
+        """
+            In this test we will try to install a chart template to a company without a country. The expected behavior
+            is that the country of the chart template will be set on the company
+        """
+        company = self.env['res.company'].create({'name': 'Test Company Without country'})
+        self.assertFalse(company.country_id)
+        with patch.object(AccountChartTemplate, '_get_chart_template_data', side_effect=test_get_data, autospec=True):
+            self.env['account.chart.template'].try_loading('test', company=company, install_demo=False)
+        self.assertEqual(company.country_id.code, "BE")

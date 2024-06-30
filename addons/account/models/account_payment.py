@@ -16,7 +16,7 @@ class AccountPayment(models.Model):
     move_id = fields.Many2one(
         comodel_name='account.move',
         string='Journal Entry', required=True, readonly=True, ondelete='cascade',
-        index='btree_not_null',
+        index=True,
         check_company=True)
 
     is_reconciled = fields.Boolean(string="Is Reconciled", store=True,
@@ -41,6 +41,7 @@ class AccountPayment(models.Model):
     qr_code = fields.Html(string="QR Code URL",
         compute="_compute_qr_code")
     paired_internal_transfer_payment_id = fields.Many2one('account.payment',
+        index='btree_not_null',
         help="When an internal transfer is posted, a paired payment is created. "
         "They are cross referenced through this field", copy=False)
 
@@ -204,7 +205,7 @@ class AccountPayment(models.Model):
         return lines
 
     def _get_valid_liquidity_accounts(self):
-        journal_comp = self.journal_id.company_id
+        journal_comp = self.journal_id.company_id or self.env.company
         accessible_branches = journal_comp.with_company(journal_comp)._accessible_branches()
         return (
             self.journal_id.default_account_id |
@@ -970,7 +971,7 @@ class AccountPayment(models.Model):
         # Do not allow to post if the account is required but not trusted
         for payment in self:
             if payment.require_partner_bank_account and not payment.partner_bank_id.allow_out_payment:
-                raise UserError(_('To record payments with %s, the recipient bank account must be manually validated. You should go on the partner bank account in order to validate it.', self.payment_method_line_id.name))
+                raise UserError(_('To record payments with %s, the recipient bank account must be manually validated. You should go on the partner bank account in order to validate it.', payment.partner_id.display_name))
 
         self.move_id._post(soft=False)
 

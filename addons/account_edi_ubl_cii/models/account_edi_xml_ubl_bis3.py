@@ -240,6 +240,12 @@ class AccountEdiXmlUBLBIS3(models.AbstractModel):
         vals['currency_dp'] = 2
         vals['price_vals']['currency_dp'] = 2
 
+        if line.currency_id.compare_amounts(vals['price_vals']['price_amount'], 0) == -1:
+            # We can't have negative unit prices, so we invert the signs of
+            # the unit price and quantity, resulting in the same amount in the end
+            vals['price_vals']['price_amount'] *= -1
+            vals['line_quantity'] *= -1
+
         return vals
 
     def _export_invoice_vals(self, invoice):
@@ -247,7 +253,7 @@ class AccountEdiXmlUBLBIS3(models.AbstractModel):
         vals = super()._export_invoice_vals(invoice)
 
         vals['vals'].update({
-            'customization_id': 'urn:cen.eu:en16931:2017#compliant#urn:fdc:peppol.eu:2017:poacc:billing:3.0',
+            'customization_id': self._get_customization_ids()['ubl_bis3'],
             'profile_id': 'urn:fdc:peppol.eu:2017:poacc:billing:01:1.0',
             'currency_dp': 2,
             'ubl_version_id': None,
@@ -324,11 +330,6 @@ class AccountEdiXmlUBLBIS3(models.AbstractModel):
                 break
 
         for line in invoice.invoice_line_ids.filtered(lambda x: x.display_type not in ('line_note', 'line_section')):
-            if invoice.currency_id.compare_amounts(line.price_unit, 0) == -1:
-                # [BR-27]-The Item net price (BT-146) shall NOT be negative.
-                constraints.update({'cen_en16931_positive_item_net_price': _(
-                    "The invoice contains line(s) with a negative unit price, which is not allowed."
-                    " You might need to set a negative quantity instead.")})
             if len(line.tax_ids.flatten_taxes_hierarchy().filtered(lambda t: t.amount_type != 'fixed')) != 1:
                 # [UBL-SR-48]-Invoice lines shall have one and only one classified tax category.
                 # /!\ exception: possible to have any number of ecotaxes (fixed tax) with a regular percentage tax
@@ -423,3 +424,19 @@ class AccountEdiXmlUBLBIS3(models.AbstractModel):
                 ) if not mva.is_valid(vat) or len(vat) != 14 or vat[:2] != 'NO' or vat[-3:] != 'MVA' else "",
             })
         return constraints
+
+    def _import_retrieve_partner_vals(self, tree, role):
+        # EXTENDS account.edi.xml.ubl_20
+        partner_vals = super()._import_retrieve_partner_vals(tree, role)
+        nsmap = {k: v for k, v in tree.nsmap.items() if k is not None}
+        endpoint_node = tree.find(f'.//cac:Accounting{role}Party/cac:Party/cbc:EndpointID', nsmap)
+        if endpoint_node is not None:
+            peppol_eas = endpoint_node.attrib.get('schemeID')
+            peppol_endpoint = endpoint_node.text
+            if peppol_eas and peppol_endpoint:
+                # include the EAS and endpoint in the search domain when retrieving the partner
+                partner_vals.update({
+                    'peppol_eas': peppol_eas,
+                    'peppol_endpoint': peppol_endpoint,
+                })
+        return partner_vals

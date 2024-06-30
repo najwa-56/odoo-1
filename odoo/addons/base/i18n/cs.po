@@ -6,10 +6,10 @@
 # karolína schusterová <karolina.schusterova@vdp.sk>, 2023
 # Ivana Bartonkova, 2023
 # Aleš Fiala <f.ales1@seznam.cz>, 2024
-# Wil Odoo, 2024
 # Tomáš Píšek, 2024
 # Jiří Podhorecký, 2024
 # Katerina Horylova, 2024
+# Wil Odoo, 2024
 # Jakub Smolka, 2024
 # 
 msgid ""
@@ -18715,6 +18715,11 @@ msgid "France - Accounting Reports"
 msgstr "Francie - účetní zprávy"
 
 #. module: base
+#: model:ir.module.module,shortdesc:base.module_l10n_fr_invoice_addr
+msgid "France - Adding Mandatory Invoice Mentions (Decree no. 2022-1299)"
+msgstr ""
+
+#. module: base
 #: model:ir.module.module,shortdesc:base.module_l10n_fr_fec
 msgid "France - FEC Export"
 msgstr "Francie - FEC export"
@@ -24144,7 +24149,7 @@ msgstr "Dejte vědět uživateli, když bude produkt znovu dostupný skladem"
 #. module: base
 #: model:ir.model.fields,field_description:base.field_ir_cron__numbercall
 msgid "Number of Calls"
-msgstr "Počet hovorů"
+msgstr "Počet volání funkce"
 
 #. module: base
 #: model:ir.model.fields,field_description:base.field_res_users__companies_count
@@ -34279,9 +34284,9 @@ msgid ""
 "\n"
 "Sorry, %s doesn't have '%s' access to:"
 msgstr ""
-"Uh-oh! Vypadá to, že jste zakopli o nějaký přísně tajný záznam.\n"
+"Ach-och! Vypadá to, že jste zakopli o nějaký přísně tajný záznam.\n"
 "\n"
-"%s nemá přístup '%s' pro záznam:"
+"Prominňte, %s nemá přístup pro '%s' k:"
 
 #. module: base
 #: model:res.country,name:base.ua

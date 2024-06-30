@@ -4,8 +4,8 @@
 # 
 # Translators:
 # Edi Santoso <repopamor@gmail.com>, 2023
-# Abe Manyo, 2024
 # Wil Odoo, 2024
+# Abe Manyo, 2024
 # 
 msgid ""
 msgstr ""
@@ -13,7 +13,7 @@ msgstr ""
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2024-01-29 10:44+0000\n"
 "PO-Revision-Date: 2023-10-26 23:09+0000\n"
-"Last-Translator: Wil Odoo, 2024\n"
+"Last-Translator: Abe Manyo, 2024\n"
 "Language-Team: Indonesian (https://app.transifex.com/odoo/teams/41243/id/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -524,8 +524,14 @@ msgstr ""
 
 #. module: account
 #: model_terms:ir.ui.view,arch_db:account.view_account_payment_register_form
-msgid "<b>Early Payment Discount applied.</b>"
-msgstr "<b>Potongan Pembayaran Awal diterapkan.</b>"
+msgid ""
+"<b>Early Payment Discount of %(payment_reference) has been applied.</b>"
+msgstr "<b>Diskon Pembayaran Awal %(payment_reference) telah diterapkan.</b>"
+
+#. module: account
+#: model_terms:ir.ui.view,arch_db:account.report_invoice_document
+msgid "<br/> on this account:"
+msgstr "<br/> pada akun ini:"
 
 #. module: account
 #: model:mail.template,body_html:account.email_template_edi_credit_note
@@ -5054,7 +5060,7 @@ msgstr "Alamat Pelanggan"
 #. module: account
 #: model:ir.actions.act_window,name:account.action_open_sale_payment_items
 msgid "Customer Amounts to Settle"
-msgstr "Jumlah Pelanggan untuk Dilunasi"
+msgstr "Jumlah Pelanggan tunuk Dilunasi"
 
 #. module: account
 #: model_terms:ir.ui.view,arch_db:account.view_account_payment_form
@@ -6110,17 +6116,6 @@ msgstr "Jumlah Akun Bank Mitra yang Diduplikasi"
 #: model:ir.model.fields,field_description:account.field_account_payment__duplicated_ref_ids
 msgid "Duplicated Ref"
 msgstr "Referensi Diduplikasi"
-
-#. module: account
-#. odoo-python
-#: code:addons/account/models/account_move.py:0
-#, python-format
-msgid ""
-"Duplicated vendor reference detected. You probably encoded twice the same "
-"vendor bill/credit note."
-msgstr ""
-"Duplikat referensi pemasok terdeteksi. Anda mungkin merekam tagihan "
-"pemasok/catatan kredit yang sama dua kali."
 
 #. module: account
 #: model:ir.model.fields,field_description:account.field_res_config_settings__module_account_reports
@@ -7205,7 +7200,7 @@ msgstr "Grup"
 #: model_terms:ir.ui.view,arch_db:account.view_bank_statement_search
 #: model_terms:ir.ui.view,arch_db:account.view_partner_bank_search_inherit
 msgid "Group By"
-msgstr "Kelompokkan berdasarkan"
+msgstr "Dikelompokkan berdasarkan"
 
 #. module: account
 #: model:ir.model.fields,field_description:account.field_account_payment_register__group_payment
@@ -8044,8 +8039,12 @@ msgstr "Tidak valid"
 #. odoo-python
 #: code:addons/account/models/partner.py:0
 #, python-format
-msgid "Invalid \"Zip Range\", please configure it properly."
-msgstr "\"Kode Pos\" tidak valid, silakan konfigurasi yang betul."
+msgid ""
+"Invalid \"Zip Range\", You have to configure both \"From\" and \"To\" values"
+" for the zip range and \"To\" should be greater than \"From\"."
+msgstr ""
+"\"Zip Range\" tidak valid, Anda harus mengonfigurasi value \"Dari\" dan "
+"\"Ke\" untuk zip range dan \"Ke\" harus lebih besar dari \"Dari\"."
 
 #. module: account
 #. odoo-python
@@ -8365,7 +8364,7 @@ msgstr "Faktur terhutang kepada Anda"
 #: code:addons/account/models/account_move.py:0
 #, python-format
 msgid "Invoices sent"
-msgstr "Faktur yang terkirim"
+msgstr "Faktur yang dikirim"
 
 #. module: account
 #. odoo-python
@@ -10400,13 +10399,6 @@ msgid "Open"
 msgstr "Terbuka"
 
 #. module: account
-#. odoo-python
-#: code:addons/account/models/account_move.py:0
-#, python-format
-msgid "Open list"
-msgstr "Buka list"
-
-#. module: account
 #: model:ir.model.fields,field_description:account.field_account_account__opening_balance
 msgid "Opening Balance"
 msgstr "Saldo Awal"
@@ -11371,7 +11363,7 @@ msgstr "Rekam Perbedaan di"
 #. module: account
 #: model_terms:ir.ui.view,arch_db:account.res_config_settings_view_form
 msgid "Post Exchange difference entries in:"
-msgstr "Enteri Post Exchange difference di:"
+msgstr "Rekam entri Exchange difference di:"
 
 #. module: account
 #: model_terms:ir.ui.view,arch_db:account.validate_account_move_view
@@ -13910,6 +13902,13 @@ msgid "Text Value"
 msgstr "Text Value"
 
 #. module: account
+#. odoo-javascript
+#: code:addons/account/static/src/components/document_state/document_state_field.js:0
+#, python-format
+msgid "Text copied"
+msgstr "Teks disali"
+
+#. module: account
 #: model:ir.model.fields,help:account.field_res_company__account_opening_date
 msgid "That is the date of the opening entry."
 msgstr "Ini adalah tanggal untuk entri awal."
@@ -14008,6 +14007,8 @@ msgid ""
 "The Syscohada chart template shouldn't be selected directly. Instead, you "
 "should directly select the chart template related to your country."
 msgstr ""
+"Templat bagan Syschohada seharusnya tidak dipilih secara langsung. Anda "
+"sebaiknya memilih templat bagan yang terkait negara Anda."
 
 #. module: account
 #. odoo-python
@@ -16505,7 +16506,7 @@ msgstr "Tulis di sini <b>alamat email Anda</b> untuk menguji alurnya."
 #. module: account
 #: model:ir.model.fields,field_description:account.field_account_payment_register__writeoff_is_exchange_account
 msgid "Writeoff Is Exchange Account"
-msgstr ""
+msgstr "Writeoff Is Exchange Account"
 
 #. module: account
 #: model:ir.model.constraint,message:account.constraint_account_move_line_check_credit_debit
@@ -16774,7 +16775,7 @@ msgstr ""
 
 #. module: account
 #. odoo-python
-#: code:addons/account/models/account_payment_method.py:0
+#: code:addons/account/models/account_journal.py:0
 #, python-format
 msgid ""
 "You can't have two payment method lines of the same payment type (%s) and "
@@ -16835,6 +16836,8 @@ msgid ""
 "You can't register payments for both inbound and outbound moves at the same "
 "time."
 msgstr ""
+"Anda tidak dapat mendaftarkan pembayaran untuk pergerakkan masuk dan keluar "
+"pada saat yang sama."
 
 #. module: account
 #. odoo-python

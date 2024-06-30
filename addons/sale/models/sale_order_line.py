@@ -328,7 +328,9 @@ class SaleOrderLine(models.Model):
                 elif dp_state == 'cancel':
                     name = _("%(line_description)s (Canceled)", line_description=name)
                 else:
-                    invoice = line._get_invoice_lines().move_id
+                    invoice = line._get_invoice_lines().filtered(
+                        lambda aml: aml.quantity >= 0
+                    ).move_id.filtered(lambda move: move.move_type == 'out_invoice')
                     if len(invoice) == 1 and invoice.payment_reference and invoice.invoice_date:
                         name = _(
                             "%(line_description)s (ref: %(reference)s on %(date)s)",
@@ -360,13 +362,16 @@ class SaleOrderLine(models.Model):
         :return: the description related to special variant attributes/values
         :rtype: string
         """
-        if not self.product_custom_attribute_value_ids and not self.product_no_variant_attribute_value_ids:
+        no_variant_ptavs = self.product_no_variant_attribute_value_ids._origin.filtered(
+            # Only describe the attributes where a choice was made by the customer
+            lambda ptav: ptav.display_type == 'multi' or ptav.attribute_line_id.value_count > 1
+        )
+        if not self.product_custom_attribute_value_ids and not no_variant_ptavs:
             return ""
 
         name = "\n"
 
         custom_ptavs = self.product_custom_attribute_value_ids.custom_product_template_attribute_value_id
-        no_variant_ptavs = self.product_no_variant_attribute_value_ids._origin
         multi_ptavs = no_variant_ptavs.filtered(lambda ptav: ptav.display_type == 'multi').sorted()
 
         # display the no_variant attributes, except those that are also
@@ -414,20 +419,15 @@ class SaleOrderLine(models.Model):
 
     @api.depends('product_id', 'company_id')
     def _compute_tax_id(self):
-        taxes_by_product_company = defaultdict(lambda: self.env['account.tax'])
         lines_by_company = defaultdict(lambda: self.env['sale.order.line'])
         cached_taxes = {}
         for line in self:
             lines_by_company[line.company_id] += line
-        for product in self.product_id:
-            for tax in product.taxes_id:
-                taxes_by_product_company[(product, tax.company_id)] += tax
         for company, lines in lines_by_company.items():
             for line in lines.with_company(company):
-                taxes, comp = None, company
-                while not taxes and comp:
-                    taxes = taxes_by_product_company[(line.product_id, comp)]
-                    comp = comp.parent_id
+                taxes = None
+                if line.product_id:
+                    taxes = line.product_id.taxes_id._filter_taxes_by_company(company)
                 if not line.product_id or not taxes:
                     # Nothing to map
                     line.tax_id = False
@@ -620,7 +620,7 @@ class SaleOrderLine(models.Model):
         Compute the amounts of the SO line.
         """
         for line in self:
-            tax_results = self.env['account.tax']._compute_taxes([
+            tax_results = self.env['account.tax'].with_company(line.company_id)._compute_taxes([
                 line._convert_to_tax_base_line_dict()
             ])
             totals = list(tax_results['totals'].values())[0]
@@ -825,6 +825,16 @@ class SaleOrderLine(models.Model):
                 line.invoice_status = 'invoiced'
             else:
                 line.invoice_status = 'no'
+
+    def _can_be_invoiced_alone(self):
+        """ Whether a given line is meaningful to invoice alone.
+
+        It is generally meaningless/confusing or even wrong to invoice some specific SOlines
+        (delivery, discounts, rewards, ...) without others, unless they are the only left to invoice
+        in the SO.
+        """
+        self.ensure_one()
+        return self.product_id.id != self.company_id.sale_discount_product_id.id
 
     @api.depends('invoice_lines', 'invoice_lines.price_total', 'invoice_lines.move_id.state', 'invoice_lines.move_id.move_type')
     def _compute_untaxed_amount_invoiced(self):

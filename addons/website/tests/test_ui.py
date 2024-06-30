@@ -7,7 +7,9 @@ from werkzeug.urls import url_encode
 
 import odoo
 import odoo.tests
+from odoo import http
 from odoo.addons.base.tests.common import HttpCaseWithUserDemo
+from odoo.addons.web_editor.controllers.main import Web_Editor
 
 
 @odoo.tests.tagged('-at_install', 'post_install')
@@ -112,8 +114,35 @@ class TestUiHtmlEditor(HttpCaseWithUserDemo):
         self.start_tour(self.env['website'].get_client_action_url('/contactus'), 'test_html_editor_scss', login='admin')
         self.start_tour(self.env['website'].get_client_action_url('/'), 'test_html_editor_scss_2', login='demo')
 
-    def media_dialog_undraw(self):
+    def test_media_dialog_undraw(self):
+        BASE_URL = self.base_url()
+        banner = '/website/static/src/img/snippets_demo/s_banner.jpg'
+
+        def mock_media_library_search(self, **params):
+            return {
+                'results': 1,
+                'media': [{
+                    'id': 1,
+                    'media_url': BASE_URL + banner,
+                    'thumbnail_url': BASE_URL + banner,
+                    'tooltip': False,
+                    'author': 'undraw',
+                    'author_link': BASE_URL,
+                }],
+            }
+
+        # disable undraw, no third party should be called in tests
+        # Mocked for the previews in the media dialog
+        mock_media_library_search.routing_type = 'json'
+        Web_Editor.media_library_search = http.route(['/web_editor/media_library_search'], type='json', auth='user', website=True)(mock_media_library_search)
+
         self.start_tour("/", 'website_media_dialog_undraw', login='admin')
+
+
+@odoo.tests.tagged('external', '-standard', '-at_install', 'post_install')
+class TestUiHtmlEditorWithExternal(HttpCaseWithUserDemo):
+    def test_media_dialog_external_library(self):
+        self.start_tour("/", 'website_media_dialog_external_library', login='admin')
 
 
 @odoo.tests.tagged('-at_install', 'post_install')
@@ -555,3 +584,36 @@ class TestUi(odoo.tests.HttpCase):
 
     def test_mobile_order_with_drag_and_drop(self):
         self.start_tour(self.env['website'].get_client_action_url('/'), 'website_mobile_order_with_drag_and_drop', login='admin')
+
+    def test_website_no_dirty_lazy_image(self):
+        website = self.env['website'].browse(1)
+        # Enable multiple langs to reduce the chance of the test being silently
+        # broken by ensuring that it receives a lot of extra o_dirty elements.
+        # This is done to account for potential later changes in the number of
+        # o_dirty elements caused by legitimate modifications in the code.
+        # Perfs: `_activate_lang()` does not load .pot so it is perf friendly
+        lang_fr = self.env['res.lang']._activate_lang('fr_FR')
+        lang_es = self.env['res.lang']._activate_lang('es_AR')
+        lang_zh = self.env['res.lang']._activate_lang('zh_HK')
+        lang_ar = self.env['res.lang']._activate_lang('ar_SY')
+        website.language_ids = self.env.ref('base.lang_en') + lang_fr + lang_es + lang_zh + lang_ar
+        # Select "dropdown with image" language selector template
+        for key, active in [
+            # footer
+            ('portal.footer_language_selector', True),
+            ('website.footer_language_selector_inline', False),
+            ('website.footer_language_selector_flag', True),
+            ('website.footer_language_selector_no_text', False),
+            ('website.footer_language_selector_flag', True),
+            ('website.footer_language_selector_no_text', False),
+            # header
+            ('website.header_language_selector', True),
+            ('website.header_language_selector_inline', False),
+            ('website.header_language_selector_flag', True),
+            ('website.header_language_selector_no_text', False),
+            ('website.header_language_selector_flag', True),
+            ('website.header_language_selector_no_text', False),
+        ]:
+            self.env['website'].with_context(website_id=website.id).viewref(key).active = active
+
+        self.start_tour('/', 'website_no_dirty_lazy_image', login='admin')

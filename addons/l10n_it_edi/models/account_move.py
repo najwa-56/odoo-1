@@ -688,7 +688,7 @@ class AccountMove(models.Model):
             ):
                 self.env.cr.commit()
                 moves |= move
-                proxy_acks.append(id_transaction)
+            proxy_acks.append(id_transaction)
 
         # Extend created moves with the related attachments and commit
         for move in moves:
@@ -1097,9 +1097,9 @@ class AccountMove(models.Model):
 
         # Discounts
         if elements := element.xpath('.//ScontoMaggiorazione'):
-            element = elements[0]
             # Special case of only 1 percentage discount
             if len(elements) == 1:
+                element = elements[0]
                 if discount_percentage := get_float(element, './/Percentuale'):
                     discount_type = get_text(element, './/Tipo')
                     discount_sign = -1 if discount_type == 'MG' else 1

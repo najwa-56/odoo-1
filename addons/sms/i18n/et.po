@@ -18,6 +18,7 @@
 # JanaAvalah, 2023
 # Eneli Õigus <enelioigus@gmail.com>, 2023
 # Mihkel avalah, 2023
+# Birgit Vijar, 2024
 # Anna, 2024
 # 
 msgid ""
@@ -243,7 +244,7 @@ msgstr "Vali keel:"
 #. module: sms
 #: model_terms:ir.ui.view,arch_db:sms.ir_actions_server_view_form
 msgid "Choose a template..."
-msgstr ""
+msgstr "Vali mall.."
 
 #. module: sms
 #: model_terms:ir.ui.view,arch_db:sms.sms_template_preview_form
@@ -587,7 +588,7 @@ msgstr "Ebapiisav krediit"
 #. module: sms
 #: model:ir.model.fields.selection,name:sms.selection__mail_notification__failure_type__sms_invalid_destination
 msgid "Invalid Destination"
-msgstr ""
+msgstr "Vigane sihtkoht"
 
 #. module: sms
 #. odoo-python
@@ -1091,7 +1092,7 @@ msgstr "Sõnumi mallid on lähtestatud"
 #. module: sms
 #: model:ir.model.fields,field_description:sms.field_mail_notification__sms_tracker_ids
 msgid "SMS Trackers"
-msgstr ""
+msgstr "SMS jälgijad"
 
 #. module: sms
 #: model_terms:ir.ui.view,arch_db:sms.sms_template_preview_form

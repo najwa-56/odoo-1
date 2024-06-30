@@ -33,9 +33,10 @@
 # F Hariri <fhari1234@gmail.com>, 2024
 # fardin mardani <fmardani0@gmail.com>, 2024
 # Sajjad Pirahesh, 2024
-# Mostafa Barmshory <mostafa.barmshory@gmail.com>, 2024
 # Hamed Mohammadi <hamed@dehongi.com>, 2024
 # Hanna Kheradroosta, 2024
+# Mostafa Barmshory <mostafa.barmshory@gmail.com>, 2024
+# darloof, 2024
 # 
 msgid ""
 msgstr ""
@@ -43,7 +44,7 @@ msgstr ""
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2024-01-29 10:44+0000\n"
 "PO-Revision-Date: 2023-10-26 23:09+0000\n"
-"Last-Translator: Hanna Kheradroosta, 2024\n"
+"Last-Translator: darloof, 2024\n"
 "Language-Team: Persian (https://app.transifex.com/odoo/teams/41243/fa/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -553,8 +554,14 @@ msgstr ""
 
 #. module: account
 #: model_terms:ir.ui.view,arch_db:account.view_account_payment_register_form
-msgid "<b>Early Payment Discount applied.</b>"
-msgstr "<b>تخفیف پرداخت زودهنگام اعمال شد.</b>"
+msgid ""
+"<b>Early Payment Discount of %(payment_reference) has been applied.</b>"
+msgstr "<b>تخفیف پرداخت زودهنگام %(payment_reference) اعمال شد.</b>"
+
+#. module: account
+#: model_terms:ir.ui.view,arch_db:account.report_invoice_document
+msgid "<br/> on this account:"
+msgstr "<br/> روی این حساب:"
 
 #. module: account
 #: model:mail.template,body_html:account.email_template_edi_credit_note
@@ -829,7 +836,8 @@ msgid ""
 "<i class=\"oi oi-fw o_button_icon oi-arrow-right\"/> Choose or Configure "
 "Email Servers"
 msgstr ""
-"<i class=\"oi oi-fw o_button_icon oi-arrow-right\"/> میل سرور را تنظیم کنید"
+"<i class=\"oi oi-fw o_button_icon oi-arrow-right\"/> میل سرور را تنظیم یا "
+"انتخاب کنید"
 
 #. module: account
 #: model_terms:ir.ui.view,arch_db:account.account_tour_upload_bill_email_confirm
@@ -1089,6 +1097,8 @@ msgid ""
 "<span invisible=\"state != 'draft' or name != '/' or posted_before or "
 "quick_edit_mode\">Draft</span>"
 msgstr ""
+"<span invisible=\"state != 'پیشنویس' or name != '/' or posted_before or "
+"quick_edit_mode\">پیشنویس</span>"
 
 #. module: account
 #: model_terms:ir.ui.view,arch_db:account.account_journal_dashboard_kanban_view
@@ -1745,7 +1755,7 @@ msgstr "حساب دریافتنی"
 #. module: account
 #: model:account.account,name:account.1_pos_receivable
 msgid "Account Receivable (PoS)"
-msgstr "حساب دریافتنی (PoS)"
+msgstr "حساب دریافتنی (پایانه فروش)"
 
 #. module: account
 #: model:ir.model.fields,field_description:account.field_account_move_line__is_account_reconcile
@@ -1773,7 +1783,7 @@ msgstr "برچسب حساب"
 #: model:ir.model.fields,field_description:account.field_product_product__account_tag_ids
 #: model:ir.model.fields,field_description:account.field_product_template__account_tag_ids
 msgid "Account Tags"
-msgstr "کلمات کلیدی حساب"
+msgstr "برچسب‌های حساب"
 
 #. module: account
 #: model_terms:ir.ui.view,arch_db:account.account_tax_view_tree
@@ -2443,7 +2453,7 @@ msgstr "تمام امور قرارداد منحصراً توسط ... اداره 
 #: code:addons/account/wizard/account_move_reversal.py:0
 #, python-format
 msgid "All selected moves for reversal must belong to the same company."
-msgstr ""
+msgstr "تمام اسناد انتخاب شده برای لغو باید متعلق به یک شرکت باشند."
 
 #. module: account
 #: model:ir.model.fields,field_description:account.field_res_config_settings__module_product_margin
@@ -3981,7 +3991,7 @@ msgstr "تنظیم جدول حساب‌ها"
 #: code:addons/account/wizard/account_move_send.py:0
 #, python-format
 msgid "Check Partner(s)"
-msgstr ""
+msgstr "بررسی همکاران ()"
 
 #. module: account
 #: model:ir.model.fields,help:account.field_account_account__reconcile
@@ -6113,17 +6123,6 @@ msgid "Duplicated Ref"
 msgstr "تکرار شماره‌ی مرجع"
 
 #. module: account
-#. odoo-python
-#: code:addons/account/models/account_move.py:0
-#, python-format
-msgid ""
-"Duplicated vendor reference detected. You probably encoded twice the same "
-"vendor bill/credit note."
-msgstr ""
-"تکرار شماره‌ی مرجع فروشنده. شاید سند بستانکار یا صورت‌حساب یک فروشنده را دو "
-"بار  کدگذاری کرده باشید. "
-
-#. module: account
 #: model:ir.model.fields,field_description:account.field_res_config_settings__module_account_reports
 msgid "Dynamic Reports"
 msgstr "گزارشهای پویا"
@@ -6238,7 +6237,7 @@ msgstr "ایمیل پیشفرض"
 #. module: account
 #: model:ir.model.fields,help:account.field_account_journal__alias_domain
 msgid "Email domain e.g. 'example.com' in 'odoo@example.com'"
-msgstr ""
+msgstr "دامنه‌ی ایمیل مانند 'example.com' در 'odoo@example.com'"
 
 #. module: account
 #: model:account.account,name:account.1_employee_payroll_taxes
@@ -6392,7 +6391,7 @@ msgstr "حقوق صاحبان سهام"
 #: code:addons/account/models/account_move.py:0
 #, python-format
 msgid "Error importing attachment '%s' as invoice (decoder=%s)"
-msgstr ""
+msgstr "خطا در وارد کردن پیوست %s به عنوان فاکتور (%s=decoder)"
 
 #. module: account
 #. odoo-python
@@ -8027,8 +8026,10 @@ msgstr "نامعتبر"
 #. odoo-python
 #: code:addons/account/models/partner.py:0
 #, python-format
-msgid "Invalid \"Zip Range\", please configure it properly."
-msgstr "\"Zip Range\" نامعتبر است، لطفاً آن را به درستی پیکربندی کنید."
+msgid ""
+"Invalid \"Zip Range\", You have to configure both \"From\" and \"To\" values"
+" for the zip range and \"To\" should be greater than \"From\"."
+msgstr ""
 
 #. module: account
 #. odoo-python
@@ -10373,13 +10374,6 @@ msgid "Open"
 msgstr "باز"
 
 #. module: account
-#. odoo-python
-#: code:addons/account/models/account_move.py:0
-#, python-format
-msgid "Open list"
-msgstr "فهرست را باز کنید"
-
-#. module: account
 #: model:ir.model.fields,field_description:account.field_account_account__opening_balance
 msgid "Opening Balance"
 msgstr "تراز اولیه"
@@ -10857,7 +10851,7 @@ msgstr "نگاشت همکار برای مدل‌های تطبیق"
 #: code:addons/account/wizard/account_move_send.py:0
 #, python-format
 msgid "Partner(s) should have an email address."
-msgstr ""
+msgstr "همکاران باید یک نشانی ایمیل داشته باشند. ()"
 
 #. module: account
 #. odoo-python
@@ -13875,6 +13869,13 @@ msgid "Text Value"
 msgstr "مقدار متن "
 
 #. module: account
+#. odoo-javascript
+#: code:addons/account/static/src/components/document_state/document_state_field.js:0
+#, python-format
+msgid "Text copied"
+msgstr "مالیات کپی شده"
+
+#. module: account
 #: model:ir.model.fields,help:account.field_res_company__account_opening_date
 msgid "That is the date of the opening entry."
 msgstr "این تاریخ ورودی افتتاحیه است."
@@ -13972,6 +13973,8 @@ msgid ""
 "The Syscohada chart template shouldn't be selected directly. Instead, you "
 "should directly select the chart template related to your country."
 msgstr ""
+"قالب نمودار Syscohada نباید به صورت مستقیم انتخاب شود. در عوض، شما باید "
+"مستقیماً قالب نمودار مربوط به کشور خود را انتخاب کنید."
 
 #. module: account
 #. odoo-python
@@ -16233,7 +16236,7 @@ msgstr "نما"
 #: code:addons/account/wizard/account_move_send.py:0
 #, python-format
 msgid "View Partner(s)"
-msgstr ""
+msgstr "مشاهده‌ی همکاران ()"
 
 #. module: account
 #: model:ir.model.fields.selection,name:account.selection__res_partner__invoice_warn__warning
@@ -16424,7 +16427,7 @@ msgstr "برای تست جریان <b>آدرس ایمیل خود</b> را این
 #. module: account
 #: model:ir.model.fields,field_description:account.field_account_payment_register__writeoff_is_exchange_account
 msgid "Writeoff Is Exchange Account"
-msgstr ""
+msgstr "کاهش ارزش حساب ارزی"
 
 #. module: account
 #: model:ir.model.constraint,message:account.constraint_account_move_line_check_credit_debit
@@ -16686,7 +16689,7 @@ msgstr ""
 
 #. module: account
 #. odoo-python
-#: code:addons/account/models/account_payment_method.py:0
+#: code:addons/account/models/account_journal.py:0
 #, python-format
 msgid ""
 "You can't have two payment method lines of the same payment type (%s) and "
@@ -16989,6 +16992,9 @@ msgid ""
 "already posted.                 If you are absolutely sure you want to "
 "modify the opening balance of your accounts, reset the move to draft."
 msgstr ""
+"اگر سند اولیه (%s) ثبت شده باشد، نمی‌توانید «تراز اولیه» را وارد کنید. اگر  "
+"کاملاًَ اطمینان دارید که می‌خواهید تراز اولیه‌ی حساب‌های خود را تغییر دهید، "
+"سند را به حالت پیشنویس بازگردانید."
 
 #. module: account
 #. odoo-python

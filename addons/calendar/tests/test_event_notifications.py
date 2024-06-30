@@ -179,13 +179,12 @@ class TestEventNotifications(TransactionCase, MailCase, CronMixinCase):
 
         self.assertEqual(len(capt.records), 1)
         self.assertLessEqual(capt.records.call_at, now)
-
         with patch.object(fields.Datetime, 'now', lambda: now):
-            with self.assertSinglePostNotifications([{'partner': self.partner, 'type': 'inbox'}], {
-                'message_type': 'user_notification',
-                'subtype': 'mail.mt_note',
-            }):
-                self.env['calendar.alarm_manager'].with_context(lastcall=now - relativedelta(minutes=15))._send_reminder()
+            self.env['calendar.alarm_manager'].with_context(lastcall=now - relativedelta(minutes=25))._send_reminder()
+            self.env.flush_all()
+            new_messages = self.env['mail.message'].search([('model', '=', 'calendar.event'), ('res_id', '=', self.event.id), ('subject', '=', 'test event - Reminder')])
+            user_message = new_messages.filtered(lambda x: self.event.user_id.partner_id in x.partner_ids)
+            self.assertTrue(user_message, "Organizer must receive a reminder")
 
     def test_email_alarm_recurrence(self):
         # test that only a single cron trigger is created for recurring events.
@@ -267,6 +266,44 @@ class TestEventNotifications(TransactionCase, MailCase, CronMixinCase):
                 }).with_context(mail_notrack=True)
                 self.env.flush_all()
                 self.assertEqual(len(capt.records), 1)
+
+        with self.capture_triggers('calendar.ir_cron_scheduler_alarm') as capt:
+            # Create alarm with one hour interval.
+            alarm_hour = self.env['calendar.alarm'].create({
+                'name': 'Alarm',
+                'alarm_type': 'email',
+                'interval': 'hours',
+                'duration': 1,
+            })
+            # Create monthly recurrence, ensure the next alarm is set to the first event
+            # and then one month later must be set one hour before to the last event.
+            with freeze_time('2024-04-16 10:00+0000'):
+                now = fields.Datetime.now()
+                self.env['calendar.event'].create({
+                    'name': "Single Doom's day",
+                    'start': now + relativedelta(hours=2),
+                    'stop': now + relativedelta(hours=3),
+                    'recurrency': True,
+                    'rrule_type': 'monthly',
+                    'count': 2,
+                    'day': 16,
+                    'alarm_ids': [fields.Command.link(alarm_hour.id)],
+                }).with_context(mail_notrack=True)
+                self.env.flush_all()
+                # Ensure that there is only one alarm set, exactly for one hour previous the event.
+                self.assertEqual(len(capt.records), 1, "Only one trigger must be created for the entire recurrence.")
+                self.assertEqual(capt.records.mapped('call_at'), [datetime(2024, 4, 16, 11, 0)], "Alarm must be one hour before the first event.")
+
+            # Garbage-collect the previous trigger from the cron.
+            with freeze_time('2024-05-10 11:00+0000'):
+                self.env['ir.cron.trigger']._gc_cron_triggers()
+
+            with freeze_time('2024-04-22 10:00+0000'):
+                # The next alarm will be set through the next_date selection for the next event.
+                # Ensure that there is only one alarm set, exactly for one hour previous the event.
+                self.env['calendar.alarm_manager']._send_reminder()
+                self.assertEqual(len(capt.records), 1, "Only one trigger must be created for the entire recurrence.")
+                self.assertEqual(capt.records.mapped('call_at'), [datetime(2024, 5, 16, 11, 0)], "Alarm must be one hour before the second event.")
 
     def test_email_alarm_daily_recurrence(self):
         # test email alarm is sent correctly on daily recurrence

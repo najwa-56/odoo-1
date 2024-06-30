@@ -139,7 +139,7 @@ class SaleOrder(models.Model):
         product = product or reward_products[:1]
         if not product or product not in reward_products:
             raise UserError(_('Invalid product to claim.'))
-        taxes = self.fiscal_position_id.map_tax(product.taxes_id.filtered(lambda t: t.company_id == self.company_id))
+        taxes = self.fiscal_position_id.map_tax(product.taxes_id._filter_taxes_by_company(self.company_id))
         points = self._get_real_points_for_coupon(coupon)
         claimable_count = float_round(points / reward.required_points, precision_rounding=1, rounding_method='DOWN') if not reward.clear_wallet else 1
         cost = points if reward.clear_wallet else claimable_count * reward.required_points
@@ -171,8 +171,9 @@ class SaleOrder(models.Model):
             # Ignore lines from this reward
             if not line.product_uom_qty or not line.price_unit:
                 continue
+            discounted_price_unit = line.price_unit * (1 - (line.discount or 0.0) / 100.0)
             tax_data = line.tax_id.compute_all(
-                line.price_unit,
+                discounted_price_unit,
                 quantity=line.product_uom_qty,
                 product=line.product_id,
                 partner=line.order_partner_id,
@@ -364,19 +365,45 @@ class SaleOrder(models.Model):
             point_cost = converted_discount / reward.discount
         # Gift cards and eWallets are considered gift cards and should not have any taxes
         if reward.program_id.is_payment_program:
-            return [{
+            reward_product = reward.discount_line_product_id
+            reward_line_values = {
                 'name': reward.description,
-                'product_id': reward.discount_line_product_id.id,
+                'product_id': reward_product.id,
                 'price_unit': -min(max_discount, discountable),
                 'product_uom_qty': 1.0,
-                'product_uom': reward.discount_line_product_id.uom_id.id,
+                'product_uom': reward_product.uom_id.id,
                 'reward_id': reward.id,
                 'coupon_id': coupon.id,
                 'points_cost': point_cost,
                 'reward_identifier_code': reward_code,
                 'sequence': sequence,
-                'tax_id': [(Command.CLEAR, 0, 0)],
-            }]
+                'tax_id': [Command.clear()],
+            }
+            if reward.program_id.program_type == 'gift_card':
+                # For gift cards, the SOL should consider the discount product taxes
+                taxes_to_apply = reward_product.taxes_id._filter_taxes_by_company(self.company_id)
+                if taxes_to_apply:
+                    mapped_taxes = self.fiscal_position_id.map_tax(taxes_to_apply)
+                    price_incl_taxes = mapped_taxes.filtered('price_include')
+                    tax_res = mapped_taxes.with_context(
+                        force_price_include=True,
+                        round=False,
+                        round_base=False,
+                    ).compute_all(
+                        reward_line_values['price_unit'],
+                        currency=self.currency_id,
+                    )
+                    new_price = tax_res['total_excluded']
+                    new_price += sum(
+                        tax_data['amount']
+                        for tax_data in tax_res['taxes']
+                        if tax_data['id'] in price_incl_taxes.ids
+                    )
+                    reward_line_values.update({
+                        'price_unit': new_price,
+                        'tax_id': [Command.set(mapped_taxes.ids)],
+                    })
+            return [reward_line_values]
         discount_factor = min(1, (max_discount / discountable)) if discountable else 1
         reward_dict = {}
         for tax, price in discountable_per_tax.items():
@@ -481,34 +508,6 @@ class SaleOrder(models.Model):
         """
         self.ensure_one()
         return self._get_points_programs() | self._get_reward_programs()
-
-    def _compute_invoice_status(self):
-        # Handling of a specific situation: an order contains
-        # a product invoiced on delivery and a promo line invoiced
-        # on order. We would avoid having the invoice status 'to_invoice'
-        # if the created invoice will only contain the promotion line
-        super()._compute_invoice_status()
-        for order in self:
-            if order.invoice_status != 'to invoice':
-                continue
-            if not any(not line.is_reward_line and line.invoice_status == 'to invoice' for line in order.order_line):
-                order.invoice_status = 'no'
-
-    def _get_invoiceable_lines(self, final=False):
-        """ Ensures we cannot invoice only reward lines.
-
-        Since promotion lines are specified with service products,
-        those lines are directly invoiceable when the order is confirmed
-        which can result in invoices containing only promotion lines.
-
-        To avoid those cases, we allow the invoicing of promotion lines
-        if at least another 'basic' lines is also invoiceable.
-        """
-        invoiceable_lines = super()._get_invoiceable_lines(final)
-        for line in invoiceable_lines:
-            if not line.is_reward_line:
-                return invoiceable_lines
-        return self.env['sale.order.line']
 
     def _recompute_prices(self):
         """Recompute coupons/promotions after pricelist prices reset."""
@@ -926,8 +925,17 @@ class SaleOrder(models.Model):
                         points += rule.reward_point_amount
                     elif rule.reward_point_mode == 'money':
                         # Compute amount paid for rule
-                        # NOTE: this does not account for discounts -> 1 point per $ * (100$ - 30%) will result in 100 points
-                        amount_paid = sum(max(0, line.price_total) for line in order_lines if line.product_id in rule_products)
+                        # NOTE: this accounts for discounts -> 1 point per $ * (100$ - 30%) will
+                        # result in 70 points
+                        amount_paid = 0.0
+                        rule_products = so_products_per_rule.get(rule, [])
+                        for line in self.order_line - self._get_no_effect_on_threshold_lines():
+                            if line.reward_id.program_id.program_type in [
+                                'ewallet', 'gift_card', program.program_type
+                            ]:
+                                continue
+                            amount_paid += line.price_total if line.product_id in rule_products else 0.0
+
                         points += float_round(rule.reward_point_amount * amount_paid, precision_digits=2, rounding_method='DOWN')
                     elif rule.reward_point_mode == 'unit':
                         points += rule.reward_point_amount * ordered_rule_products_qty

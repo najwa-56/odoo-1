@@ -4,6 +4,7 @@
 # 
 # Translators:
 # Wil Odoo, 2023
+# Pedro M. Baeza <pedro.baeza@tecnativa.com>, 2024
 # Larissa Manderfeld, 2024
 # 
 msgid ""
@@ -95,6 +96,13 @@ msgstr ""
 #: model:ir.model,name:base_vat.model_res_partner
 msgid "Contact"
 msgstr "Contacto"
+
+#. module: base_vat
+#. odoo-python
+#: code:addons/base_vat/models/res_partner.py:0
+#, python-format
+msgid "DE123456788 or 12/345/67890"
+msgstr "DE123456788 o 12/345/67890"
 
 #. module: base_vat
 #. odoo-python
@@ -243,14 +251,14 @@ msgstr "Verificar NIFs con el servicio europeo VIES"
 #: model:ir.model.fields,field_description:base_vat.field_res_partner__vies_vat_to_check
 #: model:ir.model.fields,field_description:base_vat.field_res_users__vies_vat_to_check
 msgid "Vies Vat To Check"
-msgstr "Verificación de número de IVA en VIES"
+msgstr "Comprobar un número de IVA en VIES"
 
 #. module: base_vat
 #. odoo-python
 #: code:addons/base_vat/models/res_partner.py:0
 #, python-format
 msgid "either 11 digits for CPF or 14 digits for CNPJ"
-msgstr "11 dígitos para CPF o 14 dígitos para CNPJ"
+msgstr "ya sea 11 dígitos para CPF o 14 dígitos para CNPJ"
 
 #. module: base_vat
 #. odoo-python
@@ -264,4 +272,4 @@ msgstr "posición fiscal [%s]"
 #: code:addons/base_vat/models/res_partner.py:0
 #, python-format
 msgid "partner [%s]"
-msgstr "partner [%s]"
+msgstr "contacto [%s]"

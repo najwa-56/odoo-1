@@ -205,6 +205,50 @@ QUnit.module("WebEditor.HtmlField", ({ beforeEach }) => {
         assert.strictEqual(editable.innerHTML, `<p>first</p>`);
     });
 
+    QUnit.test("undo after discard html field changes in form", async (assert) => {
+        serverData.models.partner.records = [{ id: 1, txt: "<p>first</p>" }];
+        let wysiwyg;
+        const wysiwygPromise = makeDeferred();
+        patchWithCleanup(HtmlField.prototype, {
+            async startWysiwyg() {
+                await super.startWysiwyg(...arguments);
+                wysiwyg = this.wysiwyg;
+                wysiwygPromise.resolve();
+            },
+        });
+        await makeView({
+            type: "form",
+            resId: 1,
+            resModel: "partner",
+            serverData,
+            arch: `
+                <form>
+                    <field name="txt" widget="html"/>
+                </form>`,
+        });
+        await wysiwygPromise;
+        const editor = wysiwyg.odooEditor;
+        const editable = editor.editable;
+        editor.testMode = true;
+        assert.strictEqual(editable.innerHTML, `<p>first</p>`);
+        const paragraph = editable.querySelector("p");
+        await setSelection(paragraph, 0);
+        await insertText(editor, "a");
+        assert.strictEqual(editable.innerHTML, `<p>afirst</p>`);
+        // For blur event here to call _onWysiwygBlur function in html_field
+        await editable.dispatchEvent(new Event("blur", { bubbles: true, cancelable: true }));
+        // Wait for the updates to be saved , if we don't wait the update of the value will
+        // be done after the call for discardChanges since it uses some async functions.
+        await new Promise((r) => setTimeout(r, 100));
+        const discardButton = target.querySelector(".o_form_button_cancel");
+        assert.ok(discardButton);
+        await click(discardButton);
+        assert.strictEqual(editable.innerHTML, `<p>first</p>`);
+        await editable.dispatchEvent(new KeyboardEvent('keydown', {key: 'z', ctrlKey: true, bubbles: true, cancelable: true}));
+        assert.strictEqual(editable.innerHTML, `<p>first</p>`);
+    });
+
+
     QUnit.module('Sandboxed Preview');
 
     QUnit.test("complex html is automatically in sandboxed preview mode", async (assert) => {
@@ -994,7 +1038,7 @@ QUnit.module("WebEditor.HtmlField", ({ beforeEach }) => {
         let linkPreview = document.querySelector(".modal a#link-preview");
         assert.strictEqual(labelInputField.value, 'This website',
             "The label input field should match the link's content");
-        assert.strictEqual(linkPreview.innerText.replaceAll("\u200B", ""), "This website",
+        assert.strictEqual(linkPreview.innerText.replaceAll("\ufeff", ""), "This website",
             "Link label in preview should match label input field");
 
         // Click on discard
@@ -1002,7 +1046,7 @@ QUnit.module("WebEditor.HtmlField", ({ beforeEach }) => {
 
         const p = document.querySelector(".test_target");
         // Select link label to open the floating toolbar.
-        setSelection(p, 0, p, 1);
+        setSelection(p, 1, p, 2);
         await nextTick();
         // Click on create-link button to open the Link Dialog.
         document.querySelector("#toolbar #create-link").click();
@@ -1021,7 +1065,7 @@ QUnit.module("WebEditor.HtmlField", ({ beforeEach }) => {
             "Preview should be updated on label input field change");
         // Click "Save".
         await click(document, ".modal .modal-footer button.btn-primary");
-        assert.strictEqual(p.innerText.replaceAll('\u200B', ''), 'New label',
+        assert.strictEqual(p.innerText.replaceAll('\ufeff', ''), 'New label',
             "The link's label should be updated");
     });
 

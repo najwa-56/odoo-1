@@ -180,7 +180,7 @@ class TestItEdiImport(TestItEdi):
               patch.object(sql_db.Cursor, "commit", mock_commit),
               tools.mute_logger("odoo.addons.l10n_it_edi.models.account_move")):
             for dummy in range(2):
-                self.env['account.move']._l10n_it_edi_process_downloads({
+                processed = self.env['account.move']._l10n_it_edi_process_downloads({
                     '999999999': {
                         'filename': filename,
                         'file': self.fake_test_content,
@@ -188,6 +188,8 @@ class TestItEdiImport(TestItEdi):
                     }},
                     proxy_user,
                 )
+                # The Proxy ACK must be sent in both cases of import success and failure.
+                self.assertEqual(processed['proxy_acks'], ['999999999'])
 
         # There should be one attachement with this filename
         attachments = self.env['ir.attachment'].search([
@@ -223,6 +225,42 @@ class TestItEdiImport(TestItEdi):
                     'quantity': 1.0,
                     'name': 'SCONTO',
                     'price_unit': -2,
+                }
+            ],
+        }], applied_xml)
+
+    def test_receive_bill_with_multiple_discounts_in_line(self):
+        applied_xml = """
+            <xpath expr="//FatturaElettronicaBody/DatiBeniServizi/DettaglioLinee[1]" position="inside">
+                <ScontoMaggiorazione>
+                    <Tipo>SC</Tipo>
+                    <Percentuale>50.00</Percentuale>
+                </ScontoMaggiorazione>
+                <ScontoMaggiorazione>
+                    <Tipo>SC</Tipo>
+                    <Percentuale>25.00</Percentuale>
+                </ScontoMaggiorazione>
+                <ScontoMaggiorazione>
+                    <Tipo>SC</Tipo>
+                    <Percentuale>20.00</Percentuale>
+                </ScontoMaggiorazione>
+            </xpath>
+
+            <xpath expr="//FatturaElettronicaBody/DatiBeniServizi/DettaglioLinee[1]/PrezzoTotale" position="replace">
+                <PrezzoTotale>1.50</PrezzoTotale>
+            </xpath>
+        """
+
+        self._assert_import_invoice('IT01234567890_FPR01.xml', [{
+            'invoice_date': fields.Date.from_string('2014-12-18'),
+            'amount_untaxed': 1.5,
+            'amount_tax': 0.33,
+            'invoice_line_ids': [
+                {
+                    'quantity': 5.0,
+                    'name': 'DESCRIZIONE DELLA FORNITURA',
+                    'price_unit': 1.0,
+                    'discount': 70.0,
                 }
             ],
         }], applied_xml)

@@ -651,6 +651,9 @@ class Task(models.Model):
                         extract_data(task)
                 task.name = task.display_name.strip()
 
+    def _portal_get_parent_hash_token(self, pid):
+        return self.project_id._sign_token(pid)
+
     @api.returns('self', lambda value: value.id)
     def copy(self, default=None):
         if default is None:
@@ -928,6 +931,7 @@ class Task(models.Model):
                     'display_in_project': False,
                 })
 
+            project_id = project_id or self.env.context.get('default_project_id')
             if project_id and not "company_id" in vals:
                 vals["company_id"] = self.env["project.project"].browse(
                     project_id

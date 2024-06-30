@@ -1,6 +1,7 @@
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 from odoo.addons.hr_expense.tests.common import TestExpenseCommon
 from odoo.tests import tagged
+from odoo.exceptions import UserError
 
 
 @tagged('-at_install', 'post_install')
@@ -65,6 +66,43 @@ class TestExpensesMailImport(TestExpenseCommon):
         expense = self.env['hr.expense'].message_new(message_parsed)
         self.assertRecordValues(expense, [{
             'employee_id': company_2_employee.id,
+        }])
+
+    def test_import_expense_from_email_employee_without_user(self):
+        """When an employee is not linked to a user, he has to be able to create expenses from email"""
+        employee = self.expense_employee
+        employee.user_id = False
+
+        message_parsed = {
+            'message_id': "the-world-is-a-ghetto",
+            'subject': 'New expense',
+            'email_from': employee.work_email,
+            'to': 'catchall@yourcompany.com',
+            'body': "Don't you know, that for me, and for you",
+            'attachments': [],
+        }
+
+        expense = self.env['hr.expense'].message_new(message_parsed)
+        self.assertRecordValues(expense, [{
+            'employee_id': employee.id,
+        }])
+
+    def test_import_expense_from_email_no_product(self):
+        message_parsed = {
+            'message_id': "the-world-is-a-ghetto",
+            'subject': 'no product code 800',
+            'email_from': self.expense_user_employee.email,
+            'to': 'catchall@yourcompany.com',
+            'body': "Don't you know, that for me, and for you",
+            'attachments': [],
+        }
+
+        expense = self.env['hr.expense'].message_new(message_parsed)
+
+        self.assertRecordValues(expense, [{
+            'product_id': False,
+            'total_amount': 800.0,
+            'employee_id': self.expense_employee.id,
         }])
 
     def test_import_expense_from_mail_parsing_subjects(self):
@@ -175,3 +213,17 @@ class TestExpensesMailImport(TestExpenseCommon):
             self.product_a,
             self.company_data['currency'],
         )
+
+    def test_import_expense_from_mail_get_default_expense_sheet_values_errors(self):
+        # Make sure we get the expected UserError when trying to validate an expense with no product
+        message = {
+            'message_id': "the-world-is-a-ghetto",
+            'subject': 'no product code 800',
+            'email_from': self.expense_user_employee.email,
+            'to': 'catchall@yourcompany.com',
+            'body': "Don't you know, that for me, and for you",
+            'attachments': [],
+        }
+
+        expense = self.env['hr.expense'].message_new(message)
+        self.assertRaisesRegex(UserError, r"You can not create report without category\.", expense._get_default_expense_sheet_values)
