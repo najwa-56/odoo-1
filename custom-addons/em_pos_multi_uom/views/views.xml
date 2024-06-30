@@ -55,22 +55,21 @@
                 </xpath>
             </field>
         </record>
+
+
+
+        <record id="view_move_form_inherit" model="ir.ui.view">
+        <field name="model">account.move</field>
+        <field name="inherit_id" ref="account.view_move_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='invoice_line_ids']/tree//field[@name='discount']" position="before">
+                 <field name="product_uom_id"/>
+            </xpath>
+
+        </field>
+    </record>
+
         
-        <!-- Inherit and extend the form view for account.move.line -->
-        <record id="view_account_move_line_form_inherit" model="ir.ui.view">
-            <field name="name">account.move.line.form.inherit</field>
-            <field name="model">account.move.line</field>
-            <field name="inherit_id" ref="account.view_move_line_form"/> <!-- Use the correct XML ID of the existing form view -->
-            <field name="arch" type="xml">
-                <xpath expr="//sheet/group" position="inside">
-                    <field name="product_uom_id"/>
-                </xpath>
-            </field>
-        </record>
-
-
-
-
                 <!-- test -->
         <!-- Inherit the existing product.product.tree view -->
         <record id="product_product_tree_view_inherit" model="ir.ui.view">
