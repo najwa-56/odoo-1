@@ -120,6 +120,45 @@ class PosOrder(models.Model):
         result['product_uom_id'] = order_line.product_uom.id or order_line.product_uom_id.id
         return result
 
+    def _create_account_move_from_pos_order_lines(self, lines):
+        # Create the account.move if it doesn't exist
+        if not self.account_move:
+            move_vals = {
+                'name': self.name,
+                'journal_id': self.session_id.config_id.journal_id.id,
+                'date': self.date_order,
+                'ref': self.name,
+                'line_ids': [],
+            }
+            account_move = self.env['account.move'].create(move_vals)
+            self.account_move = account_move
+        else:
+            account_move = self.account_move
+
+        # Create account.move.line records
+        lines_by_product_uom = groupby(
+            sorted(lines, key=lambda l: (l.product_id.id, l.product_uom.id)),
+            key=lambda l: (l.product_id.id, l.product_uom.id)
+        )
+
+        move_lines_vals = []
+        for dummy, olines in lines_by_product_uom:
+            order_lines = self.env['pos.order.line'].concat(*olines)
+            move_lines_vals.append(self._prepare_account_move_line_vals(order_lines[0], order_lines, account_move.id))
+
+        self.env['account.move.line'].create(move_lines_vals)
+
+    def _prepare_account_move_line_vals(self, first_line, order_lines, account_move_id):
+        return {
+            'name': first_line.name,
+            'move_id': account_move_id,
+            'product_id': first_line.product_id.id,
+            'quantity': sum(order_lines.mapped('qty')),
+            'price_unit': first_line.price_unit,
+            'product_uom_id': first_line.product_uom.id or first_line.product_uom_id.id,
+            # Add other necessary fields and logic for calculating other values if needed
+        }
+
 class PosOrderLine(models.Model):
     _inherit = "pos.order.line"
 
@@ -140,19 +179,6 @@ class PosOrderLine(models.Model):
         super(PosOrderLine, self)._compute_total_cost(stock_moves)
         for line in self:
             line.total_cost = line.total_cost * line.Ratio if line.Ratio else line.total_cost
-
-    def _prepare_account_move_line(self):
-        self.ensure_one()
-        return {
-            'name': self.name,
-            'move_id': self.order_id.account_move.id,  # Assuming account_move is set correctly in PosOrder
-            'product_id': self.product_id.id,
-            'quantity': self.qty,
-            'price_unit': self.price_unit,
-            'product_uom': self.product_uom.id or self.product_uom_id.id,
-            # Add other necessary fields
-        }
-
 
 
     def _export_for_ui(self, orderline):
@@ -313,7 +339,7 @@ class AccountMoveLine(models.Model):
             'product_uom_id': first_line.product_uom.id or first_line.product_uom_id.id,
             # Add other necessary fields and logic for calculating other values if needed
         }
-    
+
 
 
 class PosSession(models.Model):
