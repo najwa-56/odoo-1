@@ -76,7 +76,7 @@ patch(ProductScreen.prototype, {
         }
         // this.currentOrder.add_product(product, options);
 
-            var pos_multi_op = this.env.pos.em_uom_list;
+            var pos_multi_op = this.pos.em_uom_list;
             var is_multi_uom = false;
             var unit_price = 0;
             for(var i=0;i<pos_multi_op.length;i++){
@@ -86,7 +86,7 @@ patch(ProductScreen.prototype, {
                     Object.assign(options, {
                         price: pos_multi_op[i].price,
                         extras: {
-                            wvproduct_uom: this.env.pos.units_by_id[pos_multi_op[i].multi_uom_id[0]],
+                            wvproduct_uom: this.pos.units_by_id[pos_multi_op[i].multi_uom_id[0]],
                         },
                     });
                 }
