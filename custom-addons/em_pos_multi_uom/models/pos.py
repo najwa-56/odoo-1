@@ -320,6 +320,7 @@ class AccountMoveLine(models.Model):
     @api.depends('pos_order_line_id.product_uom', 'pos_order_line_id.product_uom_id')
     def _compute_product_uom_idd(self):
         for line in self:
+            _logger.info("Computing product_uom_idd for account.move.line ID %s", line.id)
             if line.pos_order_line_id and line.pos_order_line_id.product_uom:
                 line.product_uom_idd = line.pos_order_line_id.product_uom.id
             elif line.pos_order_line_id and line.pos_order_line_id.product_uom_id:
