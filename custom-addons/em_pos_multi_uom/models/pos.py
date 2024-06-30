@@ -300,10 +300,8 @@ class StockPicking(models.Model):
     #         else:
     #             current_move.quantity_done = abs(sum(order_lines.mapped('qty')))
 
-
 class AccountMoveLine(models.Model):
     _inherit = "account.move.line"
-
 
     pos_order_line_id = fields.Many2one('pos.order.line', string='POS Order Line')
     product_uom_idd = fields.Many2one(
@@ -314,7 +312,7 @@ class AccountMoveLine(models.Model):
         readonly=True
     )
 
-    @api.depends('pos_order_line_id')
+    @api.depends('pos_order_line_id.product_uom', 'pos_order_line_id.product_uom_id')
     def _compute_product_uom_idd(self):
         for line in self:
             if line.pos_order_line_id and line.pos_order_line_id.product_uom:
@@ -323,6 +321,7 @@ class AccountMoveLine(models.Model):
                 line.product_uom_idd = line.pos_order_line_id.product_uom_id.id
             else:
                 line.product_uom_idd = False
+
 
 
 
