@@ -32,6 +32,8 @@ class ResConfigSettings(models.TransientModel):
 class ProductMultiUom(models.Model):
     _name = 'product.multi.uom'
     _order = "sequence desc"
+    _description = 'Product Multiple Units of Measure'  # Add this line
+
 
     multi_uom_id = fields.Many2one('uom.uom','Unit of measure')
     price = fields.Float("Sale Price",default=0)
@@ -147,6 +149,14 @@ class PosOrderLine(models.Model):
             res['product_uom'] = orderline.product_uom_id.id;
         return res
 
+    def _prepare_account_move_line(self):
+        move_line = super(PosOrderLine, self)._prepare_account_move_line()
+        move_line.update({
+            'product_uom_id': self.product_uom.id,  # Assuming product_uom is a Many2one field
+            # Other fields assignment
+        })
+        return move_line
+
 
     def _launch_stock_rule_from_pos_order_lines(self):
 
@@ -191,6 +201,10 @@ class PosOrderLine(models.Model):
                     moves._add_mls_related_to_order(lines, are_qties_done=False)
                     moves._recompute_state()
         return True
+class AccountMoveLine(models.Model):
+    _inherit = 'account.move.line'
+
+    product_uom_id = fields.Many2one('uom.uom', 'Unit of Measure')
 
 class StockPicking(models.Model):
     _inherit='stock.picking'

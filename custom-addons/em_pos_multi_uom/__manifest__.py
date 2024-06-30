@@ -22,6 +22,7 @@
         'static/description/change.jpg',
     ],
     'installable': True,
+    'license': 'LGPL-3',  # Add this line
     'website': '',
     'auto_install': False,
     'price': 39,
