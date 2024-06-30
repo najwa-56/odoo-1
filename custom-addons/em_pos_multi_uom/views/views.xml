@@ -69,7 +69,7 @@
         </field>
     </record>
 
-        
+
                 <!-- test -->
         <!-- Inherit the existing product.product.tree view -->
         <record id="product_product_tree_view_inherit" model="ir.ui.view">

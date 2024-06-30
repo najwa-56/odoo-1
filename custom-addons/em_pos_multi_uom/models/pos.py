@@ -290,6 +290,24 @@ class AccountMoveLine(models.Model):
 
     product_uom_id = fields.Many2one('uom.uom', string='Unit of Measure')
 
+    def _prepare_account_move_line(self,first_line,order_lines):
+            res = super(AccountMoveLine, self)._prepare_account_move_line(first_line, order_lines)
+            res['product_uom'] = first_line.product_uom.id or first_line.product_id.uom_id.id,
+            return res
+
+    def _create_move_from_pos_order_lines(self):
+
+        self.ensure_one()
+        return {
+            'name': self.name,
+            'move_id': self.order_id.account_move.id,  # Assuming account_move is set correctly in PosOrder
+            'product_id': self.product_id.id,
+            'quantity': self.qty,
+            'price_unit': self.price_unit,
+            'product_uom': self.product_uom.id or self.product_uom_id.id,
+            # Add other necessary fields
+        }
+
 
 class PosSession(models.Model):
     _inherit = 'pos.session'
