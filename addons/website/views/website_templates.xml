@@ -318,7 +318,7 @@
 <!-- TODO adapt in master: remove o_main_nav id -->
 <template id="template_header_mobile" name="Template Header Mobile">
     <t t-call="website.navbar">
-        <t t-set="_navbar_classes" t-valuef="o_header_mobile d-block d-lg-none shadow-sm"/>
+        <t t-set="_navbar_classes" t-valuef="o_header_mobile d-block d-lg-none shadow-sm px-0"/>
         <t t-set="_navbar_expand_class" t-valuef="None"/>
         <t t-set="_navbar_name" t-valuef="Mobile"/>
 
@@ -326,7 +326,7 @@
             <!-- Brand -->
             <t t-call="website.placeholder_header_brand"/>
             <ul class="o_header_mobile_buttons_wrap navbar-nav flex-row align-items-center gap-2 mb-0">
-                <li>
+                <li class="o_not_editable">
                     <button
                         class="nav-link btn me-auto p-2 o_not_editable"
                         type="button"
@@ -2557,6 +2557,7 @@
 User-agent: *
 <t t-if="website.domain and not website._is_indexable_url(url_root)">
 Disallow: /
+Sitemap: <t t-esc="website.domain"/>/sitemap.xml
 </t>
 <t t-else="">
 Sitemap: <t t-esc="url_root"/>sitemap.xml
@@ -2891,7 +2892,7 @@ Sitemap: <t t-esc="url_root"/>sitemap.xml
     <xpath expr="." position="inside">
         <li t-attf-class="#{_item_class}">
             <t t-if="_layout == 'modal'">
-                <div class="modal fade" id="o_search_modal" aria-hidden="true" tabindex="-1">
+                <div class="modal fade css_editable_mode_hidden" id="o_search_modal" aria-hidden="true" tabindex="-1">
                     <div class="modal-dialog modal-lg pt-5">
                         <div class="modal-content mt-5">
                             <t t-call="website.header_search_box_input">

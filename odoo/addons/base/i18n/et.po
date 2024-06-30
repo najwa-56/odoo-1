@@ -24,11 +24,12 @@
 # Katrin Kampura, 2023
 # Mihkel avalah, 2023
 # Eneli Õigus <enelioigus@gmail.com>, 2023
-# Anna, 2024
 # Piia Paurson <piia@avalah.ee>, 2024
 # Martin Talts <martin.t@avalah.ee>, 2024
 # JanaAvalah, 2024
 # Birgit Vijar, 2024
+# Siim Raasuke, 2024
+# Anna, 2024
 # 
 msgid ""
 msgstr ""
@@ -36,7 +37,7 @@ msgstr ""
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2024-02-26 12:42+0000\n"
 "PO-Revision-Date: 2023-10-26 23:09+0000\n"
-"Last-Translator: Birgit Vijar, 2024\n"
+"Last-Translator: Anna, 2024\n"
 "Language-Team: Estonian (https://app.transifex.com/odoo/teams/41243/et/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -961,6 +962,9 @@ msgid ""
 "Accounting reports for Algeria\n"
 "================================\n"
 msgstr ""
+"\n"
+"Algeeria raamatupidamisearuanded\n"
+"================================\n"
 
 #. module: base
 #: model:ir.module.module,description:base.module_l10n_be_reports
@@ -968,6 +972,8 @@ msgid ""
 "\n"
 "Accounting reports for Belgium\n"
 msgstr ""
+"\n"
+"Belgia raamatupidamisaruanded\n"
 
 #. module: base
 #: model:ir.module.module,description:base.module_l10n_ca_reports
@@ -975,6 +981,8 @@ msgid ""
 "\n"
 "Accounting reports for Canada\n"
 msgstr ""
+"\n"
+"Kanada raamatupidamisaruanded\n"
 
 #. module: base
 #: model:ir.module.module,description:base.module_l10n_cl_reports
@@ -997,6 +1005,8 @@ msgid ""
 "\n"
 "Accounting reports for Croatia\n"
 msgstr ""
+"\n"
+"Horvaatia raamatupidamisaruanded\n"
 
 #. module: base
 #: model:ir.module.module,description:base.module_l10n_cz_reports
@@ -1013,6 +1023,9 @@ msgid ""
 "Accounting reports for Denmark\n"
 "=================================\n"
 msgstr ""
+"\n"
+"Taani raamatupidamisaruanded\n"
+"=================================\n"
 
 #. module: base
 #: model:ir.module.module,description:base.module_l10n_do_reports
@@ -1020,6 +1033,8 @@ msgid ""
 "\n"
 "Accounting reports for Dominican Republic\n"
 msgstr ""
+"\n"
+"Dominikaani Vabariigi raamatupidamisaruanded\n"
 
 #. module: base
 #: model:ir.module.module,description:base.module_l10n_ec_reports
@@ -1039,6 +1054,10 @@ msgid ""
 "================================\n"
 "\n"
 msgstr ""
+"\n"
+"Soome raamatupidamisaruanded\n"
+"================================\n"
+"\n"
 
 #. module: base
 #: model:ir.module.module,description:base.module_l10n_fr_reports
@@ -1070,6 +1089,10 @@ msgid ""
 "================================\n"
 "\n"
 msgstr ""
+"\n"
+"Kreeka raamatupidamisaruanded\n"
+"================================\n"
+"\n"
 
 #. module: base
 #: model:ir.module.module,description:base.module_l10n_hu_reports
@@ -1077,6 +1100,8 @@ msgid ""
 "\n"
 "Accounting reports for Hungary\n"
 msgstr ""
+"\n"
+"Ungari raamatupidamisearuanded\n"
 
 #. module: base
 #: model:ir.module.module,description:base.module_l10n_in_reports
@@ -1085,6 +1110,9 @@ msgid ""
 "Accounting reports for India\n"
 "================================\n"
 msgstr ""
+"\n"
+"India raamatupidamisaruanded\n"
+"================================\n"
 
 #. module: base
 #: model:ir.module.module,description:base.module_l10n_it_reports
@@ -1094,6 +1122,10 @@ msgid ""
 "============================\n"
 "\n"
 msgstr ""
+"\n"
+"Itaalia raamatupidamisaruanded\n"
+"============================\n"
+"\n"
 
 #. module: base
 #: model:ir.module.module,description:base.module_l10n_kz_reports
@@ -1102,6 +1134,9 @@ msgid ""
 "Accounting reports for Kazakhstan\n"
 "Contains Balance sheet, Profit and Loss reports\n"
 msgstr ""
+"\n"
+"Kasahstani raamatupidamisaruanded\n"
+"Sisaldab bilanssi ja kasumiaruannet\n"
 
 #. module: base
 #: model:ir.module.module,description:base.module_l10n_ke_reports
@@ -1111,6 +1146,10 @@ msgid ""
 "============================\n"
 "\n"
 msgstr ""
+"\n"
+"Keenia raamatupidamisaruanded\n"
+"============================\n"
+"\n"
 
 #. module: base
 #: model:ir.module.module,description:base.module_l10n_lt_reports
@@ -1120,6 +1159,10 @@ msgid ""
 "\n"
 "Contains Balance Sheet, Profit/Loss reports\n"
 msgstr ""
+"\n"
+"Leedu raamatupidamisaruanded\n"
+"\n"
+"Sisaldab bilanssi ja kasumiaruannet\n"
 
 #. module: base
 #: model:ir.module.module,description:base.module_l10n_lu_reports
@@ -1147,6 +1190,8 @@ msgid ""
 "\n"
 "Accounting reports for Netherlands\n"
 msgstr ""
+"\n"
+"Hollandi raamatupidamisaruanded\n"
 
 #. module: base
 #: model:ir.module.module,description:base.module_l10n_no_reports
@@ -1156,6 +1201,10 @@ msgid ""
 "================================\n"
 "\n"
 msgstr ""
+"\n"
+"Norra raamatupidamisaruanded\n"
+"================================\n"
+"\n"
 
 #. module: base
 #: model:ir.module.module,description:base.module_l10n_syscohada_reports
@@ -1171,6 +1220,8 @@ msgid ""
 "\n"
 "Accounting reports for Pakistan\n"
 msgstr ""
+"\n"
+"Pakistani raamatupidamisaruanded\n"
 
 #. module: base
 #: model:ir.module.module,description:base.module_l10n_pl_reports
@@ -1196,6 +1247,10 @@ msgid ""
 "================================\n"
 "\n"
 msgstr ""
+"\n"
+"Portugali raamatupidamisaruanded\n"
+"================================\n"
+"\n"
 
 #. module: base
 #: model:ir.module.module,description:base.module_l10n_ro_reports
@@ -1203,6 +1258,8 @@ msgid ""
 "\n"
 "Accounting reports for Romania\n"
 msgstr ""
+"\n"
+"Rumeenia raamatupidamisaruanded\n"
 
 #. module: base
 #: model:ir.module.module,description:base.module_l10n_rs_reports
@@ -1229,6 +1286,8 @@ msgid ""
 "\n"
 "Accounting reports for Spain\n"
 msgstr ""
+"\n"
+"Hispaania raamatupidamisaruanded\n"
 
 #. module: base
 #: model:ir.module.module,description:base.module_l10n_se_reports
@@ -1236,6 +1295,8 @@ msgid ""
 "\n"
 "Accounting reports for Sweden\n"
 msgstr ""
+"\n"
+"Rootsi raamatupidamisaruanded\n"
 
 #. module: base
 #: model:ir.module.module,description:base.module_l10n_ch_reports
@@ -1243,6 +1304,8 @@ msgid ""
 "\n"
 "Accounting reports for Switzerland\n"
 msgstr ""
+"\n"
+"Šveitsi raamatupidamisaruanded\n"
 
 #. module: base
 #: model:ir.module.module,description:base.module_l10n_tw_reports
@@ -1259,6 +1322,9 @@ msgid ""
 "Accounting reports for Thailand\n"
 "==============================================================================\n"
 msgstr ""
+"\n"
+"Tai raamatupidamisaruanded\n"
+"==============================================================================\n"
 
 #. module: base
 #: model:ir.module.module,description:base.module_l10n_tn_reports
@@ -1268,6 +1334,10 @@ msgid ""
 "================================\n"
 "\n"
 msgstr ""
+"\n"
+"Tuneesia raamatupidamisaruanded\n"
+"================================\n"
+"\n"
 
 #. module: base
 #: model:ir.module.module,description:base.module_l10n_tr_reports
@@ -1275,6 +1345,8 @@ msgid ""
 "\n"
 "Accounting reports for Turkey\n"
 msgstr ""
+"\n"
+"Türgi raamatupidamisaruanded\n"
 
 #. module: base
 #: model:ir.module.module,description:base.module_l10n_uk_reports
@@ -1963,6 +2035,9 @@ msgid ""
 "Australian Payroll Rules.\n"
 "=========================\n"
 msgstr ""
+"\n"
+"Austraalia palgareeglid.\n"
+"=========================\n"
 
 #. module: base
 #: model:ir.module.module,description:base.module_partner_autocomplete
@@ -2064,6 +2139,8 @@ msgid ""
 "\n"
 "Base module for Bolivian reports\n"
 msgstr ""
+"\n"
+"Baasmoodul Boliivia aruannete jaoks\n"
 
 #. module: base
 #: model:ir.module.module,description:base.module_l10n_bg_reports
@@ -2071,6 +2148,8 @@ msgid ""
 "\n"
 "Base module for Bulgarian reports\n"
 msgstr ""
+"\n"
+"Baasmoodul Bulgaaria aruannete jaoks\n"
 
 #. module: base
 #: model:ir.module.module,description:base.module_l10n_mz_reports
@@ -2547,6 +2626,11 @@ msgid ""
 "\n"
 "Thai accounting chart and localization.\n"
 msgstr ""
+"\n"
+"Tai kontoplaan.\n"
+"===============================\n"
+"\n"
+"Tai raamatupidamise kontoplaan ja lokaliseerimine.\n"
 
 #. module: base
 #: model:ir.module.module,description:base.module_l10n_si
@@ -3055,6 +3139,8 @@ msgid ""
 "\n"
 "E-invoice implementation for Romania\n"
 msgstr ""
+"\n"
+"Rumeenia e-arvete juurutamine\n"
 
 #. module: base
 #: model:ir.module.module,description:base.module_l10n_dk_oioubl
@@ -3062,6 +3148,8 @@ msgid ""
 "\n"
 "E-invoice implementation for the Denmark\n"
 msgstr ""
+"\n"
+"Taani e-arvete juurutamine\n"
 
 #. module: base
 #: model:ir.module.module,description:base.module_l10n_sa_edi
@@ -3069,6 +3157,8 @@ msgid ""
 "\n"
 "E-invoice implementation for the Kingdom of Saudi Arabia\n"
 msgstr ""
+"\n"
+"Saudi Araabia e-arvete juurutamine\n"
 
 #. module: base
 #: model:ir.module.module,description:base.module_hr_skills_slides
@@ -3360,6 +3450,8 @@ msgid ""
 "\n"
 "Expense documents will be automatically integrated to the Document app.\n"
 msgstr ""
+"\n"
+"Kuludokumendid integreeritakse automaatselt Dokument moodulisse.\n"
 
 #. module: base
 #: model:ir.module.module,description:base.module_l10n_us_payment_nacha
@@ -4069,6 +4161,9 @@ msgid ""
 "Intrastat Reports\n"
 "==================\n"
 msgstr ""
+"\n"
+"Intrastat aruanded\n"
+"==================\n"
 
 #. module: base
 #: model:ir.module.module,description:base.module_account_avatax_stock
@@ -4116,6 +4211,8 @@ msgid ""
 "\n"
 "It allows for comparing products from the wishlist\n"
 msgstr ""
+"\n"
+"See võimaldab võrrelda soovinimekirjas olevaid tooteid\n"
 
 #. module: base
 #: model:ir.module.module,description:base.module_l10n_sa_pos
@@ -4174,6 +4271,11 @@ msgid ""
 "\n"
 "Allows users to create custom dashboard.\n"
 msgstr ""
+"\n"
+"Võimaldab kasutajal luua isikupärastatud töölaua.\n"
+"========================================\n"
+"\n"
+"Võimaldab kasutajal luua isikupärastatud töölaua.\n"
 
 #. module: base
 #: model:ir.module.module,description:base.module_l10n_lt_hr_payroll
@@ -4863,6 +4965,12 @@ msgid ""
 "    * Employee Details\n"
 "    * Employee Contracts\n"
 msgstr ""
+"\n"
+"Maroko palgareeglid.\n"
+"=========================\n"
+"\n"
+"    * Töötaja andmed\n"
+"    * Töötaja lepingud\n"
 
 #. module: base
 #: model:ir.module.module,description:base.module_l10n_mz
@@ -17091,6 +17199,11 @@ msgid "France - Accounting Reports"
 msgstr "Prantsusmaa - raamatupidamise aruanded"
 
 #. module: base
+#: model:ir.module.module,shortdesc:base.module_l10n_fr_invoice_addr
+msgid "France - Adding Mandatory Invoice Mentions (Decree no. 2022-1299)"
+msgstr ""
+
+#. module: base
 #: model:ir.module.module,shortdesc:base.module_l10n_fr_fec
 msgid "France - FEC Export"
 msgstr "Prantsusmaa - FEC eksport"
@@ -26377,7 +26490,7 @@ msgstr "Lähtestamise režiim"
 #. module: base
 #: model_terms:ir.ui.view,arch_db:base.reset_view_arch_wizard_view
 msgid "Reset View"
-msgstr ""
+msgstr "Lähtesta vaade"
 
 #. module: base
 #: model_terms:ir.ui.view,arch_db:base.reset_view_arch_wizard_view
@@ -28838,7 +28951,7 @@ msgstr ""
 #. module: base
 #: model:res.country.group,name:base.ch_and_li
 msgid "Switzerland and Liechtenstein"
-msgstr "Switzerland and Liechtenstein"
+msgstr "Šveits ja Liechtenstein"
 
 #. module: base
 #: model:ir.model.fields,field_description:base.field_res_currency__symbol

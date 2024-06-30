@@ -8511,7 +8511,7 @@ msgstr ""
 #: code:addons/base/models/ir_rule.py:0
 #, python-format
 msgid "- %s (%s)"
-msgstr ""
+msgstr "- %s (%s)"
 
 #. module: base
 #: model:ir.model.fields,help:base.field_res_partner__type
@@ -8805,7 +8805,7 @@ msgstr "<i class=\"fa fa-circle\" role=\"img\" aria-label=\"Ok\" title=\"Ok\"/>"
 #. module: base
 #: model_terms:ir.ui.view,arch_db:base.view_res_users_kanban
 msgid "<i class=\"fa fa-envelope me-1\" role=\"img\" aria-label=\"Login\"/>"
-msgstr ""
+msgstr "<i class=\"fa fa-envelope me-1\" role=\"img\" aria-label=\"Login\"/>"
 
 #. module: base
 #: model_terms:ir.ui.view,arch_db:base.view_rule_form
@@ -8813,6 +8813,8 @@ msgid ""
 "<i class=\"fa fa-info fa-3x text-info float-start\" role=\"img\" aria-"
 "label=\"Info\" title=\"Info\"/>"
 msgstr ""
+"<i class=\"fa fa-info fa-3x text-info float-start\" role=\"img\" aria-"
+"label=\"Info\" title=\"Info\"/>"
 
 #. module: base
 #: model_terms:ir.ui.view,arch_db:base.view_users_form_simple_modif
@@ -9607,7 +9609,7 @@ msgstr "ABA kreditoverførsel"
 #. module: base
 #: model:res.country,vat_label:base.au
 msgid "ABN"
-msgstr ""
+msgstr "ABN"
 
 #. module: base
 #: model:ir.model,name:base.model_res_users_apikeys_description
@@ -11569,7 +11571,7 @@ msgstr "Profilikon Mixin"
 #. module: base
 #: model:ir.module.module,shortdesc:base.module_account_avatax
 msgid "Avatax"
-msgstr ""
+msgstr "Avatax"
 
 #. module: base
 #: model:ir.module.module,shortdesc:base.module_l10n_br_avatax
@@ -14617,7 +14619,7 @@ msgstr "DHL ekspres fragt"
 #. module: base
 #: model:ir.module.module,shortdesc:base.module_l10n_din5008
 msgid "DIN 5008"
-msgstr ""
+msgstr "DIN 5008"
 
 #. module: base
 #: model:ir.module.module,shortdesc:base.module_l10n_din5008_industry_fsm
@@ -16672,7 +16674,7 @@ msgstr ""
 #. module: base
 #: model:ir.module.module,shortdesc:base.module_industry_fsm_sms
 msgid "FSM - SMS"
-msgstr ""
+msgstr "FSM - SMS"
 
 #. module: base
 #: model:ir.model.fields.selection,name:base.selection__res_users_deletion__state__fail
@@ -17435,6 +17437,11 @@ msgstr "Frankrig - Regnskab"
 #: model:ir.module.module,shortdesc:base.module_l10n_fr_reports
 msgid "France - Accounting Reports"
 msgstr "Frankrig - Regnskabsrapporter"
+
+#. module: base
+#: model:ir.module.module,shortdesc:base.module_l10n_fr_invoice_addr
+msgid "France - Adding Mandatory Invoice Mentions (Decree no. 2022-1299)"
+msgstr ""
 
 #. module: base
 #: model:ir.module.module,shortdesc:base.module_l10n_fr_fec
@@ -18657,7 +18664,7 @@ msgstr "IR Profil"
 #. module: base
 #: model:res.country,vat_label:base.nz
 msgid "IRD/GST"
-msgstr ""
+msgstr "IRD/GST"
 
 #. module: base
 #: model:ir.model.fields,field_description:base.field_base_language_import__code
@@ -19525,7 +19532,7 @@ msgstr "Interne noter..."
 #. module: base
 #: model:ir.module.module,shortdesc:base.module_iot
 msgid "Internet of Things"
-msgstr "Internet af Ting"
+msgstr "Internet of Things"
 
 #. module: base
 #: model:ir.module.category,name:base.module_category_internet_of_things_(iot)
@@ -21732,7 +21739,7 @@ msgstr "Mikronesien"
 #. module: base
 #: model:ir.module.module,shortdesc:base.module_microsoft_outlook
 msgid "Microsoft Outlook"
-msgstr ""
+msgstr "Microsoft Outlook"
 
 #. module: base
 #: model:ir.module.module,shortdesc:base.module_microsoft_account
@@ -23876,7 +23883,7 @@ msgstr "OdooBot"
 #. module: base
 #: model:ir.module.module,shortdesc:base.module_mail_bot_hr
 msgid "OdooBot - HR"
-msgstr ""
+msgstr "OdooBot - HR"
 
 #. module: base
 #: model:ir.module.module,shortdesc:base.module_im_livechat_mail_bot
@@ -26372,12 +26379,12 @@ msgstr "RTN"
 #. module: base
 #: model:res.country,vat_label:base.ec model:res.country,vat_label:base.pe
 msgid "RUC"
-msgstr ""
+msgstr "RUC"
 
 #. module: base
 #: model:res.country,vat_label:base.cl model:res.country,vat_label:base.uy
 msgid "RUT"
-msgstr ""
+msgstr "RUT"
 
 #. module: base
 #: model:ir.model.fields.selection,name:base.selection__res_company__font__raleway
@@ -27055,7 +27062,7 @@ msgstr ""
 #. module: base
 #: model:ir.module.category,name:base.module_category_accounting_localizations_sbr
 msgid "SBR"
-msgstr ""
+msgstr "SBR"
 
 #. module: base
 #: model:res.country.group,name:base.sepa_zone
@@ -29356,7 +29363,7 @@ msgstr "TGZ format: samler flere PO(T) filer til et enkelt arkiv"
 #. module: base
 #: model:res.country,vat_label:base.ug
 msgid "TIN"
-msgstr ""
+msgstr "TIN"
 
 #. module: base
 #: model:ir.model.fields.selection,name:base.selection__ir_mail_server__smtp_encryption__starttls
@@ -29502,7 +29509,7 @@ msgstr "Teknisk Kurs"
 #. module: base
 #: model_terms:ir.ui.view,arch_db:base.view_server_action_form
 msgid "Technical Settings"
-msgstr ""
+msgstr "Tekniske indstillinger"
 
 #. module: base
 #: model:ir.actions.report,name:base.ir_module_reference_print
@@ -29613,7 +29620,7 @@ msgstr "Test fuld eLæringsflow"
 #. module: base
 #: model:ir.module.module,shortdesc:base.module_test_http
 msgid "Test HTTP"
-msgstr ""
+msgstr "Test HTTP"
 
 #. module: base
 #: model:ir.module.module,shortdesc:base.module_test_l10n_hk_hr_payroll_account
@@ -31287,7 +31294,7 @@ msgstr "For at returnere en handling, tilskriv: <code>action = {...}</code>"
 #: model:ir.module.category,name:base.module_category_productivity_to-do
 #: model:ir.module.module,shortdesc:base.module_project_todo
 msgid "To-Do"
-msgstr ""
+msgstr "To-Do"
 
 #. module: base
 #: model_terms:ir.ui.view,arch_db:base.ir_actions_todo_tree
@@ -33369,7 +33376,7 @@ msgstr "Yemen"
 #. module: base
 #: model:ir.model.fields.selection,name:base.selection__ir_actions_server__update_boolean_value__true
 msgid "Yes (True)"
-msgstr ""
+msgstr "Ja (sandt)"
 
 #. module: base
 #: model_terms:ir.ui.view,arch_db:base.demo_force_install_form
@@ -33826,7 +33833,7 @@ msgstr "konto"
 #. module: base
 #: model:ir.module.module,shortdesc:base.module_account_qr_code_emv
 msgid "account_qr_code_emv"
-msgstr ""
+msgstr "account_qr_code_emv"
 
 #. module: base
 #: model:ir.model.fields,field_description:base.field_ir_asset__active
@@ -33938,7 +33945,7 @@ msgstr "Udført"
 #. module: base
 #: model_terms:ir.ui.view,arch_db:base.view_partner_form
 msgid "e.g. \"B2B\", \"VIP\", \"Consulting\", ..."
-msgstr ""
+msgstr "f.eks. \"B2B\", \"VIP\", \"Konsultation\", ..."
 
 #. module: base
 #: model_terms:ir.ui.view,arch_db:base.view_partner_category_form
@@ -33969,7 +33976,7 @@ msgstr "f.eks. Europa"
 #. module: base
 #: model_terms:ir.ui.view,arch_db:base.view_server_action_form
 msgid "e.g. Follow-up"
-msgstr ""
+msgstr "f.eks. Opfølgning"
 
 #. module: base
 #: model_terms:ir.ui.view,arch_db:base.res_lang_form
@@ -34203,12 +34210,12 @@ msgstr "ir.actions.server"
 #. module: base
 #: model:ir.model.fields.selection,name:base.selection__ir_model_fields__ttype__json
 msgid "json"
-msgstr ""
+msgstr "json"
 
 #. module: base
 #: model:ir.module.module,shortdesc:base.module_l10n_be_pos_sale
 msgid "l10n_be_pos_sale"
-msgstr ""
+msgstr "l10n_be_pos_sale"
 
 #. module: base
 #: model:ir.model.fields.selection,name:base.selection__ir_model_fields__ttype__many2many
@@ -34305,7 +34312,7 @@ msgstr "pos_account_reports"
 #. module: base
 #: model:ir.module.module,shortdesc:base.module_pos_mrp
 msgid "pos_mrp"
-msgstr ""
+msgstr "pos_mrp"
 
 #. module: base
 #: model:ir.module.module,summary:base.module_hr_expense_predict_product
@@ -34325,7 +34332,7 @@ msgstr ""
 #. module: base
 #: model:ir.model.fields.selection,name:base.selection__ir_model_fields__ttype__properties_definition
 msgid "properties_definition"
-msgstr ""
+msgstr "properties_definition"
 
 #. module: base
 #. odoo-python
@@ -34360,7 +34367,7 @@ msgstr "valg"
 #. module: base
 #: model:ir.model.fields.selection,name:base.selection__ir_actions_server__value_field_to_show__selection_value
 msgid "selection_value"
-msgstr ""
+msgstr "selection_value"
 
 #. module: base
 #: model:ir.module.category,name:base.module_category_services_sales_subscriptions
@@ -34499,7 +34506,7 @@ msgstr ""
 #. module: base
 #: model:ir.model.fields.selection,name:base.selection__ir_actions_server__value_field_to_show__update_boolean_value
 msgid "update_boolean_value"
-msgstr ""
+msgstr "update_boolean_value"
 
 #. module: base
 #: model:ir.model.fields.selection,name:base.selection__ir_actions_server__value_field_to_show__value

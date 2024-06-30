@@ -101,7 +101,7 @@ class ReportMoOverview(models.AbstractModel):
             'unit_real_cost': unit_real_cost,
         }
         if production_done:
-            production_qty = summary.get('quantity', 1.0)
+            production_qty = summary.get('quantity') or 1.0
             extras['total_mo_cost_components'] = sum(compo.get('summary', {}).get('mo_cost', 0.0) for compo in components)
             extras['total_real_cost_components'] = sum(compo.get('summary', {}).get('real_cost', 0.0) for compo in components)
             extras['total_mo_cost_components_decorator'] = self._get_comparison_decorator(extras['total_real_cost_components'], extras['total_mo_cost_components'], currency.rounding)
@@ -368,7 +368,7 @@ class ReportMoOverview(models.AbstractModel):
                 'model': product._name,
                 'id': product.id,
                 'name': product.display_name,
-                'quantity': move_bp.product_uom_qty,
+                'quantity': move_bp.product_uom_qty if move_bp.state != 'done' else move_bp.quantity,
                 'uom_name': move_bp.product_uom.display_name,
                 'uom_precision': self._get_uom_precision(move_bp.product_uom.rounding),
                 'unit_cost': self._get_unit_cost(move_bp),

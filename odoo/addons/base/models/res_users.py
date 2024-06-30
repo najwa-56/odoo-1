@@ -173,7 +173,7 @@ class Groups(models.Model):
     def _search_full_name(self, operator, operand):
         lst = True
         if isinstance(operand, bool):
-            return [[('name', operator, operand)]]
+            return [('name', operator, operand)]
         if isinstance(operand, str):
             lst = False
             operand = [operand]
@@ -371,7 +371,7 @@ class Users(models.Model):
         # automatically encrypted at startup: look for passwords which don't
         # match the "extended" MCF and pass those through passlib.
         # Alternative: iterate on *all* passwords and use CryptContext.identify
-        cr.execute("""
+        cr.execute(r"""
         SELECT id, password FROM res_users
         WHERE password IS NOT NULL
           AND password !~ '^\$[^$]+\$[^$]+\$.'

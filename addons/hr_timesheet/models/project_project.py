@@ -173,7 +173,7 @@ class Project(models.Model):
     @api.depends_context('allowed_company_ids')
     def _compute_display_name(self):
         super()._compute_display_name()
-        if len(self.env.context.get('allowed_company_ids', [])) <= 1:
+        if len(self.env.context.get('allowed_company_ids') or []) <= 1:
             return
 
         for project in self:
@@ -283,3 +283,15 @@ class Project(models.Model):
             })
 
         return buttons
+
+    def action_view_tasks(self):
+        # Using the timesheet filter hide context
+        action = super().action_view_tasks()
+        action['context']['allow_timesheets'] = self.allow_timesheets
+        return action
+
+    def action_project_sharing(self):
+        # Using the timesheet filter hide context
+        action = super().action_project_sharing()
+        action['context']['allow_timesheets'] = self.allow_timesheets
+        return action

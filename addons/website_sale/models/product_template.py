@@ -268,7 +268,7 @@ class ProductTemplate(models.Model):
         for template in self:
             price_reduce = sales_prices[template.id]
 
-            product_taxes = template.sudo().taxes_id.filtered(lambda t: t.company_id in t.env.company.parent_ids)
+            product_taxes = template.sudo().taxes_id._filter_taxes_by_company(self.env.company)
             taxes = fiscal_position.map_tax(product_taxes)
 
             base_price = None
@@ -294,11 +294,11 @@ class ProductTemplate(models.Model):
 
                 # Compare_list_price are never tax included
                 base_price = self._apply_taxes_to_price(
-                    base_price, currency, product_taxes, taxes, self,
+                    base_price, currency, product_taxes, taxes, template,
                 )
 
             price_reduce = self._apply_taxes_to_price(
-                price_reduce, currency, product_taxes, taxes, self,
+                price_reduce, currency, product_taxes, taxes, template,
             )
 
             template_price_vals = {
@@ -505,9 +505,7 @@ class ProductTemplate(models.Model):
         # Apply taxes
         fiscal_position = website.fiscal_position_id.sudo()
 
-
-        product_taxes = product_or_template.sudo().taxes_id.filtered(
-            lambda t: t.company_id == self.env.company)
+        product_taxes = product_or_template.sudo().taxes_id._filter_taxes_by_company(self.env.company)
         taxes = self.env['account.tax']
         if product_taxes:
             taxes = fiscal_position.map_tax(product_taxes)

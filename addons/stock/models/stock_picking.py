@@ -1179,12 +1179,12 @@ class Picking(models.Model):
             has_quantity = False
             has_pick = False
             for move in picking.move_ids:
+                if move.quantity:
+                    has_quantity = True
                 if move.scrapped:
                     continue
                 if move.picked:
                     has_pick = True
-                if move.quantity:
-                    has_quantity = True
                 if has_quantity and has_pick:
                     break
             if has_quantity and not has_pick:
@@ -1517,6 +1517,8 @@ class Picking(models.Model):
         move_line_ids = quantity_move_line_ids.filtered(lambda ml: ml.picked)
         if not move_line_ids:
             move_line_ids = quantity_move_line_ids
+        if self.env.context.get('move_lines_to_pack_ids', False):
+            move_line_ids = move_line_ids.filtered(lambda ml: ml.id in self.env.context['move_lines_to_pack_ids'])
         return move_line_ids
 
     def action_put_in_pack(self):

@@ -286,7 +286,7 @@ class HrExpenseSheet(models.Model):
             else:
                 sheet.selectable_payment_method_line_ids = self.env['account.payment.method.line'].search([
                     ('payment_type', '=', 'outbound'),
-                    ('company_id', '=', sheet.company_id.id)
+                    ('company_id', 'parent_of', sheet.company_id.id)
                 ])
 
     @api.depends('account_move_ids', 'payment_state', 'approval_state')
@@ -657,7 +657,9 @@ class HrExpenseSheet(models.Model):
         self.activity_update()
 
     def _do_refuse(self, reason):
-        self.write({'state': 'cancel'})
+        if self.account_move_ids:  # Todo: in 17.3+, edit it to allow draft entries
+            raise UserError(_("You cannot cancel an expense sheet linked to a journal entry"))
+        self.approval_state = 'cancel'
         subtype_id = self.env['ir.model.data']._xmlid_to_res_id('mail.mt_comment')
         for sheet in self:
             sheet.message_post_with_source(

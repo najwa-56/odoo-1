@@ -33,6 +33,21 @@ PAYMENT_METHODS_MAPPING = {
     'unknown': 'card',  # For express checkout.
 }
 
+INDIAN_MANDATES_SUPPORTED_CURRENCIES = [
+    'USD',
+    'EUR',
+    'GBP',
+    'SGD',
+    'CAD',
+    'CHF',
+    'SEK',
+    'AED',
+    'JPY',
+    'NOK',
+    'MYR',
+    'HKD',
+]
+
 # Mapping of transaction states to Stripe objects ({Payment,Setup}Intent, Refund) statuses.
 # For each object's exhaustive status list, see:
 # https://stripe.com/docs/api/payment_intents/object#payment_intent_object-status
@@ -106,4 +121,16 @@ SUPPORTED_COUNTRIES = {
     'SK',
     'TH',  # Beta
     'US',
+}
+
+# Businesses in supported outlying territories should register for a Stripe account with the parent
+# territory selected as the Country.
+# See https://support.stripe.com/questions/stripe-availability-for-outlying-territories-of-supported-countries.
+COUNTRY_MAPPING = {
+    'MQ': 'FR',  # Martinique
+    'GP': 'FR',  # Guadeloupe
+    'GF': 'FR',  # French Guiana
+    'RE': 'FR',  # Réunion
+    'YT': 'FR',  # Mayotte
+    'MF': 'FR',  # Saint-Martin
 }

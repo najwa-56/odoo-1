@@ -202,6 +202,22 @@ const wSnippetMenu = weSnippetEditor.SnippetsMenu.extend({
             )[0];
             element.remove();
         });
+
+        // TODO remove in master: should be simply replaced by a
+        // `data-text-selector` attribute to mark text options.
+        const AnimationOptionEl = $html.find('[data-js="WebsiteAnimate"]')[0];
+        const HighlightOptionEl = $html.find('[data-js="TextHighlight"]')[0];
+        if (AnimationOptionEl) {
+            AnimationOptionEl.dataset.textSelector = ".o_animated_text";
+        }
+        if (HighlightOptionEl) {
+            HighlightOptionEl.dataset.textSelector = HighlightOptionEl.dataset.selector;
+        }
+        
+        // TODO remove in master: see snippets.xml
+        $html.find('we-checkbox[data-dependencies="!footer_copyright_opt"]')[0]?.remove();
+        $html.find('[data-name="header_language_selector_none_opt"]')[0]?.remove();
+        $html.find('we-select[data-dependencies="!header_language_selector_none_opt"]')[0]?.removeAttribute("data-dependencies");
     },
     /**
      * Depending of the demand, reconfigure they gmap key or configure it
@@ -258,6 +274,7 @@ const wSnippetMenu = weSnippetEditor.SnippetsMenu.extend({
             }
             onClickSave() {
                 this.props.confirm(this.modalRef, this.state.apiKey);
+                this.props.close();
             }
         };
 
@@ -391,6 +408,18 @@ const wSnippetMenu = weSnippetEditor.SnippetsMenu.extend({
         this.options.wysiwyg.odooEditor.computeFontSizeSelectorValues();
     },
     /**
+    * @override
+    */
+    _checkEditorToolbarVisibility: function (e) {
+        this._super(...arguments);
+        // Close the option's dropdowns manually on outside click if any open.
+        if (this._$toolbarContainer && this._$toolbarContainer.length) {
+            this._$toolbarContainer[0].querySelectorAll(".dropdown-toggle.show").forEach(toggleEl => {
+                Dropdown.getOrCreateInstance(toggleEl).hide();
+            });
+        }
+    },
+    /**
      * Activates & deactivates the button used to add text options, depending
      * on the selected element.
      *
@@ -481,6 +510,9 @@ const wSnippetMenu = weSnippetEditor.SnippetsMenu.extend({
             this._disableTextOptions(targetEl);
             this.options.wysiwyg.odooEditor.historyStep(true);
             restoreCursor();
+            if (this.options.enableTranslation) {
+                $(selectedTextParent).trigger("content_changed");
+            }
         } else {
             if (sel.getRangeAt(0).collapsed) {
                 return;
@@ -836,9 +868,6 @@ wSnippetMenu.include({
      */
     start() {
         const _super = this._super(...arguments);
-        if (this.options.enableTranslation) {
-            return _super;
-        }
         if (this.$body[0].ownerDocument !== this.ownerDocument) {
             this.$body.on('click.snippets_menu', '*', this._onClick);
         }

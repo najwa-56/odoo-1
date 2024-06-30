@@ -216,6 +216,11 @@ export class PosStore extends Reactive {
             searchTerm: "",
         };
     }
+
+    async setDiscountFromUI(line, val) {
+        line.set_discount(val);
+    }
+
     getDefaultPricelist() {
         const current_order = this.get_order();
         if (current_order) {
@@ -860,7 +865,8 @@ export class PosStore extends Reactive {
                 message = messageFp;
             }
         }
-        await this._getMissingProducts(ordersJson);
+        await this._loadMissingProducts(ordersJson);
+        await this._loadMissingPartners(ordersJson);
         const allOrders = [...this.get_order_list()];
         this._replaceOrders(allOrders, ordersJson);
         this.sortOrders();
@@ -898,17 +904,6 @@ export class PosStore extends Reactive {
             "get_pos_ui_product_pricelists_by_ids",
             [[odoo.pos_session_id], pricelistsToGet]
         );
-    }
-    async _getMissingProducts(ordersJson) {
-        const productIds = [];
-        for (const order of ordersJson) {
-            for (const orderline of order.lines) {
-                if (!this.db.get_product_by_id(orderline[2].product_id)) {
-                    productIds.push(orderline[2].product_id);
-                }
-            }
-        }
-        await this._addProducts(productIds, false);
     }
     _addPosPricelists(pricelistsJson) {
         if (!this.config.use_pricelist) {
@@ -1242,7 +1237,11 @@ export class PosStore extends Reactive {
      * while processing orders in the backend
      */
     _getCreateOrderContext(orders, options) {
-        return this.context || {};
+        const orderContext = this.context || {};
+        if (options.printedOrders !== undefined) {
+            orderContext.is_receipt_printed = options.printedOrders;
+        }
+        return orderContext;
     }
     // send an array of orders to the server
     // available options:
@@ -1753,6 +1752,10 @@ export class PosStore extends Reactive {
         return false;
     }
 
+    disallowLineDiscountChange() {
+        return false;
+    }
+
     getCurrencySymbol() {
         return this.currency ? this.currency.symbol : "$";
     }
@@ -1881,13 +1884,13 @@ export class PosStore extends Reactive {
         // If pos is not properly loaded, we just go back to /web without
         // doing anything in the order data.
         if (!this || this.db.get_orders().length === 0) {
-            window.location = "/web#action=point_of_sale.action_client_pos_menu";
+            this.redirectToBackend();
         }
 
         // If there are orders in the db left unsynced, we try to sync.
         const syncSuccess = await this.push_orders_with_closing_popup();
         if (syncSuccess) {
-            window.location = '/web#action=point_of_sale.action_client_pos_menu';
+            this.redirectToBackend();
         }
     }
     async selectPartner() {
@@ -1974,7 +1977,7 @@ export class PosStore extends Reactive {
     }
     openCashControl() {
         if (this.shouldShowCashControl()) {
-            this.popup.add(CashOpeningPopup, { keepBehind: true });
+            this.popup.add(CashOpeningPopup);
         }
     }
     shouldShowCashControl() {
@@ -2043,6 +2046,10 @@ export class PosStore extends Reactive {
 
     isChildPartner(partner) {
         return partner.parent_name;
+    }
+
+    redirectToBackend() {
+        window.location = "/web#action=point_of_sale.action_client_pos_menu";
     }
 }
 

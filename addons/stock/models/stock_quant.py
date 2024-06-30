@@ -58,7 +58,7 @@ class StockQuant(models.Model):
     location_id = fields.Many2one(
         'stock.location', 'Location',
         domain=lambda self: self._domain_location_id(),
-        auto_join=True, ondelete='restrict', required=True, index=True, check_company=True)
+        auto_join=True, ondelete='restrict', required=True, index=True)
     warehouse_id = fields.Many2one('stock.warehouse', related='location_id.warehouse_id')
     storage_category_id = fields.Many2one(related='location_id.storage_category_id', store=True)
     cyclic_inventory_frequency = fields.Integer(related='location_id.cyclic_inventory_frequency')
@@ -863,7 +863,7 @@ class StockQuant(models.Model):
             quantity = uom_id._compute_quantity(quantity_move_uom, product_id.uom_id, rounding_method='HALF-UP')
 
         if self.product_id.tracking == 'serial':
-            if float_compare(quantity, int(quantity), precision_digits=rounding) != 0:
+            if float_compare(quantity, int(quantity), precision_rounding=rounding) != 0:
                 quantity = 0
 
         reserved_quants = []

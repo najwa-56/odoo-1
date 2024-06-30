@@ -604,7 +604,7 @@ class AccountMoveLine(models.Model):
                     or accounts.get(('res.company', move.company_id.id, account_type))
                 )
                 if line.move_id.fiscal_position_id:
-                    account_id = self.move_id.fiscal_position_id.map_account(self.env['account.account'].browse(account_id))
+                    account_id = line.move_id.fiscal_position_id.map_account(self.env['account.account'].browse(account_id))
                 line.account_id = account_id
 
         product_lines = self.filtered(lambda line: line.display_type == 'product' and line.move_id.is_invoice(True))
@@ -895,7 +895,7 @@ class AccountMoveLine(models.Model):
             tax_ids = False if self.env.context.get('skip_computed_taxes') else self.account_id.tax_ids
 
         if self.company_id and tax_ids:
-            tax_ids = tax_ids.filtered_domain(company_domain)
+            tax_ids = tax_ids._filter_taxes_by_company(self.company_id)
 
         if tax_ids and self.move_id.fiscal_position_id:
             tax_ids = self.move_id.fiscal_position_id.map_tax(tax_ids)
@@ -916,7 +916,7 @@ class AccountMoveLine(models.Model):
                     'tax_tag_ids': [(6, 0, line.tax_tag_ids.ids)],
                     'partner_id': line.partner_id.id,
                     'move_id': line.move_id.id,
-                    'display_type': 'epd' if line.name and _('(Discount)') in line.name else line.display_type,
+                    'display_type': line.display_type,
                 })
             else:
                 line.tax_key = frozendict({'id': line.id})
@@ -1223,7 +1223,10 @@ class AccountMoveLine(models.Model):
             line.id for line in self if line.parent_state == "posted"
         ])
         lines_to_modify.analytic_line_ids.unlink()
-        lines_to_modify._create_analytic_lines()
+
+        context = dict(self.env.context)
+        context.pop('default_account_id', None)
+        lines_to_modify.with_context(context)._create_analytic_lines()
 
     @api.onchange('account_id')
     def _inverse_account_id(self):
@@ -1483,6 +1486,10 @@ class AccountMoveLine(models.Model):
                 res_vals.pop('balance', 0)
                 res_vals.pop('debit', 0)
                 res_vals.pop('credit', 0)
+
+            if res_vals['display_type'] in ('line_section', 'line_note'):
+                res_vals.pop('account_id')
+
         return result_vals_list
 
     @contextmanager
@@ -2618,14 +2625,9 @@ class AccountMoveLine(models.Model):
             return
 
         journal = company.currency_exchange_journal_id
-        if not journal:
-            raise UserError(_(
-                    "You have to configure the 'Exchange Gain or Loss Journal' in your company settings, to manage"
-                    " automatically the booking of accounting entries related to differences between exchange rates."
-                ))
         expense_exchange_account = company.expense_currency_exchange_account_id
         income_exchange_account = company.income_currency_exchange_account_id
-        accounting_exchange_date = journal.with_context(move_date=exchange_date).accounting_date
+        accounting_exchange_date = journal.with_context(move_date=exchange_date).accounting_date if journal else date.min
 
         move_vals = {
             'move_type': 'entry',
@@ -2708,6 +2710,13 @@ class AccountMoveLine(models.Model):
         for exchange_diff_values in exchange_diff_values_list:
             move_vals = exchange_diff_values['move_values']
             exchange_move_values_list.append(move_vals)
+
+            if not move_vals['journal_id']:
+                raise UserError(_(
+                    "You have to configure the 'Exchange Gain or Loss Journal' in your company settings, to manage"
+                    " automatically the booking of accounting entries related to differences between exchange rates."
+                ))
+
             journal_ids.add(move_vals['journal_id'])
 
         if not exchange_move_values_list:

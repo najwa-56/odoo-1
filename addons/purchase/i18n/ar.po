@@ -3,7 +3,7 @@
 # 	* purchase
 # 
 # Translators:
-# Wil Odoo, 2023
+# Wil Odoo, 2024
 # Malaz Abuidris <msea@odoo.com>, 2024
 # 
 msgid ""
@@ -47,7 +47,7 @@ msgstr "عدد البنود"
 #: code:addons/purchase/models/purchase_order.py:0
 #, python-format
 msgid "%(amount)s due %(date)s"
-msgstr "%(amount)s مستحق %(date)s "
+msgstr "%(amount)s مستحق في %(date)s "
 
 #. module: purchase
 #. odoo-python
@@ -1170,6 +1170,11 @@ msgstr "خصم %"
 #: model:ir.model.fields,field_description:purchase.field_purchase_order_line__discount
 msgid "Discount (%)"
 msgstr "خصم (%)"
+
+#. module: purchase
+#: model_terms:ir.ui.view,arch_db:purchase.purchase_order_form
+msgid "Discount:"
+msgstr "الخصم:"
 
 #. module: purchase
 #: model:ir.model.fields,field_description:purchase.field_purchase_bill_union__display_name

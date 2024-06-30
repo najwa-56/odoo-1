@@ -367,6 +367,9 @@ class SaleOrder(models.Model):
                 "Your cart is not ready to be paid, please verify previous steps."
             ))
 
+        if not self.only_services and not self.carrier_id:
+            raise ValidationError(_("No shipping method is selected."))
+
     def _cart_accessories(self):
         """ Suggest accessories based on 'Accessory Products' of products in cart """
         product_ids = set(self.website_order_line.product_id.ids)
@@ -499,11 +502,12 @@ class SaleOrder(models.Model):
             phone = order.partner_shipping_id.phone
 
             # we can check if the current partner has a partner of type "delivery" that has the same address
-            existing_partner = order.env['res.partner'].search(['&', '&', '&', '&',
+            existing_partner = order.env['res.partner'].search(['&', '&', '&', '&', '&',
                                                                 ('street', '=', street),
                                                                 ('city', '=', city),
                                                                 ('state_id', '=', state),
                                                                 ('country_id', '=', country),
+                                                                ('parent_id', '=', parent_id),
                                                                 ('type', '=', 'delivery')], limit=1)
 
             if existing_partner:

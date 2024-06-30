@@ -12,6 +12,7 @@ class AccountPaymentTerm(models.Model):
     _name = "account.payment.term"
     _description = "Payment Terms"
     _order = "sequence, id"
+    _check_company_domain = models.check_company_domain_parent_of
 
     def _default_line_ids(self):
         return [Command.create({'value': 'percent', 'value_amount': 100.0, 'nb_days': 0})]
@@ -62,10 +63,10 @@ class AccountPaymentTerm(models.Model):
         if self.early_discount:
             percentage = self.discount_percentage / 100.0
             if self.early_pay_discount_computation in ('excluded', 'mixed'):
-                discount_amount_currency = self.currency_id.round((total_amount - untaxed_amount) * percentage)
+                discount_amount_currency = (total_amount - untaxed_amount) * percentage
             else:
-                discount_amount_currency = self.currency_id.round(total_amount - (total_amount * (1 - (percentage))))
-            return total_amount - discount_amount_currency
+                discount_amount_currency = total_amount * percentage
+            return self.currency_id.round(total_amount - discount_amount_currency)
         return total_amount
 
     @api.depends('company_id')
@@ -82,7 +83,7 @@ class AccountPaymentTerm(models.Model):
     @api.depends('line_ids')
     def _compute_example_invalid(self):
         for payment_term in self:
-            payment_term.example_invalid = len(payment_term.line_ids) <= 1
+            payment_term.example_invalid = not payment_term.line_ids
 
     @api.depends('currency_id', 'example_amount', 'example_date', 'line_ids.value', 'line_ids.value_amount', 'line_ids.nb_days', 'early_discount', 'discount_percentage', 'discount_days')
     def _compute_example_preview(self):
@@ -143,7 +144,7 @@ class AccountPaymentTerm(models.Model):
             results['amount'] += term['foreign_amount']
         return amount_by_date
 
-    @api.constrains('line_ids')
+    @api.constrains('line_ids', 'early_discount')
     def _check_lines(self):
         round_precision = self.env['decimal.precision'].precision_get('Payment Terms')
         for terms in self:

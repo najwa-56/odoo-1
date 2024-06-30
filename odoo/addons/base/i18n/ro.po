@@ -14,8 +14,11 @@
 # Claudia Baisan, 2024
 # Cozmin Candea <office@terrabit.ro>, 2024
 # Martin Trigaux, 2024
-# Dorin Hongu <dhongu@gmail.com>, 2024
 # Foldi Robert <foldirobert@nexterp.ro>, 2024
+# Dorin Hongu <dhongu@gmail.com>, 2024
+# Larisa_nexterp, 2024
+# Maria Muntean, 2024
+# Simonel Criste <info@erpsystems.solutions>, 2024
 # 
 msgid ""
 msgstr ""
@@ -23,7 +26,7 @@ msgstr ""
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2024-02-26 12:42+0000\n"
 "PO-Revision-Date: 2023-10-26 23:09+0000\n"
-"Last-Translator: Foldi Robert <foldirobert@nexterp.ro>, 2024\n"
+"Last-Translator: Simonel Criste <info@erpsystems.solutions>, 2024\n"
 "Language-Team: Romanian (https://app.transifex.com/odoo/teams/41243/ro/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -7982,6 +7985,12 @@ msgid ""
 "- Follow-up Address: Preferred address for follow-up reports. Selected by default when you send reminders about overdue invoices.\n"
 "- Other: Other address for the company (e.g. subsidiary, ...)"
 msgstr ""
+"- Contact: Folosiți-l pentru a organiza datele de contact ale angajaților unei anumite companii (de exemplu, CEO, CFO, ...).\n"
+"- Adresa facturii: adresa preferată pentru toate facturile. Selectat implicit atunci când facturați o comandă care aparține acestei companii.\n"
+"- Adresa de livrare: adresa preferată pentru toate livrările. Selectat implicit atunci când livrați o comandă care aparține acestei companii.\n"
+"- Privat: Adresele private sunt vizibile numai de utilizatorii autorizați și conțin date sensibile (adresele de domiciliu ale angajaților, ...).\n"
+"- Adresă de urmărire: adresă preferată pentru rapoartele de urmărire. Selectat implicit atunci când trimiteți mementouri despre facturile restante.\n"
+"- Altele: altă adresă a companiei (de exemplu, filială, ...)"
 
 #. module: base
 #. odoo-python
@@ -8133,7 +8142,7 @@ msgstr "9. %w ==&gt; 5 ( Vineri este ziua a 6-a )"
 #. module: base
 #: model_terms:ir.ui.view,arch_db:base.view_partner_form
 msgid "<b invisible=\"not is_company\">Address</b>"
-msgstr ""
+msgstr "<b invisible=\"not is_company\">Adresă</b>"
 
 #. module: base
 #: model_terms:ir.ui.view,arch_db:base.view_server_action_form
@@ -8286,6 +8295,8 @@ msgid ""
 "<span class=\"o_form_label\" colspan=\"2\">Click on Update below to start "
 "the process...</span>"
 msgstr ""
+"<span class=\"o_form_label\" colspan=\"2\">Faceți clic pe Actualizați pentru"
+" a porni procesul...</span>"
 
 #. module: base
 #: model_terms:ir.ui.view,arch_db:base.view_base_module_upgrade_install
@@ -8326,7 +8337,7 @@ msgstr ""
 #. module: base
 #: model_terms:ir.ui.view,arch_db:base.res_partner_kanban_view
 msgid "<span class=\"text-bg-danger\">Archived</span>"
-msgstr ""
+msgstr "<span class=\"text-bg-danger\">Arhivat</span>"
 
 #. module: base
 #: model_terms:ir.ui.view,arch_db:base.demo_force_install_form
@@ -8995,14 +9006,14 @@ msgstr ""
 #. module: base
 #: model:ir.model,name:base.model_res_users_apikeys_description
 msgid "API Key Description"
-msgstr ""
+msgstr "Descrierea cheii API"
 
 #. module: base
 #. odoo-python
 #: code:addons/base/models/res_users.py:0
 #, python-format
 msgid "API Key Ready"
-msgstr ""
+msgstr "Cheie API pregătită"
 
 #. module: base
 #: model:ir.actions.act_window,name:base.action_res_users_keys_description
@@ -10801,7 +10812,7 @@ msgid ""
 "Automatically finds the purchase order linked to a vendor bill when using "
 "invoice extraction"
 msgstr ""
-"Găsește automat comanda de cumpărare legată de o factură a furnizorului "
+"Găsește automat comanda de achiziție legată de o factură a furnizorului "
 "atunci când se utilizează extragerea facturilor"
 
 #. module: base
@@ -12719,6 +12730,8 @@ msgid ""
 "Company tagline, which is included in a printed document's header or footer "
 "(depending on the selected layout)."
 msgstr ""
+"Sloganul companiei, care este inclus în antetul sau subsolul unui document "
+"tipărit (în funcție de aspectul selectat)."
 
 #. module: base
 #. odoo-python
@@ -15180,7 +15193,7 @@ msgstr "Raportarea contractelor angajaților"
 #. module: base
 #: model:ir.module.category,name:base.module_category_services_employee_hourly_cost
 msgid "Employee Hourly Cost"
-msgstr ""
+msgstr "Cost orar angajat"
 
 #. module: base
 #: model:ir.module.module,shortdesc:base.module_hr_hourly_cost
@@ -15268,7 +15281,7 @@ msgstr ""
 #. module: base
 #: model_terms:ir.ui.view,arch_db:base.enable_profiling_wizard
 msgid "Enable profiling"
-msgstr ""
+msgstr "Activare profilare"
 
 #. module: base
 #: model:ir.model.fields,field_description:base.field_base_enable_profiling_wizard__duration
@@ -15322,7 +15335,7 @@ msgstr ""
 #. module: base
 #: model_terms:ir.ui.view,arch_db:base.form_res_users_key_description
 msgid "Enter a description of and purpose for the key."
-msgstr ""
+msgstr "Introduceți o descriere a cheii și scopul acesteia."
 
 #. module: base
 #: model:ir.module.module,shortdesc:base.module_website_event_track_gantt
@@ -16657,6 +16670,11 @@ msgid "France - Accounting Reports"
 msgstr "Franța - Rapoarte contabile"
 
 #. module: base
+#: model:ir.module.module,shortdesc:base.module_l10n_fr_invoice_addr
+msgid "France - Adding Mandatory Invoice Mentions (Decree no. 2022-1299)"
+msgstr ""
+
+#. module: base
 #: model:ir.module.module,shortdesc:base.module_l10n_fr_fec
 msgid "France - FEC Export"
 msgstr "Franța - Export FEC"
@@ -17394,7 +17412,7 @@ msgstr "Spațiu antet"
 #. module: base
 #: model:ir.model.fields,help:base.field_res_company__company_details
 msgid "Header text displayed at the top of all reports."
-msgstr ""
+msgstr "Textul antet afișat în partea de sus a tuturor rapoartelor."
 
 #. module: base
 #: model:res.partner.industry,name:base.res_partner_industry_Q
@@ -18402,7 +18420,7 @@ msgstr "Indian - Punct de vânzare"
 #. module: base
 #: model:ir.module.module,shortdesc:base.module_l10n_in_purchase
 msgid "Indian - Purchase Report(GST)"
-msgstr "Indian - Raport de cumpărare (GST)"
+msgstr "Indian - Raport de achiziție (GST)"
 
 #. module: base
 #: model:ir.module.module,shortdesc:base.module_l10n_in_sale
@@ -19061,7 +19079,7 @@ msgstr "Este Compania"
 #. module: base
 #: model:ir.model.fields,field_description:base.field_res_company__is_company_details_empty
 msgid "Is Company Details Empty"
-msgstr ""
+msgstr "Detaliile Companiei sunt Goale"
 
 #. module: base
 #: model:ir.model.fields,field_description:base.field_res_currency__is_current_company_currency
@@ -19197,7 +19215,7 @@ msgstr "Jurnalul de articole conexe la contact"
 #: code:addons/base/models/ir_qweb_fields.py:0
 #, python-format
 msgid "Json"
-msgstr ""
+msgstr "Json"
 
 #. module: base
 #: model:res.partner.industry,full_name:base.res_partner_industry_K
@@ -19982,14 +20000,14 @@ msgstr "Jurnal"
 #: model_terms:ir.ui.view,arch_db:base.res_users_identitycheck_view_form_revokedevices
 #: model_terms:ir.ui.view,arch_db:base.view_users_form_simple_modif
 msgid "Log out from all devices"
-msgstr ""
+msgstr "Deconectează-te de pe toate dispozitivele"
 
 #. module: base
 #. odoo-python
 #: code:addons/base/models/res_users.py:0
 #, python-format
 msgid "Log out from all devices?"
-msgstr ""
+msgstr "Deconectezi de pe toate dispozitivele?"
 
 #. module: base
 #: model:ir.actions.act_window,name:base.ir_logging_all_act
@@ -25283,7 +25301,7 @@ msgstr "Puerto Rico"
 #: model:ir.module.module,shortdesc:base.module_purchase
 #: model_terms:ir.ui.view,arch_db:base.view_partner_form
 msgid "Purchase"
-msgstr "Cumpărare"
+msgstr "Achiziție"
 
 #. module: base
 #: model:ir.module.module,shortdesc:base.module_purchase_requisition
@@ -25839,7 +25857,7 @@ msgstr "Reîncarcarcă din atașament"
 #: model:ir.module.category,name:base.module_category_human_resources_remote_work
 #: model:ir.module.module,shortdesc:base.module_hr_homeworking
 msgid "Remote Work"
-msgstr ""
+msgstr "Lucru de la distanță"
 
 #. module: base
 #: model:ir.model.fields.selection,name:base.selection__ir_asset__directive__remove
@@ -27178,6 +27196,11 @@ msgid ""
 "emails are compromised. Once verified, you can activate the ability to send "
 "money."
 msgstr ""
+"Trimiterea de facturi false cu un număr de cont fraudulos este o practică "
+"comună de phishing. Pentru a vă proteja, verificați întotdeauna noile numere"
+" de cont bancar, de preferință apelând furnizorul, deoarece phishing-ul are "
+"loc de obicei atunci când e-mailurile lor sunt compromise. Odată verificat, "
+"puteți activa capacitatea de a trimite bani."
 
 #. module: base
 #: model:res.country,name:base.sn
@@ -29070,6 +29093,9 @@ msgid ""
 "country format. You can use '/' to indicate that the partner is not subject "
 "to tax."
 msgstr ""
+"Numărul de identificare fiscală. Valorile aici vor fi validate în funcție de"
+" formatul țării. Puteți folosi „/” pentru a indica că partenerul nu este "
+"plătitor de TVA."
 
 #. module: base
 #: model:ir.model.constraint,message:base.constraint_res_lang_url_code_uniq
@@ -31087,6 +31113,8 @@ msgid ""
 "Uninstalling modules can be risky, we recommend you to try it on a duplicate"
 " or test database first."
 msgstr ""
+"Dezinstalarea modulelor poate fi riscantă, vă recomandăm să o încercați mai "
+"întâi pe o bază de date de test."
 
 #. module: base
 #. odoo-python

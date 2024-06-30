@@ -500,6 +500,16 @@ export class WysiwygAdapterComponent extends Wysiwyg {
                     continue;
                 }
 
+                // Do not mark the editable dirty when simply adding/removing
+                // link zwnbsp since these are just technical nodes that aren't
+                // part of the user's editing of the document.
+                if (record.type === 'childList' &&
+                    [...record.addedNodes, ...record.removedNodes].every(node => (
+                        node.nodeType === Node.TEXT_NODE && node.textContent === '\ufeff')
+                    )) {
+                    continue;
+                }
+
                 // Mark any savable element dirty if any tracked mutation occurs
                 // inside of it.
                 $savable.not('.o_dirty').each(function () {
@@ -923,7 +933,7 @@ export class WysiwygAdapterComponent extends Wysiwyg {
      * @private
      * @param {HTMLElement} editable
      */
-    _saveCoverProperties($elementToSave) {
+    async _saveCoverProperties($elementToSave) {
         var el = $elementToSave.closest('.o_record_cover_container')[0];
         if (!el) {
             return;
@@ -950,7 +960,31 @@ export class WysiwygAdapterComponent extends Wysiwyg {
         }
         this.__savedCovers[resModel].push(resID);
 
-        var cssBgImage = $(el.querySelector('.o_record_cover_image')).css('background-image');
+        const imageEl = el.querySelector('.o_record_cover_image');
+        let cssBgImage = imageEl.style.backgroundImage;
+        if (imageEl.classList.contains("o_b64_image_to_save")) {
+            imageEl.classList.remove("o_b64_image_to_save");
+            const groups = cssBgImage.match(/url\("data:(?<mimetype>.*);base64,(?<imageData>.*)"\)/)?.groups;
+            if (!groups.imageData) {
+                // Checks if the image is in base64 format for RPC call. Relying
+                // only on the presence of the class "o_b64_image_to_save" is not
+                // robust enough.
+                return;
+            }
+            const modelName = await this.websiteService.getUserModelName(resModel);
+            const recordNameEl = imageEl.closest("body").querySelector(`[data-oe-model="${resModel}"][data-oe-id="${resID}"][data-oe-field="name"]`);
+            const recordName = recordNameEl ? `'${recordNameEl.textContent}'` : resID;
+            const attachment = await this.rpc(
+                '/web_editor/attachment/add_data',
+                {
+                    name: `${modelName} ${recordName} cover image.${groups.mimetype.split("/")[1]}`,
+                    data: groups.imageData,
+                    is_image: true,
+                    res_model: 'ir.ui.view',
+                },
+            );
+            cssBgImage = `url(${attachment.image_src})`;
+        }
         var coverProps = {
             'background-image': cssBgImage.replace(/"/g, '').replace(window.location.protocol + "//" + window.location.host, ''),
             'background_color_class': el.dataset.bgColorClass,

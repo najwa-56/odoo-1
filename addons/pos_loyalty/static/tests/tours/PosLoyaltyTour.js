@@ -396,14 +396,14 @@ registry.category("web_tour.tours").add('PosLoyaltyTour12', {
             PosLoyalty.hasRewardLine('Free Product', '-1.00'),
             ProductScreen.addOrderline('Free Product B', '2'),
             ProductScreen.clickDisplayedProduct('Free Product B'),
-            ProductScreen.totalAmountIs('4.00'),
-            PosLoyalty.hasRewardLine('Free Product', '-2.00'),
+            ProductScreen.totalAmountIs('12.00'),
+            PosLoyalty.hasRewardLine('Free Product', '-5.00'),
             ProductScreen.clickDisplayedProduct('Free Product B'),
             ProductScreen.clickDisplayedProduct('Free Product B'),
             ProductScreen.clickDisplayedProduct('Free Product B'),
             ProductScreen.selectedOrderlineHas("Free Product B", "6.00"),
-            ProductScreen.totalAmountIs('6.00'),
-            PosLoyalty.hasRewardLine('Free Product', '-3.00'),
+            ProductScreen.totalAmountIs('22.00'),
+            PosLoyalty.hasRewardLine('Free Product', '-10.00'),
         ].flat(),
 });
 
@@ -426,5 +426,56 @@ registry.category("web_tour.tours").add('PosLoyaltyMinAmountAndSpecificProductTo
             ProductScreen.clickDisplayedProduct('Product A'),
             ProductScreen.selectedOrderlineHas('Product A', '2.00', '40.00'),
             PosLoyalty.orderTotalIs('66.00'),
+        ].flat(),
+});
+
+function createOrderCoupon(totalAmount, couponName, couponAmount, loyaltyPoints) {
+    return [
+        ProductScreen.confirmOpeningPopup(),
+        ProductScreen.clickHomeCategory(),
+        ProductScreen.clickPartnerButton(),
+        ProductScreen.clickCustomer("AAAA"),
+        ProductScreen.addOrderline("product_a", "1"),
+        ProductScreen.addOrderline("product_b", "1"),
+        PosLoyalty.enterCode("promocode"),
+        PosLoyalty.hasRewardLine(`${couponName}`, `${couponAmount}`),
+        PosLoyalty.orderTotalIs(`${totalAmount}`),
+        PosLoyalty.pointsAwardedAre(`${loyaltyPoints}`),
+        PosLoyalty.finalizeOrder("Cash", `${totalAmount}`),
+    ].flat();
+}
+
+registry.category("web_tour.tours").add("PosLoyaltyPointsDiscountNoDomainProgramNoDomain", {
+    test: true,
+    url: "/pos/web",
+    steps: () => [createOrderCoupon("135.00", "10% on your order", "-15.00", "135")].flat(),
+});
+
+registry.category("web_tour.tours").add("PosLoyaltyPointsDiscountNoDomainProgramDomain", {
+    test: true,
+    url: "/pos/web",
+    steps: () => [createOrderCoupon("135.00", "10% on your order", "-15.00", "100")].flat(),
+});
+
+registry.category("web_tour.tours").add("PosLoyaltyPointsDiscountWithDomainProgramDomain", {
+    test: true,
+    url: "/pos/web",
+    steps: () => [createOrderCoupon("140.00", "10% on food", "-10.00", "90")].flat(),
+});
+
+registry.category("web_tour.tours").add("PosLoyaltyPointsGlobalDiscountProgramNoDomain", {
+    test: true,
+    url: "/pos/web",
+    steps: () =>
+        [
+            ProductScreen.confirmOpeningPopup(),
+            ProductScreen.clickHomeCategory(),
+            ProductScreen.clickPartnerButton(),
+            ProductScreen.clickCustomer("AAAA"),
+            ProductScreen.addOrderline("product_a", "1"),
+            PosLoyalty.hasRewardLine("10% on your order", "-10.00"),
+            PosLoyalty.orderTotalIs("90"),
+            PosLoyalty.pointsAwardedAre("90"),
+            PosLoyalty.finalizeOrder("Cash", "90"),
         ].flat(),
 });

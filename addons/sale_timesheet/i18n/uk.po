@@ -35,6 +35,13 @@ msgid ""
 "                </p>\n"
 "            "
 msgstr ""
+"\n"
+"                <p class=\"o_view_nocontent_smiling_face\">\n"
+"                    Жодних дій не знайдено. Створіть нову!\n"
+"                </p><p>\n"
+"                    Щодня відстежуйте свій робочий час за проєктами та виставляйте за нього рахунки своїм клієнтам.\n"
+"                </p>\n"
+"            "
 
 #. module: sale_timesheet
 #. odoo-python
@@ -96,7 +103,7 @@ msgstr ", належить до"
 #. module: sale_timesheet
 #: model_terms:ir.ui.view,arch_db:sale_timesheet.timesheet_sale_page
 msgid "- Timesheet product"
-msgstr ""
+msgstr "- Товар табеля"
 
 #. module: sale_timesheet
 #: model_terms:ir.ui.view,arch_db:sale_timesheet.project_project_view_form
@@ -105,6 +112,9 @@ msgid ""
 "                        Define the rate at which an employee's time is billed based on their expertise, skills, or experience.\n"
 "                        To bill the same service at a different rate, create separate sales order items."
 msgstr ""
+"<i class=\"fa fa-lightbulb-o\"/>\n"
+"                       Визначте ставку, за якою час працівника оплачується на основі його знань, навичок або досвіду.\n"
+"Щоб виставити рахунок за ту саму послугу за іншим тарифом, створіть окремі рядки замовлення на продаж."
 
 #. module: sale_timesheet
 #: model_terms:ir.ui.view,arch_db:sale_timesheet.hr_timesheet_line_form_inherit
@@ -125,7 +135,7 @@ msgstr "<span class=\"o_stat_text\">Замовлення на продаж</span
 #. module: sale_timesheet
 #: model_terms:ir.ui.view,arch_db:sale_timesheet.portal_my_task_inherit
 msgid "<strong>Amount Due:</strong>"
-msgstr ""
+msgstr "<strong>Сума боргу: </strong>"
 
 #. module: sale_timesheet
 #: model_terms:ir.ui.view,arch_db:sale_timesheet.portal_my_task_inherit
@@ -150,7 +160,7 @@ msgstr "<u>Рентабельність</u>"
 #. module: sale_timesheet
 #: model_terms:ir.ui.view,arch_db:sale_timesheet.project_update_default_description
 msgid "<u>Sales</u>"
-msgstr ""
+msgstr "<u>Продажі</u>"
 
 #. module: sale_timesheet
 #: model:ir.model.fields,help:sale_timesheet.field_sale_order_line__qty_delivered_method
@@ -471,7 +481,7 @@ msgstr "Кінцева дата"
 #. module: sale_timesheet
 #: model:ir.model.fields,field_description:sale_timesheet.field_project_sale_line_employee_map__existing_employee_ids
 msgid "Existing Employee"
-msgstr ""
+msgstr "Наявний співробітник"
 
 #. module: sale_timesheet
 #: model_terms:ir.ui.view,arch_db:sale_timesheet.product_template_view_search_sale_timesheet
@@ -746,7 +756,7 @@ msgstr "Години, які не виставляються у рахунку"
 #. module: sale_timesheet
 #: model_terms:ir.ui.view,arch_db:sale_timesheet.portal_my_timesheets_inherit
 msgid "Not Billed"
-msgstr ""
+msgstr "Не у рахунку"
 
 #. module: sale_timesheet
 #: model:ir.model.fields,help:sale_timesheet.field_timesheets_analysis_report__timesheet_revenues
@@ -800,7 +810,7 @@ msgstr "Посилання на замовлення"
 #. module: sale_timesheet
 #: model_terms:ir.ui.view,arch_db:sale_timesheet.portal_my_timesheets_inherit
 msgid "Hours Ordered,"
-msgstr ""
+msgstr "Замовлені години,"
 
 #. module: sale_timesheet
 #: model:ir.model.fields,help:sale_timesheet.field_product_product__service_upsell_threshold
@@ -925,7 +935,7 @@ msgstr "Години, що залишилось на SO:"
 #. module: sale_timesheet
 #: model_terms:ir.ui.view,arch_db:sale_timesheet.portal_my_timesheets_inherit
 msgid "Hours Remaining)"
-msgstr ""
+msgstr "Годин залишилось)"
 
 #. module: sale_timesheet
 #: model_terms:ir.actions.act_window,help:sale_timesheet.timesheet_action_billing_report
@@ -1098,7 +1108,7 @@ msgstr "Пороговий коефіцієнт збільшення прода�
 #. module: sale_timesheet
 #: model:product.template,name:sale_timesheet.time_product_product_template
 msgid "Service on Timesheets"
-msgstr ""
+msgstr "Послуга в Табелях"
 
 #. module: sale_timesheet
 #: model:ir.model.fields,help:sale_timesheet.field_project_project__timesheet_product_id
@@ -1121,7 +1131,7 @@ msgstr "Послуги"
 #. module: sale_timesheet
 #: model:ir.model.fields,field_description:sale_timesheet.field_sale_order__show_hours_recorded_button
 msgid "Show Hours Recorded Button"
-msgstr ""
+msgstr "Показати кнопку записаних годин"
 
 #. module: sale_timesheet
 #: model_terms:ir.ui.view,arch_db:sale_timesheet.project_update_default_description
@@ -1438,7 +1448,7 @@ msgstr ""
 #. module: sale_timesheet
 #: model_terms:ir.ui.view,arch_db:sale_timesheet.project_project_view_form
 msgid "Timesheets without a sales order item are"
-msgstr ""
+msgstr "Табелі без рядка замовлення на продаж - це"
 
 #. module: sale_timesheet
 #: model:ir.model.fields,help:sale_timesheet.field_project_create_invoice__amount_to_invoice
@@ -1583,7 +1593,7 @@ msgstr "дні"
 #: code:addons/sale_timesheet/models/sale_order.py:0
 #, python-format
 msgid "days remaining"
-msgstr ""
+msgstr "днів залишилось"
 
 #. module: sale_timesheet
 #. odoo-python
@@ -1600,7 +1610,7 @@ msgstr "маржа ("
 #. module: sale_timesheet
 #: model:ir.model.fields.selection,name:sale_timesheet.selection__project_project__billing_type__not_billable
 msgid "not billable"
-msgstr ""
+msgstr "не виставляється у рахунку"
 
 #. module: sale_timesheet
 #: model_terms:ir.ui.view,arch_db:sale_timesheet.view_product_timesheet_form

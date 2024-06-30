@@ -321,7 +321,7 @@ msgstr "<span class=\"o_stat_text\">Operazioni</span>"
 #. module: mrp
 #: model_terms:ir.ui.view,arch_db:mrp.mrp_bom_form_view
 msgid "<span class=\"o_stat_text\">Operations<br/>Performance</span>"
-msgstr "<span class=\"o_stat_text\">Prestazione<br/>Operations</span>"
+msgstr "<span class=\"o_stat_text\">Prestazione<br/>Operazioni</span>"
 
 #. module: mrp
 #: model_terms:ir.ui.view,arch_db:mrp.mrp_production_form_view
@@ -801,6 +801,11 @@ msgstr "Archivia operazione"
 #: model_terms:ir.ui.view,arch_db:mrp.view_mrp_workcenter_search
 msgid "Archived"
 msgstr "In archivio"
+
+#. module: mrp
+#: model_terms:ir.ui.view,arch_db:mrp.mrp_production_form_view
+msgid "Are you sure you want to cancel this manufacturing order?"
+msgstr "Sei sicuro di voler annullare l'ordine di produzione?"
 
 #. module: mrp
 #: model_terms:ir.ui.view,arch_db:mrp.report_mrporder
@@ -1291,6 +1296,17 @@ msgstr "Annulla"
 #: model_terms:ir.ui.view,arch_db:mrp.view_mrp_production_filter
 msgid "Cancelled"
 msgstr "Annullato"
+
+#. module: mrp
+#. odoo-python
+#: code:addons/mrp/models/mrp_bom.py:0
+#, python-format
+msgid ""
+"Cannot compute days to prepare due to missing route info for at least 1 "
+"component or for the final product."
+msgstr ""
+"Impossibile calcolare i giorni di preparazione a causa di informazioni "
+"mancanti per almeno 1 dei componenti del prodotto finale."
 
 #. module: mrp
 #. odoo-python
@@ -5215,16 +5231,6 @@ msgid ""
 msgstr ""
 "Alcuni dei componenti sono monitorati, per recuperare quelli corretti "
 "specificare un ordine di produzione."
-
-#. module: mrp
-#: model_terms:ir.ui.view,arch_db:mrp.mrp_production_form_view
-msgid ""
-"Some product moves have already been confirmed, this manufacturing order "
-"can't be completely cancelled. Are you still sure you want to process?"
-msgstr ""
-"Alcuni movimenti prodotto sono già stati confermati, l'ordine di produzione "
-"non può essere del tutto annullato. Sei sicuro di volere proseguire con "
-"l'elaborazione?"
 
 #. module: mrp
 #. odoo-python

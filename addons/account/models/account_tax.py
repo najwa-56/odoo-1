@@ -998,6 +998,18 @@ class AccountTax(models.Model):
             'total_void': sign * total_void,
         }
 
+    def _filter_taxes_by_company(self, company_id):
+        """ Filter taxes by the given company
+            It goes through the company hierarchy until a tax is found
+        """
+        if not self:
+            return self
+        taxes, company = self.env['account.tax'], company_id
+        while not taxes and company:
+            taxes = self.filtered(lambda t: t.company_id == company)
+            company = company.parent_id
+        return taxes
+
     @api.model
     def _convert_to_tax_base_line_dict(
             self, base_line,
@@ -1546,11 +1558,12 @@ class AccountTax(models.Model):
             amount_tax += sum(x['tax_group_amount'] for x in groups_by_subtotal[subtotal_title])
 
         amount_total = amount_untaxed + amount_tax
+        amount_total_company_currency = amount_untaxed_company_currency + amount_tax_company_currency
 
         display_tax_base = (len(global_tax_details['tax_details']) == 1 and currency.compare_amounts(tax_group_vals_list[0]['base_amount'], amount_untaxed) != 0)\
                            or len(global_tax_details['tax_details']) > 1
 
-        return {
+        result = {
             'amount_untaxed': currency.round(amount_untaxed) if currency else amount_untaxed,
             'amount_total': currency.round(amount_total) if currency else amount_total,
             'formatted_amount_total': formatLang(self.env, amount_total, currency_obj=currency),
@@ -1560,6 +1573,11 @@ class AccountTax(models.Model):
             'subtotals_order': sorted(subtotal_order.keys(), key=lambda k: subtotal_order[k]),
             'display_tax_base': display_tax_base
         }
+        if is_company_currency_requested:
+            comp_currency = self.env.company.currency_id
+            result['amount_total_company_currency'] = comp_currency.round(amount_total_company_currency)
+
+        return result
 
     @api.model
     def _fix_tax_included_price(self, price, prod_taxes, line_taxes):
