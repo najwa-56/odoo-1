@@ -10,6 +10,6 @@ class multi_uom(models.Model):
     price = fields.Float(string='Price',required=True,digits='Product Price')   
     _sql_constraints = [
         ('product_multi_uom_price_uniq',
-        
+         'UNIQUE (product_id,uom_id)',
          _('UOM Product Must Be Unique !'))]
     
