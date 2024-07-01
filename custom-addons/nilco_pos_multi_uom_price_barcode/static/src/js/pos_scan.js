@@ -65,7 +65,7 @@ patch(DB.PosDB.prototype, {
             return this.product_by_id[this.product_packaging_by_barcode[barcode].product_id[0]];
             }else if (barcodes.length > 0) {
 
-         //   for(var t=0;t < barcodes.length;t++){
+            for(var t=0;t < barcodes.length;t++){
                  var uoms=Object.values(barcodes[t].uom_id);
                     for(var b=0;b < uoms.length;b++){
                         if (uoms[b].barcode == barcode){
