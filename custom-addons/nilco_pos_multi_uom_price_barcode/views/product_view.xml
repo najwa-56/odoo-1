@@ -42,6 +42,7 @@
             <field name="model">product.multi.uom.price</field>
             <field name="arch" type="xml">
                 <tree editable="bottom">
+                    <field name="category_id" invisible="1" column_invisible="1"/>
                     <field name="uom_id"/>
                             <field name="price"/>
                             <field name="barcode"/>
