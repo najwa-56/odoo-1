@@ -13,18 +13,42 @@
     </record>
 
 
- <record id="combined_product_template_tree_view" model="ir.ui.view">
-        <field name="name">product.template.form.inheritt</field>
-        <field name="model">product.multi.uom.price</field>
-        <field name="inherit_id" ref="product.product_template_form_view"/>
+     <record id="combined_product_template_tree_view" model="ir.ui.view">
+        <field name="name">product.template.form.inherit.combined</field>
+        <field name="model">product.template</field>
+        <field name="inherit_id" ref="product.product_template_form_view"/> <!-- Adjust this reference if necessary -->
         <field name="arch" type="xml">
-             <xpath expr="//field[@name='multi_uom_price_id']/tree" position="inside">
-                 <field name="barcode"/>
-                  <field name="product_variant_id" column_invisible="1"/>
+            <!-- Insert the group and tree structures -->
+            <xpath expr="//page[@name='sales']/group[@name='sale']" position="inside">
+                <group>
+                    <field name="category_id" invisible="1" column_invisible="1"/>
+                </group>
+                <group name="uom_price" string="UOM Price">
+                    <field name="multi_uom_price_id" nolabel="1" colspan="2">
+                        <tree editable="bottom">
+                            <field name="category_id" invisible="1" column_invisible="1"/>
+                            <field name="uom_id"/>
+                            <field name="price"/>
+                            <field name="barcode"/>
+                            <field name="product_variant_id" column_invisible="1"/>
+                        </tree>
+                    </field>
+                </group>
             </xpath>
-
         </field>
     </record>
+     <record model="ir.ui.view" id="product_product_tree_view">
+            <field name="name">product.product.tree.view</field>
+            <field name="model">product.multi.uom.price</field>
+            <field name="arch" type="xml">
+                <tree editable="bottom">
+                    <field name="uom_id"/>
+                            <field name="price"/>
+                            <field name="barcode"/>
+                            <field name="product_variant_id" column_invisible="1"/>
+                </tree>
+            </field>
+        </record>
 
     <!-- New Menu Item -->
     <menuitem id="menu_combined_tree_view" name="Combined Tree View" parent="sale.product_menu_catalog"/> <!-- Adjust parent menu ID -->
@@ -34,7 +58,7 @@
         <field name="name">Combined Tree View</field>
         <field name="res_model">product.template</field>
         <field name="view_mode">tree,form</field>
-        <field name="view_id" ref="combined_product_template_tree_view"/>
+        <field name="view_id" ref="product_product_tree_view"/>
     </record>
 
     <!-- Link Action to Menu Item -->
