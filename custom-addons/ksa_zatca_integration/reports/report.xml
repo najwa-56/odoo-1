@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <record id="paperformat_simplified" model="report.paperformat">
+        <field name="name">European A4 low margin</field>
+        <field name="default" eval="True"/>
+        <field name="format">A4</field>
+        <field name="orientation">Portrait</field>
+        <field name="margin_top">10</field>
+        <field name="margin_bottom">10</field>
+        <field name="margin_left">10</field>
+        <field name="margin_right">10</field>
+        <field name="header_line" eval="False"/>
+        <field name="header_spacing">2</field>
+        <field name="dpi">90</field>
+    </record>
+
+    <record id="paperformat_standard" model="report.paperformat">
+        <field name="name">B2B Paper Format</field>
+        <field name="default" eval="True"/>
+        <field name="format">A4</field>
+        <field name="orientation">Portrait</field>
+        <field name="margin_top">40</field>
+        <field name="margin_bottom">20</field>
+        <field name="margin_left">10</field>
+        <field name="margin_right">10</field>
+        <field name="header_line" eval="False"/>
+        <field name="header_spacing">40</field>
+        <field name="dpi">90</field>
+    </record>
+
+    <record id="report_e_invoicing_b2c" model="ir.actions.report">
+        <field name="name">E Invoice B2C</field>
+        <field name="model">account.move</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">ksa_zatca_integration.report_e_invoicing_b2c_template</field>
+        <field name="report_file">ksa_zatca_integration.report_e_invoicing_b2c_template</field>
+        <field name="print_report_name">object.zatca_invoice_name.replace('.xml', '')</field>
+        <field name="paperformat_id" ref="ksa_zatca_integration.paperformat_simplified"/>
+    </record>
+
+    <record id="report_e_invoicing_b2b" model="ir.actions.report">
+        <field name="name">E Invoice Standard</field>
+        <field name="model">account.move</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">ksa_zatca_integration.report_e_invoicing_b2b_template</field>
+        <field name="report_file">ksa_zatca_integration.report_e_invoicing_b2b_template</field>
+        <field name="print_report_name">object.zatca_invoice_name.replace('.xml', '')</field>
+        <field name="paperformat_id" ref="ksa_zatca_integration.paperformat_standard"/>
+    </record>
+
+    <!--    report action-->
+
+    <record id="report_zatca_b2b" model="ir.actions.server">
+        <field name="name">E Invoice Standard</field>
+        <field name="model_id" ref="account.model_account_move"/>
+        <field name="binding_model_id" ref="account.model_account_move"/>
+        <field name="binding_view_types">form</field>
+        <field name="binding_type">report</field>
+        <field name="state">code</field>
+        <field name="code">action = records.print_einv_b2b()</field>
+    </record>
+
+    <record id="report_zatca_b2c" model="ir.actions.server">
+        <field name="name">E-invoice Simplified</field>
+        <field name="model_id" ref="account.model_account_move"/>
+        <field name="binding_model_id" ref="account.model_account_move"/>
+        <field name="binding_view_types">form</field>
+        <field name="binding_type">report</field>
+        <field name="state">code</field>
+        <field name="code">action = records.print_einv_b2c()</field>
+    </record>
+</odoo>

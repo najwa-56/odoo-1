@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates id="template" xml:space="preserve">
+
+    <t t-name="ksa.PaymentScreenButtons" t-inherit="point_of_sale.PaymentScreenButtons" t-inherit-mode="extension">
+        <xpath expr="//button[hasclass('js_invoice')]" position="after">
+            <span class="btn-light py-2 text-start rounded-0 border-bottom px-sm-1 customer_zatca_note"
+                    style="text-align-last: center;" t-if="currentOrder.is_to_invoice()">
+                The customer name and address info in invoice,
+                <br/>
+                is never sent to zatca, as it's not required.
+            </span>
+        </xpath>
+        <xpath expr="//div[hasclass('payment-buttons')]" position="inside">
+            <div class="zatca-flags d-flex flex-column flex-wrap" t-if="pos.company.parent_is_zatca">
+                <h3><center>Zatca Flags</center></h3>
+                <button class="button js_invoice btn btn-light py-3 text-start rounded-0 border-bottom"
+                        t-att-class="{ 'highlight text-bg-primary': currentOrder.l10n_is_third_party_invoice }"
+                        t-on-click="toggleIsThirdParty">
+                    <i class="fa fa-check-square-o me-2" />Is Third Party
+                </button>
+                <button class="button js_invoice btn btn-light py-3 text-start rounded-0 border-bottom"
+                        t-att-class="{ 'highlight text-bg-primary': currentOrder.l10n_is_nominal_invoice }"
+                        t-on-click="toggleIsNominal">
+                    <i class="fa fa-check-square-o me-2" />Is Nominal
+                </button>
+                <button class="button js_invoice btn btn-light py-3 text-start rounded-0 border-bottom"
+                        t-att-class="{ 'highlight text-bg-primary': currentOrder.l10n_is_summary_invoice }"
+                        t-on-click="toggleIsSummary">
+                    <i class="fa fa-check-square-o me-2" />Is Summary
+                </button>
+                <div style="display: grid;gap: 10px;margin:0;padding:0;">
+                    <label style="grid-column-end: 1;border-top-width: 1px;"
+                           t-if="currentOrder.get_total_with_tax() &lt; 0">Refund reason</label>
+                    <input class="" t-on-change="Refund_Reason" t-if="currentOrder.get_total_with_tax() &lt; 0"
+                           t-att-value="currentOrder.credit_debit_reason"
+                           style="grid-column-end: 2;border-top-width: 1px;"/>
+                </div>
+            </div>
+        </xpath>
+    </t>
+
+</templates>

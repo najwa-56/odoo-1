@@ -1,0 +1,197 @@
+<odoo>
+    <data>
+        <record id="view_company_form" model="ir.ui.view">
+            <field name="name">res.company</field>
+            <field name="model">res.company</field>
+            <field name="inherit_id" ref="base.view_company_form"/>
+            <field name="arch" type="xml">
+                <xpath expr="//field[@name='name']" position="after">
+                    <!--                invisible fields    -->
+                    <field name="is_zatca" invisible="1"/>
+                    <field name="country_id_name" invisible="1"/>
+                    <field name="is_group_vat" invisible="1" force_save="1"/>
+                    <field name="csr_common_name" readonly="1" invisible="1"/>
+                    <field name="csr_serial_number" readonly="1" invisible="1"/>
+                    <field name="csr_organization_unit_name" invisible="1"/>
+                    <field name="csr_organization_name" readonly="1" invisible="1"/>
+                    <field name="csr_invoice_type" readonly="1" invisible="1"/>
+                    <field name="csr_location_address" readonly="1" invisible="1"/>
+                    <field name="csr_industry_business_category" readonly="1" invisible="1"/>
+                </xpath>
+                <xpath expr="//field[@name='vat']" position="attributes">
+                    <attribute name="required">1</attribute>
+                </xpath>
+                <xpath expr="//field[@name='email']" position="attributes">
+                    <attribute name="required">is_zatca</attribute>
+                </xpath>
+                <xpath expr="//field[@name='vat']" position="after">
+                    <field name="csr_individual_vat"
+                           required="is_group_vat"
+                           invisible="not is_group_vat"/>
+                    <field name="license" required="is_zatca"
+                           groups="ksa_zatca_integration.l10n_sa_group_zatca_user"/>
+                    <field name="license_no" required="is_zatca"
+                           groups="ksa_zatca_integration.l10n_sa_group_zatca_user"/>
+                </xpath>
+                <xpath expr="//field[@name='street2']" position="after">
+                    <field name="building_no" placeholder="Building Number" class="o_address_city"
+                           style="width: 41%;"
+                           required="country_id_name == 'Saudi Arabia' and is_zatca"
+                           invisible="country_id_name != 'Saudi Arabia'"/>
+                    <field name="additional_no" placeholder="Additional Number" style="width: 57%;"
+                           invisible="country_id_name != 'Saudi Arabia'"/>
+                    <field name="district" placeholder="District" class="o_address_street"
+                           required="country_id_name == 'Saudi Arabia' and is_zatca"
+                           invisible="country_id_name != 'Saudi Arabia'"/>
+                </xpath>
+                <xpath expr="//field[@name='street']" position="attributes">
+                    <attribute name="required">country_id_name == 'Saudi Arabia' and is_zatca</attribute>
+                </xpath>
+                <xpath expr="//field[@name='city']" position="attributes">
+                    <attribute name="required">country_id_name == 'Saudi Arabia' and is_zatca</attribute>
+                </xpath>
+                <xpath expr="//field[@name='zip']" position="attributes">
+                    <attribute name="required">country_id_name == 'Saudi Arabia' and is_zatca</attribute>
+                </xpath>
+                <xpath expr="//field[@name='country_id']" position="attributes">
+                    <attribute name="required">1</attribute>
+                </xpath>
+                <xpath expr="//notebook" position="inside">
+                    <page id="zatca_configurations" string="Zatca Configurations"
+                          groups="ksa_zatca_integration.l10n_sa_group_zatca_user"
+                          invisible="parent_id">
+                        <div class="app_settings_block" data-string="ZATCA" string="ZATCA"
+                             data-key="ZATCA">
+                            <h2>ZATCA</h2>
+                            <group>
+                                <field name="is_zatca"/>
+                            </group>
+                            <div class="row mt16 o_settings_container" invisible="not is_zatca">
+                                <div class="col-12 col-lg-12 o_setting_box">
+                                    <field name="zatca_onboarding_status" readonly="1" invisible="1"/>
+                                    <field name="zatca_certificate_status" readonly="1" invisible="1"/>
+                                    <div>
+                                        <h6>User documentation</h6>
+                                        <p>
+                                            <a href="https://zatca.gov.sa/en/E-Invoicing/Introduction/Guidelines/Documents/Fatoora_Portal_User_Manual_English.pdf">
+                                                Onboarding the EGS and generating CSID
+                                            </a>
+                                            <br/>
+                                            <a href="https://zatca.gov.sa/en/E-Invoicing/Introduction/FAQ/Pages/default.aspx">
+                                                FAQ's
+                                            </a>
+                                            <br/>
+                                            <!--                                    <a href="https://zatca.gov.sa/en/E-Invoicing/Introduction/Guidelines/Documents/E-Invoicing_Detailed__Guideline.pdf">-->
+                                            <!--                                        Examples-->
+                                            <!--                                    </a>-->
+                                        </p>
+                                    </div>
+                                    <!--                                        ONLY FOR DEBUGGING-->
+                                    <group invisible="1">
+                                        <!--                                        <field name="zatca_status" readonly="0" force_save="1"/>-->
+                                        <!--                                        <field name="zatca_icv_counter" readonly="1"/>-->
+                                        <!--                                        <field name="zatca_onboarding_status" readonly="0"/>-->
+                                        <!--                                        <field name="zatca_certificate_status" readonly="1"/>-->
+                                        <!--                                        <field name="zatca_on_board_status_details"/>-->
+                                        <!--                                        <span colspan="2">live</span>-->
+                                        <!--                                        <field name="zatca_bsToken" readonly="0" style="word-wrap: anywhere;"/>-->
+                                        <!--                                        <field name="zatca_reqID" readonly="0"/>-->
+                                        <!--                                        <field name="zatca_secret" readonly="0"/>-->
+                                        <!--                                        <span colspan="2">sandbox</span>-->
+                                        <!--                                        <field name="zatca_sb_bsToken" readonly="0" style="word-wrap: anywhere;"/>-->
+                                        <!--                                        <field name="zatca_sb_reqID" readonly="0"/>-->
+                                        <!--                                        <field name="zatca_sb_secret" readonly="0"/>-->
+                                        <!--                                        <span colspan="2">Sensitive Zatca fields</span>-->
+                                        <!--                                        <field name="csr_certificate" required="0" force_save="1" style="word-wrap: anywhere;"-->
+                                        <!--                                               attrs="{'readonly' :[('zatca_certificate_status', '=', True)]}"/>-->
+                                        <!--                                        <field name="zatca_prod_private_key" readonly="0" style="word-wrap: anywhere;"/>-->
+                                        <!--                                        <field name="zatca_csr_base64" readonly="0" style="word-wrap: anywhere;"/>-->
+                                    </group>
+                                    <group>
+                                        <group>
+                                            <field name="l10n_sa_phase1_end_date"
+                                                   required="is_zatca"/>
+                                            <field name="api_type"
+                                                   required="is_zatca"
+                                                   readonly="zatca_certificate_status"/>
+                                            <field name="zatca_invoice_type"
+                                                   required="is_zatca"
+                                                   readonly="zatca_certificate_status"/>
+                                        </group>
+                                        <group>
+                                            <field name="industry_id" required="is_zatca"/>
+                                            <field name="is_self_billed"/>
+                                            <field name="zatca_send_from_pos" force_save="1"/>
+                                            <field name="csr_otp" force_save="1" invisible="api_type == 'Sandbox'"/>
+                                        </group>
+                                    </group>
+                                    <group style="padding-top: 25px;">
+                                        <field name="zatca_link" readonly="1" invisible="1"/>
+                                        <field name="zatca_status" readonly="1"/>
+                                    </group>
+                                    <group>
+                                        <field name="zatca_is_fatoora_simulation_portal" readonly="1" invisible="1"/>
+                                        <!--                                        <field name="zatca_is_sandbox" attrs="{'invisible' :[('api_type',  '!=', 'Sandbox')]}"/>-->
+                                        <span invisible="api_type != 'Sandbox'" colspan="2"
+                                              style="display: block;text-align: -webkit-center;">
+                                            use values from zatca_sandbox sample_values.txt
+                                        </span>
+                                    </group>
+                                    <group col="2" class="width_height_100" style="padding-top: 25px;">
+                                        <button name="auto_compliance"
+                                                string="Onboard Device" type="object"
+                                                class="btn-primary width_height_100"
+                                                invisible="zatca_status in
+                                                ['production credentials received.', 'production credentials renewed.']"
+                                                groups="ksa_zatca_integration.l10n_sa_group_zatca_admin"/>
+                                        <span invisible="zatca_status in
+                                                ['production credentials received.', 'production credentials renewed.']"
+                                              groups="ksa_zatca_integration.l10n_sa_group_zatca_admin"/>
+<!--                                        <button name="generate_zatca_certificate"-->
+<!--                                                string="Generate Compliance CSID" type="object"-->
+<!--                                                class="btn-primary width_height_100"-->
+<!--                                                invisible="zatca_onboarding_status or zatca_certificate_status or zatca_status in-->
+<!--                                                ['production credentials received.', 'production credentials renewed.']"-->
+<!--                                                groups="ksa_zatca_integration.l10n_sa_group_zatca_admin"/>-->
+<!--                                        <span invisible="zatca_onboarding_status or zatca_certificate_status or zatca_status in-->
+<!--                                                ['production credentials received.', 'production credentials renewed.']"-->
+<!--                                              groups="ksa_zatca_integration.l10n_sa_group_zatca_admin"/>-->
+                                        <!--                                        ONLY FOR DEBUGGING-->
+                                        <button name="reset_zatca" string="Reset ZATCA" type="object"
+                                                class="btn-primary width_height_100" invisible="0"
+                                                confirm="Are You Sure ? This will reset zatca credentials"
+                                                groups="ksa_zatca_integration.l10n_sa_group_zatca_admin"/>
+                                        <span groups="ksa_zatca_integration.l10n_sa_group_zatca_admin">
+                                            only use when api link has to change to live, simulation or sandbox.
+                                        </span>
+                                        <!--                                        <button name="register_certificate" string="Register Certificate" type="object"-->
+                                        <!--                                                class="btn-primary" -->
+                                        <!--                                                attrs="{'invisible' :zatca_certificate_status}"-->
+                                        <!--                                        />-->
+
+                                        <button name="production_credentials" string="Get PCSID" type="object"
+                                                class="btn-primary width_height_100"
+                                                invisible="zatca_onboarding_status != True or zatca_status in
+                                                ['production credentials received.', 'production credentials renewed.']"
+                                                groups="ksa_zatca_integration.l10n_sa_group_zatca_admin"/>
+                                        <span invisible="zatca_onboarding_status != True or zatca_status in
+                                                ['production credentials received.', 'production credentials renewed.']"
+                                              groups="ksa_zatca_integration.l10n_sa_group_zatca_admin"/>
+                                        <button name="production_credentials_renew" string="Renew PCSID"
+                                                type="object" class="btn-primary width_height_100"
+                                                invisible="zatca_onboarding_status != True or zatca_status in
+                                                ['Onboarding completed, request for production credentials now']"
+                                                groups="ksa_zatca_integration.l10n_sa_group_zatca_admin"/>
+                                        <span invisible="zatca_onboarding_status != True or zatca_status in
+                                                ['Onboarding completed, request for production credentials now']"
+                                              groups="ksa_zatca_integration.l10n_sa_group_zatca_admin"/>
+                                    </group>
+                                </div>
+                            </div>
+                        </div>
+                    </page>
+                </xpath>
+            </field>
+        </record>
+    </data>
+</odoo>

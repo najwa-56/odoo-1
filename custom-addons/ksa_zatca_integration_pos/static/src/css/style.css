@@ -1,0 +1,9 @@
+.zatca-flags *{
+    margin: 0px 5px 0px 5px !important;
+    line-height: 35px !important;
+}
+.customer_zatca_note.btn-light:hover {
+  color: #495057 ;
+  background-color: #FFFFFF;
+  border-color: #FFFFFF;
+}
