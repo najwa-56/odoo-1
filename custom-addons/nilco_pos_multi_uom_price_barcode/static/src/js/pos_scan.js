@@ -58,21 +58,25 @@ patch(DB.PosDB.prototype, {
         this._super.apply(this, arguments);
     },
     get_product_by_barcode(barcode) {
-    var barcodes = Object.values(this.product_multi_barcodes);
+    console.log('Scanning barcode:', barcode);
+    var barcodes = Object.values(this.product_multi_barcodes || {});
     if (this.product_by_barcode[barcode]) {
+        console.log('Found product by barcode:', this.product_by_barcode[barcode]);
         return this.product_by_barcode[barcode];
     } else if (this.product_packaging_by_barcode[barcode]) {
+        console.log('Found product by packaging barcode:', this.product_packaging_by_barcode[barcode]);
         return this.product_by_id[this.product_packaging_by_barcode[barcode].product_id[0]];
     } else if (barcodes.length > 0) {
         var results = [];
+        console.log('Checking multi barcodes:', barcodes);
 
         for (var t = 0; t < barcodes.length; t++) {
-            var uoms = Object.values(barcodes[t].uom_id);
+            var uoms = Object.values(barcodes[t].uom_id || {});
             for (var b = 0; b < uoms.length; b++) {
                 if (uoms[b].barcode == barcode) {
+                    console.log('Matching UOM found:', uoms[b]);
                     var result = this.product_by_id[uoms[b].product_variant_id[0]];
 
-                    // Add the found product to the results array
                     results.push({
                         product: result,
                         uom: uoms[b]
@@ -85,6 +89,7 @@ patch(DB.PosDB.prototype, {
             for (var r = 0; r < results.length; r++) {
                 var result = results[r].product;
                 var uom = results[r].uom;
+                console.log('Processing result:', result, 'with UOM:', uom);
 
                 const line = new Orderline(
                     { env: result.env },
@@ -95,10 +100,12 @@ patch(DB.PosDB.prototype, {
                     if (result.pos.selectedOrder.orderlines.at(i).product.id === result.id &&
                         result.pos.selectedOrder.orderlines.at(i).product_uom_id[0] === uom.id &&
                         result.pos.selectedOrder.orderlines.at(i).price === uom.price) {
+                        console.log('Existing order line found. Updating quantity.');
                         result.pos.selectedOrder.orderlines.at(i).set_quantity(result.pos.selectedOrder.orderlines.at(i).quantity + 1, uom.price);
                         return true;
                     }
                 }
+                console.log('Adding new order line.');
                 result.pos.selectedOrder.add_orderline(line);
                 result.pos.selectedOrder.selected_orderline.set_uom({ 0: uom.id, 1: uom.name });
                 result.pos.selectedOrder.selected_orderline.price_manually_set = true;
@@ -107,8 +114,10 @@ patch(DB.PosDB.prototype, {
             }
         }
 
+        console.log('No matching products found.');
         return undefined;
     }
+    console.log('No barcodes to check.');
     return undefined;
 },
 
