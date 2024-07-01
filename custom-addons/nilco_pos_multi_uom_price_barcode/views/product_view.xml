@@ -61,7 +61,7 @@
     </record>
 
     <!-- New Menu Item -->
-    <menuitem id="menu_product_multi_uom_price_tree" name="UOM Prices" parent="your_parent_menu_id" action="action_product_multi_uom_price_tree"/> <!-- Adjust parent menu ID -->
+    <menuitem id="menu_product_multi_uom_price_tree" name="UOM Prices" parent="sale.product_menu_catalog" action="action_product_multi_uom_price_tree"/> <!-- Adjust parent menu ID -->
 </odoo>
 
 
