@@ -6,11 +6,12 @@ import { PosStore } from "@point_of_sale/app/store/pos_store";
 import { Order, Orderline, Payment } from "@point_of_sale/app/store/models";
 import { ProductScreen } from "@point_of_sale/app/screens/product_screen/product_screen";
 import { ErrorBarcodePopup } from "@point_of_sale/app/barcode/error_popup/barcode_error_popup";
+
 patch(ProductScreen.prototype, {
      async _barcodeProductAction(code) {
         const product = await this._getProductByBarcode(code);
         if (product === true) {
-            return ;
+            return;
         }
         if (!product) {
             return this.popup.add(ErrorBarcodePopup, { code: code.base_code });
@@ -43,75 +44,77 @@ patch(ProductScreen.prototype, {
         }
         this.currentOrder.add_product(product, options);
         this.numberBuffer.reset();
-
     }
 });
+
 patch(PosStore.prototype, {
     async _processData(loadedData) {
         await super._processData(...arguments);
-            // this.product_multi_barcodes = loadedData['multi.barcode.products'];
-            this.db.product_multi_barcodes=this.product_uom_price;
+        this.db.product_multi_barcodes = loadedData['multi.barcode.products'];
     }
 });
-patch(DB.PosDB.prototype, { 
-     init(options){
+
+patch(DB.PosDB.prototype, {
+    init(options) {
         this._super.apply(this, arguments);
+        this.product_multi_barcodes = {};
     },
+
     get_product_by_barcode(barcode) {
-    var barcodes = Object.values(this.product_multi_barcodes);
+        var barcodes = Object.values(this.product_multi_barcodes);
 
-    // Check if the barcode directly matches any product
-    if (this.product_by_barcode[barcode]) {
-        return this.product_by_barcode[barcode];
-    }
+        // Direct match with the product by barcode
+        if (this.product_by_barcode[barcode]) {
+            return this.product_by_barcode[barcode];
+        }
 
-    // Check if the barcode matches any product packaging
-    else if (this.product_packaging_by_barcode[barcode]) {
-        return this.product_by_id[this.product_packaging_by_barcode[barcode].product_id[0]];
-    }
+        // Match with the product packaging by barcode
+        else if (this.product_packaging_by_barcode[barcode]) {
+            return this.product_by_id[this.product_packaging_by_barcode[barcode].product_id[0]];
+        }
 
-    // Check if the barcode matches any UOM in the product multi barcodes
-    else if (barcodes.length > 0) {
-        for (var t = 0; t < barcodes.length; t++) {
-            var uoms = Object.values(barcodes[t].uom_id);
-            for (var b = 0; b < uoms.length; b++) {
-                if (uoms[b].barcode == barcode) {
-                    var result = this.product_by_id[uoms[b].product_variant_id[0]];
+        // Match with the UOM barcodes
+        else if (barcodes.length > 0) {
+            for (var t = 0; t < barcodes.length; t++) {
+                var uoms = Object.values(barcodes[t].uom_id);
+                for (var b = 0; b < uoms.length; b++) {
+                    if (uoms[b].barcode === barcode) {
+                        var result = this.product_by_id[uoms[b].product_variant_id[0]];
 
-                    const line = new Orderline(
-                        { env: result.env },
-                        { pos: result.pos, order: result.pos.selectedOrder, product: result }
-                    );
+                        const line = new Orderline(
+                            { env: result.env },
+                            { pos: result.pos, order: result.pos.selectedOrder, product: result }
+                        );
 
-                    // Check for existing order line with the same product, UOM, and price
-                    var found = false;
-                    for (var i = 0; i < result.pos.selectedOrder.orderlines.length; i++) {
-                        if (result.pos.selectedOrder.orderlines.at(i).product.id === result.id &&
-                            result.pos.selectedOrder.orderlines.at(i).product_uom_id[0] === uoms[b].id &&
-                            result.pos.selectedOrder.orderlines.at(i).price === uoms[b].price) {
-                            result.pos.selectedOrder.orderlines.at(i).set_quantity(
-                                result.pos.selectedOrder.orderlines.at(i).quantity + 1,
-                                uoms[b].price
-                            );
-                            found = true;
-                            break;
+                        // Check for existing order line with the same product, UOM, and price
+                        var found = false;
+                        for (var i = 0; i < result.pos.selectedOrder.orderlines.length; i++) {
+                            if (result.pos.selectedOrder.orderlines.at(i).product.id === result.id &&
+                                result.pos.selectedOrder.orderlines.at(i).product_uom_id[0] === uoms[b].id &&
+                                result.pos.selectedOrder.orderlines.at(i).price === uoms[b].price) {
+                                result.pos.selectedOrder.orderlines.at(i).set_quantity(
+                                    result.pos.selectedOrder.orderlines.at(i).quantity + 1,
+                                    uoms[b].price
+                                );
+                                found = true;
+                                break;
+                            }
                         }
-                    }
 
-                    // Add new order line if no existing order line matches
-                    if (!found) {
-                        result.pos.selectedOrder.add_orderline(line);
-                        result.pos.selectedOrder.selected_orderline.set_uom({ 0: uoms[b].id, 1: uoms[b].name });
-                        result.pos.selectedOrder.selected_orderline.price_manually_set = true;
-                        result.pos.selectedOrder.selected_orderline.set_unit_price(uoms[b].price);
+                        // Add new order line if no existing order line matches
+                        if (!found) {
+                            result.pos.selectedOrder.add_orderline(line);
+                            result.pos.selectedOrder.selected_orderline.set_uom({ 0: uoms[b].id, 1: uoms[b].name });
+                            result.pos.selectedOrder.selected_orderline.price_manually_set = true;
+                            result.pos.selectedOrder.selected_orderline.set_unit_price(uoms[b].price);
+                        }
+                        return result;
                     }
-                    return result;
                 }
             }
+            return undefined;
         }
         return undefined;
-    }
-    return undefined;
-},
-    
+    },
 });
+
