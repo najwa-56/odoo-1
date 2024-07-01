@@ -12,21 +12,35 @@
         </field>
     </record>
 
-
-     <record id="combined_product_template_tree_view" model="ir.ui.view">
-        <field name="name">product.template.form.inherit.combined</field>
-        <field name="model">product.template</field>
-        <field name="inherit_id" ref="product.product_template_form_view"/> <!-- Adjust this reference if necessary -->
+    <odoo>
+    <!-- New Tree View for product.multi.uom.price -->
+    <record id="view_product_multi_uom_price_tree" model="ir.ui.view">
+        <field name="name">product.multi.uom.price.tree</field>
+        <field name="model">product.multi.uom.price</field>
         <field name="arch" type="xml">
-            <!-- Insert the group and tree structures -->
+            <tree>
+                <field name="product_id"/>
+                <field name="category_id" invisible="1"/>
+                <field name="uom_id"/>
+                <field name="price"/>
+                <field name="barcode"/>
+                <field name="product_variant_id" column_invisible="1"/>
+            </tree>
+        </field>
+    </record>
+
+    <!-- Inherit product.template form view to include the new tree view -->
+    <record id="view_product_template_form_inherit" model="ir.ui.view">
+        <field name="name">product.template.form.inherit</field>
+        <field name="model">product.template</field>
+        <field name="inherit_id" ref="product.product_template_form_view"/>
+        <field name="arch" type="xml">
             <xpath expr="//page[@name='sales']/group[@name='sale']" position="inside">
-                <group>
-                    <field name="category_id" invisible="1" column_invisible="1"/>
-                </group>
-                <group name="uom_price" string="UOM Price">
-                    <field name="multi_uom_price_id" nolabel="1" colspan="2">
+                <group string="UOM Prices">
+                    <field name="multi_uom_price_id" nolabel="1">
                         <tree editable="bottom">
-                            <field name="category_id" invisible="1" column_invisible="1"/>
+                            <field name="product_id"/>
+                            <field name="category_id" invisible="1"/>
                             <field name="uom_id"/>
                             <field name="price"/>
                             <field name="barcode"/>
@@ -37,31 +51,18 @@
             </xpath>
         </field>
     </record>
-     <record model="ir.ui.view" id="product_product_tree_view">
-            <field name="name">product.product.tree.view</field>
-            <field name="model">product.multi.uom.price</field>
-            <field name="arch" type="xml">
-                <tree editable="bottom">
-                    <field name="category_id" invisible="1" column_invisible="1"/>
-                    <field name="uom_id"/>
-                            <field name="price"/>
-                            <field name="barcode"/>
-                            <field name="product_variant_id" column_invisible="1"/>
-                </tree>
-            </field>
-        </record>
 
-    <!-- New Menu Item -->
-    <menuitem id="menu_combined_tree_view" name="Combined Tree View" parent="sale.product_menu_catalog"/> <!-- Adjust parent menu ID -->
-
-    <!-- New Action -->
-    <record id="action_combined_tree_view" model="ir.actions.act_window">
-        <field name="name">Combined Tree View</field>
-        <field name="res_model">product.template</field>
+    <!-- New Action for the Combined Tree View -->
+    <record id="action_product_multi_uom_price_tree" model="ir.actions.act_window">
+        <field name="name">UOM Prices</field>
+        <field name="res_model">product.multi.uom.price</field>
         <field name="view_mode">tree,form</field>
-        <field name="view_id" ref="product_product_tree_view"/>
+        <field name="view_id" ref="view_product_multi_uom_price_tree"/>
     </record>
 
-    <!-- Link Action to Menu Item -->
-    <menuitem id="menu_combined_tree_view" action="action_combined_tree_view"/>
+    <!-- New Menu Item -->
+    <menuitem id="menu_product_multi_uom_price_tree" name="UOM Prices" parent="your_parent_menu_id" action="action_product_multi_uom_price_tree"/> <!-- Adjust parent menu ID -->
+</odoo>
+
+
 </odoo>
