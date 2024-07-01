@@ -6,12 +6,11 @@ import { PosStore } from "@point_of_sale/app/store/pos_store";
 import { Order, Orderline, Payment } from "@point_of_sale/app/store/models";
 import { ProductScreen } from "@point_of_sale/app/screens/product_screen/product_screen";
 import { ErrorBarcodePopup } from "@point_of_sale/app/barcode/error_popup/barcode_error_popup";
-
 patch(ProductScreen.prototype, {
      async _barcodeProductAction(code) {
         const product = await this._getProductByBarcode(code);
         if (product === true) {
-            return;
+            return ;
         }
         if (!product) {
             return this.popup.add(ErrorBarcodePopup, { code: code.base_code });
@@ -44,24 +43,25 @@ patch(ProductScreen.prototype, {
         }
         this.currentOrder.add_product(product, options);
         this.numberBuffer.reset();
+
     }
 });
-
 patch(PosStore.prototype, {
     async _processData(loadedData) {
         await super._processData(...arguments);
-        this.db.product_multi_barcodes = loadedData['multi.barcode.products'];
+            // this.product_multi_barcodes = loadedData['multi.barcode.products'];
+            this.db.product_multi_barcodes=this.product_uom_price;
     }
 });
-
 patch(DB.PosDB.prototype, {
     init(options) {
         this._super.apply(this, arguments);
-        this.product_multi_barcodes = {};
+        this.product_multi_barcodes = {}; // Ensure it's always an object
     },
 
     get_product_by_barcode(barcode) {
-        var barcodes = Object.values(this.product_multi_barcodes);
+        // Ensure product_multi_barcodes is an object
+        var barcodes = Object.values(this.product_multi_barcodes || {});
 
         // Direct match with the product by barcode
         if (this.product_by_barcode[barcode]) {
@@ -76,7 +76,7 @@ patch(DB.PosDB.prototype, {
         // Match with the UOM barcodes
         else if (barcodes.length > 0) {
             for (var t = 0; t < barcodes.length; t++) {
-                var uoms = Object.values(barcodes[t].uom_id);
+                var uoms = Object.values(barcodes[t].uom_id || {});
                 for (var b = 0; b < uoms.length; b++) {
                     if (uoms[b].barcode === barcode) {
                         var result = this.product_by_id[uoms[b].product_variant_id[0]];
