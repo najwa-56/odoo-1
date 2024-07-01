@@ -18,16 +18,25 @@ class PosSession(models.Model):
     def _get_pos_ui_product_multi_uom_price(self, params):
         products_uom_price = self.env['product.multi.uom.price'].search_read(**params['search_params'])
         product_uom_price = {}
+
         if products_uom_price:
             for unit in products_uom_price:
-                if not unit['product_id'][0] in product_uom_price:
-                    product_uom_price[unit['product_id'][0]] = {}
-                    product_uom_price[unit['product_id'][0]]['uom_id'] = {}
-                product_uom_price[unit['product_id'][0]]['uom_id'][unit['uom_id'][0]] = {
-                        'id'    : unit['uom_id'][0],
-                        'name'  : unit['uom_id'][1],
-                        'price' : unit['price'],}
+                product_id = unit.get('product_id', False)
+                uom_id = unit.get('uom_id', False)
+
+                if product_id and uom_id:
+                    if product_id[0] not in product_uom_price:
+                        product_uom_price[product_id[0]] = {}
+
+                    if uom_id[0] not in product_uom_price[product_id[0]]['uom_id']:
+                        product_uom_price[product_id[0]]['uom_id'][uom_id[0]] = {
+                            'id': uom_id[0],
+                            'name': uom_id[1],
+                            'price': unit['price'],
+                        }
+
         return product_uom_price
+
     def _loader_params_product_product(self):
         return {
             'search_params': {
