@@ -73,7 +73,8 @@ patch(DB.PosDB.prototype, {
                             { env: result.env },
                             { pos: result.pos, order: result.pos.selectedOrder, product: result }
                         );
-                        for (const orderline of result.pos.selectedOrder.orderlines.models) {
+                        const orderlines = result.pos.selectedOrder.get_orderlines();
+                        for (const orderline of orderlines) {
                             if (orderline.product.id === result.id &&
                                 orderline.product_uom_id[0] === uom.id &&
                                 orderline.price === uom.price) {
