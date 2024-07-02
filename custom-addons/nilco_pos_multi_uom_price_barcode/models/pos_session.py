@@ -14,19 +14,23 @@ class PosSession(models.Model):
             for unit in products_uom_price:
                 product_id = unit.get('product_id')  # Get product_id from unit
                 uom_id = unit.get('uom_id')  # Get uom_id from unit
+                barcode = unit.get('barcode')
 
-                if product_id and uom_id:
+
+                if product_id and uom_id and barcode:
                     if product_id[0] not in product_uom_price:
-                        product_uom_price[product_id[0]] = {}
-                        product_uom_price[product_id[0]]['uom_id'] = {}
+                        product_uom_price[product_id[0]] = {'uom_id': {}}
 
-                    product_uom_price[product_id[0]]['uom_id'][uom_id[0]] = {
-                        'id': uom_id[0],
-                        'name': uom_id[1],
-                        'price': unit['price'],
-                        'barcode': unit['barcode'],
-                        'product_id': product_id,
-                        'product_variant_id': unit['product_variant_id'],
-                    }
+                    if uom_id[0] not in product_uom_price[product_id[0]]['uom_id']:
+                        product_uom_price[product_id[0]]['uom_id'][uom_id[0]] = {
+                            'id': uom_id[0],
+                            'name': uom_id[1],
+                            'price': unit['price'],
+                            'barcodes': [barcode],
+                            'product_id': product_id,
+                            'product_variant_id': unit['product_variant_id'],
+                        }
+                    else:
+                        product_uom_price[product_id[0]]['uom_id'][uom_id[0]]['barcodes'].append(barcode)
 
-        return product_uom_price
+                    return product_uom_price
