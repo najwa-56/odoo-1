@@ -14,7 +14,7 @@ patch(ProductScreen.prototype, {
             return;
         }
         if (!product) {
-            return this.popup.add(ErrorBarcodePopup, { code: code.base_code });
+            return this.showPopup('ErrorBarcodePopup', { code: code.base_code });
         }
         const options = await product.getAddProductOptions(code);
         if (!options) {
@@ -56,6 +56,8 @@ patch(DB.PosDB.prototype, {
         this._super.apply(this, arguments);
     },
     get_product_by_barcode(barcode) {
+        if (!barcode) return undefined;
+
         const barcodes = Object.values(this.product_multi_barcodes);
         if (this.product_by_barcode[barcode]) {
             return this.product_by_barcode[barcode];
