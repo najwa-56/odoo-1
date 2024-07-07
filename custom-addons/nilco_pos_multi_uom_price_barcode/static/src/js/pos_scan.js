@@ -39,6 +39,14 @@ patch(ProductScreen.prototype, {
                 merge: false,
             });
         }
+        const currentOrder = this.env.pos.get_order();
+        if (currentOrder.is_finalized) {
+            this.showPopup('ErrorPopup', {
+                title: 'Cannot Modify Finalized Order',
+                body: 'The order has already been finalized and cannot be modified.',
+            });
+            return;
+        }
         this.currentOrder.add_product(product, options);
         this.numberBuffer.reset();
     }
