@@ -71,7 +71,7 @@ patch(PosStore.prototype, {
   }
 });
 
-odoo.define('POS Multi UoM Price.PaymentScreen', function(require) {
+odoo.define('point_of_sale.PaymentScreen', function(require) {
     'use strict';
 
     const PaymentScreen = require('point_of_sale.PaymentScreen');
