@@ -14,7 +14,7 @@ patch(PaymentScreen.prototype, {
         if (!this.currentOrder.is_to_invoice())
             this.toggleIsToInvoice();
     },
-    async _isOrderValid(isForceValidate) {
+   async _isOrderValid(isForceValidate) {
     const res = await super._isOrderValid(...arguments);
     if (res) {
         if (this.currentOrder.get_total_with_tax() < 0 && _.contains([undefined, false, NaN, ''], this.currentOrder.credit_debit_reason)) {
@@ -32,7 +32,7 @@ patch(PaymentScreen.prototype, {
         }
     }
     return res;
-}
+},
 
     toggleIsThirdParty() {
         this.currentOrder.l10n_is_third_party_invoice = this.currentOrder.l10n_is_third_party_invoice ? 0 : 1;
