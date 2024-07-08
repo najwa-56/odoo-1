@@ -2,7 +2,6 @@
 import { Order, Orderline, Payment } from "@point_of_sale/app/store/models";
 import { patch } from "@web/core/utils/patch";
 import { PosStore } from "@point_of_sale/app/store/pos_store";
-import { _t } from "@web/core/l10n/translation";
 patch(Order.prototype, {
   set_orderline_options(orderline, options) {
         super.set_orderline_options(...arguments);
@@ -66,26 +65,4 @@ patch(PosStore.prototype, {
             this.product_uom_price = loadedData['product.multi.uom.price'];
     }
 });
-odoo.define('product.multi.uom.price.PaymentScreenExtension', function(require) {
-    'use strict';
 
-    const PaymentScreen = require('point_of_sale.PaymentScreen');
-    const { patch } = require('@web/core/utils/patch');
-    const { _t } = require('@web/core/l10n/translation');  // Ensure _t is correctly imported
-
-    patch(PaymentScreen.prototype, {
-        _isOrderValid(isForceValidate) {
-            const order = this.env.pos.get_order();
-            if (!order.get_orderlines().length) {
-                this.showPopup('ErrorPopup', {
-                    title: _t('Empty Order'),  // Use _t for translation
-                    body: _t('There must be at least one product in your order before it can be validated'),
-                });
-                return false;
-            }
-            return this._super(isForceValidate);
-        }
-    });
-
-    return PaymentScreen;
-});
