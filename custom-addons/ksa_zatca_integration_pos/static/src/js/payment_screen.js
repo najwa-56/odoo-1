@@ -4,6 +4,7 @@ import { PaymentScreen } from "@point_of_sale/app/screens/payment_screen/payment
 import { ErrorPopup } from "@point_of_sale/app/errors/popups/error_popup";
 import { ConnectionLostError } from "@web/core/network/rpc_service";
 import { useService } from "@web/core/utils/hooks";
+import _ from 'underscore';
 import { _t } from "@web/core/l10n/translation";
 import { patch } from "@web/core/utils/patch";
 
@@ -16,7 +17,7 @@ patch(PaymentScreen.prototype, {
     async _isOrderValid(isForceValidate) {
         const res = super._isOrderValid(...arguments);
         if (res)
-            if (this.currentOrder.get_total_with_tax() < 0 && _.contains([undefined, false, NaN, ''], this.currentOrder.credit_debit_reason)) {
+            if (this.currentOrder.get_total_with_tax() < 0 && (_.contains([undefined, false, NaN, ''], this.currentOrder.credit_debit_reason))) {
                 this.popup.add(ErrorPopup, {
                     title: _t("Zatca Validation Error"),
                     body: _t(
