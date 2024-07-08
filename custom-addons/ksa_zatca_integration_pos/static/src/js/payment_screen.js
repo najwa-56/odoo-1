@@ -5,7 +5,6 @@ import { ErrorPopup } from "@point_of_sale/app/errors/popups/error_popup";
 import { ConnectionLostError } from "@web/core/network/rpc_service";
 import { useService } from "@web/core/utils/hooks";
 import { _t } from "@web/core/l10n/translation";
-import _ from 'underscore';
 import { patch } from "@web/core/utils/patch";
 
 patch(PaymentScreen.prototype, {
