@@ -66,7 +66,7 @@ patch(PosStore.prototype, {
     }
 });
 
-odoo.define('your_module_name.PaymentScreenExtension', function(require) {
+odoo.define('product.multi.uom.price.PaymentScreenExtension', function(require) {
     'use strict';
 
     const PaymentScreen = require('point_of_sale.PaymentScreen');
