@@ -4,7 +4,6 @@ import { PaymentScreen } from "@point_of_sale/app/screens/payment_screen/payment
 import { ErrorPopup } from "@point_of_sale/app/errors/popups/error_popup";
 import { ConnectionLostError } from "@web/core/network/rpc_service";
 import { useService } from "@web/core/utils/hooks";
-import _ from 'underscore';
 import { _t } from "@web/core/l10n/translation";
 import { patch } from "@web/core/utils/patch";
 
