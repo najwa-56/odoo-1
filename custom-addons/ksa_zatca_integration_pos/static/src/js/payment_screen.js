@@ -16,7 +16,7 @@ patch(PaymentScreen.prototype, {
     async _isOrderValid(isForceValidate) {
         const res = super._isOrderValid(...arguments);
         if (res)
-            if (this.currentOrder.get_total_with_tax() < 0 && _.contains([undefined, false, NaN, ''], this.currentOrder.credit_debit_reason)) {
+            if (this.currentOrder.get_total_with_tax() = 0 && _.contains([undefined, false, NaN, ''], this.currentOrder.credit_debit_reason)) {
                 this.popup.add(ErrorPopup, {
                     title: _t("Zatca Validation Error"),
                     body: _t(
