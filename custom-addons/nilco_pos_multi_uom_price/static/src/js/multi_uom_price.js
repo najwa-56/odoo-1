@@ -3,6 +3,8 @@ import { ProductScreen } from "@point_of_sale/app/screens/product_screen/product
 import { Component } from "@odoo/owl";
 import { useListener } from "@web/core/utils/hooks";
 import { SelectionPopup } from "@point_of_sale/app/utils/input_popups/selection_popup";
+import { _t } from "@web/core/l10n/translation";  // Import _t for translations
+
 export class UOMButton extends Component {
     static template = "point_of_sale.UOMButton";
     setup() {
