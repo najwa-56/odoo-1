@@ -5,6 +5,7 @@ import { ErrorPopup } from "@point_of_sale/app/errors/popups/error_popup";
 import { ConnectionLostError } from "@web/core/network/rpc_service";
 import { useService } from "@web/core/utils/hooks";
 import { _t } from "@web/core/l10n/translation";
+import _ from 'underscore';
 import { patch } from "@web/core/utils/patch";
 
 patch(PaymentScreen.prototype, {
@@ -14,28 +15,25 @@ patch(PaymentScreen.prototype, {
             this.toggleIsToInvoice();
     },
     async _isOrderValid(isForceValidate) {
-        const res = super._isOrderValid(...arguments);
-        if (res)
-            if (this.currentOrder.get_total_with_tax() < 0 && (_.contains([undefined, false, NaN, ''], this.currentOrder.credit_debit_reason))) {
-                this.popup.add(ErrorPopup, {
-                    title: _t("Zatca Validation Error"),
-                    body: _t(
-                        "Reason is compulsory for returns for zatca."
-                    ),
-                });
-                return false;
-            }
-            else if (!this.currentOrder.is_to_invoice()){
-                this.popup.add(ErrorPopup, {
-                    title: _t("Zatca Validation Error"),
-                    body: _t(
-                        "Invoice is compulsory for zatca."
-                    ),
-                });
-                return false;
-            }
-        return res
-    },
+    const res = await super._isOrderValid(...arguments);
+    if (res) {
+        if (this.currentOrder.get_total_with_tax() < 0 && _.contains([undefined, false, NaN, ''], this.currentOrder.credit_debit_reason)) {
+            this.popup.add(ErrorPopup, {
+                title: _t("Zatca Validation Error"),
+                body: _t("Reason is compulsory for returns for zatca.")
+            });
+            return false;
+        } else if (!this.currentOrder.is_to_invoice()) {
+            this.popup.add(ErrorPopup, {
+                title: _t("Zatca Validation Error"),
+                body: _t("Invoice is compulsory for zatca.")
+            });
+            return false;
+        }
+    }
+    return res;
+}
+
     toggleIsThirdParty() {
         this.currentOrder.l10n_is_third_party_invoice = this.currentOrder.l10n_is_third_party_invoice ? 0 : 1;
     },
