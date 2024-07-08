@@ -64,3 +64,15 @@ patch(PosStore.prototype, {
     }
 });
 
+patch(PaymentScreen.prototype, {
+    _isOrderValid: function () {
+        if (!this.order.get_orderlines().length) {
+            this.showPopup('ErrorPopup', {
+                title: _('Empty Order'),
+                body: _('There must be at least one product in your order before it can be validated.'),
+            });
+            return false;
+        }
+        return this._super.apply(this, arguments);
+    },
+});
