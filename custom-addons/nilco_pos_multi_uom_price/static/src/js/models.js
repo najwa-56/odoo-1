@@ -71,17 +71,26 @@ patch(PosStore.prototype, {
   }
 });
 
-// Patch the PaymentScreen to handle order validation
-patch(PaymentScreen.prototype, {
-  _isOrderValid(isForceValidate) {
-    const order = this.env.pos.get_order();
-    if (!order.get_orderlines().length) {
-      this.showPopup('ErrorPopup', {
-        title: _t('Empty Order'),
-        body: _t('There must be at least one product in your order before it can be validated'),
-      });
-      return false;
-    }
-    return this._super(isForceValidate);
-  }
+odoo.define('product.multi.uom.price.PaymentScreen', function(require) {
+    'use strict';
+
+    const PaymentScreen = require('point_of_sale.PaymentScreen');
+    const { patch } = require('@web/core/utils/patch');
+    const { _t } = require('@web/core/l10n/translation');
+
+    patch(PaymentScreen.prototype, {
+        _isOrderValid(isForceValidate) {
+            const order = this.env.pos.get_order();
+            if (!order.get_orderlines().length) {
+                this.showPopup('ErrorPopup', {
+                    title: _t('Empty Order'),
+                    body: _t('There must be at least one product in your order before it can be validated'),
+                });
+                return false;
+            }
+            return this._super(isForceValidate);
+        }
+    });
+
+    return PaymentScreen;
 });
