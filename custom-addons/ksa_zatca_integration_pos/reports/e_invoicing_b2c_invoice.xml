@@ -757,7 +757,7 @@
                                         </td>
                                         <td class="second_table" style="text-align:right;">
                                             <span t-esc="'{:,}'.format(line.quantity)"/>
-                                             <span t-esc="'{:,}'.format(line.product_uom_id.name)"/>
+                                              <span t-esc="line.product_uom_id.name"/>
                                         </td>
 
 
