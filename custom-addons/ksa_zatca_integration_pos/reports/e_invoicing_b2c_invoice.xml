@@ -757,10 +757,10 @@
                                         <td class="second_table" style="text-align:right;">
                                             <span t-esc="'{:,}'.format(line.quantity)"/>
                                         </td>
-                                        <td class="second_table" style="text-align:right;">
+                                       <!-- <td class="second_table" style="text-align:right;">
                                             <span t-esc="doc.get_bt_136(line.zatca_id)"
                                                   t-options='{"widget": "monetary", "display_currency": doc.currency_id}'/>
-                                        </td>
+                                        </td>-->
                                         <td class="second_table" style="text-align:right;">
                                             <t t-if="not len(line.tax_ids.ids)">
                                                 0
@@ -770,7 +770,7 @@
                                             </t>
                                             %
                                         </td>
-                                      <!--  <td class="second_table" style="text-align:right;">
+                                        <td class="second_table" style="text-align:right;">
                                             <span t-esc="doc.get_ksa_11(line.zatca_id)"
                                                   t-options='{"widget": "monetary", "display_currency": doc.currency_id}'/>
                                         </td>
@@ -781,7 +781,7 @@
                                         <td class="second_table" style="text-align:right;">
                                             <span t-esc="doc.get_ksa_12(line.zatca_id)"
                                                   t-options='{"widget": "monetary", "display_currency": doc.currency_id}'/>
-                                        </td>-->
+                                        </td>
                                     </tr>
                                 </t>
                             </table>
