@@ -718,7 +718,7 @@
                                         </th>
                                         <th align="center" name="tax_amount" class="second_table"
                                             style="background-color:#4f4d4d;text-align:center;color:white;">
-                                            <span class="lable_bold">VAT  Amount</span>
+                                            <span class="lable_bold">VAT Amount</span>
                                             <br/>
                                             <span class="lable_bold">مبلغ ﺿﺮﻳﺒﺔ اﻟﻘﻴﻤﺔ اﻟﻤﻀﺎﻓﺔ</span>
                                         </th>
@@ -738,7 +738,7 @@
                                 </thead>
 
                                 <t t-set="serial_counter" t-value="0"/>
-                               <!-- <t t-set="tot_discount" t-value="0"/>-->
+                                <t t-set="tot_discount" t-value="0"/>
 
                                 <t t-foreach="invoice_line_ids" t-as="line">
                                     <t t-set="serial_counter" t-value="serial_counter+1"/>
@@ -757,10 +757,10 @@
                                         <td class="second_table" style="text-align:right;">
                                             <span t-esc="'{:,}'.format(line.quantity)"/>
                                         </td>
-                                        <td class="second_table" style="text-align:right;">
+                                       <!-- <td class="second_table" style="text-align:right;">
                                             <span t-esc="doc.get_bt_136(line.zatca_id)"
                                                   t-options='{"widget": "monetary", "display_currency": doc.currency_id}'/>
-                                        </td>
+                                        </td>-->
                                         <td class="second_table" style="text-align:right;">
                                             <t t-if="not len(line.tax_ids.ids)">
                                                 0
