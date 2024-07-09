@@ -757,7 +757,10 @@
                                         <td class="second_table" style="text-align:right;">
                                             <span t-esc="'{:,}'.format(line.quantity)"/>
                                         </td>
-                                        
+                                        <td class="second_table" style="text-align:right;">
+                                            <span t-esc="'{:,}'.format(line.product_uom_id)"/>
+                                        </td>
+
                                        <!-- <td class="second_table" style="text-align:right;">
                                             <span t-esc="doc.get_bt_136(line.zatca_id)"
                                                   t-options='{"widget": "monetary", "display_currency": doc.currency_id}'/>
