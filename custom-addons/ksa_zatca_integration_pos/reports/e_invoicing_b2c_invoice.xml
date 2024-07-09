@@ -704,12 +704,12 @@
                                             <br/>
                                             <span class="lable_bold">الكمية</span>
                                         </th>
-                                        <th align="center" name="discount" class="second_table"
+                                       <!-- <th align="center" name="discount" class="second_table"
                                             style="background-color:#4f4d4d;text-align:center;color:white;">
                                             <span class="lable_bold">Discount</span>
                                             <br/>
                                             <span class="lable_bold">خصومات</span>
-                                        </th>
+                                        </th>-->
                                         <th align="center" name="taxable_rate" class="second_table"
                                             style="background-color:#4f4d4d;text-align:center;color:white;">
                                             <span class="lable_bold">VAT Rate</span>
