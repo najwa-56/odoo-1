@@ -738,7 +738,7 @@
                                 </thead>
 
                                 <t t-set="serial_counter" t-value="0"/>
-                                <t t-set="tot_discount" t-value="0"/>
+                               <!-- <t t-set="tot_discount" t-value="0"/>-->
 
                                 <t t-foreach="invoice_line_ids" t-as="line">
                                     <t t-set="serial_counter" t-value="serial_counter+1"/>
