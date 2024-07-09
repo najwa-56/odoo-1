@@ -710,12 +710,7 @@
                                             <br/>
                                             <span class="lable_bold">خصومات</span>
                                         </th>-->
-                                        <th align="center" name="uom" class="second_table"
-                                            style="background-color:#4f4d4d;text-align:center;color:white;">
-                                            <span class="lable_bold">Uom</span>
-                                            <br/>
-                                            <span class="lable_bold">الوحدة</span>
-                                        </th>
+                                       
                                         <th align="center" name="taxable_rate" class="second_table"
                                             style="background-color:#4f4d4d;text-align:center;color:white;">
                                             <span class="lable_bold">VAT Rate</span>
@@ -762,10 +757,9 @@
                                         </td>
                                         <td class="second_table" style="text-align:right;">
                                             <span t-esc="'{:,}'.format(line.quantity)"/>
+                                             <span t-esc="'{:,}'.format(line.product_uom_id)"/>
                                         </td>
-                                        <td class="second_table" style="text-align:right;">
-                                            <span t-esc="'{:,}'.format(line.product_uom_id)"/>
-                                        </td>
+
 
                                        <!-- <td class="second_table" style="text-align:right;">
                                             <span t-esc="doc.get_bt_136(line.zatca_id)"
