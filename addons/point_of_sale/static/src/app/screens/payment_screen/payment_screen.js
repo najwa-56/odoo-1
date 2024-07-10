@@ -441,8 +441,7 @@ export class PaymentScreen extends Component {
         }
 
         if (
-            (this.currentOrder.is_to_invoice() || this.currentOrder.getShippingDate()) &&
-            !this.currentOrder.get_partner()
+            (this.currentOrder.is_to_invoice() || this.currentOrder.getShippingDate()) 
         ) {
             const { confirmed } = await this.popup.add(ConfirmPopup, {
                 title: _t("Please select the Customer"),
