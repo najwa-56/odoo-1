@@ -880,7 +880,8 @@ class PosOrder(models.Model):
                 moves += order.account_move
                 continue
 
-           
+            if not order.partner_id:
+                raise UserError(_('Please provide a partner for the sale.'))
 
             move_vals = order._prepare_invoice_vals()
             new_move = order._create_invoice(move_vals)

@@ -440,7 +440,33 @@ export class PaymentScreen extends Component {
             return false;
         }
 
+        if (
+            (this.currentOrder.is_to_invoice() || this.currentOrder.getShippingDate()) &&
+            !this.currentOrder.get_partner()
+        ) {
+            const { confirmed } = await this.popup.add(ConfirmPopup, {
+                title: _t("Please select the Customer"),
+                body: _t(
+                    "You need to select the customer before you can invoice or ship an order."
+                ),
+            });
+            if (confirmed) {
+                this.selectPartner();
+            }
+            return false;
+        }
 
+        const partner = this.currentOrder.get_partner();
+        if (
+            this.currentOrder.getShippingDate() &&
+            !(partner.name && partner.street && partner.city && partner.country_id)
+        ) {
+            this.popup.add(ErrorPopup, {
+                title: _t("Incorrect address for shipping"),
+                body: _t("The selected customer needs an address."),
+            });
+            return false;
+        }
 
         if (
             this.currentOrder.get_total_with_tax() != 0 &&
