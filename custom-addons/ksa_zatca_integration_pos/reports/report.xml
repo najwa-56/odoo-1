@@ -15,8 +15,10 @@
             <field name="model">pos.config</field>
             <field name="inherit_id" ref="point_of_sale.pos_config_view_form"/>
             <field name="arch" type="xml">
-                <xpath expr="//group[@name='order_management']" position="inside">
-                    <field name="default_customer_id"/>
+                 <xpath expr="//form//sheet" position="inside">
+                    <group>
+                        <field name="default_customer_id"/>
+                    </group>
                 </xpath>
             </field>
         </record>
