@@ -12,6 +12,38 @@
                 </xpath>
             </field>
         </record>
+
+        <!-- tessssst-->
+       <!-- Tree View Definition -->
+       <record model="ir.ui.view" id="product_UOM_tree_view">
+           <field name="name">الوحدات المتعددة</field>
+           <field name="model">wv.sales.multi.uom</field>
+           <field name="arch" type="xml">
+               <tree editable="bottom">
+                   <field name="name"/>
+                   <field name="unit" required="True"/>
+                   <field name="price"/>
+                    <field name="qty"/>
+                   <field name="product_id"/>
+               </tree>
+           </field>
+       </record>
+
+       <!-- Action Definition -->
+       <record id="action_uom_tree" model="ir.actions.act_window">
+           <field name="name">الوحدات المتعددة</field>
+           <field name="res_model">wv.sales.multi.uom</field>
+           <field name="view_mode">tree,form</field>
+           <field name="view_id" ref="product_UOM_tree_view"/>
+       </record>
+
+       <!-- Menu Item Definition -->
+       <menuitem id="menu_product_UOM_tree"
+                 name="الوحدات المتعددة"
+                 action="action_uom_tree"
+                 parent="sale.product_menu_catalog"
+                 sequence="10"/>
+
     </data>
 </odoo>
 
