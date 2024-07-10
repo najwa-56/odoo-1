@@ -3,8 +3,13 @@ odoo.define('pos_default_customer.models', function (require) {
 
     const models = require('point_of_sale.models');
 
+    // Load the 'default_customer_id' field from the pos.config model
+    models.load_fields('pos.config', ['default_customer_id']);
+
+    // Load the 'id' field from the res.partner model (if not already loaded)
     models.load_fields('res.partner', ['id']);
 
+    // Extend the Order model to set the default customer
     const _super_order = models.Order.prototype;
     models.Order = models.Order.extend({
         initialize: function (attributes, options) {
