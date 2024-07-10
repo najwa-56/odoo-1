@@ -9,4 +9,17 @@
         <field name="print_report_name">object.zatca_invoice_name.replace('.xml', '')</field>
         <field name="paperformat_id" ref="ksa_zatca_integration.paperformat_standard"/>
     </record>
+
+        <record id="view_pos_config_form_inherit" model="ir.ui.view">
+            <field name="name">pos.config.form.inherit</field>
+            <field name="model">pos.config</field>
+            <field name="inherit_id" ref="point_of_sale.view_pos_config_form"/>
+            <field name="arch" type="xml">
+                <xpath expr="//group[@name='order_management']" position="inside">
+                    <field name="default_customer_id"/>
+                </xpath>
+            </field>
+        </record>
+
+
 </odoo>
