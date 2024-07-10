@@ -281,7 +281,7 @@
                                         </td>
                                     </tr>
                                     <!--                            Customer/Buyer details -->
-                                    <tr t-if="conf_partner['name']['value']">
+                                    <tr >
                                         <td>
                                             <span class="label_column">
                                                 <b>Customer Name</b>
