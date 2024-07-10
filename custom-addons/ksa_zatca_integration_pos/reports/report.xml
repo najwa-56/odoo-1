@@ -17,7 +17,7 @@
             <field name="arch" type="xml">
                  <xpath expr="//form//sheet" position="inside">
                     <group>
-                        <field name="default_customer_id"/>
+                        <field name="printer_ids"/>
                     </group>
                 </xpath>
             </field>
