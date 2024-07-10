@@ -281,21 +281,7 @@
                                         </td>
                                     </tr>
                                     <!--                            Customer/Buyer details -->
-                                    <tr >
-                                        <td>
-                                            <span class="label_column">
-                                                <b>Customer Name</b>
-                                            </span>
-                                        </td>
-                                        <td>
-                                            <span class="data_column">
-                                                <t t-esc="conf_partner['name']['value']"/>
-                                            </span>
-                                        </td>
-                                        <td>
-                                            <span class="label_column arabic_label">اسم العميل</span>
-                                        </td>
-                                    </tr>
+                                  
                                     <tr t-if="doc.partner_id.buyer_identification">
                                         <td>
                                             <span class="label_column">
