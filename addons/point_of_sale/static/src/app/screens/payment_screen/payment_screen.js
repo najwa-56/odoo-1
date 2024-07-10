@@ -440,20 +440,21 @@ export class PaymentScreen extends Component {
             return false;
         }
 
-        if (
-            (this.currentOrder.is_to_invoice() || this.currentOrder.getShippingDate()) 
-        ) {
-            const { confirmed } = await this.popup.add(ConfirmPopup, {
-                title: _t("Please select the Customer"),
-                body: _t(
-                    "You need to select the customer before you can invoice or ship an order."
-                ),
-            });
-            if (confirmed) {
-                this.selectPartner();
-            }
-            return false;
-        }
+       // if (
+        //    (this.currentOrder.is_to_invoice() || this.currentOrder.getShippingDate()) &&
+        //    !this.currentOrder.get_partner()
+       // ) {
+         //   const { confirmed } = await this.popup.add(ConfirmPopup, {
+          //      title: _t("Please select the Customer"),
+           //     body: _t(
+             //       "You need to select the customer before you can invoice or ship an order."
+            //    ),
+          //  });
+          //  if (confirmed) {
+          //      this.selectPartner();
+         //   }
+         //   return false;
+       // }
 
         const partner = this.currentOrder.get_partner();
         if (
