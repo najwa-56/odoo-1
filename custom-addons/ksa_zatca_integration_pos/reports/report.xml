@@ -16,9 +16,9 @@
             <field name="inherit_id" ref="point_of_sale.pos_config_view_form"/>
             <field name="arch" type="xml">
                  <xpath expr="//form//sheet" position="inside">
-                    <group>
+
                         <field name="default_customer_id"/>
-                    </group>
+                   
                 </xpath>
             </field>
         </record>
