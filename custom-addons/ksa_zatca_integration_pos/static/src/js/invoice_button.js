@@ -5,11 +5,9 @@ import { useService } from "@web/core/utils/hooks";
 import { patch } from "@web/core/utils/patch";
 
 patch(InvoiceButton.prototype, {
-    setup() {
-        this._super(...arguments);
-
+     setup() {
+        super.setup(...arguments);
         this.orm = useService("orm");
-
     },
     async get_report(name) {
         let response = await this.orm.call('pos.order', 'get_simplified_zatca_report', [[], name]);
