@@ -13,3 +13,13 @@ class multi_uom(models.Model):
       #   'UNIQUE (product_id,uom_id)',
         # _('UOM Product Must Be Unique !'))]
     
+
+class SaleOrderLine(models.Model):
+    _inherit = 'sale.order.line'
+
+    multi_uom_id = fields.Many2one('uom.uom', string='Multi UOM')
+
+    def _export_for_ui(self, orderline):
+        res = super()._export_for_ui(orderline)
+        res.update({'product_uom_id': orderline.product_uom_id.id})
+        return res
