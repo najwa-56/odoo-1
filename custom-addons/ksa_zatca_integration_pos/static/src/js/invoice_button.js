@@ -19,5 +19,31 @@ patch(InvoiceButton.prototype, {
     async tryReprint() {
         let report = await this.get_report(this.props.order.name)
         this.printer.printHtml($(report)[0], { webPrintFallback: true });
+    },
+
+    async _downloadInvoice(orderId) {
+        try {
+            const [orderWithInvoice] = await this.orm.read(
+                "pos.order",
+                [orderId],
+                ["account_move"],
+                { load: false }
+            );
+            if (orderWithInvoice?.account_move) {
+                await this.report.doAction("ksa_zatca_integration_pos.report_e_invoicing_b2c_invoice", [
+                    orderWithInvoice.account_move,
+                ]);
+            }
+        } catch (error) {
+            if (error instanceof Error) {
+                throw error;
+            } else {
+                // NOTE: error here is most probably undefined
+                this.popup.add(ErrorPopup, {
+                    title: _t("Network Error"),
+                    body: _t("Unable to download invoice."),
+                });
+            }
+        }
     }
   });
