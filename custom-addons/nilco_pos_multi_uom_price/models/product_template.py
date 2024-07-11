@@ -12,4 +12,3 @@ class ProductTemplate(models.Model):
 class SaleOrderLine(models.Model):
     _inherit = 'sale.order.line'
 
-    
