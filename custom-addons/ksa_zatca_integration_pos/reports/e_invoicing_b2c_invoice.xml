@@ -783,10 +783,10 @@
                                             </t>
                                             %
                                         </td>
-                                        <td class="second_table" style="text-align:right;">
+                                      <!--  <td class="second_table" style="text-align:right;">
                                             <span t-esc="doc.get_ksa_11(line.zatca_id)"
                                                   t-options='{"widget": "monetary", "display_currency": doc.currency_id}'/>
-                                        </td>
+                                        </td>-->
                                         <td class="second_table" style="text-align:right;">
                                             <span t-esc="doc.get_bt_131(line.zatca_id)"
                                                   t-options='{"widget": "monetary", "display_currency": doc.currency_id}'/>
