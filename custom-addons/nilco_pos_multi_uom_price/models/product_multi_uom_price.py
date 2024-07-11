@@ -13,3 +13,9 @@ class multi_uom(models.Model):
       #   'UNIQUE (product_id,uom_id)',
         # _('UOM Product Must Be Unique !'))]
     
+class sale_order_line(models.Model):
+    _inherit = "sale.order.line"
+
+    selected_uom_ids = fields.Many2many(string="Uom Ids", related='product_id.selected_uom_ids')
+    sales_multi_uom_id = fields.Many2one("product.multi.uom.price", string="Cust UOM new",
+                                         domain="[('id', 'in', selected_uom_ids)]")
