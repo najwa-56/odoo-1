@@ -6,7 +6,7 @@
 
         <!-- Extend the template with your modifications -->
         <xpath expr="//button[@t-name='point_of_sale.InvoiceButton']" position="attributes">
-            <attribute name="t-on-click">() => this._invoiceOrder()</attribute>
+            <attribute name="t-on-click">() => this.get_simplified_zatca_report()</attribute>
         </xpath>
 
     </t>
