@@ -16,7 +16,7 @@
                         padding: 2px;
                         border: 1px solid black;
                         border-collapse: collapse;
-                        font-size:10px;
+                        font-size:11px;
                         }
                     </style>
                     <t t-if="doc.debit_origin_id">
