@@ -17,9 +17,10 @@ class multi_uom(models.Model):
 class SaleOrderLine(models.Model):
     _inherit = 'sale.order.line'
 
-    multi_uom_id = fields.Many2one('uom.uom', string='Multi UOM')
+    multi_uom_price_id = fields.Many2one('product.multi.uom.price', string='Multi UOM Price')
+    multi_uom_id = fields.Many2one('uom.uom', string='Multi UOM', compute='_compute_multi_uom_id')
 
-    def _export_for_ui(self, orderline):
-        res = super()._export_for_ui(orderline)
-        res.update({'product_uom_id': orderline.product_uom_id.id})
-        return res
+    @api.depends('multi_uom_price_id')
+    def _compute_multi_uom_id(self):
+        for line in self:
+            line.multi_uom_id = line.multi_uom_price_id.uom_id
