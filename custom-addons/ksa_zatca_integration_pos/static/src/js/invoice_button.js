@@ -1,6 +1,6 @@
 /** @odoo-module **/
 
-import { InvoiceButton } from "@point_of_sale/app/screens/ticket_screen/invoice_button";
+import { InvoiceButton } from "@point_of_sale/app/screens/ticket_screen/invoice_button/invoice_button";
 import { useService } from "@web/core/utils/hooks";
 import { patch } from "@web/core/utils/patch";
 
