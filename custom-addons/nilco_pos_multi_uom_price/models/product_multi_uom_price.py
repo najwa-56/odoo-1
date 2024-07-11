@@ -18,7 +18,7 @@ class SaleOrderLine(models.Model):
     _inherit = 'sale.order.line'
 
     multi_uom_price_id = fields.Many2one('product.multi.uom.price', string='Multi UOM Price')
-    multi_uom_id = fields.Many2one('uom.uom', string='Multi UOM', compute='_compute_multi_uom_id')
+    multi_uom_id = fields.Many2one('uom.uom', string='Multi UOM', related='product_id.uom_id')
 
     @api.depends('multi_uom_price_id')
     def _compute_multi_uom_id(self):
