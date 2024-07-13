@@ -41,8 +41,8 @@
             <field name="inherit_id" ref="sale.view_order_form"/>
             <field name="arch" type="xml">
                 <xpath expr="//field[@name='order_line']/tree/field[@name='product_uom_qty']" position="after">
-                      <field name="available_uoms" />
-                    <field name="product_uom" />
+                      <field name="available_uoms" invisible="1"/> <!-- Hide if not necessary -->
+                    <field name="product_uom"/>
                 </xpath>
             </field>
         </record>

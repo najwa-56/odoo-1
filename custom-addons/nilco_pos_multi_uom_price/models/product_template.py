@@ -37,10 +37,5 @@ class SaleOrderLine(models.Model):
             else:
                 line.selected_uom_price = 0.0
 
-    @api.model
     def _get_available_uom_ids(self):
-        lines = self.search([])
-        available_uom_ids = []
-        for line in lines:
-            available_uom_ids.append(line.available_uoms.id)
-            available_uom_ids.append(line.product_uom.id)
+        return self.mapped('available_uoms').ids
