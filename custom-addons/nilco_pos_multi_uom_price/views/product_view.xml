@@ -41,6 +41,7 @@
             <field name="inherit_id" ref="sale.view_order_form"/>
             <field name="arch" type="xml">
                 <xpath expr="//field[@name='order_line']/tree/field[@name='product_uom']" position="attributes">
+                                        <field name="available_uoms" invisible="1"/>
                      <attribute name="domain">[('id', 'in', available_uoms.ids)]</attribute>
                 </xpath>
                 <xpath expr="//field[@name='order_line']/tree/field[@name='price_unit']" position="attributes">
