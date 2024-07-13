@@ -13,31 +13,24 @@ class SaleOrderLine(models.Model):
     _inherit = 'sale.order.line'
 
     multi_uom_price_id = fields.Many2one('product.multi.uom.price', string='Multi UOM Price')
-    available_uoms = fields.Many2one(related='multi_uom_price_id.uom_id', string='Multi UOM', store=True,compute='_compute_available_uoms'
-                                  , domain="[('id', 'in', multi_uom_price_id)]")
+    available_uoms = fields.Many2many('uom.uom', compute='_compute_available_uoms')
     selected_uom_price = fields.Float(compute='_compute_selected_uom_price')
     product_uom = fields.Many2one('uom.uom', string='Unit of Measure',
-                                  domain=lambda self: [('id', 'in', self._get_available_uom_ids())])
+                                  domain=lambda self: [('id', 'in', self.available_uoms.ids)])
 
     @api.depends('product_id')
     def _compute_available_uoms(self):
+        uom_model = self.env['uom.uom']
+        all_uoms = uom_model.search([])
         for line in self:
-            if line.product_id:
-                line.available_uoms = line.product_id.multi_uom_price_id.mapped('uom_id')
-            else:
-                line.available_uoms = self.env['uom.uom'].browse([])
+            line.available_uoms = all_uoms
 
-    @api.depends('product_id', 'product_uom')
-    def _compute_selected_uom_price(self):
+    @api.onchange('product_uom')
+    def _onchange_product_uom(self):
         for line in self:
             if line.product_id and line.product_uom:
                 uom_price = line.product_id.multi_uom_price_id.filtered(lambda uom: uom.uom_id == line.product_uom)
                 if uom_price:
-                    line.selected_uom_price = uom_price[0].price
+                    line.price_unit = uom_price[0].price  # Use the first matched price
                 else:
-                    line.selected_uom_price = 0.0
-            else:
-                line.selected_uom_price = 0.0
-
-    def _get_available_uom_ids(self):
-        return self.mapped('available_uoms').ids
+                    line.price_unit = 0.0
