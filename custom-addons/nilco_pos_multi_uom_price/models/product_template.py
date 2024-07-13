@@ -22,7 +22,7 @@ class SaleOrderLine(models.Model):
             if line.product_id:
                 line.available_uoms = line.product_id.multi_uom_price_id.mapped('uom_id')
             else:
-                line.available_uoms = [(5, 0, 0)]
+                line.available_uoms = self.env['uom.uom'].browse([])  # Ensure it's empty if no product selected
 
     @api.onchange('product_uom')
     def _onchange_product_uom(self):

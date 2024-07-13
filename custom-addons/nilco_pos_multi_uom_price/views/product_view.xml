@@ -41,10 +41,8 @@
             <field name="inherit_id" ref="sale.view_order_form"/>
             <field name="arch" type="xml">
                 <xpath expr="//field[@name='order_line']/tree/field[@name='product_uom_qty']" position="after">
-  <field name="available_uoms"/>
+                      <field name="available_uoms" widget="many2many_tags"/>
                     <field name="product_uom" domain="[('id', 'in', available_uoms.ids)]"/>
-
-
                 </xpath>
             </field>
         </record>
