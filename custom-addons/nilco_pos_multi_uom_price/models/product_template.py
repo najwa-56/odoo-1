@@ -32,7 +32,7 @@ class SaleOrderLine(models.Model):
         self.ensure_one()
         if self.sales_multi_uom_id:
             self.update({"product_uom_qty": self.sales_multi_uom_id.qty})
-            domain = {'product_uom': [('id', '=', self.sales_multi_uom_id.unit.id)]}
+            domain = {'product_uom': [('id', '=', self.sales_multi_uom_id.uom_id.id)]}
             return {'domain': domain}
 
     @api.onchange('sales_multi_uom_id','product_uom', 'product_uom_qty')
@@ -43,7 +43,7 @@ class SaleOrderLine(models.Model):
         if self.sales_multi_uom_id:
             if self.sales_multi_uom_id:
                 values = {
-                    "product_uom": self.sales_multi_uom_id.unit.id,
+                    "product_uom": self.sales_multi_uom_id.uom_id.id,
                 }
             self.update(values)
             if self.order_id.partner_id:
