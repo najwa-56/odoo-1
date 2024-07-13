@@ -15,6 +15,8 @@ class SaleOrderLine(models.Model):
 
     available_uoms = fields.Many2many('uom.uom', compute='_compute_available_uoms')
     selected_uom_price = fields.Float(compute='_compute_selected_uom_price')
+    product_uom = fields.Many2one('uom.uom', string='Unit of Measure',
+                                  domain=lambda self: [('id', 'in', self.available_uoms.ids)])
 
     @api.depends('product_id')
     def _compute_available_uoms(self):
@@ -33,3 +35,4 @@ class SaleOrderLine(models.Model):
                     line.price_unit = uom_price[0].price  # Use the first matched price
                 else:
                     line.price_unit = 0.0
+

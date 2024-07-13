@@ -40,12 +40,9 @@
             <field name="model">sale.order</field>
             <field name="inherit_id" ref="sale.view_order_form"/>
             <field name="arch" type="xml">
-                <xpath expr="//field[@name='order_line']/tree" position="attributes">
-                    <attribute name="create">true</attribute>
-                </xpath>
                 <xpath expr="//field[@name='order_line']/tree/field[@name='product_uom_qty']" position="after">
                       <field name="available_uoms" widget="many2many_tags"/>
-                    <field name="product_uom" domain="[('id', 'in', order_line and order_line.available_uoms.ids or [])]"/>
+                    <field name="product_uom" />
                 </xpath>
             </field>
         </record>
