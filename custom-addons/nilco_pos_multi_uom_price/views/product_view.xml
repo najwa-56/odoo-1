@@ -35,23 +35,19 @@
             </field>
         </record>
 
-
-        <!-- Update existing form view or create a new one -->
-        <record id="view_order_line_form_inherit" model="ir.ui.view">
+     <record id="view_order_line_form_inherit" model="ir.ui.view">
             <field name="name">sale.order.line.form.inherit</field>
             <field name="model">sale.order.line</field>
             <field name="inherit_id" ref="sale.view_order_line_form"/>
             <field name="arch" type="xml">
                 <field name="product_uom" position="attributes">
-                    <attribute name="domain">[('id', 'in', available_uoms[0][2])]</attribute>
+                    <attribute name="domain">[('id', 'in', available_uoms.ids)]</attribute>
                 </field>
                 <field name="price_unit" position="attributes">
                     <attribute name="readonly">1</attribute>
                 </field>
             </field>
         </record>
-   
-
 
 
 
