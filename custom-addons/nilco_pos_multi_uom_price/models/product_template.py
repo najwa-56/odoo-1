@@ -12,7 +12,6 @@ class ProductTemplate(models.Model):
 class SaleOrderLine(models.Model):
     _inherit = 'sale.order.line'
 
-
     available_uoms = fields.Many2many('uom.uom', compute='_compute_available_uoms')
     selected_uom_price = fields.Float(compute='_compute_selected_uom_price')
     product_uom = fields.Many2one('uom.uom', string='Unit of Measure',
@@ -20,11 +19,10 @@ class SaleOrderLine(models.Model):
 
     @api.depends('product_id')
     def _compute_available_uoms(self):
+        uom_model = self.env['uom.uom']
+        all_uoms = uom_model.search([])
         for line in self:
-            if line.product_id:
-                line.available_uoms = line.product_id.multi_uom_price_id.mapped('uom_id')
-            else:
-                line.available_uoms = self.env['uom.uom'].browse([])  # Ensure it's empty if no product selected
+            line.available_uoms = all_uoms
 
     @api.onchange('product_uom')
     def _onchange_product_uom(self):
@@ -35,4 +33,3 @@ class SaleOrderLine(models.Model):
                     line.price_unit = uom_price[0].price  # Use the first matched price
                 else:
                     line.price_unit = 0.0
-
