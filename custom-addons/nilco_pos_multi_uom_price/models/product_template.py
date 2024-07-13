@@ -13,8 +13,8 @@ class ProductTemplate(models.Model):
     @api.depends('multi_uom_price_id')
     def _get_all_uom_id(self):
         for record in self:
-            if record.sales_multi_uom_id:
-                record.selected_uom_ids = self.env['product.multi.uom.price'].browse(record.sales_multi_uom_id.ids)
+            if record.multi_uom_price_id:
+                record.selected_uom_ids = self.env['product.multi.uom.price'].browse(record.multi_uom_price_id.ids)
             else:
                 record.selected_uom_ids = []
 
