@@ -12,15 +12,32 @@ class ProductTemplate(models.Model):
 class SaleOrderLine(models.Model):
     _inherit = 'sale.order.line'
 
-    multi_uom_price_id = fields.One2many('product.multi.uom.price', 'product_id', string="UOM Price")
-    multi_uom_price_info = fields.Char(string='UOM Prices', compute='_compute_multi_uom_price_info')
+    available_uoms = fields.Many2many('uom.uom', compute='_compute_available_uoms')
+    selected_uom_price = fields.Float(compute='_compute_selected_uom_price')
 
     @api.depends('product_id')
-    def _compute_multi_uom_price_info(self):
+    def _compute_available_uoms(self):
         for line in self:
             if line.product_id:
-                uom_prices = line.product_id.multi_uom_price_id
-                prices_info = ', '.join([f"{uom.uom_id.name}: {uom.price}" for uom in uom_prices])
-                line.multi_uom_price_info = prices_info
+                line.available_uoms = line.product_id.multi_uom_price_id.mapped('uom_id')
             else:
-                line.multi_uom_price_info = ''
+                line.available_uoms = False
+
+    @api.onchange('product_uom')
+    def _onchange_product_uom(self):
+        for line in self:
+            if line.product_id and line.product_uom:
+                uom_price = line.product_id.multi_uom_price_id.filtered(lambda uom: uom.uom_id == line.product_uom)
+                if uom_price:
+                    line.price_unit = uom_price.price
+                else:
+                    line.price_unit = 0.0
+
+    @api.depends('product_id', 'product_uom')
+    def _compute_selected_uom_price(self):
+        for line in self:
+            if line.product_id and line.product_uom:
+                uom_price = line.product_id.multi_uom_price_id.filtered(lambda uom: uom.uom_id == line.product_uom)
+                line.selected_uom_price = uom_price.price if uom_price else 0.0
+            else:
+                line.selected_uom_price = 0.0

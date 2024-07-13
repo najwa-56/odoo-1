@@ -42,8 +42,13 @@
             <field name="arch" type="xml">
                 <xpath expr="//field[@name='order_line']/tree/field[@name='product_uom_qty']" position="after">
 
-                    
-                    <field name="multi_uom_price_info"/>
+
+                    <field name="product_uom" position="attributes">
+                    <attribute name="domain">[('id', 'in', available_uoms[0][2])]</attribute>
+                </field>
+                <field name="price_unit" position="attributes">
+                    <attribute name="readonly">1</attribute>
+                </field>
 
                 </xpath>
             </field>
