@@ -12,7 +12,9 @@ class ProductTemplate(models.Model):
 class SaleOrderLine(models.Model):
     _inherit = 'sale.order.line'
 
-    available_uoms = fields.Many2many('uom.uom', compute='_compute_available_uoms')
+    multi_uom_price_id = fields.Many2one('product.multi.uom.price', string='Multi UOM Price')
+    available_uoms = fields.Many2one(related='multi_uom_price_id.uom_id', string='Multi UOM', store=True,compute='_compute_available_uoms'
+                                  , domain="[('id', 'in', multi_uom_price_id)]")
     selected_uom_price = fields.Float(compute='_compute_selected_uom_price')
     product_uom = fields.Many2one('uom.uom', string='Unit of Measure',
                                   domain=lambda self: [('id', 'in', self._get_available_uom_ids())])
