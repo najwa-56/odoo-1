@@ -22,4 +22,14 @@ class SaleOrderLine(models.Model):
             if line.product_id:
                 line.available_uoms = line.product_id.multi_uom_price_id.mapped('uom_id')
             else:
-                line.available_uoms = False
+                line.available_uoms = [(5, 0, 0)]
+
+    @api.onchange('product_uom')
+    def _onchange_product_uom(self):
+        for line in self:
+            if line.product_id and line.product_uom:
+                uom_price = line.product_id.multi_uom_price_id.filtered(lambda uom: uom.uom_id == line.product_uom)
+                if uom_price:
+                    line.price_unit = uom_price[0].price  # Use the first matched price
+                else:
+                    line.price_unit = 0.0
