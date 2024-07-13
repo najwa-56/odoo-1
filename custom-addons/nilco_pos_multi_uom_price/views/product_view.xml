@@ -35,20 +35,15 @@
             </field>
         </record>
 
-   <record id="view_order_form2" model="ir.ui.view">
-            <field name="name">sale.order.form.inherit</field>
+    <record id="view_order_form2" model="ir.ui.view">
+            <field name="name">sale.order.form</field>
             <field name="model">sale.order</field>
             <field name="inherit_id" ref="sale.view_order_form"/>
             <field name="arch" type="xml">
-                 <xpath expr="//field[@name='order_line']/tree" position="attributes">
-                    <attribute name="create">true</attribute>
-                </xpath>
                 <xpath expr="//field[@name='order_line']/tree/field[@name='product_uom_qty']" position="after">
-                    <field name="available_uoms" invisible="1"/>
-                    <field name="product_uom" domain="[('id', 'in', available_uoms.ids)]"/>
-                </xpath>
-                <xpath expr="//field[@name='order_line']/tree/field[@name='price_unit']" position="attributes">
-                    <attribute name="readonly">1</attribute>
+  <field name="available_uoms"/>
+
+
                 </xpath>
             </field>
         </record>
