@@ -12,6 +12,7 @@ class ProductTemplate(models.Model):
 class SaleOrderLine(models.Model):
     _inherit = 'sale.order.line'
 
+
     available_uoms = fields.Many2many('uom.uom', compute='_compute_available_uoms')
     selected_uom_price = fields.Float(compute='_compute_selected_uom_price')
 
@@ -29,7 +30,7 @@ class SaleOrderLine(models.Model):
             if line.product_id and line.product_uom:
                 uom_price = line.product_id.multi_uom_price_id.filtered(lambda uom: uom.uom_id == line.product_uom)
                 if uom_price:
-                    line.price_unit = uom_price.price
+                    line.price_unit = uom_price[0].price  # Use the first matched price
                 else:
                     line.price_unit = 0.0
 
@@ -38,6 +39,6 @@ class SaleOrderLine(models.Model):
         for line in self:
             if line.product_id and line.product_uom:
                 uom_price = line.product_id.multi_uom_price_id.filtered(lambda uom: uom.uom_id == line.product_uom)
-                line.selected_uom_price = uom_price.price if uom_price else 0.0
+                line.selected_uom_price = uom_price[0].price if uom_price else 0.0
             else:
                 line.selected_uom_price = 0.0
