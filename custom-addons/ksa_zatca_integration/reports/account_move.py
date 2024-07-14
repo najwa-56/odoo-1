@@ -22,7 +22,7 @@ class AccountMoveReport(models.Model):
         data = 0.0
         if self.invoice_line_ids:
             for rec in self.invoice_line_ids:
-                taxable_amount = (rec.price_unit * rec.quantity)-0.15
+                taxable_amount = rec.price_unit * rec.quantity
                 data += ((rec.tax_ids[0].amount if rec.tax_ids else 0.0) * taxable_amount) / 100
         return data
 
