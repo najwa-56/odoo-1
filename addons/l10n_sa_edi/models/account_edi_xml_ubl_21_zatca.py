@@ -297,9 +297,9 @@ class AccountEdiXmlUBL21Zatca(models.AbstractModel):
 
             Business Rules: BT-110 & BT-111
         """
-        curr_amount = abs(vals['tax_amount_currency'])
+        curr_amount = abs(vals['taxes_vals']['tax_amount_currency'])
         if invoice.currency_id != invoice.company_currency_id:
-            curr_amount = abs(vals['tax_amount'])
+            curr_amount = abs(vals['taxes_vals']['tax_amount'])
         return vals['vals']['tax_total_vals'] + [{
             'currency': invoice.company_currency_id,
             'currency_dp': invoice.company_currency_id.decimal_places,
