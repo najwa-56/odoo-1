@@ -24,14 +24,4 @@ class PurchaseOrderLine(models.Model):
             }
             self.update(values)
             self.price_unit = self.purchase_multi_uom_id.cost  # Update price_unit with the cost from purchase_multi_uom_id
-        else:
-            # Fallback logic if no purchase_multi_uom_id is set
-            product = self.product_id.with_context(
-                lang=self.order_id.partner_id.lang,
-                partner=self.order_id.partner_id,
-                quantity=self.product_qty,
-                date=self.order_id.date_order,
-                uom=self.product_uom.id,
-                fiscal_position=self.env.context.get('fiscal_position')
-            )
-            self.price_unit = product.standard_price  # Use the standard price as a fallback
+        
