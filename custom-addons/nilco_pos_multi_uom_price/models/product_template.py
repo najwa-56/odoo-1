@@ -42,7 +42,7 @@ class SaleOrderLine(models.Model):
         if self.sales_multi_uom_id:
             if self.sales_multi_uom_id:
                 values = {
-                    "product_uom": self.sales_multi_uom_id.unit.id,
+                    "product_uom": self.sales_multi_uom_id.uom_id.id,
                 }
             self.update(values)
 
