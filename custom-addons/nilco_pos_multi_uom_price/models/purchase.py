@@ -1,6 +1,11 @@
 from odoo import models, fields, api
 
+class PurchaseOrder(models.Model):
+    _inherit = 'purchase.order'
 
+    pricelist_id = fields.Many2one('product.pricelist', string='Pricelist')
+
+    
 class PurchaseOrderLine(models.Model):
     _inherit = 'purchase.order.line'
 
