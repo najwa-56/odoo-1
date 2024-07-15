@@ -27,5 +27,7 @@ class PurchaseOrderLine(models.Model):
         if self.purchase_multi_uom_id:
             values = {
                 "product_uom": self.purchase_multi_uom_id.uom_id.id,
+                "price_unit": self.purchase_multi_uom_cost,
+
             }
             self.update(values)
