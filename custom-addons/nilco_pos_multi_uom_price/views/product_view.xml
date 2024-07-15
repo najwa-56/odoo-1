@@ -64,18 +64,7 @@
             </field>
         </record>
 
-        <!-- Extend the purchase order line tree view -->
-        <record id="view_purchase_order_line_tree_custom" model="ir.ui.view">
-            <field name="name">purchase.order.line.tree.custom</field>
-            <field name="model">purchase.order.line</field>
-            <field name="inherit_id" ref="purchase.purchase_order_line_tree"/>
-            <field name="arch" type="xml">
-                <xpath expr="//field[@name='product_qty']" position="after">
-                    <field name="selected_uom_ids" invisible="1"/>
-                    <field name="purchase_multi_uom_id" readonly="state in ('purchase', 'done', 'cancel')"/>
-                </xpath>
-            </field>
-        </record>
+       
 
 
 </odoo>
