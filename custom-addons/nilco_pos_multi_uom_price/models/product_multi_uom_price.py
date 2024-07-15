@@ -10,6 +10,8 @@ class multi_uom(models.Model):
     uom_id = fields.Many2one('uom.uom', string="Unit of Measure", domain="[('category_id', '=', category_id)]")#,required=True
     price = fields.Float(string='Price',required=True,digits='Product Price')
     cost = fields.Float(string='Cost',required=True,digits='Product Cost')
+    qty = fields.Float(string="Quantity")
+
    # _sql_constraints = [
      #   ('product_multi_uom_price_uniq',
       #   'UNIQUE (product_id,uom_id)',
