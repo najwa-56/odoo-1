@@ -166,9 +166,11 @@ class AccountMoveReport(models.Model):
         bt_131 = bt_126.find('{urn:oasis:names:specification:ubl:schema:xsd:CommonBasicComponents-2}LineExtensionAmount')
         # Get the ksa_11 value
         ksa_11_value = self.get_ksa_11(id)
+
         # Subtract the ksa_11 value from the bt_131 value
         bt_131_value = float(bt_131.text) if float(bt_131.text) else 0
-        return bt_131_value - ksa_11_value
+        bt_131= bt_131_value - ksa_11_value
+        return bt_131
 
     def get_bt_136(self, id):
         id = str(int(id))
