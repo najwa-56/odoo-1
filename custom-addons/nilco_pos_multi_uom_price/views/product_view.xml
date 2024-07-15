@@ -57,14 +57,15 @@
             <field name="model">purchase.order</field>
             <field name="inherit_id" ref="purchase.purchase_order_form"/>
             <field name="arch" type="xml">
-                <xpath expr="//field[@name='order_line']/form/group/group/field[@name='product_id']" position="after">
-                    <field name="selected_uom_ids" invisible="1"/>
-                    <field name="purchase_multi_uom_id" readonly="state in ('purchase', 'done', 'cancel')"/>
-                </xpath>
+                <xpath expr="//field[@name='order_line']/tree//field[@name='product_qty']" position="after">
+                <field name="selected_uom_ids" invisible="1"/>
+
+                    <field name="sales_multi_uom_id" readonly="state in ('sale','done', 'cancel')"/>
+            </xpath>
             </field>
         </record>
 
-       
+
 
 
 </odoo>
