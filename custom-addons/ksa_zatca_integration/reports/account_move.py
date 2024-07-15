@@ -206,10 +206,10 @@ class AccountMoveReport(models.Model):
         # LineExtensionAmount
         ksa_11_find = "//{urn:oasis:names:specification:ubl:schema:xsd:CommonBasicComponents-2}ID[.='" + str(id) + "']"
         bt_126 = xml_file.find(ksa_11_find).getparent()
-        tax_total = bt_126.find('{urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-2}TaxExclusiveAmount')
+        tax_total = bt_126.find('{urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-2}TaxTotal')
         if tax_total is None:
             return 0.0
-        ksa_11 = tax_total.find('{urn:oasis:names:specification:ubl:schema:xsd:CommonBasicComponents-2}TaxExclusiveAmount')
+        ksa_11 = tax_total.find('{urn:oasis:names:specification:ubl:schema:xsd:CommonBasicComponents-2}TaxAmount')
         return float(ksa_11.text) if float(ksa_11.text) else 0
 
     def get_ksa_12(self, id):
