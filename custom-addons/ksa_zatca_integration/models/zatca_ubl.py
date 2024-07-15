@@ -121,7 +121,7 @@ class ZatcaUBL():
             bt[149] = 1  # ??
 
             bt[131] = self.get_l10n_field_type('amount', ((bt[146] / bt[149]) * bt[129]))
-            bt[131] = self.get_l10n_field_type('amount', bt[131] - bt[136] + bt[141])
+            bt[131] = self.get_l10n_field_type('amount', bt[131] - bt[136])
 
             bt['∑131'] += bt[131]
             bt[151] = invoice_line_id.tax_ids.classified_tax_category if invoice_line_id.tax_ids else "O"
