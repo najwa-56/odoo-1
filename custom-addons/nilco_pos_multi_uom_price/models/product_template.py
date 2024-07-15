@@ -103,7 +103,7 @@ class Pricelist(models.Model):
             # w.r.t product default UoM (min_quantity, price_surchage, ...)
 
 
-            
+
 
 
     def _get_product_price_rule12(self,product,*args, **kwargs):
