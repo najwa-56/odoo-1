@@ -182,12 +182,7 @@ class AccountMoveReport(models.Model):
         if bg_27 is None:
             return 0.0
         bt_136 = bg_27.find('{urn:oasis:names:specification:ubl:schema:xsd:CommonBasicComponents-2}Amount')
-        ksa_11_value = self.get_ksa_11(id)
-
-        # Subtract the ksa_11 value from the bt_131 value
-        bt_136_value =float(bt_136.text) if float(bt_136.text) else 0
-        bt_136 = bt_136_value - ksa_11_value
-        return bt_136
+        return float(bt_136.text) if float(bt_136.text) else 0
 
     def get_bt_141(self, id):
         invoice = base64.b64decode(self.zatca_invoice).decode()
