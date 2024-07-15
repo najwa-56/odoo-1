@@ -61,7 +61,8 @@
                 <xpath expr="//field[@name='order_line']/tree//field[@name='product_qty']" position="after">
                 <field name="selected_uom_ids" invisible="1"/>
 
-                    <field name="purchase_multi_uom_id" readonly="state in ('sale','done', 'cancel')"/>
+                    <field name="purchase_multi_uom_id" />
+                     <field name="purchase_multi_uom_cost" />
             </xpath>
             </field>
         </record>
