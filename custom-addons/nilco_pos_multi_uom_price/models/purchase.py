@@ -12,10 +12,9 @@ class PurchaseOrderLine(models.Model):
 
     @api.onchange('purchase_multi_uom_id')
     def purchase_multi_uom_id_change(self):
-        self.ensure_one()
         if self.purchase_multi_uom_id:
-            domain = {'product_uom': [('id', '=', self.purchase_multi_uom_id.uom_id.id)]}
-            return {'domain': domain}
+            self.product_uom = self.purchase_multi_uom_id.uom_id
+            self.price_unit = self.purchase_multi_uom_id.cost
 
 
     @api.onchange('purchase_multi_uom_id', 'product_uom', 'product_qty')
@@ -25,9 +24,8 @@ class PurchaseOrderLine(models.Model):
             return
 
         if self.purchase_multi_uom_id:
-            values = {
-                "product_uom": self.purchase_multi_uom_id.uom_id.id,
-                "price_unit": self.purchase_multi_uom_cost,
-
-            }
-            self.update(values)
+            self.product_uom = self.purchase_multi_uom_id.uom_id
+            self.price_unit = self.purchase_multi_uom_id.cost
+        else:
+            # Update the price_unit based on the default UOM if purchase_multi_uom_id is not set
+            self.price_unit = self.product_id.standard_price
