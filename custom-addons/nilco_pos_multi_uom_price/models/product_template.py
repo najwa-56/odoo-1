@@ -49,7 +49,7 @@ class SaleOrderLine(models.Model):
                 context_partner = dict(self.env.context, partner_id=self.order_id.partner_id.id)
                 pricelist_context = dict(context_partner, uom=False, date=self.order_id.date_order)
                 price, rule_id = self.order_id.pricelist_id.with_context(pricelist_context)._get_product_price_rule12(
-                    product=self.product_id, quantity=self.sales_multi_uom_id.qty or 1.0,
+                    product=self.product_id,
                     pro_price=self.sales_multi_uom_id.price, compute_price=False)
                 self.price_unit = self.env['account.tax']._fix_tax_included_price_company(price,
                                                                                           self.product_id.taxes_id,
