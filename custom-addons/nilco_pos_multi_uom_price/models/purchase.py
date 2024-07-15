@@ -24,4 +24,3 @@ class PurchaseOrderLine(models.Model):
             }
             self.update(values)
             self.price_unit = self.purchase_multi_uom_id.cost  # Update price_unit with the cost from purchase_multi_uom_id
-        
