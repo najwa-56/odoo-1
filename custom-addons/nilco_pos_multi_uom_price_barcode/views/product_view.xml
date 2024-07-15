@@ -30,7 +30,7 @@
     </record>
 
     <!-- Inherit product.template form view to include the new tree view -->
-   
+
 
     <!-- New Action for the Combined Tree View -->
     <record id="action_product_multi_uom_price_tree" model="ir.actions.act_window">
