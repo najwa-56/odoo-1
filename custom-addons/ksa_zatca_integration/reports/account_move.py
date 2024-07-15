@@ -234,8 +234,7 @@ class AccountMoveReport(models.Model):
             bg_20 = bg_31.find('{urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-2}ClassifiedTaxCategory')
             bt_152 = bg_20.find('{urn:oasis:names:specification:ubl:schema:xsd:CommonBasicComponents-2}Percent')
             bt_152 = 0 if bt_152 is None else (float(bt_152.text) if float(bt_152.text) else 0)
-            ksa_11 = float('{:0.2f}'.format(float_round(bt_131 * bt_152 / 100, precision_rounding=0.01)))  # BR-KSA-50
-            ksa_12 = float('{:0.2f}'.format(float_round(bt_131 + ksa_11, precision_rounding=0.01)))  # BR-KSA-51
+            ksa_12 = float('{:0.2f}'.format(float_round(bt_131 )))  # BR-KSA-51
             return ksa_12
         ksa_12 = tax_total.find('{urn:oasis:names:specification:ubl:schema:xsd:CommonBasicComponents-2}RoundingAmount')
         return float(ksa_12.text) if float(ksa_12.text) else 0
