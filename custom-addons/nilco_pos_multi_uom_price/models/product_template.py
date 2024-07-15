@@ -59,7 +59,7 @@ class SaleOrderLine(models.Model):
                 product = self.product_id.with_context(
                     lang=self.order_id.partner_id.lang,
                     partner=self.order_id.partner_id,
-                    quantity=self.product_uom_qty,
+
                     date=self.order_id.date_order,
                     pricelist=self.order_id.pricelist_id.id,
                     uom=self.product_uom.id,
@@ -73,7 +73,7 @@ class Pricelist(models.Model):
     _inherit = "product.pricelist"
 
     def _compute_price_rule12(
-            self, products, quantity, currency=None, uom=None, date=False, compute_price=True, pro_price=0.0,
+            self, products,  currency=None, uom=None, date=False, compute_price=True, pro_price=0.0,
             **kwargs
     ):
         self and self.ensure_one()  # self is at most one record
@@ -101,26 +101,9 @@ class Pricelist(models.Model):
 
             # Compute quantity in product uom because pricelist rules are specified
             # w.r.t product default UoM (min_quantity, price_surchage, ...)
-            if target_uom != product_uom:
-                qty_in_product_uom = target_uom._compute_quantity(
-                    quantity, product_uom, raise_if_failure=False
-                )
-            else:
-                qty_in_product_uom = quantity
 
-            for rule in rules:
-                if rule._is_applicable_for(product, qty_in_product_uom):
-                    suitable_rule = rule
-                    break
 
-            if compute_price:
-                price = suitable_rule._compute_price(
-                    product, quantity, target_uom, date=date, currency=currency)
-            else:
-                # Skip price computation when only the rule is requested.
-                price = pro_price
-            results[product.id] = (price, suitable_rule.id)
-        return results
+            
 
 
     def _get_product_price_rule12(self,product,*args, **kwargs):
