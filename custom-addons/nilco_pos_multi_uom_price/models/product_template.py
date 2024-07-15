@@ -34,4 +34,15 @@ class SaleOrderLine(models.Model):
             domain = {'product_uom': [('id', '=', self.sales_multi_uom_id.uom_id.id)]}
             return {'domain': domain}
 
+    @api.onchange('sales_multi_uom_id', 'product_uom', 'product_uom_qty')
+    def product_uom_change(self):
+        if not self.product_uom or not self.product_id:
+            self.price_unit = 0.0
+            return
+        if self.sales_multi_uom_id:
+            if self.sales_multi_uom_id:
+                values = {
+                    "product_uom": self.sales_multi_uom_id.unit.id,
+                }
+            self.update(values)
 
