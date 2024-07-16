@@ -32,7 +32,7 @@ class PosSession(models.Model):
                         product_uom_price[product_id[0]]['uom_id'][uom_id[0]] = {
                             'id': uom_id[0],
                             'name': uom_id[1],
-                            'price': unit['price'],
+                            'price': unit['price']*.85,
                         }
 
         return product_uom_price
