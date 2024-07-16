@@ -112,7 +112,7 @@ class ZatcaUBL():
         for invoice_line_id in invoice_line_ids:
             bt[137] = self.get_l10n_field_type('amount', invoice_line_id.price_unit * invoice_line_id.quantity)
             bt[138] = self.get_bt_138(invoice_line_id, bt)
-            bt[136] = self.get_l10n_field_type('amount', bt[137] * (bt[138] / 100))
+            bt[136] = self.get_l10n_field_type('amount', bt[137] * (15 / 100))
             bt[129] = abs(invoice_line_id.quantity)
             bt[141] = self.get_l10n_field_type('amount', 0)
             bt[147] = 0  # NO ITEM PRICE DISCOUNT bt[148] * invoice_line_id.discount/100 if invoice_line_id.discount else 0
