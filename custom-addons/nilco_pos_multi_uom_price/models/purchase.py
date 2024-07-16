@@ -39,4 +39,3 @@ class PurchaseOrderLine(models.Model):
             }
             self.update(values)
 
-    

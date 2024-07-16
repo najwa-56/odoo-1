@@ -61,7 +61,6 @@
                 <xpath expr="//field[@name='order_line']/tree//field[@name='product_qty']" position="after">
                 <field name="selected_uom_ids" invisible="1"/>
                     <field name="purchase_multi_uom_id" widget="many2one"/>
-                      <field name="price_unit" readonly="1"/>
                      <field name="purchase_multi_uom_cost" />
             </xpath>
             </field>
