@@ -16,7 +16,7 @@
                         padding: 2px;
                         border: 1px solid black;
                         border-collapse: collapse;
-                        font-size:11px;
+                        font-size:10px;
                         }
                     </style>
                     <t t-if="doc.debit_origin_id">
@@ -783,14 +783,14 @@
                                             </t>
                                             %
                                         </td>
-                                      <!--  <td class="second_table" style="text-align:right;">
+                                       <td class="second_table" style="text-align:right;">
                                             <span t-esc="doc.get_ksa_11(line.zatca_id)"
                                                   t-options='{"widget": "monetary", "display_currency": doc.currency_id}'/>
-                                        </td>-->
-                                        <td class="second_table" style="text-align:right;">
+                                        </td>
+                                        <!-- <td class="second_table" style="text-align:right;">
                                             <span t-esc="doc.get_bt_131(line.zatca_id)"
                                                   t-options='{"widget": "monetary", "display_currency": doc.currency_id}'/>
-                                        </td>
+                                        </td>-->
                                         <td class="second_table" style="text-align:right;">
                                             <span t-esc="doc.get_ksa_12(line.zatca_id)"
                                                   t-options='{"widget": "monetary", "display_currency": doc.currency_id}'/>
