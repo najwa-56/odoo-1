@@ -16,7 +16,7 @@ class PurchaseOrderLine(models.Model):
     def purchase_multi_uom_id_change(self):
         if self.purchase_multi_uom_id:
             self.product_uom = self.purchase_multi_uom_id.uom_id
-            self.price_unit = self.purchase_multi_uom_id.cost
+            self.price_unit = self.purchase_multi_uom_id.uom_id.cost
 
     @api.onchange('product_id')
     def _onchange_product_id(self):
