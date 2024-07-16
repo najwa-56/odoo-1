@@ -1,49 +1,50 @@
 from odoo import models, fields, api, _
 
+
 class PurchaseOrderLine(models.Model):
     _inherit = 'purchase.order.line'
 
     selected_uom_ids = fields.Many2many(string="UOM Ids", related='product_id.selected_uom_ids')
     purchase_multi_uom_id = fields.Many2one("product.multi.uom.price", string="Custom UOM",
-                                            domain="[('uom_id', 'in', selected_uom_ids)]")
+                                            domain="[('id', 'in', selected_uom_ids)]")
     purchase_multi_uom_cost = fields.Float(string="UOM Cost", related='purchase_multi_uom_id.cost')
+
 
     @api.onchange('purchase_multi_uom_id')
     def purchase_multi_uom_id_change(self):
+        self.ensure_one()
         if self.purchase_multi_uom_id:
-            self.product_uom = self.purchase_multi_uom_id.uom_id
-            self.price_unit = self.purchase_multi_uom_id.cost
+            domain = {'product_uom': [('id', '=', self.purchase_multi_uom_id.uom_id.id)]}
+            return {'domain': domain}
 
-    @api.onchange('product_id')
-    def _onchange_product_id(self):
-        if self.product_id:
-            self.update({
-                'product_uom': self.product_id.uom_po_id,
-                'price_unit': self.product_id.standard_price,
-                'date_planned': self.order_id.date_order
-            })
-            return {
-                'domain': {'purchase_multi_uom_id': [('product_id', '=', self.product_id.id)]},
-            }
 
-    @api.onchange('product_uom', 'product_qty', 'purchase_multi_uom_id')
-    def _onchange_uom_id(self):
+    @api.onchange('purchase_multi_uom_id', 'product_uom', 'product_qty')
+    def product_uom_change(self):
         if not self.product_uom or not self.product_id:
             self.price_unit = 0.0
             return
 
         if self.purchase_multi_uom_id:
-            self.product_uom = self.purchase_multi_uom_id.uom_id
-            self.price_unit = self.purchase_multi_uom_id.cost
-        else:
-            self.price_unit = self.product_id.standard_price
+            values = {
+                "product_uom": self.purchase_multi_uom_id.uom_id.id,
+            }
+            self.update(values)
 
-        if self.product_id and self.product_uom:
-            if self.product_id.uom_id.category_id.id != self.product_uom.category_id.id:
-                warning = {
-                    'title': _('Warning!'),
-                    'message': _(
-                        'The selected unit of measure is not compatible with the unit of measure of the product.'),
-                }
-                self.product_uom = self.product_id.uom_id
-                return {'warning': warning}
+    @api.onchange('purchase_multi_uom_id')
+    def _onchange_purchase_multi_uom_id(self):
+        for record in self:
+            if record.purchase_multi_uom_cost:
+                record.price_unit = record.purchase_multi_uom_cost
+
+    @api.model
+    def create(self, vals):
+        if 'purchase_multi_uom_id' in vals:
+            multi_uom = self.env['product.multi.uom.price'].browse(vals['purchase_multi_uom_id'])
+            vals['price_unit'] = multi_uom.cost
+        return super(PurchaseOrderLine, self).create(vals)
+
+    def write(self, vals):
+        if 'purchase_multi_uom_id' in vals:
+            multi_uom = self.env['product.multi.uom.price'].browse(vals['purchase_multi_uom_id'])
+            vals['price_unit'] = multi_uom.cost
+        return super(PurchaseOrderLine, self).write(vals)
