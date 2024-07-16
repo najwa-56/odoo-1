@@ -23,6 +23,7 @@
                 <field name="category_id" invisible="1"/>
                 <field name="uom_id"/>
                 <field name="price"/>
+                <field name="cost"/>
                 <field name="barcode"/>
                 <field name="product_variant_id" column_invisible="1"/>
             </tree>
