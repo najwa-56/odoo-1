@@ -56,4 +56,3 @@ class PurchaseOrderLine(models.Model):
                 return {'warning': warning}
 
         return
-
