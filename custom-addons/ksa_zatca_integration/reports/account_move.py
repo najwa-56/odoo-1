@@ -119,7 +119,14 @@ class AccountMoveReport(models.Model):
         xml_file = ET.fromstring(invoice).getroottree()
         legal_monetary_total = xml_file.find('./{urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-2}LegalMonetaryTotal')
         bt_109 = legal_monetary_total.find('.//{urn:oasis:names:specification:ubl:schema:xsd:CommonBasicComponents-2}TaxExclusiveAmount')
-        return float(bt_109.text) if float(bt_109.text) else 0
+        ksa_11_value = self.get_ksa_11(id)
+
+        # Subtract the ksa_11 value from the bt_131 value
+        bt_109_value = float(bt_109.text) if float(bt_109.text) else 0
+        bt_109 = bt_109_value - ksa_11_value
+        return bt_109
+
+
 
     def get_bt_112(self):
         invoice = base64.b64decode(self.zatca_invoice).decode()
