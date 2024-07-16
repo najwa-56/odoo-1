@@ -30,7 +30,7 @@ class PurchaseOrderLine(models.Model):
                 line.date_planned = line._get_date_planned(seller).strftime(DEFAULT_SERVER_DATETIME_FORMAT)
 
             if line.purchase_multi_uom_cost:
-                line.price_unit = line.purchase_multi_uom_cost *.85
+                line.price_unit = line.purchase_multi_uom_cost *(15/100)
                 continue
 
             # Original logic for computing price_unit when purchase_multi_uom_cost is not set
