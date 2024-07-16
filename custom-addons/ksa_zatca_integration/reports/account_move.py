@@ -119,14 +119,7 @@ class AccountMoveReport(models.Model):
         xml_file = ET.fromstring(invoice).getroottree()
         legal_monetary_total = xml_file.find('./{urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-2}LegalMonetaryTotal')
         bt_109 = legal_monetary_total.find('.//{urn:oasis:names:specification:ubl:schema:xsd:CommonBasicComponents-2}TaxExclusiveAmount')
-        ksa_11_value = self.get_ksa_11(id)
-
-        # Subtract the ksa_11 value from the bt_131 value
-        bt_109_value = float(bt_109.text) if float(bt_109.text) else 0
-        bt_109 = bt_109_value - ksa_11_value
-        return bt_109
-
-
+        return float(bt_109.text) if float(bt_109.text) else 0
 
     def get_bt_112(self):
         invoice = base64.b64decode(self.zatca_invoice).decode()
@@ -171,13 +164,7 @@ class AccountMoveReport(models.Model):
         bt_131_find = "//{urn:oasis:names:specification:ubl:schema:xsd:CommonBasicComponents-2}ID[.='" + str(id) + "']"
         bt_126 = xml_file.find(bt_131_find).getparent()
         bt_131 = bt_126.find('{urn:oasis:names:specification:ubl:schema:xsd:CommonBasicComponents-2}LineExtensionAmount')
-        # Get the ksa_11 value
-        ksa_11_value = self.get_ksa_11(id)
-
-        # Subtract the ksa_11 value from the bt_131 value
-        bt_131_value = float(bt_131.text) if float(bt_131.text) else 0
-        bt_131= bt_131_value - ksa_11_value
-        return bt_131
+        return float(bt_131.text) if float(bt_131.text) else 0
 
     def get_bt_136(self, id):
         id = str(int(id))
