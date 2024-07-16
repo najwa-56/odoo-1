@@ -9,22 +9,15 @@ class PurchaseOrderLine(models.Model):
                                             domain="[('id', 'in', selected_uom_ids)]")
     purchase_multi_uom_cost = fields.Float(string="UOM Cost", related='purchase_multi_uom_id.cost')
 
-    @api.depends('purchase_multi_uom_cost')
-    def _compute_price_unit(self):
-        for record in self:
-            if record.purchase_multi_uom_cost:
-                record.price_unit = record.purchase_multi_uom_cost
-
-    price_unit = fields.Float(string='Unit Price', compute='_compute_price_unit', store=True)
-
-
-
     @api.onchange('purchase_multi_uom_id')
     def purchase_multi_uom_id_change(self):
-        self.ensure_one()
         if self.purchase_multi_uom_id:
-            domain = {'product_uom': [('id', '=', self.purchase_multi_uom_id.uom_id.id)]}
+            uom_id = self.purchase_multi_uom_id.uom_id.id
+            uom_cost = self.purchase_multi_uom_id.cost
+            domain = {'product_uom': [('id', '=', uom_id)], 'price_unit': [('cost', '=', uom_cost)]}
             return {'domain': domain}
+        else:
+            return {'domain': {}}
 
 
     @api.onchange('purchase_multi_uom_id', 'product_uom', 'product_qty')
