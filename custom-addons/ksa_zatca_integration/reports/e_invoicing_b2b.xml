@@ -715,7 +715,7 @@
                                             <br/>
                                             <span class="lable_bold">مبلغ ﺿﺮﻳﺒﺔ اﻟﻘﻴﻤﺔ اﻟﻤﻀﺎﻓﺔ</span>
                                         </th>
-                                        <th align="right" name="item_subtotal" class="second_table"
+                                        <th align="right" name="item_subtotal" class="second_table" t-esc="o.amount_untaxed"
                                             style="background-color:#4f4d4d;text-align:center;color:white;">
                                             <span class="lable_bold">Subtotal Exclusive of VAT</span>
                                             <br/>

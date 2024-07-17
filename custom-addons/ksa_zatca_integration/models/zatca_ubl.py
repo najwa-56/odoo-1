@@ -112,7 +112,7 @@ class ZatcaUBL():
         for invoice_line_id in invoice_line_ids:
             bt[137] = self.get_l10n_field_type('amount', invoice_line_id.price_unit * invoice_line_id.quantity)
             bt[138] = self.get_bt_138(invoice_line_id, bt)
-            bt[136] = self.get_l10n_field_type('amount', bt[137] * (bt[138] / 100))
+            bt[136] = self.get_l10n_field_type('amount', bt[137] * bt[138] / 100)
             bt[129] = abs(invoice_line_id.quantity)
             bt[141] = self.get_l10n_field_type('amount', 0)
             bt[147] = 0  # NO ITEM PRICE DISCOUNT bt[148] * invoice_line_id.discount/100 if invoice_line_id.discount else 0
@@ -257,7 +257,7 @@ class ZatcaUBL():
         LegalMonetaryTotal = [
             "<cac:LegalMonetaryTotal>",
             "<cbc:%s currencyID='%s'>%s</cbc:%s>" % ("LineExtensionAmount", document_currency, bt[106], "LineExtensionAmount"),
-            "<cbc:%s currencyID='%s'>%s%s</cbc:%s>" % ("TaxExclusiveAmount", document_currency, bt[109], (" | " + str(self.amount_untaxed_signed) if amount_verification else ''), "TaxExclusiveAmount"),
+            "<cbc:%s currencyID='%s'>%s%s</cbc:%s>" % ("TaxExclusiveAmount", document_currency, bt[109], (" | " + str(self.amount_untaxed) if amount_verification else ''), "TaxExclusiveAmount"),
             "<cbc:%s currencyID='%s'>%s%s</cbc:%s>" % ("TaxInclusiveAmount", document_currency, bt[112], (" | " + str(self.amount_total) if amount_verification else ''), "TaxInclusiveAmount"),
         ]
         if bt[107]:
