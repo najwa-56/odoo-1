@@ -123,7 +123,7 @@ class ZatcaUBL():
             bt[131] = self.get_l10n_field_type('amount', ((bt[146] / bt[149]) * bt[129]))
             bt[131] = self.get_l10n_field_type('amount', bt[131] - bt[136] + bt[141])
 
-            bt['∑131'] += bt[131]
+            bt['∑131'] += bt[131]*85
             bt[151] = invoice_line_id.tax_ids.classified_tax_category if invoice_line_id.tax_ids else "O"
             bt[152] = self.get_l10n_field_type('percentage', self.get_l10n_field_type('amount', invoice_line_id.tax_ids.amount))
             if bt[151] in ['O', 'Z', 'E'] and bt[152] != 0:
@@ -140,7 +140,7 @@ class ZatcaUBL():
             <cac:InvoiceLine>
                 <cbc:ID>%s</cbc:ID>
                 <cbc:InvoicedQuantity unitCode="PCE">%s</cbc:InvoicedQuantity>
-                <cbc:BaseAmount currencyID="%s">%s</cbc:BaseAmount>''' %
+                <cbc:LineExtensionAmount currencyID="%s">%s</cbc:LineExtensionAmount>''' %
                                  (self.l10n_check_allowed_size(1, 6, invoice_line_id.zatca_id, "bt-126"),
                                   self.l10n_is_positive("AllowanceChargeAmount (bt-129)", bt[129]),
                                   document_currency, bt[131]))
