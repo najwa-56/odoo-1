@@ -120,7 +120,7 @@ class ZatcaUBL():
             bt[146] = bt[148] - bt[147]
             bt[149] = 1  # ??
 
-            bt[131] = self.get_l10n_field_type('amount', ((bt[146] / bt[149]) * bt[129])*.85)
+            bt[131] = self.get_l10n_field_type('amount', ((bt[146] / bt[149]) * bt[129]))
             bt[131] = self.get_l10n_field_type('amount', bt[131] - bt[136] + bt[141])
 
             bt['∑131'] += bt[131]
@@ -143,7 +143,7 @@ class ZatcaUBL():
                 <cbc:LineExtensionAmount currencyID="%s">%s</cbc:LineExtensionAmount>''' %
                                  (self.l10n_check_allowed_size(1, 6, invoice_line_id.zatca_id, "bt-126"),
                                   self.l10n_is_positive("AllowanceChargeAmount (bt-129)", bt[129]),
-                                  document_currency, bt[131]))
+                                  document_currency, bt[131]*.85))
             if bt[138]:  # allowance on invoice line: (BG-27)
                 invoice_line_xml += '''
                 <cac:AllowanceCharge>
