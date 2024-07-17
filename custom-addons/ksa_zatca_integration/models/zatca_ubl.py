@@ -257,7 +257,7 @@ class ZatcaUBL():
         LegalMonetaryTotal = [
             "<cac:LegalMonetaryTotal>",
             "<cbc:%s currencyID='%s'>%s</cbc:%s>" % ("LineExtensionAmount", document_currency, bt[106], "LineExtensionAmount"),
-            "<cbc:%s currencyID='%s'>%s%s</cbc:%s>" % ("TaxExclusiveAmount", document_currency, bt[109], (" | " + str(self.amount_untaxed) if amount_verification else ''), "TaxExclusiveAmount"),
+            "<cbc:%s currencyID='%s'>%s%s</cbc:%s>" % ("TaxExclusiveAmount", document_currency, bt[109], (" | " + str(self.amount_untaxed_signed) if amount_verification else ''), "TaxExclusiveAmount"),
             "<cbc:%s currencyID='%s'>%s%s</cbc:%s>" % ("TaxInclusiveAmount", document_currency, bt[112], (" | " + str(self.amount_total) if amount_verification else ''), "TaxInclusiveAmount"),
         ]
         if bt[107]:
