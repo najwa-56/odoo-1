@@ -140,7 +140,7 @@ class ZatcaUBL():
             <cac:InvoiceLine>
                 <cbc:ID>%s</cbc:ID>
                 <cbc:InvoicedQuantity unitCode="PCE">%s</cbc:InvoicedQuantity>
-                <cbc:LineExtensionAmount currencyID="%s">%s</cbc:LineExtensionAmount>''' %
+                <cbc:BaseAmount currencyID="%s">%s</cbc:BaseAmount>''' %
                                  (self.l10n_check_allowed_size(1, 6, invoice_line_id.zatca_id, "bt-126"),
                                   self.l10n_is_positive("AllowanceChargeAmount (bt-129)", bt[129]),
                                   document_currency, bt[131]))

@@ -163,7 +163,7 @@ class AccountMoveReport(models.Model):
         # LineExtensionAmount
         bt_131_find = "//{urn:oasis:names:specification:ubl:schema:xsd:CommonBasicComponents-2}ID[.='" + str(id) + "']"
         bt_126 = xml_file.find(bt_131_find).getparent()
-        bt_131 = bt_126.find('{urn:oasis:names:specification:ubl:schema:xsd:CommonBasicComponents-2}LineExtensionAmount')
+        bt_131 = bt_126.find('{urn:oasis:names:specification:ubl:schema:xsd:CommonBasicComponents-2}BaseAmount')
         return float(bt_131.text) if float(bt_131.text) else 0
 
     def get_bt_136(self, id):
