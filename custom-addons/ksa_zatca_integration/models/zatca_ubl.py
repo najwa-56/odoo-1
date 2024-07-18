@@ -100,6 +100,12 @@ class ZatcaUBL():
             bg_23_list, bt = ZatcaUBL._get_bg_23_list(self, False, bg_23_list, bt, bt[95], bt[96], bt[92], 1, bt[120], bt[121])
         return bt, ubl_2_1, bg_23_list
 
+    def get_price_unit(self):
+        if self.tax_ids.price_include:
+            return self.move_id.get_l10n_field_type('amount', self.price_unit / (1 + self.tax_ids[0].amount / 100))
+        else:
+            return self.price_unit
+
     def _get_invoice_line(self, bg_23_list, bt, ksa):
         if not self._is_downpayment():
             invoice_line_ids = self.invoice_line_ids.filtered(lambda x: x.display_type not in ['line_section', 'line_note'] and not x.sale_line_ids.is_downpayment)
@@ -110,13 +116,13 @@ class ZatcaUBL():
         invoice_line_xml = ''
         item_price_charge = 0
         for invoice_line_id in invoice_line_ids:
-            bt[137] = self.get_l10n_field_type('amount', invoice_line_id.price_unit * invoice_line_id.quantity)
+            bt[137] = self.get_l10n_field_type('amount', ZatcaUBL.get_price_unit(invoice_line_id) * invoice_line_id.quantity)
             bt[138] = self.get_bt_138(invoice_line_id, bt)
             bt[136] = self.get_l10n_field_type('amount', bt[137] * bt[138] / 100)
             bt[129] = abs(invoice_line_id.quantity)
             bt[141] = self.get_l10n_field_type('amount', 0)
             bt[147] = 0  # NO ITEM PRICE DISCOUNT bt[148] * invoice_line_id.discount/100 if invoice_line_id.discount else 0
-            bt[148] = invoice_line_id.price_unit
+            bt[148] = ZatcaUBL.get_price_unit(invoice_line_id)
             bt[146] = bt[148] - bt[147]
             bt[149] = 1  # ??
 

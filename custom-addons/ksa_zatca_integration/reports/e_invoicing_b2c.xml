@@ -281,7 +281,7 @@
                                         </td>
                                     </tr>
                                     <!--                            Customer/Buyer details -->
-                                   <!-- <tr t-if="conf_partner['name']['value']">
+                                    <tr t-if="conf_partner['name']['value']">
                                         <td>
                                             <span class="label_column">
                                                 <b>Customer Name</b>
@@ -295,7 +295,7 @@
                                         <td>
                                             <span class="label_column arabic_label">اسم العميل</span>
                                         </td>
-                                    </tr>-->
+                                    </tr>
                                     <tr t-if="doc.partner_id.buyer_identification">
                                         <td>
                                             <span class="label_column">
@@ -304,7 +304,7 @@
                                         </td>
                                         <td>
                                             <span class="data_column">
-                                                <t t-esc="doc.get_other_id(doc.env['ir.model.fields.selection'].search([('field_id', '=', doc.env['ir.model.fields'].search([('name', '=', 'buyer_identification'), ('model_id', '=', doc.env['ir.model'].search([('model', '=', 'res.partner')]).id)]).id), ('value', '=', doc.partner_id.buyer_identification)]).name)"/>
+                                                <t t-esc="doc.get_other_id(doc.env['ir.model.fields.selection'].sudo().search([('field_id', '=', doc.env['ir.model.fields'].sudo().search([('name', '=', 'buyer_identification'), ('model_id', '=', doc.env['ir.model'].sudo().search([('model', '=', 'res.partner')]).id)]).id), ('value', '=', doc.partner_id.buyer_identification)]).name)"/>
                                                 (<t t-esc="doc.partner_id.buyer_identification"/>)
                                             </span>
                                         </td>

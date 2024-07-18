@@ -6,7 +6,7 @@
     'description': """
         Phase-2 of ZATCA e-Invoicing(Fatoorah): Integration Phase, its include solution for KSA business
     """,
-    'live_test_url': 'https://youtu.be/UaXFwibu0zU',
+    'live_test_url': 'https://youtu.be/21z8x6ib0_I',
     "author": "Alhaditech",
     "website": "www.alhaditech.com",
     'license': 'OPL-1',

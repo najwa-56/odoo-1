@@ -582,10 +582,10 @@
                                 <td class="second_table">
                                     <span>
                                         <t t-if="doc.l10n_is_self_billed_invoice">
-                                            <t t-esc="doc.get_other_id(doc.env['ir.model.fields.selection'].search([('field_id', '=', doc.env['ir.model.fields'].search([('name', '=', 'buyer_identification'), ('model_id', '=', doc.env['ir.model'].search([('model', '=', 'res.partner')]).id)]).id), ('value', '=', license)]).name)"/>
+                                            <t t-esc="doc.get_other_id(doc.env['ir.model.fields.selection'].sudo().search([('field_id', '=', doc.env['ir.model.fields'].sudo().search([('name', '=', 'buyer_identification'), ('model_id', '=', doc.env['ir.model'].sudo().search([('model', '=', 'res.partner')]).id)]).id), ('value', '=', license)]).name)"/>
                                         </t>
                                         <t t-else="">
-                                            <t t-esc="doc.get_other_id(doc.env['ir.model.fields.selection'].search([('field_id', '=', doc.env['ir.model.fields'].search([('name', '=', 'license'), ('model_id', '=', doc.env['ir.model'].search([('model', '=', 'res.company')]).id)]).id), ('value', '=', license)]).name)"/>
+                                            <t t-esc="doc.get_other_id(doc.env['ir.model.fields.selection'].sudo().search([('field_id', '=', doc.env['ir.model.fields'].sudo().search([('name', '=', 'license'), ('model_id', '=', doc.env['ir.model'].sudo().search([('model', '=', 'res.company')]).id)]).id), ('value', '=', license)]).name)"/>
                                         </t>
                                         (<t t-esc="license"/>)
                                     </span>
@@ -602,10 +602,10 @@
                                     <td class="second_table">
                                         <span>
                                             <t t-if="doc.l10n_is_self_billed_invoice">
-                                                <t t-esc="doc.get_other_id(doc.env['ir.model.fields.selection'].search([('field_id', '=', doc.env['ir.model.fields'].search([('name', '=', 'license'), ('model_id', '=', doc.env['ir.model'].search([('model', '=', 'res.company')]).id)]).id), ('value', '=', buyer_identification)]).name)"/>
+                                                <t t-esc="doc.get_other_id(doc.env['ir.model.fields.selection'].sudo().search([('field_id', '=', doc.env['ir.model.fields'].sudo().search([('name', '=', 'license'), ('model_id', '=', doc.env['ir.model'].sudo().search([('model', '=', 'res.company')]).id)]).id), ('value', '=', buyer_identification)]).name)"/>
                                             </t>
                                             <t t-else="">
-                                                <t t-esc="doc.get_other_id(doc.env['ir.model.fields.selection'].search([('field_id', '=', doc.env['ir.model.fields'].search([('name', '=', 'buyer_identification'), ('model_id', '=', doc.env['ir.model'].search([('model', '=', 'res.partner')]).id)]).id), ('value', '=', buyer_identification)]).name)"/>
+                                                <t t-esc="doc.get_other_id(doc.env['ir.model.fields.selection'].sudo().search([('field_id', '=', doc.env['ir.model.fields'].sudo().search([('name', '=', 'buyer_identification'), ('model_id', '=', doc.env['ir.model'].sudo().search([('model', '=', 'res.partner')]).id)]).id), ('value', '=', buyer_identification)]).name)"/>
                                             </t>
                                             (<t t-esc="buyer_identification"/>)
                                         </span>
@@ -691,17 +691,11 @@
                                             <br/>
                                             <span class="lable_bold">الكمية</span>
                                         </th>
-                                       <!-- <th align="center" name="discount" class="second_table"
+                                        <th align="center" name="discount" class="second_table"
                                             style="background-color:#4f4d4d;text-align:center;color:white;">
                                             <span class="lable_bold">Discount</span>
                                             <br/>
                                             <span class="lable_bold">خصومات</span>
-                                        </th>-->
-                                        <th align="center" name="uom" class="second_table"
-                                            style="background-color:#4f4d4d;text-align:center;color:white;">
-                                            <span class="lable_bold">UOM</span>
-                                            <br/>
-                                            <span class="lable_bold">الوحدة</span>
                                         </th>
                                         <th align="center" name="taxable_rate" class="second_table"
                                             style="background-color:#4f4d4d;text-align:center;color:white;">
@@ -751,12 +745,9 @@
                                             <span t-esc="'{:,}'.format(line.quantity)"/>
                                         </td>
                                         <td class="second_table" style="text-align:right;">
-                                              <span t-esc="line.product_uom_id.name"/>
-                                        </td>
-                                       <!-- <td class="second_table" style="text-align:right;">
                                             <span t-esc="doc.get_bt_136(line.zatca_id)"
                                                   t-options='{"widget": "monetary", "display_currency": doc.currency_id}'/>
-                                        </td>-->
+                                        </td>
                                         <td class="second_table" style="text-align:right;">
                                             <t t-if="not len(line.tax_ids.ids)">
                                                 0

@@ -84,7 +84,7 @@ class AccountTax(models.Model):
                                                                                                          "'Reason is free text, to be provided by the taxpayer on case to case basis.']")
             self.tax_exemption_code = self.tax_exemption_selection
             if self.classified_tax_category != 'O':
-                self.tax_exemption_text = arabic_tax[self.env['ir.model.fields.selection'].search([('value', '=', self.tax_exemption_selection)]).name]
+                self.tax_exemption_text = arabic_tax[self.env['ir.model.fields.selection'].sudo().search([('value', '=', self.tax_exemption_selection)]).name]
             else:
                 self.tax_exemption_text = None
 
