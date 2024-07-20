@@ -37,4 +37,4 @@ class AccountMoveLine(models.Model):
 class SaleOrderLine(models.Model):
     _inherit = 'sale.order.line'
 
-    product_arabic = fields.Char(related='product_id.product_tmpl_id.product_arabic', string='Arabic Name', store=True, readonly=True)
+    product_arabic1 = fields.Char(related='product_id.product_tmpl_id.product_arabic', string='Arabic Name', store=True, readonly=True)
