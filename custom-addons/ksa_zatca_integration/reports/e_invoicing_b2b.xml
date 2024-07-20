@@ -739,11 +739,6 @@
                                         <td class="second_table" style="text-align:right;">
                                             <span t-esc='doc._get_zatca_product_name(line)["name"]["value"]'/>
                                         </td>
-                                        <td class="second_table" style="text-align:right;">
-                                        <t t-esc="line.product_id.with_context(lang='en_US').name"/>
-                                       <br/>
-                                        <t t-esc="line.product_id.with_context(lang='ar_SY').name"/>
-                                                 </td>
 
                                         <td class="second_table" style="text-align:right;">
                                             <span t-esc="doc.get_bt_146(line.zatca_id)"
