@@ -31,7 +31,7 @@
     'company': 'Cybrosys Techno Solutions',
     'maintainer': 'Cybrosys Techno Solutions',
     'website': 'http://www.cybrosys.com',
-    'depends': ['point_of_sale'],
+    'depends': ['point_of_sale','account'],
     'data': ['views/product_template_views.xml'],
     'assets': {
         'point_of_sale._assets_pos': [
