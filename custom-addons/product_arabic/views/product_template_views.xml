@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!--    Added the field Arabic product name in Kanban and form views-->
+    <record id="product_template_only_form_view" model="ir.ui.view">
+        <field name="name">product.template.view.form.inherit.product.arabic
+        </field>
+        <field name="model">product.template</field>
+        <field name="inherit_id"
+               ref="product.product_template_only_form_view"/>
+        <field name="arch" type="xml">
+            <xpath expr="//div[hasclass('oe_title')]/h1" position="inside">
+                <label class="oe_edit_only" for="product_arabic"
+                       string="Arabic Name"/>
+                <h1>
+                    <field name="product_arabic" style="text-align: right"/>
+                </h1>
+            </xpath>
+        </field>
+    </record>
+    <record id="product_template_kanban_view" model="ir.ui.view">
+        <field name="name">product.template.view.kanban.inherit.product.arabic
+        </field>
+        <field name="model">product.template</field>
+        <field name="inherit_id"
+               ref="product.product_template_kanban_view"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='name']"
+                   position="after">
+                <t t-if="record.product_arabic.value">
+                    <br/>
+                    <field name="product_arabic"/>
+                    <br/>
+                </t>
+            </xpath>
+        </field>
+    </record>
+</odoo>
