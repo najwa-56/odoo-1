@@ -688,9 +688,11 @@
                                         </th>
                                         <th align="center" name="nature_of_goods=" class="second_table"
                                             style="background-color:#4f4d4d;text-align:center;color:white;">
-                                            <span class="lable_bold">Item Name</span>
-                                            <br/>
-                                            <span class="lable_bold">التفاصيل السلع أو الخدمات</span>
+                                            <span class="lable_bold">الاسم العربي </span>
+                                        </th>
+                                         <th align="center" name="eng-name" class="second_table"
+                                            style="background-color:#4f4d4d;text-align:center;color:white;">
+                                            <span class="lable_bold">الاسم اللاتيني </span>
                                         </th>
                                         <th align="right" name="item_subtotal" class="second_table"
                                             style="background-color:#4f4d4d;text-align:center;color:white;">
@@ -704,12 +706,7 @@
                                             <br/>
                                             <span class="lable_bold">الكمية</span>
                                         </th>
-                                         <th align="center" name="eng-name" class="second_table"
-                                            style="background-color:#4f4d4d;text-align:center;color:white;">
-                                            <span class="lable_bold">Name</span>
-                                            <br/>
-                                            <span class="lable_bold">Eng</span>
-                                        </th>
+
                                        <!-- <th align="center" name="discount" class="second_table"
                                             style="background-color:#4f4d4d;text-align:center;color:white;">
                                             <span class="lable_bold">Discount</span>
