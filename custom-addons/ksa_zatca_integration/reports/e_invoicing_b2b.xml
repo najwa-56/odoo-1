@@ -680,6 +680,7 @@
                                             <br/>
                                             <span class="lable_bold">التفاصيل السلع أو الخدمات</span>
                                         </th>
+
                                         <th align="right" name="item_subtotal" class="second_table"
                                             style="background-color:#4f4d4d;text-align:center;color:white;">
                                             <span class="lable_bold">Unit Price</span>
@@ -692,12 +693,18 @@
                                             <br/>
                                             <span class="lable_bold">الكمية</span>
                                         </th>
-                                        <th align="center" name="discount" class="second_table"
+                                        <th align="center" name="eng-name" class="second_table"
+                                            style="background-color:#4f4d4d;text-align:center;color:white;">
+                                            <span class="lable_bold">Name</span>
+                                            <br/>
+                                            <span class="lable_bold">Eng</span>
+                                        </th>
+                                      <!--  <th align="center" name="discount" class="second_table"
                                             style="background-color:#4f4d4d;text-align:center;color:white;">
                                             <span class="lable_bold">Discount</span>
                                             <br/>
                                             <span class="lable_bold">خصومات</span>
-                                        </th>
+                                        </th>-->
                                         <th align="center" name="taxable_rate" class="second_table"
                                             style="background-color:#4f4d4d;text-align:center;color:white;">
                                             <span class="lable_bold">VAT Rate</span>
@@ -738,6 +745,9 @@
                                         <td class="second_table" style="text-align:right;">
                                             <span t-esc='doc._get_zatca_product_name(line)["name"]["value"]'/>
                                         </td>
+                                        <td class="second_table" style="text-align:right;">
+                                              <span t-esc="line.product_arabic"/>
+                                        </td>
 
                                         <td class="second_table" style="text-align:right;">
                                             <span t-esc="doc.get_bt_146(line.zatca_id)"
@@ -746,10 +756,10 @@
                                         <td class="second_table" style="text-align:right;">
                                             <span t-esc="'{:,}'.format(line.quantity)"/>
                                         </td>
-                                        <td class="second_table" style="text-align:right;">
+                                       <!-- <td class="second_table" style="text-align:right;">
                                             <span t-esc="doc.get_bt_136(line.zatca_id)"
                                                   t-options='{"widget": "monetary", "display_currency": doc.currency_id}'/>
-                                        </td>
+                                        </td>-->
                                         <td class="second_table" style="text-align:right;">
                                             <t t-if="not len(line.tax_ids.ids)">
                                                 0
