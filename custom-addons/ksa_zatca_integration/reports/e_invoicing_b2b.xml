@@ -738,11 +738,7 @@
                                         <td class="second_table" style="text-align:right;">
                                             <span t-esc='doc._get_zatca_product_name(line)["name"]["value"]'/>
                                         </td>
-                                         <td>
-        <t t-esc="line.product_id.with_context(lang='en_US').name"/>
-        <br/>
-        <t t-esc="line.product_id.with_context(lang='ar_SY').name"/>
-      </td>
+
                                         <td class="second_table" style="text-align:right;">
                                             <span t-esc="doc.get_bt_146(line.zatca_id)"
                                                   t-options='{"widget": "monetary", "display_currency": doc.currency_id}'/>
@@ -878,7 +874,7 @@
                                                   t-options='{"widget": "monetary", "display_currency": doc.currency_id}'/>
                                         </td>
                                     </tr>
-                                    <tr>
+                                   <!-- <tr>
                                         <td class="second_table left_column">
                                             <span class="lable_bold">Amount Due</span>
                                         </td>
@@ -889,7 +885,7 @@
                                             <span t-esc="doc.get_bt_115()"
                                                   t-options='{"widget": "monetary", "display_currency": doc.currency_id}'/>
                                         </td>
-                                    </tr>
+                                    </tr>-->
                                 </table>
                             </div>
                         </div>
