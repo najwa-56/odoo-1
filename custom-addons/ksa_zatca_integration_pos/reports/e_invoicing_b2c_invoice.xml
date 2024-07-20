@@ -763,6 +763,9 @@
                                         <td class="second_table" style="text-align:right;">
                                             <span t-esc='doc._get_zatca_product_name(line)["name"]["value"]'/>
                                         </td>
+                                         <td class="second_table" style="text-align:right;">
+                                              <span t-esc="line.product_arabic"/>
+                                        </td>
                                         <td class="second_table" style="text-align:right;">
                                             <span t-esc="doc.get_bt_146(line.zatca_id)"
                                                   t-options='{"widget": "monetary", "display_currency": doc.currency_id}'/>
@@ -774,9 +777,7 @@
                                          <td class="second_table" style="text-align:right;">
                                               <span t-esc="line.product_uom_id.name"/>
                                         </td>
-                                        <td class="second_table" style="text-align:right;">
-                                              <span t-esc="line.product_arabic"/>
-                                        </td>
+
 
 
                                        <!-- <td class="second_table" style="text-align:right;">
