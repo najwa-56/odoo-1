@@ -732,12 +732,18 @@
                                     <t t-set="serial_counter" t-value="serial_counter+1"/>
                                     <t t-set="bt_141" t-value="doc.get_bt_141(line.zatca_id)"/>
                                     <tr>
+
                                         <td class="second_table" style="text-align:center;">
                                             <t t-esc="serial_counter"/>
                                         </td>
                                         <td class="second_table" style="text-align:right;">
                                             <span t-esc='doc._get_zatca_product_name(line)["name"]["value"]'/>
                                         </td>
+                                        <td class="second_table" style="text-align:right;">
+                                        <t t-esc="line.product_id.with_context(lang='en_US').name"/>
+                                       <br/>
+                                        <t t-esc="line.product_id.with_context(lang='ar_SY').name"/>
+                                                 </td>
 
                                         <td class="second_table" style="text-align:right;">
                                             <span t-esc="doc.get_bt_146(line.zatca_id)"
