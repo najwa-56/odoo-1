@@ -680,12 +680,6 @@
                                             <br/>
                                             <span class="lable_bold">التفاصيل السلع أو الخدمات</span>
                                         </th>
-                                        <th align="center" name="names-arab" class="second_table"
-                                            style="background-color:#4f4d4d;text-align:center;color:white;">
-                                            <span class="lable_bold">names</span>
-                                            <br/>
-                                            <span class="lable_bold">الاسم</span>
-                                        </th>
                                         <th align="right" name="item_subtotal" class="second_table"
                                             style="background-color:#4f4d4d;text-align:center;color:white;">
                                             <span class="lable_bold">Unit Price</span>
@@ -738,15 +732,11 @@
                                     <t t-set="serial_counter" t-value="serial_counter+1"/>
                                     <t t-set="bt_141" t-value="doc.get_bt_141(line.zatca_id)"/>
                                     <tr>
-
                                         <td class="second_table" style="text-align:center;">
                                             <t t-esc="serial_counter"/>
                                         </td>
                                         <td class="second_table" style="text-align:right;">
                                             <span t-esc='doc._get_zatca_product_name(line)["name"]["value"]'/>
-                                        </td>
-                                         <td class="second_table" style="text-align:right;">
-                                              <span t-esc="line.product_arabic"/>
                                         </td>
 
                                         <td class="second_table" style="text-align:right;">
