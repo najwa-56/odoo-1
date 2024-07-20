@@ -898,7 +898,7 @@
                                                   t-options='{"widget": "monetary", "display_currency": doc.currency_id}'/>
                                         </td>
                                     </tr>
-                                    <tr>
+                                  <!--  <tr>
                                         <td class="second_table left_column">
                                             <span class="lable_bold">Amount Due</span>
                                         </td>
@@ -909,7 +909,7 @@
                                             <span t-esc="doc.get_bt_115()"
                                                   t-options='{"widget": "monetary", "display_currency": doc.currency_id}'/>
                                         </td>
-                                    </tr>
+                                    </tr>-->
                                 </table>
                             </div>
                         </div>
