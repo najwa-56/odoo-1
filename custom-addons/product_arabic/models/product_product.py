@@ -33,3 +33,8 @@ class AccountMoveLine(models.Model):
     _inherit = 'account.move.line'
 
     product_arabic = fields.Char(related='product_id.product_tmpl_id.product_arabic', string='Arabic Name', store=True, readonly=True)
+
+class SaleOrderLine(models.Model):
+    _inherit = 'sale.order.line'
+
+    product_arabic = fields.Char(related='product_id.product_tmpl_id.product_arabic', string='Arabic Name', store=True, readonly=True)
