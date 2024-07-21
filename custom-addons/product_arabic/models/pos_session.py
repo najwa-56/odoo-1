@@ -28,6 +28,6 @@ class PosSession(models.Model):
 
     def _loader_params_product_product(self):
         """Loading the field"""
-        result = super()._loader_params_product_product()
+        result = super()._loader_params_product_multi_uom_price()
         result['search_params']['fields'].append('product_arabic')
         return result
