@@ -12,15 +12,15 @@ patch(ProductCard.prototype, {
     },
 });
 ProductCard.props = {
-        class: { String, optional: true },
-        name: String,
-        productArabic: String,
-        productId: Number,
-        price: String,
-        imageUrl: String,
-        productInfo: { Boolean, optional: true },
-        onClick: { type: Function, optional: true },
-        onProductInfoClick: { type: Function, optional: true },
+    class: { type: String, optional: true },
+    name: { type: String },
+    productArabic: { type: String },
+    productId: { type: Number },
+    price: { type: String },
+    imageUrl: { type: String },
+    productInfo: { type: Boolean, optional: true },
+    onClick: { type: Function, optional: true },
+    onProductInfoClick: { type: Function, optional: true },
 };
 
 
