@@ -14,7 +14,7 @@ patch(ProductCard.prototype, {
 ProductCard.props = {
         class: { String, optional: true },
         name: String,
-    productArabic: { type: [String, null], optional: true },  // Make productArabic accept string or null
+        productArabic: {type: String, optional: true },
         productId: Number,
         price: String,
         imageUrl: String,
@@ -22,6 +22,20 @@ ProductCard.props = {
         onClick: { type: Function, optional: true },
         onProductInfoClick: { type: Function, optional: true },
 };
+
+const productCardInstance = new ProductCard({
+    props: {
+        class: "some-class",
+        name: "Sample Product",
+        productArabic: "",  // Set as an empty string
+        productId: 1,
+        price: "10.00",
+        imageUrl: "/path/to/image",
+        productInfo: true,
+        onClick: () => { /* some function */ },
+        onProductInfoClick: () => { /* some function */ },
+    },
+});
 
 
 
