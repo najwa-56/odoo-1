@@ -6,18 +6,16 @@ function-->
         <xpath expr="//t[@t-foreach='productsToDisplay']" position="replace">
             <t t-foreach="productsToDisplay" t-as="product" t-key="product.id">
                 <ProductCard
-        t-props-class="product.class"
-        t-props-name="product.name"
-        t-props-productArabic="productArabic"
-        t-props-productId="product.productId"
-        t-props-price="product.price"
-        t-props-imageUrl="product.imageUrl"
-        t-props-productInfo="product.productInfo"
-        t-props-onClick="product.onClick"
-        t-props-onProductInfoClick="product.onProductInfoClick"
-    />
-
-
+                        class="pos.productViewMode"
+                            name="product.display_name"
+                            productId="product.id"
+                            productArabic="product.product_arabic"
+                            price="product.getFormattedUnitPrice()"
+                            imageUrl="product.getImageUrl()"
+                            onClick="() =>this.pos.addProductToCurrentOrder(product)"
+                            productInfo="true"
+                            onProductInfoClick="() => this.onProductInfoClick(product)"
+                />
             </t>
         </xpath>
     </t>
