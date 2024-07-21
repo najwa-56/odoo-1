@@ -10,11 +10,11 @@
     <t t-name="product_arabic.ProductCard" t-inherit="point_of_sale.ProductCard"
        t-inherit-mode="extension">
         <xpath expr="//div[hasclass('product-name')]" position="after">
-            <t t-if="props.productArabic">
+
             <span>
                 <t t-esc="props.productArabic"/>
             </span>
-        </t>
+       
         </xpath>
     </t>
 </templates>
