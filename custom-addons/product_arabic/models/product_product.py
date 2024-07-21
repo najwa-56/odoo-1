@@ -29,6 +29,8 @@ class ProductTemplate(models.Model):
     product_arabic = fields.Char(string='Arabic name', default="",
                                  help='Here you can set the Arabic name of the'
                                       'Product')
+
+# we inhirt product_arabic field to tow module sale account ,
 class AccountMoveLine(models.Model):
     _inherit = 'account.move.line'
 

@@ -16,7 +16,7 @@
                         padding: 2px;
                         border: 1px solid black;
                         border-collapse: collapse;
-                        font-size:10px;
+                        font-size:11px;
                         }
                     </style>
                     <t t-if="doc.debit_origin_id">
@@ -690,10 +690,15 @@
                                             style="background-color:#4f4d4d;text-align:center;color:white;">
                                             <span class="lable_bold">الاسم العربي </span>
                                         </th>
+                                                <!-- Editeing-->
+
+                                        <!--we add product name english to invoice -->
                                          <th align="center" name="eng-name" class="second_table"
                                             style="background-color:#4f4d4d;text-align:center;color:white;">
                                             <span class="lable_bold">الاسم اللاتيني </span>
                                         </th>
+                                        <!--w -->
+
                                         <th align="right" name="item_subtotal" class="second_table"
                                             style="background-color:#4f4d4d;text-align:center;color:white;">
                                             <span class="lable_bold">Unit Price</span>
@@ -732,6 +737,8 @@
                                             <br/>
                                             <span class="lable_bold">مبلغ ﺿﺮﻳﺒﺔ اﻟﻘﻴﻤﺔ اﻟﻤﻀﺎﻓﺔ</span>
                                         </th>
+                                                <!-- Editeing-->
+
                                         <!--<th align="right" name="item_subtotal" class="second_table"
                                             style="background-color:#4f4d4d;text-align:center;color:white;">
                                             <span class="lable_bold">Subtotal Exclusive of VAT</span>
@@ -760,9 +767,14 @@
                                         <td class="second_table" style="text-align:right;">
                                             <span t-esc='doc._get_zatca_product_name(line)["name"]["value"]'/>
                                         </td>
+                                                <!-- Editeing-->
+
+                                        <!--we add product name english to invoice -->
                                          <td class="second_table" style="text-align:right;">
                                               <span t-esc="line.product_arabic"/>
                                         </td>
+                                        <!--w -->
+
                                         <td class="second_table" style="text-align:right;">
                                             <span t-esc="doc.get_bt_146(line.zatca_id)"
                                                   t-options='{"widget": "monetary", "display_currency": doc.currency_id}'/>
@@ -774,7 +786,7 @@
                                          <td class="second_table" style="text-align:right;">
                                               <span t-esc="line.product_uom_id.name"/>
                                         </td>
-
+                                                <!-- Editeing-->
 
                                        <!-- <td class="second_table" style="text-align:right;">
                                             <span t-esc="doc.get_bt_136(line.zatca_id)"
@@ -793,6 +805,8 @@
                                             <span t-esc="doc.get_ksa_11(line.zatca_id)"
                                                   t-options='{"widget": "monetary", "display_currency": doc.currency_id}'/>
                                         </td>
+                                                <!-- Editeing-->
+
                                         <!-- <td class="second_table" style="text-align:right;">
                                             <span t-esc="doc.get_bt_131(line.zatca_id)"
                                                   t-options='{"widget": "monetary", "display_currency": doc.currency_id}'/>
