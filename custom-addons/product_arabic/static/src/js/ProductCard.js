@@ -14,7 +14,7 @@ patch(ProductCard.prototype, {
 ProductCard.props = {
         class: { String, optional: true },
         name: String,
-        productArabic: {type: String, optional: true },
+    productArabic: { type: [String, null], optional: true },  // Make productArabic accept string or null
         productId: Number,
         price: String,
         imageUrl: String,
