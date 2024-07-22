@@ -12,7 +12,18 @@
         </field>
     </record>
 
-    <odoo>
+     <record id="product_product_tree_view_inherit2" model="ir.ui.view">
+            <field name="name">product.product.tree.inherit.multi.uom</field>
+            <field name="model">product.product</field>
+            <field name="inherit_id" ref="product.product_product_tree_view"/>
+            <field name="arch" type="xml">
+                <!-- Use xpath to locate the position after the 'name' field -->
+                <xpath expr="//field[@name='name']" position="after">
+                    <field name='multi_uom_price_id' widget="many2many_tags" />
+                </xpath>
+            </field>
+
+
     <!-- New Tree View for product.multi.uom.price -->
     <record id="view_product_multi_uom_price_tree" model="ir.ui.view">
         <field name="name">product.multi.uom.price.tree</field>
@@ -43,7 +54,7 @@
 
     <!-- New Menu Item -->
     <menuitem id="menu_product_multi_uom_price_tree" name="UOM Prices" parent="sale.product_menu_catalog" action="action_product_multi_uom_price_tree"/> <!-- Adjust parent menu ID -->
-</odoo>
+
 
 
 </odoo>
