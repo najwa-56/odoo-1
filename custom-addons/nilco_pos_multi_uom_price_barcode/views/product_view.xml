@@ -18,7 +18,7 @@
         <field name="inherit_id" ref="product.product_template_tree_view"/>
         <field name="arch" type="xml">
             <xpath expr="//tree" position="inside">
-                <field name="multi_uom_price_barcode" string="Barcode" domain="[('multi_uom_price_id.barcode', 'ilike', self)]"/>
+                <field name="multi_uom_price_barcode" string="Barcode" />
             </xpath>
         </field>
     </record>
