@@ -27,7 +27,7 @@ const productCardInstance = new ProductCard({
     props: {
         class: "some-class",
         name: "Sample Product",
-        productArabic: "",  // Set as an empty string
+        productArabic: "undefined",  // Set as an empty string
         productId: 1,
         price: "10.00",
         imageUrl: "/path/to/image",
