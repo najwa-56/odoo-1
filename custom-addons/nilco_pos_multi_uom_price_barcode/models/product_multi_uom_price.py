@@ -28,8 +28,11 @@ class ProductTemplate(models.Model):
             else:
                 record.multi_uom_price_barcode = ''
 
+    @api.model
     def search_product_by_barcode(self, barcode):
-        product_multi_uom_price = self.env['product.multi.uom.price'].search([('barcode', '=', barcode)], limit=1)
-        if product_multi_uom_price:
-            return self.search([('multi_uom_price_id', '=', product_multi_uom_price.id)])
+        products = self.search([])
+        for product in products:
+            barcodes = product.multi_uom_price_id.mapped('barcode')
+            if barcode in barcodes:
+                return product
         return self.env['product.template']
