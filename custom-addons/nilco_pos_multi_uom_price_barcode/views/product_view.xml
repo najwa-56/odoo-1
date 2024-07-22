@@ -18,7 +18,7 @@
             <field name="inherit_id" ref="product.product_template_search_view"/>
             <field name="arch" type="xml">
                 <xpath expr="//field[@name='categ_id']" position="after">
-                    <field string="multi_uom_price_barcode" name="a"/>
+                    <field string="barcodes" name="multi_uom_price_barcode"/>
                 </xpath>
             </field>
         </record>
