@@ -30,9 +30,9 @@ class ProductTemplate(models.Model):
 
     @api.model
     def search_product_by_barcode(self, barcode):
-        products = self.search([])
-        for product in products:
-            barcodes = product.multi_uom_price_id.mapped('barcode')
-            if barcode in barcodes:
-                return product
+        # Search for the `product.multi.uom.price` record with the given barcode
+        uom_price_records = self.env['product.multi.uom.price'].search([('barcode', '=', barcode)])
+        if uom_price_records:
+            # Return the product.template linked to the found `product.multi.uom.price` records
+            return uom_price_records.mapped('product_id.product_tmpl_id')
         return self.env['product.template']
