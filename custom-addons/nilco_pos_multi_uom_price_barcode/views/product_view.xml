@@ -22,7 +22,7 @@
                     <field name='multi_uom_price_id' widget="many2many_tags" />
                 </xpath>
             </field>
-
+ </record>
 
     <!-- New Tree View for product.multi.uom.price -->
     <record id="view_product_multi_uom_price_tree" model="ir.ui.view">
