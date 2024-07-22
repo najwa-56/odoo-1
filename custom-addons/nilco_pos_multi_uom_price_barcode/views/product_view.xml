@@ -12,17 +12,20 @@
         </field>
     </record>
 
-     <record id="product_product_tree_view_inherit2" model="ir.ui.view">
-            <field name="name">product.product.tree.inherit.multi.uom</field>
-            <field name="model">product.product</field>
-            <field name="inherit_id" ref="product.product_product_tree_view"/>
-            <field name="arch" type="xml">
-                <!-- Use xpath to locate the position after the 'name' field -->
-                <xpath expr="//field[@name='name']" position="after">
-                    <field name='multi_uom_price_id' widget="many2many_tags" />
-                </xpath>
-            </field>
- </record>
+    <odoo>
+    <!-- Inherit and extend the product template tree view -->
+    <record id="product_template_tree_view_inherit" model="ir.ui.view">
+        <field name="name">product.template.tree.inherit</field>
+        <field name="model">product.template</field>
+        <field name="inherit_id" ref="product.product_template_tree_view"/>
+        <field name="arch" type="xml">
+            <xpath expr="//tree" position="inside">
+                <field name="multi_uom_price_barcode" string="Barcodes" widget="many2many_tags"/>
+            </xpath>
+        </field>
+    </record>
+</odoo>
+
 
     <!-- New Tree View for product.multi.uom.price -->
     <record id="view_product_multi_uom_price_tree" model="ir.ui.view">
