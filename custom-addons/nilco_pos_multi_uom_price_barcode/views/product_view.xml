@@ -22,6 +22,17 @@
             </xpath>
         </field>
     </record>
+    <record id="view_purchase_order_search" model="ir.ui.view">
+    <field name="name">purchase.order.search.inherit</field>
+    <field name="model">purchase.order</field>
+    <field name="inherit_id" ref="purchase.purchase_order_search"/>
+    <field name="arch" type="xml">
+        <xpath expr="//search" position="inside">
+            <!-- Add the barcode field to the search view -->
+            <field name="multi_uom_price_barcode" string="Barcodes" />
+        </xpath>
+    </field>
+</record>
 
     <!-- New Tree View for product.multi.uom.price -->
     <record id="view_product_multi_uom_price_tree" model="ir.ui.view">
