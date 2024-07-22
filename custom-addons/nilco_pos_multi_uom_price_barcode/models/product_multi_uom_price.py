@@ -21,4 +21,9 @@ class ProductTemplate(models.Model):
     @api.depends('multi_uom_price_id')
     def _compute_multi_uom_price_barcode(self):
         for record in self:
-            record.multi_uom_price_barcode = record.multi_uom_price_id.barcode if record.multi_uom_price_id else ''
+            if record.multi_uom_price_id:
+                # If you want to concatenate all barcodes into one string
+                barcodes = record.multi_uom_price_id.mapped('barcode')
+                record.multi_uom_price_barcode = ', '.join(filter(None, barcodes))
+            else:
+                record.multi_uom_price_barcode = ''
