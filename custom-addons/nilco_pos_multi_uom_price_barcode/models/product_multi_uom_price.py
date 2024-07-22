@@ -36,3 +36,23 @@ class ProductTemplate(models.Model):
             # Return the product.template linked to the found `product.multi.uom.price` records
             return uom_price_records.mapped('product_id.product_tmpl_id')
         return self.env['product.template']
+
+
+class PurchaseOrder(models.Model):
+    _inherit = 'purchase.order'
+
+    multi_uom_price_barcode = fields.Char(
+        string='Barcodes',
+        compute='_compute_multi_uom_price_barcode',
+        store=True
+    )
+
+    @api.depends('order_line.product_id')
+    def _compute_multi_uom_price_barcode(self):
+        for order in self:
+            barcodes = []
+            for line in order.order_line:
+                # Fetch barcode from product.template through product.product
+                if line.product_id:
+                    barcodes.extend(line.product_id.multi_uom_price_barcode.split(', '))
+            order.multi_uom_price_barcode = ', '.join(set(barcodes))
