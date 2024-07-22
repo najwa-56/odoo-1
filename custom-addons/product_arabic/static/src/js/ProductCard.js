@@ -23,19 +23,6 @@ ProductCard.props = {
         onProductInfoClick: { type: Function, optional: true },
 };
 
-const productCardInstance = new ProductCard({
-    props: {
-        class: "some-class",
-        name: "Sample Product",
-        productArabic: undefined,  // Use undefined instead of null
-        productId: 1,
-        price: "10.00",
-        imageUrl: "/path/to/image",
-        productInfo: true,
-        onClick: () => { /* some function */ },
-        onProductInfoClick: () => { /* some function */ },
-    },
-});
 
 
 
