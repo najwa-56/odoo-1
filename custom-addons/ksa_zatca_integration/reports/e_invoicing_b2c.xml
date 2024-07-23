@@ -373,19 +373,18 @@
                                             <br/>
                                             <span class="label_column">Quantity</span>
                                         </th>
+                                         <th class="invline_column">
+                                            <span class="label_column arabic_label">المنتج</span>
+                                            <br/>
+                                            <span class="label_column">product</span>
+                                        </th>
                                         <!--                                <th class="invline_column" style="text-align:center;">-->
                                         <!--                                    نوع<br/>Type-->
                                         <!--                                </th>-->
                                     </tr>
                                     <t t-foreach="invoice_line_ids" t-as="line" t-key="line.id">
                                         <t t-set="bt_141" t-value="doc.get_bt_141(line.zatca_id)"/>
-                                        <tr>
-                                            <td colspan='4'
-                                                class="invline_data"
-                                                style="text-align:center;max-width:100%">
-                                                <span t-esc="doc._get_zatca_product_name(line)['name']['value']"/>
-                                            </td>
-                                        </tr>
+
                                         <tr>
                                             <td class="invline_data">
                                                 <span t-esc="doc.get_ksa_12(line.zatca_id)"
@@ -401,6 +400,11 @@
                                             </td>
                                             <td class="invline_data">
                                                 <t t-esc="line.quantity"/>
+                                            </td>
+                                             <td colspan='4'
+                                                class="invline_data"
+                                                style="text-align:center;max-width:100%">
+                                                <span t-esc="doc._get_zatca_product_name(line)['name']['value']"/>
                                             </td>
                                             <!--                                    <td class="invline_data">-->
                                             <!--                                        <t t-esc="line.product_uom_id.name"/>-->
