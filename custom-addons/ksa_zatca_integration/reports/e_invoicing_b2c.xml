@@ -335,12 +335,12 @@
                                 <t t-else=""
                                    t-set="invoice_line_ids"
                                    t-value="doc.invoice_line_ids.filtered(lambda x: x.display_type not in ['line_section', 'line_note'])"/>
-                                <table width="100%" id="invline">
+                                <table width="80%" id="invline">
                                     <colgroup>
+                                        <col width='40%'/>
                                         <col width='20%'/>
-                                        <col width='10%'/>
-                                        <col width='10%'/>
-                                        <col width='10%'/>
+                                        <col width='20%'/>
+                                        <col width='20%'/>
                                     </colgroup>
                                     <tr style="line-height: 1;">
                                         <th colspan='4' class="invline_column"
