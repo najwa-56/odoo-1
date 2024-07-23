@@ -342,14 +342,14 @@
                                         <col width='20%'/>
                                         <col width='20%'/>
                                     </colgroup>
-                                    <tr style="line-height: 1;">
+                                    <!--<tr style="line-height: 1;">
                                         <th colspan='4' class="invline_column"
                                             style="text-align:center;border-top:1pt dashed black;border-bottom:0pt;">
                                             <span class="label_column">الوصف</span>
                                             <br/>
                                             <span class="label_column">Description</span>
                                         </th>
-                                    </tr>
+                                    </tr>-->
                                     <tr style="line-height: 1;">
                                         <th class="invline_column">
                                             <span class="label_column arabic_label">السعر ﺷﺎﻣﻞ ﺿﺮﻳﺒﺔ اﻟﻘﻴﻤﺔ
