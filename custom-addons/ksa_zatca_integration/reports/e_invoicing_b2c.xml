@@ -173,7 +173,7 @@
                                             <span class="label_column arabic_label">تاريخ إصدار الفاتورة</span>
                                         </td>
                                     </tr>
-                                    <tr>
+                                   <!-- <tr>
                                         <td>
                                             <span class="label_column">
                                                 <b>Tax Currency</b>
@@ -185,7 +185,7 @@
                                         <td>
                                             <span class="label_column arabic_label">العملة الضريبية</span>
                                         </td>
-                                    </tr>
+                                    </tr>-->
                                     <t t-if="doc.reversed_entry_id or doc.debit_origin_id">
                                         <tr>
                                             <td>
@@ -204,7 +204,7 @@
                                             </td>
                                         </tr>
                                     </t>
-                                    <tr>
+                                    <!--<tr>
                                         <td>
                                             <span class="label_column">
                                                 <b>Supply Date</b>
@@ -218,7 +218,7 @@
                                         <td>
                                             <span class="label_column arabic_label">ﺗﺎرﻳﺦ اﻟﺘﻮرﻳﺪ</span>
                                         </td>
-                                    </tr>
+                                    </tr>-->
                                     <!--                            Company/Seller details -->
                                     <tr>
                                         <td>
@@ -280,7 +280,7 @@
                                             <span class="label_column arabic_label">العنوان</span>
                                         </td>
                                     </tr>
-                                    <!--                            Customer/Buyer details -->
+                                    <!--                            Customer/Buyer details
                                     <tr t-if="conf_partner['name']['value']">
                                         <td>
                                             <span class="label_column">
@@ -295,7 +295,7 @@
                                         <td>
                                             <span class="label_column arabic_label">اسم العميل</span>
                                         </td>
-                                    </tr>
+                                    </tr>-->
                                     <tr t-if="doc.partner_id.buyer_identification">
                                         <td>
                                             <span class="label_column">
@@ -352,7 +352,7 @@
                                     </tr>
                                     <tr style="line-height: 1;">
                                         <th class="invline_column">
-                                            <span class="label_column arabic_label">إﺟﻤﺎﻟﻲ اﻟﻤﺒﻠﻎ ﺷﺎﻣﻞ ﺿﺮﻳﺒﺔ اﻟﻘﻴﻤﺔ
+                                            <span class="label_column arabic_label">السعر ﺷﺎﻣﻞ ﺿﺮﻳﺒﺔ اﻟﻘﻴﻤﺔ
                                                 اﻟﻤﻀﺎﻓﺔ
                                             </span>
                                             <br/>
