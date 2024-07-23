@@ -30,42 +30,5 @@ class ProductTemplate(models.Model):
 
     @api.model
     def search_product_by_barcode(self, barcode):
-        # Search for the `product.multi.uom.price` record with the given barcode
-        uom_price_records = self.env['product.multi.uom.price'].search([('barcode', '=', barcode)])
-        if uom_price_records:
-            # Return the product.template linked to the found `product.multi.uom.price` records
-            return uom_price_records.mapped('product_id.product_tmpl_id')
-        return self.env['product.template']
-
-class SaleOrderLine(models.Model):
-    _inherit = 'sale.order.line'
-
-    @api.model
-    def _search_product_by_barcode(self, barcode):
-        # Search for the `product.multi.uom.price` record with the given barcode
-        uom_price_records = self.env['product.multi.uom.price'].search([('barcode', '=', barcode)])
-        if uom_price_records:
-            # Return the product.product linked to the found `product.multi.uom.price` records
-            return uom_price_records.mapped('product_variant_id')
-        return self.env['product.product']
-
-    @api.onchange('product_id')
-    def _onchange_product_id(self):
-        # Custom logic for onchange product_id
-        if self.product_id:
-            pass
-
-    @api.onchange('barcode')
-    def _onchange_barcode(self):
-        if self.barcode:
-            products = self._search_product_by_barcode(self.barcode)
-            if products:
-                self.product_id = products[0]
-            else:
-                self.product_id = False
-                return {
-                    'warning': {
-                        'title': _("Warning"),
-                        'message': _("No product found for the given barcode."),
-                    }
-                }
+        # Search for the `product.template` record with the given multi_uom_price_barcode
+        return self.search([('multi_uom_price_barcode', 'ilike', barcode)])
