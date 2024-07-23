@@ -358,11 +358,11 @@
                                             <br/>
                                             <span class="label_column">Total Inclusive of VAT</span>
                                         </th>
-                                        <th class="invline_column">
+                                      <!--  <th class="invline_column">
                                             <span class="label_column arabic_label">خصومات</span>
                                             <br/>
                                             <span class="label_column">Discount</span>
-                                        </th>
+                                        </th>-->
                                         <th class="invline_column">
                                             <span class="label_column arabic_label">السعر</span>
                                             <br/>
@@ -391,10 +391,10 @@
                                                 <span t-esc="doc.get_ksa_12(line.zatca_id)"
                                                       t-options='{"widget": "monetary", "display_currency": doc.currency_id}'/>
                                             </td>
-                                            <td class="invline_data">
+                                           <!-- <td class="invline_data">
                                                 <span t-esc="doc.get_bt_136(line.zatca_id)"
                                                       t-options='{"widget": "monetary", "display_currency": doc.currency_id}'/>
-                                            </td>
+                                            </td>-->
                                             <td class="invline_data">
                                                 <span t-esc="doc.get_bt_146(line.zatca_id)"
                                                       t-options='{"widget": "monetary", "display_currency": doc.currency_id}'/>
