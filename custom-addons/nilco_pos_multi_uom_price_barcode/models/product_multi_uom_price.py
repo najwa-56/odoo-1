@@ -14,21 +14,16 @@ class ProductTemplate(models.Model):
 
     multi_uom_price_barcode = fields.Char(
         string='Barcode',
-        compute='_compute_multi_uom_price_barcode',
+        compute='search_product_by_barcode',
         store=True
     )
 
-    @api.depends('multi_uom_price_id')
-    def _compute_multi_uom_price_barcode(self):
-        for record in self:
-            if record.multi_uom_price_id:
-                # If you want to concatenate all barcodes into one string
-                barcodes = record.multi_uom_price_id.mapped('barcode')
-                record.multi_uom_price_barcode = ', '.join(filter(None, barcodes))
-            else:
-                record.multi_uom_price_barcode = ''
-
     @api.model
     def search_product_by_barcode(self, barcode):
-        # Search for the `product.template` record with the given multi_uom_price_barcode
-        return self.search([('multi_uom_price_barcode', 'ilike', barcode)])
+        # Search for the `product.multi.uom.price` record with the given barcode
+        uom_price_records = self.env['product.multi.uom.price'].search([('barcode', '=', barcode)])
+        if uom_price_records:
+            # Return the product.template linked to the found `product.multi.uom.price` records
+            return uom_price_records.mapped('product_id.product_tmpl_id')
+        return self.env['product.template']
+
