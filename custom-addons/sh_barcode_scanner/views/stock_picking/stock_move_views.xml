@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="sh_inventory_barcode_scanner_stock_move_kanban" model="ir.ui.view">
+        <field name="name">sh.inventory.barcode.scanner.stock.move.kanban.inherit</field>
+        <field name="model">stock.move</field>
+        <field name="inherit_id" ref="stock.view_move_kandan" />
+        <field name="arch" type="xml">
+            <xpath expr="//kanban//field[@name='product_id']" position="after">
+                <field name="sequence" />
+            </xpath>
+            <xpath expr="//kanban" position="attributes">
+                <attribute name="default_order">sequence</attribute>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- Stock Move Wizard Form -->
+    <record id="sh_inventory_barcode_scanner_stock_move_operations" model="ir.ui.view">
+        <field name="name">sh.inventory.barcode.scanner.stock.move.operations.inherit</field>
+        <field name="model">stock.move</field>
+        <field name="inherit_id" ref="stock.view_stock_move_operations" />
+        <field name="arch" type="xml">
+            <field name="product_id" position="after">
+                <field name="_barcode_scanned" />
+            </field>
+        </field>
+    </record>
+
+</odoo>
+
+
+   

@@ -1,0 +1,2 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+sh_barcode_scanner.access_sh_barcode_scanner_search_document,access_sh_barcode_scanner_search_document,sh_barcode_scanner.model_sh_barcode_scanner_search_document,base.group_user,1,1,1,1

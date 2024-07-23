@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+
+    <!-- Inventory adjustment barcode controller List view -->
+    <t t-name="sh_barcode_scanner.InventoryAdjustmentListView" t-inherit="web.ListView" t-inherit-mode="primary">
+        <xpath expr="//t[@t-component='props.Renderer']" position="before">
+            <div class="row" style="align-items: center; padding: 10px 16px;" t-ref="shInventoryAdjustmentBarcodeScannerContainer">
+                <div class="col-md-4" t-if="sh_barcode_scanner_user_has_stock_multi_locations">
+                    <div class="form-group mb-0">
+                        <select t-on-change.stop="_onChangeStockLocation" class="form-select">
+                            <t t-foreach="sh_barcode_scanner_stock_locations" t-as="dic_location" t-key="dic_location.id">
+                                <option t-att-value="dic_location.id" t-att-selected="dic_location.id === selectedStockLocationId and 'selected' or None">
+                                    <span t-esc="dic_location.display_name" />
+                                </option>
+                            </t>
+                        </select>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <input type="text" t-on-change="_onChangeStockBarcodeScannerInput" autofocus="autofocus" class="form-control" placeholder="barcode" />
+                </div>
+                <div class="col-md-4 gap-1" t-if="sh_barcode_scanner_user_is_stock_manager" style="display: flex; justify-content: flex-start; align-items: center;">
+                    <div class="form-check w-auto">
+                        <input name="scan_negative_stock"
+                            type="checkbox"
+                            class="form-check-input"
+                            t-on-change.stop="_onChangeScanNegativeStock"
+                            t-att-checked="sh_scan_negative_stock"
+                            />
+                            <label for="scan_negative_stock" class="form-check-label"> Negative Counted Quantity?</label>
+                        </div>
+                        <button
+                            class="btn btn-primary"
+                            t-on-click.stop.prevent="_onClickBarcodeScannerStockQuantApply">
+                            <i class="fa fa-fw o_button_icon fa-save"></i>
+                            <span>Apply</span>
+                        </button>
+                </div>
+                <audio id="sh_barcode_scanner_error_sound" src="/sh_barcode_scanner/static/src/sounds/error.wav"></audio>
+                <div class="js_cls_alert_msg col-12"></div>
+            </div>
+        </xpath>
+    </t>
+
+    <!-- Auto close dialog -->
+    <t t-name="sh_barcode_scanner.InventoryAdjustmentAutoCloseDialog">
+        <Dialog size="'md'" title="props.title">
+            <p t-out="props.body" class="text-prewrap"/>
+            <t t-set-slot="footer">
+              <button class="btn" t-att-class="props.confirmClass" t-on-click="_confirm" t-esc="props.confirmLabel"/>
+            </t>
+          </Dialog>
+    </t>
+
+</templates>

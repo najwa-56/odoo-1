@@ -1,0 +1,70 @@
+/* ---- Barcode scanner  ---- */
+
+.o_data_row.text-primary {
+
+    font-weight: bold;
+
+}
+
+.o_mail_systray_dropdown_items .form-group .form-control {
+    border: 1px solid #ced4da;
+}
+
+.o_mail_systray_dropdown_items .form-group .form-control:focus {
+    box-shadow: none;
+    border: 1px solid #ced4da;
+    box-shadow: 0 0 .5px .5px#ced4da;
+}
+
+.o_mail_systray_dropdown_items .head {
+    background: #7c7bad;
+    color: #fff;
+}
+
+.o_mail_systray_dropdown_items .input {
+    margin-right: 16px;
+    margin-left: 16px;
+    padding-right: 0;
+    padding-left: 0;
+    align-items: center;
+}
+
+.o_mail_systray_dropdown_items .input .col-3,
+.o_mail_systray_dropdown_items .input .col-9 {
+    padding-right: 0;
+    padding-left: 0;
+}
+
+/* Inventory adjustment */
+.js_cls_sh_barcode_scanner_scanning_wrapper {
+    align-items: center;
+    padding: 18px 0px;
+    margin-left: 0;
+    margin-right: 0;
+}
+
+.js_cls_sh_barcode_scanner_location_select:focus,
+.js_cls_sh_barcode_scanner_stock_quant_tree_input_barcode:focus {
+    border: 1px solid #ced4da;
+}
+
+.js_cls_sh_barcode_scanner_scanning_wrapper .col-md-4,
+.js_cls_sh_barcode_scanner_scanning_wrapper .col-md-3,
+.js_cls_sh_barcode_scanner_scanning_wrapper .col-md-2 {
+    padding-right: 0;
+    padding-left: 0;
+    margin-right: 16px;
+}
+
+.js_cls_sh_barcode_scanner_scanning_wrapper .o_button_icon {
+    margin-right: 4px;
+}
+
+
+
+.js_cls_document_search_dropdown {
+    overflow: inherit;
+    width: 370px;
+    padding: 0 0px 18px 0px;
+
+}

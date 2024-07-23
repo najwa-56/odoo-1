@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="sh_product_qrcode_generator_label_layout_form" model="ir.ui.view">
+        <field name="name">sh.product.qrcode.generator.label.layout.form</field>
+        <field name="model">sh.product.qrcode.generator.label.layout</field>
+        <field name="mode">primary</field>
+        <field name="arch" type="xml">
+            <form>
+                <group>
+                    <group>
+                        <field name="product_ids" invisible="1"/>
+                        <field name="product_tmpl_ids" invisible="1"/>
+                        <field name="custom_quantity"/>
+                        <field name="print_format" widget="radio"/>
+                    </group>
+                    <group>
+                        <field name="extra_html" widget="html" invisible="print_format not in ['dymo', '2x7xprice']"/>
+                    </group>
+                </group>
+                <footer>
+                    <button name="process_with_qr_code" string="Confirm" type="object" class="btn-primary"/>
+                    <button string="Discard" class="btn-secondary" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <record id="sh_action_open_label_layout_with_qr" model="ir.actions.act_window">
+        <field name="name">Choose Labels Layout</field>
+        <field name="res_model">sh.product.qrcode.generator.label.layout</field>
+        <field name="view_ids"
+                eval="[(5, 0, 0),
+                (0, 0, {'view_mode': 'form', 'view_id': ref('sh_product_qrcode_generator_label_layout_form')})]" />
+        <field name="target">new</field>
+    </record>
+</odoo>

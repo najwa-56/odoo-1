@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Global doc search -->
+    <record id="sh_global_doc_search_res_config_settings_form" model="ir.ui.view">
+        <field name="name">sh.global.doc.search.res.config.settings.form</field>
+        <field name="model">res.config.settings</field>
+        <field name="inherit_id" ref="base_setup.res_config_settings_view_form" />
+        <field name="arch" type="xml">
+
+            <div id="contacts_settings" position="after">
+                <block title="Global Document Search" name="sh_global_doc_search_settings">
+                    <setting id="sh_global_document_search_is_enable_setting">
+                        <field name="sh_global_document_search_is_enable" />
+                        <div class="content-group"
+                            invisible="not sh_global_document_search_is_enable">
+
+                            <div>
+                                <field name="sh_global_document_search_is_sale" />
+                                <label for="sh_global_document_search_is_sale" />
+                            </div>
+
+                            <div>
+                                <field name="sh_global_document_search_is_purchase" />
+                                <label for="sh_global_document_search_is_purchase" />
+                            </div>
+
+                            <div>
+                                <field name="sh_global_document_search_is_picking" />
+                                <label for="sh_global_document_search_is_picking" />
+                            </div>
+
+                            <div>
+                                <field name="sh_global_document_search_is_invoice" />
+                                <label for="sh_global_document_search_is_invoice" />
+                            </div>
+
+                            <div>
+                                <field name="sh_global_document_search_is_product" />
+                                <label for="sh_global_document_search_is_product" />
+                            </div>
+
+                            <div>
+                                <field name="sh_global_document_search_is_lot" />
+                                <label for="sh_global_document_search_is_lot" />
+                            </div>
+
+                            <div>
+                                <field name="sh_global_document_search_is_location" />
+                                <label for="sh_global_document_search_is_location" />
+                            </div>
+                        </div>
+                    </setting>
+                    <setting id="sh_global_document_search_action_target_type_setting"
+                        invisible="not sh_global_document_search_is_enable">
+                        <field name="sh_global_document_search_action_target_type" widget="radio" />
+                    </setting>
+                </block>
+            </div>
+
+        </field>
+    </record>
+</odoo>

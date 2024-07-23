@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <data>
+        <record id="sh_report_product_template_label_with_qr" model="ir.actions.report">
+            <field name="name">Product Label with QR Code (PDF)</field>
+            <field name="model">product.template</field>
+            <field name="report_type">qweb-pdf</field>
+            <field name="report_name">sh_product_qrcode_generator.sh_report_product</field>
+            <field name="report_file">sh_product_qrcode_generator.sh_report_product</field>
+            <field name="paperformat_id" ref="product.paperformat_label_sheet"/>
+            <field name="print_report_name">'Products Labels with QR Code - %s' % (object.name)</field>
+            <field name="binding_model_id" eval="False"/>
+            <field name="binding_type">report</field>
+        </record>
+
+        <record id="sh_report_product_template_label_dymo_with_qr" model="ir.actions.report">
+            <field name="name">Product Label with QR Code (PDF)</field>
+            <field name="model">product.template</field>
+            <field name="report_type">qweb-pdf</field>
+            <field name="report_name">sh_product_qrcode_generator.sh_report_product_dymo</field>
+            <field name="report_file">sh_product_qrcode_generator.sh_report_product_dymo</field>
+            <field name="paperformat_id" ref="product.paperformat_label_sheet_dymo"/>
+            <field name="print_report_name">'Products Labels with QR Code - %s' % (object.name)</field>
+            <field name="binding_type">report</field>
+        </record>
+    </data>
+
+</odoo>

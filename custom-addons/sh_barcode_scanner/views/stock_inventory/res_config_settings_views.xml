@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="sh_inven_adjt_barcode_scanner_res_config_settings_form" model="ir.ui.view">
+        <field name="name">sh.inven.adjt.barcode.scanner.res.config.settings.form</field>
+        <field name="model">res.config.settings</field>
+        <field name="inherit_id" ref="stock.res_config_settings_view_form" />
+        <field name="arch" type="xml">
+            <block name="warehouse_setting_container" position="after">
+                <!-- inventory adjustment -->
+                <block title="Stock Adjustment Barcode Scanner" name="sh_inventory_adjustment_barcode_scanner_setting_container">
+                    <setting id="sh_inven_adjt_barcode_scanner_type_setting"
+                    string="Product Scan Options">
+                        <field name="sh_inven_adjt_barcode_scanner_type" widget="radio" />
+                    </setting>
+
+                    <setting id="sh_inven_adjt_barcode_scanner_warn_sound_setting" 
+                    string="Warning Sound?" help="Play sound with warning message" title="Play sound with warning message">
+                        <field name="sh_inven_adjt_barcode_scanner_warn_sound" />
+                    </setting>
+
+                    <setting id="sh_inven_adjt_barcode_scanner_auto_close_popup_setting" string="Auto close alert/error message after" help="Auto close alert/error message after millisecond" title="Auto close alert/error message after millisecond">
+                        <field name="sh_inven_adjt_barcode_scanner_auto_close_popup" />
+                    </setting>
+                </block>
+            </block>
+        </field>
+    </record>
+    
+</odoo>
