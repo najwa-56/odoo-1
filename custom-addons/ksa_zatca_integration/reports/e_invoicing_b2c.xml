@@ -89,10 +89,10 @@
 
                             }
                             .invline_column{
-                            border-bottom:2pt dashed black;
+                            border-bottom:1pt dashed black;
                             vertical-align:bottom;
-                            margin-bottom:6pt;
-                            padding-bottom:4pt;
+                            margin-bottom:5pt;
+                            padding-bottom:3pt;
                             }
                             .invline_data{
                             text-align:left;
