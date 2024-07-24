@@ -11,6 +11,14 @@ class Inheritmulti_uom(models.Model):
 
     product_product_id = fields.Many2one('product.product')
     product_id = fields.Many2one('product.template', string='Product')  # Ensure this field is defined
+    company_id = fields.Many2one('res.company', 'Company', default=lambda self: self.env.user.company_id)
+    multi_barcode_for_product = fields.Boolean(related='company_id.multi_barcode_for_product',
+                                               string="Multi Barcode For Product")
+    model_ids = fields.Many2one('ir.model', string='Used For')
+
+    _sql_constraints = [
+        ('uniq_barcode', 'unique(barcode)', "A barcode can only be assigned to one product !"),
+    ]
     barcode = fields.Char('Barcode')
     product_variant_id =fields.Many2one('product.product',related="product_id.product_variant_id",store=True)
     product_variant_count = fields.Integer('Product Variant Count')
