@@ -134,7 +134,6 @@ class ProductInherit(models.Model):
                 product_barcode_ids = self.env['product.multi.uom.price']._search([('barcode', operator, name)])
                 if product_barcode_ids:
                     product_ids = list(self._search([
-                        '|',
                         ('product_tmpl_id.product_barcode', 'in', product_barcode_ids)
                     ], limit=limit, order=order))
 
