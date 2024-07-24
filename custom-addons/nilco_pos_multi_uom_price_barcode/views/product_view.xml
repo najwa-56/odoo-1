@@ -23,16 +23,17 @@
             </field>
         </record>
 
-    <record id="purchase_order_search_view" model="ir.ui.view">
-    <field name="name">purchase.order.search</field>
-    <field name="model">purchase.order</field>
-    <field name="inherit_id" ref="purchase.purchase_order_view_search"/>
-    <field name="arch" type="xml">
-        <xpath expr="//field[@name='order_date']" position="after">
-            <field name="product_barcode" string="Barcode"/>
-        </xpath>
-    </field>
-</record>
+   <record id="purchase_order_search_view_inherit" model="ir.ui.view">
+        <field name="name">purchase.order.search.inherit</field>
+        <field name="model">purchase.order</field>
+        <field name="inherit_id" ref="your_module.purchase_order_view_search"/> <!-- Use the actual XML ID of the view to inherit -->
+        <field name="arch" type="xml">
+            <!-- Add a barcode search field before or after a known field -->
+            <xpath expr="//filter[@name='order_date']" position="after">
+                <filter name="barcode" string="Barcode" domain="[('product_id.product_tmpl_id.multi_uom_price_barcode', 'ilike', self)]"/>
+            </xpath>
+        </field>
+    </record>
 
 
     <!-- New Tree View for product.multi.uom.price -->
