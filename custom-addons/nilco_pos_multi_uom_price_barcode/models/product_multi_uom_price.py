@@ -29,3 +29,17 @@ class ProductTemplate(models.Model):
             else:
                 record.multi_uom_price_barcode = ''
 
+class PurchaseOrder(models.Model):
+    _inherit = 'purchase.order'
+
+    def _filter_by_barcode(self, barcode):
+        return self.env['product.template'].search([('multi_uom_price_barcode', 'ilike', barcode)])
+
+    @api.model
+    def search(self, args, offset=0, limit=None, order=None, count=False):
+        barcode = self._context.get('barcode')
+        if barcode:
+            product_templates = self._filter_by_barcode(barcode)
+            product_ids = product_templates.mapped('product_variant_ids').ids
+            args.append(('product_id', 'in', product_ids))
+        return super(PurchaseOrder, self).search(args, offset, limit, order, count)
