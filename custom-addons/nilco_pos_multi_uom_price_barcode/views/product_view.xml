@@ -12,13 +12,24 @@
         </field>
     </record>
 
-     <record id="product_template_search_view_inherit" model="ir.ui.view">
-        <field name="name">product.template.search.inherit</field>
-        <field name="model">product.template</field>
-        <field name="inherit_id" ref="product.product_template_search_view"/>
+     <record id="product_template_search_view_purchase1" model="ir.ui.view">
+            <field name="name">product.template.search.purchase</field>
+            <field name="model">product.template</field>
+            <field name="inherit_id" ref="product.product_template_search_view"/>
+            <field name="arch" type="xml">
+                <xpath expr="//field[@name='categ_id']" position="after">
+                    <field string="barcodes" name="multi_uom_price_barcode"/>
+                </xpath>
+            </field>
+        </record>
+
+    <record id="purchase_order_line_search_view_inherit" model="ir.ui.view">
+        <field name="name">purchase.order.line.search.inherit</field>
+        <field name="model">purchase.order.line</field>
+        <field name="inherit_id" ref="purchase.purchase_order_view_search"/>
         <field name="arch" type="xml">
-            <xpath expr="//search" position="inside">
-                <field name="multi_uom_price_barcode" string="Barcode" filter_domain="[('multi_uom_price_barcode', 'ilike', self)]"/>
+            <xpath expr="//field[@name='product_id']" position="after">
+                <field string="Barcode" name="multi_uom_price_barcode"/>
             </xpath>
         </field>
     </record>
