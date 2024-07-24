@@ -11,10 +11,10 @@
     'author': "Nilco Technology",
     'website': "nilcotechnology@gmail.com",
   
-    'depends': ['point_of_sale','stock','uom','nilco_pos_multi_uom_price'],
+    'depends': ['point_of_sale','stock','uom','nilco_pos_multi_uom_price','base','sale_management','purchase','account'],
     'data': [
         'views/product_view.xml',
-         #'views/res_config_inherit2.xml',
+        'views/res_config_inherit2.xml',
     ],
     'currency': 'USD',
     'price': 29,
