@@ -10,6 +10,7 @@ class Inheritmulti_uom(models.Model):
 
 
     product_product_id = fields.Many2one('product.product')
+    product_id = fields.Many2one('product.template', string='Product')  # Ensure this field is defined
     barcode = fields.Char('Barcode')
     product_variant_id =fields.Many2one('product.product',related="product_id.product_variant_id",store=True)
     product_variant_count = fields.Integer('Product Variant Count')
@@ -89,7 +90,7 @@ class ProductInherit(models.Model):
 
                         if product_barcode_ids:
                             product_ids = list(self._search(
-                                ['|', ('barcode', '=', name), ('product_barcode.barcode', '=', name)] + domain,
+                                ['|', ('barcode', '=', name), ('multi_uom_price_id.barcode', '=', name)] + domain,
                                 limit=limit, order=order))
                             if product_ids:
                                 return product_ids
@@ -137,7 +138,7 @@ class ProductInherit(models.Model):
                     product_ids = list(self._search([
                         '|',
                         ('product_barcode', 'in', product_barcode_ids),
-                        ('product_id.product_barcode', 'in', product_barcode_ids)],
+                        ('product_id.multi_uom_price_id', 'in', product_barcode_ids)],
                         limit=limit, order=order))
             else:
                 product_ids = self._search(domain, limit=limit, order=order)
@@ -155,7 +156,7 @@ class ProductInherit(models.Model):
                     product_ids = list(self._search([('default_code', '=', name)] + domain, limit=limit, order=order))
                     if not product_ids:
                         product_ids = list(
-                            self._search(['|', ('barcode', '=', name), ('product_barcode.barcode', '=', name)] + domain,
+                            self._search(['|', ('barcode', '=', name), ('multi_uom_price_id.barcode', '=', name)] + domain,
                                          limit=limit, order=order))
                         if product_ids:
                             return product_ids
@@ -204,7 +205,7 @@ class ProductInherit(models.Model):
                     ('barcode', operator, name)])
                 if product_barcode_ids:
                     product_ids = list(self._search([
-                        ('product_id.product_barcode', 'in', product_barcode_ids)],
+                        ('product_id.multi_uom_price_id', 'in', product_barcode_ids)],
                         limit=limit, order=order))
 
             else:
