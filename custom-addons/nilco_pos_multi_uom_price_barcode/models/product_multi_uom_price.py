@@ -1,7 +1,5 @@
 from odoo import models, fields, api, _
-from odoo.exceptions import UserError
-from odoo.osv import expression
-import re
+
 
 class Inheritmulti_uom(models.Model):
     _inherit = 'product.multi.uom.price'
@@ -31,3 +29,19 @@ class ProductTemplate(models.Model):
             else:
                 record.multi_uom_price_barcode = ''
 
+class SaleOrderLine(models.Model):
+    _inherit = 'sale.order.line'
+
+    @api.model
+    def _search_by_barcode(self, barcode, domain=None, operator='ilike'):
+        if not domain:
+            domain = []
+        if barcode:
+            product_ids = self.env['product.product'].search([
+                '|',
+                ('default_code', operator, barcode),
+                ('multi_uom_price_barcode', operator, barcode)
+            ])
+            if product_ids:
+                return self.search([('product_id', 'in', product_ids.ids)] + domain)
+        return super(SaleOrderLine, self)._search_by_barcode(barcode, domain, operator)
