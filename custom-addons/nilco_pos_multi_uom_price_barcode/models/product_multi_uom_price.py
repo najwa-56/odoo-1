@@ -1,6 +1,4 @@
-from odoo import models, fields, api,_
-from odoo import http
-
+from odoo import models, fields, api, _
 
 
 class Inheritmulti_uom(models.Model):
@@ -31,37 +29,12 @@ class ProductTemplate(models.Model):
                 record.multi_uom_price_barcode = ''
 
 
-  #  @api.model
-   # def search_product_by_barcode(self, barcode):
+   # @api.model
+  #  def search_product_by_barcode(self, barcode):
         # Search for the `product.multi.uom.price` record with the given barcode
-      #  uom_price_records = self.env['product.multi.uom.price'].search([('barcode', '=', barcode)])
-       # if uom_price_records:
+    #    uom_price_records = self.env['product.multi.uom.price'].search([('barcode', '=', barcode)])
+      #  if uom_price_records:
             # Return the product.template linked to the found `product.multi.uom.price` records
-       #     return uom_price_records.mapped('product_id.product_tmpl_id')
-       # return self.env['product.template']
+       #    return uom_price_records.mapped('product_id.product_tmpl_id')
+      #  return self.env['product.template']
 
-    @api.model
-    def search_by_barcodes(self, barcode_string):
-        # Split the input string into individual barcodes
-        barcodes = [barcode.strip() for barcode in barcode_string.split(',') if barcode.strip()]
-
-        # Build the domain filter
-        domain = []
-        if barcodes:
-            domain = ['|'] * (len(barcodes) - 1)  # Create OR conditions
-            for barcode in barcodes:
-                domain += [('multi_uom_price_id.barcode', 'ilike', barcode)]
-
-        # Perform the search using the domain filter
-        return self.search(domain)
-
-    @api.model
-    def search_by_barcode(self, barcode):
-        return self.search([('multi_uom_price_id.barcode', 'ilike', barcode)])
-
-class ProductSearchController(http.Controller):
-
-    @http.route('/product/search', type='json', auth='public', methods=['POST'])
-    def search_products(self, barcode_string):
-        products = http.request.env['product.template'].search_by_barcodes(barcode_string)
-        return products.read(['name', 'barcode'])
