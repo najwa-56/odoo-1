@@ -10,12 +10,7 @@ class PurchaseOrderLine(models.Model):
     purchase_multi_uom_id = fields.Many2one("product.multi.uom.price", string="Custom UOM",
                                             domain="[('id', 'in', selected_uom_ids)]")
     purchase_multi_uom_cost = fields.Float(string="UOM Cost", related='purchase_multi_uom_id.cost')
-    multi_uom_price_barcode = fields.Char(
-        string='Barcode',
-        related='product_id.multi_uom_price_id.barcode',
-        store=True,
-        readonly=True
-    )
+
     price_unit = fields.Float(string='Unit Price', compute='_compute_price_unit_and_date_planned_and_name', store=True)
 
     @api.depends('product_qty', 'product_uom', 'company_id', 'purchase_multi_uom_cost')
