@@ -14,3 +14,20 @@ class Inheritmulti_uom(models.Model):
 class ProductTemplate(models.Model):
     _inherit = 'product.template'
 
+
+    multi_uom_price_barcode = fields.Char(
+        string='Barcode',
+        compute='_compute_multi_uom_price_barcode',
+        store=True
+    )
+
+    @api.depends('multi_uom_price_id')
+    def _compute_multi_uom_price_barcode(self):
+        for record in self:
+            if record.multi_uom_price_id:
+                # If you want to concatenate all barcodes into one string
+                barcodes = record.multi_uom_price_id.mapped('barcode')
+                record.multi_uom_price_barcode = ', '.join(filter(None, barcodes))
+            else:
+                record.multi_uom_price_barcode = ''
+
