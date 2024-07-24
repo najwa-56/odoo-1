@@ -10,7 +10,7 @@ class Inheritmulti_uom(models.Model):
 
 
 class ProductTemplate(models.Model):
-    _inherit = ["barcodes.barcode_events_mixin", "product.template"]
+    _inherit = 'product.template'
 
     multi_uom_price_barcode = fields.Char(
         string='Barcode',
