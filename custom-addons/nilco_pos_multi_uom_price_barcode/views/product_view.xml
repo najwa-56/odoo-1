@@ -4,10 +4,10 @@
         <field name="model">product.template</field>
         <field name="inherit_id" ref="product.product_template_form_view"/>
         <field name="arch" type="xml">
-            <xpath expr="//field[@name='default_code']" position="after">
+           <!-- <xpath expr="//field[@name='default_code']" position="after">
 					<field name="company_barcode_id" invisible="1"/>
 					<field name="multi_barcode_for_product" invisible="1"/>
-				</xpath>
+				</xpath>-->
              <xpath expr="//field[@name='multi_uom_price_id']/tree" position="inside">
                  <field name="barcode"/>
                   <field name="product_variant_id" column_invisible="1"/>
