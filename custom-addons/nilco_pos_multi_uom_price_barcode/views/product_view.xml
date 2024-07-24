@@ -18,7 +18,7 @@
         <field name="inherit_id" ref="product.product_template_search_view"/>
         <field name="arch" type="xml">
             <xpath expr="//search" position="inside">
-                <field name="multi_uom_price_id.barcode" string="Barcode" filter_domain="[('multi_uom_price_id.barcode', 'ilike', self)]"/>
+                <field name="multi_uom_price_barcode" string="Barcode" filter_domain="[('multi_uom_price_barcode', 'ilike', self)]"/>
             </xpath>
         </field>
     </record>
