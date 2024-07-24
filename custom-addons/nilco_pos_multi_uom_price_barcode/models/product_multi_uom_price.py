@@ -38,7 +38,7 @@ class ProductTemplate(models.Model):
 class ProductInherit(models.Model):
     _inherit = 'product.product'
 
-    product_barcode = fields.One2many('product.barcode', 'product_id', string='Product Multi Barcodes')
+    product_barcode = fields.One2many('product.barcode', 'product_product_id', string='Product Multi Barcodes')
 
     @api.model
     def _name_search(self, name, domain=None, operator='ilike', limit=None, order=None):
