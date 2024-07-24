@@ -1,4 +1,6 @@
-from odoo import models, fields, api, _
+from odoo import models, fields, api,_
+from odoo import http
+
 
 
 class Inheritmulti_uom(models.Model):
@@ -43,7 +45,7 @@ class ProductTemplate(models.Model):
         # Split the input string into individual barcodes
         barcodes = [barcode.strip() for barcode in barcode_string.split(',') if barcode.strip()]
 
-        # Build a domain filter
+        # Build the domain filter
         domain = []
         if barcodes:
             domain = ['|'] * (len(barcodes) - 1)  # Create OR conditions
@@ -53,3 +55,13 @@ class ProductTemplate(models.Model):
         # Perform the search using the domain filter
         return self.search(domain)
 
+    @api.model
+    def search_by_barcode(self, barcode):
+        return self.search([('multi_uom_price_id.barcode', 'ilike', barcode)])
+
+class ProductSearchController(http.Controller):
+
+    @http.route('/product/search', type='json', auth='public', methods=['POST'])
+    def search_products(self, barcode_string):
+        products = http.request.env['product.template'].search_by_barcodes(barcode_string)
+        return products.read(['name', 'barcode'])
