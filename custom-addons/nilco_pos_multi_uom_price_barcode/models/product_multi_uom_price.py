@@ -29,11 +29,10 @@ class ProductTemplate(models.Model):
                 record.multi_uom_price_barcode = ''
 
     def on_barcode_scanned(self, barcode):
-        super(ProductTemplate, self).on_barcode_scanned(barcode)
-        # Search for a product.multi.uom.price record with the scanned barcode
+        # Search for the product.multi.uom.price record with the scanned barcode
         uom_price_record = self.env['product.multi.uom.price'].search([('barcode', '=', barcode)], limit=1)
         if uom_price_record:
-            # Perform any desired action here, e.g., updating a field or logging a message
+            # Optionally, do something with the found record, like posting a message
             self.message_post(body=_("Barcode %s scanned and linked to product %s.") % (
             barcode, uom_price_record.product_id.display_name))
         else:
