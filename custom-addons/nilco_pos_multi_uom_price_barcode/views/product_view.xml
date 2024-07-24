@@ -12,17 +12,27 @@
         </field>
     </record>
 
-     <record id="product_template_search_view_purchase1" model="ir.ui.view">
+    <!-- <record id="product_template_search_view_purchase1" model="ir.ui.view">
             <field name="name">product.template.search.purchase</field>
             <field name="model">product.template</field>
             <field name="inherit_id" ref="product.product_template_search_view"/>
             <field name="arch" type="xml">
-                <xpath expr="//field[@name='barcode']" position="after">
+                <xpath expr="//field[@name='categ_id']" position="after">
                     <field string="barcodes" name="multi_uom_price_barcode"/>
                 </xpath>
             </field>
+        </record>-->
+    <record id="product_product_tree_view_inherit2" model="ir.ui.view">
+            <field name="name">product.product.tree.inherit.multi.uom</field>
+            <field name="model">product.product</field>
+            <field name="inherit_id" ref="product.product_product_tree_view"/>
+            <field name="arch" type="xml">
+                <!-- Use xpath to locate the position after the 'name' field -->
+                <xpath expr="//field[@name='name']" position="after">
+                    <field name='multi_uom_price_barcode' widget="many2many_tags" />
+                </xpath>
+            </field>
         </record>
-
 
 
 
