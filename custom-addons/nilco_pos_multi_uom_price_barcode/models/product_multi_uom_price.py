@@ -148,7 +148,7 @@ class ProductInherit(models.Model):
                 if product_barcode_ids:
                     product_ids = list(self._search([
                         '|',
-                        ('product_barcode', 'in', product_barcode_ids),
+                        ('multi_uom_price_id', 'in', product_barcode_ids),
                         ('product_id.multi_uom_price_id', 'in', product_barcode_ids)],
                         limit=limit, order=order))
             else:
