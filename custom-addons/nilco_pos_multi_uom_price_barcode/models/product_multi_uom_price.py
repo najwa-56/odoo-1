@@ -11,6 +11,7 @@ class Inheritmulti_uom(models.Model):
 
 class ProductTemplate(models.Model):
     _inherit = 'product.template'
+    _inherit = ["barcodes.barcode_events_mixin", "product.template"]
 
     multi_uom_price_barcode = fields.Char(
         string='Barcode',
@@ -32,12 +33,17 @@ class ProductTemplate(models.Model):
         # Search for the product.multi.uom.price record with the scanned barcode
         uom_price_record = self.env['product.multi.uom.price'].search([('barcode', '=', barcode)], limit=1)
         if uom_price_record:
-            # Optionally, do something with the found record, like posting a message
-            self.message_post(body=_("Barcode %s scanned and linked to product %s.") % (
-            barcode, uom_price_record.product_id.display_name))
+            # Find the product.template associated with the found product.multi.uom.price record
+            product_template = uom_price_record.product_id.product_tmpl_id
+            if product_template:
+                # Optionally, do something with the found product template, like posting a message
+                self.message_post(
+                    body=_("Barcode %s scanned and linked to product %s.") % (barcode, product_template.name))
+                # Optionally, update some field or take some action on the found product template
+                product_template.multi_uom_price_barcode = barcode
         else:
             self.message_post(body=_("Barcode %s scanned but no matching product found.") % (barcode))
-            
+
     @api.model
     def search_product_by_barcode(self, barcode):
         # Search for the `product.multi.uom.price` record with the given barcode
