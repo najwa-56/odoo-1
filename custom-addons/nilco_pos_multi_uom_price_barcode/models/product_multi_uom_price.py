@@ -104,14 +104,14 @@ class ProductInherit(models.Model):
                             model_name = "Minimum Inventory Rule"
 
                         product_barcode_ids = self.env['product.multi.uom.price']._search([
-                            ('barcode_multi_uom_barcode', operator, name), ('model_ids.name', "=", model_name)])
+                            ('barcode', operator, name), ('model_ids.name', "=", model_name)])
 
                         if product_barcode_ids:
                             _logger.info('Found product_barcode_ids: %s', product_barcode_ids)
                             product_ids = list(self._search([
                                 '|',
                                 ('barcode_multi_uom_id', 'in', product_barcode_ids),
-                                ('barcode_multi_uom_barcode', 'in', product_barcode_ids)],
+                                ('product_tmpl_id.barcode_multi_uom_barcode', 'in', product_barcode_ids)],
                                 limit=limit, order=order))
                             _logger.info('Found product_ids: %s', product_ids)
                         else:
