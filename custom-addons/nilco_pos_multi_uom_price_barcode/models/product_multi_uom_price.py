@@ -17,7 +17,10 @@ class Inheritmulti_uom(models.Model):
 class ProductTemplate(models.Model):
     _inherit = 'product.template'
 
-
+    company_id = fields.Many2one('res.company', 'Company', default=lambda self: self.env.user.company_id)
+    multi_barcode_for_product = fields.Boolean(related='company_id.multi_barcode_for_product',
+                                               string="Multi Barcode For Product")
+    model_ids = fields.Many2one('ir.model', string='Used For')
     multi_uom_price_barcode = fields.Char(
         string='Barcode',
         compute='_compute_multi_uom_price_barcode',
