@@ -50,3 +50,27 @@ class SaleOrderLine(models.Model):
                 self.name = ''
                 self.price_unit = 0.0
                 self.product_uom_qty = 0.0
+
+
+class PurchaseOrderLine(models.Model):
+    _inherit = 'purchase.order.line'
+
+    barcode = fields.Char('Barcode')
+
+    @api.onchange('barcode')
+    def _onchange_barcode(self):
+        if self.barcode:
+            # Search for the product by barcode
+            product = self.env['product.product'].search([('multi_uom_price_id.barcode', '=', self.barcode)], limit=1)
+            if product:
+                self.product_id = product
+                self.name = product.name
+                self.price_unit = product.list_price
+                # Set quantity to 1 as default
+                self.product_qty = 1
+            else:
+                # Clear product_id if barcode is not found
+                self.product_id = False
+                self.name = ''
+                self.price_unit = 0.0
+                self.product_qty = 0.0
