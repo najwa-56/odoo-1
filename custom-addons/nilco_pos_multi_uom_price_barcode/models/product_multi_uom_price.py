@@ -1,10 +1,15 @@
 from odoo import models, fields, api, _
-
+import re
+from odoo.osv import expression
 
 class Inheritmulti_uom(models.Model):
     _inherit = 'product.multi.uom.price'
 
-
+    product_product_id = fields.Many2one('product.product')
+    company_id = fields.Many2one('res.company', 'Company', default=lambda self: self.env.user.company_id)
+    multi_barcode_for_product = fields.Boolean(related='company_id.multi_barcode_for_product',
+                                               string="Multi Barcode For Product")
+    model_ids = fields.Many2one('ir.model', string='Used For')
     barcode = fields.Char('Barcode')
     product_variant_id =fields.Many2one('product.product',related="product_id.product_variant_id",store=True)
     product_variant_count = fields.Integer('Product Variant Count')
@@ -29,39 +34,8 @@ class ProductTemplate(models.Model):
             else:
                 record.multi_uom_price_barcode = ''
 
-class SaleOrderLine(models.Model):
-    _inherit = 'sale.order.line'
 
-    barcode_multi_uom_barcode = fields.Char(string="UOM barcode", related='sales_multi_uom_id.barcode')
+class ProductInherit(models.Model):
+    _inherit = 'product.product'
 
-    @api.model
-    def _search_by_barcode(self, barcode, domain=None, operator='ilike'):
-        if not domain:
-            domain = []
-
-        if barcode:
-            # Search for products based on the barcode
-            product_ids = self.env['product.product'].search([
-                '|',
-                ('default_code', operator, barcode),
-                ('barcode', operator, barcode)
-            ])
-
-            # If products are found, return their sale order lines
-            if product_ids:
-                return self.search([('product_id', 'in', product_ids.ids)] + domain)
-
-            # Also search by multi-uom price barcodes
-            product_multi_uom_ids = self.env['product.multi.uom.price'].search([
-                ('barcode', operator, barcode)
-            ])
-
-            if product_multi_uom_ids:
-                # Find product IDs linked to these multi-uom records
-                product_ids = self.env['product.product'].search([
-                    ('multi_uom_price_ids', 'in', product_multi_uom_ids.ids)
-                ])
-                if product_ids:
-                    return self.search([('product_id', 'in', product_ids.ids)] + domain)
-
-        return super(SaleOrderLine, self)._search_by_barcode(barcode, domain, operator)
+    product_barcode = fields.One2many('product.multi.uom.price', 'product_product_id',string='Product Multi Barcodes')
