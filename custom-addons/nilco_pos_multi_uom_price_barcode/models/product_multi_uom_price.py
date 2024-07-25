@@ -66,7 +66,6 @@ class PurchaseOrderLine(models.Model):
             if product:
                 self.product_id = product
                 self.name = product.name
-                self.price_unit = product.list_price
                 # Set quantity to 1 as default
                 self.product_qty = 1
 
