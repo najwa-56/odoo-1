@@ -32,7 +32,7 @@ class ProductTemplate(models.Model):
 class SaleOrderLine(models.Model):
     _inherit = 'sale.order.line'
 
-    barcode_multi_uom_barcode = fields.Float(string="UOM Cost", related='sales_multi_uom_id.barcode')
+    barcode_multi_uom_barcode = fields.Char(string="UOM barcode", related='sales_multi_uom_id.barcode')
     @api.model
     def _search_by_barcode(self, barcode, domain=None, operator='ilike'):
         if not domain:
