@@ -18,7 +18,7 @@
     <field name="model">sale.order</field>
     <field name="inherit_id" ref="sale.view_order_form"/>
     <field name="arch" type="xml">
-        <xpath expr="//field[@name='order_line']/tree" position="befor">
+        <xpath expr="//field[@name='order_line']/tree" position="before">
             <field name="barcode" placeholder="Enter barcode"/>
         </xpath>
     </field>
