@@ -18,16 +18,16 @@
         <field name="model">sale.order</field>
         <field name="inherit_id" ref="sale.view_sale_order_filter"/> <!-- Ensure this reference is correct -->
         <field name="arch" type="xml">
-            <xpath expr="//search" position="inside">
+          <xpath expr="//search" position="inside">
                 <!-- Existing filters -->
-                <field name="name" string="Order"
-                    filter_domain="['|', '|', ('name', 'ilike', self), ('client_order_ref', 'ilike', self), ('partner_id', 'child_of', self)]"/>
-                <field name="order_line" string="Product"
-                    filter_domain="['|', '|', ('order_line.product_id.name', 'ilike', self), ('order_line.product_id.default_code', 'ilike', self)]"/>
+                <filter string="Order" name="filter_order"
+                    domain="['|', '|', ('name', 'ilike', self), ('client_order_ref', 'ilike', self), ('partner_id', 'child_of', self)]"/>
 
-                <!-- Additional filters -->
+                <!-- New filters -->
+                <filter string="Product Name" name="filter_product_name"
+                    domain="[('order_line.product_id.name', 'ilike', self)]"/>
                 <filter string="Product Barcode" name="filter_product_barcode"
-                    domain="[('order_line.multi_uom_price_id.barcode', 'ilike', self)]"/>
+                    domain="[('order_line.product_id.multi_uom_price_id.barcode', 'ilike', self)]"/>
             </xpath>
         </field>
     </record>
