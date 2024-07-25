@@ -1,8 +1,6 @@
 from odoo import models, fields, api, _
 import re
 from odoo.osv import expression
-import logging
-_logger = logging.getLogger(__name__)
 
 class Inheritmulti_uom(models.Model):
     _inherit = 'product.multi.uom.price'
@@ -19,9 +17,6 @@ class Inheritmulti_uom(models.Model):
 class ProductTemplate(models.Model):
     _inherit = 'product.template'
 
-    company_barcode_id = fields.Many2one('res.company', 'company', default=lambda self: self.env.user.company_id)
-    multi_barcode_for_product = fields.Boolean(related='company_barcode_id.multi_barcode_for_product',
-                                               string="Multi Barcode For Product")
 
     multi_uom_price_barcode = fields.Char(
         string='Barcode',
@@ -47,7 +42,7 @@ class ProductInherit(models.Model):
     selected_uom_ids = fields.Many2many(comodel_name="product.multi.uom.price", string="Uom Ids",
                                         compute='_get_all_uom_id', store=True)
     barcode_multi_uom_id = fields.Many2one("product.multi.uom.price", string="Cust UOM", domain="[('id', 'in', selected_uom_ids)]")
-    barcode_multi_uom_barcode = fields.Char(string="UOM Cost", related='barcode_multi_uom_id.barcode')
+    barcode_multi_uom_barcode = fields.Float(string="UOM Cost", related='barcode_multi_uom_id.barcode')
 
     @api.depends('multi_uom_price_id')
     def _get_all_uom_id(self):
@@ -58,9 +53,7 @@ class ProductInherit(models.Model):
                 record.selected_uom_ids = []
 
     @api.model
-    def _name_search(self, name, domain=None, operator='ilike', limit=None, order=None,):
-        _logger.info('Name search called with name: %s, domain: %s, operator: %s', name, domain, operator)
-
+    def _name_search(self, name, domain=None, operator='ilike', limit=None, order=None):
         active_model = self._context.get('active_model') or self._inherit
         company_id = self.env.user.company_id
         if company_id.multi_barcode_for_product == True:
@@ -107,17 +100,11 @@ class ProductInherit(models.Model):
                             ('barcode', operator, name), ('model_ids.name', "=", model_name)])
 
                         if product_barcode_ids:
-                            _logger.info('Found product_barcode_ids: %s', product_barcode_ids)
-                            product_ids = list(self._search([
-                                '|',
-                                ('barcode_multi_uom_id', 'in', product_barcode_ids),
-                                ('product_id.barcode_multi_uom_barcode', 'in', product_barcode_ids)],
+                            product_ids = list(self._search(
+                                ['|', ('barcode', '=', name), ('barcode_multi_uom_barcode', '=', name)] + domain,
                                 limit=limit, order=order))
-                            _logger.info('Found product_ids: %s', product_ids)
-                        else:
-                            product_ids = self._search(domain, limit=limit, order=order)
-
-                        return product_ids
+                            if product_ids:
+                                return product_ids
 
                 if not product_ids and operator not in expression.NEGATIVE_TERM_OPERATORS:
                     # Do not merge the 2 next lines into one single search, SQL search performance would be abysmal
@@ -163,8 +150,8 @@ class ProductInherit(models.Model):
 
                     product_ids = list(self._search([
                         '|',
-                        ('barcode_multi_uom_id', 'in', product_barcode_ids),
-                        ('product_id.barcode_multi_uom_id', 'in', product_barcode_ids)],
+                        ('multi_uom_price_id', 'in', product_barcode_ids),
+                        ('product_id.multi_uom_price_id', 'in', product_barcode_ids)],
                         limit=limit, order=order))
                 else:
                     product_ids = self._search(domain, limit=limit, order=order)
@@ -183,7 +170,7 @@ class ProductInherit(models.Model):
                             self._search([('default_code', '=', name)] + domain, limit=limit, order=order))
                         if not product_ids:
                             product_ids = list(self._search(
-                                ['|', ('barcode', '=', name), ('barcode_multi_uom_barcode', '=', name)] + domain,
+                                ['|', ('barcode', '=', name), ('multi_uom_price_id.barcode', '=', name)] + domain,
                                 limit=limit, order=order))
                             if product_ids:
                                 return product_ids
@@ -233,7 +220,7 @@ class ProductInherit(models.Model):
                         ('barcode', operator, name)])
                     if product_barcode_ids:
                         product_ids = list(self._search([
-                            ('product_id.barcode_multi_uom_id', 'in', product_barcode_ids)],
+                            ('product_id.multi_uom_price_id', 'in', product_barcode_ids)],
                             limit=limit, order=order))
 
                 else:
