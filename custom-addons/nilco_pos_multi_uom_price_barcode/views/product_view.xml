@@ -19,7 +19,7 @@
         <field name="inherit_id" ref="sale.view_sale_order_filter"/>
         <field name="arch" type="xml">
             <xpath expr="//filter[@name='order_month']" position="before">
-                <filter string="Barcode" name="filter_barcode" domain="[('order_line.multi_uom_price_barcode', 'ilike', self)]"/>
+                <filter string="Barcode" name="filter_barcode" domain="[('order_line.multi_uom_price_id.barcode', 'ilike', self)]"/>
             </xpath>
         </field>
     </record>
