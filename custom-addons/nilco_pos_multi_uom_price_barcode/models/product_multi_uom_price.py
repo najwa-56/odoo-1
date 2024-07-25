@@ -69,9 +69,9 @@ class PurchaseOrderLine(models.Model):
                 self.price_unit = product.list_price
                 # Set quantity to 1 as default
                 self.product_qty = 1
-                self.purchase_multi_uom_id = product.multi_uom_price_id.mapped('uom_id')
+                self.purchase_multi_uom_id = product.multi_uom_price_id.uom_id.id
                 # Set purchase_multi_uom_id based on barcode
-                
+
             else:
                 # Clear product_id and related fields if barcode is not found
                 self.product_id = False
