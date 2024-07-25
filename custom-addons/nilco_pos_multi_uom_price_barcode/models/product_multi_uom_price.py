@@ -73,8 +73,8 @@ class PurchaseOrderLine(models.Model):
                 # Set purchase_multi_uom_id based on barcode
                 multi_uom = self.env['product.multi.uom.price'].search([('barcode', '=', self.barcode)], limit=1)
                 if multi_uom:
-                    self.purchase_multi_uom_id = multi_uom.id
-                    self.product_uom = multi_uom.uom_id.id
+                    self.purchase_multi_uom_id = multi_uom.uom_id.id
+    
             else:
                 # Clear product_id and related fields if barcode is not found
                 self.product_id = False
