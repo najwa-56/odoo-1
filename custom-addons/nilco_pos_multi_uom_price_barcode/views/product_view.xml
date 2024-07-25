@@ -12,44 +12,20 @@
           
         </field>
     </record>
-    <record id="product_template_barcode_form_view_inherit" model="ir.ui.view">
-			<field name="name">product.template.form.view.inherite</field>
-			<field name="model">product.template</field>
-			<field name="inherit_id" ref="product.product_template_only_form_view"/>
-			<field name="arch" type="xml">
-				<xpath expr="//field[@name='default_code']" position="after">
-					<field name="company_barcode_id" invisible="1"/>
-					<field name="multi_barcode_for_product" invisible="1"/>
-				</xpath>
-                <xpath expr="//field[@name='multi_uom_price_id']/tree" position="inside">
-                 <field name="product_product_id" column_invisible="1" context="{'default_product_tmpl_id': parent.id,}"/>
-                 <field name="product_id" column_invisible="1"/>
-                 <field name="barcode" context="{'search_by_vat': True}"/>
-                  <field name="product_variant_id" column_invisible="1"/>
-                 <field name="model_ids" column_invisible = 'parent.multi_barcode_for_product == False'/>
-            </xpath>
-			</field>
-		</record>
 
-    <record id="view_product_product_form_inherit" model="ir.ui.view">
-			<field name="name">product.product.form.extended</field>
-			<field name="model">product.product</field>
-			<field name="inherit_id" ref="product.product_normal_form_view"/>
-			<field name="arch" type="xml">
-				<xpath expr="//field[@name='default_code']" position="after">
-					<field name="company_barcode_id" invisible="1"/>
-					<field name="multi_barcode_for_product" invisible="1"/>
-				</xpath>
-				    <xpath expr="//field[@name='multi_uom_price_id']/tree" position="inside">
-                 <field name="product_product_id" column_invisible="1" context="{'default_product_tmpl_id': parent.id,}"/>
-                 <field name="product_id" column_invisible="1"/>
-                 <field name="barcode" context="{'search_by_vat': True}"/>
-                  <field name="product_variant_id" column_invisible="1"/>
-                 <field name="model_ids" column_invisible = 'parent.multi_barcode_for_product == False'/>
+    <record id="view_sales_order_filter_inherit" model="ir.ui.view">
+        <field name="name">sale.order.filter.inherit</field>
+        <field name="model">sale.order</field>
+        <field name="inherit_id" ref="module_name.view_sales_order_filter"/> <!-- Change 'module_name' to the actual module name -->
+        <field name="arch" type="xml">
+            <xpath expr="//search" position="inside">
+                <field name="order_line.product_id" string="Product"
+                    filter_domain="[('order_line.product_id.name', 'ilike', self)]"/>
+                <filter string="Barcode" name="filter_barcode" domain="[('order_line.multi_uom_price_barcode', 'ilike', self)]"/>
+                <!-- Add additional filters if needed -->
             </xpath>
-			</field>
-		</record>
-
+        </field>
+    </record>
 
     <!-- Scan to find product by barcode        -->
 
@@ -150,9 +126,6 @@
                 <field name="cost"/>
                 <field name="barcode"/>
                 <field name="product_variant_id" column_invisible="1"/>
-                <field name="company_id" invisible="1"/>
-                <field name="multi_barcode_for_product" invisible="1"/>
-                <field name="model_ids" invisible="multi_barcode_for_product == False" required = 'multi_barcode_for_product ==  True'/>
             </tree>
         </field>
     </record>
