@@ -41,6 +41,7 @@ class SaleOrderLine(models.Model):
             if product:
                 self.product_id = product
                 self.name = product.name
+
                 self.price_unit = product.list_price
                 # Set quantity to 1 as default
                 self.product_uom_qty = 1
@@ -68,9 +69,17 @@ class PurchaseOrderLine(models.Model):
                 self.price_unit = product.list_price
                 # Set quantity to 1 as default
                 self.product_qty = 1
+
+                # Set purchase_multi_uom_id based on barcode
+                multi_uom = self.env['product.multi.uom.price'].search([('barcode', '=', self.barcode)], limit=1)
+                if multi_uom:
+                    self.purchase_multi_uom_id = multi_uom.id
+                    self.product_uom = multi_uom.uom_id.id
             else:
-                # Clear product_id if barcode is not found
+                # Clear product_id and related fields if barcode is not found
                 self.product_id = False
                 self.name = ''
                 self.price_unit = 0.0
                 self.product_qty = 0.0
+                self.purchase_multi_uom_id = False
+                self.product_uom = False
