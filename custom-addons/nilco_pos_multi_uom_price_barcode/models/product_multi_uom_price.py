@@ -1,6 +1,8 @@
 from odoo import models, fields, api, _
 import re
 from odoo.osv import expression
+import logging
+_logger = logging.getLogger(__name__)
 
 class Inheritmulti_uom(models.Model):
     _inherit = 'product.multi.uom.price'
@@ -17,6 +19,9 @@ class Inheritmulti_uom(models.Model):
 class ProductTemplate(models.Model):
     _inherit = 'product.template'
 
+    company_barcode_id = fields.Many2one('res.company', 'company', default=lambda self: self.env.user.company_id)
+    multi_barcode_for_product = fields.Boolean(related='company_barcode_id.multi_barcode_for_product',
+                                               string="Multi Barcode For Product")
 
     multi_uom_price_barcode = fields.Char(
         string='Barcode',
@@ -53,7 +58,9 @@ class ProductInherit(models.Model):
                 record.selected_uom_ids = []
 
     @api.model
-    def _name_search(self, name, domain=None, operator='ilike', limit=None, order=None):
+    def _name_search(self, name, domain=None, operator='ilike', limit=None, order=None,):
+        _logger.info('Name search called with name: %s, domain: %s, operator: %s', name, domain, operator)
+
         active_model = self._context.get('active_model') or self._inherit
         company_id = self.env.user.company_id
         if company_id.multi_barcode_for_product == True:
@@ -100,11 +107,17 @@ class ProductInherit(models.Model):
                             ('barcode', operator, name), ('model_ids.name', "=", model_name)])
 
                         if product_barcode_ids:
-                            product_ids = list(self._search(
-                                ['|', ('barcode', '=', name), ('barcode_multi_uom_barcode', '=', name)] + domain,
+                            _logger.info('Found product_barcode_ids: %s', product_barcode_ids)
+                            product_ids = list(self._search([
+                                '|',
+                                ('barcode_multi_uom_id', 'in', product_barcode_ids),
+                                ('product_tmpl_id.barcode_multi_uom_id', 'in', product_barcode_ids)],
                                 limit=limit, order=order))
-                            if product_ids:
-                                return product_ids
+                            _logger.info('Found product_ids: %s', product_ids)
+                        else:
+                            product_ids = self._search(domain, limit=limit, order=order)
+
+                        return product_ids
 
                 if not product_ids and operator not in expression.NEGATIVE_TERM_OPERATORS:
                     # Do not merge the 2 next lines into one single search, SQL search performance would be abysmal
