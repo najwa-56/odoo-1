@@ -36,7 +36,7 @@
                              'company_id': parent.company_id,
                              'default_list_price': price_unit,
                              'default_description_sale': name,
-                             'multi_uom_price_barcode': order_line.product_id.multi_uom_price_barcode
+                             'multi_uom_price_barcode': product_id.multi_uom_price_barcode
                          }"
                         options="{
                              'no_open': True,
