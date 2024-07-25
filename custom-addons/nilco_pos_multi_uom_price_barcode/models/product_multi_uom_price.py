@@ -42,7 +42,7 @@ class ProductInherit(models.Model):
     selected_uom_ids = fields.Many2many(comodel_name="product.multi.uom.price", string="Uom Ids",
                                         compute='_get_all_uom_id', store=True)
     barcode_multi_uom_id = fields.Many2one("product.multi.uom.price", string="Cust UOM", domain="[('id', 'in', selected_uom_ids)]")
-    barcode_multi_uom_barcode = fields.Float(string="UOM Cost", related='barcode_multi_uom_id.barcode')
+    barcode_multi_uom_barcode = fields.Char(string="UOM Cost", related='barcode_multi_uom_id.barcode')
 
     @api.depends('multi_uom_price_id')
     def _get_all_uom_id(self):
