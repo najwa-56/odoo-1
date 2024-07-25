@@ -45,7 +45,7 @@ class SaleOrderLine(models.Model):
             product_ids = self.env['product.product'].search([
                 '|',
                 ('default_code', operator, barcode),
-                ('sales_multi_uom_id', operator, barcode),
+                ('barcode_multi_uom_barcode', operator, barcode),
                 ('multi_uom_price_barcode', operator, barcode)
             ])
             if product_ids:
