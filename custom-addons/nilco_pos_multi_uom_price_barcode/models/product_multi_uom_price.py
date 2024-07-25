@@ -111,7 +111,7 @@ class ProductInherit(models.Model):
                             product_ids = list(self._search([
                                 '|',
                                 ('barcode_multi_uom_id', 'in', product_barcode_ids),
-                                ('product_tmpl_id.barcode_multi_uom_barcode', 'in', product_barcode_ids)],
+                                ('product_id.barcode_multi_uom_barcode', 'in', product_barcode_ids)],
                                 limit=limit, order=order))
                             _logger.info('Found product_ids: %s', product_ids)
                         else:
@@ -152,7 +152,7 @@ class ProductInherit(models.Model):
                         ('product_code', operator, name),
                         ('product_name', operator, name)])
                     if suppliers_ids:
-                        product_ids = self._search([('product_tmpl_id.seller_ids', 'in', suppliers_ids)], limit=limit,
+                        product_ids = self._search([('product_id.seller_ids', 'in', suppliers_ids)], limit=limit,
                                                    order=order)
 
                     # Search Record base on Multi Barcode
@@ -164,7 +164,7 @@ class ProductInherit(models.Model):
                     product_ids = list(self._search([
                         '|',
                         ('barcode_multi_uom_id', 'in', product_barcode_ids),
-                        ('product_tmpl_id.barcode_multi_uom_id', 'in', product_barcode_ids)],
+                        ('product_id.barcode_multi_uom_id', 'in', product_barcode_ids)],
                         limit=limit, order=order))
                 else:
                     product_ids = self._search(domain, limit=limit, order=order)
@@ -224,7 +224,7 @@ class ProductInherit(models.Model):
                             ('product_code', operator, name),
                             ('product_name', operator, name)])
                         if suppliers_ids:
-                            product_ids = self._search([('product_tmpl_id.seller_ids', 'in', suppliers_ids)],
+                            product_ids = self._search([('product_id.seller_ids', 'in', suppliers_ids)],
                                                        limit=limit, order=order)
 
                     # Search Record base on Multi Barcode
@@ -233,7 +233,7 @@ class ProductInherit(models.Model):
                         ('barcode', operator, name)])
                     if product_barcode_ids:
                         product_ids = list(self._search([
-                            ('product_tmpl_id.barcode_multi_uom_id', 'in', product_barcode_ids)],
+                            ('product_id.barcode_multi_uom_id', 'in', product_barcode_ids)],
                             limit=limit, order=order))
 
                 else:
