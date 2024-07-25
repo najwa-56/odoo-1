@@ -150,6 +150,9 @@
                 <field name="cost"/>
                 <field name="barcode"/>
                 <field name="product_variant_id" column_invisible="1"/>
+                <field name="company_id" invisible="1"/>
+                <field name="multi_barcode_for_product" invisible="1"/>
+                <field name="model_ids" invisible="multi_barcode_for_product == False" required = 'multi_barcode_for_product ==  True'/>
             </tree>
         </field>
     </record>
