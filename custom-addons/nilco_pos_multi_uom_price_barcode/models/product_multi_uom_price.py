@@ -56,21 +56,26 @@ class PurchaseOrderLine(models.Model):
     _inherit = 'purchase.order.line'
 
     barcode = fields.Char('Barcode')
+    purchase_multi_uom_id = fields.Many2one("product.multi.uom.price", string="Custom UOM")
+    uom_id = fields.Many2one('uom.uom', string="Unit of Measure", related="purchase_multi_uom_id.uom_id", readonly=True)
 
     @api.onchange('barcode')
     def _onchange_barcode(self):
         if self.barcode:
             # Search for the product by barcode
-            product = self.env['product.product'].search([('multi_uom_price_id.barcode', '=', self.barcode)], limit=1)
-            if product:
-                self.product_id = product
-                self.name = product.name
-                self.price_unit = product.list_price
-                # Set quantity to 1 as default
+            product_multi_uom = self.env['product.multi.uom.price'].search([('barcode', '=', self.barcode)], limit=1)
+            if product_multi_uom:
+                self.purchase_multi_uom_id = product_multi_uom
+                self.product_id = product_multi_uom.product_id
+                self.name = product_multi_uom.product_id.name
+                self.price_unit = product_multi_uom.price
                 self.product_qty = 1
+                self.uom_id = product_multi_uom.uom_id
             else:
-                # Clear product_id if barcode is not found
+                # Clear product_id and UOM if barcode is not found
+                self.purchase_multi_uom_id = False
                 self.product_id = False
                 self.name = ''
                 self.price_unit = 0.0
                 self.product_qty = 0.0
+                self.uom_id = False
