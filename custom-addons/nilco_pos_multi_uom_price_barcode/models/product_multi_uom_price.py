@@ -33,17 +33,35 @@ class SaleOrderLine(models.Model):
     _inherit = 'sale.order.line'
 
     barcode_multi_uom_barcode = fields.Char(string="UOM barcode", related='sales_multi_uom_id.barcode')
+
     @api.model
     def _search_by_barcode(self, barcode, domain=None, operator='ilike'):
         if not domain:
             domain = []
+
         if barcode:
+            # Search for products based on the barcode
             product_ids = self.env['product.product'].search([
                 '|',
                 ('default_code', operator, barcode),
-                ('barcode_multi_uom_barcode', operator, barcode),
-                ('multi_uom_price_barcode', operator, barcode)
+                ('barcode', operator, barcode)
             ])
+
+            # If products are found, return their sale order lines
             if product_ids:
                 return self.search([('product_id', 'in', product_ids.ids)] + domain)
+
+            # Also search by multi-uom price barcodes
+            product_multi_uom_ids = self.env['product.multi.uom.price'].search([
+                ('barcode', operator, barcode)
+            ])
+
+            if product_multi_uom_ids:
+                # Find product IDs linked to these multi-uom records
+                product_ids = self.env['product.product'].search([
+                    ('multi_uom_price_ids', 'in', product_multi_uom_ids.ids)
+                ])
+                if product_ids:
+                    return self.search([('product_id', 'in', product_ids.ids)] + domain)
+
         return super(SaleOrderLine, self)._search_by_barcode(barcode, domain, operator)
