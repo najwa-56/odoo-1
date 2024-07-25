@@ -13,14 +13,21 @@
         </field>
     </record>
 
-    
-    <record id="view_order_filter" model="ir.ui.view">
-        <field name="name">sale.order.filter</field>
+<record id="view_sales_order_filter_inherit" model="ir.ui.view">
+        <field name="name">sale.order.filter.inherit</field>
         <field name="model">sale.order</field>
-        <field name="inherit_id" ref="sale.view_sale_order_filter"/>
+        <field name="inherit_id" ref="sale.view_sale_order_filter"/> <!-- Ensure this reference is correct -->
         <field name="arch" type="xml">
-            <xpath expr="//filter[@name='filter_order_date']" position="before">
-                <filter string="Barcode" name="filter_barcode" domain="[('order_line.multi_uom_price_barcode', 'ilike', self)]"/>
+            <xpath expr="//search" position="inside">
+                <!-- Existing filters -->
+                <field name="name" string="Order"
+                    filter_domain="['|', '|', ('name', 'ilike', self), ('client_order_ref', 'ilike', self), ('partner_id', 'child_of', self)]"/>
+                <field name="order_line" string="Product"
+                    filter_domain="['|', '|', ('order_line.product_id.name', 'ilike', self), ('order_line.product_id.default_code', 'ilike', self)]"/>
+
+                <!-- Additional filters -->
+                <filter string="Product Barcode" name="filter_product_barcode"
+                    domain="[('order_line.multi_uom_price_id.barcode', 'ilike', self)]"/>
             </xpath>
         </field>
     </record>
