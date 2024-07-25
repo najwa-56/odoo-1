@@ -24,10 +24,10 @@
     </field>
 </record>
 
-    <record id="view_order_form_inherit" model="ir.ui.view">
-    <field name="name">sale.order.form.inherit</field>
-    <field name="model">sale.order</field>
-    <field name="inherit_id" ref="Purchase.purchase_order_form"/>
+    <record id="view_order_form_inherit-purchase" model="ir.ui.view">
+    <field name="name">purchase.order.form.inherit</field>
+    <field name="model">purchase.order</field>
+    <field name="inherit_id" ref="purchase.purchase_order_form"/>
     <field name="arch" type="xml">
         <xpath expr="//field[@name='order_line']/tree/field[@name='product_id']" position="before">
             <field name="barcode" placeholder="Enter barcode"/>
