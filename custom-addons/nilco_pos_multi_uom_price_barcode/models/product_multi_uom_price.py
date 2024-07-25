@@ -35,7 +35,7 @@ class SaleOrderLine(models.Model):
     selected_uom_ids = fields.Many2many(string="UOM Ids", related='product_id.selected_uom_ids')
     barcode_multi_uom_id = fields.Many2one("product.multi.uom.price", string="Custom UOM",
                                             domain="[('id', 'in', selected_uom_ids)]")
-    purchase_multi_uom_barcode = fields.Float(string="UOM Cost", related='purchase_multi_uom_id.barcode')
+    barcode_multi_uom_barcode = fields.Float(string="UOM Cost", related=' barcode_multi_uom_id.barcode')
     @api.model
     def _search_by_barcode(self, barcode, domain=None, operator='ilike'):
         if not domain:
@@ -44,7 +44,7 @@ class SaleOrderLine(models.Model):
             product_ids = self.env['product.product'].search([
                 '|',
                 ('default_code', operator, barcode),
-                ('purchase_multi_uom_barcode', operator, barcode),
+                ('barcode_multi_uom_barcode', operator, barcode),
                 ('multi_uom_price_barcode', operator, barcode)
             ])
             if product_ids:
