@@ -104,5 +104,10 @@ class PurchaseOrderLine(models.Model):
             }
             self.update(values)
 
-
-
+    @api.depends('purchase_multi_uom_id.cost')
+    def _compute_price_unit(self):
+        for record in self:
+            if record.purchase_multi_uom_id:
+                record.price_unit = record.purchase_multi_uom_id.cost
+            else:
+                record.price_unit = 0.0
