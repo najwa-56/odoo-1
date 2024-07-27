@@ -14,7 +14,7 @@ patch(ProductCard.prototype, {
 ProductCard.props = {
         class: { String, optional: true },
         name: String,
-        productArabic: {type: String, optional: true },
+        productArabic: String,
         productId: Number,
         price: String,
         imageUrl: String,
@@ -22,8 +22,6 @@ ProductCard.props = {
         onClick: { type: Function, optional: true },
         onProductInfoClick: { type: Function, optional: true },
 };
-
-
 
 
 
