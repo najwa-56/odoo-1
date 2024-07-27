@@ -18,6 +18,12 @@ class PurchaseOrderLine(models.Model):
         for line in self:
             if not line.product_id or line.invoice_lines or not line.company_id:
                 continue
+
+            # Compute price_unit considering purchase_multi_uom_cost if it exists
+            if line.purchase_multi_uom_cost:
+                line.price_unit = line.purchase_multi_uom_cost * 0.85
+                continue
+
             params = {'order_id': line.order_id}
             seller = line.product_id._select_seller(
                 partner_id=line.partner_id,
@@ -28,10 +34,6 @@ class PurchaseOrderLine(models.Model):
 
             if seller or not line.date_planned:
                 line.date_planned = line._get_date_planned(seller).strftime(DEFAULT_SERVER_DATETIME_FORMAT)
-
-            if line.purchase_multi_uom_cost:
-                line.price_unit = (line.purchase_multi_uom_cost) *.85
-                continue
 
             # Original logic for computing price_unit when purchase_multi_uom_cost is not set
             if not seller:
@@ -81,8 +83,6 @@ class PurchaseOrderLine(models.Model):
             if not line.name or line.name in default_names:
                 product_ctx = {'seller_id': seller.id, 'lang': get_lang(line.env, line.partner_id.lang).code}
                 line.name = line._get_product_purchase_description(line.product_id.with_context(product_ctx))
-
-
 
     @api.onchange('purchase_multi_uom_id')
     def purchase_multi_uom_id_change(self):
