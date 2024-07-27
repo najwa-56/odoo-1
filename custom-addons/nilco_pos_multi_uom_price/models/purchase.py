@@ -10,6 +10,7 @@ class PurchaseOrderLine(models.Model):
     purchase_multi_uom_id = fields.Many2one("product.multi.uom.price", string="Custom UOM",
                                             domain="[('id', 'in', selected_uom_ids)]")
     purchase_multi_uom_cost = fields.Float(string="UOM Cost", related='purchase_multi_uom_id.cost')
+
     price_unit = fields.Float(string='Unit Price', compute='_compute_price_unit_and_date_planned_and_name', store=True)
 
     @api.depends('product_qty', 'product_uom', 'company_id', 'purchase_multi_uom_cost')
@@ -17,12 +18,6 @@ class PurchaseOrderLine(models.Model):
         for line in self:
             if not line.product_id or line.invoice_lines or not line.company_id:
                 continue
-
-            # Compute price_unit considering purchase_multi_uom_cost if it exists
-            if line.purchase_multi_uom_cost:
-                line.price_unit = line.purchase_multi_uom_cost * 0.85
-                continue
-
             params = {'order_id': line.order_id}
             seller = line.product_id._select_seller(
                 partner_id=line.partner_id,
@@ -33,6 +28,10 @@ class PurchaseOrderLine(models.Model):
 
             if seller or not line.date_planned:
                 line.date_planned = line._get_date_planned(seller).strftime(DEFAULT_SERVER_DATETIME_FORMAT)
+
+            if line.purchase_multi_uom_cost:
+                line.price_unit = (line.purchase_multi_uom_cost) *.85
+                continue
 
             # Original logic for computing price_unit when purchase_multi_uom_cost is not set
             if not seller:
