@@ -34,53 +34,7 @@ class PurchaseOrderLine(models.Model):
                 continue
 
             # Original logic for computing price_unit when purchase_multi_uom_cost is not set
-            if not seller:
-                unavailable_seller = line.product_id.seller_ids.filtered(
-                    lambda s: s.partner_id == line.order_id.partner_id)
-                if not unavailable_seller and line.price_unit and line.product_uom == line._origin.product_uom:
-                    continue
-                po_line_uom = line.product_uom or line.product_id.uom_po_id
-                price_unit = line.env['account.tax']._fix_tax_included_price_company(
-                    line.product_id.uom_id._compute_price(line.product_id.standard_price, po_line_uom),
-                    line.product_id.supplier_taxes_id,
-                    line.taxes_id,
-                    line.company_id,
-                )
-                price_unit = line.product_id.cost_currency_id._convert(
-                    price_unit,
-                    line.currency_id,
-                    line.company_id,
-                    line.date_order or fields.Date.context_today(line),
-                    False
-                )
-                line.price_unit = float_round(price_unit, precision_digits=max(line.currency_id.decimal_places,
-                                                                               self.env[
-                                                                                   'decimal.precision'].precision_get(
-                                                                                   'Product Price')))
-                continue
-
-            price_unit = line.env['account.tax']._fix_tax_included_price_company(seller.price,
-                                                                                 line.product_id.supplier_taxes_id,
-                                                                                 line.taxes_id,
-                                                                                 line.company_id) if seller else 0.0
-            price_unit = seller.currency_id._convert(price_unit, line.currency_id, line.company_id,
-                                                     line.date_order or fields.Date.context_today(line), False)
-            price_unit = float_round(price_unit, precision_digits=max(line.currency_id.decimal_places,
-                                                                      self.env['decimal.precision'].precision_get(
-                                                                          'Product Price')))
-            line.price_unit = seller.product_uom._compute_price(price_unit, line.product_uom)
-            line.discount = seller.discount or 0.0
-
-            default_names = []
-            vendors = line.product_id._prepare_sellers({})
-            product_ctx = {'seller_id': None, 'partner_id': None, 'lang': get_lang(line.env, line.partner_id.lang).code}
-            default_names.append(line._get_product_purchase_description(line.product_id.with_context(product_ctx)))
-            for vendor in vendors:
-                product_ctx = {'seller_id': vendor.id, 'lang': get_lang(line.env, line.partner_id.lang).code}
-                default_names.append(line._get_product_purchase_description(line.product_id.with_context(product_ctx)))
-            if not line.name or line.name in default_names:
-                product_ctx = {'seller_id': seller.id, 'lang': get_lang(line.env, line.partner_id.lang).code}
-                line.name = line._get_product_purchase_description(line.product_id.with_context(product_ctx))
+           
 
     @api.onchange('purchase_multi_uom_id')
     def purchase_multi_uom_id_change(self):
