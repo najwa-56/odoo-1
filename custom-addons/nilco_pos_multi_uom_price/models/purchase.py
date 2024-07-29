@@ -2,6 +2,7 @@ from odoo import models, fields, api, _
 from odoo.tools.float_utils import float_compare, float_round
 from odoo.tools import DEFAULT_SERVER_DATETIME_FORMAT, get_lang
 
+              #--we add all this module to applay custom multi uom cost ####
 
 class PurchaseOrderLine(models.Model):
     _inherit = 'purchase.order.line'
@@ -41,8 +42,13 @@ class PurchaseOrderLine(models.Model):
                     # Avoid to modify the price unit if there is no price list for this partner and
                     # the line has already one to avoid to override unit price set manually.
                     continue
-                price_unit = line.product_id.standard_price
-
+                po_line_uom = line.product_uom or line.product_id.uom_po_id
+                price_unit = line.env['account.tax']._fix_tax_included_price_company(
+                    line.product_id.uom_id._compute_price(line.product_id.standard_price, po_line_uom),
+                    line.product_id.supplier_taxes_id,
+                    line.taxes_id,
+                    line.company_id,
+                )
                 price_unit = line.product_id.cost_currency_id._convert(
                     price_unit,
                     line.currency_id,

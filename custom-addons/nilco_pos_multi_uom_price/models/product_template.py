@@ -7,6 +7,7 @@ class ProductTemplate(models.Model):
     
     multi_uom_price_id = fields.One2many('product.multi.uom.price', 'product_id', string="UOM Price")
     category_id = fields.Many2one(related='uom_id.category_id')
+    #we add this field wich give me all idss for multi uom record in product
     selected_uom_ids = fields.Many2many(comodel_name="product.multi.uom.price", string="Uom Ids", compute='_get_all_uom_id', store=True)
 
 
@@ -18,8 +19,8 @@ class ProductTemplate(models.Model):
             else:
                 record.selected_uom_ids = []
 
-
-
+      ###########################
+# we add this calss down to find multi uom and price in sale order line and account
 class SaleOrderLine(models.Model):
     _inherit = 'sale.order.line'
 

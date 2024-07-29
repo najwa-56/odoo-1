@@ -34,8 +34,11 @@
                     <field name="Ratio"/>
                 </xpath>
             </field>
-        </record>
+     </record>
 
+                         <!--Edit-->
+
+                    <!--add     custom    uom-->
     <record id="view_order_form2" model="ir.ui.view">
             <field name="name">sale.order.form</field>
             <field name="model">sale.order</field>
@@ -51,8 +54,11 @@
                     <field name="sales_multi_uom_id" readonly="state in ('sale','done', 'cancel')"/>
                 </xpath>
             </field>
-        </record>
+    </record>
 
+                             <!--Edit-->
+
+                <!--add     custom    uom-cost -->
      <record id="view_purchase_order_form_custom" model="ir.ui.view">
             <field name="name">purchase.order.form.custom</field>
             <field name="model">purchase.order</field>
@@ -64,7 +70,7 @@
                      <field name="purchase_multi_uom_cost" invisible="1" />
             </xpath>
             </field>
-        </record>
+     </record>
 
 
 

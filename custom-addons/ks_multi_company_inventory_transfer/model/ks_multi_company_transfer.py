@@ -31,6 +31,10 @@ class KsStockTransferMultiCompany(models.Model):
             self.ks_transfer_from_location = False
 
     def ks_confirm_inventory_transfer(self):
+        
+        if self.env.user.company_id == self.ks_transfer_from:
+            raise UserError(_('You cannot confirm this inventory transfer because you are in the "Company From".'))
+
         for stock_line in self.ks_multicompany_transfer_stock_ids:
             ks_lot_serial = stock_line.ks_move_line_ids.filtered(lambda move: move.ks_lot_id.id == False and move.ks_product_id.tracking !='none')
             if ks_lot_serial:
@@ -134,7 +138,9 @@ class KsStockTransferMultiCompany(models.Model):
             self.ks_update_lot_serial(ks_picking_to_id, self.ks_multicompany_transfer_stock_ids)
             ks_picking_to_id.button_validate()
             self.state = 'posted'
+
             self.ks_stock_picking_ids = [(6, 0, [ks_picking_from_id.id, ks_picking_to_id.id])]
+
     def ks_incoming_move_line(self, ks_multicompany_transfer_stock_ids):
         move_lines = []
         ks_location = self.env['stock.location'].search([('usage', '=', 'transit')], order='company_id desc')

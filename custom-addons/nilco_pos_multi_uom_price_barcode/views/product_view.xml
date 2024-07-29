@@ -12,29 +12,32 @@
         </field>
     </record>
 
+
+        <!--add field barcode to sale order line -->
     <record id="view_order_form_inherit" model="ir.ui.view">
-    <field name="name">sale.order.form.inherit</field>
-    <field name="model">sale.order</field>
-    <field name="inherit_id" ref="sale.view_order_form"/>
-    <field name="arch" type="xml">
-        <xpath expr="//field[@name='order_line']/tree/field[@name='product_template_id']" position="before">
+        <field name="name">sale.order.form.inherit</field>
+        <field name="model">sale.order</field>
+        <field name="inherit_id" ref="sale.view_order_form"/>
+        <field name="arch" type="xml">
+         <xpath expr="//field[@name='order_line']/tree/field[@name='product_template_id']" position="before">
             <field name="barcode" placeholder="Enter barcode"/>
-        </xpath>
-    </field>
-</record>
+         </xpath>
+        </field>
+    </record>
 
+               <!--add field barcode to purchase order line  -->
     <record id="view_order_form_inherit-purchase" model="ir.ui.view">
-    <field name="name">purchase.order.form.inherit</field>
-    <field name="model">purchase.order</field>
-    <field name="inherit_id" ref="purchase.purchase_order_form"/>
-    <field name="arch" type="xml">
-        <xpath expr="//field[@name='order_line']/tree/field[@name='product_id']" position="before">
-            <field name="barcode" placeholder="Enter barcode"/>
-        </xpath>
-    </field>
-</record>
+           <field name="name">purchase.order.form.inherit</field>
+           <field name="model">purchase.order</field>
+           <field name="inherit_id" ref="purchase.purchase_order_form"/>
+           <field name="arch" type="xml">
+                <xpath expr="//field[@name='order_line']/tree/field[@name='product_id']" position="before">
+                   <field name="barcode" placeholder="Enter barcode"/>
+                </xpath>
+          </field>
+    </record>
 
-    <!-- Scan to find product by barcode        -->
+    <!-- Scan in products view search to find product by barcode        -->
 
     <record id="view_product_template_inherit_search" model="ir.ui.view">
 		  <field name="name">product.template.search.expand</field>
@@ -61,6 +64,7 @@
 
 
     <!-- New Tree View for product.multi.uom.price          -->
+
     <record id="view_product_multi_uom_price_tree" model="ir.ui.view">
         <field name="name">product.multi.uom.price.tree</field>
         <field name="model">product.multi.uom.price</field>
