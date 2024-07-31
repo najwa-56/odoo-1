@@ -31,7 +31,7 @@ class KsStockTransferMultiCompany(models.Model):
             self.ks_transfer_from_location = False
 
     def ks_confirm_inventory_transfer(self):
-        
+
         if self.env.user.company_id == self.ks_transfer_from:
             raise UserError(_('You cannot confirm this inventory transfer because you are in the "Company From".'))
 
