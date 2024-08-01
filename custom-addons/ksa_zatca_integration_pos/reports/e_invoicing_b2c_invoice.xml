@@ -62,7 +62,7 @@
                     <h2 style="text-align:center;">
                         <t t-esc="invoice_type"/>
                     </h2>
-                    <div dir="ltr">
+
                         <div class="page row">
                             <div class="col-8 table-container">
                                 <table  class="main_table second_table" width="100%">
@@ -220,10 +220,11 @@
                                 </table>
                             </div>
                             <div class="col-4">
-                                <img style="text-align:right;width:100px;max-height:100px;float:right;margin-top:-10px;padding-top:0px;"
+                                <img style="text-align:right;width:150px;max-height:150px;float:right;margin-top:-10px;padding-top:0px;"
                                      alt="Barcode" t-att-src="doc.get_qrcode()"/>
                             </div>
                         </div>
+                    <div dir="ltr">
                         <table style="margin-top:5px;" width="100%">
                             <col style="width:11%"/>
                             <col style="width:18%"/>
