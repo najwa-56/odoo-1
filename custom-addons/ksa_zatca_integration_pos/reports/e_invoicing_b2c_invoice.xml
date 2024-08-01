@@ -64,11 +64,11 @@
                     </h2>
                     <div dir="ltr">
                         <div class="page row">
-                            <div class="col-8">
-                                <table style="margin-top:5px; " class="main_table second_table" width="100%">
-                                    <col style="width:5%"/>
-                                    <col style="width:5%"/>
-                                    <col style="width:5%"/>
+                            <div class="col-8 table-container">
+                                <table  class="main_table second_table" width="100%">
+                                    <col style="width:15%"/>
+                                    <col style="width:15%"/>
+                                    <col style="width:15%"/>
                                     <!--<tr>
                                         <td class="second_table left_column">
                                             <span>
