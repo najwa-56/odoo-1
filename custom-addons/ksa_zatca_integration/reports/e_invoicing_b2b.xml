@@ -60,7 +60,7 @@
                     </h2>
                     <div dir="ltr">
                         <div class="page row">
-                            <div class="col-8">
+
                                 <table style="margin-top:5px;" class="main_table second_table" width="100%">
                                     <col style="width:15%"/>
                                     <col style="width:50%"/>
@@ -214,7 +214,7 @@
                                         </td>
                                     </tr>
                                 </table>
-                            </div>
+                            
 
                         </div>
                         <table style="margin-top:5px;" width="100%">
