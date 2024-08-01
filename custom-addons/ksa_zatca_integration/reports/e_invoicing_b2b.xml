@@ -363,7 +363,7 @@
                                     <span class="lable_bold">رقم المبنى</span>
                                 </td>
                             </tr>
-                            <tr>
+                           <!-- <tr>
                                 <t t-if="_company_id.additional_no">
                                     <td class="second_table left_column">
                                         <span>
@@ -397,7 +397,7 @@
                                         <span class="lable_bold">الرقم الإضافي للعنوان</span>
                                     </td>
                                 </t>
-                            </tr>
+                            </tr>-->
                             <tr>
                                 <td class="second_table left_column">
                                     <span>
