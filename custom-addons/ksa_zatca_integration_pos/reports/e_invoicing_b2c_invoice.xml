@@ -5,20 +5,27 @@
             <t t-foreach="docs" t-as="doc">
                 <t t-call="web.external_layout">
                     <style>
-                        .head{ margin-top: 0; }
-                        .lable_bold { font-weight: bold; }
-                        .main_table td:nth-child(1) {white-space: nowrap;}
-                        .main_table td:nth-child(3) {white-space: nowrap;}
-                        .left_column {text-align:left;}
-                        .total_table {white-space: nowrap;}
-                        .right_column {text-align:right;}
-                        .second_table {
-                        padding: 2px;
-                        border: 1px solid black;
-                        border-collapse: collapse;
-                        font-size:11px;
-                        }
-                    </style>
+    .head { margin-top: 0; }
+    .lable_bold { font-weight: bold; }
+    .main_table td:nth-child(1) { white-space: nowrap; }
+    .main_table td:nth-child(3) { white-space: nowrap; }
+    .left_column { text-align: left; }
+    .total_table { white-space: nowrap; }
+    .right_column { text-align: right; }
+    .second_table {
+        padding: 2px;
+        border: 1px solid black;
+        border-collapse: collapse;
+        font-size: 11px;
+        /* Ensure the table is aligned to the left */
+        margin: 0; /* Reset any margin that might center it */
+        text-align: left; /* Align content inside the table to the left */
+    }
+    .table-container {
+        text-align: left; /* Align the container to the left */
+    }
+</style>
+
                     <t t-if="doc.debit_origin_id">
                         <t t-set="invoice_type" t-value="'Debit Note'"/>
                         <t t-set="invoice_type_ar" t-value="'اشعار ﻣﺪﻳﻦ'"/>
@@ -58,7 +65,7 @@
                     <div dir="ltr">
                         <div class="page row">
                             <div class="col-8">
-                                <table style="margin-top:5px; text-align: left;" class="main_table second_table" width="100%">
+                                <table style="margin-top:5px; " class="main_table second_table" width="100%">
                                     <col style="width:15%"/>
                                     <col style="width:15%"/>
                                     <col style="width:15%"/>
