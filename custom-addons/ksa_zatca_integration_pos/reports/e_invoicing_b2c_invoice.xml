@@ -586,7 +586,7 @@
                                     </td>
                                 </t>
                             </tr>
-                           <!-- <tr>
+                            <!--<tr>
                                 <td class="second_table left_column">
                                     <span>
                                         <b>Other Seller Type</b>
@@ -627,11 +627,11 @@
                                         <span class="lable_bold">بائع آخر</span>
                                     </td>
                                 </t>
-                            </tr>
+                            </tr>-->
                             <tr>
                                 <td class="second_table left_column">
                                     <span>
-                                        <b>Other Seller ID</b>
+                                        <b>CRN</b>
                                     </span>
                                 </td>
                                 <td class="second_table">
@@ -640,12 +640,12 @@
                                     </span>
                                 </td>
                                 <td class="second_table" style="text-align:right;">
-                                    <span class="lable_bold">اي دي البائع الآخر</span>
+                                    <span class="lable_bold">رقم السجل التجاري</span>
                                 </td>
                                 <t t-if="buyer_identification_no">
                                     <td class="second_table left_column">
                                         <span>
-                                            <b>Other Buyer ID</b>
+                                            <b>CRN</b>
                                         </span>
                                     </td>
                                     <td class="second_table">
@@ -654,10 +654,10 @@
                                         </span>
                                     </td>
                                     <td class="second_table" style="text-align:right;">
-                                        <span class="lable_bold">معرف آخر</span>
+                                        <span class="lable_bold">رقم السجل التجاري</span>
                                     </td>
                                 </t>
-                            </tr>-->
+                            </tr>
                         </table>
 
                         <t t-if="not doc._is_downpayment()"
