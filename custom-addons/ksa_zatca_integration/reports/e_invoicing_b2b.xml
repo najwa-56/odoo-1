@@ -219,7 +219,7 @@
                                 </table>
                             </div>
                             <div class="col-4">
-                                <img style="text-align:center;width:200px;max-height:200px;float:right;margin-top:-10px;padding-top:0px;"
+                                <img style="text-align:right;width:100px;max-height:100px;float:right;margin-top:-10px;padding-top:0px;"
                                      alt="Barcode" t-att-src="doc.get_qrcode()"/>
                             </div>
                         </div>
