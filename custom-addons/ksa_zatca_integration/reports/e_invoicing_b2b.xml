@@ -573,7 +573,7 @@
                                     <span class="lable_bold">رقم تسجيل ضريبة القيمة المضافة</span>
                                 </td>
                             </tr>
-                            <tr>
+                            <!-- <tr>
                                 <td class="second_table left_column">
                                     <span>
                                         <b>Other Seller Type</b>
@@ -644,7 +644,7 @@
                                         <span class="lable_bold">معرف آخر</span>
                                     </td>
                                 </t>
-                            </tr>
+                            </tr>-->
                         </table>
 
                         <t t-if="not doc._is_downpayment()"

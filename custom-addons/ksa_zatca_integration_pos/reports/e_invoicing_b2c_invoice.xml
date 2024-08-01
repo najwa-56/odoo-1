@@ -215,7 +215,7 @@
                                     </tr>
                                 </table>
                             </div>
-                            
+
                         </div>
                         <table style="margin-top:5px;" width="100%">
                             <col style="width:11%"/>
@@ -586,7 +586,7 @@
                                     </td>
                                 </t>
                             </tr>
-                            <tr>
+                           <!-- <tr>
                                 <td class="second_table left_column">
                                     <span>
                                         <b>Other Seller Type</b>
@@ -657,7 +657,7 @@
                                         <span class="lable_bold">معرف آخر</span>
                                     </td>
                                 </t>
-                            </tr>
+                            </tr>-->
                         </table>
 
                         <t t-if="not doc._is_downpayment()"
