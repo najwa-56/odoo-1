@@ -147,8 +147,8 @@
                                             </td>
                                         </tr>
                                     </t>
-                                    <t t-elif="doc.invoice_origin">
-                                       <!-- <tr>
+                                   <!-- <t t-elif="doc.invoice_origin">
+                                        <tr>
                                             <td class="second_table left_column">
                                                 <span>
                                                     <b>Quotation Number</b>
@@ -162,8 +162,8 @@
                                             <td class="second_table" style="text-align:right;">
                                                 <span class="lable_bold">رقم الإقتباس</span>
                                             </td>
-                                        </tr>-->
-                                    </t>
+                                        </tr>
+                                    </t>-->
                                     <!--<tr>
                                         <td class="second_table left_column">
                                             <span>
