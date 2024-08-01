@@ -94,12 +94,12 @@
                                                 </b>
                                             </span>
                                         </td>
-                                        <td class="second_table">
+                                        <td class="second_table left_column">
                                             <span>
                                                 <t t-esc="doc.zatca_unique_seq"/>
                                             </span>
                                         </td>
-                                        <td class="second_table" style="text-align:right;">
+                                        <td class="second_table left_column" style="text-align:right;">
                                             <span class="lable_bold">رقم الفاتورة</span>
                                         </td>
                                     </tr>
