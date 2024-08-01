@@ -300,7 +300,7 @@
                                 </td>
 
                             </tr>
-                            <tr>
+                            <!--<tr>
                                 <t t-if="conf_company['street2']['value']">
                                     <td class="second_table left_column">
                                         <span>
@@ -334,7 +334,7 @@
                                         <span class="lable_bold">اسم الشارع</span>
                                     </td>
                                 </t>
-                            </tr>
+                            </tr>-->
                             <tr>
                                 <td class="second_table left_column">
                                     <span>
