@@ -62,7 +62,7 @@
                                     <col style="width:15%"/>
                                     <col style="width:50%"/>
                                     <col style="width:15%"/>
-                                    <tr>
+                                    <!--<tr>
                                         <td class="second_table left_column">
                                             <span>
                                                 <b>Invoice Type</b>
@@ -79,7 +79,7 @@
                                         <td class="second_table" style="text-align:right;">
                                             <span class="lable_bold">نوع الفاتورة</span>
                                         </td>
-                                    </tr>
+                                    </tr>-->
                                     <tr>
                                         <td class="second_table left_column">
                                             <span>
@@ -148,7 +148,7 @@
                                         </tr>
                                     </t>
                                     <t t-elif="doc.invoice_origin">
-                                        <tr>
+                                       <!-- <tr>
                                             <td class="second_table left_column">
                                                 <span>
                                                     <b>Quotation Number</b>
@@ -162,9 +162,9 @@
                                             <td class="second_table" style="text-align:right;">
                                                 <span class="lable_bold">رقم الإقتباس</span>
                                             </td>
-                                        </tr>
+                                        </tr>-->
                                     </t>
-                                    <tr>
+                                    <!--<tr>
                                         <td class="second_table left_column">
                                             <span>
                                                 <b>Tax Currency</b>
@@ -176,8 +176,8 @@
                                         <td class="second_table" style="text-align:right;">
                                             <span class="lable_bold">العملة الضريبية</span>
                                         </td>
-                                    </tr>
-                                    <tr>
+                                    </tr>-->
+                                    <!--<tr>
                                         <td class="second_table left_column">
                                             <span>
                                                 <b>Supply Date</b>
@@ -191,7 +191,7 @@
                                         <td class="second_table" style="text-align:right;">
                                             <span class="lable_bold">ﺗﺎرﻳﺦ اﻟﺘﻮرﻳﺪ</span>
                                         </td>
-                                    </tr>
+                                    </tr>-->
                                     <tr t-if="doc.get_bt_120() not in [0, False, '', None] and len(doc.get_bt_120()) > 0">
                                         <td class="second_table left_column">
                                             <span>
