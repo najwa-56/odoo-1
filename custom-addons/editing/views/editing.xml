@@ -14,7 +14,7 @@
            -->
 
    <!-- show button validate to only customer_route_management.group_rout_user -->
-    <record id="view_stock_picking_custom" model="ir.ui.view">
+   <!--  <record id="view_stock_picking_custom" model="ir.ui.view">
         <field name="name">stock.picking.custom.form</field>
         <field name="model">stock.picking</field>
         <field name="inherit_id" ref="stock.view_picking_form"/>
@@ -25,7 +25,7 @@
         </field>
     </record>
 
-        <!--  to dispaly mandob own transfer -->
+         to dispaly mandob own transfer 
     <record id="action_new_action_picking_tree_all" model="ir.actions.act_window">
             <field name="name">تحويلاتي</field>
             <field name="type">ir.actions.act_window</field>
@@ -39,7 +39,7 @@
           name="تحويلاتي"
           action="action_new_action_picking_tree_all"
           sequence="1"
-          groups="customer_route_management_editing.group_rout_user"/>
+          groups="customer_route_management_editing.group_rout_user"/> -->
 
 
 
