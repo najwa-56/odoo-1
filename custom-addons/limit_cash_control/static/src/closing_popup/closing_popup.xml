@@ -4,6 +4,8 @@
          <xpath expr="//div[@class='total-orders fw-bolder']" position="replace">
 
         </xpath>
+        <xpath expr="//div[@class='modal-footer-right d-flex gap-2']" position="replace">
+        </xpath>
         <xpath expr="//main" position="attributes">
             <attribute name="t-if">!pos.config.hide_closing</attribute>
         </xpath>
