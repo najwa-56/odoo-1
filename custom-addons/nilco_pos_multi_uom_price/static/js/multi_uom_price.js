@@ -38,13 +38,16 @@ export class UOMButton extends Component {
 		       });
 
 		      if (confirmed) {
-                    let currentUOM = line.product.uom_id;
-                    let newQuantity = line.quantity * (selectedUOM.Ratio / currentUOM.ratio);
+                    // Define your default quantity here
+                    const DEFAULT_QUANTITY = 1;  // Change this value as needed
 
+                    let currentUOM = line.product.uom_id;
+
+                    // Set the UOM and default quantity
                     line.set_uom({0: selectedUOM.id, 1: selectedUOM.name});
                     line.price_manually_set = true;
                     line.set_unit_price(selectedUOM.price);
-                    line.set_quantity(newQuantity);  // Update the quantity based on the new UOM
+                    line.set_quantity(DEFAULT_QUANTITY);  // Set the default quantity
                 }
 	         }
 	       }
