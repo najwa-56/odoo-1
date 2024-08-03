@@ -26,23 +26,35 @@ export class UOMButton extends Component {
 				       uomList.push({
 					       id:	uomPrice.id,
 					       label:	uomPrice.name,
-					       isSelected: true,
+					        isSelected: false,
 					       item:	uomPrice,
 				       });
 				       });
 		       }
 		       const { confirmed, payload: selectedUOM } = await this.env.services.popup.add(
 			            SelectionPopup, {
-			       title: 'UOM',
+			        title: _t('UOM'),
 			       list: uomList,
 		       });
 
 		       if (confirmed) {
-			      line.set_uom({0:selectedUOM.id,1:selectedUOM.name});
-			      line.price_manually_set = true;
-			      line.set_unit_price(selectedUOM.price);
+                    // Access current UOM information and adjust quantity accordingly
+                    const currentUOMId = line.uom_id[0]; // Access current UOM ID
+                    const quantity = line.get_quantity();
 
-		       }
+                    // Fetch the ratio for the current and selected UOMs
+                    const currentUOMRatio = line.pos.product_uom_price[product]?.uom_id[currentUOMId]?.ratio || 1;
+                    const selectedUOMRatio = selectedUOM.ratio || 1;
+
+                    // Calculate new quantity based on UOM ratio
+                    const newQuantity = (quantity * currentUOMRatio) / selectedUOMRatio;
+
+                    // Update line with new UOM and price
+                    line.set_uom({0: selectedUOM.id, 1: selectedUOM.name});
+                    line.price_manually_set = true;
+                    line.set_unit_price(selectedUOM.price);
+                    line.set_quantity(newQuantity); // Update quantity based on UOM
+                }
 	         }
 	       }
        }	   
