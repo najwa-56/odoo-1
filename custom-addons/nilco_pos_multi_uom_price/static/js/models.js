@@ -58,6 +58,18 @@ patch(Orderline.prototype, {
         }
         return this.product.get_unit();
     }
+    adjust_quantity_for_uom() {
+    const unit = this.get_unit();
+    if (unit) {
+      const factor = unit.factor_inv;
+      this.set({ 'quantity': this.quantity * factor });
+    }
+  },
+
+  set_uom(uom_id) {
+    super.set_uom(uom_id);
+    this.adjust_quantity_for_uom();
+  }
 });
 patch(PosStore.prototype, {
     async _processData(loadedData) {
