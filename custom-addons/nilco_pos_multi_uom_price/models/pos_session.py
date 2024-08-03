@@ -13,7 +13,7 @@ class PosSession(models.Model):
 
 
     def _loader_params_product_multi_uom_price(self):
-        return {'search_params': {'domain': [], 'fields': ['product_id', 'uom_id', 'price'],},}
+        return {'search_params': {'domain': [], 'fields': ['product_id', 'uom_id', 'price','qty'],},}
 
     def _get_pos_ui_product_multi_uom_price(self, params):
         products_uom_price = self.env['product.multi.uom.price'].search_read(**params['search_params'])
@@ -23,6 +23,7 @@ class PosSession(models.Model):
             for unit in products_uom_price:
                 product_id = unit.get('product_id', False)
                 uom_id = unit.get('uom_id', False)
+                qty = unit.get('qty', 0)
 
                 if product_id and uom_id:
                     if product_id[0] not in product_uom_price:
@@ -33,6 +34,7 @@ class PosSession(models.Model):
                             'id': uom_id[0],
                             'name': uom_id[1],
                             'price': unit['price']*.85,
+                            'qty': qty,
                         }
 
         return product_uom_price
