@@ -14,6 +14,7 @@
                                 <field name="category_id" invisible="1" column_invisible="1"/>
                                 <field name="uom_id"/>
                                 <field name="price"/>
+                                <field name="qty"/>
                                   <field name="cost"/>
                             </tree>
                         </field>                                
