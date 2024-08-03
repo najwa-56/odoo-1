@@ -37,8 +37,8 @@ export class UOMButton extends Component {
 			       list: uomList,
 		       });
 		       if (confirmed) {
-                    let currentUOM = line.product.selectedUOM;
-                    let newQuantity = line.quantity * (selectedUOM.ratio / currentUOM.ratio);
+                    let currentUOM = line.product.uom_id;
+                    let newQuantity = line.quantity * (selectedUOM.Ratio / currentUOM.ratio);
 
                     line.set_uom({0: selectedUOM.id, 1: selectedUOM.name});
                     line.price_manually_set = true;
