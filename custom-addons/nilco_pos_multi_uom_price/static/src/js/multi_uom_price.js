@@ -31,27 +31,26 @@ export class UOMButton extends Component {
 				       });
 				       });
 		       }
-		         const { confirmed: uomConfirmed, payload: selectedUOM } = await this.env.services.popup.add(
-                SelectionPopup, {
-                    title: _t('Select UOM'),
-                    list: uomList,
-                }
-            );
+		       const { confirmed, payload: selectedUOM } = await this.env.services.popup.add(
+			            SelectionPopup, {
+			       title: 'UOM',
+			       list: uomList,
+		       });
+		       if (confirmed) {
+                    // Calculate the quantity based on the new UOM
+                    const previousUOM = line.get_uom();
+                    const previousUOMId = previousUOM ? previousUOM[0] : null;
+                    const quantity = line.get_quantity();
+                    const previousUOMRatio = previousUOMId ? line.pos.product_uom_price[product].uom_id[previousUOMId].Ratio : 1;
+                    const selectedUOMRatio = selectedUOM.Ratio;
 
-            if (uomConfirmed) {
-                const { confirmed: qtyConfirmed, payload: quantity } = await this.env.services.popup.add(
-                    NumberPopup, {
-                        title: _t('Enter Quantity'),
-                        value: line.qty,  // Default to current quantity
-                        min: 0,
-                    }
-                );
+                    // Adjust the quantity based on the Ratio of the UOMs
+                    const newQuantity = (quantity * previousUOMRatio) / selectedUOMRatio;
 
-                if (qtyConfirmed) {
-                    line.set_uom({ 0: selectedUOM.id, 1: selectedUOM.name });
+                    line.set_uom({0: selectedUOM.id, 1: selectedUOM.name});
                     line.price_manually_set = true;
                     line.set_unit_price(selectedUOM.price);
-                    line.set_quantity(quantity);  // Update the quantity based on UOM
+                    line.set_quantity(newQuantity); // Update quantity based on UOM
                 }
 	         }
 	       }

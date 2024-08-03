@@ -11,6 +11,13 @@ class multi_uom(models.Model):
     price = fields.Float(string='Price',required=True,digits='Product Price')
     cost = fields.Float(string='Cost',required=True,digits='Product Cost')
     qty = fields.Float(string="Quantity")
+    Ratio = fields.Float("Ratio", compute="_compute_ratio",
+                         store=False)  # Ratio field  # Related field to the ratio in uom.uom
+
+    @api.depends('uom_id')
+    def _compute_ratio(self):
+        for record in self:
+            record.Ratio = record.uom_id.ratio if record.uom_id else 1.0
 
    # _sql_constraints = [
      #   ('product_multi_uom_price_uniq',
