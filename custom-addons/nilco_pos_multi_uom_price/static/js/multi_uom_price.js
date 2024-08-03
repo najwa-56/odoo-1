@@ -37,25 +37,12 @@ export class UOMButton extends Component {
 			       list: uomList,
 		       });
 
-		      if (confirmed) {
-                    let currentUOM = line.product.uom_id;
-                    let newQuantity = line.quantity * (selectedUOM.ratio / currentUOM.ratio);
+		       if (confirmed) {
+			      line.set_uom({0:selectedUOM.id,1:selectedUOM.name});
+			      line.price_manually_set = true;
+			      line.set_unit_price(selectedUOM.price);
 
-                    // Debugging: Check selectedUOM price
-                    console.log('Selected UOM:', selectedUOM);
-                    console.log('Selected UOM Price:', selectedUOM.price);
-
-                    // Ensure price is not zero or undefined
-                    if (selectedUOM.price !== undefined && selectedUOM.price > 0) {
-                        line.set_uom({0: selectedUOM.id, 1: selectedUOM.name});
-                        line.price_manually_set = true;
-                        line.set_unit_price(selectedUOM.price);
-                        line.set_quantity(newQuantity);  // Update the quantity based on the new UOM
-                    } else {
-                        console.error('Invalid price for selected UOM:', selectedUOM);
-                        // Handle the error appropriately
-                    }
-                }
+		       }
 	         }
 	       }
        }	   
