@@ -25,7 +25,7 @@
         </field>
     </record>
 
-         to dispaly mandob own transfer 
+         to dispaly mandob own transfer
     <record id="action_new_action_picking_tree_all" model="ir.actions.act_window">
             <field name="name">تحويلاتي</field>
             <field name="type">ir.actions.act_window</field>

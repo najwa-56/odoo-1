@@ -23,7 +23,7 @@ class PosSession(models.Model):
             for unit in products_uom_price:
                 product_id = unit.get('product_id', False)
                 uom_id = unit.get('uom_id', False)
-                qty = unit.get('qty', 0)
+                qty = unit.get('qty', 1)
 
                 if product_id and uom_id:
                     if product_id[0] not in product_uom_price:
