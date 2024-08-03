@@ -19,6 +19,19 @@ class PosOrderLine(models.Model):
         for record in self:
             record.Ratio = record.product_uom_id.ratio if record.product_uom_id else 1.0
 
+    @api.depends('price_unit', 'qty', 'discount', 'tax_ids')
+    def _onchange_uom(self):
+        for line in self:
+            if line.product_uom_id:
+                price = line.price_unit * (1 - (line.discount or 0.0) / 100.0)
+                line.price_subtotal = line.price_subtotal_incl = price * line.qty
+
+                if line.tax_ids:
+                    taxes = line.tax_ids.compute_all(price, line.order_id.currency_id, line.qty,
+                                                     product=line.product_id, partner=False)
+                    line.price_subtotal = taxes['total_excluded']
+                    line.price_subtotal_incl = taxes['total_included']
+
     def _compute_total_cost(self, stock_moves=None):
         """
         Compute the total cost of the order lines and multiply by the ratio.
@@ -41,3 +54,7 @@ class PosOrderLine(models.Model):
         res = super()._export_for_ui(orderline)
         res.update({'product_uom_id': orderline.product_uom_id.id})
         return res
+
+
+
+
