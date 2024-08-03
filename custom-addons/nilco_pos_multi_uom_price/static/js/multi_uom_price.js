@@ -41,8 +41,6 @@ export class UOMButton extends Component {
                     // Define your default quantity here
                     const DEFAULT_QUANTITY = 1;  // Change this value as needed
 
-                    let currentUOM = line.product.uom_id;
-
                     // Set the UOM and default quantity
                     line.set_uom({0: selectedUOM.id, 1: selectedUOM.name});
                     line.price_manually_set = true;
