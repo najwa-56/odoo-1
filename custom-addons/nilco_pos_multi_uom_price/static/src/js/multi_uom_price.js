@@ -37,20 +37,11 @@ export class UOMButton extends Component {
 			       list: uomList,
 		       });
 		       if (confirmed) {
-                    // Access UOM and ratio directly from the line's properties
-                    const previousUOMId = line.uom_id; // Accessing UOM ID directly if available
-                    const quantity = line.quantity; // Assuming `quantity` is a property of line
-                    const previousUOMRatio = previousUOMId ? line.pos.product_uom_price[product].uom_id[previousUOMId].ratio : 1;
-                    const selectedUOMRatio = selectedUOM.ratio;
+			      line.set_uom({0:selectedUOM.id,1:selectedUOM.name});
+			      line.price_manually_set = true;
+			      line.set_unit_price(selectedUOM.price);
 
-                    // Adjust the quantity based on the ratio of the UOMs
-                    const newQuantity = (quantity * previousUOMRatio) / selectedUOMRatio;
-
-                    line.set_uom({0: selectedUOM.id, 1: selectedUOM.name});
-                    line.price_manually_set = true;
-                    line.set_unit_price(selectedUOM.price);
-                    line.set_quantity(newQuantity); // Update quantity based on UOM
-                }
+		       }
 	         }
 	       }
        }	   
