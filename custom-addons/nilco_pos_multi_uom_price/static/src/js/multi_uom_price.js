@@ -37,14 +37,12 @@ export class UOMButton extends Component {
 			       list: uomList,
 		       });
 		       if (confirmed) {
-                    // Define your default quantity here
-                    const DEFAULT_QUANTITY = 1;  // Change this value as needed
-                    // Set the UOM and default quantity
-                    line.set_uom({0: selectedUOM.id, 1: selectedUOM.name});
-                    line.price_manually_set = true;
-                    line.set_unit_price(selectedUOM.price);
-                    line.set_quantity(DEFAULT_QUANTITY);  // Set the default quantity
-                }
+			      line.set_uom({0:selectedUOM.id,1:selectedUOM.name});
+			      line.price_manually_set = true;
+			      line.set_unit_price(selectedUOM.price);
+			      line.set_quantity(selectedUOM.qty);
+
+		       }
 	         }
 	       }
        }	   

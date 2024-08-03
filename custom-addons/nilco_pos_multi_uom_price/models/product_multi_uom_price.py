@@ -10,7 +10,7 @@ class multi_uom(models.Model):
     uom_id = fields.Many2one('uom.uom', string="Unit of Measure", domain="[('category_id', '=', category_id)]")#,required=True
     price = fields.Float(string='Price',required=True,digits='Product Price')
     cost = fields.Float(string='Cost',required=True,digits='Product Cost')
-    qty = fields.Float(string="Quantity")
+    qty = fields.Float(string="Quantity" , default="1")
     Ratio = fields.Float("Ratio", compute="_compute_ratio",
                          store=False)  # Ratio field  # Related field to the ratio in uom.uom
 
