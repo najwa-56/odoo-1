@@ -28,6 +28,7 @@ class PosOrderLine(models.Model):
         for line in self:
             line.total_cost = line.total_cost * line.Ratio if line.Ratio else line.total_cost
 
+
     @api.depends('price_subtotal', 'total_cost')
     def _compute_margin(self):
         for line in self:

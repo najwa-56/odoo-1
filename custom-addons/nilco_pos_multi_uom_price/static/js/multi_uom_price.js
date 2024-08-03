@@ -31,28 +31,28 @@ export class UOMButton extends Component {
 				       });
 				       });
 		       }
-		       const { confirmed, payload: selectedUOM } = await this.env.services.popup.add(
-			            SelectionPopup, {
-			       title: 'UOM',
-			       list: uomList,
-		       });
+		         const { confirmed: uomConfirmed, payload: selectedUOM } = await this.env.services.popup.add(
+                SelectionPopup, {
+                    title: _t('Select UOM'),
+                    list: uomList,
+                }
+            );
 
-		       if (confirmed) {
-                    // Ask for the new quantity
-                    const { confirmed: qtyConfirmed, payload: quantity } = await this.env.services.popup.add(
-                        NumberPopup, {
-                            title: _t('Enter Quantity'),
-                            value: line.get_quantity(), // Default to current quantity
-                            min: 0,
-                        }
-                    );
-                    if (qtyConfirmed) {
-                        line.set_uom({ 0: selectedUOM.id, 1: selectedUOM.name });
-                        line.price_manually_set = true;
-                        line.set_unit_price(selectedUOM.price);
-                        line.set_quantity(quantity); // Set the new quantity
+            if (uomConfirmed) {
+                const { confirmed: qtyConfirmed, payload: quantity } = await this.env.services.popup.add(
+                    NumberPopup, {
+                        title: _t('Enter Quantity'),
+                        value: line.qty,  // Default to current quantity
+                        min: 0,
                     }
-		       
+                );
+
+                if (qtyConfirmed) {
+                    line.set_uom({ 0: selectedUOM.id, 1: selectedUOM.name });
+                    line.price_manually_set = true;
+                    line.set_unit_price(selectedUOM.price);
+                    line.set_quantity(quantity);  // Update the quantity based on UOM
+                }
 	         }
 	       }
        }	   
