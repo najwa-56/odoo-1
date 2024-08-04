@@ -56,7 +56,9 @@ _onQuantityChange() {
 
         let uom = this.get_unit();
         if (uom) {
-            this.set_unit_price(uom.price);
+            // Fetch the price from UOM-related data
+            let price = this.pos.product_uom_price[this.product.product_tmpl_id].uom_id[uom.id]?.price || this.price_unit;
+            this.set_unit_price(price);
     },
     set_unit_price(price) {
         this.unit_price = price;
