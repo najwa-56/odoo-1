@@ -14,6 +14,19 @@ class PosOrderLine(models.Model):
     Ratio = fields.Float("Ratio", compute="_compute_ratio",
                          store=False)  # Ratio field  # Related field to the ratio in uom.uom
 
+    @api.depends('qty', 'product_uom_id')
+    def _compute_price(self):
+        for line in self:
+            if line.product_uom_id:
+                uom = line.product_uom_id
+                # Assuming you have a way to get the price based on UOM
+                price = line.product_uom_price.get(uom.id, line.price_unit)
+                line.price_unit = price * uom.ratio
+                line.price_subtotal = line.price_unit * line.qty
+                line.price_total = line.price_subtotal + \
+                                   line.tax_ids.compute_all(line.price_unit, line.currency_id, line.qty)[
+                                       'total_included']
+
     @api.depends('product_uom_id')
     def _compute_ratio(self):
         for record in self:
@@ -43,53 +56,3 @@ class PosOrderLine(models.Model):
         res.update({'product_uom_id': orderline.product_uom_id.id})
 
         return res
-
-    @api.onchange('qty', 'discount', 'price_unit', 'tax_ids', 'product_uom_id')
-    def _onchange_qty(self):
-        if self.product_id:
-            base_price = self.order_id.pricelist_id._get_product_price(
-                self.product_id, self.qty or 1.0, currency=self.currency_id
-            )
-            if self.product_uom_id:
-                uom = self.env['uom.uom'].browse(self.product_uom_id.id)
-                self.price_unit = uom.price if uom.price else base_price
-            else:
-                self.price_unit = base_price
-             # Use the stored UOM price if available
-            price = self.price_unit
-            price = price * (1 - (self.discount or 0.0) / 100.0)
-            self.price_subtotal = self.price_subtotal_incl = price * self.qty
-            if self.tax_ids:
-                taxes = self.tax_ids.compute_all(price, self.order_id.currency_id, self.qty, product=self.product_id,
-                                                 partner=False)
-                self.price_subtotal = taxes['total_excluded']
-                self.price_subtotal_incl = taxes['total_included']
-
-    @api.onchange('product_id', 'product_uom_id')
-    def _onchange_product_id(self):
-        if self.product_id:
-            # Get the base price from the pricelist
-            base_price = self.order_id.pricelist_id._get_product_price(
-                self.product_id, self.qty or 1.0, currency=self.currency_id
-            )
-
-            # Check if a UOM is selected
-            if self.product_uom_id:
-                uom = self.env['uom.uom'].browse(self.product_uom_id.id)
-                # Use UOM price if available
-                self.price_unit = uom.price if uom.price else base_price
-            else:
-                self.price_unit = base_price
-
-            # Update taxes based on the product and fiscal position
-            self.tax_ids = self.product_id.taxes_id.filtered_domain(
-                self.env['account.tax']._check_company_domain(self.company_id))
-            tax_ids_after_fiscal_position = self.order_id.fiscal_position_id.map_tax(self.tax_ids)
-
-            # Fix tax-included price based on the selected UOM or base price
-            self.price_unit = self.env['account.tax']._fix_tax_included_price_company(
-                self.price_unit, self.tax_ids, tax_ids_after_fiscal_position, self.company_id
-            )
-
-            # Trigger quantity-related recalculations
-            self._onchange_qty()
