@@ -70,6 +70,6 @@ class PosOrderLine(models.Model):
         return record
 
     def set_uom(self, uom):
-        self.product_uom_id = uom.get('0')
-        self.uom_price = self.env['uom.uom'].browse(uom.get('0')).price
-        self._onchange_qty()
+        self.product_uom_id = self.env['uom.uom'].browse(uom.get('0'))
+        self.uom_price = self.product_uom_id.price  # Update price based on selected UOM
+        self._onchange_qty()  # Recalculate prices and subtotals
