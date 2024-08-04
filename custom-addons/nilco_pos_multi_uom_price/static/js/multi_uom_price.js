@@ -53,7 +53,7 @@ export class UOMButton extends Component {
             // Recalculate and update the line price based on the current quantity
             let quantity = line.quantity;
             let unitPrice = line.get_unit_price();
-            line.set_price(quantity * unitPrice);
+            line.set_unit_price(quantity * unitPrice);
         }
     }
      _onOrderlineChange() {
