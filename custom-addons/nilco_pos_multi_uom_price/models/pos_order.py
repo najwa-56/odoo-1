@@ -10,10 +10,6 @@ _logger = logging.getLogger(__name__)
 class PosOrderLine(models.Model):
     _inherit = 'pos.order.line'
 
-    selected_uom_ids = fields.Many2many(string="Uom Ids", related='product_id.selected_uom_ids')
-    pos_multi_uom_id = fields.Many2one("product.multi.uom.price", string="Cust UOM", domain="[('id', 'in', selected_uom_ids)]")
-    uom_price = fields.Float(string="UOM price", related='pos_multi_uom_id.price')
-
     product_uom_id = fields.Many2one('uom.uom', string='Product UoM', related='')
     Ratio = fields.Float("Ratio", compute="_compute_ratio",
                          store=False)  # Ratio field  # Related field to the ratio in uom.uom
@@ -51,8 +47,16 @@ class PosOrderLine(models.Model):
     @api.onchange('qty', 'discount', 'price_unit', 'tax_ids', 'product_uom_id')
     def _onchange_qty(self):
         if self.product_id:
-            # Use the stored UOM price if available
-            price = self.uom_price or self.price_unit
+            base_price = self.order_id.pricelist_id._get_product_price(
+                self.product_id, self.qty or 1.0, currency=self.currency_id
+            )
+            if self.product_uom_id:
+                uom = self.env['uom.uom'].browse(self.product_uom_id.id)
+                self.price_unit = uom.price if uom.price else base_price
+            else:
+                self.price_unit = base_price
+             # Use the stored UOM price if available
+            price = self.price_unit
             price = price * (1 - (self.discount or 0.0) / 100.0)
             self.price_subtotal = self.price_subtotal_incl = price * self.qty
             if self.tax_ids:
