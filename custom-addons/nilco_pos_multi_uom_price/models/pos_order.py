@@ -61,15 +61,31 @@ class PosOrderLine(models.Model):
                 self.price_subtotal = taxes['total_excluded']
                 self.price_subtotal_incl = taxes['total_included']
 
-    @api.model
-    def create(self, vals):
-        record = super(PosOrderLine, self).create(vals)
-        if record.product_uom_id:
-            uom = self.env['uom.uom'].browse(record.product_uom_id.id)
-            record.uom_price = uom.price  # Assuming the UOM model has a price field
-        return record
+    @api.onchange('product_id', 'product_uom_id')
+    def _onchange_product_id(self):
+        if self.product_id:
+            # Get the base price from the pricelist
+            base_price = self.order_id.pricelist_id._get_product_price(
+                self.product_id, self.qty or 1.0, currency=self.currency_id
+            )
 
-    def set_uom(self, uom):
-        self.product_uom_id = self.env['uom.uom'].browse(uom.get('0'))
-        self.uom_price = self.product_uom_id.price  # Update price based on selected UOM
-        self._onchange_qty()  # Recalculate prices and subtotals
+            # Check if a UOM is selected
+            if self.product_uom_id:
+                uom = self.env['uom.uom'].browse(self.product_uom_id.id)
+                # Use UOM price if available
+                self.price_unit = uom.price if uom.price else base_price
+            else:
+                self.price_unit = base_price
+
+            # Update taxes based on the product and fiscal position
+            self.tax_ids = self.product_id.taxes_id.filtered_domain(
+                self.env['account.tax']._check_company_domain(self.company_id))
+            tax_ids_after_fiscal_position = self.order_id.fiscal_position_id.map_tax(self.tax_ids)
+
+            # Fix tax-included price based on the selected UOM or base price
+            self.price_unit = self.env['account.tax']._fix_tax_included_price_company(
+                self.price_unit, self.tax_ids, tax_ids_after_fiscal_position, self.company_id
+            )
+
+            # Trigger quantity-related recalculations
+            self._onchange_qty()
