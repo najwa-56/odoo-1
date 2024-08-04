@@ -58,8 +58,7 @@ patch(Orderline.prototype, {
             this.set_unit_price(uom.price);
     },
     set_unit_price(price) {
-        this.unit_price = price;
-        this.trigger('change:unit_price');
+        this.unit_price = price*this.quantity;
     },
     get_unit(){
         if (this.product_uom_id){

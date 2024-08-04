@@ -61,8 +61,7 @@ patch(Orderline.prototype, {
     },
 
     set_unit_price(price) {
-        this.unit_price = price;
-        this.trigger('change:unit_price');
+        this.unit_price = price*this.quantity;
     },
 
     get_unit() {
