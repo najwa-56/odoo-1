@@ -16,6 +16,7 @@ patch(Orderline.prototype, {
     setup(_defaultObj, options) {
         super.setup(...arguments);
         this.product_uom_id =  this.product_uom_id || this.product.uom_id;
+        this.on('change:quantity', this._onQuantityChange.bind(this));
     },
 
     export_as_JSON() {
@@ -41,6 +42,15 @@ patch(Orderline.prototype, {
     }
 },
 
+_onQuantityChange() {
+        // Handle quantity changes and update the price
+        let uom = this.get_unit();
+        if (uom) {
+            let price = uom.price;
+            this.set_unit_price(price);
+        }
+    },
+
     set_uom(uom_id) {
         this.product_uom_id = uom_id;
 
@@ -52,6 +62,8 @@ patch(Orderline.prototype, {
         this.unit_price = price;
         this.trigger('change:unit_price');
     }
+
+
     get_unit(){
         if (this.product_uom_id){
             var unit_id = this.product_uom_id;

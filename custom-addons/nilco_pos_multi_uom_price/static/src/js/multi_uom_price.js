@@ -9,8 +9,6 @@ export class UOMButton extends Component {
     static template = "point_of_sale.UOMButton";
     setup() {
            super.setup();
-           this.product_uom_id = this.product_uom_id || this.product.uom_id;
-        this.on('change:quantity', this._onQuantityChange.bind(this));
        }
     get selectedOrderline() {
 	       return this.env.services.pos.get_order().get_selected_orderline();
