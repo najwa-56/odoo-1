@@ -9,6 +9,8 @@ export class UOMButton extends Component {
     static template = "point_of_sale.UOMButton";
     setup() {
            super.setup();
+           this.product_uom_id = this.product_uom_id || this.product.uom_id;
+        this.on('change:quantity', this._onQuantityChange.bind(this));
        }
     get selectedOrderline() {
 	       return this.env.services.pos.get_order().get_selected_orderline();
@@ -46,6 +48,17 @@ export class UOMButton extends Component {
 	         }
 	       }
        }
+       _onQuantityChange() {
+        let line = this.selectedOrderline;
+        if (line) {
+            // Assuming the price should be updated based on the current UOM
+            let uom = line.get_unit();
+            if (uom) {
+                let price = uom.price;
+                line.set_unit_price(price);
+            }
+        }
+    }
    }
 
 
