@@ -38,24 +38,15 @@ export class UOMButton extends Component {
 		       });
 
 		       if (confirmed) {
-                // Store selected UOM and price
-                line.set_uom({0: selectedUOM.id, 1: selectedUOM.name});
-                line.price_manually_set = true;
-                line.uom_price = selectedUOM.price; // Store UOM price
+			      line.set_uom({0:selectedUOM.id,1:selectedUOM.name});
+			      line.price_manually_set = true;
+			      line.set_unit_price(selectedUOM.price);
 
-                // Update the price based on the current quantity
-                this.updatePriceBasedOnQuantity(line);
-            }
+		       }
 	         }
 	       }
-       }
-    updatePriceBasedOnQuantity(line) {
-        const quantity = line.get_quantity() || 1;
-        const price = line.uom_price * quantity; // Calculate price based on UOM price and quantity
-        line.set_unit_price(price);
-        line.set_quantity(quantity);  // Ensure quantity is updated
-    }
-}
+       }	   
+   }
 
 
 ProductScreen.addControlButton({
