@@ -41,7 +41,6 @@ export class UOMButton extends Component {
                 line.set_uom({0: selectedUOM.id, 1: selectedUOM.name});
                 line.price_manually_set = true;
                 line.uom_price = selectedUOM.price; // Store UOM price
-
                 // Update the price based on the current quantity
                 this.updatePriceBasedOnQuantity(line);
             }
