@@ -53,7 +53,6 @@ export class UOMButton extends Component {
         const quantity = line.get_quantity() || 1;
         const price = line.uom_price * quantity; // Calculate price based on UOM price and quantity
         line.set_unit_price(price);
-        line.trigger('change');
     }
 }
 
