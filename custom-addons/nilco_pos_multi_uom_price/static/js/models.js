@@ -63,7 +63,7 @@ _onQuantityChange() {
     set_unit_price(price) {
         this.unit_price = price;
         this.trigger('change:unit_price');
-    }
+    },
 
 
     get_unit(){

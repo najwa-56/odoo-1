@@ -61,7 +61,7 @@ _onQuantityChange() {
     set_unit_price(price) {
         this.unit_price = price;
         this.trigger('change:unit_price');
-    }
+    },
     get_unit(){
         if (this.product.default_uom_price > 0 & this.price_type == "original" & this.product.default_uom_id != false){
             this.price = this.product.default_uom_price;
