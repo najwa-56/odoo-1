@@ -38,11 +38,17 @@ export class UOMButton extends Component {
 		       });
 
 		       if (confirmed) {
-			      line.set_uom({0:selectedUOM.id,1:selectedUOM.name});
-			      line.price_manually_set = true;
-			      line.set_unit_price(selectedUOM.price);
+                // Set the new UOM
+                line.set_uom({0: selectedUOM.id, 1: selectedUOM.name});
+                line.price_manually_set = true;
 
-		       }
+                // Calculate and set the new price based on UOM
+                const newPrice = selectedUOM.price * (line.get_quantity() || 1); // Adjust the formula based on your pricing rules
+                line.set_unit_price(newPrice);
+
+                // Optionally update the quantity if required
+                // line.set_quantity(newQuantity); // Set a new quantity if needed
+            }
 	         }
 	       }
        }	   

@@ -40,17 +40,9 @@ class PosOrderLine(models.Model):
 
     def _export_for_ui(self, orderline):
         res = super()._export_for_ui(orderline)
-        res.update({
-            'product_uom_id': orderline.product_uom_id.id,
-            'qty': orderline.qty
-        })
-        return res
+        res.update({'product_uom_id': orderline.product_uom_id.id})
 
-    def _onchange_uom(self, product_uom_id):
-        if product_uom_id:
-            uom = self.env['uom.uom'].browse(product_uom_id)
-            conversion_factor = uom.factor_inv
-            self.qty = self.qty * conversion_factor
+        return res
 
 
 
