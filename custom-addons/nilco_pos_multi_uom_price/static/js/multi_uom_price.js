@@ -50,11 +50,12 @@ export class UOMButton extends Component {
 	       }
        }
     updatePriceBasedOnQuantity(line) {
-    const quantity = line.get_quantity() || 1;
-    const price = line.uom_price * quantity;
-    line.set_unit_price(price);
+        const quantity = line.get_quantity() || 1;
+        const price = line.uom_price * quantity; // Calculate price based on UOM price and quantity
+        line.set_unit_price(price);
+        line.trigger('change');
+    }
 }
-   }
 
 
 ProductScreen.addControlButton({

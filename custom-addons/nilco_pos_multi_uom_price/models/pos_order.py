@@ -60,3 +60,16 @@ class PosOrderLine(models.Model):
                                                  partner=False)
                 self.price_subtotal = taxes['total_excluded']
                 self.price_subtotal_incl = taxes['total_included']
+
+    @api.model
+    def create(self, vals):
+        record = super(PosOrderLine, self).create(vals)
+        if record.product_uom_id:
+            uom = self.env['uom.uom'].browse(record.product_uom_id.id)
+            record.uom_price = uom.price  # Assuming the UOM model has a price field
+        return record
+
+    def set_uom(self, uom):
+        self.product_uom_id = uom.get('0')
+        self.uom_price = self.env['uom.uom'].browse(uom.get('0')).price
+        self._onchange_qty()
