@@ -36,21 +36,23 @@ export class UOMButton extends Component {
 			       title: 'UOM',
 			       list: uomList,
 		       });
-		       if (confirmed) {
-                // Set the new UOM
+		      if (confirmed) {
+                // Store selected UOM and price
                 line.set_uom({0: selectedUOM.id, 1: selectedUOM.name});
                 line.price_manually_set = true;
+                line.uom_price = selectedUOM.price; // Store UOM price
 
-                // Calculate and set the new price based on UOM
-                const newPrice = selectedUOM.price * (line.get_quantity() || 1); // Adjust the formula based on your pricing rules
-                line.set_unit_price(newPrice);
-
-                // Optionally update the quantity if required
-                // line.set_quantity(newQuantity); // Set a new quantity if needed
+                // Update the price based on the current quantity
+                this.updatePriceBasedOnQuantity(line);
             }
 	         }
 	       }
-       }	   
+       }
+       updatePriceBasedOnQuantity(line) {
+    const quantity = line.get_quantity() || 1;
+    const price = line.uom_price * quantity;
+    line.set_unit_price(price);
+}
    }
 
 

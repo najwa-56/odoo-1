@@ -14,6 +14,9 @@ class PosOrderLine(models.Model):
     Ratio = fields.Float("Ratio", compute="_compute_ratio",
                          store=False)  # Ratio field  # Related field to the ratio in uom.uom
 
+    uom_price = fields.Float(string='UOM Price')  # Store the UOM price
+
+
     @api.depends('product_uom_id')
     def _compute_ratio(self):
         for record in self:
@@ -43,6 +46,17 @@ class PosOrderLine(models.Model):
         res.update({'product_uom_id': orderline.product_uom_id.id})
 
         return res
+
+    def set_uom(self, uom):
+        # Update UOM and store price
+        self.product_uom_id = uom.get('0')
+        self.uom_price = self.env['uom.uom'].browse(uom.get('0')).price  # Assuming UOM has a price field
+        self._update_price()
+
+    def _update_price(self):
+        # Update the price based on UOM and quantity
+        quantity = self.qty
+        self.price_unit = self.uom_price * quantity
 
 
 
