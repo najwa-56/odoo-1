@@ -44,17 +44,6 @@ export class UOMButton extends Component {
 	         }
 	       }
        }
-       _onQuantityChange() {
-        let line = this.selectedOrderline;
-        if (line) {
-            // Assuming the price should be updated based on the current UOM
-            let uom = line.get_unit();
-            if (uom) {
-                let price = uom.price;
-                line.set_unit_price(price);
-            }
-        }
-    }
    }
 
 
