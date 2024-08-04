@@ -16,6 +16,8 @@ patch(Orderline.prototype, {
     setup(_defaultObj, options) {
         super.setup(...arguments);
         this.product_uom_id = this.product.default_uom_id || this.product_uom_id || this.product.uom_id;
+                this.on('change:quantity', this._onQuantityChange.bind(this));
+
     },
 
     export_as_JSON() {
@@ -40,9 +42,26 @@ patch(Orderline.prototype, {
         this.product_uom_id = null;  // or some default value
     }
 },
+_onQuantityChange() {
+        // Handle quantity changes and update the price
+        let uom = this.get_unit();
+        if (uom) {
+            let price = uom.price;
+            this.set_unit_price(price);
+        }
+    },
     set_uom(uom_id) {
         this.product_uom_id = uom_id;
+        let uom = this.get_unit();
+        if (uom) {
+            // Fetch the price from UOM-related data
+            let price = this.pos.product_uom_price[this.product.product_tmpl_id].uom_id[uom.id]?.price || this.price_unit;
+            this.set_unit_price(price);
     },
+    set_unit_price(price) {
+        this.unit_price = price;
+        this.trigger('change:unit_price');
+    }
     get_unit(){
         if (this.product.default_uom_price > 0 & this.price_type == "original" & this.product.default_uom_id != false){
             this.price = this.product.default_uom_price;
