@@ -11,8 +11,8 @@
                         </button>
                     </div>
                     <div class="modal-body">
-                        <!-- Ensure `quantity` is correctly bound for two-way data binding -->
-                        <input type="number" class="form-control" t-model="quantity" min="0" step="any"/>
+                        <!-- Correctly bind quantity -->
+                        <input type="number" class="form-control" t-model="state.quantity" min="0" step="any"/>
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" t-on-click="onClose"><t t-esc="_t('Cancel')"/></button>

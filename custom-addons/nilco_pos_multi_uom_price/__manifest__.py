@@ -23,7 +23,11 @@
     ],
     'installable': True,
     'auto_install': False,
-    'assets': {'web.assets_backend': [
+    'qweb': [
+        'static/src/xml/quantity_popup.xml',
+    ],
+    'assets': {
+        'web.assets_backend': [
             'static/src/js/*.js',
         ],
         'point_of_sale._assets_pos':[
