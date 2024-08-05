@@ -5605,9 +5605,8 @@ class StockMove(TransactionCase):
         self.assertTrue(all(move.state == 'done' for move in picking.move_ids), 'Wrong state for move.')
 
     def test_put_in_pack_1(self):
-        """ Check that reserving a move and adding its move lines to
-        different packages work as expected.
-        """
+        """ Check that completing a move in 2 separate move lines and calling put in pack after
+        each ml's creation puts them in different packages. """
         self.env['stock.quant']._update_available_quantity(self.product, self.stock_location, 2)
         picking = self.env['stock.picking'].create({
             'location_id': self.stock_location.id,
@@ -5630,14 +5629,16 @@ class StockMove(TransactionCase):
         self.assertEqual(self.env['stock.quant']._get_available_quantity(self.product, self.stock_location), 0)
         move1.quantity = 1
         picking.action_put_in_pack()
+        picking.action_assign()
 
         self.assertEqual(self.env['stock.quant']._get_available_quantity(self.product, self.stock_location), 0)
         self.assertEqual(len(picking.move_line_ids), 2)
-        unpacked_ml = picking.move_line_ids.filtered(lambda ml: not ml.result_package_id)
-        self.assertEqual(unpacked_ml.quantity_product_uom, 1)
-        unpacked_ml.quantity = 1
+        not_packed_ml = picking.move_line_ids.filtered(lambda ml: not ml.result_package_id)
+        self.assertEqual(not_packed_ml.quantity_product_uom, 1)
+        not_packed_ml.quantity = 1
         picking.action_put_in_pack()
         self.assertEqual(len(picking.move_line_ids), 2)
+        self.assertNotEqual(picking.move_line_ids[0].result_package_id, picking.move_line_ids[1].result_package_id)
         self.assertEqual(self.env['stock.quant']._get_available_quantity(self.product, self.stock_location), 0)
         picking.move_ids.picked = True
         picking.button_validate()
@@ -5980,6 +5981,7 @@ class StockMove(TransactionCase):
         self.assertEqual(len(picking.move_line_ids), 1)
 
         picking.action_put_in_pack()  # Create a first package
+        picking.action_assign()
         self.assertEqual(len(picking.move_line_ids), 2)
 
         unpacked_ml = picking.move_line_ids.filtered(lambda ml: not ml.result_package_id)
@@ -6600,3 +6602,41 @@ class StockMove(TransactionCase):
             total_qty <= storage_category.product_capacity_ids.quantity,
             f'On-hand quantity = {total_qty}'
         )
+
+    def test_correct_quantity_autofilled(self):
+        """
+         Check if the quantity is correctly computed when:
+            - The product uom differs from the move uom.
+            - Move lines are manually removed and added back.
+            - The quantity is manually divided into different move lines.
+        """
+        self.product.uom_id = self.env.ref('uom.product_uom_gram')
+        quant = self.env['stock.quant'].create({
+            'product_id': self.product.id,
+            'location_id': self.stock_location.id,
+            'quantity': 1000000,
+        })
+        move = self.env['stock.move'].create({
+            'name': 'Test move',
+            'product_id': self.product.id,
+            'product_uom_qty': 2,
+            'product_uom': self.env.ref('uom.product_uom_kgm').id,
+            'location_id': self.stock_location.id,
+            'location_dest_id': self.customer_location.id,
+        })
+        move._action_confirm()
+        # remove the exsiting ml
+        move.move_line_ids.unlink()
+        # add a ml
+        line1 = self.env['stock.move.line'].create({
+            'move_id': move.id,
+        })
+        line1.quant_id = quant
+        self.assertEqual(move.move_line_ids.quantity, 2.0)
+        # assign half the quantity to the first ml and add another one
+        line1.quantity = 1.0
+        line2 = self.env['stock.move.line'].create({
+            'move_id': move.id,
+        })
+        line2.quant_id = quant
+        self.assertEqual(move.move_line_ids[1].quantity, 1.0)

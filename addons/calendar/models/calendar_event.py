@@ -293,7 +293,7 @@ class Meeting(models.Model):
             # Right before saving the event, old partners must be able to save changes.
             if event._origin:
                 editor_candidates += event._origin.partner_ids.user_ids
-            event.user_can_edit = self.env.user in editor_candidates
+            event.user_can_edit = self.env.user.id in editor_candidates.ids
 
     @api.depends('attendee_ids')
     def _compute_invalid_email_partner_ids(self):
@@ -626,7 +626,7 @@ class Meeting(models.Model):
     def write(self, values):
         detached_events = self.env['calendar.event']
         recurrence_update_setting = values.pop('recurrence_update', None)
-        update_recurrence = recurrence_update_setting in ('all_events', 'future_events') and len(self) == 1
+        update_recurrence = recurrence_update_setting in ('all_events', 'future_events') and len(self) == 1 and self.recurrence_id
         break_recurrence = values.get('recurrency') is False
 
         if any(vals in self._get_recurrent_fields() for vals in values) and not (update_recurrence or values.get('recurrency')):

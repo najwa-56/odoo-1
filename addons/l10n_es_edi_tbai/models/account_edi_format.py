@@ -114,8 +114,9 @@ class AccountEdiFormat(models.Model):
                 error_msg = _("TicketBAI: Cannot post invoice while chain head (%s) has not been posted", chain_head.name)
             if (
                 invoice.move_type == 'out_refund'
-                and not invoice.reversed_entry_id._l10n_es_tbai_is_in_chain()
-                and invoice.reversed_entry_id.edi_document_ids.filtered(lambda d: d.edi_format_id.code == 'es_tbai')  # avoid imported ones
+                and not invoice.reversed_entry_id or (
+                    not invoice.reversed_entry_id._l10n_es_tbai_is_in_chain()
+                    and invoice.reversed_entry_id.edi_document_ids.filtered(lambda d: d.edi_format_id.code == 'es_tbai'))  # avoid imported ones
             ):
                 error_msg = _("TicketBAI: Cannot post a reversal move while the source document (%s) has not been posted", invoice.reversed_entry_id.name)
 
@@ -374,7 +375,7 @@ class AccountEdiFormat(models.Model):
                 'discount': discount * refund_sign,
                 'unit_price': (line.balance + discount) / line.quantity * refund_sign if line.quantity > 0 else 0,
                 'total': total,
-                'description': regex_sub(r'[^0-9a-zA-Z ]', '', line.name)[:250]
+                'description': regex_sub(r'[^0-9a-zA-Z ]', '', line.name or '')[:250]
             })
         values['invoice_lines'] = invoice_lines
         # Tax details (desglose)

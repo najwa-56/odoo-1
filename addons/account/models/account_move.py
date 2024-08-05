@@ -322,6 +322,7 @@ class AccountMove(models.Model):
         string='Commercial Entity',
         compute='_compute_commercial_partner_id', store=True, readonly=True,
         ondelete='restrict',
+        check_company=True,
     )
     partner_shipping_id = fields.Many2one(
         comodel_name='res.partner',
@@ -590,6 +591,8 @@ class AccountMove(models.Model):
     duplicated_ref_ids = fields.Many2many(comodel_name='account.move', compute='_compute_duplicated_ref_ids')
     need_cancel_request = fields.Boolean(compute='_compute_need_cancel_request')
 
+    show_update_fpos = fields.Boolean(string="Has Fiscal Position Changed", store=False)  # True if the fiscal position was changed
+
     # used to display the various dates and amount dues on the invoice's PDF
     payment_term_details = fields.Binary(compute="_compute_payment_term_details", exportable=False)
     show_payment_term_details = fields.Boolean(compute="_compute_show_payment_term_details")
@@ -828,7 +831,7 @@ class AccountMove(models.Model):
 
     @api.depends('line_ids.account_id.account_type')
     def _compute_always_tax_exigible(self):
-        for record in self:
+        for record in self.with_context(prefetch_fields=False):
             # We need to check is_invoice as well because always_tax_exigible is used to
             # set the tags as well, during the encoding. So, if no receivable/payable
             # line has been created yet, the invoice would be detected as always exigible,
@@ -1776,6 +1779,10 @@ class AccountMove(models.Model):
             # Reset
             self.invoice_vendor_bill_id = False
 
+    @api.onchange('fiscal_position_id')
+    def _onchange_fpos_id_show_update_fpos(self):
+        self.show_update_fpos = self.line_ids and self._origin.fiscal_position_id != self.fiscal_position_id
+
     @api.onchange('partner_id')
     def _onchange_partner_id(self):
         self = self.with_company((self.journal_id.company_id or self.env.company)._accessible_branches()[:1])
@@ -2553,17 +2560,16 @@ class AccountMove(models.Model):
         If a user is a Billing Administrator/Accountant or if fidu mode is activated, we show a warning,
         but they can delete the moves even if it creates a sequence gap.
         """
-        for record in self:
-            if not (
-                record.user_has_groups('account.group_account_manager')
-                or record.company_id.quick_edit_mode
-                or record._context.get('force_delete')
-                or record.check_move_sequence_chain()
-            ):
-                raise UserError(_(
-                    "You cannot delete this entry, as it has already consumed a sequence number and is not the last one in the chain. "
-                    "You should probably revert it instead."
-                ))
+        if not (
+            self.user_has_groups('account.group_account_manager')
+            or any(self.company_id.mapped('quick_edit_mode'))
+            or self._context.get('force_delete')
+            or self.check_move_sequence_chain()
+        ):
+            raise UserError(_(
+                "You cannot delete this entry, as it has already consumed a sequence number and is not the last one in the chain. "
+                "You should probably revert it instead."
+            ))
 
     def unlink(self):
         self = self.with_context(skip_invoice_sync=True, dynamic_unlink=True)  # no need to sync to delete everything
@@ -3180,12 +3186,11 @@ class AccountMove(models.Model):
             if decoder:
                 try:
                     with self.env.cr.savepoint():
-                        with current_invoice._get_edi_creation() as invoice:
-                            # pylint: disable=not-callable
-                            success = decoder(invoice, file_data, new)
+                        invoice = current_invoice or self.create({})
+                        success = decoder(invoice, file_data, new)
+
                         if success or file_data['type'] == 'pdf':
                             invoice._link_bill_origin_to_purchase_orders(timeout=4)
-
                             invoices |= invoice
                             current_invoice = self.env['account.move']
                             add_file_data_results(file_data, invoice)
@@ -3196,7 +3201,7 @@ class AccountMove(models.Model):
                     raise
                 except Exception:
                     message = _("Error importing attachment '%s' as invoice (decoder=%s)", file_data['filename'], decoder.__name__)
-                    invoice.sudo().message_post(body=message)
+                    current_invoice.sudo().message_post(body=message)
                     _logger.exception(message)
 
             passed_file_data_list.append(file_data)
@@ -3769,8 +3774,8 @@ class AccountMove(models.Model):
             return
         to_reverse = self.env['account.move']
         to_unlink = self.env['account.move']
-        lock_date = self.company_id._get_user_fiscal_lock_date()
         for move in self:
+            lock_date = move.company_id._get_user_fiscal_lock_date()
             if move.inalterable_hash or move.date <= lock_date:
                 to_reverse += move
             else:
@@ -3986,6 +3991,10 @@ class AccountMove(models.Model):
             'target': 'current',
         }
 
+    def action_update_fpos_values(self):
+        self.invoice_line_ids._compute_tax_ids()
+        self.line_ids._compute_account_id()
+
     def open_created_caba_entries(self):
         self.ensure_one()
         return {
@@ -4123,7 +4132,16 @@ class AccountMove(models.Model):
     def button_draft(self):
         if any(move.state not in ('cancel', 'posted') for move in self):
             raise UserError(_("Only posted/cancelled journal entries can be reset to draft."))
+        if any(move.need_cancel_request for move in self):
+            raise UserError(_("You can't reset to draft those journal entries. You need to request a cancellation instead."))
 
+        self._check_draftable()
+        # We remove all the analytics entries for this journal
+        self.mapped('line_ids.analytic_line_ids').unlink()
+        self.mapped('line_ids').remove_move_reconcile()
+        self.write({'state': 'draft', 'is_move_sent': False})
+
+    def _check_draftable(self):
         exchange_move_ids = set()
         if self:
             self.env['account.full.reconcile'].flush_model(['exchange_move_id'])
@@ -4159,11 +4177,6 @@ class AccountMove(models.Model):
                 raise UserError(_('You cannot reset to draft a tax cash basis journal entry.'))
             if move.restrict_mode_hash_table and move.state == 'posted':
                 raise UserError(_('You cannot modify a posted entry of this journal because it is in strict mode.'))
-            # We remove all the analytics entries for this journal
-            move.mapped('line_ids.analytic_line_ids').unlink()
-
-        self.mapped('line_ids').remove_move_reconcile()
-        self.write({'state': 'draft', 'is_move_sent': False})
 
     def button_request_cancel(self):
         """ Hook allowing the localizations to request a cancellation from the government before cancelling the invoice. """
@@ -4858,6 +4871,13 @@ class AccountMove(models.Model):
         """
         self.ensure_one()
         return True
+
+    def _can_force_cancel(self):
+        """ Hook to indicate whether it should be possible to force-cancel this invoice,
+        that is, cancel it without waiting for the cancellation request to succeed.
+        """
+        self.ensure_one()
+        return False
 
     @contextmanager
     def _send_only_when_ready(self):

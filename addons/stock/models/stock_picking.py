@@ -924,13 +924,7 @@ class Picking(models.Model):
         )
         if not moves:
             raise UserError(_('Nothing to check the availability for.'))
-        # If a package level is done when confirmed its location can be different than where it will be reserved.
-        # So we remove the move lines created when confirmed to set quantity done to the new reserved ones.
-        package_level_done = self.mapped('package_level_ids').filtered(lambda pl: pl.is_done and pl.state == 'confirmed')
-        package_level_done.write({'is_done': False})
         moves._action_assign()
-        package_level_done.write({'is_done': True})
-
         return True
 
     def action_cancel(self):
@@ -1462,7 +1456,10 @@ class Picking(models.Model):
                 'views': [(view_id, 'form')],
                 'type': 'ir.actions.act_window',
                 'res_id': wiz.id,
-                'target': 'new'
+                'target': 'new',
+                'context': {
+                    'move_lines_to_pack_ids': move_line_ids.ids,
+                }
             }
         else:
             return {}
@@ -1529,7 +1526,6 @@ class Picking(models.Model):
                 res = self._pre_put_in_pack_hook(move_line_ids)
                 if not res:
                     package = self._put_in_pack(move_line_ids)
-                    self.action_assign()
                     return self._post_put_in_pack_hook(package)
                 return res
             raise UserError(_("There is nothing eligible to put in a pack. Either there are no quantities to put in a pack or all products are already in a pack."))

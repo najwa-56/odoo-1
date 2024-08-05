@@ -6,7 +6,7 @@ from datetime import datetime, timedelta
 from odoo import Command
 
 from odoo.exceptions import UserError
-from odoo.tests import Form, tagged
+from odoo.tests import Form, HttpCase, tagged
 from odoo.tests.common import TransactionCase
 
 
@@ -905,11 +905,7 @@ class TestBatchPicking02(TransactionCase):
         """
         Check pickings are still linked to the batch after validation.
         """
-        warehouse = self.env['stock.warehouse'].create({
-            'name': 'Warehouse test',
-            'code': 'WHTEST',
-            'company_id': self.env.company.id,
-        })
+        warehouse = self.env.ref('stock.warehouse0')
         productA, productB = self.productA, self.productB
         partner = self.env['res.partner'].create({'name': 'Mr. Belougat'})
 
@@ -967,11 +963,13 @@ class TestBatchPicking02(TransactionCase):
         self.assertTrue(bo_1 and bo_2)
         backorders = bo_1 | bo_2
         self.assertEqual(pickings.backorder_ids, backorders)
-        bo_batch = backorders.batch_id
-        self.assertEqual(bo_batch.picking_ids, backorders)
         self.assertEqual(backorders.move_ids.mapped('product_qty'), [3.0, 3.0])
 
-        # Validate the new batch where every picking is to backorder
+        # Validate a new batch where every picking is to backorder
+        bo_batch = self.env['stock.picking.batch'].create({
+            'picking_ids': [Command.link(bo_1.id), Command.link(bo_2.id)],
+            'picking_type_id': warehouse.in_type_id.id,
+        })
         backorders.action_confirm()
         backorders.move_ids.quantity = 1.0
         bo_batch.action_confirm()
@@ -985,17 +983,78 @@ class TestBatchPicking02(TransactionCase):
         self.assertTrue(bo_3 and bo_4)
         backorders_2 = bo_3 | bo_4
         self.assertEqual(bo_batch.picking_ids.backorder_ids, backorders_2)
-        bo_batch_2 = backorders_2.batch_id
-        self.assertEqual(bo_batch_2.picking_ids, backorders_2)
         self.assertEqual(backorders_2.move_ids.mapped('product_qty'), [2.0, 2.0])
 
-        # validate the new batch where no picking is to backorder
+        # Validate a new batch where no picking is to backorder
+        bo_batch_2 = self.env['stock.picking.batch'].create({
+            'picking_ids': [Command.link(bo_3.id), Command.link(bo_4.id)],
+            'picking_type_id': warehouse.in_type_id.id,
+        })
         backorders_2.action_confirm()
         bo_batch_2.action_confirm()
         bo_batch_2.action_done()
         self.assertEqual(bo_batch_2.state, 'done')
         self.assertEqual(bo_batch_2.picking_ids.mapped('state'), ['done', 'done'])
         self.assertRecordValues(bo_batch_2.move_ids, [
-            {'product_id': productA.id, 'quantity': 2.0, 'picked': True},
-            {'product_id': productB.id, 'quantity': 2.0, 'picked': True},
+            {'quantity': 2.0, 'picked': True},
+            {'quantity': 2.0, 'picked': True},
         ])
+
+
+@tagged('post_install', '-at_install')
+class TestBatchPickingSynchronization(HttpCase):
+
+    def test_stock_picking_batch_sm_to_sml_synchronization(self):
+        """ Test the synchronization between stock move and stock move line within
+            the detailed operation modal for stock picking batches.
+        """
+
+        self.env['res.config.settings'].create({'group_stock_multi_locations': True}).execute()
+        location = self.env.ref('stock.stock_location_stock')
+        loc1, loc2 = self.env['stock.location'].create([{
+            'name': 'Shelf A',
+            'location_id': location.id,
+        }, {
+            'name': 'Shelf B',
+            'location_id': location.id,
+        }])
+
+        productA = self.env['product.product'].create({
+            'name': 'Product A',
+            'type': 'product',
+            'categ_id': self.env.ref('product.product_category_all').id,
+        })
+
+        picking_type_internal = self.env.ref('stock.picking_type_internal')
+        self.env['stock.quant']._update_available_quantity(productA, loc1, 50)
+        picking_1 = self.env['stock.picking'].create({
+            'location_id': loc1.id,
+            'location_dest_id': loc2.id,
+            'picking_type_id': picking_type_internal.id,
+            'company_id': self.env.company.id,
+        })
+        self.env['stock.move'].create({
+            'name': productA.name,
+            'product_id': productA.id,
+            'product_uom_qty': 1,
+            'product_uom': productA.uom_id.id,
+            'picking_id': picking_1.id,
+            'location_id': loc1.id,
+            'location_dest_id': loc2.id,
+        })
+        picking_1.action_confirm()
+        picking_1.action_assign()
+        picking_1.move_ids.move_line_ids.write({'quantity': 1})
+        picking_1.move_ids.picked = True
+
+        batch = self.env['stock.picking.batch'].create({
+            'name': 'Batch 1',
+            'company_id': self.env.company.id,
+            'picking_ids': [(4, picking_1.id)]
+        })
+
+        action_id = self.env.ref('stock_picking_batch.stock_picking_batch_menu').action
+        url = f'/web#model=stock.picking.batch&view_type=form&action={action_id.id}&id={batch.id}'
+        self.start_tour(url, "test_stock_picking_batch_sm_to_sml_synchronization", login="admin", timeout=100)
+        self.assertEqual(batch.picking_ids.move_ids.quantity, 7)
+        self.assertEqual(batch.picking_ids.move_ids.move_line_ids.quantity, 7)
