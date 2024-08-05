@@ -11,7 +11,7 @@
                         </button>
                     </div>
                     <div class="modal-body">
-                        <!-- Bind t-model to the quantity property -->
+                        <!-- Ensure `quantity` is correctly bound for two-way data binding -->
                         <input type="number" class="form-control" t-model="quantity" min="0" step="any"/>
                     </div>
                     <div class="modal-footer">
@@ -23,4 +23,3 @@
         </div>
     </t>
 </templates>
-
