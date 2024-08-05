@@ -4,6 +4,9 @@ import { Component } from "@odoo/owl";
 import { useListener } from "@web/core/utils/hooks";
 import { SelectionPopup } from "@point_of_sale/app/utils/input_popups/selection_popup";
 import { _t } from "@web/core/l10n/translation";  // Import _t for translations
+import { CustomProductScreen } from "./odoo-1-2/custom-addons/nilco_pos_multi_uom_price/static/src/js/multi_uom_price.js";
+
+registry.category("screens").add("product_screen", CustomProductScreen);
 
 export class UOMButton extends Component {
     static template = "point_of_sale.UOMButton";
