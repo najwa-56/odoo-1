@@ -59,3 +59,15 @@ class PosOrderLine(models.Model):
         res.update({'product_uom_id': orderline.product_uom_id.id})
 
         return res
+
+    def set_uom(self, uom_id):
+        self.product_uom_id = uom_id
+        # Update price and quantity based on the new UOM
+        self._onchange_qty()
+
+    def set_unit_price(self, price):
+        self.price_unit = price
+        self.price_subtotal = price * self.qty
+        self.price_total = self.price_subtotal
+        # Notify that price has been manually set
+        self.price_manually_set = True

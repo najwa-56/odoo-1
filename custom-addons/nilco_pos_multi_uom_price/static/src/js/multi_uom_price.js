@@ -27,21 +27,25 @@ export class UOMButton extends Component {
 				       uomList.push({
 					       id:	uomPrice.id,
 					       label:	uomPrice.name,
-					       isSelected: true,
+					       isSelected: false,
 					       item:	uomPrice,
 				       });
 				       });
 		       }
 		       const { confirmed, payload: selectedUOM } = await this.env.services.popup.add(
 			            SelectionPopup, {
-			       title: 'UOM',
+			       title: _t('UOM'),
 			       list: uomList,
 		       });
-		       if (confirmed) {
-			      line.set_uom({0:selectedUOM.id,1:selectedUOM.name});
-			      line.price_manually_set = true;
-			      line.set_unit_price(selectedUOM.price);
-		       }
+		       if (confirmed && selectedUOM) {
+                    // Assuming line.set_uom is a method that updates the UOM and price
+                    line.set_uom(selectedUOM.id);
+                    line.price_manually_set = true;
+                    line.set_unit_price(selectedUOM.price);
+
+                    // Optionally, recalculate subtotal and total if needed
+                    line.trigger('change', line);
+                }
 	         }
 	       }
        }
