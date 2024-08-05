@@ -3,7 +3,7 @@ import { ProductScreen } from "@point_of_sale/app/screens/product_screen/product
 import { Component } from "@odoo/owl";
 import { useListener } from "@web/core/utils/hooks";
 import { SelectionPopup } from "@point_of_sale/app/utils/input_popups/selection_popup";
-import { QuantityPopup } from "./odoo-1-2/custom-addons/nilco_pos_multi_uom_price/static/js/quantity_popup";
+import { QuantityPopup } from "./quantity_popup";  // Adjust this path based on your file structure
 import { _t } from "@web/core/l10n/translation";  // Import _t for translations
 import { registry } from "@web/core/registry";
 
