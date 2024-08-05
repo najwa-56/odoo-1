@@ -38,6 +38,7 @@ class ProductTemplate(models.Model):
                 'available_threshold': self.available_threshold,
                 'cart_qty': product._get_cart_qty(website),
                 'uom_name': product.uom_id.name,
+                'uom_rounding': product.uom_id.rounding,
                 'allow_out_of_stock_order': self.allow_out_of_stock_order,
                 'show_availability': self.show_availability,
                 'out_of_stock_message': self.out_of_stock_message,
@@ -59,3 +60,6 @@ class ProductTemplate(models.Model):
 
     def _is_sold_out(self):
         return self.product_variant_id._is_sold_out()
+
+    def _website_show_quick_add(self):
+        return (self.allow_out_of_stock_order or not self._is_sold_out()) and super()._website_show_quick_add()

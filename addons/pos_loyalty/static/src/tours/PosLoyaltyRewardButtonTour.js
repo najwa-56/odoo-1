@@ -144,3 +144,92 @@ PosLoyalty.do.clickRewardButton();
 PosLoyalty.check.hasRewardLine('Free Product - Test Product A', '-11.50', '1.00');
 
 Tour.register('PosLoyaltyFreeProductTour2', { test: true, url: '/pos/web' }, getSteps());
+
+startSteps();
+
+ProductScreen.do.confirmOpeningPopup();
+ProductScreen.do.clickHomeCategory();
+
+ProductScreen.do.clickDisplayedProduct('Test Product A');
+ProductScreen.check.selectedOrderlineHas('Test Product A', '1.00', '40.00');
+ProductScreen.do.clickDisplayedProduct('Test Product B');
+ProductScreen.check.selectedOrderlineHas('Test Product B', '1.00', '40.00');
+PosLoyalty.do.clickRewardButton();
+PosLoyalty.check.hasRewardLine('$ 10 per order on specific products', '-10.00', '1.00');
+PosLoyalty.check.orderTotalIs('60.00');
+
+Tour.register('PosLoyaltySpecificDiscountTour', { test: true, url: '/pos/web' }, getSteps());
+
+startSteps();
+
+ProductScreen.do.confirmOpeningPopup();
+ProductScreen.do.clickHomeCategory();
+
+ProductScreen.do.clickDisplayedProduct('Test Product A');
+ProductScreen.do.clickDisplayedProduct('Test Product C');
+PosLoyalty.check.orderTotalIs('130.00');
+PosLoyalty.check.isRewardButtonHighlighted(true);
+PosLoyalty.do.clickRewardButton();
+PosLoyalty.check.orderTotalIs('130.00');
+
+Tour.register('PosLoyaltySpecificDiscountWithFreeProductTour', { test: true, url: '/pos/web' }, getSteps());
+
+startSteps();
+
+ProductScreen.do.confirmOpeningPopup();
+ProductScreen.do.clickHomeCategory();
+
+ProductScreen.do.clickDisplayedProduct('Product A');
+ProductScreen.check.selectedOrderlineHas('Product A', '1.00', '15.00');
+PosLoyalty.check.orderTotalIs('15.00');
+
+ProductScreen.do.clickDisplayedProduct('Product B');
+ProductScreen.check.selectedOrderlineHas('Product B', '1.00', '50.00');
+PosLoyalty.check.orderTotalIs('40.00');
+
+Tour.register('PosLoyaltySpecificDiscountWithRewardProductDomainTour', { test: true, url: '/pos/web' }, getSteps());
+
+startSteps();
+
+ProductScreen.do.confirmOpeningPopup();
+ProductScreen.do.clickHomeCategory();
+
+ProductScreen.do.clickDisplayedProduct('Product A');
+ProductScreen.check.selectedOrderlineHas('Product A', '1.00', '15.00');
+PosLoyalty.check.orderTotalIs('15.00');
+
+ProductScreen.do.clickDisplayedProduct('Product B');
+ProductScreen.check.selectedOrderlineHas('Product B', '1.00', '50.00');
+PosLoyalty.check.orderTotalIs('40.00');
+
+Tour.register('PosLoyaltySpecificDiscountCategoryTour', { test: true, url: '/pos/web' }, getSteps());
+
+startSteps();
+ProductScreen.do.confirmOpeningPopup();
+ProductScreen.do.clickHomeCategory();
+
+ProductScreen.do.clickDisplayedProduct("Desk Organizer");
+ProductScreen.do.clickDisplayedProduct("Desk Organizer");
+PosLoyalty.check.isRewardButtonHighlighted(true);
+PosLoyalty.do.clickRewardButton();
+SelectionPopup.do.clickItem("product_a");
+PosLoyalty.check.hasRewardLine("Free Product", "-2", "1.00");
+PosLoyalty.check.isRewardButtonHighlighted(false);
+
+ProductScreen.do.clickDisplayedProduct("Desk Organizer");
+ProductScreen.do.clickDisplayedProduct("Desk Organizer");
+PosLoyalty.check.isRewardButtonHighlighted(true);
+PosLoyalty.do.clickRewardButton();
+SelectionPopup.do.clickItem("product_b");
+PosLoyalty.check.hasRewardLine("Free Product", "-5", "1.00");
+PosLoyalty.check.isRewardButtonHighlighted(false);
+
+ProductScreen.do.clickDisplayedProduct("Desk Organizer");
+ProductScreen.do.clickDisplayedProduct("Desk Organizer");
+PosLoyalty.check.isRewardButtonHighlighted(true);
+PosLoyalty.do.clickRewardButton();
+SelectionPopup.do.clickItem("product_b");
+PosLoyalty.check.hasRewardLine("Free Product", "-10", "2.00");
+PosLoyalty.check.isRewardButtonHighlighted(false);
+
+Tour.register("PosLoyaltyRewardProductTag", { test: true, url: "/pos/web" }, getSteps());

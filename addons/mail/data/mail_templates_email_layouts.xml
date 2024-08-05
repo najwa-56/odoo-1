@@ -3,9 +3,9 @@
     <data>
         <template id="mail_notification_layout" name="Mail: mail notification layout template">
 <html t-att-lang="lang">
-<header>
+<head>
     <meta http-equiv="Content-Type" content="text/html charset=UTF-8" />
-</header>
+</head>
 <body style="font-family:Verdana, Arial,sans-serif; color: #454748;">
 <t t-set="subtype_internal" t-value="subtype and subtype.internal"/>
 <!-- HEADER -->
@@ -110,9 +110,9 @@
 
         <template id="mail_notification_light">
 <html t-att-lang="lang">
-<header>
+<head>
     <meta http-equiv="Content-Type" content="text/html charset=UTF-8" />
-</header>
+</head>
 <body>
 <t t-set="subtype_internal" t-value="False"/>
 <t t-call="mail.notification_preview"/>
@@ -180,7 +180,7 @@
         </template>
 
         <template id="notification_preview">
-<div style="display: none; max-height: 0px; overflow: hidden;">
+<div style="display: none; max-height: 0px; overflow: hidden; color:#fff; font-size:0px; line-height:0px">
     <t t-if="tracking_values">
         <t t-out="tracking_values[0][0]"/>: <t t-out="tracking_values[0][1]"/> &#8594; <t t-out="tracking_values[0][2]"/>
         <t t-if="len(tracking_values) > 1"> |...</t>

@@ -11,6 +11,7 @@ class AccountAnalyticPlan(models.Model):
     _parent_store = True
     _rec_name = 'complete_name'
     _order = 'complete_name asc'
+    _check_company_auto = True
 
     def _default_color(self):
         return randint(1, 11)
@@ -22,6 +23,7 @@ class AccountAnalyticPlan(models.Model):
         string="Parent",
         ondelete='cascade',
         domain="[('id', '!=', id), ('company_id', 'in', [False, company_id])]",
+        check_company=True,
     )
     parent_path = fields.Char(
         index='btree',
@@ -120,7 +122,7 @@ class AccountAnalyticPlan(models.Model):
         result = {
             "type": "ir.actions.act_window",
             "res_model": "account.analytic.plan",
-            "domain": [('id', 'in', self.children_ids.ids)],
+            "domain": [('parent_id', '=', self.id)],
             "context": {'default_parent_id': self.id,
                         'default_color': self.color},
             "name": _("Analytical Plans"),
@@ -145,7 +147,7 @@ class AccountAnalyticPlan(models.Model):
         # If we have accounts that are already selected (before the applicability rules changed or from a model),
         # we want the plans that were unavailable to be shown in the list (and in optional, because the previous
         # percentage could be different from 0)
-        forced_plans = self.env['account.analytic.account'].browse(record_account_ids).mapped(
+        forced_plans = self.env['account.analytic.account'].browse(record_account_ids).exists().mapped(
             'root_plan_id') - root_plans
         return sorted([
             {

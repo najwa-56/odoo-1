@@ -8,21 +8,21 @@
 # Algo Kärp <algokarp@gmail.com>, 2022
 # Triine Aavik <triine@avalah.ee>, 2022
 # Arma Gedonsky <armagedonsky@hot.ee>, 2022
-# Martin Trigaux, 2022
 # Martin Aavastik <martin@avalah.ee>, 2022
 # Egon Raamat <egon@avalah.ee>, 2022
 # Maidu Targama <m.targama@gmail.com>, 2022
 # Anna, 2023
 # Leaanika Randmets, 2023
+# Martin Trigaux, 2024
 # 
 msgid ""
 msgstr ""
-"Project-Id-Version: Odoo Server 16.0+e\n"
+"Project-Id-Version: Odoo Server 16.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-12-15 12:49+0000\n"
+"POT-Creation-Date: 2024-02-06 13:31+0000\n"
 "PO-Revision-Date: 2022-09-22 05:54+0000\n"
-"Last-Translator: Leaanika Randmets, 2023\n"
-"Language-Team: Estonian (https://www.transifex.com/odoo/teams/41243/et/)\n"
+"Last-Translator: Martin Trigaux, 2024\n"
+"Language-Team: Estonian (https://app.transifex.com/odoo/teams/41243/et/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: \n"
@@ -65,6 +65,13 @@ msgid "A better global discount is already applied."
 msgstr "Parem globaalne allahindlus on juba rakendatud."
 
 #. module: pos_loyalty
+#. odoo-javascript
+#: code:addons/pos_loyalty/static/src/js/Loyalty.js:0
+#, python-format
+msgid "A reward could not be loaded"
+msgstr ""
+
+#. module: pos_loyalty
 #: model:ir.model.fields,help:pos_loyalty.field_loyalty_rule__promo_barcode
 msgid ""
 "A technical field used as an alternative to the promo code. This is "
@@ -72,27 +79,6 @@ msgid ""
 msgstr ""
 "Tehniline väli, mida kasutatakse alternatiivina sooduskoodile. See "
 "genereeritakse automaatselt, kui sooduskoodi muudetakse."
-
-#. module: pos_loyalty
-#. odoo-javascript
-#: code:addons/pos_loyalty/static/src/xml/OrderWidget.xml:0
-#, python-format
-msgid "Active Coupons"
-msgstr "Aktiivsed kupongid"
-
-#. module: pos_loyalty
-#. odoo-javascript
-#: code:addons/pos_loyalty/static/src/xml/OrderWidget.xml:0
-#, python-format
-msgid "Active Programs"
-msgstr "Aktiivsed programmid"
-
-#. module: pos_loyalty
-#. odoo-javascript
-#: code:addons/pos_loyalty/static/src/xml/OrderWidget.xml:0
-#, python-format
-msgid "Active Rewards"
-msgstr "Aktiivsed preemiad"
 
 #. module: pos_loyalty
 #: model_terms:ir.ui.view,arch_db:pos_loyalty.loyalty_program_view_form_inherit_pos_loyalty
@@ -164,6 +150,13 @@ msgstr "Kupongipunkt(id)"
 #, python-format
 msgid "Current Balance:"
 msgstr "Praegune saldo"
+
+#. module: pos_loyalty
+#. odoo-javascript
+#: code:addons/pos_loyalty/static/src/xml/OrderReceipt.xml:0
+#, python-format
+msgid "Customer"
+msgstr "Klient"
 
 #. module: pos_loyalty
 #. odoo-javascript
@@ -349,6 +342,13 @@ msgstr "Selle kupongiga ei saa preemiat lunastada."
 #, python-format
 msgid "No rewards available."
 msgstr "Ühtegi preemiat pole saadaval."
+
+#. module: pos_loyalty
+#. odoo-javascript
+#: code:addons/pos_loyalty/static/src/js/ControlButtons/eWalletButton.js:0
+#, python-format
+msgid "No valid eWallet found"
+msgstr ""
 
 #. module: pos_loyalty
 #. odoo-javascript
@@ -572,6 +572,15 @@ msgstr ""
 "loomisel kassas."
 
 #. module: pos_loyalty
+#. odoo-javascript
+#: code:addons/pos_loyalty/static/src/js/Loyalty.js:0
+#, python-format
+msgid ""
+"The reward \"%s\" contain an error in its domain, your domain must be "
+"compatible with the PoS client"
+msgstr ""
+
+#. module: pos_loyalty
 #: model:ir.model.fields,help:pos_loyalty.field_pos_order_line__reward_id
 msgid "The reward associated with this line."
 msgstr "Preemia, mis on seotud selle reaga."
@@ -761,6 +770,14 @@ msgstr "Te ei saa müüa kinkekaarti, mis on juba müüdud."
 msgid "You cannot set negative quantity or price to gift card or ewallet."
 msgstr ""
 "Kinkekaardile või e-rahakotile ei saa määrata negatiivset kogust või hinda."
+
+#. module: pos_loyalty
+#. odoo-javascript
+#: code:addons/pos_loyalty/static/src/js/ControlButtons/eWalletButton.js:0
+#, python-format
+msgid ""
+"You either have not created an eWallet or all your eWallets have expired."
+msgstr ""
 
 #. module: pos_loyalty
 #. odoo-python

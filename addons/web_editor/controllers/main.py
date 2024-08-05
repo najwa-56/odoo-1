@@ -11,6 +11,7 @@ import werkzeug.urls
 from PIL import Image, ImageFont, ImageDraw
 from lxml import etree
 from base64 import b64decode, b64encode
+from math import floor
 
 from odoo.http import request, Response
 from odoo import http, tools, _, SUPERUSER_ID
@@ -39,26 +40,72 @@ def ensure_no_history_divergence(record, html_field_name, incoming_history_ids):
             logger.warning('The document was already saved from someone with a different history for model %r, field %r with id %r.', record._name, html_field_name, record.id)
             raise ValidationError(_('The document was already saved from someone with a different history for model %r, field %r with id %r.', record._name, html_field_name, record.id))
 
+# This method must be called in a context that has write access to the record as
+# it will write to the bus.
 def handle_history_divergence(record, html_field_name, vals):
     # Do not handle history divergence if the field is not in the values.
     if html_field_name not in vals:
         return
+    # Do not handle history divergence if in module installation mode.
+    if record.env.context.get('install_module'):
+        return
     incoming_html = vals[html_field_name]
-    incoming_history_matches = re.search(diverging_history_regex, incoming_html)
+    incoming_history_matches = re.search(diverging_history_regex, incoming_html or '')
     # When there is no incoming history id, it means that the value does not
     # comes from the odoo editor or the collaboration was not activated. In
     # project, it could come from the collaboration pad. In that case, we do not
     # handle history divergences.
+    if request:
+        channel = (request.db, 'editor_collaboration', record._name, html_field_name, record.id)
     if incoming_history_matches is None:
+        if request:
+            bus_data = {
+                'model_name': record._name,
+                'field_name': html_field_name,
+                'res_id': record.id,
+                'notificationName': 'html_field_write',
+                'notificationPayload': {'last_step_id': None},
+            }
+            request.env['bus.bus']._sendone(channel, 'editor_collaboration', bus_data)
         return
     incoming_history_ids = incoming_history_matches[1].split(',')
-    incoming_last_history_id = incoming_history_ids[-1]
+    last_step_id = incoming_history_ids[-1]
+
+    bus_data = {
+        'model_name': record._name,
+        'field_name': html_field_name,
+        'res_id': record.id,
+        'notificationName': 'html_field_write',
+        'notificationPayload': {'last_step_id': last_step_id},
+    }
+    if request:
+        request.env['bus.bus']._sendone(channel, 'editor_collaboration', bus_data)
 
     if record[html_field_name]:
         ensure_no_history_divergence(record, html_field_name, incoming_history_ids)
 
     # Save only the latest id.
-    vals[html_field_name] = incoming_html[0:incoming_history_matches.start(1)] + incoming_last_history_id + incoming_html[incoming_history_matches.end(1):]
+    vals[html_field_name] = incoming_html[0:incoming_history_matches.start(1)] + last_step_id + incoming_html[incoming_history_matches.end(1):]
+
+def get_existing_attachment(IrAttachment, vals):
+    """
+    Check if an attachment already exists for the same vals. Return it if
+    so, None otherwise.
+    """
+    fields = dict(vals)
+    # Falsy res_id defaults to 0 on attachment creation.
+    fields['res_id'] = fields.get('res_id') or 0
+    raw, datas = fields.pop('raw', None), fields.pop('datas', None)
+    domain = [(field, '=', value) for field, value in fields.items()]
+    if fields.get('type') == 'url':
+        if 'url' not in fields:
+            return None
+        domain.append(('checksum', '=', False))
+    else:
+        if not (raw or datas):
+            return None
+        domain.append(('checksum', '=', IrAttachment._compute_checksum(raw or b64decode(datas))))
+    return IrAttachment.search(domain, limit=1) or None
 
 class Web_Editor(http.Controller):
     #------------------------------------------------------
@@ -91,6 +138,17 @@ class Web_Editor(http.Controller):
 
             :returns PNG image converted from given font
         """
+        # For custom icons, use the corresponding custom font
+        if icon.isdigit():
+            if int(icon) == 57467:
+                font = "/web/static/fonts/tiktok_only.woff"
+            elif int(icon) == 61593:  # F099
+                icon = "59392"  # E800
+                font = "/web/static/fonts/twitter_x_only.woff"
+            elif int(icon) == 61569:  # F081
+                icon = "59395"  # E803
+                font = "/web/static/fonts/twitter_x_only.woff"
+
         size = max(width, height, 1) if width else size
         width = width or size
         height = height or size
@@ -110,13 +168,28 @@ class Web_Editor(http.Controller):
             bg = bg.replace('rgba', 'rgb')
             bg = ','.join(bg.split(',')[:-1])+')'
 
+        # Convert the opacity value compatible with PIL Image color (0 to 255)
+        # when color specifier is 'rgba'
+        if color is not None and color.startswith('rgba'):
+            *rgb, a = color.strip(')').split(',')
+            opacity = str(floor(float(a) * 255))
+            color = ','.join([*rgb, opacity]) + ')'
+
         # Determine the dimensions of the icon
         image = Image.new("RGBA", (width, height), color)
         draw = ImageDraw.Draw(image)
 
-        boxw, boxh = draw.textsize(icon, font=font_obj)
+        if hasattr(draw, 'textbbox'):
+            box = draw.textbbox((0, 0), icon, font=font_obj)
+            left = box[0]
+            top = box[1]
+            boxw = box[2] - box[0]
+            boxh = box[3] - box[1]
+        else:  # pillow < 8.00 (Focal)
+            left, top, _right, _bottom = image.getbbox()
+            boxw, boxh = draw.textsize(icon, font=font_obj)
+
         draw.text((0, 0), icon, font=font_obj)
-        left, top, right, bottom = image.getbbox()
 
         # Create an alpha mask
         imagemask = Image.new("L", (boxw, boxh), 0)
@@ -185,7 +258,7 @@ class Web_Editor(http.Controller):
     @http.route('/web_editor/stars', type='json', auth='user')
     def update_stars(self, res_model, res_id, filename, starsId, rating):
         record = request.env[res_model].browse(res_id)
-        value = getattr(record, filename, False)
+        value = filename in record._fields and record[filename]
         htmlelem = etree.fromstring("<div>%s</div>" % value, etree.HTMLParser())
 
         stars_widget = htmlelem.find(".//span[@id='checkId-%s']" % starsId)
@@ -370,7 +443,8 @@ class Web_Editor(http.Controller):
             if not attachment_data['public']:
                 attachment.sudo().generate_access_token()
         else:
-            attachment = IrAttachment.create(attachment_data)
+            attachment = get_existing_attachment(IrAttachment, attachment_data) \
+                or IrAttachment.create(attachment_data)
 
         return attachment
 
@@ -438,7 +512,7 @@ class Web_Editor(http.Controller):
 
         # Compile regex outside of the loop
         # This will used to exclude library scss files from the result
-        excluded_url_matcher = re.compile("^(.+/lib/.+)|(.+import_bootstrap.+\.scss)$")
+        excluded_url_matcher = re.compile(r"^(.+/lib/.+)|(.+import_bootstrap.+\.scss)$")
 
         # First check the t-call-assets used in the related views
         url_infos = dict()
@@ -544,7 +618,11 @@ class Web_Editor(http.Controller):
             fields['res_id'] = res_id
         if name:
             fields['name'] = name
-        attachment = attachment.copy(fields)
+        existing_attachment = get_existing_attachment(request.env['ir.attachment'], fields)
+        if existing_attachment and not existing_attachment.url:
+            attachment = existing_attachment
+        else:
+            attachment = attachment.copy(fields)
         if attachment.url:
             # Don't keep url if modifying static attachment because static images
             # are only served from disk and don't fallback to attachments.
@@ -563,6 +641,17 @@ class Web_Editor(http.Controller):
         return '%s?access_token=%s' % (attachment.image_src, attachment.access_token)
 
     def _get_shape_svg(self, module, *segments):
+        Module = request.env['ir.module.module'].sudo()
+        # Avoid creating a bridge module just for this check.
+        if 'imported' in Module._fields and Module.search([('name', '=', module)]).imported:
+            attachment = request.env['ir.attachment'].sudo().search([
+                ('url', '=', f"/{module.replace('.', '_')}/static/{'/'.join(segments)}"),
+                ('public', '=', True),
+                ('type', '=', 'binary'),
+            ], limit=1)
+            if attachment:
+                return b64decode(attachment.datas)
+            raise werkzeug.exceptions.NotFound()
         shape_path = get_resource_path(module, 'static', *segments)
         if not shape_path:
             raise werkzeug.exceptions.NotFound()
@@ -641,11 +730,11 @@ class Web_Editor(http.Controller):
         svg, options = self._update_svg_colors(kwargs, svg)
         flip_value = options.get('flip', False)
         if flip_value == 'x':
-            svg = svg.replace('<svg ', '<svg style="transform: scaleX(-1);" ')
+            svg = svg.replace('<svg ', '<svg style="transform: scaleX(-1);" ', 1)
         elif flip_value == 'y':
-            svg = svg.replace('<svg ', '<svg style="transform: scaleY(-1)" ')
+            svg = svg.replace('<svg ', '<svg style="transform: scaleY(-1)" ', 1)
         elif flip_value == 'xy':
-            svg = svg.replace('<svg ', '<svg style="transform: scale(-1)" ')
+            svg = svg.replace('<svg ', '<svg style="transform: scale(-1)" ', 1)
 
         return request.make_response(svg, [
             ('Content-type', 'image/svg+xml'),
@@ -717,17 +806,21 @@ class Web_Editor(http.Controller):
         for id, url in response.json().items():
             req = requests.get(url)
             name = '_'.join([media[id]['query'], url.split('/')[-1]])
-            # Need to bypass security check to write image with mimetype image/svg+xml
-            # ok because svgs come from whitelisted origin
-            context = {'binary_field_real_user': request.env['res.users'].sudo().browse([SUPERUSER_ID])}
-            attachment = request.env['ir.attachment'].sudo().with_context(context).create({
+            IrAttachment = request.env['ir.attachment']
+            attachment_data = {
                 'name': name,
                 'mimetype': req.headers['content-type'],
                 'datas': b64encode(req.content),
                 'public': True,
                 'res_model': 'ir.ui.view',
                 'res_id': 0,
-            })
+            }
+            attachment = get_existing_attachment(IrAttachment, attachment_data)
+            # Need to bypass security check to write image with mimetype image/svg+xml
+            # ok because svgs come from whitelisted origin
+            if not attachment:
+                context = {'binary_field_real_user': request.env['res.users'].sudo().browse([SUPERUSER_ID])}
+                attachment = IrAttachment.sudo().with_context(context).create(attachment_data)
             if media[id]['is_dynamic_svg']:
                 colorParams = werkzeug.urls.url_encode(media[id]['dynamic_colors'])
                 attachment['url'] = '/web_editor/shape/illustration/%s?%s' % (slug(attachment), colorParams)

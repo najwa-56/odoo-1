@@ -23,10 +23,10 @@ class Project(models.Model):
 
         query.order = None
         query_string, query_param = query.select(
-            'jsonb_object_keys(analytic_distribution) as account_id',
+            'jsonb_object_keys(purchase_order_line.analytic_distribution) as account_id',
             'COUNT(DISTINCT(order_id)) as purchase_order_count',
         )
-        query_string = f"{query_string} GROUP BY jsonb_object_keys(analytic_distribution)"
+        query_string = f"{query_string} GROUP BY jsonb_object_keys(purchase_order_line.analytic_distribution)"
 
         self._cr.execute(query_string, query_param)
         data = {int(record.get('account_id')): record.get('purchase_order_count') for record in self._cr.dictfetchall()}
@@ -126,34 +126,35 @@ class Project(models.Model):
                 ('state', 'in', ['purchase', 'done']),
                 '|',
                 ('qty_invoiced', '>', 0),
-                '|', ('qty_to_invoice', '>', 0), ('product_uom_qty', '>', 0),
+                '|', ('qty_to_invoice', '>', 0), ('product_qty', '>', 0),
             ])
             query.add_where('purchase_order_line.analytic_distribution ? %s', [str(self.analytic_account_id.id)])
-            query_string, query_param = query.select('"purchase_order_line".id', 'qty_invoiced', 'qty_to_invoice', 'product_uom_qty', 'price_unit', 'purchase_order_line.currency_id', '"purchase_order_line".analytic_distribution')
+            query_string, query_param = query.select('"purchase_order_line".id', 'qty_invoiced', 'qty_to_invoice', 'product_qty', 'price_subtotal', 'purchase_order_line.currency_id', '"purchase_order_line".analytic_distribution')
             self._cr.execute(query_string, query_param)
             purchase_order_line_read = [{
                 **pol,
-                'invoice_lines': self.env['purchase.order.line'].browse(pol['id']).invoice_lines,  # One2Many cannot be queried, they are not columns
+                'invoice_lines': self.env['purchase.order.line'].browse(pol['id']).sudo().invoice_lines,  # One2Many cannot be queried, they are not columns
             } for pol in self._cr.dictfetchall()]
             purchase_order_line_invoice_line_ids = self._get_already_included_profitability_invoice_line_ids()
             if purchase_order_line_read:
 
-                # Get conversion rate from currencies to currency of analytic account
-                currency_ids = {pol['currency_id'] for pol in purchase_order_line_read + [{'currency_id': self.analytic_account_id.currency_id.id}]}
+                # Get conversion rate from currencies to currency of the project
+                currency_ids = {pol['currency_id'] for pol in purchase_order_line_read + [{'currency_id': self.currency_id.id}]}
                 rates = self.env['res.currency'].browse(list(currency_ids))._get_rates(self.company_id, date.today())
-                conversion_rates = {cid: rates[self.analytic_account_id.currency_id.id] / rate_from for cid, rate_from in rates.items()}
+                conversion_rates = {cid: rates[self.currency_id.id] / rate_from for cid, rate_from in rates.items()}
 
                 amount_invoiced = amount_to_invoice = 0.0
                 purchase_order_line_ids = []
                 for pol_read in purchase_order_line_read:
                     purchase_order_line_invoice_line_ids.extend(pol_read['invoice_lines'].ids)
-                    price_unit = self.analytic_account_id.currency_id.round(pol_read['price_unit'] * conversion_rates[pol_read['currency_id']])
+                    price_subtotal = self.currency_id.round(pol_read['price_subtotal'] * conversion_rates[pol_read['currency_id']])
+                    price_subtotal_unit = price_subtotal / pol_read['product_qty'] if pol_read['product_qty'] else 0.0
                     analytic_contribution = pol_read['analytic_distribution'][str(self.analytic_account_id.id)] / 100.
-                    amount_invoiced -= price_unit * pol_read['qty_invoiced'] * analytic_contribution if pol_read['qty_invoiced'] > 0 else 0.0
+                    amount_invoiced -= price_subtotal_unit * pol_read['qty_invoiced'] * analytic_contribution if pol_read['qty_invoiced'] > 0 else 0.0
                     if pol_read['qty_to_invoice'] > 0:
-                        amount_to_invoice -= price_unit * pol_read['qty_to_invoice'] * analytic_contribution
+                        amount_to_invoice -= price_subtotal_unit * pol_read['qty_to_invoice'] * analytic_contribution
                     else:
-                        amount_to_invoice -= price_unit * (pol_read['product_uom_qty'] - pol_read['qty_invoiced']) * analytic_contribution
+                        amount_to_invoice -= price_subtotal_unit * (pol_read['product_qty'] - pol_read['qty_invoiced']) * analytic_contribution
                     purchase_order_line_ids.append(pol_read['id'])
                 costs = profitability_items['costs']
                 section_id = 'purchase_order'
@@ -183,14 +184,14 @@ class Project(models.Model):
             bills_move_line_read = self._cr.dictfetchall()
             if bills_move_line_read:
 
-                # Get conversion rate from currencies to currency of analytic account
-                currency_ids = {bml['currency_id'] for bml in bills_move_line_read + [{'currency_id': self.analytic_account_id.currency_id.id}]}
+                # Get conversion rate from currencies to currency of the project
+                currency_ids = {bml['currency_id'] for bml in bills_move_line_read + [{'currency_id': self.currency_id.id}]}
                 rates = self.env['res.currency'].browse(list(currency_ids))._get_rates(self.company_id, date.today())
-                conversion_rates = {cid: rates[self.analytic_account_id.currency_id.id] / rate_from for cid, rate_from in rates.items()}
+                conversion_rates = {cid: rates[self.currency_id.id] / rate_from for cid, rate_from in rates.items()}
 
                 amount_invoiced = amount_to_invoice = 0.0
                 for moves_read in bills_move_line_read:
-                    price_subtotal = self.analytic_account_id.currency_id.round(moves_read['price_subtotal'] * conversion_rates[moves_read['currency_id']])
+                    price_subtotal = self.currency_id.round(moves_read['price_subtotal'] * conversion_rates[moves_read['currency_id']])
                     analytic_contribution = moves_read['analytic_distribution'][str(self.analytic_account_id.id)] / 100.
                     if moves_read['parent_state'] == 'draft':
                         if moves_read['move_type'] == 'in_invoice':

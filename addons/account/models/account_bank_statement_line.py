@@ -1,6 +1,7 @@
 from odoo import api, Command, fields, models, _
 from odoo.exceptions import UserError, ValidationError
 from odoo.tools import html2plaintext
+from odoo.tools.misc import str2bool
 
 from odoo.addons.base.models.res_bank import sanitize_account_number
 
@@ -45,6 +46,7 @@ class AccountBankStatementLine(models.Model):
         comodel_name='account.move',
         auto_join=True,
         string='Journal Entry', required=True, readonly=True, ondelete='cascade',
+        index=True,
         check_company=True)
     statement_id = fields.Many2one(
         comodel_name='account.bank.statement',
@@ -95,6 +97,7 @@ class AccountBankStatementLine(models.Model):
         help="The optional other currency if it is a multi-currency entry.",
     )
     amount_currency = fields.Monetary(
+        compute='_compute_amount_currency', store=True, readonly=False,
         string="Amount in Currency",
         currency_field='foreign_currency_id',
         help="The amount expressed in an optional other currency if it is a multi-currency entry.",
@@ -144,6 +147,20 @@ class AccountBankStatementLine(models.Model):
     # -------------------------------------------------------------------------
     # COMPUTE METHODS
     # -------------------------------------------------------------------------
+
+    @api.depends('foreign_currency_id', 'date', 'amount', 'company_id')
+    def _compute_amount_currency(self):
+        for st_line in self:
+            if not st_line.foreign_currency_id:
+                st_line.amount_currency = False
+            elif st_line.date and not st_line.amount_currency:
+                # only convert if it hasn't been set already
+                st_line.amount_currency = st_line.currency_id._convert(
+                    from_amount=st_line.amount,
+                    to_currency=st_line.foreign_currency_id,
+                    company=st_line.company_id,
+                    date=st_line.date,
+                )
 
     @api.depends('journal_id.currency_id')
     def _compute_currency_id(self):
@@ -412,7 +429,16 @@ class AccountBankStatementLine(models.Model):
     # -------------------------------------------------------------------------
 
     def _find_or_create_bank_account(self):
-        bank_account = self.env['res.partner.bank'].search([
+        self.ensure_one()
+        if str2bool(self.env['ir.config_parameter'].sudo().get_param("account.skip_create_bank_account_on_reconcile")):
+            return self.env['res.partner.bank']
+
+        # There is a sql constraint on res.partner.bank ensuring an unique pair <partner, account number>.
+        # Since it's not dependent of the company, we need to search on others company too to avoid the creation
+        # of an extra res.partner.bank raising an error coming from this constraint.
+        # However, at the end, we need to filter out the results to not trigger the check_company when trying to
+        # assign a res.partner.bank owned by another company.
+        bank_account = self.env['res.partner.bank'].sudo().with_context(active_test=False).search([
             ('acc_number', '=', self.account_number),
             ('partner_id', '=', self.partner_id.id),
         ])
@@ -420,8 +446,9 @@ class AccountBankStatementLine(models.Model):
             bank_account = self.env['res.partner.bank'].create({
                 'acc_number': self.account_number,
                 'partner_id': self.partner_id.id,
+                'journal_id': None,
             })
-        return bank_account
+        return bank_account.filtered(lambda x: x.company_id in (False, self.company_id))
 
     def _get_amounts_with_currencies(self):
         """
@@ -625,7 +652,7 @@ class AccountBankStatementLine(models.Model):
             account_number_nums = sanitize_account_number(self.account_number)
             if account_number_nums:
                 domain = [('sanitized_acc_number', 'ilike', account_number_nums)]
-                for extra_domain in ([('company_id', '=', self.company_id.id)], []):
+                for extra_domain in ([('company_id', '=', self.company_id.id)], [('company_id', '=', False)]):
                     bank_accounts = self.env['res.partner.bank'].search(extra_domain + domain)
                     if len(bank_accounts.partner_id) == 1:
                         return bank_accounts.partner_id
@@ -643,8 +670,9 @@ class AccountBankStatementLine(models.Model):
                 ],
             )
             for domain in domains:
-                partner = self.env['res.partner'].search(list(domain) + [('parent_id', '=', False)], limit=1)
-                if partner:
+                partner = self.env['res.partner'].search(list(domain) + [('parent_id', '=', False)], limit=2)
+                # Return the partner if there is only one with this name
+                if len(partner) == 1:
                     return partner
 
         # Retrieve the partner from the 'reconcile models'.
@@ -677,6 +705,9 @@ class AccountBankStatementLine(models.Model):
                 suspense_lines += line
             else:
                 other_lines += line
+        if not liquidity_lines:
+            liquidity_lines = self.move_id.line_ids.filtered(lambda l: l.account_id.account_type in ('asset_cash', 'liability_credit_card'))
+            other_lines -= liquidity_lines
         return liquidity_lines, suspense_lines, other_lines
 
     # SYNCHRONIZATION account.bank.statement.line <-> account.move
@@ -724,8 +755,12 @@ class AccountBankStatementLine(models.Model):
                         'amount': liquidity_lines.balance,
                     })
 
-                if len(suspense_lines) == 1:
-
+                if len(suspense_lines) > 1:
+                    raise UserError(_(
+                        "%s reached an invalid state regarding its related statement line.\n"
+                        "To be consistent, the journal entry must always have exactly one suspense line.", st_line.move_id.display_name
+                    ))
+                elif len(suspense_lines) == 1:
                     if journal_currency and suspense_lines.currency_id == journal_currency:
 
                         # The suspense line is expressed in the journal's currency meaning the foreign currency

@@ -2,7 +2,6 @@
 
 import { getFixture, patchWithCleanup, triggerEvent } from "@web/../tests/helpers/utils";
 import { browser } from "@web/core/browser/browser";
-import { dialogService } from "@web/core/dialog/dialog_service";
 import { registry } from "@web/core/registry";
 import { ControlPanel } from "@web/search/control_panel/control_panel";
 import { FavoriteMenu } from "@web/search/favorite_menu/favorite_menu";
@@ -64,7 +63,6 @@ QUnit.module("Search", (hooks) => {
         };
         setupControlPanelFavoriteMenuRegistry();
         setupControlPanelServiceRegistry();
-        serviceRegistry.add("dialog", dialogService);
         patchWithCleanup(browser, {
             setTimeout: (fn) => fn(),
             clearTimeout: () => {},
@@ -347,43 +345,96 @@ QUnit.module("Search", (hooks) => {
         }
     );
 
-    QUnit.test("undefined name for filter shows notification and not error", async function (assert) {
-        assert.expect(2);
+    QUnit.test(
+        "undefined name for filter shows notification and not error",
+        async function (assert) {
+            assert.expect(2);
 
+            serviceRegistry.add(
+                "notification",
+                {
+                    start() {
+                        return {
+                            add(message, options) {
+                                assert.strictEqual(
+                                    message,
+                                    "A name for your favorite filter is required.",
+                                    "The notification should match: A name for your favorite filter is required."
+                                );
+                                assert.deepEqual(options, { type: "danger" });
+                            },
+                        };
+                    },
+                },
+                { force: true }
+            );
+
+            await makeWithSearch({
+                serverData,
+                mockRPC: (_, args) => {
+                    if (args.model === "ir.filters" && args.method === "create_or_replace") {
+                        return 7; // fake serverSideId
+                    }
+                },
+                resModel: "foo",
+                Component: FavoriteMenu,
+                searchViewId: false,
+            });
+
+            await toggleFavoriteMenu(target);
+            await toggleSaveFavorite(target);
+            await saveFavorite(target);
+        }
+    );
+
+    QUnit.test("add favorite with enter which already exists", async function (assert) {
         serviceRegistry.add(
             "notification",
             {
                 start() {
                     return {
                         add(message, options) {
-                            assert.strictEqual(
-                                message,
-                                "A name for your favorite filter is required.",
-                                "The notification should match: A name for your favorite filter is required."
-                            );
+                            assert.strictEqual(message, "A filter with same name already exists.");
                             assert.deepEqual(options, { type: "danger" });
+                            assert.step("warning dialog");
                         },
                     };
                 },
             },
             { force: true }
         );
-
         await makeWithSearch({
             serverData,
-            mockRPC: (_, args) => {
-                if (args.model === "ir.filters" && args.method === "create_or_replace") {
-                    return 7; // fake serverSideId
-                }
-            },
             resModel: "foo",
-            Component: FavoriteMenu,
+            Component: ControlPanel,
+            searchMenuTypes: ["favorite"],
             searchViewId: false,
+            config: {
+                displayName: "Action Name",
+            },
+            irFilters: [
+                {
+                    context: "{}",
+                    domain: "[]",
+                    id: 1,
+                    is_default: false,
+                    name: "My favorite",
+                    sort: "[]",
+                    user_id: [2, "Mitchell Admin"],
+                },
+            ],
         });
 
         await toggleFavoriteMenu(target);
         await toggleSaveFavorite(target);
-        await saveFavorite(target);
+        await editFavoriteName(target, "My favorite");
+        triggerEvent(
+            target,
+            `.o_favorite_menu .o_add_favorite .dropdown-menu input[type="text"]`,
+            "keydown",
+            { key: "Enter" }
+        );
+        assert.verifySteps(["warning dialog"]);
     });
 
     QUnit.skip("save search filter in modal", async function (assert) {

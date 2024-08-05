@@ -427,7 +427,7 @@
          * @private
          */
         _checkLocationHref: function () {
-            if (window.location.href.includes('quiz_quick_create')) {
+            if (window.location.href.includes('quiz_quick_create') && this.quiz.questionsCount === 0) {
                 this._onCreateQuizClick();
             }
         },
@@ -791,7 +791,7 @@
                     .text(_t('Mark To Do'))
                     .removeAttr('title')
                     .removeAttr('aria-disabled')
-                    .attr('href', `/slides/slide/${slide.id}/set_uncompleted`);
+                    .attr('href', `/slides/slide/${encodeURIComponent(slide.id)}/set_uncompleted`);
             }
         },
 

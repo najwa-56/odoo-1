@@ -2,9 +2,11 @@
 'use strict';
 
 import {qweb} from 'web.core';
+import {descendants, preserveCursor} from "@web_editor/js/editor/odoo-editor/src/utils/utils";
 const rowSize = 50; // 50px.
 // Maximum number of rows that can be added when dragging a grid item.
 export const additionalRowLimit = 10;
+const defaultGridPadding = 10; // 10px (see `--grid-item-padding-(x|y)` CSS variables).
 
 /**
  * Returns the grid properties: rowGap, rowSize, columnGap and columnSize.
@@ -83,17 +85,28 @@ export function _gridCleanUp(rowEl, columnEl) {
  * @param {Element} containerEl element with the class "container"
  */
 export function _toggleGridMode(containerEl) {
-    let rowEl = containerEl.querySelector('.row');
-    // For the snippets having text outside of the row (and therefore not in a
-    // column), create a column and put the text in it so it can also be placed
-    // in the grid.
-    const textEls = [...containerEl.children].filter(el => el.nodeName !== 'DIV');
-    if (rowEl && textEls.length > 0) {
+    let rowEl = containerEl.querySelector(':scope > .row');
+    const outOfRowEls = [...containerEl.children].filter(el => !el.classList.contains('row'));
+    // Avoid an unwanted rollback that prevents from deleting the text.
+    const avoidRollback = (el) => {
+        for (const node of descendants(el)) {
+            node.ouid = undefined;
+        }
+    };
+    // Keep the text selection.
+    const restoreCursor = !rowEl || outOfRowEls.length > 0 ?
+        preserveCursor(containerEl.ownerDocument) : () => {};
+
+    // For the snippets having elements outside of the row (and therefore not in
+    // a column), create a column and put these elements in it so they can also
+    // be placed in the grid.
+    if (rowEl && outOfRowEls.length > 0) {
         const columnEl = document.createElement('div');
         columnEl.classList.add('col-lg-12');
-        for (let i = textEls.length - 1; i >= 0; i--) {
-            columnEl.prepend(textEls[i]);
+        for (let i = outOfRowEls.length - 1; i >= 0; i--) {
+            columnEl.prepend(outOfRowEls[i]);
         }
+        avoidRollback(columnEl);
         rowEl.prepend(columnEl);
     }
 
@@ -111,9 +124,11 @@ export function _toggleGridMode(containerEl) {
         for (let i = containerChildren.length - 1; i >= 0; i--) {
             columnEl.prepend(containerChildren[i]);
         }
+        avoidRollback(columnEl);
         rowEl.appendChild(columnEl);
         containerEl.appendChild(rowEl);
     }
+    restoreCursor();
 
     // Converting the columns to grid and getting back the number of rows.
     const columnEls = rowEl.children;
@@ -162,11 +177,14 @@ function _placeColumns(columnEls, rowSize, rowGap, columnSize, columnGap) {
         // Placing the column.
         const style = window.getComputedStyle(columnEl);
         // Horizontal placement.
-        const columnLeft = isImageColumn ? imageEl.offsetLeft : columnEl.offsetLeft;
+        const borderLeft = parseFloat(style.borderLeft);
+        const columnLeft = isImageColumn && !borderLeft ? imageEl.offsetLeft : columnEl.offsetLeft;
         // Getting the width of the column.
         const paddingLeft = parseFloat(style.paddingLeft);
-        const width = isImageColumn ? parseFloat(imageEl.scrollWidth)
+        let width = isImageColumn ? parseFloat(imageEl.scrollWidth)
             : parseFloat(columnEl.scrollWidth) - (allBackgroundColor ? 0 : 2 * paddingLeft);
+        const borderX = borderLeft + parseFloat(style.borderRight);
+        width += borderX + (allBackgroundColor || isImageColumn ? 0 : 2 * defaultGridPadding);
         let columnSpan = Math.round((width + columnGap) / (columnSize + columnGap));
         if (columnSpan < 1) {
             columnSpan = 1;
@@ -175,14 +193,17 @@ function _placeColumns(columnEls, rowSize, rowGap, columnSize, columnGap) {
         const columnEnd = columnStart + columnSpan;
 
         // Vertical placement.
-        const columnTop = isImageColumn ? imageEl.offsetTop : columnEl.offsetTop;
+        const borderTop = parseFloat(style.borderTop);
+        const columnTop = isImageColumn && !borderTop ? imageEl.offsetTop : columnEl.offsetTop;
         // Getting the top and bottom paddings and computing the row offset.
         const paddingTop = parseFloat(style.paddingTop);
         const paddingBottom = parseFloat(style.paddingBottom);
         const rowOffsetTop = Math.floor((paddingTop + rowGap) / (rowSize + rowGap));
         // Getting the height of the column.
-        const height = isImageColumn ? parseFloat(imageEl.scrollHeight)
+        let height = isImageColumn ? parseFloat(imageEl.scrollHeight)
             : parseFloat(columnEl.scrollHeight) - (allBackgroundColor ? 0 : paddingTop + paddingBottom);
+        const borderY = borderTop + parseFloat(style.borderBottom);
+        height += borderY + (allBackgroundColor || isImageColumn ? 0 : 2 * defaultGridPadding);
         const rowSpan = Math.ceil((height + rowGap) / (rowSize + rowGap));
         const rowStart = Math.round(columnTop / (rowSize + rowGap)) + 1 + (allBackgroundColor || isImageColumn ? 0 : rowOffsetTop);
         const rowEnd = rowStart + rowSpan;
@@ -190,13 +211,7 @@ function _placeColumns(columnEls, rowSize, rowGap, columnSize, columnGap) {
         columnEl.style.gridArea = `${rowStart} / ${columnStart} / ${rowEnd} / ${columnEnd}`;
         columnEl.classList.add('o_grid_item');
 
-        // Removing the grid classes (since they end with 0) and adding the
-        // correct ones.
-        const regex = /^(g-)/;
-        const toRemove = [...columnEl.classList].filter(c => {
-            return regex.test(c);
-        });
-        columnEl.classList.remove(...toRemove);
+        // Adding the grid classes.
         columnEl.classList.add('g-col-lg-' + columnSpan, 'g-height-' + rowSpan);
 
         // Setting the initial z-index.
@@ -248,7 +263,7 @@ function _placeColumns(columnEls, rowSize, rowGap, columnSize, columnGap) {
 export function _reloadLazyImages(columnEl) {
     const imageEls = columnEl.querySelectorAll('img');
     for (const imageEl of imageEls) {
-        const src = imageEl.src;
+        const src = imageEl.getAttribute("src");
         imageEl.src = '';
         imageEl.src = src;
     }
@@ -271,13 +286,24 @@ export function _convertColumnToGrid(rowEl, columnEl, columnWidth, columnHeight)
         _convertImageColumn(columnEl);
     }
 
+    // Taking the grid padding into account.
+    const paddingX = parseFloat(rowEl.style.getPropertyValue("--grid-item-padding-x")) || defaultGridPadding;
+    const paddingY = parseFloat(rowEl.style.getPropertyValue("--grid-item-padding-y")) || defaultGridPadding;
+    columnWidth += 2 * paddingX;
+    columnHeight += 2 * paddingY;
+
     // Computing the column and row spans.
     const gridProp = _getGridProperties(rowEl);
     const columnColCount = Math.round((columnWidth + gridProp.columnGap) / (gridProp.columnSize + gridProp.columnGap));
     const columnRowCount = Math.ceil((columnHeight + gridProp.rowGap) / (gridProp.rowSize + gridProp.rowGap));
 
+    // Removing the padding and offset classes.
+    const regex = /^(pt|pb|col-|offset-)/;
+    const toRemove = [...columnEl.classList].filter(c => regex.test(c));
+    columnEl.classList.remove(...toRemove);
+
     // Adding the grid classes.
-    columnEl.classList.add('g-col-lg-' + columnColCount, 'g-height-' + columnRowCount);
+    columnEl.classList.add('g-col-lg-' + columnColCount, 'g-height-' + columnRowCount, 'col-lg-' + columnColCount);
     columnEl.classList.add('o_grid_item');
 
     return {columnColCount: columnColCount, columnRowCount: columnRowCount};
@@ -285,7 +311,8 @@ export function _convertColumnToGrid(rowEl, columnEl, columnWidth, columnHeight)
 /**
  * Checks whether the column only contains an image or not. An image is
  * considered alone if the column only contains empty textnodes and line breaks
- * in addition to the image.
+ * in addition to the image. Note that "image" also refers to an image link
+ * (i.e. `a > img`).
  *
  * @private
  * @param {Element} columnEl
@@ -293,7 +320,7 @@ export function _convertColumnToGrid(rowEl, columnEl, columnWidth, columnHeight)
  */
 export function _checkIfImageColumn(columnEl) {
     let isImageColumn = false;
-    const imageEls = columnEl.querySelectorAll(':scope > img');
+    const imageEls = columnEl.querySelectorAll(":scope > img, :scope > a > img");
     const columnChildrenEls = [...columnEl.children].filter(el => el.nodeName !== 'BR');
     if (imageEls.length === 1 && columnChildrenEls.length === 1) {
         // If there is only one image and if this image is the only "real"
@@ -306,8 +333,7 @@ export function _checkIfImageColumn(columnEl) {
 }
 /**
  * Removes the line breaks and textnodes of the column, adds the grid class and
- * sets the image width to default so it can be displayed as expected. Also
- * blocks the edition of the column.
+ * sets the image width to default so it can be displayed as expected.
  *
  * @private
  * @param {Element} columnEl a column containing only an image.

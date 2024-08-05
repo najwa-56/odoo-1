@@ -132,7 +132,7 @@ class ReplenishmentReport(models.AbstractModel):
         assert product_template_ids or product_variant_ids
         res = {}
 
-        if self.env.context.get('warehouse'):
+        if self.env.context.get('warehouse') and isinstance(self.env.context['warehouse'], int):
             warehouse = self.env['stock.warehouse'].browse(self.env.context.get('warehouse'))
         else:
             warehouse = self.env['stock.warehouse'].browse(self.get_warehouses()[0]['id'])
@@ -274,7 +274,7 @@ class ReplenishmentReport(models.AbstractModel):
                 # Reconcile with the current stock.
                 reserved = 0.0
                 if not float_is_zero(reserved_availability, precision_rounding=product_rounding):
-                    reserved = out.product_uom._compute_quantity(reserved_availability, product.uom_id)
+                    reserved = reserved_availability
                 demand = out.product_qty - reserved
 
                 if float_is_zero(demand, precision_rounding=product_rounding):

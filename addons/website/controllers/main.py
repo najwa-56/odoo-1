@@ -28,6 +28,7 @@ from odoo.addons.http_routing.models.ir_http import slug, slugify, _guess_mimety
 from odoo.addons.portal.controllers.portal import pager as portal_pager
 from odoo.addons.portal.controllers.web import Home
 from odoo.addons.web.controllers.binary import Binary
+from odoo.addons.website.tools import get_base_domain
 
 logger = logging.getLogger(__name__)
 
@@ -138,7 +139,7 @@ class Website(Home):
 
         if not isredir and website.domain:
             domain_from = request.httprequest.environ.get('HTTP_HOST', '')
-            domain_to = werkzeug.urls.url_parse(website.domain).netloc
+            domain_to = get_base_domain(website.domain)
             if domain_from != domain_to:
                 # redirect to correct domain for a correct routing map
                 url_to = werkzeug.urls.url_join(website.domain, '/website/force/%s?isredir=1&path=%s' % (website.id, path))
@@ -203,7 +204,7 @@ class Website(Home):
         # default lang in case we switch from /fr -> /en with /en as default lang.
         request.update_context(lang=lang_code)
         redirect = request.redirect(r or ('/%s' % lang))
-        redirect.set_cookie('frontend_lang', lang_code)
+        redirect.set_cookie('frontend_lang', lang_code, max_age=365 * 24 * 3600)
         return redirect
 
     @http.route(['/website/country_infos/<model("res.country"):country>'], type='json', auth="public", methods=['POST'], website=True)
@@ -283,7 +284,19 @@ class Website(Home):
 
         return request.make_response(content, [('Content-Type', mimetype)])
 
-    @http.route('/website/info', type='http', auth="public", website=True, sitemap=True)
+    def sitemap_website_info(env, rule, qs):
+        website = env['website'].get_current_website()
+        if not (
+            website.viewref('website.website_info', False).active
+            and website.viewref('website.show_website_info', False).active
+        ):
+            # avoid 404 or blank page in sitemap
+            return False
+
+        if not qs or qs.lower() in '/website/info':
+            yield {'loc': '/website/info'}
+
+    @http.route('/website/info', type='http', auth="public", website=True, sitemap=sitemap_website_info)
     def website_info(self, **kwargs):
         Module = request.env['ir.module.module'].sudo()
         apps = Module.search([('state', '=', 'installed'), ('application', '=', True)])
@@ -596,10 +609,18 @@ class Website(Home):
         template = template and dict(template=template) or {}
         website_id = kwargs.get('website_id')
         if website_id:
-            website = request.env['website'].browse(website_id)
+            website = request.env['website'].browse(int(website_id))
             website._force()
         page = request.env['website'].new_page(path, add_menu=add_menu, **template)
         url = page['url']
+        # In case the page is created through the 404 "Create Page" button, the
+        # URL may use special characters which are slugified on page creation.
+        # If that URL is also a menu, we update it accordingly.
+        # NB: we don't want to slugify on menu creation as it could redirect
+        # towards files (with spaces, apostrophes, etc.).
+        menu = request.env['website.menu'].search([('url', '=', '/' + path)])
+        if menu:
+            menu.page_id = page['page_id']
 
         if redirect:
             if ext_special_case:  # redirect non html pages to backend to edit
@@ -729,6 +750,9 @@ class Website(Home):
 
         if enable:
             records = self._get_customize_data(enable, is_view_data)
+            if 'website_blog.opt_blog_cover_post' in enable:
+                # TODO: In master, set the priority in XML directly.
+                records.filtered_domain([('key', '=', 'website_blog.opt_blog_cover_post')]).priority = 17
             records.filtered(lambda x: not x.active).write({'active': True})
 
     @http.route(['/website/theme_customize_bundle_reload'], type='json', auth='user', website=True)

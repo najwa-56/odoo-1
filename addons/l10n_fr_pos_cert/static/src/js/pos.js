@@ -22,6 +22,12 @@ const L10nFrPosGlobalState = (PosGlobalState) => class L10nFrPosGlobalState exte
     }
     disallowLineQuantityChange() {
         let result = super.disallowLineQuantityChange(...arguments);
+        let selectedOrderLine = this.selectedOrder.get_selected_orderline();
+        //Note: is_reward_line is a field in the pos_loyalty module
+        if (selectedOrderLine && selectedOrderLine.is_reward_line) {
+            //Always allow quantity change for reward lines
+            return false || result;
+        }
         return this.is_french_country() || result;
     }
 }
@@ -50,33 +56,28 @@ const L10nFrOrder = (Order) => class L10nFrOrder extends Order {
       result = Boolean(result || this.pos.is_french_country());
       return result;
     }
-    destroy (option) {
-        // SUGGESTION: It's probably more appropriate to apply this restriction
-        // in the TicketScreen.
-        if (option && option.reason == 'abandon' && this.pos.is_french_country() && this.get_orderlines().length) {
-            Gui.showPopup("ErrorPopup", {
-                'title': _t("Fiscal Data Module error"),
-                'body':  _t("Deleting of orders is not allowed."),
-            });
-        } else {
-            super.destroy(...arguments);
-        }
-    }
+    _get_qr_code_data() {
+      if (this.pos.is_french_country()){
+        return false;
+      } else {
+        return super._get_qr_code_data(...arguments);
+      }
+  }
 }
 Registries.Model.extend(Order, L10nFrOrder);
 
 
 const L10nFrOrderline = (Orderline) => class L10nFrOrderline extends Orderline {
     can_be_merged_with(orderline) {
-        let order = this.pos.get_order();
-        let orderlines = order.orderlines;
-        let lastOrderline = order.orderlines.at(orderlines.length - 1);
-
-        if(this.pos.is_french_country() && (lastOrderline.product.id !== orderline.product.id || lastOrderline.quantity < 0)) {
-            return false;
-        } else {
+        if (this.pos.is_french_country()) {
+            const order = this.pos.get_order();
+            const lastOrderline = order.orderlines.at(order.orderlines.length - 1);
+            if ((lastOrderline.product.id !== orderline.product.id || lastOrderline.quantity < 0)) {
+                return false;
+            }
             return super.can_be_merged_with(...arguments);
         }
+        return super.can_be_merged_with(...arguments);
     }
 }
 Registries.Model.extend(Orderline, L10nFrOrderline);

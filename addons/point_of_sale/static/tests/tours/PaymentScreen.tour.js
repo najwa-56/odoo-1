@@ -2,8 +2,10 @@ odoo.define('point_of_sale.tour.PaymentScreen', function (require) {
     'use strict';
 
     const { Chrome } = require('point_of_sale.tour.ChromeTourMethods');
+    const { ErrorPopup } = require('point_of_sale.tour.ErrorPopupTourMethods');
     const { ProductScreen } = require('point_of_sale.tour.ProductScreenTourMethods');
     const { PaymentScreen } = require('point_of_sale.tour.PaymentScreenTourMethods');
+    const { ReceiptScreen } = require('point_of_sale.tour.ReceiptScreenTourMethods');
     const { TicketScreen } = require('point_of_sale.tour.TicketScreenTourMethods');
     const { getSteps, startSteps } = require('point_of_sale.tour.utils');
     var Tour = require('web_tour.tour');
@@ -191,6 +193,50 @@ odoo.define('point_of_sale.tour.PaymentScreen', function (require) {
 
     ProductScreen.do.confirmOpeningPopup();
     ProductScreen.do.clickHomeCategory();
+    ProductScreen.exec.addOrderline('Product Test 40', '1');
+    ProductScreen.do.clickPartnerButton();
+    ProductScreen.do.clickCustomer('Nicole Ford');
+    ProductScreen.do.clickPayButton();
+
+    PaymentScreen.check.totalIs('40.00');
+    PaymentScreen.do.clickPaymentMethod('Bank');
+    PaymentScreen.do.pressNumpad('3 8');
+    PaymentScreen.check.remainingIs('2.0');
+    PaymentScreen.do.clickPaymentMethod('Cash');
+
+    PaymentScreen.check.remainingIs('0.0');
+    PaymentScreen.check.changeIs('0.0');
+
+    PaymentScreen.do.clickInvoiceButton();
+    PaymentScreen.do.clickValidate();
+    ReceiptScreen.check.receiptIsThere();
+    ReceiptScreen.do.clickNextOrder();
+
+    ProductScreen.do.clickHomeCategory();
+    ProductScreen.exec.addOrderline('Product Test 41', '1');
+    ProductScreen.do.clickPartnerButton();
+    ProductScreen.do.clickCustomer('Nicole Ford');
+    ProductScreen.do.clickPayButton();
+
+    PaymentScreen.check.totalIs('41.00');
+    PaymentScreen.do.clickPaymentMethod('Bank');
+    PaymentScreen.do.pressNumpad('3 8');
+    PaymentScreen.check.remainingIs('3.0');
+    PaymentScreen.do.clickPaymentMethod('Cash');
+
+    PaymentScreen.check.remainingIs('0.0');
+    PaymentScreen.check.changeIs('0.0');
+
+    PaymentScreen.do.clickInvoiceButton();
+    PaymentScreen.do.clickValidate();
+    ReceiptScreen.check.receiptIsThere();
+
+    Tour.register('PaymentScreenRoundingHalfUpCashAndBank', { test: true, url: '/pos/ui' }, getSteps());
+
+    startSteps();
+
+    ProductScreen.do.confirmOpeningPopup();
+    ProductScreen.do.clickHomeCategory();
     ProductScreen.exec.addOrderline('Product Test', '1');
     ProductScreen.do.clickPayButton();
 
@@ -204,4 +250,25 @@ odoo.define('point_of_sale.tour.PaymentScreen', function (require) {
 
     Tour.register('PaymentScreenTotalDueWithOverPayment', { test: true, url: '/pos/ui' }, getSteps());
 
+    startSteps();
+
+    ProductScreen.do.confirmOpeningPopup();
+    ProductScreen.do.clickHomeCategory();
+    ProductScreen.exec.addOrderline('Magnetic Board', '1');
+    ProductScreen.do.clickPayButton();
+
+    // Check the popup error is shown when selecting another payment method
+    PaymentScreen.check.totalIs('1.90');
+    PaymentScreen.do.clickPaymentMethod('Cash');
+    PaymentScreen.do.pressNumpad('1 .');
+    PaymentScreen.check.selectedPaymentlineHas('Cash', '1.00');
+    PaymentScreen.do.pressNumpad('2 4');
+    PaymentScreen.check.selectedPaymentlineHas('Cash', '1.24');
+    PaymentScreen.do.clickPaymentMethod('Bank');
+    ErrorPopup.check.isShown();
+    ErrorPopup.check.messageBodyContains(  // Verify the value displayed are as expected
+        'The rounding precision is 0.10 so you should set 1.20 or 1.30 as payment amount instead of 1.24.'
+    );
+
+    Tour.register('CashRoundingPayment', { test: true, url: '/pos/ui' }, getSteps());
 });

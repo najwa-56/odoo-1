@@ -18,7 +18,7 @@ class BaseMailPerformance(MailCommon, TransactionCaseWithUserDemo):
     def setUpClass(cls):
         super(BaseMailPerformance, cls).setUpClass()
 
-        # creating partners is required notably witn template usage
+        # creating partners is required notably with template usage
         cls.user_employee.write({'groups_id': [(4, cls.env.ref('base.group_partner_manager').id)]})
         cls.user_test = cls.env['res.users'].with_context(cls._test_context).create({
             'name': 'Paulette Testouille',
@@ -275,6 +275,24 @@ class TestMailAPIPerformance(BaseMailPerformance):
         with self.assertQueryCount(admin=15, employee=15):
             activity.action_feedback(feedback='Zizisse Done !')
 
+    @warmup
+    def test_adv_activity_mixin_batched(self):
+        records = self.env['mail.test.activity'].create([{'name': 'Test'}] * 10)
+        MailActivity = self.env['mail.activity'].with_context({
+            'default_res_model': 'mail.test.activity',
+        })
+        activity_type = self.env.ref('mail.mail_activity_data_todo')
+
+        MailActivity.create([{
+            'summary': 'Test Activity',
+            'res_id': record.id,
+            'activity_type_id': activity_type.id,
+        } for record in records])
+
+        self.env.invalidate_all()
+        with self.assertQueryCount(3):
+            records.mapped('activity_date_deadline')
+
     @users('admin', 'employee')
     @warmup
     @mute_logger('odoo.models.unlink')
@@ -409,7 +427,7 @@ class TestMailAPIPerformance(BaseMailPerformance):
             }).create({})
             composer._onchange_template_id_wrapper()
 
-        with self.assertQueryCount(admin=156, employee=159), self.mock_mail_gateway():
+        with self.assertQueryCount(admin=157, employee=160), self.mock_mail_gateway():
             composer._action_send_mail()
 
         self.assertEqual(len(self._new_mails), 10)
@@ -704,10 +722,13 @@ class TestMailAPIPerformance(BaseMailPerformance):
     @users('admin', 'employee')
     @warmup
     def test_notification_reply_to_batch(self):
+        # overwrite company name to keep it short/simple
+        # and not trigger the 68 character reply_to formatting
+        self.env.user.company_id.name = "Forced"
         test_records_sudo = self.env['mail.test.container'].sudo().create([
-            {'alias_name': 'alias.test.%s.%d' % (self.env.user.name, index),
+            {'alias_name': 'a.%s.%d' % (self.env.user.name, index),
              'customer_id': self.customer.id,
-             'name': 'Test_%d' % index,
+             'name': 'T_%d' % index,
             } for index in range(10)
         ])
 
@@ -1065,7 +1086,7 @@ class TestMailComplexPerformance(BaseMailPerformance):
         rec1 = rec.with_context(active_test=False)      # to see inactive records
         self.assertEqual(rec1.message_partner_ids, self.partners | self.env.user.partner_id | self.user_portal.partner_id)
 
-        with self.assertQueryCount(admin=30, employee=30):
+        with self.assertQueryCount(admin=31, employee=31):
             rec.write({
                 'name': 'Test2',
                 'customer_id': customer_id,

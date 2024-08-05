@@ -4,17 +4,19 @@
 # 
 # Translators:
 # Martin Trigaux, 2022
-# Malaz Abuidris <msea@odoo.com>, 2022
 # Niyas Raphy, 2022
+# Wil Odoo, 2024
+# Malaz Abuidris <msea@odoo.com>, 2024
+# Mohammad Abdulmoneim, 2024
 # 
 msgid ""
 msgstr ""
-"Project-Id-Version: Odoo Server 16.0+e\n"
+"Project-Id-Version: Odoo Server 16.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-12-15 12:51+0000\n"
+"POT-Creation-Date: 2024-02-06 13:32+0000\n"
 "PO-Revision-Date: 2022-09-22 05:53+0000\n"
-"Last-Translator: Niyas Raphy, 2022\n"
-"Language-Team: Arabic (https://www.transifex.com/odoo/teams/41243/ar/)\n"
+"Last-Translator: Mohammad Abdulmoneim, 2024\n"
+"Language-Team: Arabic (https://app.transifex.com/odoo/teams/41243/ar/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: \n"
@@ -47,7 +49,7 @@ msgstr "نوع قائمة المواد"
 #: model:ir.model.fields,field_description:mrp_subcontracting.field_res_partner__bom_ids
 #: model:ir.model.fields,field_description:mrp_subcontracting.field_res_users__bom_ids
 msgid "BoMs for which the Partner is one of the subcontractors"
-msgstr ""
+msgstr "وحدات القياس التي يكون الشريك أحد المتعاقدين من الباطن لها "
 
 #. module: mrp_subcontracting
 #: model:ir.model.fields,field_description:mrp_subcontracting.field_mrp_production__bom_product_ids
@@ -71,6 +73,9 @@ msgid ""
 "company. Note that standard subcontracting routes will be adapted so as to "
 "take these into account automatically."
 msgstr ""
+"حدد هذا المربع لإنشاء موقع تعاقد فرعي مخصص جديد لهذه الشركة. يرجى العلم بأن "
+"مسارات التعاقد الفرعي القياسية سيتم ضبطها لاعتبار تلك المسارات بعين الاعتبار"
+" تلقائياً. "
 
 #. module: mrp_subcontracting
 #: model:ir.model.fields,help:mrp_subcontracting.field_product_supplierinfo__is_subcontractor
@@ -164,13 +169,15 @@ msgstr "إخفاء "
 #, python-format
 msgid ""
 "In order to manage stock accurately, subcontracting locations must be type "
-"Internal, linked to the appropriate company and not specific to a warehouse."
+"Internal, linked to the appropriate company."
 msgstr ""
+"حتى تتمكن من إدارة المخزون بشكل دقيق، يجب أن تكون مواقع التعاقد من الباطن "
+"داخلية ومرتبطة بالشركة الصحيحة. "
 
 #. module: mrp_subcontracting
 #: model_terms:ir.ui.view,arch_db:mrp_subcontracting.mrp_production_subcontracting_filter
 msgid "Incoming transfer"
-msgstr ""
+msgstr "التحويل القادم "
 
 #. module: mrp_subcontracting
 #: model:ir.model,name:mrp_subcontracting.model_stock_location
@@ -185,7 +192,7 @@ msgstr "التعاقد من الباطن "
 #. module: mrp_subcontracting
 #: model:ir.model.fields,field_description:mrp_subcontracting.field_stock_location__is_subcontracting_location
 msgid "Is a Subcontracting Location?"
-msgstr ""
+msgstr "موقع تعاقد من الباطن؟ "
 
 #. module: mrp_subcontracting
 #: model:ir.model.fields,help:mrp_subcontracting.field_mrp_production__bom_product_ids
@@ -193,12 +200,22 @@ msgid ""
 "List of Products used in the BoM, used to filter the list of products in the"
 " subcontracting portal view"
 msgstr ""
+"قائمة المنتجات المستخدمة في قائمة المواد، تُستخدم لتصفية قائمة المنتجات في "
+"نافذة عرض بوابة التعاقد من الباطن. "
+
+#. module: mrp_subcontracting
+#. odoo-python
+#: code:addons/mrp_subcontracting/models/stock_picking.py:0
+#, python-format
+msgid "Locations to update"
+msgstr "المواقع التي سيتم تحديثها"
 
 #. module: mrp_subcontracting
 #: model:ir.model.fields,field_description:mrp_subcontracting.field_res_partner__production_ids
 #: model:ir.model.fields,field_description:mrp_subcontracting.field_res_users__production_ids
 msgid "MRP Productions for which the Partner is the subcontractor"
 msgstr ""
+"إنتاجات تخطيط متطلبات المواد التي يكون الشريك أحد المتعاقدين من الباطن لها "
 
 #. module: mrp_subcontracting
 #. odoo-python
@@ -289,6 +306,8 @@ msgid ""
 "Portal users cannot create a stock move with a state 'Done' or change the "
 "current state to 'Done'."
 msgstr ""
+"لا يمكن لمستخدمي البوابة إنشاء حركة مخزون بحالة \"منتهي\" أو تغيير الحالة "
+"الحالية إلى \"تم الانتهاء\". "
 
 #. module: mrp_subcontracting
 #: model:ir.model,name:mrp_subcontracting.model_stock_move_line
@@ -424,6 +443,7 @@ msgstr "حركة المخزون"
 #: model:ir.model.fields,field_description:mrp_subcontracting.field_res_users__picking_ids
 msgid "Stock Pickings for which the Partner is the subcontractor"
 msgstr ""
+"عمليات الانتقاء من المخزون التي يكون الشريك أحد المتعاقدين من الباطن لها "
 
 #. module: mrp_subcontracting
 #: model:ir.model,name:mrp_subcontracting.model_stock_rule
@@ -452,7 +472,7 @@ msgstr "تم التعاقد من الباطن "
 #: code:addons/mrp_subcontracting/models/mrp_production.py:0
 #, python-format
 msgid "Subcontracted manufacturing orders cannot be merged."
-msgstr ""
+msgstr "لا يمكن دمج أوامر التصنيع التي قد تم التعاقد من الباطن بشأنها. "
 
 #. module: mrp_subcontracting
 #. odoo-python
@@ -493,7 +513,7 @@ msgstr "نوع عملية التعاقد من الباطن "
 #. module: mrp_subcontracting
 #: model:ir.actions.act_window,name:mrp_subcontracting.subcontracting_portal_view_production_action
 msgid "Subcontracting Portal"
-msgstr ""
+msgstr "بوابة التعاقد من الباطن "
 
 #. module: mrp_subcontracting
 #: model:ir.model.fields,field_description:mrp_subcontracting.field_stock_warehouse__subcontracting_resupply_type_id
@@ -512,7 +532,7 @@ msgstr "التعاقد من الباطن: "
 #: code:addons/mrp_subcontracting/report/mrp_report_bom_structure.py:0
 #, python-format
 msgid "Subcontracting: %s"
-msgstr ""
+msgstr "التعاقد من الباطن: %s "
 
 #. module: mrp_subcontracting
 #: model:ir.model.fields,field_description:mrp_subcontracting.field_mrp_production__subcontractor_id
@@ -557,7 +577,7 @@ msgstr ""
 #. module: mrp_subcontracting
 #: model_terms:ir.ui.view,arch_db:mrp_subcontracting.portal_my_productions
 msgid "There are currently no productions for your account."
-msgstr ""
+msgstr "لا توجد حالياً أي إنتاجات لحسابك. "
 
 #. module: mrp_subcontracting
 #. odoo-python
@@ -567,6 +587,8 @@ msgid ""
 "There shouldn't be multiple productions to record for the same subcontracted"
 " move."
 msgstr ""
+"يجب ألا تكون هناك عدة إنتاجات لتسجيلها لنفس الحركة المتعاقد عليها من الباطن."
+" "
 
 #. module: mrp_subcontracting
 #. odoo-python
@@ -596,7 +618,7 @@ msgstr "الشحنة"
 #. module: mrp_subcontracting
 #: model:ir.model.fields,help:mrp_subcontracting.field_mrp_production__subcontractor_id
 msgid "Used to restrict access to the portal user through Record Rules"
-msgstr ""
+msgstr "يُستخدم لتقييد الوصول إلى مستخدم البوابة من خلال قواعد السجل "
 
 #. module: mrp_subcontracting
 #: model:ir.model,name:mrp_subcontracting.model_stock_warehouse
@@ -627,23 +649,21 @@ msgstr ""
 #: code:addons/mrp_subcontracting/models/stock_location.py:0
 #, python-format
 msgid "You cannot alter the company's subcontracting location"
-msgstr ""
-
-#. module: mrp_subcontracting
-#. odoo-python
-#: code:addons/mrp_subcontracting/models/stock_location.py:0
-#, python-format
-msgid ""
-"You cannot change the subcontracting location as it is still linked to a "
-"subcontractor partner"
-msgstr ""
+msgstr "لا يمكنك تعديل موقع التعاقد من الباطن الخاص بالشركة "
 
 #. module: mrp_subcontracting
 #. odoo-python
 #: code:addons/mrp_subcontracting/models/mrp_production.py:0
 #, python-format
 msgid "You cannot write on fields %s in mrp.production."
-msgstr ""
+msgstr "لا يمكنك الكتابة في الحقول %s في mrp.production. "
+
+#. module: mrp_subcontracting
+#. odoo-python
+#: code:addons/mrp_subcontracting/models/stock_picking.py:0
+#, python-format
+msgid "You might want to update the locations of this transfer's operations"
+msgstr "قد ترغب في تحديث المواقع لعمليات هذه الشحنة "
 
 #. module: mrp_subcontracting
 #. odoo-python

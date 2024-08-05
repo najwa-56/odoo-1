@@ -34,9 +34,9 @@ class MailMail(models.Model):
     def default_get(self, fields):
         # protection for `default_type` values leaking from menu action context (e.g. for invoices)
         # To remove when automatic context propagation is removed in web client
-        if self._context.get('default_type') not in type(self).message_type.base_field.selection:
+        if self._context.get('default_type') not in self._fields['message_type'].base_field.selection:
             self = self.with_context(dict(self._context, default_type=None))
-        if self._context.get('default_state') not in type(self).state.base_field.selection:
+        if self._context.get('default_state') not in self._fields['state'].base_field.selection:
             self = self.with_context(dict(self._context, default_state='outgoing'))
         return super(MailMail, self).default_get(fields)
 
@@ -44,7 +44,7 @@ class MailMail(models.Model):
     mail_message_id = fields.Many2one('mail.message', 'Message', required=True, ondelete='cascade', index=True, auto_join=True)
     mail_message_id_int = fields.Integer(compute='_compute_mail_message_id_int', compute_sudo=True)
     body_html = fields.Text('Text Contents', help="Rich-text/HTML message")
-    body_content = fields.Html('Rich-text Contents', sanitize=True, compute='_compute_body_content')
+    body_content = fields.Html('Rich-text Contents', sanitize=True, compute='_compute_body_content', search="_search_body_content")
     references = fields.Text('References', help='Message references, such as identifiers of previous messages', readonly=1)
     headers = fields.Text('Headers', copy=False)
     restricted_attachment_count = fields.Integer('Restricted attachments', compute='_compute_restricted_attachments')
@@ -117,6 +117,27 @@ class MailMail(models.Model):
             restricted_attaments = mail_sudo.attachment_ids - IrAttachment._filter_attachment_access(mail_sudo.attachment_ids.ids)
             mail_sudo.attachment_ids = restricted_attaments | mail.unrestricted_attachment_ids
 
+    def _search_body_content(self, operator, value):
+        return [('body_html', operator, value)]
+
+    @api.model
+    def fields_get(self, *args, **kwargs):
+        # related selection will fetch translations from DB
+        # selections added in stable won't be in DB -> add them on the related model if not already added
+        message_type_field = self.env['mail.message']._fields['message_type']
+        if 'auto_comment' not in {value for value, name in message_type_field.get_description(self.env)['selection']}:
+            self._fields_get_message_type_update_selection(message_type_field.selection)
+        return super().fields_get(*args, **kwargs)
+
+    def _fields_get_message_type_update_selection(self, selection):
+        """Update the field selection for message type on mail.message to match the runtime values.
+
+        DO NOT USE it is only there for a stable fix and should not be used for any reason other than hotfixing.
+        """
+        self.env['ir.model.fields'].invalidate_model(['selection_ids'])
+        self.env['ir.model.fields.selection'].sudo()._update_selection('mail.message', 'message_type', selection)
+        self.env.registry.clear_caches()
+
     @api.model_create_multi
     def create(self, values_list):
         # notification field: if not set, set if mail comes from an existing mail.message
@@ -168,9 +189,8 @@ class MailMail(models.Model):
         SQL queries.
         """
         super()._add_inherited_fields()
-        cls = type(self)
         for field in ('email_from', 'reply_to', 'subject'):
-            cls._fields[field].related_sudo = True
+            self._fields[field].related_sudo = True
 
     def action_retry(self):
         self.filtered(lambda mail: mail.state == 'exception').mark_outgoing()
@@ -329,7 +349,14 @@ class MailMail(models.Model):
         body = self._send_prepare_body()
         body_alternative = tools.html2plaintext(body)
         if partner:
-            email_to = [tools.formataddr((partner.name or 'False', partner.email or 'False'))]
+            emails_normalized = tools.email_normalize_all(partner.email)
+            if emails_normalized:
+                email_to = [
+                    tools.formataddr((partner.name or "False", email or "False"))
+                    for email in emails_normalized
+                ]
+            else:
+                email_to = [tools.formataddr((partner.name or "False", partner.email or "False"))]
         else:
             email_to = tools.email_split_and_format(self.email_to)
         res = {
@@ -494,13 +521,27 @@ class MailMail(models.Model):
                     # see rev. 56596e5240ef920df14d99087451ce6f06ac6d36
                     notifs.flush_recordset(['notification_status', 'failure_type', 'failure_reason'])
 
+                # protect against ill-formatted email_from when formataddr was used on an already formatted email
+                emails_from = tools.email_split_and_format(mail.email_from)
+                email_from = emails_from[0] if emails_from else mail.email_from
+
                 # build an RFC2822 email.message.Message object and send it without queuing
                 res = None
                 # TDE note: could be great to pre-detect missing to/cc and skip sending it
                 # to go directly to failed state update
                 for email in email_list:
+                    # support headers specific to the specific outgoing email
+                    if email.get('headers'):
+                        email_headers = headers.copy()
+                        try:
+                            email_headers.update(email.get('headers'))
+                        except Exception:  # noqa: BLE001
+                            pass
+                    else:
+                        email_headers = headers
+
                     msg = IrMailServer.build_email(
-                        email_from=mail.email_from,
+                        email_from=email_from,
                         email_to=email.get('email_to'),
                         subject=mail.subject,
                         body=email.get('body'),
@@ -513,7 +554,7 @@ class MailMail(models.Model):
                         object_id=mail.res_id and ('%s-%s' % (mail.res_id, mail.model)),
                         subtype='html',
                         subtype_alternative='plain',
-                        headers=headers)
+                        headers=email_headers)
                     processing_pid = email.pop("partner_id", None)
                     try:
                         res = IrMailServer.send_email(

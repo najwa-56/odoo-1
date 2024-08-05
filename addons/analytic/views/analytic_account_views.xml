@@ -53,15 +53,29 @@
             <field name="arch" type="xml">
                 <tree string="Analytic Accounts" multi_edit="1">
                     <field name="company_id" invisible="1"/>
+                    <field name="currency_id" invisible="1"/>
                     <field name="name" string="Name"/>
                     <field name="code"/>
                     <field name="partner_id"/>
                     <field name="plan_id"/>
                     <field name="active" invisible="1"/>
                     <field name="company_id" groups="base.group_multi_company"/>
-                    <field name="debit" sum="Debit"/>
-                    <field name="credit" sum="Credit"/>
+                    <field name="debit" sum="Debit" invisible="1"/>
+                    <field name="credit" sum="Credit" invisible="1"/>
                     <field name="balance" sum="Balance"/>
+                </tree>
+            </field>
+        </record>
+
+        <record id="view_account_analytic_account_list_select" model="ir.ui.view">
+            <field name="name">account.analytic.account.list.select</field>
+            <field name="model">account.analytic.account</field>
+            <field name="mode">primary</field>
+            <field eval="18" name="priority"/>
+            <field name="inherit_id" ref="analytic.view_account_analytic_account_list"/>
+            <field name="arch" type="xml">
+                <tree position="attributes">
+                    <attribute name="multi_edit">0</attribute>
                 </tree>
             </field>
         </record>

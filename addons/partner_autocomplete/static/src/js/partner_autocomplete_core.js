@@ -1,5 +1,7 @@
 /** @odoo-module **/
+/* global checkVATNumber */
 
+import { loadJS } from "@web/core/assets";
 import { _t } from "@web/core/l10n/translation";
 import { KeepLast } from "@web/core/utils/concurrency";
 import { useService } from "@web/core/utils/hooks";
@@ -21,8 +23,47 @@ export function usePartnerAutocomplete() {
     const notification = useService("notification");
     const orm = useService("orm");
 
-    function autocomplete(value, isVAT = false) {
+    function sanitizeVAT(value) {
+        return value ? value.replace(/[^A-Za-z0-9]/g, '') : '';
+    }
+
+    async function isVATNumber(value) {
+        // Lazyload jsvat only if the component is being used.
+        await loadJS("/partner_autocomplete/static/lib/jsvat.js");
+
+        // checkVATNumber is defined in library jsvat.
+        // It validates that the input has a valid VAT number format
+        return checkVATNumber(sanitizeVAT(value));
+    }
+
+    function isGSTNumber(value) {
+        // Check if the input is a valid GST number.
+        let isGST = false;
+        if (value && value.length === 15) {
+            const allGSTinRe = [
+                /\d{2}[a-zA-Z]{5}\d{4}[a-zA-Z][1-9A-Za-z][Zz1-9A-Ja-j][0-9a-zA-Z]/, // Normal, Composite, Casual GSTIN
+                /\d{4}[A-Z]{3}\d{5}[UO]N[A-Z0-9]/, // UN/ON Body GSTIN
+                /\d{4}[a-zA-Z]{3}\d{5}NR[0-9a-zA-Z]/, // NRI GSTIN
+                /\d{2}[a-zA-Z]{4}[a-zA-Z0-9]\d{4}[a-zA-Z][1-9A-Za-z][DK][0-9a-zA-Z]/, // TDS GSTIN
+                /\d{2}[a-zA-Z]{5}\d{4}[a-zA-Z][1-9A-Za-z]C[0-9a-zA-Z]/ // TCS GSTIN
+            ];
+
+            isGST = allGSTinRe.some((re) => re.test(value));
+        }
+
+        return isGST;
+    }
+
+    async function isTAXNumber(value) {
+        const isVAT = await isVATNumber(value);
+        const isGST = isGSTNumber(value);
+        return isVAT || isGST;
+    }
+
+    async function autocomplete(value) {
         value = value.trim();
+
+        const isVAT = await isTAXNumber(value);
         let odooSuggestions = [];
         let clearbitSuggestions = [];
         return new Promise((resolve, reject) => {
@@ -112,7 +153,7 @@ export function usePartnerAutocomplete() {
     function getCreateData(company) {
         const removeUselessFields = (company) => {
             // Delete attribute to avoid "Field_changed" errors
-            const fields = ['label', 'description', 'domain', 'logo', 'legal_name', 'ignored', 'email', 'bank_ids', 'classList'];
+            const fields = ['label', 'description', 'domain', 'logo', 'legal_name', 'ignored', 'email', 'bank_ids', 'classList', 'skip_enrich'];
             fields.forEach((field) => {
                 delete company[field];
             });
@@ -128,7 +169,7 @@ export function usePartnerAutocomplete() {
 
         return new Promise((resolve) => {
             // Fetch additional company info via Autocomplete Enrichment API
-            const enrichPromise = enrichCompany(company);
+            const enrichPromise = !company.skip_enrich ? enrichCompany(company) : false;
 
             // Get logo
             const logoPromise = company.logo ? getCompanyLogo(company.logo) : false;
@@ -149,6 +190,15 @@ export function usePartnerAutocomplete() {
                     }
                     else {
                         notification.add(company_data.error_message);
+                    }
+                    if (company_data.city !== undefined) {
+                        company.city = company_data.city;
+                    }
+                    if (company_data.street !== undefined) {
+                        company.street = company_data.street;
+                    }
+                    if (company_data.zip !== undefined) {
+                        company.zip = company_data.zip;
                     }
                     company_data = company;
                 }
@@ -292,5 +342,5 @@ export function usePartnerAutocomplete() {
             notification.add(title);
         }
     }
-    return { autocomplete, getCreateData };
+    return { autocomplete, getCreateData, isTAXNumber };
 }

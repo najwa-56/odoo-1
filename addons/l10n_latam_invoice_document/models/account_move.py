@@ -64,7 +64,7 @@ class AccountMove(models.Model):
            when we change the document type) """
         without_doc_type = self.filtered(lambda x: x.journal_id.l10n_latam_use_documents and not x.l10n_latam_document_type_id)
         manual_documents = self.filtered(lambda x: x.journal_id.l10n_latam_use_documents and x.l10n_latam_manual_document_number)
-        (without_doc_type + manual_documents.filtered(lambda x: not x.name or x.name and x.state == 'draft' and not x.posted_before)).name = '/'
+        (without_doc_type + manual_documents.filtered(lambda x: not x.name)).name = '/'
         # we need to group moves by document type as _compute_name will apply the same name prefix of the first record to the others
         group_by_document_type = defaultdict(self.env['account.move'].browse)
         for move in (self - without_doc_type - manual_documents):
@@ -196,7 +196,7 @@ class AccountMove(models.Model):
 
     @api.depends('l10n_latam_available_document_type_ids', 'debit_origin_id')
     def _compute_l10n_latam_document_type(self):
-        for rec in self.filtered(lambda x: x.state == 'draft'):
+        for rec in self.filtered(lambda x: x.state == 'draft' and not x.posted_before):
             document_types = rec.l10n_latam_available_document_type_ids._origin
             invoice_type = rec.move_type
             if invoice_type in ['out_refund', 'in_refund']:
@@ -226,3 +226,8 @@ class AccountMove(models.Model):
             ]
             if rec.search(domain):
                 raise ValidationError(_('Vendor bill number must be unique per vendor and company.'))
+
+    def _compute_made_sequence_hole(self):
+        manual_documents = self.filtered(lambda x: x.journal_id.l10n_latam_use_documents and x.l10n_latam_manual_document_number)
+        manual_documents.made_sequence_hole = False
+        super(AccountMove, self - manual_documents)._compute_made_sequence_hole()

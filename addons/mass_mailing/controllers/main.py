@@ -2,7 +2,6 @@
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
 import base64
-import werkzeug
 
 from odoo import _, exceptions, http, tools
 from odoo.http import request, Response
@@ -27,6 +26,13 @@ class MassMailController(http.Controller):
     # SUBSCRIPTION MANAGEMENT
     # ------------------------------------------------------------
 
+    # csrf is disabled here because it will be called by the MUA with unpredictable session at that time
+    @http.route(['/mail/mailing/<int:mailing_id>/unsubscribe_oneclick'], type='http', website=True, auth='public',
+                methods=["POST"], csrf=False)
+    def mailing_unsubscribe_oneclick(self, mailing_id, email=None, res_id=None, token="", **post):
+        self.mailing(mailing_id, email=email, res_id=res_id, token=token, **post)
+        return Response(status=200)
+
     @http.route(['/mail/mailing/<int:mailing_id>/unsubscribe'], type='http', website=True, auth='public')
     def mailing(self, mailing_id, email=None, res_id=None, token="", **post):
         mailing = request.env['mailing.mailing'].sudo().browse(mailing_id)
@@ -49,7 +55,7 @@ class MassMailController(http.Controller):
                 opt_out_list_ids = set([list.id for list in opt_out_list_ids if list not in opt_in_list_ids])
 
                 unique_list_ids = set([list.list_id.id for list in subscription_list_ids])
-                list_ids = request.env['mailing.list'].sudo().browse(unique_list_ids)
+                list_ids = request.env['mailing.list'].sudo().browse(unique_list_ids).filtered('active')
                 unsubscribed_list = ', '.join(str(list.name) for list in mailing.contact_list_ids if list.is_public)
                 return request.render('mass_mailing.page_unsubscribe', {
                     'contacts': contacts,
@@ -65,7 +71,7 @@ class MassMailController(http.Controller):
                 opt_in_lists = request.env['mailing.contact.subscription'].sudo().search([
                     ('contact_id.email_normalized', '=', email),
                     ('opt_out', '=', False)
-                ]).mapped('list_id')
+                ]).mapped('list_id').filtered('active')
                 blacklist_rec = request.env['mail.blacklist'].sudo()._add(email)
                 self._log_blacklist_action(
                     blacklist_rec, mailing_id,
@@ -107,7 +113,7 @@ class MassMailController(http.Controller):
     @http.route(['/unsubscribe_from_list'], type='http', website=True, multilang=False, auth='public', sitemap=False)
     def unsubscribe_placeholder_link(self, **post):
         """Dummy route so placeholder is not prefixed by language, MUST have multilang=False"""
-        raise werkzeug.exceptions.NotFound()
+        raise NotFound()
 
     # ------------------------------------------------------------
     # TRACKING
@@ -138,7 +144,10 @@ class MassMailController(http.Controller):
             country_code=country_code,
             mailing_trace_id=mailing_trace_id
         )
-        return request.redirect(request.env['link.tracker'].get_url_from_code(code), code=301, local=False)
+        redirect_url = request.env['link.tracker'].get_url_from_code(code)
+        if not redirect_url:
+            raise NotFound()
+        return request.redirect(redirect_url, code=301, local=False)
 
     # ------------------------------------------------------------
     # MAILING MANAGEMENT
@@ -147,7 +156,7 @@ class MassMailController(http.Controller):
     @http.route('/mailing/report/unsubscribe', type='http', website=True, auth='public')
     def turn_off_mailing_reports(self, token, user_id):
         if not token or not user_id:
-            raise werkzeug.exceptions.NotFound()
+            raise NotFound()
         user_id = int(user_id)
         correct_token = consteq(token, request.env['mailing.mailing']._get_unsubscribe_token(user_id))
         user = request.env['res.users'].sudo().browse(user_id)
@@ -157,7 +166,7 @@ class MassMailController(http.Controller):
                 menu_id = request.env.ref('mass_mailing.menu_mass_mailing_global_settings').id
                 return request.render('mass_mailing.mailing_report_deactivated', {'menu_id': menu_id})
             return request.render('mass_mailing.mailing_report_deactivated')
-        raise werkzeug.exceptions.NotFound()
+        raise NotFound()
 
     @http.route(['/mailing/<int:mailing_id>/view'], type='http', website=True, auth='public')
     def view(self, mailing_id, email=None, res_id=None, token=""):

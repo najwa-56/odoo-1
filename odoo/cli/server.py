@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
 """
@@ -20,6 +19,7 @@ import sys
 import threading
 import traceback
 import time
+from pathlib import Path
 
 from psycopg2 import ProgrammingError, errorcodes
 
@@ -66,6 +66,11 @@ def report_configuration():
     port = config['db_port'] or os.environ.get('PGPORT', 'default')
     user = config['db_user'] or os.environ.get('PGUSER', 'default')
     _logger.info('database: %s@%s:%s', user, host, port)
+    if sys.version_info[:2] > odoo.MAX_PY_VERSION:
+        _logger.warning("Python %s is not officially supported, please use Python %s instead",
+            '.'.join(map(str, sys.version_info[:2])),
+            '.'.join(map(str, odoo.MAX_PY_VERSION))
+        )
 
 def rm_pid_file(main_pid):
     config = odoo.tools.config
@@ -176,4 +181,5 @@ def main(args):
 class Server(Command):
     """Start the odoo server (default command)"""
     def run(self, args):
+        odoo.tools.config.parser.prog = f'{Path(sys.argv[0]).name} {self.name}'
         main(args)

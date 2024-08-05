@@ -2,7 +2,6 @@
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 import odoo
 from odoo.tests import HttpCase, tagged
-from odoo.tests.common import HOST
 from odoo.tools import mute_logger
 from odoo.addons.http_routing.models.ir_http import slug
 
@@ -210,3 +209,91 @@ class TestRedirect(HttpCase):
         self.assertTrue(
             r.url.endswith(url_rec2),
             "Unpublished record should redirect to published record set in redirect")
+
+    @mute_logger('odoo.http')
+    def test_05_redirect_404_notfound_record(self):
+        # 1. Accessing unexisting record: raise 404
+        url_rec1 = '/test_website/200/unexisting-100000'
+        r = self.url_open(url_rec1)
+        self.assertEqual(r.status_code, 404)
+
+        # 2. Accessing unpublished record with redirect to a 404: expecting 404
+        redirect = self.env['website.rewrite'].create({
+            'name': 'Test 301 Redirect route unexisting record',
+            'redirect_type': '301',
+            'url_from': url_rec1,
+            'url_to': '/get',
+        })
+        r = self.url_open(url_rec1, allow_redirects=False)
+        self.assertEqual(r.status_code, 301)
+        self.assertTrue(r.headers.get('Location', '').endswith(redirect.url_to))
+
+        r = self.url_open(url_rec1, allow_redirects=True)
+        self.assertEqual(r.status_code, 200)
+        self.assertTrue(r.url.endswith(redirect.url_to))
+
+    def test_redirect_308_multiple_url_endpoint(self):
+        self.env['website.rewrite'].create({
+            'name': 'Test Multi URL 308',
+            'redirect_type': '308',
+            'url_from': '/test_countries_308',
+            'url_to': '/test_countries_308_redirected',
+        })
+        rec1 = self.env['test.model'].create({
+            'name': '301 test record',
+            'is_published': True,
+        })
+        url_rec1 = f"/test_countries_308/{slug(rec1)}"
+
+        resp = self.url_open("/test_countries_308", allow_redirects=False)
+        self.assertEqual(resp.status_code, 308)
+        self.assertEqual(resp.headers.get('Location'), self.base_url() + "/test_countries_308_redirected")
+
+        resp = self.url_open(url_rec1)
+        self.assertEqual(resp.status_code, 200)
+        self.assertTrue(resp.url.endswith(url_rec1))
+
+    def test_redirect_with_qs(self):
+        self.env['website.rewrite'].create({
+            'name': 'Test 301 Redirect with qs',
+            'redirect_type': '301',
+            'url_from': '/foo?bar=1',
+            'url_to': '/new-page-01',
+        })
+        self.env['website.rewrite'].create({
+            'name': 'Test 301 Redirect with qs',
+            'redirect_type': '301',
+            'url_from': '/foo?bar=2',
+            'url_to': '/new-page-10?qux=2',
+        })
+        self.env['website.rewrite'].create({
+            'name': 'Test 301 Redirect without qs',
+            'redirect_type': '301',
+            'url_from': '/foo',
+            'url_to': '/new-page-11',
+        })
+
+        # should match qs first
+        resp = self.url_open("/foo?bar=1", allow_redirects=False)
+        self.assertEqual(resp.status_code, 301)
+        self.assertEqual(resp.headers.get('Location'), self.base_url() + "/new-page-01?bar=1")
+
+        # should match qs first
+        resp = self.url_open("/foo?bar=2", allow_redirects=False)
+        self.assertEqual(resp.status_code, 301)
+        self.assertEqual(resp.headers.get('Location'), self.base_url() + "/new-page-10?qux=2&bar=2")
+
+        # should match no qs
+        resp = self.url_open("/foo?bar=3", allow_redirects=False)
+        self.assertEqual(resp.status_code, 301)
+        self.assertEqual(resp.headers.get('Location'), self.base_url() + "/new-page-11?bar=3")
+
+        resp = self.url_open("/foo", allow_redirects=False)
+        self.assertEqual(resp.status_code, 301)
+        self.assertEqual(resp.headers.get('Location'), self.base_url() + "/new-page-11")
+
+        # we dont support wrong get order
+        # purpose is to support simple case like content.asp?id=xx
+        resp = self.url_open("/foo?oups=1&bar=2", allow_redirects=False)
+        self.assertEqual(resp.status_code, 301)
+        self.assertEqual(resp.headers.get('Location'), self.base_url() + "/new-page-11?oups=1&bar=2")

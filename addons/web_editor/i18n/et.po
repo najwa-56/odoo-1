@@ -16,18 +16,19 @@
 # Rivo Zängov <eraser@eraser.ee>, 2022
 # Patrick-Jordan Kiudorv, 2022
 # Leaanika Randmets, 2023
-# Anna, 2023
 # JanaAvalah, 2023
 # Martin Trigaux, 2023
+# Katrin Kampura, 2023
+# Anna, 2024
 # 
 msgid ""
 msgstr ""
-"Project-Id-Version: Odoo Server 16.0+e\n"
+"Project-Id-Version: Odoo Server 16.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-12-15 12:45+0000\n"
+"POT-Creation-Date: 2024-02-06 13:32+0000\n"
 "PO-Revision-Date: 2022-09-22 05:55+0000\n"
-"Last-Translator: Martin Trigaux, 2023\n"
-"Language-Team: Estonian (https://www.transifex.com/odoo/teams/41243/et/)\n"
+"Last-Translator: Anna, 2024\n"
+"Language-Team: Estonian (https://app.transifex.com/odoo/teams/41243/et/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: \n"
@@ -276,6 +277,7 @@ msgstr "Lisa rida"
 
 #. module: web_editor
 #. odoo-javascript
+#: code:addons/web_editor/static/src/components/media_dialog/document_selector.js:0
 #: code:addons/web_editor/static/src/components/media_dialog/image_selector.js:0
 #, python-format
 msgid "Add URL"
@@ -336,13 +338,6 @@ msgstr "Lisa rida ülesse"
 #, python-format
 msgid "Add a row below"
 msgstr "Lisa rida alla"
-
-#. module: web_editor
-#. odoo-javascript
-#: code:addons/web_editor/static/src/components/media_dialog/document_selector.js:0
-#, python-format
-msgid "Add document"
-msgstr "Lisa dokument"
 
 #. module: web_editor
 #: model_terms:ir.ui.view,arch_db:web_editor.snippet_options_image_optimization_widgets
@@ -795,7 +790,11 @@ msgid "Could not install module <strong>%s</strong>"
 msgstr "Moodulit ei saanud installida <strong>%s</strong>"
 
 #. module: web_editor
+#. odoo-javascript
+#. module: web_editor
+#: code:addons/web_editor/static/src/components/upload_progress_toast/upload_service.js:0
 #: model_terms:ir.ui.view,arch_db:web_editor.snippet_options_background_options
+#, python-format
 msgid "Cover"
 msgstr "Kaas"
 
@@ -1311,6 +1310,7 @@ msgstr "Pealkiri 6"
 #. module: web_editor
 #. odoo-javascript
 #: code:addons/web_editor/static/src/js/editor/odoo-editor/src/OdooEditor.js:0
+#: code:addons/web_editor/static/src/js/editor/odoo-editor/src/OdooEditor.js:0
 #, python-format
 msgid "Heading 1"
 msgstr "Pealkiri 1"
@@ -1318,12 +1318,14 @@ msgstr "Pealkiri 1"
 #. module: web_editor
 #. odoo-javascript
 #: code:addons/web_editor/static/src/js/editor/odoo-editor/src/OdooEditor.js:0
+#: code:addons/web_editor/static/src/js/editor/odoo-editor/src/OdooEditor.js:0
 #, python-format
 msgid "Heading 2"
 msgstr "Pealkiri 2"
 
 #. module: web_editor
 #. odoo-javascript
+#: code:addons/web_editor/static/src/js/editor/odoo-editor/src/OdooEditor.js:0
 #: code:addons/web_editor/static/src/js/editor/odoo-editor/src/OdooEditor.js:0
 #, python-format
 msgid "Heading 3"
@@ -2333,6 +2335,14 @@ msgid "Reset Image"
 msgstr "Nulli pilt"
 
 #. module: web_editor
+#. odoo-javascript
+#: code:addons/web_editor/static/src/js/editor/odoo-editor/src/OdooEditor.js:0
+#: code:addons/web_editor/static/src/xml/editor.xml:0
+#, python-format
+msgid "Reset Size"
+msgstr "Lähtesta suurus"
+
+#. module: web_editor
 #: model_terms:ir.ui.view,arch_db:web_editor.snippet_options
 msgid "Reset crop"
 msgstr "Lähtesta kärpimine"
@@ -2529,6 +2539,7 @@ msgstr "Vali meedia"
 #. odoo-javascript
 #: code:addons/web_editor/static/src/js/editor/odoo-editor/src/OdooEditor.js:0
 #: code:addons/web_editor/static/src/js/editor/odoo-editor/src/OdooEditor.js:0
+#: model_terms:ir.ui.view,arch_db:web_editor.snippets
 #, python-format
 msgid "Separator"
 msgstr "Eraldaja"
@@ -2807,6 +2818,15 @@ msgid "The datetime %s does not match the format %s"
 msgstr "Kuupäev ja kellaaeg %s ei vasta formaadile %s"
 
 #. module: web_editor
+#. odoo-python
+#: code:addons/web_editor/controllers/main.py:0
+#, python-format
+msgid ""
+"The document was already saved from someone with a different history for "
+"model %r, field %r with id %r."
+msgstr ""
+
+#. module: web_editor
 #. odoo-javascript
 #: code:addons/web_editor/static/src/components/media_dialog/video_selector.js:0
 #, python-format
@@ -2944,7 +2964,7 @@ msgstr ""
 #: code:addons/web_editor/static/src/js/editor/odoo-editor/src/OdooEditor.js:0
 #, python-format
 msgid "To-do"
-msgstr ""
+msgstr "To-do"
 
 #. module: web_editor
 #: model_terms:ir.ui.view,arch_db:web_editor.snippet_options_image_optimization_widgets
@@ -3167,7 +3187,7 @@ msgstr "Ava"
 #: code:addons/web_editor/static/src/xml/ace.xml:0
 #, python-format
 msgid "Views and Assets bundles"
-msgstr ""
+msgstr "Vaadete ja varade kogumikud"
 
 #. module: web_editor
 #. odoo-javascript

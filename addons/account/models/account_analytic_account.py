@@ -15,6 +15,9 @@ class AccountAnalyticAccount(models.Model):
         compute='_compute_vendor_bill_count',
     )
 
+    debit = fields.Monetary(groups='account.group_account_readonly')
+    credit = fields.Monetary(groups='account.group_account_readonly')
+
     @api.depends('line_ids')
     def _compute_invoice_count(self):
         sale_types = self.env['account.move'].get_sale_types(include_receipts=True)
@@ -77,7 +80,7 @@ class AccountAnalyticAccount(models.Model):
             "type": "ir.actions.act_window",
             "res_model": "account.move",
             "domain": [('id', 'in', move_ids)],
-            "context": {"create": False},
+            "context": {"create": False, 'default_move_type': 'out_invoice'},
             "name": _("Customer Invoices"),
             'view_mode': 'tree,form',
         }
@@ -95,7 +98,7 @@ class AccountAnalyticAccount(models.Model):
             "type": "ir.actions.act_window",
             "res_model": "account.move",
             "domain": [('id', 'in', move_ids)],
-            "context": {"create": False},
+            "context": {"create": False, 'default_move_type': 'in_invoice'},
             "name": _("Vendor Bills"),
             'view_mode': 'tree,form',
         }

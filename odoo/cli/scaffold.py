@@ -1,10 +1,9 @@
-#!/usr/bin/env python
-# -*- coding: utf-8 -*-
-from __future__ import print_function
+# Part of Odoo. See LICENSE file for full copyright and licensing details.
 import argparse
 import os
 import re
 import sys
+from pathlib import Path
 
 import jinja2
 
@@ -16,7 +15,7 @@ class Scaffold(Command):
     def run(self, cmdargs):
         # TODO: bash completion file
         parser = argparse.ArgumentParser(
-            prog="%s scaffold" % sys.argv[0].split(os.path.sep)[-1],
+            prog=f'{Path(sys.argv[0]).name} {self.name}',
             description=self.__doc__,
             epilog=self.epilog(),
         )
@@ -63,7 +62,7 @@ def snake(s):
 def pascal(s):
     return ''.join(
         ss.capitalize()
-        for ss in re.sub('[_\s]+', ' ', s).split()
+        for ss in re.sub(r'[_\s]+', ' ', s).split()
     )
 
 def directory(p, create=False):

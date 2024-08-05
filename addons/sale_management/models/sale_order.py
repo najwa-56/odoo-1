@@ -92,6 +92,9 @@ class SaleOrder(models.Model):
 
     @api.onchange('sale_order_template_id')
     def _onchange_sale_order_template_id(self):
+        if not self.sale_order_template_id:
+            return
+
         sale_order_template = self.sale_order_template_id.with_context(lang=self.partner_id.lang)
 
         order_lines_data = [fields.Command.clear()]
@@ -99,6 +102,11 @@ class SaleOrder(models.Model):
             fields.Command.create(line._prepare_order_line_values())
             for line in sale_order_template.sale_order_template_line_ids
         ]
+
+        # set first line to sequence -99, so a resequence on first page doesn't cause following page
+        # lines (that all have sequence 10 by default) to get mixed in the first page
+        if len(order_lines_data) >= 2:
+            order_lines_data[1][2]['sequence'] = -99
 
         self.order_line = order_lines_data
 

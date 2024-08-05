@@ -55,7 +55,7 @@ class StockWarehouse(models.Model):
         return result
 
     def _update_global_route_resupply_subcontractor(self):
-        route_id = self._find_global_route('mrp_subcontracting.route_resupply_subcontractor_mto',
+        route_id = self._find_or_create_global_route('mrp_subcontracting.route_resupply_subcontractor_mto',
                                            _('Resupply Subcontractor on Order'))
         if not route_id.sudo().rule_ids.filtered(lambda r: r.active):
             route_id.active = False
@@ -98,7 +98,7 @@ class StockWarehouse(models.Model):
                     'company_id': self.company_id.id,
                     'action': 'pull',
                     'auto': 'manual',
-                    'route_id': self._find_global_route('stock.route_warehouse0_mto', _('Make To Order')).id,
+                    'route_id': self._find_or_create_global_route('stock.route_warehouse0_mto', _('Make To Order')).id,
                     'name': self._format_rulename(self.lot_stock_id, subcontract_location_id, 'MTO'),
                     'location_dest_id': subcontract_location_id.id,
                     'location_src_id': self.lot_stock_id.id,
@@ -115,7 +115,7 @@ class StockWarehouse(models.Model):
                     'company_id': self.company_id.id,
                     'action': 'pull',
                     'auto': 'manual',
-                    'route_id': self._find_global_route('mrp_subcontracting.route_resupply_subcontractor_mto',
+                    'route_id': self._find_or_create_global_route('mrp_subcontracting.route_resupply_subcontractor_mto',
                                                         _('Resupply Subcontractor on Order')).id,
                     'name': self._format_rulename(subcontract_location_id, production_location_id, False),
                     'location_dest_id': production_location_id.id,
@@ -184,7 +184,7 @@ class StockWarehouse(models.Model):
                 'default_location_dest_id': production_location_id.id,
             },
             'subcontracting_resupply_type_id': {
-                'default_location_src_id': production_location_id.id,
+                'default_location_src_id': self.lot_stock_id.id,
                 'default_location_dest_id': subcontract_location_id.id,
                 'barcode': self.code.replace(" ", "").upper() + "-RESUPPLY",
                 'active': self.subcontracting_to_resupply and self.active

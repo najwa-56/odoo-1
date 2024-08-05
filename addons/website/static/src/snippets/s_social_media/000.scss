@@ -8,7 +8,7 @@
         margin: 0 .4rem 0 0;
     }
     a {
-        i.fa {
+        i.fa, span.fa {
             display: flex;
             justify-content: center;
             align-items: center;
@@ -59,6 +59,11 @@
         .s_social_media_youtube {
             &, &:hover, &:focus {
                 @extend .text-youtube;
+            }
+        }
+        .s_social_media_tiktok {
+            &, &:hover, &:focus {
+                @extend .text-tiktok;
             }
         }
     }

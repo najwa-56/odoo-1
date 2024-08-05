@@ -4,24 +4,26 @@
 # 
 # Translators:
 # Walther Barnett <walther@gundogpro.dk>, 2022
-# lhmflexerp <lhm@flexerp.dk>, 2022
-# Sanne Kristensen <sanne@vkdata.dk>, 2022
 # Preben Lisby <preben.lisby@gmail.com>, 2022
 # Pernille Kristensen <pernillekristensen1994@gmail.com>, 2022
 # peso <peer.sommerlund@gmail.com>, 2022
 # Mads Søndergaard, 2022
 # Mads Søndergaard, 2022
-# Martin Trigaux, 2023
 # JonathanStein <jstein@image.dk>, 2023
+# Martin Trigaux, 2023
+# Morten Paaske, 2024
+# lhmflexerp <lhm@flexerp.dk>, 2024
+# Sammi Iversen <sammi@vkdata.dk>, 2024
+# Sanne Kristensen <sanne@vkdata.dk>, 2024
 # 
 msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 16.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-02-02 10:33+0000\n"
+"POT-Creation-Date: 2024-02-06 13:31+0000\n"
 "PO-Revision-Date: 2022-09-22 05:53+0000\n"
-"Last-Translator: JonathanStein <jstein@image.dk>, 2023\n"
-"Language-Team: Danish (https://www.transifex.com/odoo/teams/41243/da/)\n"
+"Last-Translator: Sanne Kristensen <sanne@vkdata.dk>, 2024\n"
+"Language-Team: Danish (https://app.transifex.com/odoo/teams/41243/da/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: \n"
@@ -111,7 +113,7 @@ msgstr "%(user_name)s inviterede dig til at følge et nyt dokument"
 #: code:addons/mail/models/ir_mail_server.py:0
 #, python-format
 msgid "%s (Email Template)"
-msgstr ""
+msgstr "%s(Email skabelon)"
 
 #. module: mail
 #. odoo-python
@@ -125,14 +127,14 @@ msgstr "%s (kopi)"
 #: code:addons/mail/static/src/models/messaging_notification_handler.js:0
 #, python-format
 msgid "%s Message"
-msgstr ""
+msgstr "%sBesked"
 
 #. module: mail
 #. odoo-javascript
 #: code:addons/mail/static/src/models/messaging_notification_handler.js:0
 #, python-format
 msgid "%s Messages"
-msgstr ""
+msgstr "%sBeskeder"
 
 #. module: mail
 #. odoo-javascript
@@ -256,6 +258,8 @@ msgid ""
 ",\n"
 "    <br/><br/>"
 msgstr ""
+",\n"
+"    <br/><br/>"
 
 #. module: mail
 #. odoo-javascript
@@ -308,14 +312,14 @@ msgstr "0 I dag"
 #: code:addons/mail/static/src/models_data/emoji_data.js:0
 #, python-format
 msgid "00"
-msgstr ""
+msgstr "00"
 
 #. module: mail
 #. odoo-javascript
 #: code:addons/mail/static/src/models_data/emoji_data.js:0
 #, python-format
 msgid "1.30"
-msgstr ""
+msgstr "1.30"
 
 #. module: mail
 #. odoo-javascript
@@ -330,28 +334,28 @@ msgstr "10"
 #: code:addons/mail/static/src/models_data/emoji_data.js:0
 #, python-format
 msgid "10.30"
-msgstr ""
+msgstr "10.30"
 
 #. module: mail
 #. odoo-javascript
 #: code:addons/mail/static/src/models_data/emoji_data.js:0
 #, python-format
 msgid "100"
-msgstr ""
+msgstr "100"
 
 #. module: mail
 #. odoo-javascript
 #: code:addons/mail/static/src/models_data/emoji_data.js:0
 #, python-format
 msgid "10:00"
-msgstr ""
+msgstr "10:00"
 
 #. module: mail
 #. odoo-javascript
 #: code:addons/mail/static/src/models_data/emoji_data.js:0
 #, python-format
 msgid "10:30"
-msgstr ""
+msgstr "10:30"
 
 #. module: mail
 #. odoo-javascript
@@ -366,21 +370,21 @@ msgstr "11"
 #: code:addons/mail/static/src/models_data/emoji_data.js:0
 #, python-format
 msgid "11.30"
-msgstr ""
+msgstr "11.30"
 
 #. module: mail
 #. odoo-javascript
 #: code:addons/mail/static/src/models_data/emoji_data.js:0
 #, python-format
 msgid "11:00"
-msgstr ""
+msgstr "11:00"
 
 #. module: mail
 #. odoo-javascript
 #: code:addons/mail/static/src/models_data/emoji_data.js:0
 #, python-format
 msgid "11:30"
-msgstr ""
+msgstr "11:30"
 
 #. module: mail
 #. odoo-javascript
@@ -395,28 +399,28 @@ msgstr "12"
 #: code:addons/mail/static/src/models_data/emoji_data.js:0
 #, python-format
 msgid "12.30"
-msgstr ""
+msgstr "12.30"
 
 #. module: mail
 #. odoo-javascript
 #: code:addons/mail/static/src/models_data/emoji_data.js:0
 #, python-format
 msgid "1234"
-msgstr ""
+msgstr "1234"
 
 #. module: mail
 #. odoo-javascript
 #: code:addons/mail/static/src/models_data/emoji_data.js:0
 #, python-format
 msgid "12:00"
-msgstr ""
+msgstr "12:00"
 
 #. module: mail
 #. odoo-javascript
 #: code:addons/mail/static/src/models_data/emoji_data.js:0
 #, python-format
 msgid "12:30"
-msgstr ""
+msgstr "12:30"
 
 #. module: mail
 #. odoo-javascript
@@ -430,14 +434,14 @@ msgstr "18"
 #: code:addons/mail/static/src/models_data/emoji_data.js:0
 #, python-format
 msgid "1:00"
-msgstr ""
+msgstr "1:00"
 
 #. module: mail
 #. odoo-javascript
 #: code:addons/mail/static/src/models_data/emoji_data.js:0
 #, python-format
 msgid "1:30"
-msgstr ""
+msgstr "1:30"
 
 #. module: mail
 #. odoo-javascript
@@ -445,28 +449,28 @@ msgstr ""
 #: code:addons/mail/static/src/models_data/emoji_data.js:0
 #, python-format
 msgid "1st place medal"
-msgstr ""
+msgstr "1. plads medalje"
 
 #. module: mail
 #. odoo-javascript
 #: code:addons/mail/static/src/models_data/emoji_data.js:0
 #, python-format
 msgid "2.30"
-msgstr ""
+msgstr "2.30"
 
 #. module: mail
 #. odoo-javascript
 #: code:addons/mail/static/src/models_data/emoji_data.js:0
 #, python-format
 msgid "2:00"
-msgstr ""
+msgstr "2:00"
 
 #. module: mail
 #. odoo-javascript
 #: code:addons/mail/static/src/models_data/emoji_data.js:0
 #, python-format
 msgid "2:30"
-msgstr ""
+msgstr "2:30"
 
 #. module: mail
 #. odoo-javascript
@@ -474,28 +478,28 @@ msgstr ""
 #: code:addons/mail/static/src/models_data/emoji_data.js:0
 #, python-format
 msgid "2nd place medal"
-msgstr ""
+msgstr "2. plads medalje"
 
 #. module: mail
 #. odoo-javascript
 #: code:addons/mail/static/src/models_data/emoji_data.js:0
 #, python-format
 msgid "3.30"
-msgstr ""
+msgstr "3.30"
 
 #. module: mail
 #. odoo-javascript
 #: code:addons/mail/static/src/models_data/emoji_data.js:0
 #, python-format
 msgid "3:00"
-msgstr ""
+msgstr "3:00"
 
 #. module: mail
 #. odoo-javascript
 #: code:addons/mail/static/src/models_data/emoji_data.js:0
 #, python-format
 msgid "3:30"
-msgstr ""
+msgstr "3:30"
 
 #. module: mail
 #. odoo-javascript
@@ -503,147 +507,147 @@ msgstr ""
 #: code:addons/mail/static/src/models_data/emoji_data.js:0
 #, python-format
 msgid "3rd place medal"
-msgstr ""
+msgstr "3. plads medalje"
 
 #. module: mail
 #. odoo-javascript
 #: code:addons/mail/static/src/models_data/emoji_data.js:0
 #, python-format
 msgid "4.30"
-msgstr ""
+msgstr "4.30"
 
 #. module: mail
 #. odoo-javascript
 #: code:addons/mail/static/src/models_data/emoji_data.js:0
 #, python-format
 msgid "4:00"
-msgstr ""
+msgstr "4:00"
 
 #. module: mail
 #. odoo-javascript
 #: code:addons/mail/static/src/models_data/emoji_data.js:0
 #, python-format
 msgid "4:30"
-msgstr ""
+msgstr "4:30"
 
 #. module: mail
 #. odoo-javascript
 #: code:addons/mail/static/src/models_data/emoji_data.js:0
 #, python-format
 msgid "4WD"
-msgstr ""
+msgstr "4WD"
 
 #. module: mail
 #. odoo-javascript
 #: code:addons/mail/static/src/models_data/emoji_data.js:0
 #, python-format
 msgid "4x4"
-msgstr ""
+msgstr "4x4"
 
 #. module: mail
 #. odoo-javascript
 #: code:addons/mail/static/src/models_data/emoji_data.js:0
 #, python-format
 msgid "5.30"
-msgstr ""
+msgstr "5.30"
 
 #. module: mail
 #. odoo-javascript
 #: code:addons/mail/static/src/models_data/emoji_data.js:0
 #, python-format
 msgid "5:00"
-msgstr ""
+msgstr "5:00"
 
 #. module: mail
 #. odoo-javascript
 #: code:addons/mail/static/src/models_data/emoji_data.js:0
 #, python-format
 msgid "5:30"
-msgstr ""
+msgstr "5:30"
 
 #. module: mail
 #. odoo-javascript
 #: code:addons/mail/static/src/models_data/emoji_data.js:0
 #, python-format
 msgid "6.30"
-msgstr ""
+msgstr "6.30"
 
 #. module: mail
 #. odoo-javascript
 #: code:addons/mail/static/src/models_data/emoji_data.js:0
 #, python-format
 msgid "6:00"
-msgstr ""
+msgstr "6:00"
 
 #. module: mail
 #. odoo-javascript
 #: code:addons/mail/static/src/models_data/emoji_data.js:0
 #, python-format
 msgid "6:30"
-msgstr ""
+msgstr "6:30"
 
 #. module: mail
 #. odoo-javascript
 #: code:addons/mail/static/src/models_data/emoji_data.js:0
 #, python-format
 msgid "7.30"
-msgstr ""
+msgstr "7.30"
 
 #. module: mail
 #. odoo-javascript
 #: code:addons/mail/static/src/models_data/emoji_data.js:0
 #, python-format
 msgid "7:00"
-msgstr ""
+msgstr "7:00"
 
 #. module: mail
 #. odoo-javascript
 #: code:addons/mail/static/src/models_data/emoji_data.js:0
 #, python-format
 msgid "7:30"
-msgstr ""
+msgstr "7:30"
 
 #. module: mail
 #. odoo-javascript
 #: code:addons/mail/static/src/models_data/emoji_data.js:0
 #, python-format
 msgid "8.30"
-msgstr ""
+msgstr "8.30"
 
 #. module: mail
 #. odoo-javascript
 #: code:addons/mail/static/src/models_data/emoji_data.js:0
 #, python-format
 msgid "8:00"
-msgstr ""
+msgstr "8:00"
 
 #. module: mail
 #. odoo-javascript
 #: code:addons/mail/static/src/models_data/emoji_data.js:0
 #, python-format
 msgid "8:30"
-msgstr ""
+msgstr "8:30"
 
 #. module: mail
 #. odoo-javascript
 #: code:addons/mail/static/src/models_data/emoji_data.js:0
 #, python-format
 msgid "9.30"
-msgstr ""
+msgstr "9.30"
 
 #. module: mail
 #. odoo-javascript
 #: code:addons/mail/static/src/models_data/emoji_data.js:0
 #, python-format
 msgid "9:00"
-msgstr ""
+msgstr "9:00"
 
 #. module: mail
 #. odoo-javascript
 #: code:addons/mail/static/src/models_data/emoji_data.js:0
 #, python-format
 msgid "9:30"
-msgstr ""
+msgstr "9:30"
 
 #. module: mail
 #: model_terms:ir.ui.view,arch_db:mail.mail_template_preview_view_form
@@ -774,12 +778,12 @@ msgstr ""
 #. module: mail
 #: model_terms:ir.ui.view,arch_db:mail.res_config_settings_view_form
 msgid "<span class=\"d-block w-75 py-2\">Button Color</span>"
-msgstr ""
+msgstr "<span class=\"d-block w-75 py-2\">Farve på knap</span>"
 
 #. module: mail
 #: model_terms:ir.ui.view,arch_db:mail.res_config_settings_view_form
 msgid "<span class=\"d-block w-75 py-2\">Header Color</span>"
-msgstr ""
+msgstr "<span class=\"d-block w-75 py-2\">Header farve</span>"
 
 #. module: mail
 #: model_terms:ir.ui.view,arch_db:mail.res_config_settings_view_form
@@ -825,7 +829,7 @@ msgstr ""
 #. module: mail
 #: model_terms:ir.ui.view,arch_db:mail.res_config_settings_view_form
 msgid "<span>@</span>"
-msgstr ""
+msgstr "<span>@</span>"
 
 #. module: mail
 #: model_terms:ir.ui.view,arch_db:mail.mail_notification_layout
@@ -869,7 +873,7 @@ msgstr ""
 #: code:addons/mail/static/src/models_data/emoji_data.js:0
 #, python-format
 msgid "A button (blood type)"
-msgstr ""
+msgstr "En knap (blodtype)"
 
 #. module: mail
 #: model:ir.model.constraint,message:mail.constraint_mail_channel_member_partner_or_guest_exists
@@ -923,7 +927,7 @@ msgstr ""
 #: code:addons/mail/static/src/models_data/emoji_data.js:0
 #, python-format
 msgid "AB"
-msgstr ""
+msgstr "AB"
 
 #. module: mail
 #. odoo-javascript
@@ -931,14 +935,14 @@ msgstr ""
 #: code:addons/mail/static/src/models_data/emoji_data.js:0
 #, python-format
 msgid "AB button (blood type)"
-msgstr ""
+msgstr "AB knap (blodtype)"
 
 #. module: mail
 #. odoo-javascript
 #: code:addons/mail/static/src/models_data/emoji_data.js:0
 #, python-format
 msgid "ABCD"
-msgstr ""
+msgstr "ABCD"
 
 #. module: mail
 #. odoo-javascript
@@ -952,7 +956,7 @@ msgstr "AM"
 #: code:addons/mail/static/src/models_data/emoji_data.js:0
 #, python-format
 msgid "ATM"
-msgstr ""
+msgstr "ATM"
 
 #. module: mail
 #. odoo-javascript
@@ -960,7 +964,7 @@ msgstr ""
 #: code:addons/mail/static/src/models_data/emoji_data.js:0
 #, python-format
 msgid "ATM sign"
-msgstr ""
+msgstr "ATM skilt"
 
 #. module: mail
 #. odoo-javascript
@@ -1122,7 +1126,7 @@ msgstr "Aktivitet Mixin"
 #. module: mail
 #: model_terms:ir.ui.view,arch_db:mail.mail_activity_type_view_form
 msgid "Activity Settings"
-msgstr ""
+msgstr "Aktivitets indstillinger"
 
 #. module: mail
 #: model:ir.model.fields,field_description:mail.field_mail_activity_mixin__activity_state
@@ -1302,9 +1306,53 @@ msgid "Africa"
 msgstr "Afrika"
 
 #. module: mail
+#: model:ir.model.fields.selection,name:mail.selection__account_journal__activity_exception_decoration__warning
+#: model:ir.model.fields.selection,name:mail.selection__account_move__activity_exception_decoration__warning
+#: model:ir.model.fields.selection,name:mail.selection__account_payment__activity_exception_decoration__warning
+#: model:ir.model.fields.selection,name:mail.selection__crm_lead__activity_exception_decoration__warning
+#: model:ir.model.fields.selection,name:mail.selection__event_booth__activity_exception_decoration__warning
+#: model:ir.model.fields.selection,name:mail.selection__event_event__activity_exception_decoration__warning
+#: model:ir.model.fields.selection,name:mail.selection__event_registration__activity_exception_decoration__warning
+#: model:ir.model.fields.selection,name:mail.selection__event_sponsor__activity_exception_decoration__warning
+#: model:ir.model.fields.selection,name:mail.selection__event_track__activity_exception_decoration__warning
+#: model:ir.model.fields.selection,name:mail.selection__fleet_vehicle__activity_exception_decoration__warning
+#: model:ir.model.fields.selection,name:mail.selection__fleet_vehicle_log_contract__activity_exception_decoration__warning
+#: model:ir.model.fields.selection,name:mail.selection__fleet_vehicle_log_services__activity_exception_decoration__warning
+#: model:ir.model.fields.selection,name:mail.selection__hr_applicant__activity_exception_decoration__warning
+#: model:ir.model.fields.selection,name:mail.selection__hr_contract__activity_exception_decoration__warning
+#: model:ir.model.fields.selection,name:mail.selection__hr_employee__activity_exception_decoration__warning
+#: model:ir.model.fields.selection,name:mail.selection__hr_expense__activity_exception_decoration__warning
+#: model:ir.model.fields.selection,name:mail.selection__hr_expense_sheet__activity_exception_decoration__warning
+#: model:ir.model.fields.selection,name:mail.selection__hr_leave__activity_exception_decoration__warning
+#: model:ir.model.fields.selection,name:mail.selection__hr_leave_allocation__activity_exception_decoration__warning
+#: model:ir.model.fields.selection,name:mail.selection__lunch_supplier__activity_exception_decoration__warning
 #: model:ir.model.fields.selection,name:mail.selection__mail_activity_mixin__activity_exception_decoration__warning
 #: model:ir.model.fields.selection,name:mail.selection__mail_activity_type__decoration_type__warning
+#: model:ir.model.fields.selection,name:mail.selection__mailing_mailing__activity_exception_decoration__warning
+#: model:ir.model.fields.selection,name:mail.selection__maintenance_equipment__activity_exception_decoration__warning
+#: model:ir.model.fields.selection,name:mail.selection__maintenance_request__activity_exception_decoration__warning
+#: model:ir.model.fields.selection,name:mail.selection__mrp_production__activity_exception_decoration__warning
+#: model:ir.model.fields.selection,name:mail.selection__mrp_unbuild__activity_exception_decoration__warning
+#: model:ir.model.fields.selection,name:mail.selection__note_note__activity_exception_decoration__warning
+#: model:ir.model.fields.selection,name:mail.selection__pos_session__activity_exception_decoration__warning
+#: model:ir.model.fields.selection,name:mail.selection__product_product__activity_exception_decoration__warning
+#: model:ir.model.fields.selection,name:mail.selection__product_template__activity_exception_decoration__warning
+#: model:ir.model.fields.selection,name:mail.selection__project_project__activity_exception_decoration__warning
+#: model:ir.model.fields.selection,name:mail.selection__project_task__activity_exception_decoration__warning
+#: model:ir.model.fields.selection,name:mail.selection__project_update__activity_exception_decoration__warning
+#: model:ir.model.fields.selection,name:mail.selection__purchase_order__activity_exception_decoration__warning
+#: model:ir.model.fields.selection,name:mail.selection__purchase_requisition__activity_exception_decoration__warning
+#: model:ir.model.fields.selection,name:mail.selection__repair_order__activity_exception_decoration__warning
 #: model:ir.model.fields.selection,name:mail.selection__res_partner__activity_exception_decoration__warning
+#: model:ir.model.fields.selection,name:mail.selection__res_partner_bank__activity_exception_decoration__warning
+#: model:ir.model.fields.selection,name:mail.selection__sale_order__activity_exception_decoration__warning
+#: model:ir.model.fields.selection,name:mail.selection__slide_channel__activity_exception_decoration__warning
+#: model:ir.model.fields.selection,name:mail.selection__stock_landed_cost__activity_exception_decoration__warning
+#: model:ir.model.fields.selection,name:mail.selection__stock_lot__activity_exception_decoration__warning
+#: model:ir.model.fields.selection,name:mail.selection__stock_picking__activity_exception_decoration__warning
+#: model:ir.model.fields.selection,name:mail.selection__stock_picking_batch__activity_exception_decoration__warning
+#: model:ir.model.fields.selection,name:mail.selection__survey_survey__activity_exception_decoration__warning
+#: model:ir.model.fields.selection,name:mail.selection__survey_user_input__activity_exception_decoration__warning
 msgid "Alert"
 msgstr "Advarsel"
 
@@ -1359,7 +1407,7 @@ msgstr "Alle"
 #: code:addons/mail/static/src/models_data/emoji_data.js:0
 #, python-format
 msgid "Americas"
-msgstr ""
+msgstr "Amerikas"
 
 #. module: mail
 #. odoo-python
@@ -1371,6 +1419,13 @@ msgid ""
 msgstr ""
 "Der forekom en SSL undtagelse. Tjek SSL/TLS konfiguration på server port.\n"
 "   %s"
+
+#. module: mail
+#. odoo-python
+#: code:addons/mail/models/ir_attachment.py:0
+#, python-format
+msgid "An access token must be provided for each attachment."
+msgstr "En adgangs token skal angives for hver vedhæftning."
 
 #. module: mail
 #. odoo-python
@@ -1420,7 +1475,7 @@ msgstr ""
 #: code:addons/mail/static/src/models_data/emoji_data.js:0
 #, python-format
 msgid "Animals & Nature"
-msgstr ""
+msgstr "Dyr & Natur"
 
 #. module: mail
 #. odoo-javascript
@@ -1451,7 +1506,7 @@ msgstr "Anvend"
 #: code:addons/mail/static/src/models_data/emoji_data.js:0
 #, python-format
 msgid "Aquarius"
-msgstr ""
+msgstr "Vandmanden"
 
 #. module: mail
 #: model_terms:ir.ui.view,arch_db:mail.mail_activity_type_view_form
@@ -1502,7 +1557,7 @@ msgstr ""
 #: code:addons/mail/static/src/models_data/emoji_data.js:0
 #, python-format
 msgid "Aries"
-msgstr ""
+msgstr "Vædderen"
 
 #. module: mail
 #. odoo-javascript
@@ -1749,21 +1804,21 @@ msgstr "Væk"
 #: code:addons/mail/static/src/models_data/emoji_data.js:0
 #, python-format
 msgid "B button (blood type)"
-msgstr ""
+msgstr "B knap (blodtype)"
 
 #. module: mail
 #. odoo-javascript
 #: code:addons/mail/static/src/models_data/emoji_data.js:0
 #, python-format
 msgid "BACK"
-msgstr ""
+msgstr "Tilbage"
 
 #. module: mail
 #. odoo-javascript
 #: code:addons/mail/static/src/models_data/emoji_data.js:0
 #, python-format
 msgid "BACK arrow"
-msgstr ""
+msgstr "Tilbage pil"
 
 #. module: mail
 #. odoo-javascript
@@ -1833,7 +1888,7 @@ msgstr ""
 #: code:addons/mail/static/src/models_data/emoji_data.js:0
 #, python-format
 msgid "Blu-ray"
-msgstr ""
+msgstr "Blu-ray"
 
 #. module: mail
 #. odoo-javascript
@@ -1889,12 +1944,12 @@ msgstr ""
 #: code:addons/mail/static/src/models_data/emoji_data.js:0
 #, python-format
 msgid "Buddhist"
-msgstr ""
+msgstr "Buddhist"
 
 #. module: mail
 #: model:ir.model.fields,field_description:mail.field_res_config_settings__secondary_color
 msgid "Button Color"
-msgstr ""
+msgstr "Farve på knap"
 
 #. module: mail
 #. odoo-python
@@ -1908,14 +1963,14 @@ msgstr "CC Email"
 #: code:addons/mail/static/src/models_data/emoji_data.js:0
 #, python-format
 msgid "CD"
-msgstr ""
+msgstr "CD"
 
 #. module: mail
 #. odoo-javascript
 #: code:addons/mail/static/src/models_data/emoji_data.js:0
 #, python-format
 msgid "CL"
-msgstr ""
+msgstr "CL"
 
 #. module: mail
 #. odoo-javascript
@@ -1923,14 +1978,14 @@ msgstr ""
 #: code:addons/mail/static/src/models_data/emoji_data.js:0
 #, python-format
 msgid "CL button"
-msgstr ""
+msgstr "CL knap"
 
 #. module: mail
 #. odoo-javascript
 #: code:addons/mail/static/src/models_data/emoji_data.js:0
 #, python-format
 msgid "COOL"
-msgstr ""
+msgstr "COOL"
 
 #. module: mail
 #. odoo-javascript
@@ -1938,7 +1993,7 @@ msgstr ""
 #: code:addons/mail/static/src/models_data/emoji_data.js:0
 #, python-format
 msgid "COOL button"
-msgstr ""
+msgstr "COOL knap"
 
 #. module: mail
 #: model:mail.activity.type,name:mail.mail_activity_data_call
@@ -1955,7 +2010,7 @@ msgstr ""
 #. module: mail
 #: model:ir.model.fields,field_description:mail.field_mail_resend_message__can_cancel
 msgid "Can Cancel"
-msgstr ""
+msgstr "Kan annullere"
 
 #. module: mail
 #: model:ir.model.fields,field_description:mail.field_mail_compose_message__can_edit_body
@@ -2050,7 +2105,7 @@ msgstr ""
 #: code:addons/mail/static/src/models_data/emoji_data.js:0
 #, python-format
 msgid "Capricorn"
-msgstr ""
+msgstr "Stenbukken"
 
 #. module: mail
 #: model:ir.model.fields,help:mail.field_mail_mail__email_cc
@@ -2204,6 +2259,9 @@ msgid ""
 "Chat is private and unique between 2 persons. Group is private among invited"
 " persons. Channel can be freely joined (depending on its configuration)."
 msgstr ""
+"Chat er privat og unikt mellem 2 personer. Gruppen er privat blandt "
+"inviterede personer. Kanalen kan frit tilsluttes (afhængigt af dens "
+"konfiguration)."
 
 #. module: mail
 #: model:ir.model.fields,field_description:mail.field_mail_mail__child_ids
@@ -2249,7 +2307,7 @@ msgstr "Jul"
 #: code:addons/mail/static/src/models_data/emoji_data.js:0
 #, python-format
 msgid "Christmas tree"
-msgstr ""
+msgstr "Juletræ"
 
 #. module: mail
 #. odoo-javascript
@@ -2257,7 +2315,7 @@ msgstr ""
 #: code:addons/mail/static/src/models_data/emoji_data.js:0
 #, python-format
 msgid "Claus"
-msgstr ""
+msgstr "Claus"
 
 #. module: mail
 #. odoo-javascript
@@ -2372,9 +2430,11 @@ msgstr "Virksomheder"
 
 #. module: mail
 #. odoo-javascript
+#. odoo-python
 #: code:addons/mail/static/src/js/activity.js:0
-#: code:addons/mail/static/src/models/mail_template.js:0
 #: code:addons/mail/static/src/models/composer_view.js:0
+#: code:addons/mail/static/src/models/mail_template.js:0
+#: code:addons/mail/wizard/mail_compose_message.py:0
 #: model:ir.actions.act_window,name:mail.action_email_compose_message_wizard
 #: model_terms:ir.ui.view,arch_db:mail.email_compose_message_wizard_form
 #, python-format
@@ -2743,14 +2803,14 @@ msgstr ""
 #: code:addons/mail/static/src/models_data/emoji_data.js:0
 #, python-format
 msgid "DNA"
-msgstr ""
+msgstr "DNA"
 
 #. module: mail
 #. odoo-javascript
 #: code:addons/mail/static/src/models_data/emoji_data.js:0
 #, python-format
 msgid "DVD"
-msgstr ""
+msgstr "DVD"
 
 #. module: mail
 #: model:ir.model.fields,field_description:mail.field_mail_mail__date
@@ -2769,7 +2829,7 @@ msgstr ""
 #: code:addons/mail/static/src/models_data/emoji_data.js:0
 #, python-format
 msgid "David"
-msgstr ""
+msgstr "David"
 
 #. module: mail
 #: model:ir.model.fields.selection,name:mail.selection__ir_actions_server__activity_date_deadline_range_type__days
@@ -2805,7 +2865,7 @@ msgstr "Deadline:"
 #: code:addons/mail/models/mail_activity.py:0
 #, python-format
 msgid "Deadline: %s"
-msgstr ""
+msgstr "Deadline: %s"
 
 #. module: mail
 #. odoo-javascript
@@ -3015,6 +3075,7 @@ msgstr ""
 #. module: mail
 #. odoo-javascript
 #: code:addons/mail/static/src/components/thread_view_topbar/thread_view_topbar.xml:0
+#: code:addons/mail/static/src/models/discuss.js:0
 #: model:ir.actions.client,name:mail.action_discuss
 #: model:ir.ui.menu,name:mail.mail_menu_technical
 #: model:ir.ui.menu,name:mail.menu_root_discuss
@@ -3187,7 +3248,7 @@ msgstr ""
 #: code:addons/mail/static/src/models_data/emoji_data.js:0
 #, python-format
 msgid "Dracula"
-msgstr ""
+msgstr "Dracula"
 
 #. module: mail
 #. odoo-javascript
@@ -3218,7 +3279,7 @@ msgstr "Forfaldsdato om"
 #: code:addons/mail/static/src/models/activity_list_view_item.js:0
 #, python-format
 msgid "Due in %s days"
-msgstr ""
+msgstr "Forfalder om %s dage"
 
 #. module: mail
 #. odoo-javascript
@@ -3255,14 +3316,14 @@ msgstr ""
 #: code:addons/mail/static/src/models_data/emoji_data.js:0
 #, python-format
 msgid "END"
-msgstr ""
+msgstr "SLUT"
 
 #. module: mail
 #. odoo-javascript
 #: code:addons/mail/static/src/models_data/emoji_data.js:0
 #, python-format
 msgid "END arrow"
-msgstr ""
+msgstr "SLUT pil"
 
 #. module: mail
 #. odoo-javascript
@@ -3306,7 +3367,7 @@ msgstr "Redigér abonnement"
 #: code:addons/mail/static/src/views/fields/many2many_tags_email/many2many_tags_email.js:0
 #, python-format
 msgid "Edit: %s"
-msgstr ""
+msgstr "Rediger: %s"
 
 #. module: mail
 #: model:ir.model.fields,field_description:mail.field_mail_blacklist_remove__email
@@ -3327,7 +3388,7 @@ msgstr "E-mail"
 #: model:ir.model.fields,field_description:mail.field_mail_mail__email_add_signature
 #: model:ir.model.fields,field_description:mail.field_mail_message__email_add_signature
 msgid "Email Add Signature"
-msgstr ""
+msgstr "Email tilføj signatur"
 
 #. module: mail
 #: model:ir.model.fields,field_description:mail.field_mail_blacklist__email
@@ -3524,9 +3585,53 @@ msgstr "Aktiver skrivebords notifikationer til chat."
 #. module: mail
 #. odoo-javascript
 #: code:addons/mail/static/src/models/notification.js:0
+#: model:ir.model.fields.selection,name:mail.selection__account_journal__activity_exception_decoration__danger
+#: model:ir.model.fields.selection,name:mail.selection__account_move__activity_exception_decoration__danger
+#: model:ir.model.fields.selection,name:mail.selection__account_payment__activity_exception_decoration__danger
+#: model:ir.model.fields.selection,name:mail.selection__crm_lead__activity_exception_decoration__danger
+#: model:ir.model.fields.selection,name:mail.selection__event_booth__activity_exception_decoration__danger
+#: model:ir.model.fields.selection,name:mail.selection__event_event__activity_exception_decoration__danger
+#: model:ir.model.fields.selection,name:mail.selection__event_registration__activity_exception_decoration__danger
+#: model:ir.model.fields.selection,name:mail.selection__event_sponsor__activity_exception_decoration__danger
+#: model:ir.model.fields.selection,name:mail.selection__event_track__activity_exception_decoration__danger
+#: model:ir.model.fields.selection,name:mail.selection__fleet_vehicle__activity_exception_decoration__danger
+#: model:ir.model.fields.selection,name:mail.selection__fleet_vehicle_log_contract__activity_exception_decoration__danger
+#: model:ir.model.fields.selection,name:mail.selection__fleet_vehicle_log_services__activity_exception_decoration__danger
+#: model:ir.model.fields.selection,name:mail.selection__hr_applicant__activity_exception_decoration__danger
+#: model:ir.model.fields.selection,name:mail.selection__hr_contract__activity_exception_decoration__danger
+#: model:ir.model.fields.selection,name:mail.selection__hr_employee__activity_exception_decoration__danger
+#: model:ir.model.fields.selection,name:mail.selection__hr_expense__activity_exception_decoration__danger
+#: model:ir.model.fields.selection,name:mail.selection__hr_expense_sheet__activity_exception_decoration__danger
+#: model:ir.model.fields.selection,name:mail.selection__hr_leave__activity_exception_decoration__danger
+#: model:ir.model.fields.selection,name:mail.selection__hr_leave_allocation__activity_exception_decoration__danger
+#: model:ir.model.fields.selection,name:mail.selection__lunch_supplier__activity_exception_decoration__danger
 #: model:ir.model.fields.selection,name:mail.selection__mail_activity_mixin__activity_exception_decoration__danger
 #: model:ir.model.fields.selection,name:mail.selection__mail_activity_type__decoration_type__danger
+#: model:ir.model.fields.selection,name:mail.selection__mailing_mailing__activity_exception_decoration__danger
+#: model:ir.model.fields.selection,name:mail.selection__maintenance_equipment__activity_exception_decoration__danger
+#: model:ir.model.fields.selection,name:mail.selection__maintenance_request__activity_exception_decoration__danger
+#: model:ir.model.fields.selection,name:mail.selection__mrp_production__activity_exception_decoration__danger
+#: model:ir.model.fields.selection,name:mail.selection__mrp_unbuild__activity_exception_decoration__danger
+#: model:ir.model.fields.selection,name:mail.selection__note_note__activity_exception_decoration__danger
+#: model:ir.model.fields.selection,name:mail.selection__pos_session__activity_exception_decoration__danger
+#: model:ir.model.fields.selection,name:mail.selection__product_product__activity_exception_decoration__danger
+#: model:ir.model.fields.selection,name:mail.selection__product_template__activity_exception_decoration__danger
+#: model:ir.model.fields.selection,name:mail.selection__project_project__activity_exception_decoration__danger
+#: model:ir.model.fields.selection,name:mail.selection__project_task__activity_exception_decoration__danger
+#: model:ir.model.fields.selection,name:mail.selection__project_update__activity_exception_decoration__danger
+#: model:ir.model.fields.selection,name:mail.selection__purchase_order__activity_exception_decoration__danger
+#: model:ir.model.fields.selection,name:mail.selection__purchase_requisition__activity_exception_decoration__danger
+#: model:ir.model.fields.selection,name:mail.selection__repair_order__activity_exception_decoration__danger
 #: model:ir.model.fields.selection,name:mail.selection__res_partner__activity_exception_decoration__danger
+#: model:ir.model.fields.selection,name:mail.selection__res_partner_bank__activity_exception_decoration__danger
+#: model:ir.model.fields.selection,name:mail.selection__sale_order__activity_exception_decoration__danger
+#: model:ir.model.fields.selection,name:mail.selection__slide_channel__activity_exception_decoration__danger
+#: model:ir.model.fields.selection,name:mail.selection__stock_landed_cost__activity_exception_decoration__danger
+#: model:ir.model.fields.selection,name:mail.selection__stock_lot__activity_exception_decoration__danger
+#: model:ir.model.fields.selection,name:mail.selection__stock_picking__activity_exception_decoration__danger
+#: model:ir.model.fields.selection,name:mail.selection__stock_picking_batch__activity_exception_decoration__danger
+#: model:ir.model.fields.selection,name:mail.selection__survey_survey__activity_exception_decoration__danger
+#: model:ir.model.fields.selection,name:mail.selection__survey_user_input__activity_exception_decoration__danger
 #, python-format
 msgid "Error"
 msgstr "Fejl"
@@ -3607,14 +3712,14 @@ msgstr "Udvidede filtre"
 #: code:addons/mail/static/src/models_data/emoji_data.js:0
 #, python-format
 msgid "FM"
-msgstr ""
+msgstr "FM"
 
 #. module: mail
 #. odoo-javascript
 #: code:addons/mail/static/src/models_data/emoji_data.js:0
 #, python-format
 msgid "FREE"
-msgstr ""
+msgstr "GRATIS"
 
 #. module: mail
 #. odoo-javascript
@@ -3622,7 +3727,7 @@ msgstr ""
 #: code:addons/mail/static/src/models_data/emoji_data.js:0
 #, python-format
 msgid "FREE button"
-msgstr ""
+msgstr "GRATIS knap"
 
 #. module: mail
 #: model:ir.model.fields,field_description:mail.field_res_config_settings__fail_counter
@@ -3638,7 +3743,10 @@ msgstr "Fejlede"
 #. odoo-python
 #: code:addons/mail/models/mail_render_mixin.py:0
 #, python-format
-msgid "Failed to render QWeb template : %s)"
+msgid ""
+"Failed to render QWeb template : %s\n"
+"\n"
+"%s)"
 msgstr ""
 
 #. module: mail
@@ -3686,14 +3794,14 @@ msgstr "Fejltype"
 #: code:addons/mail/static/src/models_data/emoji_data.js:0
 #, python-format
 msgid "Father"
-msgstr ""
+msgstr "Far"
 
 #. module: mail
 #. odoo-javascript
 #: code:addons/mail/static/src/models_data/emoji_data.js:0
 #, python-format
 msgid "Father Christmas"
-msgstr ""
+msgstr "Julemanden"
 
 #. module: mail
 #: model:ir.model.fields,field_description:mail.field_mail_mail__starred_partner_ids
@@ -3885,7 +3993,7 @@ msgstr "Skrifttype awesome icon f.eks. fa-opgaver"
 #: code:addons/mail/static/src/models_data/emoji_data.js:0
 #, python-format
 msgid "Food & Drink"
-msgstr ""
+msgstr "Mad & Drikke"
 
 #. module: mail
 #. odoo-python
@@ -3913,21 +4021,21 @@ msgstr "Formateret e-mail"
 #: code:addons/mail/static/src/models_data/emoji_data.js:0
 #, python-format
 msgid "French"
-msgstr ""
+msgstr "Fransk"
 
 #. module: mail
 #. odoo-javascript
 #: code:addons/mail/static/src/models_data/emoji_data.js:0
 #, python-format
 msgid "French stick"
-msgstr ""
+msgstr "Fransk pind"
 
 #. module: mail
 #. odoo-javascript
 #: code:addons/mail/static/src/models_data/emoji_data.js:0
 #, python-format
 msgid "Frisbee"
-msgstr ""
+msgstr "Frisbee"
 
 #. module: mail
 #: model:ir.model.fields,field_description:mail.field_mail_compose_message__email_from
@@ -3957,7 +4065,7 @@ msgstr ""
 #: code:addons/mail/static/src/models_data/emoji_data.js:0
 #, python-format
 msgid "Fuji"
-msgstr ""
+msgstr "Fuji"
 
 #. module: mail
 #. odoo-javascript
@@ -3997,7 +4105,7 @@ msgstr "Gateway"
 #: code:addons/mail/static/src/models_data/emoji_data.js:0
 #, python-format
 msgid "Gemini"
-msgstr ""
+msgstr "tvilling"
 
 #. module: mail
 #: model:ir.model.fields.selection,name:mail.selection__ir_actions_server__activity_user_type__generic
@@ -4018,13 +4126,6 @@ msgstr ""
 #: model_terms:ir.ui.view,arch_db:mail.res_config_settings_view_form
 msgid "Gmail Credentials"
 msgstr ""
-
-#. module: mail
-#. odoo-python
-#: code:addons/mail/models/res_users.py:0
-#, python-format
-msgid "Go to the configuration panel"
-msgstr "Gå til konfigurations fanebladet"
 
 #. module: mail
 #: model:ir.model.fields.selection,name:mail.selection__mail_channel__channel_type__group
@@ -4112,7 +4213,7 @@ msgstr "HTTP Routing"
 #: code:addons/mail/static/src/models_data/emoji_data.js:0
 #, python-format
 msgid "Halloween"
-msgstr ""
+msgstr "Halloween"
 
 #. module: mail
 #: model:ir.model.fields.selection,name:mail.selection__res_users__notification_type__email
@@ -4201,6 +4302,7 @@ msgstr ""
 
 #. module: mail
 #. odoo-javascript
+#: code:addons/mail/static/src/components/chat_window_header/chat_window_header.xml:0
 #: code:addons/mail/static/src/components/thread_view_topbar/thread_view_topbar.xml:0
 #, python-format
 msgid "Hide Call Settings"
@@ -4208,7 +4310,6 @@ msgstr ""
 
 #. module: mail
 #. odoo-javascript
-#: code:addons/mail/static/src/components/chat_window_header/chat_window_header.xml:0
 #: code:addons/mail/static/src/components/chat_window_header/chat_window_header.xml:0
 #: code:addons/mail/static/src/components/thread_view_topbar/thread_view_topbar.xml:0
 #, python-format
@@ -4241,7 +4342,7 @@ msgstr ""
 #: code:addons/mail/static/src/models_data/emoji_data.js:0
 #, python-format
 msgid "Hindu"
-msgstr ""
+msgstr "Hindu"
 
 #. module: mail
 #. odoo-javascript
@@ -4324,7 +4425,7 @@ msgstr "ID"
 #: code:addons/mail/static/src/models_data/emoji_data.js:0
 #, python-format
 msgid "ID button"
-msgstr ""
+msgstr "ID knap"
 
 #. module: mail
 #: model:ir.model.fields,help:mail.field_mail_alias__alias_parent_thread_id
@@ -4340,7 +4441,7 @@ msgstr ""
 #: code:addons/mail/static/src/models_data/emoji_data.js:0
 #, python-format
 msgid "ILY"
-msgstr ""
+msgstr "ILY"
 
 #. module: mail
 #: model:ir.model.fields,field_description:mail.field_mail_guest__im_status
@@ -4699,7 +4800,7 @@ msgstr ""
 #: code:addons/mail/static/src/components/channel_invitation_form/channel_invitation_form.xml:0
 #, python-format
 msgid "Invitation Link"
-msgstr ""
+msgstr "Invitationslink"
 
 #. module: mail
 #: model:ir.model.fields,field_description:mail.field_mail_channel__invitation_url
@@ -4826,7 +4927,7 @@ msgstr ""
 #: code:addons/mail/static/src/models_data/emoji_data.js:0
 #, python-format
 msgid "Islam"
-msgstr ""
+msgstr "Islam"
 
 #. module: mail
 #. odoo-javascript
@@ -4873,14 +4974,14 @@ msgstr "Japan"
 #: code:addons/mail/static/src/models_data/emoji_data.js:0
 #, python-format
 msgid "Japanese"
-msgstr ""
+msgstr "japansk"
 
 #. module: mail
 #. odoo-javascript
 #: code:addons/mail/static/src/models_data/emoji_data.js:0
 #, python-format
 msgid "Japanese castle"
-msgstr ""
+msgstr "japansk slot"
 
 #. module: mail
 #. odoo-javascript
@@ -4888,7 +4989,7 @@ msgstr ""
 #: code:addons/mail/static/src/models_data/emoji_data.js:0
 #, python-format
 msgid "Japanese dolls"
-msgstr ""
+msgstr "Japanske dukker"
 
 #. module: mail
 #. odoo-javascript
@@ -4896,7 +4997,7 @@ msgstr ""
 #: code:addons/mail/static/src/models_data/emoji_data.js:0
 #, python-format
 msgid "Japanese post office"
-msgstr ""
+msgstr "japansk postkontor"
 
 #. module: mail
 #. odoo-javascript
@@ -4904,14 +5005,14 @@ msgstr ""
 #: code:addons/mail/static/src/models_data/emoji_data.js:0
 #, python-format
 msgid "Japanese symbol for beginner"
-msgstr ""
+msgstr "Japanske symboler for begyndere"
 
 #. module: mail
 #. odoo-javascript
 #: code:addons/mail/static/src/models_data/emoji_data.js:0
 #, python-format
 msgid "Japanese wind socks"
-msgstr ""
+msgstr "Japanske vindsokker"
 
 #. module: mail
 #. odoo-javascript
@@ -4919,7 +5020,7 @@ msgstr ""
 #: code:addons/mail/static/src/models_data/emoji_data.js:0
 #, python-format
 msgid "Japanese “acceptable” button"
-msgstr ""
+msgstr "Japansk “acceptabel” knap"
 
 #. module: mail
 #. odoo-javascript
@@ -4927,7 +5028,7 @@ msgstr ""
 #: code:addons/mail/static/src/models_data/emoji_data.js:0
 #, python-format
 msgid "Japanese “application” button"
-msgstr ""
+msgstr "Japansk “ansøgning” knap"
 
 #. module: mail
 #. odoo-javascript
@@ -4935,7 +5036,7 @@ msgstr ""
 #: code:addons/mail/static/src/models_data/emoji_data.js:0
 #, python-format
 msgid "Japanese “bargain” button"
-msgstr ""
+msgstr "Japansk “bargain” knap"
 
 #. module: mail
 #. odoo-javascript
@@ -4943,7 +5044,7 @@ msgstr ""
 #: code:addons/mail/static/src/models_data/emoji_data.js:0
 #, python-format
 msgid "Japanese “congratulations” button"
-msgstr ""
+msgstr "Japansk “tillykke” knap"
 
 #. module: mail
 #. odoo-javascript
@@ -4951,7 +5052,7 @@ msgstr ""
 #: code:addons/mail/static/src/models_data/emoji_data.js:0
 #, python-format
 msgid "Japanese “discount” button"
-msgstr ""
+msgstr "Japansk “rabat” knap"
 
 #. module: mail
 #. odoo-javascript
@@ -4959,7 +5060,7 @@ msgstr ""
 #: code:addons/mail/static/src/models_data/emoji_data.js:0
 #, python-format
 msgid "Japanese “free of charge” button"
-msgstr ""
+msgstr "Japansk “gratis” knap"
 
 #. module: mail
 #. odoo-javascript
@@ -4967,7 +5068,7 @@ msgstr ""
 #: code:addons/mail/static/src/models_data/emoji_data.js:0
 #, python-format
 msgid "Japanese “here” button"
-msgstr ""
+msgstr "Japansk “her” knap"
 
 #. module: mail
 #. odoo-javascript
@@ -4975,7 +5076,7 @@ msgstr ""
 #: code:addons/mail/static/src/models_data/emoji_data.js:0
 #, python-format
 msgid "Japanese “monthly amount” button"
-msgstr ""
+msgstr "´Japansk “månedligt antal” knap"
 
 #. module: mail
 #. odoo-javascript
@@ -4983,7 +5084,7 @@ msgstr ""
 #: code:addons/mail/static/src/models_data/emoji_data.js:0
 #, python-format
 msgid "Japanese “no vacancy” button"
-msgstr ""
+msgstr "Japansk “intet ledigt” knap"
 
 #. module: mail
 #. odoo-javascript
@@ -4991,7 +5092,7 @@ msgstr ""
 #: code:addons/mail/static/src/models_data/emoji_data.js:0
 #, python-format
 msgid "Japanese “not free of charge” button"
-msgstr ""
+msgstr "Japansk “ikke gratis” knap"
 
 #. module: mail
 #. odoo-javascript
@@ -4999,7 +5100,7 @@ msgstr ""
 #: code:addons/mail/static/src/models_data/emoji_data.js:0
 #, python-format
 msgid "Japanese “open for business” button"
-msgstr ""
+msgstr "Japansk “åben for forretning” knap"
 
 #. module: mail
 #. odoo-javascript
@@ -5007,7 +5108,7 @@ msgstr ""
 #: code:addons/mail/static/src/models_data/emoji_data.js:0
 #, python-format
 msgid "Japanese “passing grade” button"
-msgstr ""
+msgstr "Japansk “bestået karakter” knap"
 
 #. module: mail
 #. odoo-javascript
@@ -5015,7 +5116,7 @@ msgstr ""
 #: code:addons/mail/static/src/models_data/emoji_data.js:0
 #, python-format
 msgid "Japanese “prohibited” button"
-msgstr ""
+msgstr "Japansk “forbudt” knap"
 
 #. module: mail
 #. odoo-javascript
@@ -5023,7 +5124,7 @@ msgstr ""
 #: code:addons/mail/static/src/models_data/emoji_data.js:0
 #, python-format
 msgid "Japanese “reserved” button"
-msgstr ""
+msgstr "Japansk “reserveret” knap"
 
 #. module: mail
 #. odoo-javascript
@@ -5031,7 +5132,7 @@ msgstr ""
 #: code:addons/mail/static/src/models_data/emoji_data.js:0
 #, python-format
 msgid "Japanese “secret” button"
-msgstr ""
+msgstr "Japansk “hemmelig” knap"
 
 #. module: mail
 #. odoo-javascript
@@ -5039,7 +5140,7 @@ msgstr ""
 #: code:addons/mail/static/src/models_data/emoji_data.js:0
 #, python-format
 msgid "Japanese “service charge” button"
-msgstr ""
+msgstr "Japansk “gebyr” knap"
 
 #. module: mail
 #. odoo-javascript
@@ -5047,7 +5148,7 @@ msgstr ""
 #: code:addons/mail/static/src/models_data/emoji_data.js:0
 #, python-format
 msgid "Japanese “vacancy” button"
-msgstr ""
+msgstr "Japansk “ledig” knap"
 
 #. module: mail
 #. odoo-javascript
@@ -5055,7 +5156,7 @@ msgstr ""
 #: code:addons/mail/static/src/models_data/emoji_data.js:0
 #, python-format
 msgid "Jew"
-msgstr ""
+msgstr "Jøde"
 
 #. module: mail
 #. odoo-javascript
@@ -5063,7 +5164,7 @@ msgstr ""
 #: code:addons/mail/static/src/models_data/emoji_data.js:0
 #, python-format
 msgid "Jewish"
-msgstr ""
+msgstr "Jødisk"
 
 #. module: mail
 #: model_terms:ir.ui.view,arch_db:mail.mail_channel_view_kanban
@@ -5090,7 +5191,7 @@ msgstr "Deltag i kanal"
 #: code:addons/mail/static/src/components/call_action_list/call_action_list.xml:0
 #, python-format
 msgid "Join Video Call"
-msgstr ""
+msgstr "Deltag i videoopkald"
 
 #. module: mail
 #: model:ir.actions.act_window,name:mail.mail_channel_action_view
@@ -5102,14 +5203,14 @@ msgstr "Deltag i en gruppe"
 #: code:addons/mail/static/src/models_data/emoji_data.js:0
 #, python-format
 msgid "Jolly Roger"
-msgstr ""
+msgstr "Jolly Roger"
 
 #. module: mail
 #. odoo-javascript
 #: code:addons/mail/static/src/models_data/emoji_data.js:0
 #, python-format
 msgid "Judaism"
-msgstr ""
+msgstr "Jødedommen"
 
 #. module: mail
 #. odoo-javascript
@@ -5298,14 +5399,14 @@ msgstr "Overskredet aktiviteter"
 #: code:addons/mail/static/src/models_data/emoji_data.js:0
 #, python-format
 msgid "Latin"
-msgstr ""
+msgstr "Latin"
 
 #. module: mail
 #. odoo-javascript
 #: code:addons/mail/static/src/models_data/emoji_data.js:0
 #, python-format
 msgid "Latin cross"
-msgstr ""
+msgstr "latinsk kors"
 
 #. module: mail
 #: model:ir.model.fields,field_description:mail.field_mail_mail__email_layout_xmlid
@@ -5320,7 +5421,7 @@ msgstr "Layout"
 #: model_terms:ir.ui.view,arch_db:mail.mail_channel_view_kanban
 #, python-format
 msgid "Leave"
-msgstr "Ferie"
+msgstr "Forlad"
 
 #. module: mail
 #. odoo-javascript
@@ -5344,7 +5445,7 @@ msgstr ""
 #: code:addons/mail/static/src/models_data/emoji_data.js:0
 #, python-format
 msgid "Liberty"
-msgstr ""
+msgstr "Frihed"
 
 #. module: mail
 #. odoo-javascript
@@ -5471,9 +5572,9 @@ msgstr "Log bemærkning"
 
 #. module: mail
 #. odoo-javascript
-#: code:addons/mail/static/src/components/welcome_view/welcome_view.xml:0
+#: code:addons/mail/static/src/components/welcome_view/welcome_view.js:0
 #, python-format
-msgid "Logged as"
+msgid "Logged in as %s"
 msgstr ""
 
 #. module: mail
@@ -5491,7 +5592,7 @@ msgstr ""
 #: code:addons/mail/static/src/models_data/emoji_data.js:0
 #, python-format
 msgid "Mahjong"
-msgstr ""
+msgstr "Mahjong"
 
 #. module: mail
 #. odoo-javascript
@@ -5735,6 +5836,13 @@ msgstr "Mærk som To do"
 #, python-format
 msgid "Mark as done"
 msgstr "Markér som udført"
+
+#. module: mail
+#. odoo-javascript
+#: code:addons/mail/static/src/models/call_settings_menu.js:0
+#, python-format
+msgid "Media devices unobtainable"
+msgstr ""
 
 #. module: mail
 #: model:mail.activity.type,name:mail.mail_activity_data_meeting
@@ -6000,21 +6108,21 @@ msgstr ""
 #: code:addons/mail/static/src/models_data/emoji_data.js:0
 #, python-format
 msgid "Mexican"
-msgstr ""
+msgstr "Mexicaner"
 
 #. module: mail
 #. odoo-javascript
 #: code:addons/mail/static/src/models_data/emoji_data.js:0
 #, python-format
 msgid "Milky"
-msgstr ""
+msgstr "Mælkede"
 
 #. module: mail
 #. odoo-javascript
 #: code:addons/mail/static/src/models_data/emoji_data.js:0
 #, python-format
 msgid "Milky Way"
-msgstr ""
+msgstr "Milky Way"
 
 #. module: mail
 #: model:ir.model.fields.selection,name:mail.selection__mail_mail__failure_type__mail_email_missing
@@ -6089,7 +6197,7 @@ msgstr "Flere"
 #: code:addons/mail/static/src/models_data/emoji_data.js:0
 #, python-format
 msgid "Mother"
-msgstr ""
+msgstr "Mor"
 
 #. module: mail
 #. odoo-javascript
@@ -6132,7 +6240,7 @@ msgstr ""
 #: code:addons/mail/static/src/models_data/emoji_data.js:0
 #, python-format
 msgid "Munch"
-msgstr ""
+msgstr "Munch"
 
 #. module: mail
 #. odoo-javascript
@@ -6170,7 +6278,7 @@ msgstr "NY"
 #: code:addons/mail/static/src/models_data/emoji_data.js:0
 #, python-format
 msgid "NEW button"
-msgstr ""
+msgstr "NY knap"
 
 #. module: mail
 #. odoo-javascript
@@ -6185,7 +6293,7 @@ msgstr ""
 #: code:addons/mail/static/src/models_data/emoji_data.js:0
 #, python-format
 msgid "NG button"
-msgstr ""
+msgstr "NG knap"
 
 #. module: mail
 #: model:ir.model.fields,field_description:mail.field_fetchmail_server__name
@@ -6383,7 +6491,7 @@ msgstr "Ingen samtale endnu..."
 #: code:addons/mail/static/src/models/emoji_grid_no_search_content_view.js:0
 #, python-format
 msgid "No emoji match your search"
-msgstr ""
+msgstr "Ingen emoji matcher din søgning"
 
 #. module: mail
 #. odoo-javascript
@@ -6578,8 +6686,8 @@ msgstr "Antal fejl"
 #: model:ir.model.fields,help:mail.field_mail_thread_cc__message_needaction_counter
 #: model:ir.model.fields,help:mail.field_res_partner__message_needaction_counter
 #: model:ir.model.fields,help:mail.field_res_users__message_needaction_counter
-msgid "Number of messages which requires an action"
-msgstr "Antal meddelser der kræver handling"
+msgid "Number of messages requiring action"
+msgstr "Antal meddelelser der kræver handling"
 
 #. module: mail
 #: model:ir.model.fields,help:mail.field_mail_blacklist__message_has_error_counter
@@ -6598,7 +6706,7 @@ msgstr "Antal beskeder med leveringsfejl"
 #: code:addons/mail/static/src/models_data/emoji_data.js:0
 #, python-format
 msgid "O button (blood type)"
-msgstr ""
+msgstr "O knap (blod type)"
 
 #. module: mail
 #. odoo-javascript
@@ -6617,35 +6725,35 @@ msgstr "Ok"
 #: code:addons/mail/static/src/models_data/emoji_data.js:0
 #, python-format
 msgid "OK button"
-msgstr ""
+msgstr "OK knap"
 
 #. module: mail
 #. odoo-javascript
 #: code:addons/mail/static/src/models_data/emoji_data.js:0
 #, python-format
 msgid "OK hand"
-msgstr ""
+msgstr "OK hånd"
 
 #. module: mail
 #. odoo-javascript
 #: code:addons/mail/static/src/models_data/emoji_data.js:0
 #, python-format
 msgid "ON"
-msgstr ""
+msgstr "TÆNDT"
 
 #. module: mail
 #. odoo-javascript
 #: code:addons/mail/static/src/models_data/emoji_data.js:0
 #, python-format
 msgid "ON!"
-msgstr ""
+msgstr "TÆNDT!"
 
 #. module: mail
 #. odoo-javascript
 #: code:addons/mail/static/src/models_data/emoji_data.js:0
 #, python-format
 msgid "ON! arrow"
-msgstr ""
+msgstr "TÆNDT! pil"
 
 #. module: mail
 #. odoo-javascript
@@ -6653,14 +6761,14 @@ msgstr ""
 #: code:addons/mail/static/src/models_data/emoji_data.js:0
 #, python-format
 msgid "Oberon"
-msgstr ""
+msgstr "Oberon"
 
 #. module: mail
 #. odoo-javascript
 #: code:addons/mail/static/src/models_data/emoji_data.js:0
 #, python-format
 msgid "Objects"
-msgstr ""
+msgstr "Objekter"
 
 #. module: mail
 #: model_terms:ir.ui.view,arch_db:mail.mail_notification_layout
@@ -7001,9 +7109,53 @@ msgstr ""
 #. odoo-javascript
 #: code:addons/mail/static/src/backend_components/activity_list_view/activity_list_view.xml:0
 #: code:addons/mail/static/src/js/views/activity/activity_renderer.js:0
+#: model:ir.model.fields.selection,name:mail.selection__account_journal__activity_state__overdue
+#: model:ir.model.fields.selection,name:mail.selection__account_move__activity_state__overdue
+#: model:ir.model.fields.selection,name:mail.selection__account_payment__activity_state__overdue
+#: model:ir.model.fields.selection,name:mail.selection__crm_lead__activity_state__overdue
+#: model:ir.model.fields.selection,name:mail.selection__event_booth__activity_state__overdue
+#: model:ir.model.fields.selection,name:mail.selection__event_event__activity_state__overdue
+#: model:ir.model.fields.selection,name:mail.selection__event_registration__activity_state__overdue
+#: model:ir.model.fields.selection,name:mail.selection__event_sponsor__activity_state__overdue
+#: model:ir.model.fields.selection,name:mail.selection__event_track__activity_state__overdue
+#: model:ir.model.fields.selection,name:mail.selection__fleet_vehicle__activity_state__overdue
+#: model:ir.model.fields.selection,name:mail.selection__fleet_vehicle_log_contract__activity_state__overdue
+#: model:ir.model.fields.selection,name:mail.selection__fleet_vehicle_log_services__activity_state__overdue
+#: model:ir.model.fields.selection,name:mail.selection__hr_applicant__activity_state__overdue
+#: model:ir.model.fields.selection,name:mail.selection__hr_contract__activity_state__overdue
+#: model:ir.model.fields.selection,name:mail.selection__hr_employee__activity_state__overdue
+#: model:ir.model.fields.selection,name:mail.selection__hr_expense__activity_state__overdue
+#: model:ir.model.fields.selection,name:mail.selection__hr_expense_sheet__activity_state__overdue
+#: model:ir.model.fields.selection,name:mail.selection__hr_leave__activity_state__overdue
+#: model:ir.model.fields.selection,name:mail.selection__hr_leave_allocation__activity_state__overdue
+#: model:ir.model.fields.selection,name:mail.selection__lunch_supplier__activity_state__overdue
 #: model:ir.model.fields.selection,name:mail.selection__mail_activity__state__overdue
 #: model:ir.model.fields.selection,name:mail.selection__mail_activity_mixin__activity_state__overdue
+#: model:ir.model.fields.selection,name:mail.selection__mailing_mailing__activity_state__overdue
+#: model:ir.model.fields.selection,name:mail.selection__maintenance_equipment__activity_state__overdue
+#: model:ir.model.fields.selection,name:mail.selection__maintenance_request__activity_state__overdue
+#: model:ir.model.fields.selection,name:mail.selection__mrp_production__activity_state__overdue
+#: model:ir.model.fields.selection,name:mail.selection__mrp_unbuild__activity_state__overdue
+#: model:ir.model.fields.selection,name:mail.selection__note_note__activity_state__overdue
+#: model:ir.model.fields.selection,name:mail.selection__pos_session__activity_state__overdue
+#: model:ir.model.fields.selection,name:mail.selection__product_product__activity_state__overdue
+#: model:ir.model.fields.selection,name:mail.selection__product_template__activity_state__overdue
+#: model:ir.model.fields.selection,name:mail.selection__project_project__activity_state__overdue
+#: model:ir.model.fields.selection,name:mail.selection__project_task__activity_state__overdue
+#: model:ir.model.fields.selection,name:mail.selection__project_update__activity_state__overdue
+#: model:ir.model.fields.selection,name:mail.selection__purchase_order__activity_state__overdue
+#: model:ir.model.fields.selection,name:mail.selection__purchase_requisition__activity_state__overdue
+#: model:ir.model.fields.selection,name:mail.selection__repair_order__activity_state__overdue
 #: model:ir.model.fields.selection,name:mail.selection__res_partner__activity_state__overdue
+#: model:ir.model.fields.selection,name:mail.selection__res_partner_bank__activity_state__overdue
+#: model:ir.model.fields.selection,name:mail.selection__sale_order__activity_state__overdue
+#: model:ir.model.fields.selection,name:mail.selection__slide_channel__activity_state__overdue
+#: model:ir.model.fields.selection,name:mail.selection__stock_landed_cost__activity_state__overdue
+#: model:ir.model.fields.selection,name:mail.selection__stock_lot__activity_state__overdue
+#: model:ir.model.fields.selection,name:mail.selection__stock_picking__activity_state__overdue
+#: model:ir.model.fields.selection,name:mail.selection__stock_picking_batch__activity_state__overdue
+#: model:ir.model.fields.selection,name:mail.selection__survey_survey__activity_state__overdue
+#: model:ir.model.fields.selection,name:mail.selection__survey_user_input__activity_state__overdue
 #, python-format
 msgid "Overdue"
 msgstr "Forfalden"
@@ -7186,9 +7338,53 @@ msgstr ""
 #. odoo-javascript
 #: code:addons/mail/static/src/backend_components/activity_list_view/activity_list_view.xml:0
 #: code:addons/mail/static/src/js/views/activity/activity_renderer.js:0
+#: model:ir.model.fields.selection,name:mail.selection__account_journal__activity_state__planned
+#: model:ir.model.fields.selection,name:mail.selection__account_move__activity_state__planned
+#: model:ir.model.fields.selection,name:mail.selection__account_payment__activity_state__planned
+#: model:ir.model.fields.selection,name:mail.selection__crm_lead__activity_state__planned
+#: model:ir.model.fields.selection,name:mail.selection__event_booth__activity_state__planned
+#: model:ir.model.fields.selection,name:mail.selection__event_event__activity_state__planned
+#: model:ir.model.fields.selection,name:mail.selection__event_registration__activity_state__planned
+#: model:ir.model.fields.selection,name:mail.selection__event_sponsor__activity_state__planned
+#: model:ir.model.fields.selection,name:mail.selection__event_track__activity_state__planned
+#: model:ir.model.fields.selection,name:mail.selection__fleet_vehicle__activity_state__planned
+#: model:ir.model.fields.selection,name:mail.selection__fleet_vehicle_log_contract__activity_state__planned
+#: model:ir.model.fields.selection,name:mail.selection__fleet_vehicle_log_services__activity_state__planned
+#: model:ir.model.fields.selection,name:mail.selection__hr_applicant__activity_state__planned
+#: model:ir.model.fields.selection,name:mail.selection__hr_contract__activity_state__planned
+#: model:ir.model.fields.selection,name:mail.selection__hr_employee__activity_state__planned
+#: model:ir.model.fields.selection,name:mail.selection__hr_expense__activity_state__planned
+#: model:ir.model.fields.selection,name:mail.selection__hr_expense_sheet__activity_state__planned
+#: model:ir.model.fields.selection,name:mail.selection__hr_leave__activity_state__planned
+#: model:ir.model.fields.selection,name:mail.selection__hr_leave_allocation__activity_state__planned
+#: model:ir.model.fields.selection,name:mail.selection__lunch_supplier__activity_state__planned
 #: model:ir.model.fields.selection,name:mail.selection__mail_activity__state__planned
 #: model:ir.model.fields.selection,name:mail.selection__mail_activity_mixin__activity_state__planned
+#: model:ir.model.fields.selection,name:mail.selection__mailing_mailing__activity_state__planned
+#: model:ir.model.fields.selection,name:mail.selection__maintenance_equipment__activity_state__planned
+#: model:ir.model.fields.selection,name:mail.selection__maintenance_request__activity_state__planned
+#: model:ir.model.fields.selection,name:mail.selection__mrp_production__activity_state__planned
+#: model:ir.model.fields.selection,name:mail.selection__mrp_unbuild__activity_state__planned
+#: model:ir.model.fields.selection,name:mail.selection__note_note__activity_state__planned
+#: model:ir.model.fields.selection,name:mail.selection__pos_session__activity_state__planned
+#: model:ir.model.fields.selection,name:mail.selection__product_product__activity_state__planned
+#: model:ir.model.fields.selection,name:mail.selection__product_template__activity_state__planned
+#: model:ir.model.fields.selection,name:mail.selection__project_project__activity_state__planned
+#: model:ir.model.fields.selection,name:mail.selection__project_task__activity_state__planned
+#: model:ir.model.fields.selection,name:mail.selection__project_update__activity_state__planned
+#: model:ir.model.fields.selection,name:mail.selection__purchase_order__activity_state__planned
+#: model:ir.model.fields.selection,name:mail.selection__purchase_requisition__activity_state__planned
+#: model:ir.model.fields.selection,name:mail.selection__repair_order__activity_state__planned
 #: model:ir.model.fields.selection,name:mail.selection__res_partner__activity_state__planned
+#: model:ir.model.fields.selection,name:mail.selection__res_partner_bank__activity_state__planned
+#: model:ir.model.fields.selection,name:mail.selection__sale_order__activity_state__planned
+#: model:ir.model.fields.selection,name:mail.selection__slide_channel__activity_state__planned
+#: model:ir.model.fields.selection,name:mail.selection__stock_landed_cost__activity_state__planned
+#: model:ir.model.fields.selection,name:mail.selection__stock_lot__activity_state__planned
+#: model:ir.model.fields.selection,name:mail.selection__stock_picking__activity_state__planned
+#: model:ir.model.fields.selection,name:mail.selection__stock_picking_batch__activity_state__planned
+#: model:ir.model.fields.selection,name:mail.selection__survey_survey__activity_state__planned
+#: model:ir.model.fields.selection,name:mail.selection__survey_user_input__activity_state__planned
 #, python-format
 msgid "Planned"
 msgstr "Planlagt"
@@ -7892,7 +8088,7 @@ msgid "Review All Templates"
 msgstr ""
 
 #. module: mail
-#: model:ir.model.fields,field_description:mail.field_mail_mail__body_html
+#: model:ir.model.fields,field_description:mail.field_mail_mail__body_content
 msgid "Rich-text Contents"
 msgstr "Rig-tekst indhold"
 
@@ -7958,6 +8154,13 @@ msgid "SSL"
 msgstr "SSL"
 
 #. module: mail
+#. odoo-javascript
+#: code:addons/mail/static/src/models/call_settings_menu.js:0
+#, python-format
+msgid "SSL might not be set up properly"
+msgstr ""
+
+#. module: mail
 #: model:ir.model.fields,field_description:mail.field_fetchmail_server__is_ssl
 msgid "SSL/TLS"
 msgstr "SSL / TLS"
@@ -7989,7 +8192,7 @@ msgstr "Sælger"
 #: code:addons/mail/static/src/models_data/emoji_data.js:0
 #, python-format
 msgid "Santa"
-msgstr ""
+msgstr "julemanden"
 
 #. module: mail
 #. odoo-javascript
@@ -7997,7 +8200,7 @@ msgstr ""
 #: code:addons/mail/static/src/models_data/emoji_data.js:0
 #, python-format
 msgid "Santa Claus"
-msgstr ""
+msgstr "Julemanden"
 
 #. module: mail
 #: model_terms:ir.ui.view,arch_db:mail.mail_activity_view_form_popup
@@ -8452,6 +8655,7 @@ msgstr ""
 
 #. module: mail
 #. odoo-javascript
+#: code:addons/mail/static/src/components/chat_window_header/chat_window_header.xml:0
 #: code:addons/mail/static/src/components/thread_view_topbar/thread_view_topbar.xml:0
 #, python-format
 msgid "Show Call Settings"
@@ -8466,7 +8670,6 @@ msgstr "Vis Følgere"
 
 #. module: mail
 #. odoo-javascript
-#: code:addons/mail/static/src/components/chat_window_header/chat_window_header.xml:0
 #: code:addons/mail/static/src/components/chat_window_header/chat_window_header.xml:0
 #: code:addons/mail/static/src/components/thread_view_topbar/thread_view_topbar.xml:0
 #, python-format
@@ -8610,7 +8813,7 @@ msgstr "Start en samtale"
 #: code:addons/mail/static/src/components/discuss_sidebar/discuss_sidebar.xml:0
 #, python-format
 msgid "Start a meeting"
-msgstr ""
+msgstr "Start et møde"
 
 #. module: mail
 #: model:ir.model.fields,field_description:mail.field_mail_activity__state
@@ -8982,6 +9185,11 @@ msgid "Test & Confirm"
 msgstr "Test & bekræft"
 
 #. module: mail
+#: model:ir.model.fields,field_description:mail.field_mail_mail__body_html
+msgid "Text Contents"
+msgstr ""
+
+#. module: mail
 #. odoo-javascript
 #: code:addons/mail/static/src/components/attachment_viewer/attachment_viewer.xml:0
 #, python-format
@@ -9014,6 +9222,23 @@ msgid ""
 "The Tax Identification Number. Values here will be validated based on the "
 "country format. You can use '/' to indicate that the partner is not subject "
 "to tax."
+msgstr ""
+
+#. module: mail
+#. odoo-python
+#: code:addons/mail/models/ir_attachment.py:0
+#, python-format
+msgid ""
+"The attachment %s does not exist or you do not have the rights to access it."
+msgstr ""
+"Vedhæftningen %s eksisterer ikke, eller også har du ikke rettighederne til "
+"at tilgå den."
+
+#. module: mail
+#. odoo-python
+#: code:addons/mail/models/ir_attachment.py:0
+#, python-format
+msgid "The attachment %s does not exist."
 msgstr ""
 
 #. module: mail
@@ -9149,6 +9374,13 @@ msgstr ""
 "Du har ikke rettigheder til at udføre den ønskede handling. Kontakt supporten, hvis du mener det skyldes en fejl i systemet.\n"
 "\n"
 "(Model: %s, Operation: %s)"
+
+#. module: mail
+#. odoo-javascript
+#: code:addons/mail/static/src/models/blur_manager.js:0
+#, python-format
+msgid "The selfie segmentation library was not loaded"
+msgstr ""
 
 #. module: mail
 #. odoo-python
@@ -9374,9 +9606,53 @@ msgstr "Til:"
 #: code:addons/mail/static/src/models/activity_list_view_item.js:0
 #: code:addons/mail/static/src/models/message.js:0
 #: code:addons/mail/static/src/models/message.js:0
+#: model:ir.model.fields.selection,name:mail.selection__account_journal__activity_state__today
+#: model:ir.model.fields.selection,name:mail.selection__account_move__activity_state__today
+#: model:ir.model.fields.selection,name:mail.selection__account_payment__activity_state__today
+#: model:ir.model.fields.selection,name:mail.selection__crm_lead__activity_state__today
+#: model:ir.model.fields.selection,name:mail.selection__event_booth__activity_state__today
+#: model:ir.model.fields.selection,name:mail.selection__event_event__activity_state__today
+#: model:ir.model.fields.selection,name:mail.selection__event_registration__activity_state__today
+#: model:ir.model.fields.selection,name:mail.selection__event_sponsor__activity_state__today
+#: model:ir.model.fields.selection,name:mail.selection__event_track__activity_state__today
+#: model:ir.model.fields.selection,name:mail.selection__fleet_vehicle__activity_state__today
+#: model:ir.model.fields.selection,name:mail.selection__fleet_vehicle_log_contract__activity_state__today
+#: model:ir.model.fields.selection,name:mail.selection__fleet_vehicle_log_services__activity_state__today
+#: model:ir.model.fields.selection,name:mail.selection__hr_applicant__activity_state__today
+#: model:ir.model.fields.selection,name:mail.selection__hr_contract__activity_state__today
+#: model:ir.model.fields.selection,name:mail.selection__hr_employee__activity_state__today
+#: model:ir.model.fields.selection,name:mail.selection__hr_expense__activity_state__today
+#: model:ir.model.fields.selection,name:mail.selection__hr_expense_sheet__activity_state__today
+#: model:ir.model.fields.selection,name:mail.selection__hr_leave__activity_state__today
+#: model:ir.model.fields.selection,name:mail.selection__hr_leave_allocation__activity_state__today
+#: model:ir.model.fields.selection,name:mail.selection__lunch_supplier__activity_state__today
 #: model:ir.model.fields.selection,name:mail.selection__mail_activity__state__today
 #: model:ir.model.fields.selection,name:mail.selection__mail_activity_mixin__activity_state__today
+#: model:ir.model.fields.selection,name:mail.selection__mailing_mailing__activity_state__today
+#: model:ir.model.fields.selection,name:mail.selection__maintenance_equipment__activity_state__today
+#: model:ir.model.fields.selection,name:mail.selection__maintenance_request__activity_state__today
+#: model:ir.model.fields.selection,name:mail.selection__mrp_production__activity_state__today
+#: model:ir.model.fields.selection,name:mail.selection__mrp_unbuild__activity_state__today
+#: model:ir.model.fields.selection,name:mail.selection__note_note__activity_state__today
+#: model:ir.model.fields.selection,name:mail.selection__pos_session__activity_state__today
+#: model:ir.model.fields.selection,name:mail.selection__product_product__activity_state__today
+#: model:ir.model.fields.selection,name:mail.selection__product_template__activity_state__today
+#: model:ir.model.fields.selection,name:mail.selection__project_project__activity_state__today
+#: model:ir.model.fields.selection,name:mail.selection__project_task__activity_state__today
+#: model:ir.model.fields.selection,name:mail.selection__project_update__activity_state__today
+#: model:ir.model.fields.selection,name:mail.selection__purchase_order__activity_state__today
+#: model:ir.model.fields.selection,name:mail.selection__purchase_requisition__activity_state__today
+#: model:ir.model.fields.selection,name:mail.selection__repair_order__activity_state__today
 #: model:ir.model.fields.selection,name:mail.selection__res_partner__activity_state__today
+#: model:ir.model.fields.selection,name:mail.selection__res_partner_bank__activity_state__today
+#: model:ir.model.fields.selection,name:mail.selection__sale_order__activity_state__today
+#: model:ir.model.fields.selection,name:mail.selection__slide_channel__activity_state__today
+#: model:ir.model.fields.selection,name:mail.selection__stock_landed_cost__activity_state__today
+#: model:ir.model.fields.selection,name:mail.selection__stock_lot__activity_state__today
+#: model:ir.model.fields.selection,name:mail.selection__stock_picking__activity_state__today
+#: model:ir.model.fields.selection,name:mail.selection__stock_picking_batch__activity_state__today
+#: model:ir.model.fields.selection,name:mail.selection__survey_survey__activity_state__today
+#: model:ir.model.fields.selection,name:mail.selection__survey_user_input__activity_state__today
 #, python-format
 msgid "Today"
 msgstr "I dag"
@@ -9851,7 +10127,7 @@ msgstr ""
 #: model_terms:ir.ui.view,arch_db:mail.res_users_settings_view_form
 #: model_terms:ir.ui.view,arch_db:mail.res_users_settings_view_tree
 msgid "User Settings"
-msgstr ""
+msgstr "Bruger indstillinger"
 
 #. module: mail
 #: model:ir.model,name:mail.model_res_users_settings_volumes
@@ -9941,7 +10217,7 @@ msgstr ""
 #: code:addons/mail/static/src/models_data/emoji_data.js:0
 #, python-format
 msgid "VHS"
-msgstr ""
+msgstr "VHS"
 
 #. module: mail
 #. odoo-javascript
@@ -9959,6 +10235,15 @@ msgid "VS button"
 msgstr ""
 
 #. module: mail
+#. odoo-python
+#: code:addons/mail/models/mail_alias.py:0
+#, python-format
+msgid ""
+"Value for `mail.catchall.domain.allowed` cannot be validated.\n"
+"It should be a comma separated list of domains e.g. example.com,example.org."
+msgstr ""
+
+#. module: mail
 #. odoo-javascript
 #: code:addons/mail/static/src/components/attachment_viewer/attachment_viewer.xml:0
 #, python-format
@@ -9970,7 +10255,7 @@ msgstr "Video"
 #: code:addons/mail/static/src/components/call_settings_menu/call_settings_menu.xml:0
 #, python-format
 msgid "Video Settings"
-msgstr ""
+msgstr "Videoindstillinger"
 
 #. module: mail
 #. odoo-python
@@ -10033,7 +10318,7 @@ msgstr ""
 #: code:addons/mail/static/src/components/call_settings_menu/call_settings_menu.xml:0
 #, python-format
 msgid "Voice Settings"
-msgstr ""
+msgstr "Stemmeindstillinger"
 
 #. module: mail
 #. odoo-javascript
@@ -10145,7 +10430,7 @@ msgstr "Skriv Feedback"
 #. module: mail
 #: model_terms:ir.ui.view,arch_db:mail.email_compose_message_wizard_form
 msgid "Write your message here..."
-msgstr ""
+msgstr "Skriv din besked her..."
 
 #. module: mail
 #. odoo-python
@@ -10157,7 +10442,7 @@ msgstr ""
 #. module: mail
 #: model_terms:ir.ui.view,arch_db:mail.view_mail_form
 msgid "YYYY-MM-DD HH:MM:SS"
-msgstr ""
+msgstr "YYYY-MM-DD HH:MM:SS"
 
 #. module: mail
 #. odoo-javascript
@@ -10191,6 +10476,9 @@ msgid ""
 "access to it unless you are invited again. Are you sure you want to "
 "continue?"
 msgstr ""
+"Du er ved at forlade denne gruppesamtale og vil ikke længere have adgang til"
+" den, medmindre du bliver inviteret igen. Er du sikker på, at du vil "
+"fortsætte?"
 
 #. module: mail
 #. odoo-python
@@ -10275,17 +10563,6 @@ msgstr "Du kan kun åbne profilen for eksisterende brugere."
 
 #. module: mail
 #. odoo-python
-#: code:addons/mail/models/res_users.py:0
-#, python-format
-msgid ""
-"You cannot create a new user from here.\n"
-" To create new user please go to configuration panel."
-msgstr ""
-"Du kan ikke oprette en ny bruger herfra.\n"
-" For at oprette en ny bruger, bedes du venligst gå til konfigurations panelet."
-
-#. module: mail
-#. odoo-python
 #: code:addons/mail/models/mail_channel.py:0
 #, python-format
 msgid ""
@@ -10347,6 +10624,14 @@ msgid ""
 msgstr ""
 "Du kan vedhæfte filer til denne skabelon, der skal føjes til alle e-mails "
 "oprettet fra denne skabelon"
+
+#. module: mail
+#: code:addons/mail/models/ir_attachment.py:0
+#, python-format
+msgid ""
+"You may not unlink or modify the content of attachments from other people's "
+"messages"
+msgstr ""
 
 #. module: mail
 #. odoo-javascript
@@ -10436,7 +10721,7 @@ msgstr ""
 #: code:addons/mail/static/src/models_data/emoji_data.js:0
 #, python-format
 msgid "ZZZ"
-msgstr ""
+msgstr "ZZZ"
 
 #. module: mail
 #. odoo-javascript
@@ -10458,21 +10743,21 @@ msgstr "Zoom Ud (-)"
 #: code:addons/mail/static/src/models_data/emoji_data.js:0
 #, python-format
 msgid "abacus"
-msgstr ""
+msgstr "abacus"
 
 #. module: mail
 #. odoo-javascript
 #: code:addons/mail/static/src/models_data/emoji_data.js:0
 #, python-format
 msgid "abc"
-msgstr ""
+msgstr "abc"
 
 #. module: mail
 #. odoo-javascript
 #: code:addons/mail/static/src/models_data/emoji_data.js:0
 #, python-format
 msgid "abcd"
-msgstr ""
+msgstr "abcd"
 
 #. module: mail
 #. odoo-javascript
@@ -13119,7 +13404,7 @@ msgstr ""
 #: code:addons/mail/static/src/models_data/emoji_data.js:0
 #, python-format
 msgid "business"
-msgstr ""
+msgstr "forretning"
 
 #. module: mail
 #. odoo-javascript
@@ -13527,7 +13812,7 @@ msgstr ""
 #: code:addons/mail/static/src/models_data/emoji_data.js:0
 #, python-format
 msgid "cart"
-msgstr ""
+msgstr "Kurv"
 
 #. module: mail
 #. odoo-javascript
@@ -15061,7 +15346,7 @@ msgstr ""
 #: code:addons/mail/static/src/models_data/emoji_data.js:0
 #, python-format
 msgid "cover"
-msgstr ""
+msgstr "cover"
 
 #. module: mail
 #. odoo-javascript
@@ -15868,7 +16153,7 @@ msgstr "afdeling"
 #: code:addons/mail/static/src/models_data/emoji_data.js:0
 #, python-format
 msgid "department store"
-msgstr ""
+msgstr "Stormagasin"
 
 #. module: mail
 #. odoo-javascript
@@ -16957,7 +17242,7 @@ msgstr ""
 #: code:addons/mail/static/src/models_data/emoji_data.js:0
 #, python-format
 msgid "email"
-msgstr ""
+msgstr "email"
 
 #. module: mail
 #. odoo-javascript
@@ -28618,7 +28903,7 @@ msgstr ""
 #: code:addons/mail/static/src/models_data/emoji_data.js:0
 #, python-format
 msgid "reminder"
-msgstr ""
+msgstr "påmindelse"
 
 #. module: mail
 #. odoo-javascript
@@ -32680,7 +32965,7 @@ msgstr ""
 #: code:addons/mail/static/src/models_data/emoji_data.js:0
 #, python-format
 msgid "ticket"
-msgstr ""
+msgstr "sag"
 
 #. module: mail
 #. odoo-javascript
@@ -35587,7 +35872,7 @@ msgstr ""
 #: code:addons/mail/static/src/models_data/emoji_data.js:0
 #, python-format
 msgid "write"
-msgstr ""
+msgstr "skrive"
 
 #. module: mail
 #. odoo-javascript
@@ -35965,4 +36250,4 @@ msgstr ""
 #: code:addons/mail/static/src/models_data/emoji_data.js:0
 #, python-format
 msgid "ココ"
-msgstr ""
+msgstr "ココ"

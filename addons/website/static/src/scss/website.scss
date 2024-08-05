@@ -112,18 +112,22 @@ $-seen-urls: ();
     @include print-variable('custom-colors', $custom-colors);
 }
 
+@mixin body-image-bg-style() {
+    background-image: url("/#{str-slice(o-website-value('body-image'), 2)}");
+    background-position: center;
+    background-attachment: fixed;
+    @if o-website-value('body-image-type') == 'pattern' {
+        background-size: auto;
+        background-repeat: repeat;
+    } @else {
+        background-size: cover;
+        background-repeat: no-repeat;
+    }
+};
+
 #wrapwrap {
     @if o-website-value('body-image') {
-        background-image: url("/#{str-slice(o-website-value('body-image'), 2)}");
-        background-position: center;
-        background-attachment: fixed;
-        @if o-website-value('body-image-type') == 'pattern' {
-            background-size: auto;
-            background-repeat: repeat;
-        } @else {
-            background-size: cover;
-            background-repeat: no-repeat;
-        }
+        @include body-image-bg-style();
     }
 
     @if o-website-value('layout') != 'full' {
@@ -284,6 +288,10 @@ $-header-nav-link-height: $nav-link-height;
         @include o-apply-colors('copyright', $background: $-footer-color);
         @include o-apply-colors('copyright-custom', $background: $-footer-color);
         @include o-add-gradient('copyright-gradient');
+    }
+    .s_popup {
+        // The colors of the footer must not impact the "all pages" popup.
+        @include o-apply-colors(1);
     }
 }
 
@@ -539,6 +547,9 @@ table.table_desc tr td {
     }
     // Content
     .carousel-inner {
+        // Create a new stacking context to ensure that elements like indicators
+        // and arrows will always appear on top of the carousel content.
+        isolation: isolate;
         overflow: hidden;
         height: 100%;
         .carousel-item {
@@ -812,10 +823,6 @@ $-transition-duration: 200ms;
     }
 }
 
-.o_hoverable_dropdown .nav-link.dropdown-toggle:focus {
-    outline: none;
-}
-
 // Navbar
 .navbar .o_extra_menu_items > .show {
     > li {
@@ -886,6 +893,12 @@ header {
         max-height: 80vh;
         overflow-y: auto;
         overflow-x: hidden; // Needed because of container in container having 0px padding... TODO improve
+
+        @include media-breakpoint-down(lg) {
+            .nav-link, .dropdown-item {
+                white-space: normal;
+            }
+        }
     }
 
     &:not(.o_header_is_scrolled) {
@@ -1049,12 +1062,22 @@ header {
                     // make sense to show it if the dropdown is always open.
                     display: none;
                 }
+                @if o-website-value('header-template') == 'slogan' {
+                    justify-content: unset !important;
+                }
             }
             @if o-website-value('header-template') == 'vertical' {
                 .oe_structure_solo {
                     // Hide the "oe_structure_solo" because it is outside the
                     // menu when the off-canvas menu is open.
                     display: none;
+                }
+                #top_menu {
+                    // This is useful because otherwise, the 'order-first' class
+                    // of the 'template_header_vertical' template puts the menu
+                    // behind the "backdrop" and it's no longer possible to
+                    // click on the menu links (only on Firefox).
+                    order: unset !important;
                 }
             }
         }
@@ -1171,6 +1194,9 @@ header {
     }
 } @else if o-website-value('header-template') == 'centered_logo' {
     header .o_header_centered_logo {
+        > li.nav-item {
+            align-self: center !important;
+        }
         @include media-breakpoint-up(lg) {
             width: 50%;
         }
@@ -1192,7 +1218,7 @@ header {
                             padding-right: $nav-link-padding-x;
                             padding-left: $nav-link-padding-x;
                         }
-                        .dropdown-menu {
+                        .dropdown-menu:not(.o_mega_menu) {
                             position: absolute;
                         }
                     }
@@ -1205,16 +1231,21 @@ header {
             }
         }
     }
+} @else if o-website-value('header-template') == 'slogan' {
+    #top_menu_container > ul.nav > li.nav-item {
+        align-self: center;
+    }
 }
 
 // Mega menu
 .o_mega_menu {
     width: 100%;
     padding: 0;
-    margin-top: 0;
+    margin-top: 0 !important;
     border-radius: 0;
     background-clip: unset; // Remove the 1px gap introduced by BS4
     background-color: transparent; // In order to allow the mega menu to be transparent
+    border: 1px solid $gray-200; // Prevent to see the color of the block behind.
 
     .container, .container-fluid {
         // Need to reforce those because they are removed since its a container
@@ -1264,7 +1295,7 @@ header {
 }
 
 #wrapwrap.o_header_overlay {
-    > header:not(.o_header_affixed):not(.o_top_menu_collapse_shown) {
+    > header:not(.o_header_affixed):not(.o_top_menu_collapse_shown):not(.o_header_sidebar) {
         @include o-position-absolute(0, 0, auto, 0);
         z-index: 1000;
 
@@ -1361,7 +1392,11 @@ header {
                     // Ensure a transparent snippet at the end of the content
                     // still appears with the same background when hovering the
                     // footer during the scroll effect.
-                    background-color: $body-bg;
+                    @if o-website-value('body-image') {
+                        @include body-image-bg-style();
+                    } @else {
+                        background-color: $body-bg;
+                    }
                 }
                 @if o-website-value('footer-effect') == 'slideout_shadow' {
                     box-shadow: $box-shadow;
@@ -1387,12 +1422,27 @@ header {
             vertical-align: middle;
         }
     }
+
+    @if index(
+        ('default', 'slogan', 'Contact', 'centered_logo', 'image'),
+        o-website-value('header-template')
+    ) != null {
+        @include media-breakpoint-down(md) {
+            .dropdown-toggle {
+                display: block;
+            }
+            .dropdown-menu {
+                position: static;
+            }
+        }
+    }
 }
 .o_lang_flag {
     width: 1em;
     height: 1em;
     margin-right: 0.2em;
     border-radius: $border-radius-pill;
+    object-fit: cover;
 }
 a.js_change_lang:hover, a.o_add_language:hover {
     text-decoration: none;
@@ -1544,14 +1594,27 @@ $ribbon-padding: 100px;
     display: none !important;
 }
 
+// Cookies Bar
+#website_cookies_bar {
+    min-height: 0px;
+    height: 0px;
+}
+
 // Search results
 .o_search_result_item_detail {
     flex: 1;
 }
 
+.o_cookies_bar_toggle {
+    gap: 0.5rem;
+    inset-inline-end: 1rem;
+    inset-block-end: var(--cookies-bar-toggle-inset-block-end, 1rem);
+    z-index: $zindex-modal + 1; // Over the modal backdrop.
+}
+
 .o_website_btn_loading {
-    cursor: wait;
     opacity: $btn-disabled-opacity;
+
     .fa:not(.fa-spin) {
         display: none;
     }
@@ -1591,6 +1654,21 @@ ul.o_checklist > li.o_checked::after {
 input[value*="data-oe-translation-initial-sha"] {
     @extend .o_text_content_invisible;
 }
+[data-oe-translation-initial-sha] {
+    > .o_translation_select {
+        border: $input-border-width solid $input-border-color;
+        @include border-radius($input-border-radius, 0);
+
+        // Hide translatable `<select/>`s since we use `.o_translation_select`
+        // elements to handle translations.
+        + select {
+            display: none !important;
+        }
+        > div:not(:last-child) {
+            border-bottom: inherit;
+        }
+    }
+}
 
 //------------------------------------------------------------------------------
 // Website Animate
@@ -1622,6 +1700,17 @@ input[value*="data-oe-translation-initial-sha"] {
 }
 .o_wanim_overflow_xy_hidden {
     overflow-x: hidden !important;
+
+    &.o_rtl, .o_rtl {
+        // Fix for Chrome and Edge bug: resolves slow/stuck scrolling during
+        // left-overflowing animations on RTL web pages. Note: using overflow on
+        // the main element hides animated elements outside of it (e.g. "Framed"
+        // page layout). This may not be the ideal solution but could be the
+        // best workaround for now.
+        > main {
+            overflow-x: hidden;
+        }
+    }
     .o_footer_slideout {
         overflow-y: hidden !important;
     }

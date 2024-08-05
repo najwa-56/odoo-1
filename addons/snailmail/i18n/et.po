@@ -13,17 +13,18 @@
 # Martin Aavastik <martin@avalah.ee>, 2022
 # Arma Gedonsky <armagedonsky@hot.ee>, 2022
 # Martin Trigaux, 2022
-# Jana Jaakson, 2022
+# JanaAvalah, 2022
 # Leaanika Randmets, 2023
+# Anna, 2024
 # 
 msgid ""
 msgstr ""
-"Project-Id-Version: Odoo Server 16.0+e\n"
+"Project-Id-Version: Odoo Server 16.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-12-15 12:44+0000\n"
+"POT-Creation-Date: 2023-04-14 05:52+0000\n"
 "PO-Revision-Date: 2022-09-22 05:55+0000\n"
-"Last-Translator: Leaanika Randmets, 2023\n"
-"Language-Team: Estonian (https://www.transifex.com/odoo/teams/41243/et/)\n"
+"Last-Translator: Anna, 2024\n"
+"Language-Team: Estonian (https://app.transifex.com/odoo/teams/41243/et/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: \n"
@@ -109,7 +110,7 @@ msgstr "Osta punkte"
 #. module: snailmail
 #: model:ir.model.fields.selection,name:snailmail.selection__snailmail_letter__error_code__credit_error
 msgid "CREDIT_ERROR"
-msgstr ""
+msgstr "CREDIT_ERROR"
 
 #. module: snailmail
 #: model_terms:ir.ui.view,arch_db:snailmail.snailmail_confirm_view
@@ -251,7 +252,7 @@ msgstr "Viga"
 #. module: snailmail
 #: model:ir.model.fields.selection,name:snailmail.selection__snailmail_letter__error_code__format_error
 msgid "FORMAT_ERROR"
-msgstr ""
+msgstr "FORMAT_ERROR"
 
 #. module: snailmail
 #. odoo-javascript
@@ -292,6 +293,13 @@ msgstr "Järjekorras"
 #: model:ir.model.fields,field_description:snailmail.field_snailmail_letter__info_msg
 msgid "Information"
 msgstr "Informatsioon"
+
+#. module: snailmail
+#. odoo-python
+#: code:addons/snailmail/models/snailmail_letter.py:0
+#, python-format
+msgid "Invalid recipient name."
+msgstr ""
 
 #. module: snailmail
 #: model:ir.model.fields,field_description:snailmail.field_snailmail_letter____last_update
@@ -336,7 +344,7 @@ msgstr ""
 #. module: snailmail
 #: model:ir.model.fields.selection,name:snailmail.selection__snailmail_letter__error_code__missing_required_fields
 msgid "MISSING_REQUIRED_FIELDS"
-msgstr ""
+msgstr "MISSING_REQUIRED_FIELDS"
 
 #. module: snailmail
 #: model:ir.model,name:snailmail.model_mail_message
@@ -372,7 +380,7 @@ msgstr "Mudeli nimetus"
 #. module: snailmail
 #: model:ir.model.fields.selection,name:snailmail.selection__snailmail_letter__error_code__no_price_available
 msgid "NO_PRICE_AVAILABLE"
-msgstr ""
+msgstr "NO_PRICE_AVAILABLE"
 
 #. module: snailmail
 #. odoo-python
@@ -602,7 +610,7 @@ msgstr "Tänav2"
 #. module: snailmail
 #: model:ir.model.fields.selection,name:snailmail.selection__snailmail_letter__error_code__trial_error
 msgid "TRIAL_ERROR"
-msgstr ""
+msgstr "TRIAL_ERROR"
 
 #. module: snailmail
 #. odoo-python
@@ -668,7 +676,7 @@ msgstr "Tüüp"
 #. module: snailmail
 #: model:ir.model.fields.selection,name:snailmail.selection__snailmail_letter__error_code__unknown_error
 msgid "UNKNOWN_ERROR"
-msgstr ""
+msgstr "UNKNOWN_ERROR"
 
 #. module: snailmail
 #: model_terms:ir.ui.view,arch_db:snailmail.snailmail_letter_format_error

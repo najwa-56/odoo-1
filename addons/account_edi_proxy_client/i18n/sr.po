@@ -3,18 +3,19 @@
 # 	* account_edi_proxy_client
 # 
 # Translators:
-# Martin Trigaux, 2022
 # Uros Kalajdzic <ukalajdzic@gmail.com>, 2022
 # Dragan Vukosavljevic <dragan.vukosavljevic@gmail.com>, 2022
+# Martin Trigaux, 2023
+# コフスタジオ, 2024
 # 
 msgid ""
 msgstr ""
-"Project-Id-Version: Odoo Server 15.0\n"
+"Project-Id-Version: Odoo Server 16.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-11-16 13:18+0000\n"
+"POT-Creation-Date: 2023-04-14 05:51+0000\n"
 "PO-Revision-Date: 2022-09-22 05:44+0000\n"
-"Last-Translator: Dragan Vukosavljevic <dragan.vukosavljevic@gmail.com>, 2022\n"
-"Language-Team: Serbian (https://www.transifex.com/odoo/teams/41243/sr/)\n"
+"Last-Translator: コフスタジオ, 2024\n"
+"Language-Team: Serbian (https://app.transifex.com/odoo/teams/41243/sr/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: \n"
@@ -24,12 +25,17 @@ msgstr ""
 #. module: account_edi_proxy_client
 #: model:ir.model,name:account_edi_proxy_client.model_account_edi_proxy_client_user
 msgid "Account EDI proxy user"
-msgstr ""
+msgstr "Korisnik EDI posrednika naloga"
 
 #. module: account_edi_proxy_client
 #: model:ir.model.fields,field_description:account_edi_proxy_client.field_res_company__account_edi_proxy_client_ids
 msgid "Account Edi Proxy Client"
-msgstr ""
+msgstr "Nalog Edi Proxy Klijent"
+
+#. module: account_edi_proxy_client
+#: model_terms:ir.ui.view,arch_db:account_edi_proxy_client.view_form_account_edi_proxy_client_user
+msgid "Account Journal"
+msgstr "Dnevnik konta"
 
 #. module: account_edi_proxy_client
 #: model:ir.model.fields,field_description:account_edi_proxy_client.field_account_edi_proxy_client_user__active
@@ -67,19 +73,29 @@ msgid "Display Name"
 msgstr "Naziv za prikaz"
 
 #. module: account_edi_proxy_client
+#: model:ir.actions.act_window,name:account_edi_proxy_client.action_tree_account_edi_proxy_client_user
+msgid "EDI Proxy User"
+msgstr "EDI Proxy Korisnik"
+
+#. module: account_edi_proxy_client
+#: model:ir.ui.menu,name:account_edi_proxy_client.menu_account_proxy_client_user
+msgid "EDI Proxy Users"
+msgstr "EDI Proxy Korisnici"
+
+#. module: account_edi_proxy_client
 #: model:ir.model,name:account_edi_proxy_client.model_account_edi_format
 msgid "EDI format"
-msgstr ""
+msgstr "EDI format"
 
 #. module: account_edi_proxy_client
 #: model:ir.model.fields,field_description:account_edi_proxy_client.field_account_edi_proxy_client_user__edi_format_id
 msgid "Edi Format"
-msgstr ""
+msgstr "Edi Format"
 
 #. module: account_edi_proxy_client
 #: model:ir.model.fields,field_description:account_edi_proxy_client.field_account_edi_proxy_client_user__edi_identification
 msgid "Edi Identification"
-msgstr ""
+msgstr "Edi Identifikacija"
 
 #. module: account_edi_proxy_client
 #: model:ir.model.fields,field_description:account_edi_proxy_client.field_account_edi_proxy_client_user__id
@@ -89,7 +105,7 @@ msgstr "ID"
 #. module: account_edi_proxy_client
 #: model:ir.model.fields,field_description:account_edi_proxy_client.field_account_edi_proxy_client_user__id_client
 msgid "Id Client"
-msgstr ""
+msgstr "Id Klijent"
 
 #. module: account_edi_proxy_client
 #: model:ir.model.fields,field_description:account_edi_proxy_client.field_account_edi_proxy_client_user____last_update
@@ -109,17 +125,22 @@ msgstr "Poslednje ažuriranje dana"
 #. module: account_edi_proxy_client
 #: model:ir.model.fields,field_description:account_edi_proxy_client.field_account_edi_proxy_client_user__private_key
 msgid "Private Key"
-msgstr ""
+msgstr "Privatni ključ"
+
+#. module: account_edi_proxy_client
+#: model:ir.model.fields,field_description:account_edi_proxy_client.field_account_edi_proxy_client_user__private_key_filename
+msgid "Private Key Filename"
+msgstr "Ime fajla privatnog ključa"
 
 #. module: account_edi_proxy_client
 #: model:ir.model.fields,field_description:account_edi_proxy_client.field_account_edi_proxy_client_user__refresh_token
 msgid "Refresh Token"
-msgstr ""
+msgstr "Osveži token"
 
 #. module: account_edi_proxy_client
 #: model:ir.model.fields,help:account_edi_proxy_client.field_account_edi_proxy_client_user__private_key
 msgid "The key to encrypt all the user's data"
-msgstr ""
+msgstr "Ključ za šifrovanje svih korisničkih podataka"
 
 #. module: account_edi_proxy_client
 #: model:ir.model.fields,help:account_edi_proxy_client.field_account_edi_proxy_client_user__edi_identification
@@ -129,27 +150,35 @@ msgid ""
 msgstr ""
 
 #. module: account_edi_proxy_client
+#. odoo-python
 #: code:addons/account_edi_proxy_client/models/account_edi_proxy_user.py:0
 #, python-format
 msgid ""
 "The url that this service requested returned an error. The url it tried to "
 "contact was %s"
 msgstr ""
+"URL koji je ovaj servis zahtevao vratio je grešku. URL koji je pokušao da "
+"kontaktira je %s."
 
 #. module: account_edi_proxy_client
+#. odoo-python
 #: code:addons/account_edi_proxy_client/models/account_edi_proxy_user.py:0
 #, python-format
 msgid ""
 "The url that this service requested returned an error. The url it tried to "
 "contact was %s. %s"
 msgstr ""
+"Url koji je ovaj servis zahtevao vratio je grešku. Url koji je pokušao da "
+"kontaktira je %s. %s"
 
 #. module: account_edi_proxy_client
+#. odoo-python
 #: code:addons/account_edi_proxy_client/models/account_edi_proxy_user.py:0
 #, python-format
 msgid ""
 "The url that this service tried to contact does not exist. The url was %r"
 msgstr ""
+"URL koji je ovaj servis pokušao da kontaktira ne postoji. URL je bio %r"
 
 #. module: account_edi_proxy_client
 #: model:ir.model.constraint,message:account_edi_proxy_client.constraint_account_edi_proxy_client_user_unique_edi_identification_per_format
@@ -159,4 +188,4 @@ msgstr ""
 #. module: account_edi_proxy_client
 #: model:ir.model.constraint,message:account_edi_proxy_client.constraint_account_edi_proxy_client_user_unique_id_client
 msgid "This id_client is already used on another user."
-msgstr ""
+msgstr "Ovaj id_client se već koristi na drugom korisniku."

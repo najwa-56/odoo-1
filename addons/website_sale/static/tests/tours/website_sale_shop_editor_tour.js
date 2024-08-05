@@ -1,14 +1,12 @@
 /** @odoo-module **/
 
-import tour from 'web_tour.tour';
+import wTourUtils from "website.tour_utils";
 
-tour.register('shop_editor', {
+wTourUtils.registerWebsitePreviewTour("shop_editor", {
     test: true,
-    url: '/shop?enable_editor=1',
+    url: "/shop",
+    edition: true,
 }, [{
-    trigger: '#oe_snippets.o_loaded',
-    content: "Wait for the editor to be loaded"
-}, {
     content: "Click on pricelist dropdown",
     trigger: "iframe div.o_pricelist_dropdown a[data-bs-toggle=dropdown]",
 }, {
@@ -19,4 +17,25 @@ tour.register('shop_editor', {
     trigger: "iframe div.o_pricelist_dropdown a[data-bs-toggle=dropdown]",
     extra_trigger: "iframe div.o_pricelist_dropdown a[data-bs-toggle=dropdown][aria-expanded=false]",
     content: "Click on the pricelist again.",
+}]);
+
+wTourUtils.registerWebsitePreviewTour("shop_editor_set_product_ribbon", {
+    test: true,
+    url: "/shop",
+    edition: true,
+}, [{
+    content: "Click on first product",
+    trigger: "iframe .oe_product:first",
+}, {
+    content: "Open the ribbon selector",
+    trigger: ".o_wsale_ribbon_select we-toggler",
+}, {
+    content: "Select a ribbon",
+    trigger: '.o_wsale_ribbon_select we-button:contains("Sale")',
+},
+...wTourUtils.clickOnSave(),
+{
+    content: "Check that the ribbon was properly saved",
+    trigger: 'iframe .oe_product:first .o_ribbon:contains("Sale")',
+    run: () => null,
 }]);

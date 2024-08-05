@@ -51,9 +51,9 @@
                             <field name="auto_apply"/>
                             <field name="vat_required" attrs="{'invisible': [('auto_apply', '!=', True)]}"/>
                             <field name="foreign_vat"/>
-                            <field name="country_group_id" attrs="{'invisible': [('auto_apply', '!=', True)]}"/>
+                            <field name="country_group_id" attrs="{'invisible': [('auto_apply', '=', False), ('foreign_vat', '=', False)], 'required': [('foreign_vat', '!=', False), ('country_id', '=', False)]}"/>
                             <field name="country_id"
-                                attrs="{'required': [('foreign_vat', '!=', False)]}"
+                                attrs="{'required': [('foreign_vat', '!=', False), ('country_group_id', '=', False)]}"
                                 options="{'no_open': True, 'no_create': True}"/>
                             <field name="state_ids" widget="many2many_tags" domain="[('country_id', '=', country_id)]"
                                 attrs="{'invisible': ['|', '|', '&amp;', ('auto_apply', '!=', True), ('foreign_vat', '=', False), ('country_id', '=', False), ('states_count', '=', 0)]}"/>
@@ -71,7 +71,8 @@
                     <notebook>
                         <page name="tax_mapping" string="Tax Mapping">
                             <field name="tax_ids" widget="one2many" nolabel="1" context="{'append_type_to_tax_name': True}">
-                                <tree name="tax_map_tree" string="Tax Mapping" editable="bottom" no_open="1">
+                                <tree name="tax_map_tree" string="Tax Mapping" editable="bottom" no_open="1" decoration-muted="tax_dest_id and not tax_dest_active">
+                                    <field name="tax_dest_active" invisible="1"/>
                                     <field name="tax_src_id"
                                         domain="[
                                             ('type_tax_use', '!=', 'none'),
@@ -209,7 +210,7 @@
                                         <field name="sequence" widget="handle"/>
                                         <field name="bank_id"/>
                                         <field name="acc_number"/>
-                                        <field name="allow_out_payment" widget="boolean_toggle"/>
+                                        <field name="allow_out_payment" widget="boolean_toggle" options="{'autosave': False}"/>
                                         <field name="acc_holder_name" invisible="1"/>
                                     </tree>
                                 </field>

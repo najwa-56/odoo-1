@@ -21,7 +21,7 @@ import babel.core
 import pytz
 from lxml import etree
 from lxml.builder import E
-from passlib.context import CryptContext
+from passlib.context import CryptContext as _CryptContext
 from psycopg2 import sql
 
 from odoo import api, fields, models, tools, SUPERUSER_ID, _, Command
@@ -34,9 +34,47 @@ from odoo.tools import is_html_empty, partition, collections, frozendict, lazy_p
 
 _logger = logging.getLogger(__name__)
 
+class CryptContext:
+    def __init__(self, *args, **kwargs):
+        self.__obj__ = _CryptContext(*args, **kwargs)
+
+    @property
+    def encrypt(self):
+        # deprecated alias
+        return self.hash
+
+    @property
+    def copy(self):
+        return self.__obj__.copy
+
+    @property
+    def hash(self):
+        return self.__obj__.hash
+
+    @property
+    def identify(self):
+        return self.__obj__.identify
+
+    @property
+    def verify(self):
+        return self.__obj__.verify
+
+    @property
+    def verify_and_update(self):
+        return self.__obj__.verify_and_update
+
+    def schemes(self):
+        return self.__obj__.schemes()
+
+    def update(self, **kwargs):
+        if kwargs.get("schemes"):
+            assert isinstance(kwargs["schemes"], str) or all(isinstance(s, str) for s in kwargs["schemes"])
+        return self.__obj__.update(**kwargs)
+
+
 # Only users who can modify the user (incl. the user herself) see the real contents of these fields
 USER_PRIVATE_FIELDS = []
-MIN_ROUNDS = 350000
+MIN_ROUNDS = 600_000
 concat = chain.from_iterable
 
 #
@@ -131,6 +169,7 @@ class Groups(models.Model):
     _description = "Access Groups"
     _rec_name = 'full_name'
     _order = 'name'
+    _allow_sudo_commands = False
 
     name = fields.Char(required=True, translate=True)
     users = fields.Many2many('res.users', 'res_groups_users_rel', 'gid', 'uid')
@@ -153,6 +192,13 @@ class Groups(models.Model):
     def _check_one_user_type(self):
         self.users._check_one_user_type()
 
+    @api.ondelete(at_uninstall=False)
+    def _unlink_except_settings_group(self):
+        classified = self.env['res.config.settings']._get_classified_fields()
+        for _name, _groups, implied_group in classified['group']:
+            if implied_group.id in self.ids:
+                raise ValidationError(_('You cannot delete a group linked with a settings field.'))
+
     @api.depends('category_id.name', 'name')
     def _compute_full_name(self):
         # Important: value must be stored in environment of group, not group1!
@@ -165,7 +211,7 @@ class Groups(models.Model):
     def _search_full_name(self, operator, operand):
         lst = True
         if isinstance(operand, bool):
-            return [[('name', operator, operand)]]
+            return [('name', operator, operand)]
         if isinstance(operand, str):
             lst = False
             operand = [operand]
@@ -223,7 +269,7 @@ class Groups(models.Model):
         result = self.get_external_id()
         missings = {group_id: f'__custom__.group_{group_id}' for group_id, ext_id in result.items() if not ext_id}
         if missings:
-            self.env['ir.model.data'].create(
+            self.env['ir.model.data'].sudo().create(
                 [
                     {
                         'name': name.split('.')[1],
@@ -270,6 +316,7 @@ class Users(models.Model):
     _description = 'User'
     _inherits = {'res.partner': 'partner_id'}
     _order = 'name, login'
+    _allow_sudo_commands = False
 
     @property
     def SELF_READABLE_FIELDS(self):
@@ -292,8 +339,12 @@ class Users(models.Model):
         return ['signature', 'action_id', 'company_id', 'email', 'name', 'image_1920', 'lang', 'tz']
 
     def _default_groups(self):
-        default_user_id = self.env['ir.model.data']._xmlid_to_res_id('base.default_user', raise_if_not_found=False)
-        return self.env['res.users'].browse(default_user_id).sudo().groups_id if default_user_id else []
+        """Default groups for employees
+
+        All the groups of the Template User
+        """
+        default_user = self.env.ref('base.default_user', raise_if_not_found=False)
+        return default_user.sudo().groups_id if default_user else []
 
     partner_id = fields.Many2one('res.partner', required=True, ondelete='restrict', auto_join=True, index=True,
         string='Related Partner', help='Partner-related data of the user')
@@ -312,7 +363,7 @@ class Users(models.Model):
     active_partner = fields.Boolean(related='partner_id.active', readonly=True, string="Partner is Active")
     action_id = fields.Many2one('ir.actions.actions', string='Home Action',
         help="If specified, this action will be opened at log on for this user, in addition to the standard menu.")
-    groups_id = fields.Many2many('res.groups', 'res_groups_users_rel', 'uid', 'gid', string='Groups', default=_default_groups)
+    groups_id = fields.Many2many('res.groups', 'res_groups_users_rel', 'uid', 'gid', string='Groups', default=lambda s: s._default_groups())
     log_ids = fields.One2many('res.users.log', 'create_uid', string='User log entries')
     login_date = fields.Datetime(related='log_ids.create_date', string='Latest authentication', readonly=False)
     share = fields.Boolean(compute='_compute_share', compute_sudo=True, string='Share User', store=True,
@@ -351,7 +402,7 @@ class Users(models.Model):
         # automatically encrypted at startup: look for passwords which don't
         # match the "extended" MCF and pass those through passlib.
         # Alternative: iterate on *all* passwords and use CryptContext.identify
-        cr.execute("""
+        cr.execute(r"""
         SELECT id, password FROM res_users
         WHERE password IS NOT NULL
           AND password !~ '^\$[^$]+\$[^$]+\$.'
@@ -582,6 +633,15 @@ class Users(models.Model):
             user.partner_id.active = user.active
         return users
 
+    def _apply_groups_to_existing_employees(self):
+        """ Should new groups be added to existing employees?
+
+        If the template user is being modified, the groups should be applied to
+        every other base_user users
+        """
+        default_user = self.env.ref('base.default_user', raise_if_not_found=False)
+        return default_user and default_user in self
+
     def write(self, values):
         if values.get('active') and SUPERUSER_ID in self._ids:
             raise UserError(_("You cannot activate the superuser."))
@@ -604,18 +664,20 @@ class Users(models.Model):
                 # safe fields only, so we write as super-user to bypass access rights
                 self = self.sudo().with_context(binary_field_real_user=self.env.user)
 
-        if 'groups_id' in values:
-            default_user = self.env.ref('base.default_user', raise_if_not_found=False)
-            if default_user and default_user in self:
-                old_groups = default_user.groups_id
+        old_groups = []
+        if 'groups_id' in values and self._apply_groups_to_existing_employees():
+            # if modify groups_id content, compute the delta of groups to apply
+            # the new ones to other existing users
+            old_groups = self._default_groups()
 
         res = super(Users, self).write(values)
 
-        if 'groups_id' in values and default_user and default_user in self:
-            # Sync added groups on default user template to existing users
-            added_groups = default_user.groups_id - old_groups
+        if old_groups:
+            # new elements in _default_groups() means new groups for default users
+            # that needs to be added to existing ones as well for consistency
+            added_groups = self._default_groups() - old_groups
             if added_groups:
-                internal_users = self.env.ref('base.group_user').users - default_user
+                internal_users = self.env.ref('base.group_user').users - self
                 internal_users.write({'groups_id': [Command.link(gid) for gid in added_groups.ids]})
 
         if 'company_id' in values:
@@ -649,10 +711,17 @@ class Users(models.Model):
         return res
 
     @api.ondelete(at_uninstall=True)
-    def _unlink_except_superuser(self):
+    def _unlink_except_master_data(self):
+        portal_user_template = self.env.ref('base.template_portal_user_id', False)
+        default_user_template = self.env.ref('base.default_user', False)
         if SUPERUSER_ID in self.ids:
             raise UserError(_('You can not remove the admin user as it is used internally for resources created by Odoo (updates, module installation, ...)'))
+        user_admin = self.env.ref('base.user_admin', raise_if_not_found=False)
+        if user_admin and user_admin in self:
+            raise UserError(_('You cannot delete the admin user because it is utilized in various places (such as security configurations,...). Instead, archive it.'))
         self.clear_caches()
+        if (portal_user_template and portal_user_template in self) or (default_user_template and default_user_template in self):
+            raise UserError(_('Deleting the template users is not allowed. Deleting this profile will compromise critical functionalities.'))
 
     @api.model
     def _name_search(self, name, args=None, operator='ilike', limit=100, name_get_uid=None):
@@ -745,6 +814,10 @@ class Users(models.Model):
     @api.model
     def _get_login_domain(self, login):
         return [('login', '=', login)]
+
+    @api.model
+    def _get_email_domain(self, email):
+        return [('email', '=', email)]
 
     @api.model
     def _get_login_order(self):
@@ -910,8 +983,8 @@ class Users(models.Model):
             user.write({
                 'login': f'__deleted_user_{user.id}_{time.time()}',
                 'password': '',
-                'api_key_ids': Command.clear(),
             })
+            user.api_key_ids._remove()
 
             res_users_deletion_values.append({
                 'user_id': user.id,
@@ -1284,7 +1357,7 @@ class UsersImplied(models.Model):
                 user = self.new(values)
                 gs = user.groups_id._origin
                 gs = gs | gs.trans_implied_ids
-                values['groups_id'] = type(self).groups_id.convert_to_write(gs, user)
+                values['groups_id'] = self._fields['groups_id'].convert_to_write(gs, user)
         return super(UsersImplied, self).create(vals_list)
 
     def write(self, values):
@@ -1426,6 +1499,9 @@ class GroupsView(models.Model):
                         xml_by_category[category_name].append(E.newline())
                     xml_by_category[category_name].append(E.field(name=field_name, **attrs))
                     xml_by_category[category_name].append(E.newline())
+                    # add duplicate invisible field so default values are saved on create
+                    if attrs.get('groups') == 'base.group_no_one':
+                        xml0.append(E.field(name=field_name, **dict(attrs, invisible="1", groups='!base.group_no_one')))
 
                 else:
                     # application separator with boolean fields
@@ -1443,6 +1519,8 @@ class GroupsView(models.Model):
                             dest_group.append(E.field(name=field_name, invisible="1", **attrs))
                         else:
                             dest_group.append(E.field(name=field_name, **attrs))
+                        # add duplicate invisible field so default values are saved on create
+                        xml0.append(E.field(name=field_name, **dict(attrs, invisible="1", groups='!base.group_no_one')))
                         group_count += 1
                     xml4.append(E.group(*left_group))
                     xml4.append(E.group(*right_group))
@@ -1641,7 +1719,8 @@ class UsersView(models.Model):
             missing_implied_groups = missing_implied_groups.filtered(
                 lambda g:
                 g.category_id not in (group.category_id | categories_to_ignore) and
-                g not in current_groups_by_category[g.category_id]
+                g not in current_groups_by_category[g.category_id] and
+                (self.user_has_groups('base.group_no_one') or g.category_id)
             )
             if missing_implied_groups:
                 # prepare missing group message, by categories
@@ -1672,9 +1751,13 @@ class UsersView(models.Model):
                 values1[key] = val
 
         if 'groups_id' not in values and (add or rem):
+            added = self.env['res.groups'].sudo().browse(add)
+            added |= added.mapped('trans_implied_ids')
+            added_ids = added._ids
             # remove group ids in `rem` and add group ids in `add`
+            # do not remove groups that are added by implied
             values1['groups_id'] = list(itertools.chain(
-                zip(repeat(3), rem),
+                zip(repeat(3), [gid for gid in rem if gid not in added_ids]),
                 zip(repeat(4), add)
             ))
 
@@ -1972,6 +2055,7 @@ class APIKeys(models.Model):
     _name = 'res.users.apikeys'
     _description = 'Users API Keys'
     _auto = False # so we can have a secret column
+    _allow_sudo_commands = False
 
     name = fields.Char("Description", required=True, readonly=True)
     user_id = fields.Many2one('res.users', index=True, required=True, readonly=True, ondelete="cascade")

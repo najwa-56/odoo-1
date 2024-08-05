@@ -13,7 +13,6 @@ class ProjectTask(models.Model):
                 task._message_sms_with_template(
                     template=task.stage_id.sms_template_id,
                     partner_ids=task.partner_id.ids,
-                    sms_numbers=task.partner_id.mapped('mobile'),
                 )
 
     @api.model_create_multi
@@ -26,9 +25,6 @@ class ProjectTask(models.Model):
         res = super().write(vals)
 
         if 'stage_id' in vals:
-            if self.env.user.has_group('base.group_portal') and not self.env.su:
-                # sudo as sms template model is protected
-                self.sudo()._send_sms()
-            else:
-                self._send_sms()
+            # sudo as sms template model is protected
+            self.sudo()._send_sms()
         return res

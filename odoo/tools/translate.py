@@ -26,6 +26,7 @@ from lxml import etree, html
 from psycopg2.extras import Json
 
 import odoo
+from odoo.exceptions import UserError
 from odoo.modules.module import get_resource_path
 from . import config, pycompat
 from .misc import file_open, get_iso_codes, SKIPPED_ELEMENT_TYPES
@@ -147,7 +148,7 @@ TRANSLATED_ELEMENTS = {
     'abbr', 'b', 'bdi', 'bdo', 'br', 'cite', 'code', 'data', 'del', 'dfn', 'em',
     'font', 'i', 'ins', 'kbd', 'keygen', 'mark', 'math', 'meter', 'output',
     'progress', 'q', 'ruby', 's', 'samp', 'small', 'span', 'strong', 'sub',
-    'sup', 'time', 'u', 'var', 'wbr', 'text',
+    'sup', 'time', 'u', 'var', 'wbr', 'text', 'select', 'option',
 }
 
 # Which attributes must be translated. This is a dict, where the value indicates
@@ -155,7 +156,7 @@ TRANSLATED_ELEMENTS = {
 TRANSLATED_ATTRS = dict.fromkeys({
     'string', 'add-label', 'help', 'sum', 'avg', 'confirm', 'placeholder', 'alt', 'title', 'aria-label',
     'aria-keyshortcuts', 'aria-placeholder', 'aria-roledescription', 'aria-valuetext',
-    'value_label', 'data-tooltip',
+    'value_label', 'data-tooltip', 'data-editor-message', 'label',
 }, lambda e: True)
 
 def translate_attrib_value(node):
@@ -175,6 +176,7 @@ TRANSLATED_ATTRS.update(
 )
 
 avoid_pattern = re.compile(r"\s*<!DOCTYPE", re.IGNORECASE | re.MULTILINE | re.UNICODE)
+space_pattern = re.compile(r"[\s\uFEFF]*")  # web_editor uses \uFEFF as ZWNBSP
 
 
 def translate_xml_node(node, callback, parse, serialize):
@@ -188,7 +190,7 @@ def translate_xml_node(node, callback, parse, serialize):
 
     def nonspace(text):
         """ Return whether ``text`` is a string with non-space characters. """
-        return bool(text) and not text.isspace()
+        return bool(text) and not space_pattern.fullmatch(text)
 
     def translatable(node):
         """ Return whether the given node can be translated as a whole. """
@@ -293,7 +295,11 @@ def serialize_xml(node):
 _HTML_PARSER = etree.HTMLParser(encoding='utf8')
 
 def parse_html(text):
-    return html.fragment_fromstring(text, parser=_HTML_PARSER)
+    try:
+        parse = html.fragment_fromstring(text, parser=_HTML_PARSER)
+    except TypeError as e:
+        raise UserError(_("Error while parsing view:\n\n%s") % e) from e
+    return parse
 
 def serialize_html(node):
     return etree.tostring(node, method='html', encoding='unicode')
@@ -339,7 +345,7 @@ def html_translate(callback, value):
         root = parse_html("<div>%s</div>" % value)
         result = translate_xml_node(root, callback, parse_html, serialize_html)
         # remove tags <div> and </div> from result
-        value = serialize_html(result)[5:-6]
+        value = serialize_html(result)[5:-6].replace('\xa0', '&nbsp;')
     except ValueError:
         _logger.exception("Cannot translate malformed HTML, using source value instead")
 
@@ -739,7 +745,7 @@ class PoFileWriter:
     def write_rows(self, rows):
         # we now group the translations by source. That means one translation per source.
         grouped_rows = {}
-        modules = set([])
+        modules = set()
         for module, type, name, res_id, src, trad, comments in rows:
             row = grouped_rows.setdefault(src, {})
             row.setdefault('modules', set()).add(module)
@@ -755,7 +761,7 @@ class PoFileWriter:
                 row['translation'] = ''
             elif not row.get('translation'):
                 row['translation'] = ''
-            self.add_entry(row['modules'], sorted(row['tnrs']), src, row['translation'], row['comments'])
+            self.add_entry(sorted(row['modules']), sorted(row['tnrs']), src, row['translation'], sorted(row['comments']))
 
         import odoo.release as release
         self.po.header = "Translation of %s.\n" \
@@ -870,18 +876,12 @@ def _extract_translatable_qweb_terms(element, callback):
                 and el.get("t-translation", '').strip() != "off"):
 
             _push(callback, el.text, el.sourceline)
-            # Do not export terms contained on the Component directive of OWL
-            # attributes in this context are most of the time variables,
-            # not real HTML attributes.
-            # Node tags starting with a capital letter are considered OWL Components
-            # and a widespread convention and good practice for DOM tags is to write
-            # them all lower case.
-            # https://www.w3schools.com/html/html5_syntax.asp
-            # https://github.com/odoo/owl/blob/master/doc/reference/component.md#composition
-            if not el.tag[0].isupper() and 't-component' not in el.attrib:
-                for att in ('title', 'alt', 'label', 'placeholder', 'aria-label'):
-                    if att in el.attrib:
-                        _push(callback, el.attrib[att], el.sourceline)
+            # heuristic: tags with names starting with an uppercase letter are
+            # component nodes
+            is_component = el.tag[0].isupper() or "t-component" in el.attrib or "t-set-slot" in el.attrib
+            for attr in el.attrib:
+                if (not is_component and attr in TRANSLATED_ATTRS) or (is_component and attr.endswith(".translate")):
+                    _push(callback, el.attrib[attr], el.sourceline)
             _extract_translatable_qweb_terms(el, callback)
         _push(callback, el.tail, el.sourceline)
 
@@ -1256,7 +1256,7 @@ class TranslationImporter:
             reader = TranslationFileReader(fileobj, fileformat=fileformat)
             self._load(reader, lang, xmlids)
         except IOError:
-            iso_lang = get_iso_codes(self.lang)
+            iso_lang = get_iso_codes(lang)
             filename = '[lang: %s][format: %s]' % (iso_lang or 'new', fileformat)
             _logger.exception("couldn't read translation file %s", filename)
 
@@ -1280,9 +1280,9 @@ class TranslationImporter:
             xmlid = module_name + '.' + row['imd_name']
             if xmlids and xmlid not in xmlids:
                 continue
-            if row.get('type') == 'model':
+            if row.get('type') == 'model' and field.translate is True:
                 self.model_translations[model_name][field_name][xmlid][lang] = row['value']
-            elif row.get('type') == 'model_terms':
+            elif row.get('type') == 'model_terms' and callable(field.translate):
                 self.model_terms_translations[model_name][field_name][xmlid][row['src']][lang] = row['value']
 
     def save(self, overwrite=False, force_overwrite=False):
@@ -1313,7 +1313,7 @@ class TranslationImporter:
                     # [module_name, imd_name, module_name, imd_name, ...]
                     params = []
                     for xmlid in sub_xmlids:
-                        params.extend(xmlid.split('.'))
+                        params.extend(xmlid.split('.', maxsplit=1))
                     cr.execute(f'''
                         SELECT m.id, imd.module || '.' || imd.name, m."{field_name}", imd.noupdate
                         FROM "{model_table}" m, "ir_model_data" imd
@@ -1371,7 +1371,7 @@ class TranslationImporter:
                     # [xmlid, translations, xmlid, translations, ...]
                     params = []
                     for xmlid, translations in sub_field_dictionary:
-                        params.extend([*xmlid.split('.'), Json(translations)])
+                        params.extend([*xmlid.split('.', maxsplit=1), Json(translations)])
                     if not force_overwrite:
                         value_query = f"""CASE WHEN {overwrite} IS TRUE AND imd.noupdate IS FALSE
                         THEN m."{field_name}" || t.value
@@ -1392,6 +1392,7 @@ class TranslationImporter:
         self.model_translations.clear()
 
         env.invalidate_all()
+        env.registry.clear_caches()
         if self.verbose:
             _logger.info("translations are loaded successfully")
 
@@ -1560,17 +1561,21 @@ def _get_translation_upgrade_queries(cr, field):
     cleanup_queries = []
 
     if field.translate is True:
+        emtpy_src = """'{"en_US": ""}'::jsonb"""
         query = f"""
             WITH t AS (
                 SELECT it.res_id as res_id, jsonb_object_agg(it.lang, it.value) AS value, bool_or(imd.noupdate) AS noupdate
                   FROM _ir_translation it
              LEFT JOIN ir_model_data imd
-                    ON imd.model = %s AND imd.res_id = it.res_id
+                    ON imd.model = %s AND imd.res_id = it.res_id AND imd.module != '__export__'
                  WHERE it.type = 'model' AND it.name = %s AND it.state = 'translated'
               GROUP BY it.res_id
             )
             UPDATE {Model._table} m
-               SET "{field.name}" = CASE WHEN t.noupdate THEN m."{field.name}" || t.value ELSE t.value || m."{field.name}" END
+               SET "{field.name}" = CASE WHEN m."{field.name}" IS NULL THEN {emtpy_src} || t.value
+                                         WHEN t.noupdate IS FALSE THEN t.value || m."{field.name}"
+                                         ELSE m."{field.name}" || t.value
+                                     END
               FROM t
              WHERE t.res_id = m.id
         """
@@ -1581,6 +1586,28 @@ def _get_translation_upgrade_queries(cr, field):
 
     # upgrade model_terms translation: one update per field per record
     if callable(field.translate):
+        cr.execute("SELECT code FROM res_lang WHERE active = 't'")
+        languages = {l[0] for l in cr.fetchall()}
+        query = f"""
+            SELECT t.res_id, m."{field.name}", t.value, t.noupdate
+              FROM t
+              JOIN "{Model._table}" m ON t.res_id = m.id
+        """
+        if translation_name == 'ir.ui.view,arch_db':
+            cr.execute("SELECT id from ir_module_module WHERE name = 'website' AND state='installed'")
+            if cr.fetchone():
+                query = f"""
+                    SELECT t.res_id, m."{field.name}", t.value, t.noupdate, l.code
+                      FROM t
+                      JOIN "{Model._table}" m ON t.res_id = m.id
+                      JOIN website w ON m.website_id = w.id
+                      JOIN res_lang l ON w.default_lang_id = l.id
+                    UNION
+                    SELECT t.res_id, m."{field.name}", t.value, t.noupdate, 'en_US'
+                      FROM t
+                      JOIN "{Model._table}" m ON t.res_id = m.id
+                     WHERE m.website_id IS NULL
+                """
         cr.execute(f"""
             WITH t0 AS (
                 -- aggregate translations by source term --
@@ -1596,12 +1623,8 @@ def _get_translation_upgrade_queries(cr, field):
              LEFT JOIN ir_model_data imd
                     ON imd.model = %s AND imd.res_id = t0.res_id
               GROUP BY t0.res_id
-            )
-            SELECT t.res_id, m."{field.name}", t.value, t.noupdate
-              FROM t
-              JOIN "{Model._table}" m ON t.res_id = m.id
-        """, [translation_name, Model._name])
-        for id_, new_translations, translations, noupdate in cr.fetchall():
+            )""" + query, [translation_name, Model._name])
+        for id_, new_translations, translations, noupdate, *extra in cr.fetchall():
             if not new_translations:
                 continue
             # new_translations contains translations updated from the latest po files
@@ -1621,6 +1644,14 @@ def _get_translation_upgrade_queries(cr, field):
             }
             if "en_US" not in new_values:
                 new_values["en_US"] = field.translate(lambda v: None, src_value)
+            if extra and extra[0] not in new_values:
+                new_values[extra[0]] = field.translate(lambda v: None, src_value)
+            elif not extra:
+                missing_languages = languages - set(translations)
+                if missing_languages:
+                    src_value = field.translate(lambda v: None, src_value)
+                    for lang in sorted(missing_languages):
+                        new_values[lang] = src_value
             query = f'UPDATE "{Model._table}" SET "{field.name}" = %s WHERE id = %s'
             migrate_queries.append(cr.mogrify(query, [Json(new_values), id_]).decode())
 

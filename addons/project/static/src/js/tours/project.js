@@ -38,26 +38,24 @@ tour.register('project_tour', {
         actions.auto('.modal:visible .btn.btn-primary');
     },
 }, {
-    trigger: ".o_kanban_project_tasks .o_column_quick_create .input-group",
+    trigger: ".o_kanban_project_tasks .o_column_quick_create .input-group .o_input",
     content: Markup(_t("Add columns to organize your tasks into <b>stages</b> <i>e.g. New - In Progress - Done</i>.")),
-    position: 'right',
-    run: function (actions) {
-        actions.text("Test", this.$anchor.find("input"));
-    },
+    position: 'bottom',
+    run: "text Test",
 }, {
     trigger: ".o_kanban_project_tasks .o_column_quick_create .o_kanban_add",
-    auto: true,
+    content: Markup(_t('Let\'s create your first <b>stage</b>.')),
+    position: 'right',
 }, {
-    trigger: ".o_kanban_project_tasks .o_column_quick_create .input-group",
+    trigger: ".o_kanban_project_tasks .o_column_quick_create .input-group .o_input",
     extra_trigger: '.o_kanban_group',
     content: Markup(_t("Add columns to organize your tasks into <b>stages</b> <i>e.g. New - In Progress - Done</i>.")),
-    position: 'right',
-    run: function (actions) {
-        actions.text("Test", this.$anchor.find("input"));
-    },
+    position: 'bottom',
+    run: "text Test",
 }, {
     trigger: ".o_kanban_project_tasks .o_column_quick_create .o_kanban_add",
-    auto: true,
+    content: Markup(_t('Let\'s create your second <b>stage</b>.')),
+    position: 'right',
 }, {
     trigger: '.o-kanban-button-new',
     extra_trigger: '.o_kanban_group:eq(1)',
@@ -111,21 +109,28 @@ tour.register('project_tour', {
     position: "bottom",
     run: "click",
 }, {
-    trigger: ".o_field_widget[name='user_ids'] input",
+    trigger: ".o_field_widget[name='user_ids']",
     extra_trigger: '.o_form_project_tasks',
     content: _t("Assign a responsible to your task"),
     position: "right",
-    run: "text a"
+    run() {
+        document.querySelector('.o_field_widget[name="user_ids"] input').click();
+    }
 }, {
     trigger: ".ui-autocomplete > li > a:not(:has(i.fa))",
     auto: true,
+    mobile: false,
+}, {
+    trigger: "div[role='article']",
+    mobile: true,
+    run: "click",
 }, {
     trigger: ".o_form_button_save",
     extra_trigger: '.o_form_project_tasks.o_form_dirty',
     content: Markup(_t("You have unsaved changes - no worries! Odoo will automatically save it as you navigate.<br/> You can discard these changes from here or manually save your task.<br/>Let's save it manually.")),
     position: "bottom",
 }, {
-    trigger: ".breadcrumb-item:not(.active):last",
+    trigger: ".breadcrumb .o_back_button",
     extra_trigger: '.o_form_project_tasks',
     content: Markup(_t("Let's go back to the <b>kanban view</b> to have an overview of your next tasks.")),
     position: "right",

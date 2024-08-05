@@ -60,6 +60,7 @@ class PurchaseRequisitionCreateAlternative(models.TransientModel):
             )
         vals = self._get_alternative_values()
         alt_po = self.env['purchase.order'].with_context(origin_po_id=self.origin_po_id.id, default_requisition_id=False).create(vals)
+        alt_po.order_line._compute_tax_id()
         return {
             'type': 'ir.actions.act_window',
             'view_mode': 'form',
@@ -76,6 +77,7 @@ class PurchaseRequisitionCreateAlternative(models.TransientModel):
             'partner_id': self.partner_id.id,
             'user_id': self.origin_po_id.user_id.id,
             'dest_address_id': self.origin_po_id.dest_address_id.id,
+            'origin': self.origin_po_id.origin,
         }
         if self.copy_products and self.origin_po_id:
             vals['order_line'] = [Command.create({

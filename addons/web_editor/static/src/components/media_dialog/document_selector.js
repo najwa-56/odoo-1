@@ -11,7 +11,7 @@ export class DocumentSelector extends FileSelector {
 
         this.uploadText = this.env._t("Upload a document");
         this.urlPlaceholder = "https://www.odoo.com/mydocument";
-        this.addText = this.env._t("Add document");
+        this.addText = this.env._t("Add URL");
         this.searchPlaceholder = this.env._t("Search a document");
         this.allLoadedText = this.env._t("All documents have been loaded");
     }
@@ -49,7 +49,7 @@ export class DocumentSelector extends FileSelector {
     static async createElements(selectedMedia, { orm }) {
         return Promise.all(selectedMedia.map(async attachment => {
             const linkEl = document.createElement('a');
-            let href = `/web/content/${attachment.id}?unique=${attachment.checksum}&download=true`;
+            let href = `/web/content/${encodeURIComponent(attachment.id)}?unique=${encodeURIComponent(attachment.checksum)}&download=true`;
             if (!attachment.public) {
                 let accessToken = attachment.access_token;
                 if (!accessToken) {
@@ -59,7 +59,7 @@ export class DocumentSelector extends FileSelector {
                         [attachment.id],
                     );
                 }
-                href += `&access_token=${accessToken}`;
+                href += `&access_token=${encodeURIComponent(accessToken)}`;
             }
             linkEl.href = href;
             linkEl.title = attachment.name;

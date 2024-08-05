@@ -304,10 +304,14 @@ def drop_index(cr, indexname, tablename):
     _schema.debug("Table %r: dropped index %r", tablename, indexname)
 
 def drop_view_if_exists(cr, viewname):
-    cr.execute("DROP view IF EXISTS %s CASCADE" % (viewname,))
+    kind = table_kind(cr, viewname)
+    if kind == 'v':
+        cr.execute("DROP VIEW {} CASCADE".format(viewname))
+    elif kind == 'm':
+        cr.execute("DROP MATERIALIZED VIEW {} CASCADE".format(viewname))
 
 def escape_psql(to_escape):
-    return to_escape.replace('\\', r'\\').replace('%', '\%').replace('_', '\_')
+    return to_escape.replace('\\', r'\\').replace('%', r'\%').replace('_', r'\_')
 
 def pg_varchar(size=0):
     """ Returns the VARCHAR declaration for the provided size:
@@ -360,7 +364,7 @@ def increment_fields_skiplock(records, *fields):
     """).format(
         table=Identifier(records._table),
         sets=SQL(', ').join(map(
-            SQL('{0} = {0} + 1').format,
+            SQL('{0} = COALESCE({0}, 0) + 1').format,
             map(Identifier, fields)
         ))
     )

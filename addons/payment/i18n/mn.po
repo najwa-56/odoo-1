@@ -5,23 +5,23 @@
 # Translators:
 # Otgonbayar.A <gobi.mn@gmail.com>, 2022
 # hish, 2022
+# Batmunkh Ganbat <batmunkh.g@bumanit.mn>, 2022
 # Cheemee Bumtsend <cheemeesun@gmail.com>, 2022
 # Bayarkhuu Bataa, 2022
-# Batmunkh Ganbat <batmunkh.g@bumanit.mn>, 2022
-# Батмөнх Ганбат <batmunkh2522@gmail.com>, 2022
+# Batmunkh Ganbat <batmunkh2522@gmail.com>, 2022
 # Насан-Очир <nasaaskii@gmail.com>, 2022
-# Baskhuu Lodoikhuu <baskhuujacara@gmail.com>, 2022
-# tserendavaa tsogtoo <tseegii011929@gmail.com>, 2022
-# Martin Trigaux, 2022
+# tserendavaa tsogtoo <tseegii011929@gmail.com>, 2024
+# Martin Trigaux, 2024
+# Baskhuu Lodoikhuu <baskhuujacara@gmail.com>, 2024
 # 
 msgid ""
 msgstr ""
-"Project-Id-Version: Odoo Server 16.0+e\n"
+"Project-Id-Version: Odoo Server 16.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-12-15 12:51+0000\n"
+"POT-Creation-Date: 2024-02-06 13:32+0000\n"
 "PO-Revision-Date: 2022-09-22 05:53+0000\n"
-"Last-Translator: Martin Trigaux, 2022\n"
-"Language-Team: Mongolian (https://www.transifex.com/odoo/teams/41243/mn/)\n"
+"Last-Translator: Baskhuu Lodoikhuu <baskhuujacara@gmail.com>, 2024\n"
+"Language-Team: Mongolian (https://app.transifex.com/odoo/teams/41243/mn/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: \n"
@@ -72,17 +72,17 @@ msgstr "<i class=\"fa fa-trash\"/>Устгах"
 #. module: payment
 #: model_terms:ir.ui.view,arch_db:payment.view_partners_form_payment_defaultcreditcard
 msgid "<span class=\"o_stat_text\">Saved Payment Methods</span>"
-msgstr ""
+msgstr "<span class=\"o_stat_text\">Хадгалагдсан төлбөрийн аргууд</span>"
 
 #. module: payment
 #: model_terms:ir.ui.view,arch_db:payment.payment_provider_form
 msgid "<span class=\"text-danger\">Unpublished</span>"
-msgstr ""
+msgstr "<span class=\"text-danger\">Нийтлэгдээгүй</span>"
 
 #. module: payment
 #: model_terms:ir.ui.view,arch_db:payment.payment_provider_form
 msgid "<span class=\"text-success\">Published</span>"
-msgstr ""
+msgstr "<span class=\"text-success\">Нийтэлсэн</span>"
 
 #. module: payment
 #: model_terms:ir.ui.view,arch_db:payment.payment_provider_onboarding_wizard_form
@@ -90,16 +90,7 @@ msgid ""
 "<span><i class=\"fa fa-arrow-right\"/> How to configure your PayPal "
 "account</span>"
 msgstr ""
-
-#. module: payment
-#: model_terms:ir.ui.view,arch_db:payment.payment_provider_onboarding_wizard_form
-msgid ""
-"<span>Start selling directly without an account; an email will be sent by "
-"Paypal to create your new account and collect your payments.</span>"
-msgstr ""
-"<span>Данс холболгүйгээр бараагаа борлуулж эхлэх боломжтой ба улмаар таны "
-"имэйл-рүү шинэ Paypal данс үүсгэж төлбөрөө цуглуулж авах заавар илгээгдэх "
-"болно.</span>"
+"<span><i class=\"fa fa-arrow-right\"/> Хэрхэн PayPal дансаа холбох вэ</span>"
 
 #. module: payment
 #: model_terms:ir.ui.view,arch_db:payment.pay
@@ -107,11 +98,13 @@ msgid ""
 "<strong>No suitable payment option could be found.</strong><br/>\n"
 "                                If you believe that it is an error, please contact the website administrator."
 msgstr ""
+"<strong>Ямар нэг боломжит төлбөрийн сонголт олдсонгүй.</strong><br/>\n"
+"                                Хэрэв та үүнийг алдаа гэж үзэж байвал манай вебсайт админ-тай холбоо барина уу."
 
 #. module: payment
 #: model_terms:ir.ui.view,arch_db:payment.payment_methods
 msgid "<strong>No suitable payment provider could be found.</strong>"
-msgstr ""
+msgstr "<strong>Ямар нэг төлбөр дамжуулагч үйлчилгээ олдсонгүй.</strong>"
 
 #. module: payment
 #: model_terms:ir.ui.view,arch_db:payment.payment_provider_form
@@ -131,11 +124,13 @@ msgstr ""
 #: model_terms:ir.ui.view,arch_db:payment.pay
 msgid "<strong>Warning</strong> The currency is missing or incorrect."
 msgstr ""
+"<strong>Анхаар</strong> Валютын төрөл тодорхойлогдоогүй эсвэл буруу байна."
 
 #. module: payment
 #: model_terms:ir.ui.view,arch_db:payment.pay
 msgid "<strong>Warning</strong> You must be logged in to pay."
 msgstr ""
+"<strong>Анхаар</strong> Та төлбөр төлөхийн тулд нэвтэрсэн байх шаардлагатай."
 
 #. module: payment
 #. odoo-python
@@ -220,23 +215,23 @@ msgstr "Adyen"
 #. module: payment
 #: model:ir.model.fields,field_description:payment.field_payment_provider__allow_express_checkout
 msgid "Allow Express Checkout"
-msgstr ""
+msgstr "Шууд төлөхийг зөвшөөрөх"
 
 #. module: payment
 #: model:ir.model.fields,field_description:payment.field_payment_link_wizard__payment_provider_selection
 msgid "Allow Payment Provider"
-msgstr ""
+msgstr "Төлбөр дамжуулагч үйлчилгээг зөвшөөрөх"
 
 #. module: payment
 #: model:ir.model.fields,field_description:payment.field_payment_provider__allow_tokenization
 msgid "Allow Saving Payment Methods"
-msgstr ""
+msgstr "Төлбөрийн аргыг хадгалахыг зөвшөөрөх"
 
 #. module: payment
 #: model:payment.provider,display_as:payment.payment_provider_aps
 #: model:payment.provider,name:payment.payment_provider_aps
 msgid "Amazon Payment Services"
-msgstr ""
+msgstr "Amazon төлбөр дамжуулагч"
 
 #. module: payment
 #: model:ir.model.fields,field_description:payment.field_payment_link_wizard__amount
@@ -255,7 +250,7 @@ msgstr "Дээд дүн"
 #: code:addons/payment/static/src/xml/payment_post_processing.xml:0
 #, python-format
 msgid "An error occurred during the processing of this payment."
-msgstr ""
+msgstr "Уг төлбөрийг гүйцэтгэх явцад алдаа гарлаа."
 
 #. module: payment
 #: model_terms:ir.ui.view,arch_db:payment.transaction_status
@@ -383,8 +378,8 @@ msgstr ""
 #. odoo-javascript
 #: code:addons/payment/static/src/xml/payment_post_processing.xml:0
 #, python-format
-msgid "Cancelled payments"
-msgstr "Төлбөрийг цуцаллаа"
+msgid "Canceled operations"
+msgstr "Гүйлгээ цуцлагдсан"
 
 #. module: payment
 #: model:ir.model.fields,field_description:payment.field_payment_provider__capture_manually
@@ -422,6 +417,8 @@ msgstr "Хот"
 
 #. module: payment
 #. odoo-javascript
+#: code:addons/payment/static/src/xml/payment_post_processing.xml:0
+#: code:addons/payment/static/src/xml/payment_post_processing.xml:0
 #: code:addons/payment/static/src/xml/payment_post_processing.xml:0
 #, python-format
 msgid "Click here to be redirected to the confirmation page."
@@ -567,6 +564,7 @@ msgstr ""
 
 #. module: payment
 #: model:ir.model.fields.selection,name:payment.selection__payment_provider_onboarding_wizard__payment_method__stripe
+#: model:ir.model.fields.selection,name:payment.selection__sale_payment_provider_onboarding_wizard__payment_method__stripe
 msgid "Credit & Debit card (via Stripe)"
 msgstr ""
 
@@ -609,6 +607,7 @@ msgstr "Валют"
 
 #. module: payment
 #: model:ir.model.fields.selection,name:payment.selection__payment_provider_onboarding_wizard__payment_method__manual
+#: model:ir.model.fields.selection,name:payment.selection__sale_payment_provider_onboarding_wizard__payment_method__manual
 msgid "Custom payment instructions"
 msgstr "Өөрийн төлбөрийн заавар"
 
@@ -703,7 +702,7 @@ msgstr "Алдаа"
 #: code:addons/payment/static/src/js/payment_form_mixin.js:0
 #, python-format
 msgid "Error: %s"
-msgstr ""
+msgstr "Алдаа: %s"
 
 #. module: payment
 #: model:ir.model.fields,field_description:payment.field_payment_provider__express_checkout_form_view_id
@@ -714,6 +713,13 @@ msgstr ""
 #: model:ir.model.fields,field_description:payment.field_payment_provider__support_express_checkout
 msgid "Express Checkout Supported"
 msgstr ""
+
+#. module: payment
+#. odoo-javascript
+#: code:addons/payment/static/src/xml/payment_post_processing.xml:0
+#, python-format
+msgid "Failed operations"
+msgstr "Гүйлгээ амжилтгүй"
 
 #. module: payment
 #: model:ir.model.fields,field_description:payment.field_payment_transaction__fees
@@ -791,11 +797,13 @@ msgstr "Тусламжийн Зурвас"
 
 #. module: payment
 #: model:ir.model.fields.selection,name:payment.selection__payment_provider_onboarding_wizard__paypal_user_type__new_user
+#: model:ir.model.fields.selection,name:payment.selection__sale_payment_provider_onboarding_wizard__paypal_user_type__new_user
 msgid "I don't have a Paypal account"
 msgstr "Надад Paypal данс байхгүй"
 
 #. module: payment
 #: model:ir.model.fields.selection,name:payment.selection__payment_provider_onboarding_wizard__paypal_user_type__existing_user
+#: model:ir.model.fields.selection,name:payment.selection__sale_payment_provider_onboarding_wizard__paypal_user_type__existing_user
 msgid "I have a Paypal account"
 msgstr "Надад Paypal данс бий"
 
@@ -880,7 +888,7 @@ msgstr "Суулгасан"
 #: code:addons/payment/static/src/xml/payment_post_processing.xml:0
 #, python-format
 msgid "Internal server error"
-msgstr "Дотоод серверийн алдаа"
+msgstr "Системийн дотоод алдаа"
 
 #. module: payment
 #: model:ir.model.fields,field_description:payment.field_payment_transaction__is_post_processed
@@ -1124,6 +1132,13 @@ msgid "Operation"
 msgstr "Ажилбар"
 
 #. module: payment
+#. odoo-javascript
+#: code:addons/payment/static/src/xml/payment_post_processing.xml:0
+#, python-format
+msgid "Operations in progress"
+msgstr "Гүйлгээ хийгдэж байна"
+
+#. module: payment
 #: model:ir.model.fields.selection,name:payment.selection__res_company__payment_onboarding_payment_method__other
 msgid "Other"
 msgstr "Бусад"
@@ -1159,6 +1174,7 @@ msgstr "Төлөх"
 #. module: payment
 #: model:ir.model.fields.selection,name:payment.selection__payment_provider_onboarding_wizard__payment_method__paypal
 #: model:ir.model.fields.selection,name:payment.selection__res_company__payment_onboarding_payment_method__paypal
+#: model:ir.model.fields.selection,name:payment.selection__sale_payment_provider_onboarding_wizard__payment_method__paypal
 #: model:payment.provider,name:payment.payment_provider_paypal
 msgid "PayPal"
 msgstr "PayPal"
@@ -1207,13 +1223,13 @@ msgstr "Төлбөрийн арга"
 #. module: payment
 #: model:ir.model,name:payment.model_payment_provider
 msgid "Payment Provider"
-msgstr ""
+msgstr "Төлбөр дамжуулагч"
 
 #. module: payment
 #: model:ir.actions.act_window,name:payment.action_payment_provider
 #: model_terms:ir.ui.view,arch_db:payment.payment_provider_list
 msgid "Payment Providers"
-msgstr ""
+msgstr "Төлбөр дамжуулагч"
 
 #. module: payment
 #: model:ir.model.fields,field_description:payment.field_payment_link_wizard__available_provider_ids
@@ -1288,20 +1304,6 @@ msgid "Payments"
 msgstr "Төлбөрүүд"
 
 #. module: payment
-#. odoo-javascript
-#: code:addons/payment/static/src/xml/payment_post_processing.xml:0
-#, python-format
-msgid "Payments failed"
-msgstr "Төлбөр амжилтгүй болсон"
-
-#. module: payment
-#. odoo-javascript
-#: code:addons/payment/static/src/xml/payment_post_processing.xml:0
-#, python-format
-msgid "Payments received"
-msgstr "Төлбөр хүлээн авсан"
-
-#. module: payment
 #: model:ir.model.fields,field_description:payment.field_payment_provider_onboarding_wizard__paypal_user_type
 msgid "Paypal User Type"
 msgstr "Paypal хэрэглэгчийн төрөл"
@@ -1326,14 +1328,14 @@ msgstr "Утас"
 #: code:addons/payment/static/src/js/payment_form_mixin.js:0
 #, python-format
 msgid "Please select a payment option."
-msgstr ""
+msgstr "Төлбөрийн хэлбэр сонгоно уу."
 
 #. module: payment
 #. odoo-javascript
 #: code:addons/payment/static/src/js/payment_form_mixin.js:0
 #, python-format
 msgid "Please select only one payment option."
-msgstr ""
+msgstr "Зөвхөн нэг төлбөрийн хэлбэр сонгоно уу."
 
 #. module: payment
 #. odoo-python
@@ -1412,7 +1414,7 @@ msgstr "Шалтгаан:"
 #: code:addons/payment/models/payment_transaction.py:0
 #, python-format
 msgid "Reason: %s"
-msgstr ""
+msgstr "Шалтгаан: %s"
 
 #. module: payment
 #: model:ir.model.fields,field_description:payment.field_payment_provider__redirect_form_view_id
@@ -1466,12 +1468,19 @@ msgstr "SEPA төлбөр хүлээн авах"
 #. module: payment
 #: model_terms:ir.ui.view,arch_db:payment.manage
 msgid "Save Payment Method"
-msgstr ""
+msgstr "Төлбөрийн аргыг хадгалах"
 
 #. module: payment
 #: model_terms:ir.ui.view,arch_db:payment.checkout
 msgid "Save my payment details"
-msgstr ""
+msgstr "Миний төлбөрийн мэдээллийг хадгал"
+
+#. module: payment
+#. odoo-javascript
+#: code:addons/payment/static/src/xml/payment_post_processing.xml:0
+#, python-format
+msgid "Saving your payment method, please wait..."
+msgstr "Таны төлбөрийн аргыг хадгалж байна, түр хүлээнэ үү..."
 
 #. module: payment
 #: model_terms:ir.ui.view,arch_db:payment.payment_provider_form
@@ -1539,7 +1548,7 @@ msgstr ""
 #. module: payment
 #: model:ir.model.fields,field_description:payment.field_payment_provider__show_payment_icon_ids
 msgid "Show Payment Icon"
-msgstr ""
+msgstr "Төлбөрийн дүрс харуулах"
 
 #. module: payment
 #: model:ir.model.fields,field_description:payment.field_payment_provider__show_pending_msg
@@ -1797,7 +1806,7 @@ msgstr ""
 #. module: payment
 #: model_terms:ir.ui.view,arch_db:payment.pay
 msgid "There is nothing to pay."
-msgstr ""
+msgstr "Төлбөр хийх дүн алга."
 
 #. module: payment
 #. odoo-python
@@ -1839,21 +1848,21 @@ msgid ""
 msgstr ""
 
 #. module: payment
+#. odoo-javascript
+#: code:addons/payment/static/src/xml/payment_post_processing.xml:0
+#, python-format
+msgid "This payment has been canceled."
+msgstr "Энэ төлбөр цуцлагдсан."
+
+#. module: payment
 #: model_terms:ir.ui.view,arch_db:payment.verified_token_checkmark
 msgid "This payment method has been verified by our system."
-msgstr ""
+msgstr "Уг төлбөрийн арга нь манай системээр баталгаажсан."
 
 #. module: payment
 #: model_terms:ir.ui.view,arch_db:payment.verified_token_checkmark
 msgid "This payment method has not been verified by our system."
-msgstr ""
-
-#. module: payment
-#. odoo-javascript
-#: code:addons/payment/static/src/xml/payment_post_processing.xml:0
-#, python-format
-msgid "This transaction has been cancelled."
-msgstr "Энэ гүйлгээг цуцаллаа."
+msgstr "Уг төлбөрийн арга нь манай системээр баталгаажаагүй."
 
 #. module: payment
 #: model:ir.model.fields,field_description:payment.field_payment_provider__token_inline_form_view_id
@@ -1902,7 +1911,7 @@ msgstr "Хувилбар Ахиулах"
 #. module: payment
 #: model:ir.model.fields.selection,name:payment.selection__payment_transaction__operation__validation
 msgid "Validation of the payment method"
-msgstr ""
+msgstr "Төлбөрийн аргыг баталгаажилт"
 
 #. module: payment
 #: model:ir.model.fields,field_description:payment.field_payment_provider__fees_dom_var
@@ -1935,8 +1944,8 @@ msgstr "Гүйлгээ буцаалт"
 #. odoo-javascript
 #: code:addons/payment/static/src/xml/payment_post_processing.xml:0
 #, python-format
-msgid "Waiting for payment"
-msgstr "Төлбөр хүлээж байна"
+msgid "Waiting for operations to process"
+msgstr "Төлбөрийн гүйлгээ баталгаажилтыг хүлээж байна"
 
 #. module: payment
 #. odoo-python
@@ -1958,7 +1967,7 @@ msgstr "Анхааруулга!"
 #: code:addons/payment/static/src/js/manage_form.js:0
 #, python-format
 msgid "We are not able to delete your payment method."
-msgstr ""
+msgstr "Бид таны төлбөрийн аргыг утгах боломжгүй байна."
 
 #. module: payment
 #. odoo-javascript
@@ -1993,7 +2002,7 @@ msgstr "Таны төлбөрийг боловсруулж байна, хүлэ�
 #: code:addons/payment/static/src/xml/payment_post_processing.xml:0
 #, python-format
 msgid "We are waiting for the payment provider to confirm the payment."
-msgstr ""
+msgstr "Бид төлбөр дамжуулагч талаас уг төлбөрийг батлахыг хүлээж байна."
 
 #. module: payment
 #: model:ir.model.fields,help:payment.field_payment_transaction__tokenize
@@ -2020,11 +2029,13 @@ msgid "Wire Transfer"
 msgstr "Дансны шилжүүлгэ"
 
 #. module: payment
-#. odoo-javascript
-#: code:addons/payment/static/src/xml/payment_post_processing.xml:0
+#. odoo-python
+#: code:addons/payment/models/payment_provider.py:0
 #, python-format
-msgid "You can click here to be redirected to the confirmation page."
-msgstr "Баталгаажуулах хуудас руу шилжихийн тулд та энд дарна уу."
+msgid ""
+"You cannot delete the payment provider %s; disable it or uninstall it "
+"instead."
+msgstr ""
 
 #. module: payment
 #. odoo-python
@@ -2061,20 +2072,6 @@ msgstr "Төлбөр баталгаажсан тохиолдолд танд мэ
 #, python-format
 msgid "You will be notified when the payment is fully confirmed."
 msgstr "Төлбөр бүрэн баталгаажсан тохиолдолд танд мэдэгдэх болно."
-
-#. module: payment
-#. odoo-javascript
-#: code:addons/payment/static/src/xml/payment_post_processing.xml:0
-#, python-format
-msgid "Your order has been processed."
-msgstr "Таны захиалгыг боловсруулж байна."
-
-#. module: payment
-#. odoo-javascript
-#: code:addons/payment/static/src/xml/payment_post_processing.xml:0
-#, python-format
-msgid "Your order is being processed, please wait ..."
-msgstr "Таны захиалгыг боловсруулж байна, түр хүлээнэ үү ..."
 
 #. module: payment
 #. odoo-python
@@ -2119,6 +2116,13 @@ msgstr "Таны захиалгыг зөвшөөрсөн."
 #, python-format
 msgid "Your payment has been cancelled."
 msgstr "Таны төлбөр цуцлагдлаа."
+
+#. module: payment
+#. odoo-javascript
+#: code:addons/payment/static/src/xml/payment_post_processing.xml:0
+#, python-format
+msgid "Your payment has been processed."
+msgstr "Таны төлбөр баталгаажсан."
 
 #. module: payment
 #. odoo-javascript
@@ -2170,12 +2174,19 @@ msgstr "Таны төлбөр амжилттай хийгдсэн бөгөөд �
 #: model_terms:payment.provider,done_msg:payment.payment_provider_transfer
 #, python-format
 msgid "Your payment has been successfully processed. Thank you!"
-msgstr ""
+msgstr "Таны төлбөр амжилттай баталгаажлаа. Танд баярлалаа!"
 
 #. module: payment
 #: model_terms:ir.ui.view,arch_db:payment.transaction_status
 msgid "Your payment has not been processed yet."
-msgstr ""
+msgstr "Таны төлбөр хараахан баталгаажаагүй байна."
+
+#. module: payment
+#. odoo-javascript
+#: code:addons/payment/static/src/xml/payment_post_processing.xml:0
+#, python-format
+msgid "Your payment is being processed, please wait..."
+msgstr "Таны төлбөрийг баталгаажуулж байна, түр хүлээнэ үү..."
 
 #. module: payment
 #. odoo-javascript
@@ -2183,6 +2194,13 @@ msgstr ""
 #, python-format
 msgid "Your payment is in pending state."
 msgstr "Таны төлбөр хүлээгдэж байна."
+
+#. module: payment
+#. odoo-javascript
+#: code:addons/payment/static/src/xml/payment_post_processing.xml:0
+#, python-format
+msgid "Your payment method has been saved."
+msgstr "Таны төлбөрийн арга хадгалагдлаа."
 
 #. module: payment
 #: model_terms:ir.ui.view,arch_db:payment.payment_transaction_form
@@ -2234,12 +2252,4 @@ msgstr ""
 #. module: payment
 #: model_terms:ir.ui.view,arch_db:payment.transaction_status
 msgid "warning"
-msgstr ""
-
-#. module: payment
-#: code:addons/payment/models/account_journal.py:0
-#, python-format
-msgid ""
-"You must first deactivate a payment provider before deleting its journal.\n"
-"Linked providers: %s"
 msgstr ""

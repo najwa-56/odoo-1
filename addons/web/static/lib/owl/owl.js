@@ -86,65 +86,6 @@
     // Custom error class that wraps error that happen in the owl lifecycle
     class OwlError extends Error {
     }
-    // Maps fibers to thrown errors
-    const fibersInError = new WeakMap();
-    const nodeErrorHandlers = new WeakMap();
-    function _handleError(node, error) {
-        if (!node) {
-            return false;
-        }
-        const fiber = node.fiber;
-        if (fiber) {
-            fibersInError.set(fiber, error);
-        }
-        const errorHandlers = nodeErrorHandlers.get(node);
-        if (errorHandlers) {
-            let handled = false;
-            // execute in the opposite order
-            for (let i = errorHandlers.length - 1; i >= 0; i--) {
-                try {
-                    errorHandlers[i](error);
-                    handled = true;
-                    break;
-                }
-                catch (e) {
-                    error = e;
-                }
-            }
-            if (handled) {
-                return true;
-            }
-        }
-        return _handleError(node.parent, error);
-    }
-    function handleError(params) {
-        let { error } = params;
-        // Wrap error if it wasn't wrapped by wrapError (ie when not in dev mode)
-        if (!(error instanceof OwlError)) {
-            error = Object.assign(new OwlError(`An error occured in the owl lifecycle (see this Error's "cause" property)`), { cause: error });
-        }
-        const node = "node" in params ? params.node : params.fiber.node;
-        const fiber = "fiber" in params ? params.fiber : node.fiber;
-        // resets the fibers on components if possible. This is important so that
-        // new renderings can be properly included in the initial one, if any.
-        let current = fiber;
-        do {
-            current.node.fiber = current;
-            current = current.parent;
-        } while (current);
-        fibersInError.set(fiber.root, error);
-        const handled = _handleError(node, error);
-        if (!handled) {
-            console.warn(`[Owl] Unhandled error. Destroying the root component`);
-            try {
-                node.app.destroy();
-            }
-            catch (e) {
-                console.error(e);
-            }
-            throw error;
-        }
-    }
 
     const { setAttribute: elemSetAttribute, removeAttribute } = Element.prototype;
     const tokenList = DOMTokenList.prototype;
@@ -178,11 +119,21 @@
     }
     function attrsSetter(attrs) {
         if (isArray(attrs)) {
-            setAttribute.call(this, attrs[0], attrs[1]);
+            if (attrs[0] === "class") {
+                setClass.call(this, attrs[1]);
+            }
+            else {
+                setAttribute.call(this, attrs[0], attrs[1]);
+            }
         }
         else {
             for (let k in attrs) {
-                setAttribute.call(this, k, attrs[k]);
+                if (k === "class") {
+                    setClass.call(this, attrs[k]);
+                }
+                else {
+                    setAttribute.call(this, k, attrs[k]);
+                }
             }
         }
     }
@@ -194,7 +145,12 @@
                 if (val === oldAttrs[1]) {
                     return;
                 }
-                setAttribute.call(this, name, val);
+                if (name === "class") {
+                    updateClass.call(this, val, oldAttrs[1]);
+                }
+                else {
+                    setAttribute.call(this, name, val);
+                }
             }
             else {
                 removeAttribute.call(this, oldAttrs[0]);
@@ -204,13 +160,23 @@
         else {
             for (let k in oldAttrs) {
                 if (!(k in attrs)) {
-                    removeAttribute.call(this, k);
+                    if (k === "class") {
+                        updateClass.call(this, "", oldAttrs[k]);
+                    }
+                    else {
+                        removeAttribute.call(this, k);
+                    }
                 }
             }
             for (let k in attrs) {
                 const val = attrs[k];
                 if (val !== oldAttrs[k]) {
-                    setAttribute.call(this, k, val);
+                    if (k === "class") {
+                        updateClass.call(this, val, oldAttrs[k]);
+                    }
+                    else {
+                        setAttribute.call(this, k, val);
+                    }
                 }
             }
         }
@@ -281,6 +247,89 @@
         }
     }
 
+    /**
+     * Creates a batched version of a callback so that all calls to it in the same
+     * microtick will only call the original callback once.
+     *
+     * @param callback the callback to batch
+     * @returns a batched version of the original callback
+     */
+    function batched(callback) {
+        let scheduled = false;
+        return async (...args) => {
+            if (!scheduled) {
+                scheduled = true;
+                await Promise.resolve();
+                scheduled = false;
+                callback(...args);
+            }
+        };
+    }
+    /**
+     * Determine whether the given element is contained in its ownerDocument:
+     * either directly or with a shadow root in between.
+     */
+    function inOwnerDocument(el) {
+        if (!el) {
+            return false;
+        }
+        if (el.ownerDocument.contains(el)) {
+            return true;
+        }
+        const rootNode = el.getRootNode();
+        return rootNode instanceof ShadowRoot && el.ownerDocument.contains(rootNode.host);
+    }
+    function validateTarget(target) {
+        // Get the document and HTMLElement corresponding to the target to allow mounting in iframes
+        const document = target && target.ownerDocument;
+        if (document) {
+            const HTMLElement = document.defaultView.HTMLElement;
+            if (target instanceof HTMLElement || target instanceof ShadowRoot) {
+                if (!document.body.contains(target instanceof HTMLElement ? target : target.host)) {
+                    throw new OwlError("Cannot mount a component on a detached dom node");
+                }
+                return;
+            }
+        }
+        throw new OwlError("Cannot mount component: the target is not a valid DOM element");
+    }
+    class EventBus extends EventTarget {
+        trigger(name, payload) {
+            this.dispatchEvent(new CustomEvent(name, { detail: payload }));
+        }
+    }
+    function whenReady(fn) {
+        return new Promise(function (resolve) {
+            if (document.readyState !== "loading") {
+                resolve(true);
+            }
+            else {
+                document.addEventListener("DOMContentLoaded", resolve, false);
+            }
+        }).then(fn || function () { });
+    }
+    async function loadFile(url) {
+        const result = await fetch(url);
+        if (!result.ok) {
+            throw new OwlError("Error while fetching xml templates");
+        }
+        return await result.text();
+    }
+    /*
+     * This class just transports the fact that a string is safe
+     * to be injected as HTML. Overriding a JS primitive is quite painful though
+     * so we need to redfine toString and valueOf.
+     */
+    class Markup extends String {
+    }
+    /*
+     * Marks a value as safe, that is, a value that can be injected as HTML directly.
+     * It should be used to wrap the value passed to a t-out directive to allow a raw rendering.
+     */
+    function markup(value) {
+        return new Markup(value);
+    }
+
     function createEventHandler(rawEvent) {
         const eventName = rawEvent.split(".")[0];
         const capture = rawEvent.includes(".capture");
@@ -300,7 +349,7 @@
         }
         function listener(ev) {
             const currentTarget = ev.currentTarget;
-            if (!currentTarget || !currentTarget.ownerDocument.contains(currentTarget))
+            if (!currentTarget || !inOwnerDocument(currentTarget))
                 return;
             const data = currentTarget[eventKey];
             if (!data)
@@ -664,12 +713,7 @@
                     info.push({ type: "child", idx: index });
                     el = document.createTextNode("");
                 }
-                const attrs = node.attributes;
-                const ns = attrs.getNamedItem("block-ns");
-                if (ns) {
-                    attrs.removeNamedItem("block-ns");
-                    currentNS = ns.value;
-                }
+                currentNS || (currentNS = node.namespaceURI);
                 if (!el) {
                     el = currentNS
                         ? document.createElementNS(currentNS, tagName)
@@ -685,6 +729,7 @@
                         const fragment = document.createElement("template").content;
                         fragment.appendChild(el);
                     }
+                    const attrs = node.attributes;
                     for (let i = 0; i < attrs.length; i++) {
                         const attrName = attrs[i].name;
                         const attrValue = attrs[i].value;
@@ -1496,6 +1541,68 @@
         vnode.remove();
     }
 
+    // Maps fibers to thrown errors
+    const fibersInError = new WeakMap();
+    const nodeErrorHandlers = new WeakMap();
+    function _handleError(node, error) {
+        if (!node) {
+            return false;
+        }
+        const fiber = node.fiber;
+        if (fiber) {
+            fibersInError.set(fiber, error);
+        }
+        const errorHandlers = nodeErrorHandlers.get(node);
+        if (errorHandlers) {
+            let handled = false;
+            // execute in the opposite order
+            for (let i = errorHandlers.length - 1; i >= 0; i--) {
+                try {
+                    errorHandlers[i](error);
+                    handled = true;
+                    break;
+                }
+                catch (e) {
+                    error = e;
+                }
+            }
+            if (handled) {
+                return true;
+            }
+        }
+        return _handleError(node.parent, error);
+    }
+    function handleError(params) {
+        let { error } = params;
+        // Wrap error if it wasn't wrapped by wrapError (ie when not in dev mode)
+        if (!(error instanceof OwlError)) {
+            error = Object.assign(new OwlError(`An error occured in the owl lifecycle (see this Error's "cause" property)`), { cause: error });
+        }
+        const node = "node" in params ? params.node : params.fiber.node;
+        const fiber = "fiber" in params ? params.fiber : node.fiber;
+        if (fiber) {
+            // resets the fibers on components if possible. This is important so that
+            // new renderings can be properly included in the initial one, if any.
+            let current = fiber;
+            do {
+                current.node.fiber = current;
+                current = current.parent;
+            } while (current);
+            fibersInError.set(fiber.root, error);
+        }
+        const handled = _handleError(node, error);
+        if (!handled) {
+            console.warn(`[Owl] Unhandled error. Destroying the root component`);
+            try {
+                node.app.destroy();
+            }
+            catch (e) {
+                console.error(e);
+            }
+            throw error;
+        }
+    }
+
     function makeChildFiber(node, parent) {
         let current = node.fiber;
         if (current) {
@@ -1545,8 +1652,7 @@
             let node = fiber.node;
             fiber.render = throwOnRender;
             if (node.status === 0 /* NEW */) {
-                node.destroy();
-                delete node.parent.children[node.parentKey];
+                node.cancel();
             }
             node.fiber = null;
             if (fiber.bdom) {
@@ -1747,8 +1853,9 @@
     };
     const objectToString = Object.prototype.toString;
     const objectHasOwnProperty = Object.prototype.hasOwnProperty;
-    const SUPPORTED_RAW_TYPES = new Set(["Object", "Array", "Set", "Map", "WeakMap"]);
-    const COLLECTION_RAWTYPES = new Set(["Set", "Map", "WeakMap"]);
+    // Use arrays because Array.includes is faster than Set.has for small arrays
+    const SUPPORTED_RAW_TYPES = ["Object", "Array", "Set", "Map", "WeakMap"];
+    const COLLECTION_RAW_TYPES = ["Set", "Map", "WeakMap"];
     /**
      * extract "RawType" from strings like "[object RawType]" => this lets us ignore
      * many native objects such as Promise (whose toString is [object Promise])
@@ -1771,7 +1878,7 @@
         if (typeof value !== "object") {
             return false;
         }
-        return SUPPORTED_RAW_TYPES.has(rawType(value));
+        return SUPPORTED_RAW_TYPES.includes(rawType(value));
     }
     /**
      * Creates a reactive from the given object/callback if possible and returns it,
@@ -1941,7 +2048,7 @@
         const reactivesForTarget = reactiveCache.get(target);
         if (!reactivesForTarget.has(callback)) {
             const targetRawType = rawType(target);
-            const handler = COLLECTION_RAWTYPES.has(targetRawType)
+            const handler = COLLECTION_RAW_TYPES.includes(targetRawType)
                 ? collectionsProxyHandler(target, callback, targetRawType)
                 : basicProxyHandler(callback);
             const proxy = new Proxy(target, handler);
@@ -1970,7 +2077,7 @@
             set(target, key, value, receiver) {
                 const hadKey = objectHasOwnProperty.call(target, key);
                 const originalValue = Reflect.get(target, key, receiver);
-                const ret = Reflect.set(target, key, value, receiver);
+                const ret = Reflect.set(target, key, toRaw(value), receiver);
                 if (!hadKey && objectHasOwnProperty.call(target, key)) {
                     notifyReactives(target, KEYCHANGES);
                 }
@@ -2074,7 +2181,7 @@
             if (hadKey !== hasKey) {
                 notifyReactives(target, KEYCHANGES);
             }
-            if (originalValue !== value) {
+            if (originalValue !== target[getterName](key)) {
                 notifyReactives(target, key);
             }
             return ret;
@@ -2165,82 +2272,6 @@
         });
     }
 
-    /**
-     * Creates a batched version of a callback so that all calls to it in the same
-     * microtick will only call the original callback once.
-     *
-     * @param callback the callback to batch
-     * @returns a batched version of the original callback
-     */
-    function batched(callback) {
-        let called = false;
-        return async () => {
-            // This await blocks all calls to the callback here, then releases them sequentially
-            // in the next microtick. This line decides the granularity of the batch.
-            await Promise.resolve();
-            if (!called) {
-                called = true;
-                // wait for all calls in this microtick to fall through before resetting "called"
-                // so that only the first call to the batched function calls the original callback.
-                // Schedule this before calling the callback so that calls to the batched function
-                // within the callback will proceed only after resetting called to false, and have
-                // a chance to execute the callback again
-                Promise.resolve().then(() => (called = false));
-                callback();
-            }
-        };
-    }
-    function validateTarget(target) {
-        // Get the document and HTMLElement corresponding to the target to allow mounting in iframes
-        const document = target && target.ownerDocument;
-        if (document) {
-            const HTMLElement = document.defaultView.HTMLElement;
-            if (target instanceof HTMLElement) {
-                if (!document.body.contains(target)) {
-                    throw new OwlError("Cannot mount a component on a detached dom node");
-                }
-                return;
-            }
-        }
-        throw new OwlError("Cannot mount component: the target is not a valid DOM element");
-    }
-    class EventBus extends EventTarget {
-        trigger(name, payload) {
-            this.dispatchEvent(new CustomEvent(name, { detail: payload }));
-        }
-    }
-    function whenReady(fn) {
-        return new Promise(function (resolve) {
-            if (document.readyState !== "loading") {
-                resolve(true);
-            }
-            else {
-                document.addEventListener("DOMContentLoaded", resolve, false);
-            }
-        }).then(fn || function () { });
-    }
-    async function loadFile(url) {
-        const result = await fetch(url);
-        if (!result.ok) {
-            throw new OwlError("Error while fetching xml templates");
-        }
-        return await result.text();
-    }
-    /*
-     * This class just transports the fact that a string is safe
-     * to be injected as HTML. Overriding a JS primitive is quite painful though
-     * so we need to redfine toString and valueOf.
-     */
-    class Markup extends String {
-    }
-    /*
-     * Marks a value as safe, that is, a value that can be injected as HTML directly.
-     * It should be used to wrap the value passed to a t-out directive to allow a raw rendering.
-     */
-    function markup(value) {
-        return new Markup(value);
-    }
-
     let currentNode = null;
     function getCurrent() {
         if (!currentNode) {
@@ -2292,6 +2323,7 @@
             this.bdom = null;
             this.status = 0 /* NEW */;
             this.forceNextRender = false;
+            this.nextProps = null;
             this.children = Object.create(null);
             this.refs = {};
             this.willStart = [];
@@ -2348,6 +2380,9 @@
             }
         }
         async render(deep) {
+            if (this.status >= 2 /* CANCELLED */) {
+                return;
+            }
             let current = this.fiber;
             if (current && (current.root.locked || current.bdom === true)) {
                 await Promise.resolve();
@@ -2373,7 +2408,7 @@
             this.fiber = fiber;
             this.app.scheduler.addFiber(fiber);
             await Promise.resolve();
-            if (this.status === 2 /* DESTROYED */) {
+            if (this.status >= 2 /* CANCELLED */) {
                 return;
             }
             // We only want to actually render the component if the following two
@@ -2389,6 +2424,18 @@
             //   in the next microtick anyway, so we should not render it again.
             if (this.fiber === fiber && (current || !fiber.parent)) {
                 fiber.render();
+            }
+        }
+        cancel() {
+            this._cancel();
+            delete this.parent.children[this.parentKey];
+            this.app.scheduler.scheduleDestroy(this);
+        }
+        _cancel() {
+            this.status = 2 /* CANCELLED */;
+            const children = this.children;
+            for (let childKey in children) {
+                children[childKey]._cancel();
             }
         }
         destroy() {
@@ -2418,10 +2465,10 @@
                     this.app.handleError({ error: e, node: this });
                 }
             }
-            this.status = 2 /* DESTROYED */;
+            this.status = 3 /* DESTROYED */;
         }
         async updateAndRender(props, parentFiber) {
-            const rawProps = props;
+            this.nextProps = props;
             props = Object.assign({}, props);
             // update
             const fiber = makeChildFiber(this, parentFiber);
@@ -2445,7 +2492,6 @@
                 return;
             }
             component.props = props;
-            this.props = rawProps;
             fiber.render();
             const parentRoot = parentFiber.root;
             if (this.willPatch.length) {
@@ -2520,6 +2566,7 @@
                 // by the component will be patched independently in the appropriate
                 // fiber.complete
                 this._patch();
+                this.props = this.nextProps;
             }
         }
         _patch() {
@@ -2578,7 +2625,7 @@
                             result.catch(() => { }),
                             new Promise((resolve) => setTimeout(() => resolve(TIMEOUT), 3000)),
                         ]).then((res) => {
-                            if (res === TIMEOUT && node.fiber === fiber) {
+                            if (res === TIMEOUT && node.fiber === fiber && node.status <= 2) {
                                 console.warn(timeoutError);
                             }
                         });
@@ -2870,14 +2917,27 @@
         if ("element" in descr) {
             result = validateArrayType(key, value, descr.element);
         }
-        else if ("shape" in descr && !result) {
+        else if ("shape" in descr) {
             if (typeof value !== "object" || Array.isArray(value)) {
                 result = `'${key}' is not an object`;
             }
             else {
                 const errors = validateSchema(value, descr.shape);
                 if (errors.length) {
-                    result = `'${key}' has not the correct shape (${errors.join(", ")})`;
+                    result = `'${key}' doesn't have the correct shape (${errors.join(", ")})`;
+                }
+            }
+        }
+        else if ("values" in descr) {
+            if (typeof value !== "object" || Array.isArray(value)) {
+                result = `'${key}' is not an object`;
+            }
+            else {
+                const errors = Object.entries(value)
+                    .map(([key, value]) => validateType(key, value, descr.values))
+                    .filter(Boolean);
+                if (errors.length) {
+                    result = `some of the values in '${key}' are invalid (${errors.join(", ")})`;
                 }
             }
         }
@@ -2938,12 +2998,20 @@
             keys = collection;
             values = collection;
         }
-        else if (collection) {
-            values = Object.keys(collection);
-            keys = Object.values(collection);
+        else if (collection instanceof Map) {
+            keys = [...collection.keys()];
+            values = [...collection.values()];
+        }
+        else if (Symbol.iterator in Object(collection)) {
+            keys = [...collection];
+            values = keys;
+        }
+        else if (collection && typeof collection === "object") {
+            values = Object.values(collection);
+            keys = Object.keys(collection);
         }
         else {
-            throw new OwlError("Invalid loop expression");
+            throw new OwlError(`Invalid loop expression: "${collection}" is not iterable`);
         }
         const n = values.length;
         return [keys, values, n, new Array(n)];
@@ -2992,7 +3060,7 @@
      * Safely outputs `value` as a block depending on the nature of `value`
      */
     function safeOutput(value, defaultValue) {
-        if (value === undefined) {
+        if (value === undefined || value === null) {
             return defaultValue ? toggler("default", defaultValue) : toggler("undefined", text(""));
         }
         let safeKey;
@@ -3095,8 +3163,14 @@
         makeRefWrapper,
     };
 
-    const bdom = { text, createBlock, list, multi, html, toggler, comment };
-    function parseXML$1(xml) {
+    /**
+     * Parses an XML string into an XML document, throwing errors on parser errors
+     * instead of returning an XML document containing the parseerror.
+     *
+     * @param xml the string to parse
+     * @returns an XML document corresponding to the content of the string
+     */
+    function parseXML(xml) {
         const parser = new DOMParser();
         const doc = parser.parseFromString(xml, "text/xml");
         if (doc.getElementsByTagName("parsererror").length) {
@@ -3124,6 +3198,8 @@
         }
         return doc;
     }
+
+    const bdom = { text, createBlock, list, multi, html, toggler, comment };
     class TemplateSet {
         constructor(config = {}) {
             this.rawTemplates = Object.create(globalTemplates);
@@ -3133,14 +3209,26 @@
             this.translateFn = config.translateFn;
             this.translatableAttributes = config.translatableAttributes;
             if (config.templates) {
-                this.addTemplates(config.templates);
+                if (config.templates instanceof Document || typeof config.templates === "string") {
+                    this.addTemplates(config.templates);
+                }
+                else {
+                    for (const name in config.templates) {
+                        this.addTemplate(name, config.templates[name]);
+                    }
+                }
             }
+            this.getRawTemplate = config.getTemplate;
         }
         static registerTemplate(name, fn) {
             globalTemplates[name] = fn;
         }
         addTemplate(name, template) {
             if (name in this.rawTemplates) {
+                // this check can be expensive, just silently ignore double definitions outside dev mode
+                if (!this.dev) {
+                    return;
+                }
                 const rawTemplate = this.rawTemplates[name];
                 const currentAsString = typeof rawTemplate === "string"
                     ? rawTemplate
@@ -3160,15 +3248,16 @@
                 // empty string
                 return;
             }
-            xml = xml instanceof Document ? xml : parseXML$1(xml);
+            xml = xml instanceof Document ? xml : parseXML(xml);
             for (const template of xml.querySelectorAll("[t-name]")) {
                 const name = template.getAttribute("t-name");
                 this.addTemplate(name, template);
             }
         }
         getTemplate(name) {
+            var _a;
             if (!(name in this.templates)) {
-                const rawTemplate = this.rawTemplates[name];
+                const rawTemplate = ((_a = this.getRawTemplate) === null || _a === void 0 ? void 0 : _a.call(this, name)) || this.rawTemplates[name];
                 if (rawTemplate === undefined) {
                     let extraInfo = "";
                     try {
@@ -3196,7 +3285,7 @@
         }
         callTemplate(owner, subTemplate, ctx, parent, key) {
             const template = this.getTemplate(subTemplate);
-            return toggler(subTemplate, template.call(owner, ctx, parent, key));
+            return toggler(subTemplate, template.call(owner, ctx, parent, key + subTemplate));
         }
     }
     // -----------------------------------------------------------------------------
@@ -3426,7 +3515,7 @@
         const localVars = new Set();
         const tokens = tokenize(expr);
         let i = 0;
-        let stack = []; // to track last opening [ or {
+        let stack = []; // to track last opening (, [ or {
         while (i < tokens.length) {
             let token = tokens[i];
             let prevToken = tokens[i - 1];
@@ -3435,10 +3524,12 @@
             switch (token.type) {
                 case "LEFT_BRACE":
                 case "LEFT_BRACKET":
+                case "LEFT_PAREN":
                     stack.push(token.type);
                     break;
                 case "RIGHT_BRACE":
                 case "RIGHT_BRACKET":
+                case "RIGHT_PAREN":
                     stack.pop();
             }
             let isVar = token.type === "SYMBOL" && !RESERVED_WORDS.includes(token.value);
@@ -3549,6 +3640,13 @@
                 return key === "disabled";
         }
         return false;
+    }
+    /**
+     * Returns a template literal that evaluates to str. You can add interpolation
+     * sigils into the string if required
+     */
+    function toStringExpression(str) {
+        return `\`${str.replace(/\\/g, "\\\\").replace(/`/g, "\\`").replace(/\$\{/, "\\${")}\``;
     }
     // -----------------------------------------------------------------------------
     // BlockDescription
@@ -3730,15 +3828,14 @@
                 mainCode.push(``);
                 for (let block of this.blocks) {
                     if (block.dom) {
-                        let xmlString = block.asXmlString();
-                        xmlString = xmlString.replace(/\\/g, "\\\\").replace(/`/g, "\\`");
+                        let xmlString = toStringExpression(block.asXmlString());
                         if (block.dynamicTagName) {
-                            xmlString = xmlString.replace(/^<\w+/, `<\${tag || '${block.dom.nodeName}'}`);
-                            xmlString = xmlString.replace(/\w+>$/, `\${tag || '${block.dom.nodeName}'}>`);
-                            mainCode.push(`let ${block.blockName} = tag => createBlock(\`${xmlString}\`);`);
+                            xmlString = xmlString.replace(/^`<\w+/, `\`<\${tag || '${block.dom.nodeName}'}`);
+                            xmlString = xmlString.replace(/\w+>`$/, `\${tag || '${block.dom.nodeName}'}>\``);
+                            mainCode.push(`let ${block.blockName} = tag => createBlock(${xmlString});`);
                         }
                         else {
-                            mainCode.push(`let ${block.blockName} = createBlock(\`${xmlString}\`);`);
+                            mainCode.push(`let ${block.blockName} = createBlock(${xmlString});`);
                         }
                     }
                 }
@@ -3784,7 +3881,7 @@
         createBlock(parentBlock, type, ctx) {
             const hasRoot = this.target.hasRoot;
             const block = new BlockDescription(this.target, type);
-            if (!hasRoot && !ctx.preventRoot) {
+            if (!hasRoot) {
                 this.target.hasRoot = true;
                 block.isRoot = true;
             }
@@ -3807,7 +3904,7 @@
             if (ctx.tKeyExpr) {
                 blockExpr = `toggler(${ctx.tKeyExpr}, ${blockExpr})`;
             }
-            if (block.isRoot && !ctx.preventRoot) {
+            if (block.isRoot) {
                 if (this.target.on) {
                     blockExpr = this.wrapWithEventCatcher(blockExpr, this.target.on);
                 }
@@ -3849,6 +3946,10 @@
                 return tok.value;
             })
                 .join("");
+        }
+        translate(str) {
+            const match = translationRE.exec(str);
+            return match[1] + this.translateFn(match[2]) + match[3];
         }
         /**
          * @returns the newly created block name, if any
@@ -3912,7 +4013,7 @@
             const isNewBlock = !block || forceNewBlock;
             if (isNewBlock) {
                 block = this.createBlock(block, "comment", ctx);
-                this.insertBlock(`comment(\`${ast.value}\`)`, block, {
+                this.insertBlock(`comment(${toStringExpression(ast.value)})`, block, {
                     ...ctx,
                     forceNewBlock: forceNewBlock && !block,
                 });
@@ -3927,15 +4028,14 @@
             let { block, forceNewBlock } = ctx;
             let value = ast.value;
             if (value && ctx.translate !== false) {
-                const match = translationRE.exec(value);
-                value = match[1] + this.translateFn(match[2]) + match[3];
+                value = this.translate(value);
             }
             if (!ctx.inPreTag) {
                 value = value.replace(whitespaceRE, " ");
             }
             if (!block || forceNewBlock) {
                 block = this.createBlock(block, "text", ctx);
-                this.insertBlock(`text(\`${value}\`)`, block, {
+                this.insertBlock(`text(${toStringExpression(value)})`, block, {
                     ...ctx,
                     forceNewBlock: forceNewBlock && !block,
                 });
@@ -3980,11 +4080,6 @@
             }
             // attributes
             const attrs = {};
-            const nameSpace = ast.ns || ctx.nameSpace;
-            if (nameSpace && isNewBlock) {
-                // specific namespace uri
-                attrs["block-ns"] = nameSpace;
-            }
             for (let key in ast.attrs) {
                 let expr, attrName;
                 if (key.startsWith("t-attf")) {
@@ -4100,7 +4195,10 @@
                 const idx = block.insertData(setRefStr, "ref");
                 attrs["block-ref"] = String(idx);
             }
-            const dom = xmlDoc.createElement(ast.tag);
+            const nameSpace = ast.ns || ctx.nameSpace;
+            const dom = nameSpace
+                ? xmlDoc.createElementNS(nameSpace, ast.tag)
+                : xmlDoc.createElement(ast.tag);
             for (const [attr, val] of Object.entries(attrs)) {
                 if (!(attr === "class" && val === "")) {
                     dom.setAttribute(attr, val);
@@ -4142,7 +4240,7 @@
                                 break;
                         }
                     }
-                    this.addLine(`let ${block.children.map((c) => c.varName)};`, codeIdx);
+                    this.addLine(`let ${block.children.map((c) => c.varName).join(", ")};`, codeIdx);
                 }
             }
             return block.varName;
@@ -4158,7 +4256,8 @@
                 expr = compileExpr(ast.expr);
                 if (ast.defaultValue) {
                     this.helpers.add("withDefault");
-                    expr = `withDefault(${expr}, \`${ast.defaultValue}\`)`;
+                    // FIXME: defaultValue is not translated
+                    expr = `withDefault(${expr}, ${toStringExpression(ast.defaultValue)})`;
                 }
             }
             if (!block || forceNewBlock) {
@@ -4245,7 +4344,7 @@
                                 break;
                         }
                     }
-                    this.addLine(`let ${block.children.map((c) => c.varName)};`, codeIdx);
+                    this.addLine(`let ${block.children.map((c) => c.varName).join(", ")};`, codeIdx);
                 }
                 // note: this part is duplicated from end of compilemulti:
                 const args = block.children.map((c) => c.varName).join(", ");
@@ -4274,18 +4373,18 @@
             }
             this.addLine(`for (let ${loopVar} = 0; ${loopVar} < ${l}; ${loopVar}++) {`);
             this.target.indentLevel++;
-            this.addLine(`ctx[\`${ast.elem}\`] = ${vals}[${loopVar}];`);
+            this.addLine(`ctx[\`${ast.elem}\`] = ${keys}[${loopVar}];`);
             if (!ast.hasNoFirst) {
                 this.addLine(`ctx[\`${ast.elem}_first\`] = ${loopVar} === 0;`);
             }
             if (!ast.hasNoLast) {
-                this.addLine(`ctx[\`${ast.elem}_last\`] = ${loopVar} === ${vals}.length - 1;`);
+                this.addLine(`ctx[\`${ast.elem}_last\`] = ${loopVar} === ${keys}.length - 1;`);
             }
             if (!ast.hasNoIndex) {
                 this.addLine(`ctx[\`${ast.elem}_index\`] = ${loopVar};`);
             }
             if (!ast.hasNoValue) {
-                this.addLine(`ctx[\`${ast.elem}_value\`] = ${keys}[${loopVar}];`);
+                this.addLine(`ctx[\`${ast.elem}_value\`] = ${vals}[${loopVar}];`);
             }
             this.define(`key${this.target.loopLevel}`, ast.key ? compileExpr(ast.key) : loopVar);
             if (this.dev) {
@@ -4360,7 +4459,6 @@
                     block,
                     index,
                     forceNewBlock: !isTSet,
-                    preventRoot: ctx.preventRoot,
                     isLast: ctx.isLast && i === l - 1,
                 });
                 this.compileAST(child, subCtx);
@@ -4369,21 +4467,19 @@
                 }
             }
             if (isNewBlock) {
-                if (block.hasDynamicChildren) {
-                    if (block.children.length) {
-                        const code = this.target.code;
-                        const children = block.children.slice();
-                        let current = children.shift();
-                        for (let i = codeIdx; i < code.length; i++) {
-                            if (code[i].trimStart().startsWith(`const ${current.varName} `)) {
-                                code[i] = code[i].replace(`const ${current.varName}`, current.varName);
-                                current = children.shift();
-                                if (!current)
-                                    break;
-                            }
+                if (block.hasDynamicChildren && block.children.length) {
+                    const code = this.target.code;
+                    const children = block.children.slice();
+                    let current = children.shift();
+                    for (let i = codeIdx; i < code.length; i++) {
+                        if (code[i].trimStart().startsWith(`const ${current.varName} `)) {
+                            code[i] = code[i].replace(`const ${current.varName}`, current.varName);
+                            current = children.shift();
+                            if (!current)
+                                break;
                         }
-                        this.addLine(`let ${block.children.map((c) => c.varName)};`, codeIdx);
                     }
+                    this.addLine(`let ${block.children.map((c) => c.varName).join(", ")};`, codeIdx);
                 }
                 const args = block.children.map((c) => c.varName).join(", ");
                 this.insertBlock(`multi([${args}])`, block, ctx);
@@ -4397,32 +4493,30 @@
                 ctxVar = generateId("ctx");
                 this.addLine(`let ${ctxVar} = ${compileExpr(ast.context)};`);
             }
+            const isDynamic = INTERP_REGEXP.test(ast.name);
+            const subTemplate = isDynamic ? interpolate(ast.name) : "`" + ast.name + "`";
+            if (block && !forceNewBlock) {
+                this.insertAnchor(block);
+            }
+            block = this.createBlock(block, "multi", ctx);
             if (ast.body) {
                 this.addLine(`${ctxVar} = Object.create(${ctxVar});`);
                 this.addLine(`${ctxVar}[isBoundary] = 1;`);
                 this.helpers.add("isBoundary");
-                const subCtx = createContext(ctx, { preventRoot: true, ctxVar });
+                const subCtx = createContext(ctx, { ctxVar });
                 const bl = this.compileMulti({ type: 3 /* Multi */, content: ast.body }, subCtx);
                 if (bl) {
                     this.helpers.add("zero");
                     this.addLine(`${ctxVar}[zero] = ${bl};`);
                 }
             }
-            const isDynamic = INTERP_REGEXP.test(ast.name);
-            const subTemplate = isDynamic ? interpolate(ast.name) : "`" + ast.name + "`";
-            if (block) {
-                if (!forceNewBlock) {
-                    this.insertAnchor(block);
-                }
-            }
-            const key = `key + \`${this.generateComponentKey()}\``;
+            const key = this.generateComponentKey();
             if (isDynamic) {
                 const templateVar = generateId("template");
                 if (!this.staticDefs.find((d) => d.id === "call")) {
                     this.staticDefs.push({ id: "call", expr: `app.callTemplate.bind(app)` });
                 }
                 this.define(templateVar, subTemplate);
-                block = this.createBlock(block, "multi", ctx);
                 this.insertBlock(`call(this, ${templateVar}, ${ctxVar}, node, ${key})`, block, {
                     ...ctx,
                     forceNewBlock: !block,
@@ -4431,7 +4525,6 @@
             else {
                 const id = generateId(`callTemplate_`);
                 this.staticDefs.push({ id, expr: `app.getTemplate(${subTemplate})` });
-                block = this.createBlock(block, "multi", ctx);
                 this.insertBlock(`${id}.call(this, ${ctxVar}, node, ${key})`, block, {
                     ...ctx,
                     forceNewBlock: !block,
@@ -4469,11 +4562,12 @@
             else {
                 let value;
                 if (ast.defaultValue) {
+                    const defaultValue = toStringExpression(ctx.translate ? this.translate(ast.defaultValue) : ast.defaultValue);
                     if (ast.value) {
-                        value = `withDefault(${expr}, \`${ast.defaultValue}\`)`;
+                        value = `withDefault(${expr}, ${defaultValue})`;
                     }
                     else {
-                        value = `\`${ast.defaultValue}\``;
+                        value = defaultValue;
                     }
                 }
                 else {
@@ -4484,12 +4578,12 @@
             }
             return null;
         }
-        generateComponentKey() {
+        generateComponentKey(currentKey = "key") {
             const parts = [generateId("__")];
             for (let i = 0; i < this.target.loopLevel; i++) {
                 parts.push(`\${key${i + 1}}`);
             }
-            return parts.join("__");
+            return `${currentKey} + \`${parts.join("__")}\``;
         }
         /**
          * Formats a prop name and value into a string suitable to be inserted in the
@@ -4503,7 +4597,12 @@
          * "onClick.bind"    "onClick"        "onClick: bind(ctx, ctx['onClick'])"
          */
         formatProp(name, value) {
-            value = this.captureExpression(value);
+            if (name.endsWith(".translate")) {
+                value = toStringExpression(this.translateFn(value));
+            }
+            else {
+                value = this.captureExpression(value);
+            }
             if (name.includes(".")) {
                 let [_name, suffix] = name.split(".");
                 name = _name;
@@ -4512,6 +4611,7 @@
                         value = `(${value}).bind(this)`;
                         break;
                     case "alike":
+                    case "translate":
                         break;
                     default:
                         throw new OwlError("Invalid prop suffix");
@@ -4580,7 +4680,6 @@
                 this.addLine(`${propVar}.slots = markRaw(Object.assign(${slotDef}, ${propVar}.slots))`);
             }
             // cmap key
-            const key = this.generateComponentKey();
             let expr;
             if (ast.isDynamic) {
                 expr = generateId("Comp");
@@ -4596,7 +4695,7 @@
                 // todo: check the forcenewblock condition
                 this.insertAnchor(block);
             }
-            let keyArg = `key + \`${key}\``;
+            let keyArg = this.generateComponentKey();
             if (ctx.tKeyExpr) {
                 keyArg = `${ctx.tKeyExpr} + ${keyArg}`;
             }
@@ -4669,7 +4768,7 @@
             }
             let key = this.target.loopLevel ? `key${this.target.loopLevel}` : "key";
             if (isMultiple) {
-                key = `${key} + \`${this.generateComponentKey()}\``;
+                key = this.generateComponentKey(key);
             }
             const props = ast.attrs ? this.formatPropObject(ast.attrs) : [];
             const scope = this.getPropString(props, dynProps);
@@ -4710,7 +4809,6 @@
             }
             let { block } = ctx;
             const name = this.compileInNewTarget("slot", ast.content, ctx);
-            const key = this.generateComponentKey();
             let ctxStr = "ctx";
             if (this.target.loopLevel || !this.hasSafeContext) {
                 ctxStr = generateId("ctx");
@@ -4723,7 +4821,8 @@
                 expr: `app.createComponent(null, false, true, false, false)`,
             });
             const target = compileExpr(ast.target);
-            const blockString = `${id}({target: ${target},slots: {'default': {__render: ${name}.bind(this), __ctx: ${ctxStr}}}}, key + \`${key}\`, node, ctx, Portal)`;
+            const key = this.generateComponentKey();
+            const blockString = `${id}({target: ${target},slots: {'default': {__render: ${name}.bind(this), __ctx: ${ctxStr}}}}, ${key}, node, ctx, Portal)`;
             if (block) {
                 this.insertAnchor(block);
             }
@@ -4752,7 +4851,7 @@
     }
     function _parse(xml) {
         normalizeXML(xml);
-        const ctx = { inPreTag: false, inSVG: false };
+        const ctx = { inPreTag: false };
         return parseNode(xml, ctx) || { type: 0 /* Text */, value: "" };
     }
     function parseNode(node, ctx) {
@@ -4766,10 +4865,10 @@
             parseTCall(node, ctx) ||
             parseTCallBlock(node) ||
             parseTEscNode(node, ctx) ||
+            parseTOutNode(node, ctx) ||
             parseTKey(node, ctx) ||
             parseTTranslation(node, ctx) ||
             parseTSlot(node, ctx) ||
-            parseTOutNode(node, ctx) ||
             parseComponent(node, ctx) ||
             parseDOMNode(node, ctx) ||
             parseTSetNode(node, ctx) ||
@@ -4843,9 +4942,7 @@
         if (tagName === "pre") {
             ctx.inPreTag = true;
         }
-        const shouldAddSVGNS = ROOT_SVG_TAGS.has(tagName) && !ctx.inSVG;
-        ctx.inSVG = ctx.inSVG || shouldAddSVGNS;
-        const ns = shouldAddSVGNS ? "http://www.w3.org/2000/svg" : null;
+        let ns = !ctx.nameSpace && ROOT_SVG_TAGS.has(tagName) ? "http://www.w3.org/2000/svg" : null;
         const ref = node.getAttribute("t-ref");
         node.removeAttribute("t-ref");
         const nodeAttrsNames = node.getAttributeNames();
@@ -4854,10 +4951,10 @@
         let model = null;
         for (let attr of nodeAttrsNames) {
             const value = node.getAttribute(attr);
-            if (attr.startsWith("t-on")) {
-                if (attr === "t-on") {
-                    throw new OwlError("Missing event name with t-on directive");
-                }
+            if (attr === "t-on" || attr === "t-on-") {
+                throw new OwlError("Missing event name with t-on directive");
+            }
+            if (attr.startsWith("t-on-")) {
                 on = on || {};
                 on[attr.slice(5)] = value;
             }
@@ -4882,13 +4979,11 @@
                 const typeAttr = node.getAttribute("type");
                 const isInput = tagName === "input";
                 const isSelect = tagName === "select";
-                const isTextarea = tagName === "textarea";
                 const isCheckboxInput = isInput && typeAttr === "checkbox";
                 const isRadioInput = isInput && typeAttr === "radio";
-                const isOtherInput = isInput && !isCheckboxInput && !isRadioInput;
-                const hasLazyMod = attr.includes(".lazy");
-                const hasNumberMod = attr.includes(".number");
                 const hasTrimMod = attr.includes(".trim");
+                const hasLazyMod = hasTrimMod || attr.includes(".lazy");
+                const hasNumberMod = attr.includes(".number");
                 const eventType = isRadioInput ? "click" : isSelect || hasLazyMod ? "change" : "input";
                 model = {
                     baseExpr,
@@ -4897,8 +4992,8 @@
                     specialInitTargetAttr: isRadioInput ? "checked" : null,
                     eventType,
                     hasDynamicChildren: false,
-                    shouldTrim: hasTrimMod && (isOtherInput || isTextarea),
-                    shouldNumberize: hasNumberMod && (isOtherInput || isTextarea),
+                    shouldTrim: hasTrimMod,
+                    shouldNumberize: hasNumberMod,
                 };
                 if (isSelect) {
                     // don't pollute the original ctx
@@ -4908,6 +5003,9 @@
             }
             else if (attr.startsWith("block-")) {
                 throw new OwlError(`Invalid attribute: '${attr}'`);
+            }
+            else if (attr === "xmlns") {
+                ns = value;
             }
             else if (attr !== "t-name") {
                 if (attr.startsWith("t-") && !attr.startsWith("t-att")) {
@@ -4920,6 +5018,9 @@
                 attrs = attrs || {};
                 attrs[attr] = value;
             }
+        }
+        if (ns) {
+            ctx.nameSpace = ns;
         }
         const children = parseChildren(node, ctx);
         return {
@@ -4960,9 +5061,6 @@
                 ref,
                 content: [tesc],
             };
-        }
-        if (ast.type === 11 /* TComponent */) {
-            throw new OwlError("t-esc is not supported on Component nodes");
         }
         return tesc;
     }
@@ -5216,14 +5314,14 @@
                 // be ignored)
                 let el = slotNode.parentElement;
                 let isInSubComponent = false;
-                while (el !== clone) {
+                while (el && el !== clone) {
                     if (el.hasAttribute("t-component") || el.tagName[0] === el.tagName[0].toUpperCase()) {
                         isInSubComponent = true;
                         break;
                     }
                     el = el.parentElement;
                 }
-                if (isInSubComponent) {
+                if (isInSubComponent || !el) {
                     continue;
                 }
                 slotNode.removeAttribute("t-set-slot");
@@ -5405,19 +5503,21 @@
      *
      * @param el the element containing the tree that should be normalized
      */
-    function normalizeTEsc(el) {
-        const elements = [...el.querySelectorAll("[t-esc]")].filter((el) => el.tagName[0] === el.tagName[0].toUpperCase() || el.hasAttribute("t-component"));
-        for (const el of elements) {
-            if (el.childNodes.length) {
-                throw new OwlError("Cannot have t-esc on a component that already has content");
+    function normalizeTEscTOut(el) {
+        for (const d of ["t-esc", "t-out"]) {
+            const elements = [...el.querySelectorAll(`[${d}]`)].filter((el) => el.tagName[0] === el.tagName[0].toUpperCase() || el.hasAttribute("t-component"));
+            for (const el of elements) {
+                if (el.childNodes.length) {
+                    throw new OwlError(`Cannot have ${d} on a component that already has content`);
+                }
+                const value = el.getAttribute(d);
+                el.removeAttribute(d);
+                const t = el.ownerDocument.createElement("t");
+                if (value != null) {
+                    t.setAttribute(d, value);
+                }
+                el.appendChild(t);
             }
-            const value = el.getAttribute("t-esc");
-            el.removeAttribute("t-esc");
-            const t = el.ownerDocument.createElement("t");
-            if (value != null) {
-                t.setAttribute("t-esc", value);
-            }
-            el.appendChild(t);
         }
     }
     /**
@@ -5428,42 +5528,7 @@
      */
     function normalizeXML(el) {
         normalizeTIf(el);
-        normalizeTEsc(el);
-    }
-    /**
-     * Parses an XML string into an XML document, throwing errors on parser errors
-     * instead of returning an XML document containing the parseerror.
-     *
-     * @param xml the string to parse
-     * @returns an XML document corresponding to the content of the string
-     */
-    function parseXML(xml) {
-        const parser = new DOMParser();
-        const doc = parser.parseFromString(xml, "text/xml");
-        if (doc.getElementsByTagName("parsererror").length) {
-            let msg = "Invalid XML in template.";
-            const parsererrorText = doc.getElementsByTagName("parsererror")[0].textContent;
-            if (parsererrorText) {
-                msg += "\nThe parser has produced the following error message:\n" + parsererrorText;
-                const re = /\d+/g;
-                const firstMatch = re.exec(parsererrorText);
-                if (firstMatch) {
-                    const lineNumber = Number(firstMatch[0]);
-                    const line = xml.split("\n")[lineNumber - 1];
-                    const secondMatch = re.exec(parsererrorText);
-                    if (line && secondMatch) {
-                        const columnIndex = Number(secondMatch[0]) - 1;
-                        if (line[columnIndex]) {
-                            msg +=
-                                `\nThe error might be located at xml line ${lineNumber} column ${columnIndex}\n` +
-                                    `${line}\n${"-".repeat(columnIndex - 1)}^`;
-                        }
-                    }
-                }
-            }
-            throw new OwlError(msg);
-        }
-        return doc;
+        normalizeTEscTOut(el);
     }
 
     function compile(template, options = {}) {
@@ -5477,11 +5542,20 @@
         const codeGenerator = new CodeGenerator(ast, { ...options, hasSafeContext });
         const code = codeGenerator.generateCode();
         // template function
-        return new Function("app, bdom, helpers", code);
+        try {
+            return new Function("app, bdom, helpers", code);
+        }
+        catch (originalError) {
+            const { name } = options;
+            const nameStr = name ? `template "${name}"` : "anonymous template";
+            const err = new OwlError(`Failed to compile ${nameStr}: ${originalError.message}\n\ngenerated code:\nfunction(app, bdom, helpers) {\n${code}\n}`);
+            err.cause = originalError;
+            throw err;
+        }
     }
 
-    // do not modify manually. This value is updated by the release script.
-    const version = "2.0.9";
+    // do not modify manually. This file is generated by the release script.
+    const version = "2.3.0";
 
     // -----------------------------------------------------------------------------
     //  Scheduler
@@ -5491,10 +5565,17 @@
             this.tasks = new Set();
             this.frame = 0;
             this.delayedRenders = [];
+            this.cancelledNodes = new Set();
             this.requestAnimationFrame = Scheduler.requestAnimationFrame;
         }
         addFiber(fiber) {
             this.tasks.add(fiber.root);
+        }
+        scheduleDestroy(node) {
+            this.cancelledNodes.add(node);
+            if (this.frame === 0) {
+                this.frame = this.requestAnimationFrame(() => this.processTasks());
+            }
         }
         /**
          * Process all current tasks. This only applies to the fibers that are ready.
@@ -5505,21 +5586,28 @@
                 let renders = this.delayedRenders;
                 this.delayedRenders = [];
                 for (let f of renders) {
-                    if (f.root && f.node.status !== 2 /* DESTROYED */ && f.node.fiber === f) {
+                    if (f.root && f.node.status !== 3 /* DESTROYED */ && f.node.fiber === f) {
                         f.render();
                     }
                 }
             }
             if (this.frame === 0) {
-                this.frame = this.requestAnimationFrame(() => {
-                    this.frame = 0;
-                    this.tasks.forEach((fiber) => this.processFiber(fiber));
-                    for (let task of this.tasks) {
-                        if (task.node.status === 2 /* DESTROYED */) {
-                            this.tasks.delete(task);
-                        }
-                    }
-                });
+                this.frame = this.requestAnimationFrame(() => this.processTasks());
+            }
+        }
+        processTasks() {
+            this.frame = 0;
+            for (let node of this.cancelledNodes) {
+                node._destroy();
+            }
+            this.cancelledNodes.clear();
+            for (let task of this.tasks) {
+                this.processFiber(task);
+            }
+            for (let task of this.tasks) {
+                if (task.node.status === 3 /* DESTROYED */) {
+                    this.tasks.delete(task);
+                }
             }
         }
         processFiber(fiber) {
@@ -5532,7 +5620,7 @@
                 this.tasks.delete(fiber);
                 return;
             }
-            if (fiber.node.status === 2 /* DESTROYED */) {
+            if (fiber.node.status === 3 /* DESTROYED */) {
                 this.tasks.delete(fiber);
                 return;
             }
@@ -5556,11 +5644,8 @@
 This is not suitable for production use.
 See https://github.com/odoo/owl/blob/${hash}/doc/reference/app.md#configuration for more information.`;
     };
-    window.__OWL_DEVTOOLS__ || (window.__OWL_DEVTOOLS__ = {
-        apps: new Set(),
-        Fiber: Fiber,
-        RootFiber: RootFiber,
-    });
+    const apps = new Set();
+    window.__OWL_DEVTOOLS__ || (window.__OWL_DEVTOOLS__ = { apps, Fiber, RootFiber, toRaw, reactive });
     class App extends TemplateSet {
         constructor(Root, config = {}) {
             super(config);
@@ -5568,7 +5653,7 @@ See https://github.com/odoo/owl/blob/${hash}/doc/reference/app.md#configuration 
             this.root = null;
             this.name = config.name || "";
             this.Root = Root;
-            window.__OWL_DEVTOOLS__.apps.add(this);
+            apps.add(this);
             if (config.test) {
                 this.dev = true;
             }
@@ -5622,10 +5707,10 @@ See https://github.com/odoo/owl/blob/${hash}/doc/reference/app.md#configuration 
         }
         destroy() {
             if (this.root) {
-                this.scheduler.flush();
                 this.root.destroy();
+                this.scheduler.processTasks();
             }
-            window.__OWL_DEVTOOLS__.apps.delete(this);
+            apps.delete(this);
         }
         createComponent(name, isStatic, hasSlotsProp, hasDynamicPropList, propList) {
             const isDynamic = !isStatic;
@@ -5700,6 +5785,7 @@ See https://github.com/odoo/owl/blob/${hash}/doc/reference/app.md#configuration 
         }
     }
     App.validateTarget = validateTarget;
+    App.apps = apps;
     App.version = version;
     async function mount(C, target, config = {}) {
         return new App(C, config).mount(target, config);
@@ -5754,9 +5840,11 @@ See https://github.com/odoo/owl/blob/${hash}/doc/reference/app.md#configuration 
         switch (component.__owl__.status) {
             case 0 /* NEW */:
                 return "new";
+            case 2 /* CANCELLED */:
+                return "cancelled";
             case 1 /* MOUNTED */:
                 return "mounted";
-            case 2 /* DESTROYED */:
+            case 3 /* DESTROYED */:
                 return "destroyed";
         }
     }
@@ -5774,7 +5862,7 @@ See https://github.com/odoo/owl/blob/${hash}/doc/reference/app.md#configuration 
         return {
             get el() {
                 const el = refs[name];
-                return (el === null || el === void 0 ? void 0 : el.ownerDocument.contains(el)) ? el : null;
+                return inOwnerDocument(el) ? el : null;
             },
         };
     }
@@ -5812,8 +5900,9 @@ See https://github.com/odoo/owl/blob/${hash}/doc/reference/app.md#configuration 
      * will run a cleanup function before patching and before unmounting the
      * the component.
      *
-     * @param {Effect} effect the effect to run on component mount and/or patch
-     * @param {()=>any[]} [computeDependencies=()=>[NaN]] a callback to compute
+     * @template T
+     * @param {Effect<T>} effect the effect to run on component mount and/or patch
+     * @param {()=>[...T]} [computeDependencies=()=>[NaN]] a callback to compute
      *      dependencies that will decide if the effect needs to be cleaned up and
      *      run again. If the dependencies did not change, the effect will not run
      *      again. The default value returns an array containing only NaN because
@@ -5897,6 +5986,7 @@ See https://github.com/odoo/owl/blob/${hash}/doc/reference/app.md#configuration 
     exports.EventBus = EventBus;
     exports.OwlError = OwlError;
     exports.__info__ = __info__;
+    exports.batched = batched;
     exports.blockDom = blockDom;
     exports.loadFile = loadFile;
     exports.markRaw = markRaw;
@@ -5924,14 +6014,15 @@ See https://github.com/odoo/owl/blob/${hash}/doc/reference/app.md#configuration 
     exports.useState = useState;
     exports.useSubEnv = useSubEnv;
     exports.validate = validate;
+    exports.validateType = validateType;
     exports.whenReady = whenReady;
     exports.xml = xml;
 
     Object.defineProperty(exports, '__esModule', { value: true });
 
 
-    __info__.date = '2023-03-13T09:56:54.968Z';
-    __info__.hash = '8893e02';
+    __info__.date = '2024-07-25T13:13:44.371Z';
+    __info__.hash = '0cde4b8';
     __info__.url = 'https://github.com/odoo/owl';
 
 

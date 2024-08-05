@@ -2,7 +2,7 @@
 
 from os import getenv
 from odoo.tests import tagged
-from .test_static import TestHttpStatic, TestHttpStaticCache
+from . import test_static
 
 
 # Small configuration to run the tests against a web server.
@@ -11,7 +11,7 @@ WEB_SERVER_URL = getenv('WEB_SERVER_URL', 'http://localhost:80')
 
 
 @tagged('webserver', '-standard', '-at_install')
-class TestHttpStaticWebServer(TestHttpStatic, TestHttpStaticCache):
+class TestHttpStaticWebServer(test_static.TestHttpStatic, test_static.TestHttpStaticCache):
     @classmethod
     def base_url(cls):
         return WEB_SERVER_URL
@@ -25,3 +25,11 @@ class TestHttpStaticWebServer(TestHttpStatic, TestHttpStaticCache):
             x_sendfile=False,
             assert_filename=assert_filename
         )
+
+    def test_static_cache3_private(self):
+        super().test_static_cache3_private()
+
+        # Extra step: verify that there is no cache leak. Run this test
+        # with squid, a web server with http caching capabilities.
+        self.authenticate(None, None)
+        self.assertDownloadPlaceholder('/web/image/test_http.gizeh_png')

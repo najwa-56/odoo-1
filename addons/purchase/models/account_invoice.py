@@ -25,14 +25,14 @@ class AccountMove(models.Model):
 
     def _get_invoice_reference(self):
         self.ensure_one()
-        vendor_refs = [ref for ref in set(self.line_ids.mapped('purchase_line_id.order_id.partner_ref')) if ref]
+        vendor_refs = [ref for ref in set(self.invoice_line_ids.mapped('purchase_line_id.order_id.partner_ref')) if ref]
         if self.ref:
             return [ref for ref in self.ref.split(', ') if ref and ref not in vendor_refs] + vendor_refs
         return vendor_refs
 
     @api.onchange('purchase_vendor_bill_id', 'purchase_id')
     def _onchange_purchase_auto_complete(self):
-        ''' Load from either an old purchase order, either an old vendor bill.
+        r''' Load from either an old purchase order, either an old vendor bill.
 
         When setting a 'purchase.bill.union' in 'purchase_vendor_bill_id':
         * If it's a vendor bill, 'invoice_vendor_bill_id' is set and the loading is done by '_onchange_invoice_vendor_bill'.
@@ -52,20 +52,24 @@ class AccountMove(models.Model):
 
         # Copy data from PO
         invoice_vals = self.purchase_id.with_company(self.purchase_id.company_id)._prepare_invoice()
-        invoice_vals['currency_id'] = self.invoice_line_ids and self.currency_id or invoice_vals.get('currency_id')
-        del invoice_vals['ref']
+        has_invoice_lines = bool(self.invoice_line_ids.filtered(lambda x: x.display_type not in ('line_note', 'line_section')))
+        new_currency_id = self.currency_id if has_invoice_lines else invoice_vals.get('currency_id')
+        del invoice_vals['ref'], invoice_vals['payment_reference']
         del invoice_vals['company_id']  # avoid recomputing the currency
+        if self.move_type == invoice_vals['move_type']:
+            del invoice_vals['move_type'] # no need to be updated if it's same value, to avoid recomputes
         self.update(invoice_vals)
+        self.currency_id = new_currency_id
 
         # Copy purchase lines.
-        po_lines = self.purchase_id.order_line - self.line_ids.mapped('purchase_line_id')
+        po_lines = self.purchase_id.order_line - self.invoice_line_ids.mapped('purchase_line_id')
         for line in po_lines.filtered(lambda l: not l.display_type):
             self.invoice_line_ids += self.env['account.move.line'].new(
                 line._prepare_account_move_line(self)
             )
 
         # Compute invoice_origin.
-        origins = set(self.line_ids.mapped('purchase_line_id.order_id.name'))
+        origins = set(self.invoice_line_ids.mapped('purchase_line_id.order_id.name'))
         self.invoice_origin = ','.join(list(origins))
 
         # Compute ref.
@@ -73,31 +77,37 @@ class AccountMove(models.Model):
         self.ref = ', '.join(refs)
 
         # Compute payment_reference.
-        if len(refs) == 1:
-            self.payment_reference = refs[0]
+        if not self.payment_reference:
+            if len(refs) == 1:
+                self.payment_reference = refs[0]
+            elif len(refs) > 1:
+                self.payment_reference = refs[-1]
 
         self.purchase_id = False
 
     @api.onchange('partner_id', 'company_id')
     def _onchange_partner_id(self):
         res = super(AccountMove, self)._onchange_partner_id()
-        if self.partner_id and\
-                self.move_type in ['in_invoice', 'in_refund'] and\
-                self.currency_id != self.partner_id.property_purchase_currency_id and\
-                self.partner_id.property_purchase_currency_id.id:
+
+        currency_id = (
+                self.partner_id.property_purchase_currency_id
+                or self.env['res.currency'].browse(self.env.context.get("default_currency_id"))
+                or self.currency_id
+        )
+
+        if self.partner_id and self.move_type in ['in_invoice', 'in_refund'] and self.currency_id != currency_id:
             if not self.env.context.get('default_journal_id'):
                 journal_domain = [
                     ('type', '=', 'purchase'),
                     ('company_id', '=', self.company_id.id),
-                    ('currency_id', '=', self.partner_id.property_purchase_currency_id.id),
+                    ('currency_id', '=', currency_id.id),
                 ]
                 default_journal_id = self.env['account.journal'].search(journal_domain, limit=1)
                 if default_journal_id:
                     self.journal_id = default_journal_id
-            if self.env.context.get('default_currency_id'):
-                self.currency_id = self.env.context['default_currency_id']
-            if self.partner_id.property_purchase_currency_id:
-                self.currency_id = self.partner_id.property_purchase_currency_id
+
+            self.currency_id = currency_id
+
         return res
 
     @api.depends('line_ids.purchase_line_id')
@@ -202,7 +212,7 @@ class AccountMove(models.Model):
                 'no_match': no result found
             * recordset of matched 'purchase.order.line' (could come from more than one purchase.order)
         """
-        common_domain = [('company_id', '=', self.company_id.id), ('state', '=', 'purchase'), ('invoice_status', 'in', ('to invoice', 'no'))]
+        common_domain = [('company_id', '=', self.company_id.id), ('state', 'in', ('purchase', 'done')), ('invoice_status', 'in', ('to invoice', 'no'))]
 
         matching_pos = self.env['purchase.order']
         if po_references and amount_total:

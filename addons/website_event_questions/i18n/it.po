@@ -4,15 +4,17 @@
 # 
 # Translators:
 # Martin Trigaux, 2022
+# Marianna Ciofani, 2023
+# Sergio Zanchetta <primes2h@gmail.com>, 2024
 # 
 msgid ""
 msgstr ""
-"Project-Id-Version: Odoo Server 16.0beta\n"
+"Project-Id-Version: Odoo Server 16.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-10-04 09:26+0000\n"
+"POT-Creation-Date: 2024-02-06 13:32+0000\n"
 "PO-Revision-Date: 2022-09-22 05:56+0000\n"
-"Last-Translator: Martin Trigaux, 2022\n"
-"Language-Team: Italian (https://www.transifex.com/odoo/teams/41243/it/)\n"
+"Last-Translator: Sergio Zanchetta <primes2h@gmail.com>, 2024\n"
+"Language-Team: Italian (https://app.transifex.com/odoo/teams/41243/it/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: \n"
@@ -53,7 +55,7 @@ msgstr "Risposte"
 #. module: website_event_questions
 #: model:ir.model.fields,field_description:website_event_questions.field_event_question__once_per_order
 msgid "Ask once per order"
-msgstr ""
+msgstr "Una domanda per ordine"
 
 #. module: website_event_questions
 #: model:ir.model.fields,field_description:website_event_questions.field_event_registration__registration_answer_ids
@@ -200,7 +202,7 @@ msgstr "Tipo di pasto"
 #. module: website_event_questions
 #: model:event.question.answer,name:website_event_questions.event_0_question_0_answer_0
 msgid "Mixed"
-msgstr "Mischiato"
+msgstr "Misto"
 
 #. module: website_event_questions
 #: model:event.question.answer,name:website_event_questions.event_type_data_conference_question_0_answer_1
@@ -237,12 +239,12 @@ msgid "Question Type"
 msgstr "Tipo di domanda"
 
 #. module: website_event_questions
+#. odoo-python
 #: code:addons/website_event_questions/models/event_question.py:0
 #, python-format
-msgid "Question cannot belong to both the event category and itself."
+msgid "Question cannot be linked to both an Event and an Event Type."
 msgstr ""
-"La domanda non può appartenere sia alla categoria dell'evento che all'evento"
-" stesso."
+"La domanda non può essere collegata sia all'evento che al tipo di evento."
 
 #. module: website_event_questions
 #: model:ir.model.fields,field_description:website_event_questions.field_event_event__question_ids
@@ -271,7 +273,7 @@ msgstr "Vendite"
 #. module: website_event_questions
 #: model_terms:ir.ui.view,arch_db:website_event_questions.event_registration_view_tree
 msgid "Selected Answers"
-msgstr ""
+msgstr "Risposte selezionate"
 
 #. module: website_event_questions
 #: model_terms:ir.ui.view,arch_db:website_event_questions.event_registration_answer_view_tree
@@ -297,7 +299,7 @@ msgstr "Domande specifiche"
 #. module: website_event_questions
 #: model:ir.model.fields,field_description:website_event_questions.field_event_registration_answer__value_answer_id
 msgid "Suggested answer"
-msgstr "Risposta suggerita"
+msgstr "Risposta indicata"
 
 #. module: website_event_questions
 #: model:ir.model.fields.selection,name:website_event_questions.selection__event_question__question_type__text_box
@@ -341,6 +343,7 @@ msgid "Yes"
 msgstr "Sì"
 
 #. module: website_event_questions
+#. odoo-python
 #: code:addons/website_event_questions/models/event_question.py:0
 #, python-format
 msgid ""
@@ -350,21 +353,24 @@ msgstr ""
 "risposte."
 
 #. module: website_event_questions
+#. odoo-python
 #: code:addons/website_event_questions/models/event_question.py:0
 #, python-format
 msgid ""
 "You cannot delete a question that has already been answered by attendees."
 msgstr ""
+"Non puoi eliminare una domanda alla quale i partecipanti hanno già risposto."
 
 #. module: website_event_questions
+#. odoo-python
 #: code:addons/website_event_questions/models/event_question.py:0
 #, python-format
 msgid ""
 "You cannot delete an answer that has already been selected by attendees."
-msgstr ""
+msgstr "Non puoi eliminare una risposta già selezionata dai partecipanti."
 
 #. module: website_event_questions
 #: model_terms:ir.ui.view,arch_db:website_event_questions.event_event_view_form
 #: model_terms:ir.ui.view,arch_db:website_event_questions.event_question_view_form
 msgid "e.g. \"Do you have any diet restrictions?\""
-msgstr ""
+msgstr "ad es. \"Hai delle esigenze alimentari?\""
