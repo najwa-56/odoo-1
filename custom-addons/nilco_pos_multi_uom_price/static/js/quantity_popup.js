@@ -1,11 +1,12 @@
+/** @odoo-module **/
 import { Component, useState } from "@odoo/owl";
+import { _t } from "@web/core/l10n/translation";
 
 export class QuantityPopup extends Component {
     static template = "point_of_sale.QuantityPopup";
 
     setup() {
-        // Initialize quantity in the component state
-        this.quantity = useState({ value: 1 });
+        this.quantity = useState({ value: 1 }); // Define quantity as a reactive property
     }
 
     get quantity() {
@@ -17,10 +18,10 @@ export class QuantityPopup extends Component {
     }
 
     onConfirm() {
-        this.trigger('confirm', this.quantity); // Handle confirmation with the current quantity
+        this.trigger('confirm', this.quantity); // or any method to handle confirmation
     }
 
     onClose() {
-        this.trigger('close'); // Handle close action
+        this.trigger('close'); // or any method to handle closing
     }
 }
