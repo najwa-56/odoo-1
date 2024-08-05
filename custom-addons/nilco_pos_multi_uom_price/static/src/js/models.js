@@ -48,9 +48,10 @@ patch(Orderline.prototype, {
     set_uom(uom_id) {
         this.product_uom_id = uom_id;
          const unit = this.get_unit();
-        if (unit) {
-            this.set_unit_price(unit.price);
-            this.compute_price_based_on_quantity();
+         if (unit) {
+      this.set_unit_price(unit.price);
+      this.compute_price_based_on_quantity();
+    }
     },
     get_unit(){
         if (this.product.default_uom_price > 0 & this.price_type == "original" & this.product.default_uom_id != false){
