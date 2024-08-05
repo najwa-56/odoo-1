@@ -27,7 +27,7 @@ export class UOMButton extends Component {
 				       uomList.push({
 					       id:	uomPrice.id,
 					       label:	uomPrice.name,
-					       isSelected: false,
+					       isSelected: true,
 					       item:	uomPrice,
 				       });
 				       });
