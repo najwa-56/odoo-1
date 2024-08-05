@@ -14,6 +14,21 @@ class PosOrderLine(models.Model):
     Ratio = fields.Float("Ratio", compute="_compute_ratio",
                          store=False)  # Ratio field  # Related field to the ratio in uom.uom
 
+    @api.onchange('qty', 'product_id', 'product_uom_id')
+    def _onchange_qty(self):
+        for line in self:
+            if line.product_uom_id:
+                # Calculate the price based on UOM conversion factor
+                uom_factor = line.product_uom_id.factor_inv / line.product_id.uom_id.factor_inv
+                price = line.product_id.with_context(uom_id=line.product_uom_id.id).list_price
+                line.price_unit = price
+                line.price_subtotal = price * line.qty * uom_factor
+                line.price_total = line.price_subtotal
+            else:
+                # Fallback to basic UOM price
+                line.price_unit = line.product_id.list_price
+                line.price_subtotal = line.product_id.list_price * line.qty
+                line.price_total = line.price_subtotal
 
     @api.depends('product_uom_id')
     def _compute_ratio(self):
