@@ -14,7 +14,7 @@ class PosOrderLine(models.Model):
     Ratio = fields.Float("Ratio", compute="_compute_ratio",
                          store=False)  # Ratio field  # Related field to the ratio in uom.uom
 
-    
+
     @api.depends('product_uom_id')
     def _compute_ratio(self):
         for record in self:

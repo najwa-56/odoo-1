@@ -13,6 +13,17 @@ export class UOMButton extends Component {
     get selectedOrderline() {
 	       return this.env.services.pos.get_order().get_selected_orderline();
        }
+     get selectedOrderlineQuantity() {
+        return this.currentOrder.get_selected_orderline()?.get_quantity_str();
+    }
+    get selectedOrderlineDisplayName() {
+        return this.currentOrder.get_selected_orderline()?.get_full_product_name();
+    }
+    get selectedOrderlineTotal() {
+        return this.env.utils.formatCurrency(
+            this.currentOrder.get_selected_orderline()?.get_display_price()
+        );
+    }
     async onClick() {
 	       let line = this.selectedOrderline;
 	       if (line) {
