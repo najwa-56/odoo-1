@@ -8,19 +8,5 @@
             UOM
         </button>
 	</t>
-
-   <t t-name="point_of_sale.Numpad">
-        <div class="numpad">
-            <t t-foreach="buttons" t-as="button" t-key="button.value">
-                <t t-if="button.value !== '-'">
-                    <button t-attf-class="numpad-button #{button.class}"
-                            t-on-click="() => onClick(button.value)"
-                            t-att-title="button.text">
-                        <t t-esc="button.text" />
-                    </button>
-                </t>
-            </t>
-        </div>
-    </t>
 	
 </templates>

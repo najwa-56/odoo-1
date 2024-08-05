@@ -26,8 +26,10 @@
     'assets': {
         'point_of_sale._assets_pos':[
             'nilco_pos_multi_uom_price/static/src/js/multi_uom_price.js',
+            'nilco_pos_multi_uom_price/static/src/js/quantity_popup.js',
             'nilco_pos_multi_uom_price/static/src/js/models.js',
             'nilco_pos_multi_uom_price/static/src/xml/multi_uom_price.xml',
+            'nilco_pos_multi_uom_price/static/src/xml/quantity_popup.xml',
         ],
     },
 }

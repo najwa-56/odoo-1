@@ -1,0 +1,21 @@
+<t t-name="point_of_sale.QuantityPopup">
+    <div class="modal">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title"><t t-esc="_t('Enter Quantity')"/></h4>
+                    <button type="button" class="close" aria-label="Close" t-on-click="onClose">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <input type="number" class="form-control" t-model="quantity" min="0" step="any"/>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" t-on-click="onClose"><t t-esc="_t('Cancel')"/></button>
+                    <button type="button" class="btn btn-primary" t-on-click="onConfirm"><t t-esc="_t('Confirm')"/></button>
+                </div>
+            </div>
+        </div>
+    </div>
+</t>
