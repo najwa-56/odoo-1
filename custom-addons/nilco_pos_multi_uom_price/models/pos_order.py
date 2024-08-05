@@ -14,22 +14,17 @@ class PosOrderLine(models.Model):
     Ratio = fields.Float("Ratio", compute="_compute_ratio",
                          store=False)  # Ratio field  # Related field to the ratio in uom.uom
 
-    @api.onchange('qty', 'product_id', 'product_uom_id')
-    def _onchange_qty(self):
+    @api.depends('product_uom_id')
+    def _compute_price(self):
         for line in self:
             if line.product_uom_id:
-                # Calculate the price based on UOM conversion factor
-                uom_factor = line.product_uom_id.factor_inv / line.product_id.uom_id.factor_inv
-                price = line.product_id.with_context(uom_id=line.product_uom_id.id).list_price
-                line.price_unit = price
-                line.price_subtotal = price * line.qty * uom_factor
-                line.price_total = line.price_subtotal
-            else:
-                # Fallback to basic UOM price
-                line.price_unit = line.product_id.list_price
-                line.price_subtotal = line.product_id.list_price * line.qty
-                line.price_total = line.price_subtotal
-
+                uom_price = self.env['product.multi.uom.price'].search([
+                    ('product_id', '=', line.product_id.id),
+                    ('uom_id', '=', line.product_uom_id.id)
+                ], limit=1)
+                if uom_price:
+                    line.price_unit = uom_price.price
+                    
     @api.depends('product_uom_id')
     def _compute_ratio(self):
         for record in self:
@@ -59,15 +54,3 @@ class PosOrderLine(models.Model):
         res.update({'product_uom_id': orderline.product_uom_id.id})
 
         return res
-
-    def set_uom(self, uom_id):
-        self.product_uom_id = uom_id
-        # Update price and quantity based on the new UOM
-        self._onchange_qty()
-
-    def set_unit_price(self, price):
-        self.price_unit = price
-        self.price_subtotal = price * self.qty
-        self.price_total = self.price_subtotal
-        # Notify that price has been manually set
-        self.price_manually_set = True
