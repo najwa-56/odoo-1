@@ -24,7 +24,7 @@ class PosOrderLine(models.Model):
                 ], limit=1)
                 if uom_price:
                     line.price_unit = uom_price.price
-                    
+
     @api.depends('product_uom_id')
     def _compute_ratio(self):
         for record in self:

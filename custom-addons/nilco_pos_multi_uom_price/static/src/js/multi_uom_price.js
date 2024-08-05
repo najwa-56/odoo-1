@@ -47,6 +47,15 @@ export class UOMButton extends Component {
        }
    }
 
+export class CustomProductScreen extends ProductScreen {
+    setup() {
+        super.setup();
+    }
+
+    getNumpadButtons() {
+        return super.getNumpadButtons().filter(button => button.value !== "-");
+    }
+}
 
 ProductScreen.addControlButton({
     component: UOMButton,
