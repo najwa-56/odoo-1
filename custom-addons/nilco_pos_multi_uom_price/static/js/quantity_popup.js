@@ -3,7 +3,6 @@ import { Component } from "@odoo/owl";
 import { _t } from "@web/core/l10n/translation";
 
 export class QuantityPopup extends Component {
-    static template = "point_of_sale.QuantityPopup";
 
     setup() {
         super.setup();
