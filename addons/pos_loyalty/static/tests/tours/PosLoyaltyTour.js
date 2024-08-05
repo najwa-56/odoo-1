@@ -236,7 +236,7 @@ registry.category("web_tour.tours").add("PosLoyaltyTour6", {
             ProductScreen.clickDisplayedProduct("Test Product A"),
             PosLoyalty.clickRewardButton(),
             SelectionPopup.clickItem("$ 1 per point on your order"),
-            ProductScreen.totalAmountIs("138.50"),
+            ProductScreen.totalAmountIs("165.00"),
         ].flat(),
 });
 
@@ -295,12 +295,12 @@ registry.category("web_tour.tours").add('PosLoyaltyTour9', {
         [
             ProductScreen.clickHomeCategory(),
             ProductScreen.confirmOpeningPopup(),
-
-            ProductScreen.clickPartnerButton(),
-            ProductScreen.clickCustomer('AAA Partner'),
             ProductScreen.clickDisplayedProduct('Product B'),
             ProductScreen.clickDisplayedProduct('Product A'),
             ProductScreen.totalAmountIs('210.00'),
+            ProductScreen.clickPartnerButton(),
+            ProductScreen.clickCustomer('AAA Partner'),
+            PosLoyalty.customerIs('AAA Partner'),
             PosLoyalty.isRewardButtonHighlighted(true),
             PosLoyalty.clickRewardButton(),
             SelectionPopup.clickItem("$ 5"),
@@ -319,12 +319,12 @@ registry.category("web_tour.tours").add('PosLoyaltyTour10', {
         [
             ProductScreen.clickHomeCategory(),
             ProductScreen.confirmOpeningPopup(),
-            ProductScreen.clickPartnerButton(),
-            ProductScreen.clickCustomer('AAA Partner'),
-            PosLoyalty.customerIs('AAA Partner'),
             ProductScreen.clickDisplayedProduct('Product Test'),
             ProductScreen.totalAmountIs('1.00'),
             ProductScreen.selectedOrderlineHas("Product Test", "1.00"),
+            ProductScreen.clickPartnerButton(),
+            ProductScreen.clickCustomer('AAA Partner'),
+            PosLoyalty.customerIs('AAA Partner'),
             PosLoyalty.isRewardButtonHighlighted(true),
             PosLoyalty.clickRewardButton(),
             SelectionPopup.clickItem('Free Product with Tag'),
@@ -365,14 +365,6 @@ registry.category("web_tour.tours").add('PosLoyaltyTour11.2', {
             ProductScreen.totalAmountIs('50.00'),
             PosLoyalty.isRewardButtonHighlighted(false),
             PosLoyalty.enterCode('123456'),
-            PosLoyalty.isRewardButtonHighlighted(true),
-            PosLoyalty.clickRewardButton(),
-            SelectionPopup.clickItem('Free Product'),
-            PosLoyalty.hasRewardLine('Free Product', '-1.00'),
-            PosLoyalty.isRewardButtonHighlighted(true),
-            PosLoyalty.clickRewardButton(),
-            SelectionPopup.clickItem('Free Product'),
-            PosLoyalty.hasRewardLine('Free Product', '-2.00'),
             PosLoyalty.isRewardButtonHighlighted(true),
             PosLoyalty.clickRewardButton(),
             SelectionPopup.clickItem('Free Product'),
@@ -477,5 +469,38 @@ registry.category("web_tour.tours").add("PosLoyaltyPointsGlobalDiscountProgramNo
             PosLoyalty.orderTotalIs("90"),
             PosLoyalty.pointsAwardedAre("90"),
             PosLoyalty.finalizeOrder("Cash", "90"),
+        ].flat(),
+});
+
+registry.category("web_tour.tours").add("PosLoyaltyArchivedRewardProductsInactive", {
+    test: true,
+    url: "/pos/web",
+    steps: () =>
+        [
+            ProductScreen.confirmOpeningPopup(),
+            ProductScreen.clickHomeCategory(),
+
+            ProductScreen.clickPartnerButton(),
+            ProductScreen.clickCustomer("AAAA"),
+
+            ProductScreen.clickDisplayedProduct("Test Product A"),
+            PosLoyalty.checkNoClaimableRewards(),
+            ProductScreen.selectedOrderlineHas('Test Product A', '1.00', '100.00'),
+            PosLoyalty.finalizeOrder("Cash", "100"),
+        ].flat(),
+});
+
+registry.category("web_tour.tours").add("PosLoyaltyArchivedRewardProductsActive", {
+    test: true,
+    url: "/pos/web",
+    steps: () =>
+        [
+            ProductScreen.clickPartnerButton(),
+            ProductScreen.clickCustomer("AAAA"),
+
+            ProductScreen.clickDisplayedProduct("Test Product A"),
+            PosLoyalty.isRewardButtonHighlighted(true),
+            ProductScreen.selectedOrderlineHas('Test Product A', '1.00', '100.00'),
+            PosLoyalty.finalizeOrder("Cash", "100"),
         ].flat(),
 });

@@ -897,6 +897,8 @@ class MrpProduction(models.Model):
                     finished_move_lines.write({'lot_id': vals.get('lot_producing_id')})
                 if 'qty_producing' in vals:
                     finished_move.quantity = vals.get('qty_producing')
+                    if production.product_tracking == 'lot':
+                        finished_move.move_line_ids.lot_id = production.lot_producing_id
             if self._has_workorders() and not production.workorder_ids.operation_id and vals.get('date_start') and not vals.get('date_finished'):
                 new_date_start = fields.Datetime.to_datetime(vals.get('date_start'))
                 if not production.date_finished or new_date_start >= production.date_finished:
@@ -1396,6 +1398,18 @@ class MrpProduction(models.Model):
         self._set_lot_producing()
         if self.product_id.tracking == 'serial':
             self._set_qty_producing()
+            if self.warehouse_id.manufacture_steps != 'mrp_one_step':
+                is_waiting = self.picking_ids.filtered(
+                    lambda p: p.picking_type_id == self.warehouse_id.pbm_type_id
+                    and p.state not in ('done', 'cancel')
+                )
+                if is_waiting:
+                    moves_to_reset = self.move_raw_ids.filtered(
+                        lambda move: not (move.manual_consumption and move.picked)
+                        and move.product_id.type == 'product'
+                    )
+                    moves_to_reset.picked = False
+                    moves_to_reset.quantity = 0.0
         if self.picking_type_id.auto_print_generated_mrp_lot:
             return self._autoprint_generated_lot(self.lot_producing_id)
 
@@ -1945,6 +1959,7 @@ class MrpProduction(models.Model):
         # reserve new backorder moves depending on the picking type
         self.env['stock.move'].browse(assigned_moves).write({'state': 'assigned'})
         self.env['stock.move'].browse(partially_assigned_moves).write({'state': 'partially_available'})
+        self.env['stock.move.line'].create(move_lines_vals)
         move_to_assign = move_to_assign.filtered(
             lambda move: move.state in ('confirmed', 'partially_available')
             and (move._should_bypass_reservation()
@@ -1955,7 +1970,6 @@ class MrpProduction(models.Model):
         # Avoid triggering a useless _recompute_state
         self.env['stock.move.line'].browse(move_lines_to_unlink).write({'move_id': False})
         self.env['stock.move.line'].browse(move_lines_to_unlink).unlink()
-        self.env['stock.move.line'].create(move_lines_vals)
 
         moves_to_consume.write({'picked': True})
 

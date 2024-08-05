@@ -641,22 +641,9 @@ publicWidget.registry.hoverableDropdown = animations.Animation.extend({
      * @override
      */
     start: function () {
-        if (this.editableMode) {
-            this._onPageClick = this._onPageClick.bind(this);
-            this.el.closest('#wrapwrap').addEventListener('click', this._onPageClick, {capture: true});
-        }
         this.$dropdownMenus = this.$el.find('.dropdown-menu');
         this.$dropdownToggles = this.$el.find('.dropdown-toggle');
         this._dropdownHover();
-        return this._super.apply(this, arguments);
-    },
-    /**
-     * @override
-     */
-    destroy() {
-        if (this.editableMode) {
-            this.el.closest('#wrapwrap').removeEventListener('click', this._onPageClick, {capture: true});
-        }
         return this._super.apply(this, arguments);
     },
 
@@ -680,6 +667,7 @@ publicWidget.registry.hoverableDropdown = animations.Animation.extend({
     /**
      * Hides all opened dropdowns.
      *
+     * TODO: Remove in master.
      * @private
      */
     _hideDropdowns() {
@@ -739,7 +727,10 @@ publicWidget.registry.hoverableDropdown = animations.Animation.extend({
         if (focusedEl) {
             focusedEl.focus();
         } else {
-            ev.currentTarget.querySelector(".dropdown-toggle").blur();
+            const dropdownToggleEl = ev.currentTarget.querySelector(".dropdown-toggle");
+            if (dropdownToggleEl) {
+                dropdownToggleEl.blur();
+            }
         }
     },
     /**
@@ -757,6 +748,7 @@ publicWidget.registry.hoverableDropdown = animations.Animation.extend({
      * Called when the page is clicked anywhere.
      * Closes the shown dropdown if the click is outside of it.
      *
+     * TODO: Remove in master.
      * @private
      * @param {Event} ev
      */
@@ -908,11 +900,12 @@ publicWidget.registry.HeaderGeneral = publicWidget.Widget.extend({
      * @override
      */
     start() {
-        this.searchModalEl = document.querySelector("#o_shared_blocks #o_search_modal");
+        this.searchModalEl = document.querySelector("#o_search_modal_block");
         if (this.searchModalEl) {
             // Fix in stable because we moved '#o_search_modal' within
-            // '#o_shared_blocks' (see 'adapt_content.js'). TODO: remove this in
-            // master and add a new 'publicWidget' for '#o_search_modal'.
+            // '#o_search_modal_block' (see 'adapt_content.js'). TODO: remove
+            // this in master and add a new 'publicWidget' for
+            // '#o_search_modal'.
             this.__onSearchModalShow = this._onSearchModalShow.bind(this);
             this.searchModalEl.addEventListener("show.bs.modal", this.__onSearchModalShow);
             this.__onSearchModalShown = this._onSearchModalShown.bind(this);

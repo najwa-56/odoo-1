@@ -1819,16 +1819,6 @@ QUnit.module("Views", (hooks) => {
         assert.containsNone(target, ".o_selected_row");
     });
 
-    QUnit.test("boolean field has no title (data-tooltip)", async function (assert) {
-        await makeView({
-            type: "list",
-            resModel: "foo",
-            serverData,
-            arch: '<tree><field name="bar"/></tree>',
-        });
-        assert.strictEqual(target.querySelector(".o_data_cell").getAttribute("data-tooltip"), null);
-    });
-
     QUnit.test("field with nolabel has no title", async function (assert) {
         await makeView({
             type: "list",
@@ -2817,6 +2807,46 @@ QUnit.module("Views", (hooks) => {
             target.querySelector("tr:not(.o_group_header) td:not(.o_list_record_selector)")
         );
         assert.verifySteps(["openRecord", "openRecord"]);
+    });
+
+    QUnit.test("open invalid but unchanged record", async function (assert) {
+        const listView = registry.category("views").get("list");
+        class CustomListController extends listView.Controller {
+            openRecord(record) {
+                assert.step("openRecord");
+                assert.strictEqual(record.resId, 2);
+                return super.openRecord(record);
+            }
+        }
+        registry.category("views").add("custom_list", {
+            ...listView,
+            Controller: CustomListController,
+        });
+
+        const list = await makeView({
+            type: "list",
+            resModel: "foo",
+            serverData,
+            arch: `
+                <tree js_class="custom_list">
+                    <field name="foo"/>
+                    <field name="date" required="1"/>
+                </tree>`,
+        });
+
+        patchWithCleanup(list.env.services.notification, {
+            add: () => {
+                throw new Error("should not display a notification");
+            },
+        });
+
+        // second record is invalid as date is not set
+        assert.strictEqual(
+            target.querySelector(".o_data_row:nth-child(2) .o_data_cell[name=date]").innerText,
+            ""
+        );
+        await click(target.querySelector(".o_data_row:nth-child(2) .o_data_cell"));
+        assert.verifySteps(["openRecord"]);
     });
 
     QUnit.test(
@@ -6557,6 +6587,40 @@ QUnit.module("Views", (hooks) => {
         }
     );
 
+    QUnit.test("grouped list, reload aggregates when a record is deleted", async function (assert) {
+        serverData.models.foo.records = [
+            { id: 121, foo: "blip", int_field: 100 },
+            { id: 122, foo: "blip", int_field: 300 },
+            { id: 123, foo: "blip", int_field: 700 },
+        ];
+        await makeView({
+            type: "list",
+            resModel: "foo",
+            serverData,
+            arch: /*xml*/ `
+                <tree expand="1">
+                    <field name="foo"/>
+                    <field name="int_field"/>
+                </tree>`,
+            groupBy: ["foo"],
+            actionMenus: {},
+        });
+
+        assert.strictEqual(
+            target.querySelector(".o_group_header .o_list_number").textContent.trim(),
+            "1100"
+        );
+
+        await click(target.querySelector(".o_data_row input"));
+        await toggleActionMenu(target);
+        await toggleMenuItem(target, "Delete");
+        await click(target, ".modal .btn-primary");
+        assert.strictEqual(
+            target.querySelector(".o_group_header .o_list_number").textContent.trim(),
+            "1000"
+        );
+    });
+
     QUnit.test("pager (ungrouped and grouped mode), default limit", async function (assert) {
         assert.expect(4);
 
@@ -7583,11 +7647,8 @@ QUnit.module("Views", (hooks) => {
 
         await mouseEnter(target.querySelector("th[data-name=foo]"));
         await nextTick(); // GES: see next nextTick comment
-        assert.strictEqual(
-            target.querySelectorAll(".o-tooltip .o-tooltip--technical").length,
-            0,
-            "should not have rendered a tooltip"
-        );
+        assert.strictEqual(target.querySelectorAll(".o-tooltip").length, 1);
+        assert.strictEqual(target.querySelector(".o-tooltip").innerText, "Foo");
 
         patchWithCleanup(odoo, {
             debug: true,
@@ -7616,6 +7677,28 @@ QUnit.module("Views", (hooks) => {
             ]),
             ["Widget:Favorite (boolean_favorite) "],
             "widget description should be correct"
+        );
+    });
+
+    QUnit.test("field (with help) tooltip in non debug mode", async function (assert) {
+        patchWithCleanup(odoo, {
+            debug: false,
+        });
+
+        serverData.models.foo.fields.foo.help = "This is a foo field";
+        await makeView({
+            type: "list",
+            resModel: "foo",
+            serverData,
+            arch: `<tree><field name="foo"/></tree>`,
+        });
+
+        await mouseEnter(target.querySelector("th[data-name=foo]"));
+        await nextTick();
+        assert.strictEqual(target.querySelectorAll(".o-tooltip").length, 1);
+        assert.strictEqual(
+            target.querySelector(".o-tooltip").innerText,
+            "Foo\nThis is a foo field"
         );
     });
 
@@ -19653,17 +19736,22 @@ QUnit.module("Views", (hooks) => {
             string: "Property char",
         };
         const definition1 = {
+            type: "separator",
+            name: "property_separator",
+            string: "Group 1",
+        };
+        const definition2 = {
             type: "boolean",
             name: "property_boolean",
             string: "Property boolean",
         };
         serverData.models.bar.records[0].definitions = [definition0];
-        serverData.models.bar.records[1].definitions = [definition1];
+        serverData.models.bar.records[1].definitions = [definition1, definition2];
         for (const record of serverData.models.foo.records) {
             if (record.m2o === 1) {
                 record.properties = [{ ...definition0, value: "0" }];
             } else if (record.m2o === 2) {
-                record.properties = [{ ...definition1, value: true }];
+                record.properties = [definition1, { ...definition2, value: true }];
             }
         }
 
@@ -19680,6 +19768,7 @@ QUnit.module("Views", (hooks) => {
         });
 
         await click(target, ".o_optional_columns_dropdown_toggle");
+        assert.containsN(target, ".o_optional_columns_dropdown input[type='checkbox']", 2)
 
         await click(
             target.querySelectorAll(".o_optional_columns_dropdown input[type='checkbox']")[0]

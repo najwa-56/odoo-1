@@ -883,13 +883,13 @@ class ProductTemplate(models.Model):
             raise UserError(_('You still have some active reordering rules on this product. Please archive or delete them first.'))
         if any('type' in vals and vals['type'] != prod_tmpl.type for prod_tmpl in self):
             existing_done_move_lines = self.env['stock.move.line'].sudo().search([
-                ('product_id', 'in', self.mapped('product_variant_ids').ids),
+                ('product_id', 'in', self.with_context(active_test=False).mapped('product_variant_ids').ids),
                 ('state', '=', 'done'),
             ], limit=1)
             if existing_done_move_lines:
                 raise UserError(_("You can not change the type of a product that was already used."))
             existing_reserved_move_lines = self.env['stock.move.line'].sudo().search([
-                ('product_id', 'in', self.mapped('product_variant_ids').ids),
+                ('product_id', 'in', self.with_context(active_test=False).mapped('product_variant_ids').ids),
                 ('state', 'in', ['partially_available', 'assigned']),
             ], limit=1)
             if existing_reserved_move_lines:
@@ -916,7 +916,10 @@ class ProductTemplate(models.Model):
 
     # Be aware that the exact same function exists in product.product
     def action_open_quants(self):
-        return self.product_variant_ids.filtered(lambda p: p.active or p.qty_available != 0).action_open_quants()
+        if (self.env.context.get('default_product_id')):
+            return self.env['product.product'].browse(self.env.context['default_product_id']).action_open_quants()
+        else:
+            return self.product_variant_ids.filtered(lambda p: p.active or p.qty_available != 0).action_open_quants()
 
     def action_update_quantity_on_hand(self):
         advanced_option_groups = [
