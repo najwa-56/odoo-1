@@ -23,7 +23,9 @@
     ],
     'installable': True,
     'auto_install': False,
-    'assets': {
+    'assets': {'web.assets_backend': [
+            'static/src/js/*.js',
+        ],
         'point_of_sale._assets_pos':[
             'nilco_pos_multi_uom_price/static/src/js/multi_uom_price.js',
             'nilco_pos_multi_uom_price/static/src/js/quantity_popup.js',
