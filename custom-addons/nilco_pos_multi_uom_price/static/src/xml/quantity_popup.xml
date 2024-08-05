@@ -6,8 +6,9 @@
                 <div class="modal-header">
                     <h4 class="modal-title"><t t-esc="_t('Enter Quantity')"/></h4>
                     <button type="button" class="close" aria-label="Close" t-on-click="onClose">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
+    <span aria-hidden="true">×</span>
+</button>
+
                 </div>
                 <div class="modal-body">
                     <input type="number" class="form-control" t-model="quantity" min="0" step="any"/>
