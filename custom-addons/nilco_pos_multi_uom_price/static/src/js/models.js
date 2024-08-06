@@ -17,13 +17,14 @@ patch(Orderline.prototype, {
     setup(_defaultObj, options) {
         super.setup(...arguments);
         this.product_uom_id = this.product.default_uom_id || this.product_uom_id || this.product.uom_id;
-        
+        this.quantity = this.quantity || 1;
 
     },
 
     export_as_JSON() {
         const json = super.export_as_JSON(...arguments);
         json.product_uom_id = this.product_uom_id[0];
+        json.quantity = this.quantity;
         return json;
     },
     init_from_JSON(json) {
@@ -42,12 +43,15 @@ patch(Orderline.prototype, {
         // Handle the case where product_uom_id is not found, e.g., by setting a default value or showing an error message
         this.product_uom_id = null;  // or some default value
     }
+            this.quantity = json.quantity || 1;
+
 },
     set_uom(uom_id) {
         this.product_uom_id = uom_id;
         const unit = this.get_unit();
     if (unit) {
         this.set_unit_price(unit.price);
+         this.compute_price_based_on_quantity();
     }
     },
     get_unit(){
@@ -66,7 +70,19 @@ patch(Orderline.prototype, {
             return this.pos.units_by_id[unit_id];
         }
         return this.product.get_unit();
-    }
+    },
+    set_quantity(new_quantity) {
+        this.quantity = new_quantity;
+        this.compute_price_based_on_quantity(); // Recompute price when quantity changes
+    },
+
+    compute_price_based_on_quantity() {
+        const unit = this.get_unit();
+        if (unit) {
+            // Assuming unit.price is the price per unit of the selected UOM
+            this.set_unit_price(unit.price * this.quantity);
+        }
+    },
 });
 patch(PosStore.prototype, {
     async _processData(loadedData) {
