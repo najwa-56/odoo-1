@@ -14,11 +14,10 @@
             <!-- Hide the buttons -->
             <attribute name="class">d-flex align-items-center input-group</attribute>
         </xpath>
-        <xpath expr="//button[contains(@class, 'fa-minus')]" position="attributes">
-            <attribute name="style">display: none;</attribute>
+        <xpath expr="//button[contains(@class, 'fa-minus')]" position="replace">
+
         </xpath>
-        <xpath expr="//button[contains(@class, 'fa-plus')]" position="attributes">
-            <attribute name="style">display: none;</attribute>
+        <xpath expr="//button[contains(@class, 'fa-plus')]" position="replace">
         </xpath>
    	</t>
 
