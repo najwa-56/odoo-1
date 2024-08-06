@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<templates id="template" xml:space="preserve">
-   <t t-name="point_of_sale.QuantityPopup">
+<templates >
+  <!-- <t t-name="point_of_sale.QuantityPopup">
     <div class="modal">
         <div class="modal-dialog">
             <div class="modal-content">
@@ -10,7 +10,10 @@
                         <span aria-hidden="true">×</span>
                     </button>
                 </div>
-                
+                <div class="modal-body">
+
+                    <input type="number" class="form-control" t-model="quantity" min="0" step="any"/>
+                </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" t-on-click="onClose"><t t-esc="_t('Cancel')"/></button>
                     <button type="button" class="btn btn-primary" t-on-click="onConfirm"><t t-esc="_t('Confirm')"/></button>
@@ -18,5 +21,5 @@
             </div>
         </div>
     </div>
-</t>
+</t>-->
 </templates>
