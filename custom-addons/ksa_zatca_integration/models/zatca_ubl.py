@@ -5,27 +5,28 @@ amount_verification = 0  # for debug mode
 
 class ZatcaUBL():
 
-    def set_zatca_id(self, invoice_line_id):
-        def next_invoice_line_id(invoice_line_id):
-            id = self.env['ir.sequence'].with_company(self.company_id.parent_root_id).next_by_code('zatca.move.line.seq')
-            if invoice_line_id.sudo().search([('zatca_id', '=', id)]).id:
-                id = next_invoice_line_id(invoice_line_id)
-            return id
+    def set_zatca_id(self, invoice_line_id, bt):
+        # def next_invoice_line_id(invoice_line_id):
+        #     id = self.env['ir.sequence'].with_company(self.company_id.parent_root_id).next_by_code('zatca.move.line.seq')
+        #     if invoice_line_id.sudo().search([('zatca_id', '=', id)]).id:
+        #         id = next_invoice_line_id(invoice_line_id)
+        #     return id
+        #
+        # # seq check
+        # sequence = self.env['ir.sequence'].search([('code', '=', 'zatca.move.line.seq'),
+        #                                            ('company_id', 'in', [self.company_id.parent_root_id.id, False])],
+        #                                           order='company_id', limit=1)
+        # if not sequence:
+        #     raise exceptions.MissingError(_("Sequence") + " 'zatca.move.line.seq' " + _("not found for this company"))
+        bt[126] += 1
+        invoice_line_id.zatca_id = bt[126]
 
-        # seq check
-        sequence = self.env['ir.sequence'].search([('code', '=', 'zatca.move.line.seq'),
-                                                   ('company_id', 'in', [self.company_id.parent_root_id.id, False])],
-                                                  order='company_id', limit=1)
-        if not sequence:
-            raise exceptions.MissingError(_("Sequence") + " 'zatca.move.line.seq' " + _("not found for this company"))
-        invoice_line_id.zatca_id = next_invoice_line_id(invoice_line_id)
-
-    def _get_bg_23_list(self, invoice_line_id, bg_23_list, bt, tax_category, tax_rate, net_amount, is_bg_20, bt_120, bt_121, is_bg_25=False):
+    def _get_bg_23_list(self, invoice_line_id, bg_23_list, bt, tax_category, tax_rate, net_amount, is_bg_20, bt_120, bt_121, is_bg_25=False, bt_117=0):
         if not bg_23_list.get(tax_category, False):
             bg_23_list[tax_category] = {}
         if not bg_23_list[tax_category].get(bt_121, False):
-            bg_23_list[tax_category][bt_121] = {'∑bt_92': 0, '∑bt_99': 0, '∑bt_116': 0,
-                                                'bt_117': 0, 'bt_119': tax_rate, 'bt_120': bt_120}
+            bg_23_list[tax_category][bt_121] = {'∑bt_92': 0, '∑bt_99': 0, '∑bt_116_p': 0, '∑bt_116': 0,
+                                                '∑bt_117': 0, 'bt_119': tax_rate, 'bt_120': bt_120}
         if tax_category == "O":
             # if bt_120 not in bg_23_list[tax_category][bt_121]['bt_120']:
             #     bg_23_list[tax_category][bt_121]['bt_120'] += ",%s" % bt_120
@@ -34,6 +35,10 @@ class ZatcaUBL():
                                                 not invoice_line_id.tax_ids.tax_exemption_code):
                     raise exceptions.MissingError(_("Tax exemption Reason Text is missing in Tax Category") + " 'O' ")
         if is_bg_25:
+            if bt_117:
+                bg_23_list[tax_category][bt_121]['∑bt_117'] += bt_117
+            else:
+                bg_23_list[tax_category][bt_121]['∑bt_116_p'] += net_amount
             bg_23_list[tax_category][bt_121]['∑bt_116'] += net_amount
         elif is_bg_20:
             bg_23_list[tax_category][bt_121]['∑bt_92'] += net_amount
@@ -102,7 +107,8 @@ class ZatcaUBL():
 
     def get_price_unit(self):
         if self.tax_ids.price_include:
-            return self.move_id.get_l10n_field_type('amount', self.price_unit / (1 + self.tax_ids[0].amount / 100))
+            return self.env['account.edi.xml.ubl_20']._get_invoice_line_price_vals(self)['price_amount']
+            # return self.price_unit / (1 + self.tax_ids[0].amount / 100)
         else:
             return self.price_unit
 
@@ -138,9 +144,8 @@ class ZatcaUBL():
 
             bt_120 = invoice_line_id.tax_ids.tax_exemption_text if len(invoice_line_id.tax_ids) > 0 else 'Not subject to VAT'
             bt_121 = invoice_line_id.tax_ids.tax_exemption_code if len(invoice_line_id.tax_ids) > 0 else 'VATEX-SA-OOS'
-            bg_23_list, bt = ZatcaUBL._get_bg_23_list(self, invoice_line_id, bg_23_list, bt, bt[151], bt[152], bt[131], False, bt_120, bt_121, True)
 
-            ZatcaUBL.set_zatca_id(self, invoice_line_id)
+            ZatcaUBL.set_zatca_id(self, invoice_line_id, bt)
 
             invoice_line_xml += ('''
             <cac:InvoiceLine>
@@ -196,8 +201,15 @@ class ZatcaUBL():
                                      (bt[145], self.l10n_check_allowed_size(0, 1000, bt[144], 'AllowanceChargeReason'),
                                       document_currency, self.l10n_is_positive("AllowanceChargeAmount (bt-141)", bt[141])))
 
-            ksa[11] = self.get_l10n_field_type('amount', bt[131] * bt[152]/100)
+            if invoice_line_id.tax_ids.price_include:
+                ksa[11] = self.get_l10n_field_type('amount', invoice_line_id.price_total - bt[131])
+            else:
+                ksa[11] = self.get_l10n_field_type('amount', bt[131] * bt[152]/100)
             ksa[12] = self.get_l10n_field_type('amount', bt[131] + ksa[11])
+
+            bt_117 = ksa[11] if invoice_line_id.tax_ids.price_include else 0
+            bg_23_list, bt = ZatcaUBL._get_bg_23_list(self, invoice_line_id, bg_23_list, bt, bt[151], bt[152], bt[131], False, bt_120, bt_121, True, bt_117)
+
             # BR-KSA-52 and BR-KSA-53
             invoice_line_xml += ('''
                 <cac:TaxTotal>

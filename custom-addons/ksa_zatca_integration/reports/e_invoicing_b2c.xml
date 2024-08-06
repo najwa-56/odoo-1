@@ -173,7 +173,7 @@
                                             <span class="label_column arabic_label">تاريخ إصدار الفاتورة</span>
                                         </td>
                                     </tr>
-                                   <!-- <tr>
+                                    <tr>
                                         <td>
                                             <span class="label_column">
                                                 <b>Tax Currency</b>
@@ -185,7 +185,7 @@
                                         <td>
                                             <span class="label_column arabic_label">العملة الضريبية</span>
                                         </td>
-                                    </tr>-->
+                                    </tr>
                                     <t t-if="doc.reversed_entry_id or doc.debit_origin_id">
                                         <tr>
                                             <td>
@@ -204,7 +204,7 @@
                                             </td>
                                         </tr>
                                     </t>
-                                    <!--<tr>
+                                    <tr>
                                         <td>
                                             <span class="label_column">
                                                 <b>Supply Date</b>
@@ -218,7 +218,7 @@
                                         <td>
                                             <span class="label_column arabic_label">ﺗﺎرﻳﺦ اﻟﺘﻮرﻳﺪ</span>
                                         </td>
-                                    </tr>-->
+                                    </tr>
                                     <!--                            Company/Seller details -->
                                     <tr>
                                         <td>
@@ -280,7 +280,7 @@
                                             <span class="label_column arabic_label">العنوان</span>
                                         </td>
                                     </tr>
-                                    <!--                            Customer/Buyer details
+                                    <!--                            Customer/Buyer details -->
                                     <tr t-if="conf_partner['name']['value']">
                                         <td>
                                             <span class="label_column">
@@ -295,7 +295,7 @@
                                         <td>
                                             <span class="label_column arabic_label">اسم العميل</span>
                                         </td>
-                                    </tr>-->
+                                    </tr>
                                     <tr t-if="doc.partner_id.buyer_identification">
                                         <td>
                                             <span class="label_column">
@@ -342,27 +342,27 @@
                                         <col width='20%'/>
                                         <col width='20%'/>
                                     </colgroup>
-                                    <!--<tr style="line-height: 1;">
+                                    <tr style="line-height: 1;">
                                         <th colspan='4' class="invline_column"
                                             style="text-align:center;border-top:1pt dashed black;border-bottom:0pt;">
                                             <span class="label_column">الوصف</span>
                                             <br/>
                                             <span class="label_column">Description</span>
                                         </th>
-                                    </tr>-->
+                                    </tr>
                                     <tr style="line-height: 1;">
                                         <th class="invline_column">
-                                            <span class="label_column arabic_label">السعر ﺷﺎﻣﻞ ﺿﺮﻳﺒﺔ اﻟﻘﻴﻤﺔ
+                                            <span class="label_column arabic_label">إﺟﻤﺎﻟﻲ اﻟﻤﺒﻠﻎ ﺷﺎﻣﻞ ﺿﺮﻳﺒﺔ اﻟﻘﻴﻤﺔ
                                                 اﻟﻤﻀﺎﻓﺔ
                                             </span>
                                             <br/>
                                             <span class="label_column">Total Inclusive of VAT</span>
                                         </th>
-                                      <!--  <th class="invline_column">
+                                        <th class="invline_column">
                                             <span class="label_column arabic_label">خصومات</span>
                                             <br/>
                                             <span class="label_column">Discount</span>
-                                        </th>-->
+                                        </th>
                                         <th class="invline_column">
                                             <span class="label_column arabic_label">السعر</span>
                                             <br/>
@@ -373,38 +373,34 @@
                                             <br/>
                                             <span class="label_column">Quantity</span>
                                         </th>
-                                         <th class="invline_column">
-                                            <span class="label_column arabic_label">المنتج</span>
-                                            <br/>
-                                            <span class="label_column">product</span>
-                                        </th>
                                         <!--                                <th class="invline_column" style="text-align:center;">-->
                                         <!--                                    نوع<br/>Type-->
                                         <!--                                </th>-->
                                     </tr>
                                     <t t-foreach="invoice_line_ids" t-as="line" t-key="line.id">
                                         <t t-set="bt_141" t-value="doc.get_bt_141(line.zatca_id)"/>
-
+                                        <tr>
+                                            <td colspan='4'
+                                                class="invline_data"
+                                                style="text-align:center;max-width:100%">
+                                                <span t-esc="doc._get_zatca_product_name(line)['name']['value']"/>
+                                            </td>
+                                        </tr>
                                         <tr>
                                             <td class="invline_data">
                                                 <span t-esc="doc.get_ksa_12(line.zatca_id)"
                                                       t-options='{"widget": "monetary", "display_currency": doc.currency_id}'/>
                                             </td>
-                                           <!-- <td class="invline_data">
+                                            <td class="invline_data">
                                                 <span t-esc="doc.get_bt_136(line.zatca_id)"
                                                       t-options='{"widget": "monetary", "display_currency": doc.currency_id}'/>
-                                            </td>-->
+                                            </td>
                                             <td class="invline_data">
                                                 <span t-esc="doc.get_bt_146(line.zatca_id)"
                                                       t-options='{"widget": "monetary", "display_currency": doc.currency_id}'/>
                                             </td>
                                             <td class="invline_data">
                                                 <t t-esc="line.quantity"/>
-                                            </td>
-                                             <td colspan='4'
-                                                class="invline_data"
-                                                style="text-align:center;max-width:100%">
-                                                <span t-esc="doc._get_zatca_product_name(line)['name']['value']"/>
                                             </td>
                                             <!--                                    <td class="invline_data">-->
                                             <!--                                        <t t-esc="line.product_uom_id.name"/>-->
@@ -469,7 +465,7 @@
                                         </td>
                                     </tr>
                                     <!--                            Not required by zatca-->
-                                   <!-- <tr>
+                                    <tr>
                                         <td class="left_column">
                                             <span>Amount Due</span>
                                         </td>
@@ -480,7 +476,7 @@
                                         <td class="right_column arabic_label">
                                             <span>المبلغ المتبقي</span>
                                         </td>
-                                    </tr>-->
+                                    </tr>
                                 </table>
                                 <hr></hr>
                                 <t t-if="doc.env['ir.module.module'].sudo().search([('name', '=', 'point_of_sale')]) == 'installed'">

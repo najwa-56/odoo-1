@@ -18,6 +18,14 @@ class AccountMoveReport(models.Model):
         # %H:%M can be removed.
         return fields.Datetime.context_timestamp(self.with_context(tz='Asia/Riyadh'), self.l10n_sa_confirmation_datetime).strftime('%Y-%m-%d %H:%M')
 
+    def get_tax_amount(self):
+        data = 0.0
+        if self.invoice_line_ids:
+            for rec in self.invoice_line_ids:
+                taxable_amount = rec.price_unit * rec.quantity
+                data += ((rec.tax_ids[0].amount if rec.tax_ids else 0.0) * taxable_amount) / 100
+        return data
+
     def _l10n_sa_pdf_conversion(self, collected_streams):
         is_tax_invoice = 1 if self.l10n_sa_invoice_type == 'Standard' else 0
         xml = self.zatca_hash_cleared_invoice if is_tax_invoice else self.zatca_invoice

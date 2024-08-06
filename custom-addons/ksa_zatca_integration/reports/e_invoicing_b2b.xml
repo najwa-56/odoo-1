@@ -16,7 +16,7 @@
                         padding: 2px;
                         border: 1px solid black;
                         border-collapse: collapse;
-                        font-size:11px;
+                        font-size:10px;
                         }
                     </style>
                     <t t-if="doc.debit_origin_id">
@@ -48,10 +48,7 @@
                        t-value="doc.partner_id.buyer_identification if doc.l10n_is_self_billed_invoice else doc.company_id.license"/>
                     <t t-set="license_no"
                        t-value="doc.partner_id.buyer_identification_no if doc.l10n_is_self_billed_invoice else doc.company_id.license_no"/>
-                            <div class="col-4">
-                                <img style="text-align:center;width:200px;max-height:200px;float:right;margin-top:-10px;padding-top:0px;"
-                                     alt="Barcode" t-att-src="doc.get_qrcode()"/>
-                            </div>
+
                     <h3 style="text-align:center;">
                         <t t-esc="invoice_type_ar"/>
                     </h3>
@@ -60,12 +57,12 @@
                     </h2>
                     <div dir="ltr">
                         <div class="page row">
-
+                            <div class="col-8">
                                 <table style="margin-top:5px;" class="main_table second_table" width="100%">
-                                    <col style="width:10%"/>
-                                    <col style="width:20%"/>
-                                    <col style="width:20%"/>
-                                    <!--<tr>
+                                    <col style="width:15%"/>
+                                    <col style="width:50%"/>
+                                    <col style="width:15%"/>
+                                    <tr>
                                         <td class="second_table left_column">
                                             <span>
                                                 <b>Invoice Type</b>
@@ -82,7 +79,7 @@
                                         <td class="second_table" style="text-align:right;">
                                             <span class="lable_bold">نوع الفاتورة</span>
                                         </td>
-                                    </tr>-->
+                                    </tr>
                                     <tr>
                                         <td class="second_table left_column">
                                             <span>
@@ -150,7 +147,7 @@
                                             </td>
                                         </tr>
                                     </t>
-                                   <!-- <t t-elif="doc.invoice_origin">
+                                    <t t-elif="doc.invoice_origin">
                                         <tr>
                                             <td class="second_table left_column">
                                                 <span>
@@ -166,8 +163,8 @@
                                                 <span class="lable_bold">رقم الإقتباس</span>
                                             </td>
                                         </tr>
-                                    </t>-->
-                                    <!--<tr>
+                                    </t>
+                                    <tr>
                                         <td class="second_table left_column">
                                             <span>
                                                 <b>Tax Currency</b>
@@ -179,8 +176,8 @@
                                         <td class="second_table" style="text-align:right;">
                                             <span class="lable_bold">العملة الضريبية</span>
                                         </td>
-                                    </tr>-->
-                                    <!--<tr>
+                                    </tr>
+                                    <tr>
                                         <td class="second_table left_column">
                                             <span>
                                                 <b>Supply Date</b>
@@ -194,7 +191,7 @@
                                         <td class="second_table" style="text-align:right;">
                                             <span class="lable_bold">ﺗﺎرﻳﺦ اﻟﺘﻮرﻳﺪ</span>
                                         </td>
-                                    </tr>-->
+                                    </tr>
                                     <tr t-if="doc.get_bt_120() not in [0, False, '', None] and len(doc.get_bt_120()) > 0">
                                         <td class="second_table left_column">
                                             <span>
@@ -214,8 +211,11 @@
                                         </td>
                                     </tr>
                                 </table>
-
-
+                            </div>
+                            <div class="col-4">
+                                <img style="text-align:center;width:200px;max-height:200px;float:right;margin-top:-10px;padding-top:0px;"
+                                     alt="Barcode" t-att-src="doc.get_qrcode()"/>
+                            </div>
                         </div>
                         <table style="margin-top:5px;" width="100%">
                             <col style="width:11%"/>
@@ -300,7 +300,7 @@
                                 </td>
 
                             </tr>
-                            <!--<tr>
+                            <tr>
                                 <t t-if="conf_company['street2']['value']">
                                     <td class="second_table left_column">
                                         <span>
@@ -334,7 +334,7 @@
                                         <span class="lable_bold">اسم الشارع</span>
                                     </td>
                                 </t>
-                            </tr>-->
+                            </tr>
                             <tr>
                                 <td class="second_table left_column">
                                     <span>
@@ -363,7 +363,7 @@
                                     <span class="lable_bold">رقم المبنى</span>
                                 </td>
                             </tr>
-                           <!-- <tr>
+                            <tr>
                                 <t t-if="_company_id.additional_no">
                                     <td class="second_table left_column">
                                         <span>
@@ -397,7 +397,7 @@
                                         <span class="lable_bold">الرقم الإضافي للعنوان</span>
                                     </td>
                                 </t>
-                            </tr>-->
+                            </tr>
                             <tr>
                                 <td class="second_table left_column">
                                     <span>
@@ -454,7 +454,7 @@
                                     <span class="lable_bold">الرمز البريدي</span>
                                 </td>
                             </tr>
-                           <!-- <tr>
+                            <tr>
                                 <t t-if="conf_company['state_id_name']['value']">
                                     <td class="second_table left_column">
                                         <span>
@@ -473,7 +473,7 @@
                                 <t t-elif="conf_partner['state_id_name']['value']">
                                     <td colspan="3"/>
                                 </t>
-                               <t t-if="conf_partner['state_id_name']['value']">
+                                <t t-if="conf_partner['state_id_name']['value']">
                                     <td class="second_table left_column">
                                         <span>
                                             <b>State</b>
@@ -488,7 +488,7 @@
                                         <span class="lable_bold">الحي</span>
                                     </td>
                                 </t>
-                            </tr>-->
+                            </tr>
                             <tr>
                                 <td class="second_table left_column">
                                     <span>
@@ -573,7 +573,7 @@
                                     <span class="lable_bold">رقم تسجيل ضريبة القيمة المضافة</span>
                                 </td>
                             </tr>
-                            <!-- <tr>
+                            <tr>
                                 <td class="second_table left_column">
                                     <span>
                                         <b>Other Seller Type</b>
@@ -614,11 +614,11 @@
                                         <span class="lable_bold">بائع آخر</span>
                                     </td>
                                 </t>
-                            </tr>-->
+                            </tr>
                             <tr>
                                 <td class="second_table left_column">
                                     <span>
-                                        <b>CRN</b>
+                                        <b>Other Seller ID</b>
                                     </span>
                                 </td>
                                 <td class="second_table">
@@ -627,12 +627,12 @@
                                     </span>
                                 </td>
                                 <td class="second_table" style="text-align:right;">
-                                    <span class="lable_bold">رقم السجل التجاري</span>
+                                    <span class="lable_bold">اي دي البائع الآخر</span>
                                 </td>
                                 <t t-if="buyer_identification_no">
                                     <td class="second_table left_column">
                                         <span>
-                                            <b>CRN</b>
+                                            <b>Other Buyer ID</b>
                                         </span>
                                     </td>
                                     <td class="second_table">
@@ -641,7 +641,7 @@
                                         </span>
                                     </td>
                                     <td class="second_table" style="text-align:right;">
-                                        <span class="lable_bold">رقم السجل التجاري</span>
+                                        <span class="lable_bold">معرف آخر</span>
                                     </td>
                                 </t>
                             </tr>
@@ -675,17 +675,10 @@
                                         </th>
                                         <th align="center" name="nature_of_goods=" class="second_table"
                                             style="background-color:#4f4d4d;text-align:center;color:white;">
-                                              <span class="lable_bold">الاسم العربي </span>
+                                            <span class="lable_bold">Item Name</span>
+                                            <br/>
+                                            <span class="lable_bold">التفاصيل السلع أو الخدمات</span>
                                         </th>
-
-                                        <!--we add product name english to invoice -->
-
-                                         <th align="center" name="eng-name" class="second_table"
-                                            style="background-color:#4f4d4d;text-align:center;color:white;">
-                                             <span class="lable_bold">الاسم اللاتيني </span>
-                                        </th>
-                                        <!--- -->
-
                                         <th align="right" name="item_subtotal" class="second_table"
                                             style="background-color:#4f4d4d;text-align:center;color:white;">
                                             <span class="lable_bold">Unit Price</span>
@@ -698,14 +691,12 @@
                                             <br/>
                                             <span class="lable_bold">الكمية</span>
                                         </th>
-                                                    <!--we hide disscaount -->
-
-                                      <!--  <th align="center" name="discount" class="second_table"
+                                        <th align="center" name="discount" class="second_table"
                                             style="background-color:#4f4d4d;text-align:center;color:white;">
                                             <span class="lable_bold">Discount</span>
                                             <br/>
                                             <span class="lable_bold">خصومات</span>
-                                        </th>-->
+                                        </th>
                                         <th align="center" name="taxable_rate" class="second_table"
                                             style="background-color:#4f4d4d;text-align:center;color:white;">
                                             <span class="lable_bold">VAT Rate</span>
@@ -746,13 +737,6 @@
                                         <td class="second_table" style="text-align:right;">
                                             <span t-esc='doc._get_zatca_product_name(line)["name"]["value"]'/>
                                         </td>
-                                        <!--we add product name english to invoice -->
-
-                                        <td class="second_table" style="text-align:right;">
-                                              <span t-esc="line.product_arabic"/>
-                                        </td>
-                                        <!--- -->
-
                                         <td class="second_table" style="text-align:right;">
                                             <span t-esc="doc.get_bt_146(line.zatca_id)"
                                                   t-options='{"widget": "monetary", "display_currency": doc.currency_id}'/>
@@ -760,13 +744,10 @@
                                         <td class="second_table" style="text-align:right;">
                                             <span t-esc="'{:,}'.format(line.quantity)"/>
                                         </td>
-
-                                        <!--we hide disscaount -->
-
-                                       <!-- <td class="second_table" style="text-align:right;">
+                                        <td class="second_table" style="text-align:right;">
                                             <span t-esc="doc.get_bt_136(line.zatca_id)"
                                                   t-options='{"widget": "monetary", "display_currency": doc.currency_id}'/>
-                                        </td>-->
+                                        </td>
                                         <td class="second_table" style="text-align:right;">
                                             <t t-if="not len(line.tax_ids.ids)">
                                                 0
@@ -891,7 +872,7 @@
                                                   t-options='{"widget": "monetary", "display_currency": doc.currency_id}'/>
                                         </td>
                                     </tr>
-                                   <!-- <tr>
+                                    <tr>
                                         <td class="second_table left_column">
                                             <span class="lable_bold">Amount Due</span>
                                         </td>
@@ -902,7 +883,7 @@
                                             <span t-esc="doc.get_bt_115()"
                                                   t-options='{"widget": "monetary", "display_currency": doc.currency_id}'/>
                                         </td>
-                                    </tr>-->
+                                    </tr>
                                 </table>
                             </div>
                         </div>

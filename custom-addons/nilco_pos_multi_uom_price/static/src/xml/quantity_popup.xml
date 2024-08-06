@@ -14,6 +14,7 @@
                 <div class="modal-body">
                     <!-- Correctly bound to the component’s state -->
                     <input type="number" class="form-control" t-model="state.quantity" min="0" step="any"/>
+
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" t-on-click="onClose"><t t-esc="_t('Cancel')"/></button>

@@ -528,7 +528,7 @@ class AccountMove(models.Model):
         bt_31 = company_id.vat
         bg_23_list = {}
         ksa = {'∑31': 0, '∑32': 0}
-        bt = {12: 0,
+        bt = {12: 0, 126: 0,
               25: self.env['account.move'],
               92: 0,  # No document level allowance, in default odoo
               95: 0, 99: 0, '∑92': 0, '∑99': 0,
@@ -820,11 +820,13 @@ class AccountMove(models.Model):
                 raise exceptions.ValidationError(_("Multiple tax reasons for same tax group can't be applied in one invoice."))
             for bt_121 in bg_23_list[tax_category]:
                 bg_23 = bg_23_list[tax_category][bt_121]
-                bt[116] = self.get_l10n_field_type('amount', bg_23['∑bt_116'] - bg_23['∑bt_92'] + bg_23['∑bt_99'])
+                bt[116] = self.get_l10n_field_type('amount', bg_23['∑bt_116_p'] - bg_23['∑bt_92'] + bg_23['∑bt_99'])
                 bt[118] = tax_category
                 bt[119] = self.get_l10n_field_type('percentage', self.get_l10n_field_type('amount', bg_23['bt_119']))
 
                 bt[117] = bt[116] * (bt[119] / 100)
+                bt[116] = self.get_l10n_field_type('amount', bg_23['∑bt_116'] - bg_23['∑bt_92'] + bg_23['∑bt_99'])
+                bt[117] += bg_23['∑bt_117']
                 bt['∑117'] += bt[117]
                 bt[117] = self.get_l10n_field_type('amount', bt[117])
 

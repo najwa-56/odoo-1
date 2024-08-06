@@ -12,7 +12,7 @@
     'license': 'OPL-1',
     'images': ['static/description/cover.png'],
     'category': 'Invoicing',
-    'version': '17.10.3',
+    'version': '17.11.0',
     'price': 700, 'currency': 'USD',
     'depends': ['account', 'sale', 'l10n_sa', 'purchase', 'account_debit_note', 'account_edi_ubl_cii'],
     'external_dependencies': {
