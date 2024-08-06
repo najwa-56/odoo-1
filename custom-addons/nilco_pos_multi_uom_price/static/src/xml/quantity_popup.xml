@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <templates>
-    <t t-name="point_of_sale.QuantityPopup">
+   <t t-name="point_of_sale.QuantityPopup">
     <div class="modal">
         <div class="modal-dialog">
             <div class="modal-content">
@@ -11,7 +11,7 @@
                     </button>
                 </div>
                 <div class="modal-body">
-                    <!-- Ensure `quantity` is correctly bound for two-way data binding -->
+                    <!-- Correctly bound to the component’s state -->
                     <input type="number" class="form-control" t-model="quantity" min="0" step="any"/>
                 </div>
                 <div class="modal-footer">
@@ -22,4 +22,5 @@
         </div>
     </div>
 </t>
+
 </templates>

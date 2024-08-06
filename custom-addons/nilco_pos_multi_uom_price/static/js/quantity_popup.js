@@ -8,7 +8,6 @@ export class QuantityPopup extends Component {
 
     setup() {
         this.state = useState({ quantity: 1 });
-        this._t = _t; // Ensure _t is assigned correctly
     }
 
     get quantity() {
