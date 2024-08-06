@@ -10,14 +10,19 @@
 	</t>
 
     <t t-name="NumericInput_inherit" inherit_id="point_of_sale.NumericInput" t-inherit-mode="extension" owl="1">
-        <xpath expr="//div[@class='input-group']" position="attributes">
-            <!-- Hide the buttons -->
-            <attribute name="class">d-flex align-items-center input-group</attribute>
-        </xpath>
         <xpath expr="//button[contains(@class, 'fa-minus')]" position="replace">
-
+            <t t-if="false">
+                <button class="btn btn-secondary border" t-on-click="() => this.setValue(this.getValue() - 1)" t-att-disabled="getValue() lte props.min">
+                    <i class="fa fa-minus center"/>
+                </button>
+            </t>
         </xpath>
         <xpath expr="//button[contains(@class, 'fa-plus')]" position="replace">
+            <t t-if="false">
+                <button class="btn btn-secondary border" t-on-click="() => this.setValue(this.getValue() + 1)">
+                    <i class="fa fa-plus"/>
+                </button>
+            </t>
         </xpath>
    	</t>
 
