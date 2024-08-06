@@ -45,6 +45,23 @@ export class UOMButton extends Component {
 	         }
 	       }
        }
+    async selectPartner(isEditMode = false, missingFields = []) {
+        if (partner == false){
+            const currentPartner = this.currentOrder.get_partner();
+            const partnerScreenProps = { partner: currentPartner };
+            if (isEditMode && currentPartner) {
+                partnerScreenProps.editModeProps = true;
+                partnerScreenProps.missingFields = missingFields;
+            }
+            const { confirmed, payload: newPartner } = await this.pos.showTempScreen(
+                "PartnerListScreen",
+                partnerScreenProps
+            );
+            if (confirmed) {
+                this.currentOrder.set_partner(newPartner);
+            }
+        }
+    }
    }
 
 
