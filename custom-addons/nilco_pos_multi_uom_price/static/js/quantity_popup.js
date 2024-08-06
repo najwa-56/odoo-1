@@ -1,4 +1,5 @@
 /** @odoo-module */
+
 import { Component, useState } from "@odoo/owl";
 
 export class QuantityPopup extends Component {
@@ -25,3 +26,4 @@ export class QuantityPopup extends Component {
         this.trigger('close'); // Handle close action
     }
 }
+
