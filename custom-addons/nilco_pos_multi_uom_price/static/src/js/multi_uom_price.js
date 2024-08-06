@@ -3,7 +3,7 @@ import { ProductScreen } from "@point_of_sale/app/screens/product_screen/product
 import { Component } from "@odoo/owl";
 import { useListener } from "@web/core/utils/hooks";
 import { SelectionPopup } from "@point_of_sale/app/utils/input_popups/selection_popup";
-import { QuantityPopup } from "./quantity_popup";
+import { _t } from "@web/core/l10n/translation";  // Import _t for translations
 
 export class UOMButton extends Component {
     static template = "point_of_sale.UOMButton";
@@ -37,21 +37,11 @@ export class UOMButton extends Component {
 			       title: 'UOM',
 			       list: uomList,
 		       });
-		        if (confirmed) {
-                    // Show quantity popup
-                    const { confirmed: qtyConfirmed, payload: quantity } = await this.env.services.popup.add(
-                        QuantityPopup, {
-                            title: 'Enter Quantity',
-                        }
-                    );
-
-                    if (qtyConfirmed) {
-                        line.set_uom({0: selectedUOM.id, 1: selectedUOM.name});
-                        line.price_manually_set = true;
-                        line.set_unit_price(selectedUOM.price);
-                        line.set_quantity(quantity);
-                    }
-                }
+		       if (confirmed) {
+			      line.set_uom({0:selectedUOM.id,1:selectedUOM.name});
+			      line.price_manually_set = true;
+			      line.set_unit_price(selectedUOM.price);
+		       }
 	         }
 	       }
        }
