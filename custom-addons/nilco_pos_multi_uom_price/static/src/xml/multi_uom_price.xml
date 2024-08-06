@@ -9,25 +9,6 @@
         </button>
 	</t>
 
-    <xpath expr="//t[@t-name='point_of_sale.NumericInput']" position="replace">
-        <t t-name="point_of_sale.NumericInput">
-            <div t-attf-class="{{props.class}} d-flex align-items-center input-group" >
-                <!-- Hide the minus button -->
-                <button class="btn btn-secondary border" t-att-disabled="getValue() lte props.min" style="display: none;">
-                    <i class="fa fa-minus center"/>
-                </button>
-                <input class="o_input form-control border text-center text-bg-light" type="number"
-                        t-on-focus="ev=>ev.target.select()"
-                        t-att-value="getValue()"
-                        t-att-min="props.min"
-                        t-on-input="(event) => this.setValue(parseInt(event.target.value))" />
-                <!-- Hide the plus button -->
-                <button class="btn btn-secondary border" style="display: none;">
-                    <i class="fa fa-plus"/>
-                </button>
-            </div>
-        </t>
-    </xpath>
     
 	
 </templates>
