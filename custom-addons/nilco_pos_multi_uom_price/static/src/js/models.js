@@ -17,14 +17,13 @@ patch(Orderline.prototype, {
     setup(_defaultObj, options) {
         super.setup(...arguments);
         this.product_uom_id = this.product.default_uom_id || this.product_uom_id || this.product.uom_id;
-         this.quantity = this.quantity || 1;
+        
 
     },
 
     export_as_JSON() {
         const json = super.export_as_JSON(...arguments);
         json.product_uom_id = this.product_uom_id[0];
-        json.quantity = this.quantity;
         return json;
     },
     init_from_JSON(json) {
@@ -43,14 +42,12 @@ patch(Orderline.prototype, {
         // Handle the case where product_uom_id is not found, e.g., by setting a default value or showing an error message
         this.product_uom_id = null;  // or some default value
     }
-     this.quantity = json.quantity || 1;
 },
     set_uom(uom_id) {
         this.product_uom_id = uom_id;
-         const unit = this.get_unit();
-         if (unit) {
-      this.set_unit_price(unit.price);
-      this.compute_price_based_on_quantity();
+        const unit = this.get_unit();
+    if (unit) {
+        this.set_unit_price(unit.price);
     }
     },
     get_unit(){
