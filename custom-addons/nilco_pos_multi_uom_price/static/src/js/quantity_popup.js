@@ -1,12 +1,13 @@
 /** @odoo-module */
 import { Component, useState } from "@odoo/owl";
+import { _t } from '@web/core/l10n/translation';
 
 export class QuantityPopup extends Component {
     static template = "point_of_sale.QuantityPopup";
 
     setup() {
-        // Define quantity as a reactive state
         this.state = useState({ quantity: 1 });
+        this._t = _t; // Ensure _t is assigned correctly
     }
 
     get quantity() {
