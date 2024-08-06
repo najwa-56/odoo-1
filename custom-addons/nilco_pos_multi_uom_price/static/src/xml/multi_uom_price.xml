@@ -9,10 +9,7 @@
         </button>
 	</t>
 
-
-
-        <t t-name="NumericInput_inherit" t-inherit="point_of_sale.NumericInput" t-inherit-mode="extension" owl="1">
-
+    <template id="point_of_sale.NumericInput_inherit" inherit_id="point_of_sale.NumericInput">
         <xpath expr="//div[@class='input-group']" position="attributes">
             <!-- Hide the buttons -->
             <attribute name="class">d-flex align-items-center input-group</attribute>
@@ -23,6 +20,6 @@
         <xpath expr="//button[contains(@class, 'fa-plus')]" position="attributes">
             <attribute name="style">display: none;</attribute>
         </xpath>
- </t>
-</templates>
+    </template>
 
+</templates>
