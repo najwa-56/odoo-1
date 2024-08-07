@@ -42,7 +42,6 @@ export class UOMButton extends Component {
 		       if (confirmed) {
 			      line.set_uom({0:selectedUOM.id,1:selectedUOM.name});
 			      line.price_manually_set = true;
-			      console.log("I am here 4");
 			      line.set_unit_price(selectedUOM.price);
 
 		       }

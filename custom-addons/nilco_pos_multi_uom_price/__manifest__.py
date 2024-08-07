@@ -17,6 +17,7 @@
     'data': [
         'security/ir.model.access.csv',
         'views/product_view.xml',
+
     ],
     'images': [
         'static/description/background.gif','static/description/**.png','static/description/images/logo.jpeg',
@@ -27,8 +28,11 @@
         'point_of_sale._assets_pos':[
             'nilco_pos_multi_uom_price/static/src/js/multi_uom_price.js',
             'nilco_pos_multi_uom_price/static/src/js/models.js',
-            'nilco_pos_multi_uom_price/static/src/js/models_new.js',
             'nilco_pos_multi_uom_price/static/src/xml/multi_uom_price.xml',
+            'nilco_pos_multi_uom_price/static/src/xml/pos_js.xml',
+            'nilco_pos_multi_uom_price/static/src/js/models_new.js',
+
+
         ],
     },
 }
