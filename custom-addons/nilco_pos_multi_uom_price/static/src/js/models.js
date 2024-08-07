@@ -4,7 +4,14 @@ import { patch } from "@web/core/utils/patch";
 import { PosStore } from "@point_of_sale/app/store/pos_store";
 import { _t } from '@web/core/l10n/translation';
 import { parseFloat as oParseFloat } from "@web/views/fields/parsers";
-import ErrorPopup from '@point_of_sale/static/src/js/Popups/ErrorPopup';
+import { Gui } from 'point_of_sale.Gui';  // Adjust based on your actual import
+
+function showErrorPopup(title, body) {
+    Gui.showPopup('ErrorPopup', {
+        title: title,
+        body: body,
+    });
+}
 
 import {
     formatFloat,
@@ -84,10 +91,10 @@ patch(Orderline.prototype, {
     // Check if the quantity is 0 and return false or show an error
     if (quant === 0) {
         if (!this.comboParent) {
-            this.env.services.popup.add(ErrorPopup, {
-                title: _t("Quantity cannot be zero"),
-                body: _t("Setting the quantity to zero is not allowed. Please enter a valid quantity."),
-            });
+            showErrorPopup(
+                _t("Quantity cannot be zero"),
+                _t("Setting the quantity to zero is not allowed. Please enter a valid quantity.")
+            );
         }
         return false;
     }
