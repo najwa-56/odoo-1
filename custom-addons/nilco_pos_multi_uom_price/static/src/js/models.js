@@ -130,6 +130,10 @@ patch(Orderline.prototype, {
         }
         return true;
     }
+    set_partner(partner) {
+        this.assert_editable();
+        this.partner = partner;
+    }
 
 });
 patch(PosStore.prototype, {
