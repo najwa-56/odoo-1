@@ -21,4 +21,7 @@
 	<record id="group_customer_button" model="res.groups">
 		<field name="name">Disable Customer Button</field>
 	</record>
+	<record id="group_Delete_button" model="res.groups">
+		<field name="name">Disable Delete Button</field>
+	</record>
 </odoo>

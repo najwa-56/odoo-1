@@ -164,6 +164,6 @@ patch(ProductScreen.prototype, {
                 this.numberBuffer.sendKey(buttonValue);
             }
         }
-        
+
     }
 });

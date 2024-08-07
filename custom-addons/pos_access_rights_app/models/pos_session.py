@@ -15,6 +15,7 @@ class PosSessionInherit(models.Model):
 		numpad = user.has_group('pos_access_rights_app.group_numpad_button')
 		price = user.has_group('pos_access_rights_app.group_price_button')
 		partner = user.has_group('pos_access_rights_app.group_customer_button')
+		Delete = user.has_group('pos_access_rights_app.group_Delete_button')
 		dict_pos_group = {'discount': discount, 'plus_minus': plus_minus, 'payment': payment, 'quantity': quantity,
 					'numpad': numpad, 'price': price, 'partner': partner}
 		return dict_pos_group
