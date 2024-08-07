@@ -49,4 +49,10 @@ class PosSession(models.Model):
             },
             'context': {'display_default_code': False},
         }
-  
+
+    def pos_active_user_group(self, current_user):
+        user = self.env['res.users'].search([('id', '=', current_user['id'])])
+        ristrict = user.has_group('pos_access_rights_app.group_ristrict_0')
+
+        dict_pos_group = {'ristrict': ristrict}
+        return dict_pos_group

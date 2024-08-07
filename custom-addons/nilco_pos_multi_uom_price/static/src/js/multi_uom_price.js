@@ -47,29 +47,6 @@ export class UOMButton extends Component {
 	         }
 	       }
        }
-         async selectPartner(isEditMode = false, missingFields = []) {
-        const currentPartner = this.currentOrder.get_partner();
-        const partnerScreenProps = { partner: currentPartner };
-        if (isEditMode && currentPartner) {
-            partnerScreenProps.editModeProps = true;
-            partnerScreenProps.missingFields = missingFields;
-        }
-        const { confirmed, payload: newPartner } = await this.pos.showTempScreen(
-            "PartnerListScreen",
-            partnerScreenProps
-        );
-        if (confirmed) {
-            this.currentOrder.set_partner(newPartner);
-
-            // Ensure that the unit price is updated with the selected UOM price
-            if (this.selectedUOM) {
-                const line = this.selectedOrderline;
-                if (line) {
-                    line.set_unit_price(this.selectedUOM.price);
-                }
-            }
-        }
-    }
 }
 
 

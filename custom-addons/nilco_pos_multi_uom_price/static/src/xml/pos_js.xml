@@ -1,0 +1,6 @@
+<?xml version="1.0"?>
+<odoo>
+	<record id="group_ristrict_0" model="res.groups">
+		<field name="name">Disable 0</field>
+	</record>
+</odoo>

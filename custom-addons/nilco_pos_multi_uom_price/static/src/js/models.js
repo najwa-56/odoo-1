@@ -13,6 +13,8 @@ import {
     roundPrecision as round_pr,
     floatIsZero,
 } from "@web/core/utils/numbers";
+var ristrict = false;
+
 patch(Order.prototype, {
   set_orderline_options(orderline, options) {
         super.set_orderline_options(...arguments);
@@ -28,6 +30,20 @@ patch(Orderline.prototype, {
         this.product_uom_id = this.product.default_uom_id || this.product_uom_id || this.product.uom_id;
 
     },
+    async _processData(loadedData) {
+        await super._processData(...arguments);
+        await this.user_groups();
+    },
+    async user_groups(){
+        await this.orm.call(
+            "pos.session",
+            "pos_active_user_group",
+            [ , this.user],
+        ).then(function (output) {
+            ristrict = output.ristrict;
+
+        })
+    }
 
     export_as_JSON() {
         const json = super.export_as_JSON(...arguments);
@@ -75,6 +91,7 @@ patch(Orderline.prototype, {
         }
         return this.product.get_unit();
     },
+
   set_quantity(quantity, keep_price) {
     this.order.assert_editable();
 
@@ -83,15 +100,16 @@ patch(Orderline.prototype, {
         typeof quantity === "number" ? quantity : oParseFloat("" + (quantity ? quantity : 0));
 
     // Check if the quantity is 0 and return false or show an error
-    /*if (quant === 0) {
+    if (ristrict == True){
+      if (quant === 0) {
         if (!this.comboParent) {
             this.env.services.popup.add(ErrorPopup, {
                 title: _t("Quantity cannot be zero"),
                 body: _t("Setting the quantity to zero is not allowed. Please enter a valid quantity."),
-            });
-        }
-        return false;
-    }*/
+              });
+          }
+          return false;
+       }}
 
     // Handle refund logic
     if (this.refunded_orderline_id in this.pos.toRefundLines) {
