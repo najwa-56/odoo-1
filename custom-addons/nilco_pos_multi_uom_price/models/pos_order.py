@@ -14,16 +14,6 @@ class PosOrderLine(models.Model):
     Ratio = fields.Float("Ratio", compute="_compute_ratio",
                          store=False)  # Ratio field  # Related field to the ratio in uom.uom
 
-    @api.depends('product_uom_id')
-    def _compute_price(self):
-        for line in self:
-            if line.product_uom_id:
-                uom_price = self.env['product.multi.uom.price'].search([
-                    ('product_id', '=', line.product_id.id),
-                    ('uom_id', '=', line.product_uom_id.id)
-                ], limit=1)
-                if uom_price:
-                    line.price_unit = uom_price.price
 
     @api.depends('product_uom_id')
     def _compute_ratio(self):
