@@ -21,6 +21,7 @@
 	<record id="group_customer_button" model="res.groups">
 		<field name="name">Disable Customer Button</field>
 	</record>
+	<!--i add group delete to xml -->
 	<record id="group_Delete_button" model="res.groups">
 		<field name="name">Disable Delete Button</field>
 	</record>

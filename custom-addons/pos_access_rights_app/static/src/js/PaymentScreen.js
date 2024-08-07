@@ -153,6 +153,7 @@ patch(ProductScreen.prototype, {
                 this.numberBuffer.sendKey(buttonValue);
             }
         }
+        /* I add this method to enable delete*/
         if (["Backspace", "⌫"].includes(buttonValue)) {
             if (Delete == false){
                 if (["quantity", "discount", "price"].includes(buttonValue)) {
