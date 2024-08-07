@@ -43,7 +43,7 @@ patch(Orderline.prototype, {
             ristrict = output.ristrict;
 
         })
-    }
+    },
 
     export_as_JSON() {
         const json = super.export_as_JSON(...arguments);
