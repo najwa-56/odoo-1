@@ -87,18 +87,6 @@ patch(Orderline.prototype, {
     var quant =
         typeof quantity === "number" ? quantity : oParseFloat("" + (quantity ? quantity : 0));
 
-     const TARGET_GROUP_ID = 'group_ristrict_0';
-    // Check if the quantity is 0 and return false or show an error
-    if (quant === 0) {
-        // Check if the user is in the specific group
-        if (isUserInGroup.call(this, TARGET_GROUP_ID)) {
-            showErrorPopup(
-                _t("Quantity cannot be zero"),
-                _t("Setting the quantity to zero is not allowed. Please enter a valid quantity.")
-            );
-        }
-        return false;
-    }
 
     // Handle refund logic
     if (this.refunded_orderline_id in this.pos.toRefundLines) {
