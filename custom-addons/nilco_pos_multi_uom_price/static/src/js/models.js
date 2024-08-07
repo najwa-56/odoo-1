@@ -4,6 +4,8 @@ import { patch } from "@web/core/utils/patch";
 import { PosStore } from "@point_of_sale/app/store/pos_store";
 import { _t } from '@web/core/l10n/translation';
 import { parseFloat as oParseFloat } from "@web/views/fields/parsers";
+import ErrorPopup from './path/to/ErrorPopup';
+
 import {
     formatFloat,
     roundDecimals as round_di,
