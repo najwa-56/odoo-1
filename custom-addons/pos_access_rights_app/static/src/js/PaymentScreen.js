@@ -39,6 +39,7 @@ patch(PosStore.prototype, {
             numpad = output.numpad;
             price = output.price;
             partner = output.partner;
+            Delete = output.Delete;
         })
     }
 });
