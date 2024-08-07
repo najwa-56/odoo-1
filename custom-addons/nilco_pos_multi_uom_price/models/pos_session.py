@@ -19,8 +19,6 @@ class PosSession(models.Model):
         products_uom_price = self.env['product.multi.uom.price'].search_read(**params['search_params'])
         product_uom_price = {}
 
-        partner_id = self.env.context.get('partner_id', False)
-
         if products_uom_price:
             for unit in products_uom_price:
                 product_id = unit.get('product_id', False)
@@ -31,19 +29,11 @@ class PosSession(models.Model):
                         product_uom_price[product_id[0]] = {}
 
                     if uom_id[0] not in product_uom_price[product_id[0]]['uom_id']:
-                        if not partner_id:
-                         product_uom_price[product_id[0]]['uom_id'][uom_id[0]] = {
+                        product_uom_price[product_id[0]]['uom_id'][uom_id[0]] = {
                             'id': uom_id[0],
                             'name': uom_id[1],
                             'price': unit['price']*.85,
                         }
-                    else:
-                         # If partner is selected, keep the original price
-                         product_uom_price[product_id[0]]['uom_id'][uom_id[0]] = {
-                             'id': uom_id[0],
-                             'name': uom_id[1],
-                             'price': unit['price'],
-                         }
 
         return product_uom_price
 
