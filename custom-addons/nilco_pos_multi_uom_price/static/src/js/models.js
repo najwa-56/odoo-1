@@ -129,11 +129,22 @@ patch(Orderline.prototype, {
             this.order.fix_tax_included_price(this);
         }
         return true;
-    },
+    }
     set_partner(partner) {
         this.assert_editable();
         this.partner = partner;
-    },
+    }
+    get_partner() {
+        return this.partner;
+    }
+    get_partner_name() {
+        const partner = this.partner;
+        return partner ? partner.name : "";
+    }
+    get_cardholder_name() {
+        var card_payment_line = this.paymentlines.find((pl) => pl.cardholder_name);
+        return card_payment_line ? card_payment_line.cardholder_name : "";
+    }
 
 });
 patch(PosStore.prototype, {
