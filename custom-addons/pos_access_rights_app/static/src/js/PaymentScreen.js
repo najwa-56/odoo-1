@@ -19,6 +19,7 @@ var numpad = false;
 var price = false;
 var partner = false;
 var quantity = false;
+var Delete = false;
 
 patch(PosStore.prototype, {
     async _processData(loadedData) {
@@ -152,5 +153,17 @@ patch(ProductScreen.prototype, {
                 this.numberBuffer.sendKey(buttonValue);
             }
         }
+        if (["Backspace", "⌫"].includes(buttonValue)) {
+            if (Delete == false){
+                if (["quantity", "discount", "price"].includes(buttonValue)) {
+                    this.numberBuffer.capture();
+                    this.numberBuffer.reset();
+                    this.pos.numpadMode = buttonValue;
+                    return;
+                }
+                this.numberBuffer.sendKey(buttonValue);
+            }
+        }
+        
     }
 });
