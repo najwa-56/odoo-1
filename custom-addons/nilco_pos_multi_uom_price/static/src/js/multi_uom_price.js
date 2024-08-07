@@ -38,16 +38,14 @@ export class UOMButton extends Component {
 			       list: uomList,
 		       });
 		       if (confirmed) {
-		          this.selectedUOM = selectedUOM; // Save selected UOM
 			      line.set_uom({0:selectedUOM.id,1:selectedUOM.name});
 			      line.price_manually_set = true;
 			      line.set_unit_price(selectedUOM.price);
-
 		       }
 	         }
 	       }
        }
-}
+   }
 
 
 

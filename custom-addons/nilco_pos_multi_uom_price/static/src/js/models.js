@@ -3,17 +3,6 @@ import { Order, Orderline, Payment } from "@point_of_sale/app/store/models";
 import { patch } from "@web/core/utils/patch";
 import { PosStore } from "@point_of_sale/app/store/pos_store";
 import { _t } from '@web/core/l10n/translation';
-import { parseFloat as oParseFloat } from "@web/views/fields/parsers";
-import { ErrorPopup } from "@point_of_sale/app/errors/popups/error_popup";
-
-
-import {
-    formatFloat,
-    roundDecimals as round_di,
-    roundPrecision as round_pr,
-    floatIsZero,
-} from "@web/core/utils/numbers";
-
 
 patch(Order.prototype, {
   set_orderline_options(orderline, options) {
@@ -76,73 +65,7 @@ patch(Orderline.prototype, {
             return this.pos.units_by_id[unit_id];
         }
         return this.product.get_unit();
-    },
-  set_quantity(quantity, keep_price) {
-    this.order.assert_editable();
-
-    // Parse the quantity
-    var quant =
-        typeof quantity === "number" ? quantity : oParseFloat("" + (quantity ? quantity : 0));
-
-
-    // Handle refund logic
-    if (this.refunded_orderline_id in this.pos.toRefundLines) {
-        const toRefundDetail = this.pos.toRefundLines[this.refunded_orderline_id];
-        const maxQtyToRefund =
-            toRefundDetail.orderline.qty - toRefundDetail.orderline.refundedQty;
-        if (quant > 0) {
-            if (!this.comboParent) {
-                this.env.services.popup.add(ErrorPopup, {
-                    title: _t("Positive quantity not allowed"),
-                    body: _t(
-                        "Only a negative quantity is allowed for this refund line. Click on +/- to modify the quantity to be refunded."
-                    ),
-                });
-            }
-            return false;
-        } else if (-quant <= maxQtyToRefund) {
-            toRefundDetail.qty = -quant;
-        } else {
-            if (!this.comboParent) {
-                this.env.services.popup.add(ErrorPopup, {
-                    title: _t("Greater than allowed"),
-                    body: _t(
-                        "The requested quantity to be refunded is higher than the refundable quantity of %s.",
-                        this.env.utils.formatProductQty(maxQtyToRefund)
-                    ),
-                });
-            }
-            return false;
-        }
     }
-
-    // Handle unit of measure rounding
-    var unit = this.get_unit();
-    if (unit) {
-        if (unit.rounding) {
-            var decimals = this.pos.dp["Product Unit of Measure"];
-            var rounding = Math.max(unit.rounding, Math.pow(10, -decimals));
-            this.quantity = round_pr(quant, rounding);
-            this.quantityStr = formatFloat(this.quantity, {
-                digits: [69, decimals],
-            });
-        } else {
-            this.quantity = round_pr(quant, 1);
-            this.quantityStr = this.quantity.toFixed(0);
-        }
-    } else {
-        this.quantity = quant;
-        this.quantityStr = "" + this.quantity;
-    }
-
-    // Adjust price if needed
-    if (!keep_price && this.price_type === "original") {
-        this.order.fix_tax_included_price(this);
-    }
-    return true;
-}
-
-
 });
 patch(PosStore.prototype, {
     async _processData(loadedData) {
@@ -150,3 +73,4 @@ patch(PosStore.prototype, {
             this.product_uom_price = loadedData['product.multi.uom.price'];
     }
 });
+
