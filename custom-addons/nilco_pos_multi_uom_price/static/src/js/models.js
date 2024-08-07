@@ -83,7 +83,7 @@ patch(Orderline.prototype, {
         typeof quantity === "number" ? quantity : oParseFloat("" + (quantity ? quantity : 0));
 
     // Check if the quantity is 0 and return false or show an error
-    if (quant === 0) {
+    /*if (quant === 0) {
         if (!this.comboParent) {
             this.env.services.popup.add(ErrorPopup, {
                 title: _t("Quantity cannot be zero"),
@@ -91,7 +91,7 @@ patch(Orderline.prototype, {
             });
         }
         return false;
-    }
+    }*/
 
     // Handle refund logic
     if (this.refunded_orderline_id in this.pos.toRefundLines) {
