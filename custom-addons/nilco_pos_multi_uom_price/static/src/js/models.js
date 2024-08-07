@@ -13,10 +13,7 @@ import {
     roundPrecision as round_pr,
     floatIsZero,
 } from "@web/core/utils/numbers";
-function isUserInGroup(groupId) {
-    const userGroups = this.pos.user.groups_id;  // Adjust this path based on your Odoo version
-    return userGroups.some(group => group.id === groupId);
-}
+
 
 patch(Order.prototype, {
   set_orderline_options(orderline, options) {
