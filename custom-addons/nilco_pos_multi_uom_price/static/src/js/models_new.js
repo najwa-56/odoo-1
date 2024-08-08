@@ -9,6 +9,12 @@ patch(Order.prototype, {
         this.pricelist = pricelist;
 
         const orderlines = this.get_orderlines();
+        if (!this.get_orderlines) {
+    console.error('get_orderlines method is not available on Order instance.');
+    return;
+}console.log('Order instance:', this);
+console.log('Pricelist:', pricelist);
+console.log('Orderlines:', this.get_orderlines());
 
         const lines_to_recompute = orderlines.filter(
             (line) =>
@@ -36,7 +42,7 @@ patch(Order.prototype, {
         const combo_children_lines = orderlines.filter(
             (line) => line.price_type === "original" && line.comboParent
         ); combo_children_lines.forEach((line) => {
-            
+
             self.fix_tax_included_price(line);
         });
     },
