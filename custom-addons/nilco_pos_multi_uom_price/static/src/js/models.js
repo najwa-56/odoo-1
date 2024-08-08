@@ -114,9 +114,9 @@ patch(Orderline.prototype, {
         var quant =
             typeof quantity === "number" ? quantity : oParseFloat("" + (quantity ? quantity : 0));
 
- console.log('this.pos.zero:', this.pos.zero);
+ console.log('zero', zero);
              // Ensure this.pos.zero is correctly set
-        const can_set_zero = this.pos.zero;
+        const can_set_zero = zero;
 
         if (quant === 0 && !can_set_zero) {
             if (!this.comboParent) {
