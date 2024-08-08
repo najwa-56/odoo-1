@@ -199,7 +199,6 @@ patch(PosStore.prototype, {
     async _processData(loadedData) {
         await super._processData(...arguments);
             this.product_uom_price = loadedData['product.multi.uom.price'];
-        await this.user_groups();
     },
 
 
