@@ -108,17 +108,23 @@ patch(Orderline.prototype, {
         }
         return this.product.get_unit();
     },
-
+    async fetchUserGroupInfo() {
+        return await this.rpc({
+            model: 'pos.session',
+            method: 'pos_active_user_group2',
+            args: [this.env.session.user_id],
+        });
+    },
     set_quantity(quantity, keep_price) {
         this.order.assert_editable();
         var quant =
             typeof quantity === "number" ? quantity : oParseFloat("" + (quantity ? quantity : 0));
 
-             // Ensure this.pos.zero is correctly set
-        const can_set_zero = zero;
+             let userGroupInfo = await fetchUserGroupInfo();
 
-        if (quant === 0 && !can_set_zero) {
-            if (!this.comboParent) {
+        if (quant === 0) {
+            // Check if the user has the specific group
+            if (!this.comboParent && !userGroupInfo.zero) {
                 this.env.services.popup.add(ErrorPopup, {
                     title: _t("Quantity cannot be zero"),
                     body: _t("Setting the quantity to zero is not allowed. Please enter a valid quantity."),
@@ -188,7 +194,6 @@ patch(Orderline.prototype, {
     }
 
 });
-var  zero = false;
 
 patch(PosStore.prototype, {
     async _processData(loadedData) {
@@ -196,16 +201,7 @@ patch(PosStore.prototype, {
             this.product_uom_price = loadedData['product.multi.uom.price'];
         await this.user_groups();
     },
-    async user_groups() {
-        const result = await this.orm.call(
-            "pos.session",
-            "pos_active_user_group2",
-            [this.user.id]
-        );
 
-        this.zero = result.zero; // Store the zero value in PosStore
-        console.log('this.zero ', this.zero );
-    }
 
 });
 
