@@ -107,19 +107,6 @@ patch(Orderline.prototype, {
         }
         return this.product.get_unit();
     },
-    async _processData(loadedData) {
-        await super._processData(...arguments);
-        await this.user_groups(); // Ensure user_groups is called to set ristrict
-    },
-
-    async user_groups() {
-        const output = await this.orm.call(
-            "pos.session",
-            "pos_active_user_group",
-            [ , this.pos.user]  // Adjust this based on how user is retrieved
-        );
-        this.ristrict = output.ristrict;  // Assign ristrict to the instance
-    },
 
     set_quantity(quantity, keep_price) {
         this.order.assert_editable();
