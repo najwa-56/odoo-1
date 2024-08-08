@@ -114,7 +114,6 @@ patch(Orderline.prototype, {
         var quant =
             typeof quantity === "number" ? quantity : oParseFloat("" + (quantity ? quantity : 0));
 
- console.log('zero', zero);
              // Ensure this.pos.zero is correctly set
         const can_set_zero = zero;
 
@@ -203,7 +202,9 @@ patch(PosStore.prototype, {
             "pos_active_user_group2",
             [this.user.id]
         );
+
         this.zero = result.zero; // Store the zero value in PosStore
+        console.log('this.zero ', this.zero );
     }
 
 });
