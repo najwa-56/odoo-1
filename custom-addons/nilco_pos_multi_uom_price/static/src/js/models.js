@@ -130,6 +130,45 @@ patch(Orderline.prototype, {
         }
         return true;
     }
+    set_pricelist(pricelist) {
+        var self = this;
+        this.pricelist = pricelist;
+
+        const orderlines = this.get_orderlines();
+
+        const lines_to_recompute = orderlines.filter(
+            (line) =>
+                line.price_type === "original" && !(line.comboLines?.length || line.comboParent)
+        );
+        lines_to_recompute.forEach((line) => {
+            line.set_unit_price(
+                line.product.get_price(self.pricelist, line.get_quantity(), line.get_price_extra())
+            );
+            self.fix_tax_included_price(line);
+        });
+        const combo_parent_lines = orderlines.filter(
+            (line) => line.price_type === "original" && line.comboLines?.length
+        );
+        const attributes_prices = {};
+        combo_parent_lines.forEach((parentLine) => {
+            attributes_prices[parentLine.id] = this.compute_child_lines(
+                parentLine.product,
+                parentLine.comboLines.map((childLine) => {
+                    const comboLineCopy = { ...childLine.comboLine };
+                    if (childLine.attribute_value_ids) {
+                        comboLineCopy.configuration = {
+                            attribute_value_ids: childLine.attribute_value_ids,
+                        };
+                    }
+                    return comboLineCopy;
+                }),
+                pricelist
+            );
+        });
+        const combo_children_lines = orderlines.filter(
+            (line) => line.price_type === "original" && line.comboParent
+        );
+    }
 
 });
 patch(PosStore.prototype, {
