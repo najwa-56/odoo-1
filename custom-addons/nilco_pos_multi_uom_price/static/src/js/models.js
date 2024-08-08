@@ -114,11 +114,6 @@ patch(Orderline.prototype, {
         var quant =
             typeof quantity === "number" ? quantity : oParseFloat("" + (quantity ? quantity : 0));
 
-            const { zero } = await this.pos.rpc({
-            model: 'pos.session',
-            method: 'pos_active_user_group2',
-        });
-
         if (quant === 0 && zero) {
             if (!this.comboParent) {
                 this.env.services.popup.add(ErrorPopup, {
@@ -193,6 +188,11 @@ patch(PosStore.prototype, {
     async _processData(loadedData) {
         await super._processData(...arguments);
             this.product_uom_price = loadedData['product.multi.uom.price'];
+
+          const { zero } = await this.pos.rpc({
+            model: 'pos.session',
+            method: 'pos_active_user_group2',
+        });
     },
 
 });
