@@ -185,7 +185,7 @@ patch(Orderline.prototype, {
     }
 
 });
-var zero1=true;
+var zero1=false;
 patch(PosStore.prototype, {
     async _processData(loadedData) {
         await super._processData(...arguments);
@@ -194,12 +194,17 @@ patch(PosStore.prototype, {
     },
 
     async user_groups() {
-            zero1 = await this.orm.call(
+        try {
+            const zero1 = await this.orm.call(
                 "pos.session",
                 "pos_active_user_group2",
                 [this.env.session.user_id]
             );
-
+            return output.zero1; // Return the zero value
+        } catch (error) {
+            console.error('Error fetching user groups:', error);
+            return false; // Default to false in case of error
+        }
     },
 });
 
