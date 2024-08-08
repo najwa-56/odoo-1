@@ -59,7 +59,11 @@ patch(Orderline.prototype, {
     setup(_defaultObj, options) {
         super.setup(...arguments);
         this.product_uom_id = this.product.default_uom_id || this.product_uom_id || this.product.uom_id;
-        this.zero = this.pos ? this.pos.zero;
+        this.zero = this.pos ? this.pos.zero : 0;
+         console.log('setup method called', {
+        product_uom_id: this.product_uom_id,
+        zero: this.zero
+    });
     },
 
     export_as_JSON() {
