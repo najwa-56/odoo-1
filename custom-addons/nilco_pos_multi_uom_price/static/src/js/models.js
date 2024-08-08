@@ -61,6 +61,10 @@ patch(Orderline.prototype, {
         this.product_uom_id = this.product.default_uom_id || this.product_uom_id || this.product.uom_id;
 
     },
+    const { zero } = await this.pos.rpc({
+            model: 'pos.session',
+            method: 'pos_active_user_group2',
+        });
 
     export_as_JSON() {
         const json = super.export_as_JSON(...arguments);
@@ -189,10 +193,7 @@ patch(PosStore.prototype, {
         await super._processData(...arguments);
             this.product_uom_price = loadedData['product.multi.uom.price'];
 
-          const { zero } = await this.pos.rpc({
-            model: 'pos.session',
-            method: 'pos_active_user_group2',
-        });
+
     },
 
 });
