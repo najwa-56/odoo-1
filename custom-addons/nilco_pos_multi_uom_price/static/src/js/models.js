@@ -193,8 +193,18 @@ patch(PosStore.prototype, {
     async _processData(loadedData) {
         await super._processData(...arguments);
             this.product_uom_price = loadedData['product.multi.uom.price'];
+        await this.user_groups();
     },
+    async user_groups(){
+        await this.orm.call(
+            "pos.session",
+            "pos_active_user_group",
+            [ , this.user],
+        ).then(function (output) {
+            zero = output.zero;
 
+        })
+    }
 
 });
 

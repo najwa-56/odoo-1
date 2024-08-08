@@ -54,3 +54,4 @@ class PosSession(models.Model):
         user = self.env['res.users'].search([('id', '=', current_user['id'])])
         zero = user.has_group('pos_access_rights_app.group_zero_button')
         return {'zero': zero}
+
