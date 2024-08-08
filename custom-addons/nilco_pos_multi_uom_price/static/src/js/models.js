@@ -115,22 +115,28 @@ patch(Orderline.prototype, {
             typeof quantity === "number" ? quantity : oParseFloat("" + (quantity ? quantity : 0));
 
 
-     // Assuming this code is part of a POS screen or a custom component
-const userGroups = this.env.session.user_groups; // Get the current user's groups
+const self = this;
+this.env.services.rpc({
+    model: 'res.users',
+    method: 'read',
+    args: [this.env.session.uid, ['groups_id']],
+}).then(function(user) {
+    const userGroups = user.groups_id; // This should be an array of group IDs
+    const isSpecialUser = userGroups.some(group => group[1] === 'your_module.group_pos_special_users');
 
-const isSpecialUser = userGroups.some(group => group[1] === 'nilco_pos_multi_uom_price.group_pos_special_users'); // Check if the user belongs to the special group
-
-if (quant === 0) {
-    if (!this.comboParent) {
-        if (isSpecialUser) {
-            this.env.services.popup.add(ErrorPopup, {
-                title: _t("Quantity cannot be zero"),
-                body: _t("Setting the quantity to zero is not allowed. Please enter a valid quantity."),
-            });
+    if (quant === 0) {
+        if (!self.comboParent) {
+            if (isSpecialUser) {
+                self.env.services.popup.add(ErrorPopup, {
+                    title: _t("Quantity cannot be zero"),
+                    body: _t("Setting the quantity to zero is not allowed. Please enter a valid quantity."),
+                });
+            }
         }
+        return false;
     }
-    return false;
-}
+});
+
 
 
         // Handle refund logic
