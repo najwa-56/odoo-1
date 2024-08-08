@@ -59,12 +59,12 @@ patch(Orderline.prototype, {
     setup(_defaultObj, options) {
         super.setup(...arguments);
         this.product_uom_id = this.product.default_uom_id || this.product_uom_id || this.product.uom_id;
-
-    },
-    const { zero } = await this.pos.rpc({
+ const { zero } = await this.pos.rpc({
             model: 'pos.session',
             method: 'pos_active_user_group2',
         });
+    },
+
 
     export_as_JSON() {
         const json = super.export_as_JSON(...arguments);
