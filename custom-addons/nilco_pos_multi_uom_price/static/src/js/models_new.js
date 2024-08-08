@@ -35,6 +35,9 @@ patch(Order.prototype, {
         });
         const combo_children_lines = orderlines.filter(
             (line) => line.price_type === "original" && line.comboParent
-        );
+        ); combo_children_lines.forEach((line) => {
+            
+            self.fix_tax_included_price(line);
+        });
     },
 });
