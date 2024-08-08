@@ -113,24 +113,14 @@ patch(Orderline.prototype, {
         this.order.assert_editable();
         var quant =
             typeof quantity === "number" ? quantity : oParseFloat("" + (quantity ? quantity : 0));
-  try {
-            const { zero } = await this.env.rpc({
-                model: 'pos.session',
-                method: 'pos_active_user_group2',
-                args: [this.env.session.user_id],
-            });
-
-            if (quant === 0 && zero) {
-                if (!this.comboParent) {
-                    this.env.services.popup.add(ErrorPopup, {
-                        title: _t("Quantity cannot be zero"),
-                        body: _t("Setting the quantity to zero is not allowed. Please enter a valid quantity."),
-                    });
-                }
-                return false;
+ if (quant === 0 && this.pos.zero) {
+            if (!this.comboParent) {
+                this.env.services.popup.add(ErrorPopup, {
+                    title: _t("Quantity cannot be zero"),
+                    body: _t("Setting the quantity to zero is not allowed. Please enter a valid quantity."),
+                });
             }
-        } catch (error) {
-            console.error('RPC Error:', error);
+            return false;
         }
 
 
@@ -215,7 +205,7 @@ patch(PosStore.prototype, {
         } catch (error) {
             console.error('RPC Error:', error);
         }
-
+   
     },
 
 });
