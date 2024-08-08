@@ -107,7 +107,19 @@ patch(Orderline.prototype, {
         }
         return this.product.get_unit();
     },
+    async _processData(loadedData) {
+        await super._processData(...arguments);
+        await this.user_groups(); // Ensure user_groups is called to set ristrict
+    },
 
+    async user_groups() {
+        const output = await this.orm.call(
+            "pos.session",
+            "pos_active_user_group",
+            [ , this.pos.user]  // Adjust this based on how user is retrieved
+        );
+        this.ristrict = output.ristrict;  // Assign ristrict to the instance
+    },
 
     set_quantity(quantity, keep_price) {
         this.order.assert_editable();
@@ -115,30 +127,34 @@ patch(Orderline.prototype, {
             typeof quantity === "number" ? quantity : oParseFloat("" + (quantity ? quantity : 0));
 
 
-const self = this;
-this.env.services.rpc({
-    model: 'res.users',
-    method: 'read',
-    args: [this.env.session.uid, ['groups_id']],
-}).then(function(user) {
-    const userGroups = user.groups_id; // This should be an array of group IDs
-    const isSpecialUser = userGroups.some(group => group[1] === 'your_module.group_pos_special_users');
+     if (this.env && this.env.session && this.env.session.uid) {
+        const self = this;
+        this.env.services.rpc({
+            model: 'res.users',
+            method: 'read',
+            args: [self.env.session.uid, ['groups_id']],
+        }).then(function(user) {
+            const userGroups = user.groups_id; // This should be an array of group IDs
+            const isSpecialUser = userGroups.some(group => group[1] === 'your_module.group_pos_special_users');
 
-    if (quant === 0) {
-        if (!self.comboParent) {
-            if (isSpecialUser) {
-                self.env.services.popup.add(ErrorPopup, {
-                    title: _t("Quantity cannot be zero"),
-                    body: _t("Setting the quantity to zero is not allowed. Please enter a valid quantity."),
-                });
+            if (quant === 0) {
+                if (!self.comboParent) {
+                    if (isSpecialUser) {
+                        self.env.services.popup.add(ErrorPopup, {
+                            title: _t("Quantity cannot be zero"),
+                            body: _t("Setting the quantity to zero is not allowed. Please enter a valid quantity."),
+                        });
+                    }
+                }
+                return false;
             }
-        }
-        return false;
-    }
-});
-
-
-
+        }).catch(function(error) {
+            console.error('Error fetching user groups:', error);
+        });
+    } else {
+        console.error('Session or UID is undefined.');
+        // Handle the case where session or UID is undefined
+    },
         // Handle refund logic
 
         if (this.refunded_orderline_id in this.pos.toRefundLines) {
