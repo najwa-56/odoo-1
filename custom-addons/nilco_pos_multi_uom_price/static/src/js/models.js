@@ -115,13 +115,10 @@ patch(Orderline.prototype, {
             typeof quantity === "number" ? quantity : oParseFloat("" + (quantity ? quantity : 0));
 
 
-             // Retrieve user group condition (assumed to be available in this context)
-    // Retrieve user group condition
-        var can_set_zero = this.pos.zero;
+             // Ensure this.pos.zero is correctly set
+        const can_set_zero = this.pos.zero;
 
-
-        if (quant === 0 && can_set_zero ) {
-
+        if (quant === 0 && !can_set_zero) {
             if (!this.comboParent) {
                 this.env.services.popup.add(ErrorPopup, {
                     title: _t("Quantity cannot be zero"),
@@ -192,7 +189,7 @@ patch(Orderline.prototype, {
     }
 
 });
-var zero = false;
+
 patch(PosStore.prototype, {
     async _processData(loadedData) {
         await super._processData(...arguments);
