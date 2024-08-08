@@ -41,6 +41,6 @@ console.log('Orderlines:', this.get_orderlines());
         });
         const combo_children_lines = orderlines.filter(
             (line) => line.price_type === "original" && line.comboParent
-        ); 
+        );
     },
 });
