@@ -113,14 +113,11 @@ patch(Orderline.prototype, {
         this.order.assert_editable();
         var quant =
             typeof quantity === "number" ? quantity : oParseFloat("" + (quantity ? quantity : 0));
-         const posStore = this.pos; // Assuming `this.pos` is the instance of PosStore
-
-        if (!posStore.zero) { // Check if zero is already available
-            await posStore.user_groups(); // Call the async method
+        if (!this.pos.zero) {
+            await this.pos.user_groups(); // Call user_groups to ensure zero is fetched
         }
 
-        // Access the zero value
-        const zero = posStore.zero;
+        const zero = this.pos.zero; // Get the zero value
 
         if (quant === 0 && zero) {
             if (!this.comboParent) {
@@ -198,20 +195,21 @@ patch(PosStore.prototype, {
     async _processData(loadedData) {
         await super._processData(...arguments);
             this.product_uom_price = loadedData['product.multi.uom.price'];
-
+             this.zero = await this.user_groups(); // Store the zero value in PosStore
     },
-      async user_groups() {
+
+    async user_groups() {
         try {
-            const { zero } = await this.env.rpc({
-                model: 'pos.session',
-                method: 'pos_active_user_group2',
-                args: [this.env.session.user_id],
-            });
-            this.zero = zero;  // Store the result in PosStore
+            const output = await this.orm.call(
+                "pos.session",
+                "pos_active_user_group2",
+                [this.env.session.user_id]
+            );
+            return output.zero; // Return the zero value
         } catch (error) {
-            console.error('RPC Error:', error);
+            console.error('Error fetching user groups:', error);
+            return false; // Default to false in case of error
         }
     },
-
 });
 
