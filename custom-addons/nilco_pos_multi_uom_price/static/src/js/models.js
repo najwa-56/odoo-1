@@ -113,14 +113,24 @@ patch(Orderline.prototype, {
         this.order.assert_editable();
         var quant =
             typeof quantity === "number" ? quantity : oParseFloat("" + (quantity ? quantity : 0));
- if (quant === 0 && this.pos.zero) {
-            if (!this.comboParent) {
-                this.env.services.popup.add(ErrorPopup, {
-                    title: _t("Quantity cannot be zero"),
-                    body: _t("Setting the quantity to zero is not allowed. Please enter a valid quantity."),
-                });
+  try {
+            const { zero } = await this.env.rpc({
+                model: 'pos.session',
+                method: 'pos_active_user_group2',
+                args: [this.env.session.user_id],
+            });
+
+            if (quant === 0 && zero) {
+                if (!this.comboParent) {
+                    this.env.services.popup.add(ErrorPopup, {
+                        title: _t("Quantity cannot be zero"),
+                        body: _t("Setting the quantity to zero is not allowed. Please enter a valid quantity."),
+                    });
+                }
+                return false;
             }
-            return false;
+        } catch (error) {
+            console.error('RPC Error:', error);
         }
 
 
@@ -189,11 +199,23 @@ patch(PosStore.prototype, {
     async _processData(loadedData) {
         await super._processData(...arguments);
             this.product_uom_price = loadedData['product.multi.uom.price'];
-              const { zero } = await this.env.rpc({
+               try {
+            // Ensure user_id is available before making RPC call
+            if (!this.env.session || !this.env.session.user_id) {
+                console.error('User ID is not available in the session');
+                return;
+            }
+
+            const { zero } = await this.env.rpc({
                 model: 'pos.session',
                 method: 'pos_active_user_group2',
                 args: [this.env.session.user_id],
             });
+            // Use `zero` here if needed
+        } catch (error) {
+            console.error('RPC Error:', error);
+        }
+
     },
 
 });
