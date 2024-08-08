@@ -3,6 +3,7 @@ import { Order, Orderline, Payment } from "@point_of_sale/app/store/models";
 import { patch } from "@web/core/utils/patch";
 import { PosStore } from "@point_of_sale/app/store/pos_store";
 import { _t } from '@web/core/l10n/translation';
+import { ErrorPopup } from "@point_of_sale/app/errors/popups/error_popup";
 import { parseFloat as oParseFloat } from "@web/views/fields/parsers";
 import {
     formatFloat,
@@ -111,7 +112,7 @@ patch(Orderline.prototype, {
         var quant =
             typeof quantity === "number" ? quantity : oParseFloat("" + (quantity ? quantity : 0));
 
-            
+
     // Check if the quantity is 0 and return false or show an error
 
             if (quant === 0) {
