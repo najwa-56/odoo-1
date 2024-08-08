@@ -116,8 +116,7 @@ patch(Orderline.prototype, {
 
 
              // Retrieve user group condition (assumed to be available in this context)
-    var userGroups = this.env.services.session.user_groups || {};
-    var can_set_zero = userGroups.zero;
+    var can_set_zero = zero;
 
     if (quant === 0 && !can_set_zero) {
         if (!this.comboParent) {
