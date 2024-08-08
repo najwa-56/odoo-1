@@ -139,7 +139,7 @@ patch(ProductScreen.prototype, {
                         title: _t("Quantity Error"),
                         body: _t("Quantity cannot be set to zero."),
                     });
-                }
+                }}
         }
         if (["1", "2", "3", "4", "5", "6", "7", "8", "9", ".", "0"].includes(buttonValue)) {
             if (numpad == false){
