@@ -62,7 +62,6 @@ patch(Orderline.prototype, {
 
     },
 
-
     export_as_JSON() {
         const json = super.export_as_JSON(...arguments);
         json.product_uom_id = this.product_uom_id[0];
@@ -115,11 +114,13 @@ patch(Orderline.prototype, {
         var quant =
             typeof quantity === "number" ? quantity : oParseFloat("" + (quantity ? quantity : 0));
 
-             let userGroupInfo = await fetchUserGroupInfo();
+            const { zero } = await this.pos.rpc({
+            model: 'pos.session',
+            method: 'pos_active_user_group2',
+        });
 
-        if (quant === 0) {
-            // Check if the user has the specific group
-            if (!this.comboParent && !userGroupInfo.zero) {
+        if (quant === 0 && zero) {
+            if (!this.comboParent) {
                 this.env.services.popup.add(ErrorPopup, {
                     title: _t("Quantity cannot be zero"),
                     body: _t("Setting the quantity to zero is not allowed. Please enter a valid quantity."),
@@ -127,8 +128,6 @@ patch(Orderline.prototype, {
             }
             return false;
         }
-
-
         // Handle refund logic
 
         if (this.refunded_orderline_id in this.pos.toRefundLines) {
@@ -195,16 +194,6 @@ patch(PosStore.prototype, {
         await super._processData(...arguments);
             this.product_uom_price = loadedData['product.multi.uom.price'];
     },
- // Define the method to fetch user group information
-    async fetchUserGroupInfo() {
-        try {
-            return await this.rpc({
-                model: 'pos.session',
-                method: 'pos_active_user_group2',
-                args: [this.env.session.user_id],
-            });
-        }
-    }
 
 });
 
