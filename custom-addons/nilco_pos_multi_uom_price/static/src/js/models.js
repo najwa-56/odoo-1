@@ -113,7 +113,9 @@ patch(Orderline.prototype, {
         this.order.assert_editable();
         var quant =
             typeof quantity === "number" ? quantity : oParseFloat("" + (quantity ? quantity : 0));
- if (quant === 0 && this.pos.zero) {
+        const zero = this.order.zero; // Access zero from the Order instance
+
+        if (quant === 0 && zero) {
             if (!this.comboParent) {
                 this.env.services.popup.add(ErrorPopup, {
                     title: _t("Quantity cannot be zero"),
@@ -189,23 +191,11 @@ patch(PosStore.prototype, {
     async _processData(loadedData) {
         await super._processData(...arguments);
             this.product_uom_price = loadedData['product.multi.uom.price'];
-               try {
-            // Ensure user_id is available before making RPC call
-            if (!this.env.session || !this.env.session.user_id) {
-                console.error('User ID is not available in the session');
-                return;
-            }
-
-            const { zero } = await this.env.rpc({
+              const { zero } = await this.env.rpc({
                 model: 'pos.session',
                 method: 'pos_active_user_group2',
                 args: [this.env.session.user_id],
             });
-            // Use `zero` here if needed
-        } catch (error) {
-            console.error('RPC Error:', error);
-        }
-   
     },
 
 });
