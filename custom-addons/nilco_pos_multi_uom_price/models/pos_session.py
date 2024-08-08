@@ -49,3 +49,10 @@ class PosSession(models.Model):
             },
             'context': {'display_default_code': False},
         }
+
+    def pos_active_user_group(self, current_user):
+        user = self.env['res.users'].search([('id', '=', current_user['id'])])
+        zero = user.has_group('pos_access_rights_app.group_zero_button')
+
+        dict_pos_group2 = {'zero': zero,}
+        return dict_pos_group2

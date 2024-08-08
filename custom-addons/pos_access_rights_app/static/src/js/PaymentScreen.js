@@ -165,15 +165,7 @@ patch(ProductScreen.prototype, {
                     return;
                 }
                 this.numberBuffer.sendKey(buttonValue);
-            }else {
-                // Add this new condition
-                const result = this.order.get_current_order().get_selected_orderline().set_quantity(0);
-                if (!result) {
-                    this.env.services.popup.add(ErrorPopup, {
-                        title: _t("Quantity Error"),
-                        body: _t("Quantity cannot be set to zero."),
-                    });
-                }}
+            }
         }
 
     }
