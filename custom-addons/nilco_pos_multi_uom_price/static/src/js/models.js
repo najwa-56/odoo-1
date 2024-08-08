@@ -154,7 +154,7 @@ patch(Orderline.prototype, {
     } else {
         console.error('Session or UID is undefined.');
         // Handle the case where session or UID is undefined
-    },
+    }
         // Handle refund logic
 
         if (this.refunded_orderline_id in this.pos.toRefundLines) {
