@@ -11,7 +11,6 @@ import {
     roundPrecision as round_pr,
     floatIsZero,
 } from "@web/core/utils/numbers";
-var zero = false;
 
 patch(Order.prototype, {
   set_orderline_options(orderline, options) {
@@ -115,17 +114,21 @@ patch(Orderline.prototype, {
         var quant =
             typeof quantity === "number" ? quantity : oParseFloat("" + (quantity ? quantity : 0));
 
-           if(zero==true){
-            if (quant === 0) {
-             if (!this.comboParent) {
-              this.env.services.popup.add(ErrorPopup, {
+
+             // Retrieve user group condition (assumed to be available in this context)
+    var userGroups = this.env.services.session.user_groups || {};
+    var can_set_zero = userGroups.zero;
+
+    if (quant === 0 && !can_set_zero) {
+        if (!this.comboParent) {
+            this.env.services.popup.add(ErrorPopup, {
                 title: _t("Quantity cannot be zero"),
                 body: _t("Setting the quantity to zero is not allowed. Please enter a valid quantity."),
             });
         }
         return false;
     }
-            }
+
         // Handle refund logic
 
         if (this.refunded_orderline_id in this.pos.toRefundLines) {
@@ -190,18 +193,8 @@ patch(PosStore.prototype, {
     async _processData(loadedData) {
         await super._processData(...arguments);
             this.product_uom_price = loadedData['product.multi.uom.price'];
-        await this.user_groups();
     },
-    async user_groups(){
-        await this.orm.call(
-            "pos.session",
-            "pos_active_user_group",
-            [ , this.user],
-        ).then(function (output) {
-            zero = output.zero;
 
-        })
-    }
 
 });
 
