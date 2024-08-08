@@ -110,6 +110,21 @@ patch(Orderline.prototype, {
         this.order.assert_editable();
         var quant =
             typeof quantity === "number" ? quantity : oParseFloat("" + (quantity ? quantity : 0));
+
+            
+    // Check if the quantity is 0 and return false or show an error
+
+            if (quant === 0) {
+        if (!this.comboParent) {
+            this.env.services.popup.add(ErrorPopup, {
+                title: _t("Quantity cannot be zero"),
+                body: _t("Setting the quantity to zero is not allowed. Please enter a valid quantity."),
+            });
+        }
+        return false;
+    }
+        // Handle refund logic
+
         if (this.refunded_orderline_id in this.pos.toRefundLines) {
             const toRefundDetail = this.pos.toRefundLines[this.refunded_orderline_id];
             const maxQtyToRefund =
@@ -141,6 +156,8 @@ patch(Orderline.prototype, {
                 return false;
             }
         }
+            // Handle unit of measure rounding
+
         var unit = this.get_unit();
         if (unit) {
             if (unit.rounding) {
