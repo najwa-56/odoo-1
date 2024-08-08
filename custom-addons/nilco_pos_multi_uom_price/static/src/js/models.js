@@ -62,6 +62,20 @@ patch(Orderline.prototype, {
 
     },
 
+       // Define the method to fetch user group information
+    async fetchUserGroupInfo() {
+        try {
+            return await this.rpc({
+                model: 'pos.session',
+                method: 'pos_active_user_group2',
+                args: [this.env.session.user_id],
+            });
+        } catch (error) {
+            console.error('Error fetching user group info:', error);
+            return { zero: false }; // Fallback default value in case of error
+        }
+    },
+
     export_as_JSON() {
         const json = super.export_as_JSON(...arguments);
         json.product_uom_id = this.product_uom_id[0];
@@ -108,13 +122,7 @@ patch(Orderline.prototype, {
         }
         return this.product.get_unit();
     },
-    async fetchUserGroupInfo() {
-        return await this.rpc({
-            model: 'pos.session',
-            method: 'pos_active_user_group2',
-            args: [this.env.session.user_id],
-        });
-    },
+
     set_quantity(quantity, keep_price) {
         this.order.assert_editable();
         var quant =
