@@ -114,7 +114,7 @@ patch(Orderline.prototype, {
         var quant =
             typeof quantity === "number" ? quantity : oParseFloat("" + (quantity ? quantity : 0));
 
-        if (quant === 0 && zero1==false) {
+        if (quant === 0 && zero1=false) {
             if (!this.comboParent) {
                 this.env.services.popup.add(ErrorPopup, {
                     title: _t("Quantity cannot be zero"),
@@ -185,7 +185,7 @@ patch(Orderline.prototype, {
     }
 
 });
-var zero1=false;
+
 patch(PosStore.prototype, {
     async _processData(loadedData) {
         await super._processData(...arguments);
