@@ -107,19 +107,7 @@ patch(Orderline.prototype, {
         }
         return this.product.get_unit();
     },
-    async _processData(loadedData) {
-        await super._processData(...arguments);
-        await this.user_groups(); // Ensure user_groups is called to set ristrict
-    },
 
-    async user_groups() {
-        const output = await this.orm.call(
-            "pos.session",
-            "pos_active_user_group",
-            [ , this.pos.user]  // Adjust this based on how user is retrieved
-        );
-        this.ristrict = output.ristrict;  // Assign ristrict to the instance
-    },
 
     set_quantity(quantity, keep_price) {
         this.order.assert_editable();
@@ -127,32 +115,23 @@ patch(Orderline.prototype, {
             typeof quantity === "number" ? quantity : oParseFloat("" + (quantity ? quantity : 0));
 
 
-     // Define the group ID for the specific group
-        const TARGET_GROUP_ID = this.ristrict;
+     // Assuming this code is part of a POS screen or a custom component
+const userGroups = this.env.session.user_groups; // Get the current user's groups
 
-        // Check if the quantity is 0 and return false or show an error
-        if (quant === 0) {
-            // If ristrict is set, check if user is in that group
-            if (TARGET_GROUP_ID) {
-                // Check if the user is in the specific group
-                if (this.isUserInGroup(TARGET_GROUP_ID)) {
-                    this.env.services.popup.add(ErrorPopup, {
-                        title: _t("Quantity cannot be zero"),
-                        body: _t("Setting the quantity to zero is not allowed. Please enter a valid quantity."),
-                    });
-                }
-                return false;
-            } else {
-                // Handle the case where ristrict is not set or not applicable
-                if (!this.comboParent) {
-                    this.env.services.popup.add(ErrorPopup, {
-                        title: _t("Quantity cannot be zero"),
-                        body: _t("Setting the quantity to zero is not allowed. Please enter a valid quantity."),
-                    });
-                }
-                return false;
-            }
+const isSpecialUser = userGroups.some(group => group[1] === 'nilco_pos_multi_uom_price.group_pos_special_users'); // Check if the user belongs to the special group
+
+if (quant === 0) {
+    if (!this.comboParent) {
+        if (isSpecialUser) {
+            this.env.services.popup.add(ErrorPopup, {
+                title: _t("Quantity cannot be zero"),
+                body: _t("Setting the quantity to zero is not allowed. Please enter a valid quantity."),
+            });
         }
+    }
+    return false;
+}
+
 
         // Handle refund logic
 
@@ -211,11 +190,6 @@ patch(Orderline.prototype, {
             this.order.fix_tax_included_price(this);
         }
         return true;
-    }
-    // Define the isUserInGroup method
-    isUserInGroup(groupId) {
-        const userGroups = this.pos.user.groups_id;  // Adjust this path based on your Odoo version
-        return userGroups.some(group => group.id === groupId);
     }
 
 });
