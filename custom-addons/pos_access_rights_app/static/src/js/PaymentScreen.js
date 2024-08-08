@@ -11,6 +11,7 @@ import { useService } from "@web/core/utils/hooks";
 import { reactive, Component, onMounted, onWillStart } from "@odoo/owl";
 import { session } from "@web/session";
 import { PosStore } from "@point_of_sale/app/store/pos_store";
+import { ErrorPopup } from "@point_of_sale/app/errors/popups/error_popup";
 
 var discount = false;
 var plus_minus = false;
@@ -130,7 +131,15 @@ patch(ProductScreen.prototype, {
                     return;
                 }
                 this.numberBuffer.sendKey(buttonValue);
-            }
+            }else {
+                // Add this new condition
+                const result = this.order.get_current_order().get_selected_orderline().set_quantity(0);
+                if (!result) {
+                    this.env.services.popup.add(ErrorPopup, {
+                        title: _t("Quantity Error"),
+                        body: _t("Quantity cannot be set to zero."),
+                    });
+                }
         }
         if (["1", "2", "3", "4", "5", "6", "7", "8", "9", ".", "0"].includes(buttonValue)) {
             if (numpad == false){

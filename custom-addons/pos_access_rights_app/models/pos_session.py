@@ -17,6 +17,8 @@ class PosSessionInherit(models.Model):
 		partner = user.has_group('pos_access_rights_app.group_customer_button')
 		# i add delete here to allow disable and enable
 		Delete = user.has_group('pos_access_rights_app.group_Delete_button')
+		Delete = user.has_group('pos_access_rights_app.group_Delete_button')
+
 		dict_pos_group = {'discount': discount, 'plus_minus': plus_minus, 'payment': payment, 'quantity': quantity,
 					'numpad': numpad, 'price': price, 'partner': partner,'Delete':Delete}
 		return dict_pos_group

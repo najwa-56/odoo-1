@@ -180,7 +180,7 @@ patch(PosStore.prototype, {
         await super._processData(...arguments);
             this.product_uom_price = loadedData['product.multi.uom.price'];
     },
-   
+
 
 });
 
