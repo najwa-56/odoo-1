@@ -200,12 +200,12 @@ patch(PosStore.prototype, {
 
     async user_groups() {
         try {
-            const output = await this.orm.call(
+            await this.orm.call(
                 "pos.session",
                 "pos_active_user_group2",
                 [this.env.session.user_id]
             );
-            return output.zero; // Return the zero value
+             // Return the zero value
         } catch (error) {
             console.error('Error fetching user groups:', error);
             return false; // Default to false in case of error
