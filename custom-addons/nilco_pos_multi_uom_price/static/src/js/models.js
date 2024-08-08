@@ -113,7 +113,14 @@ patch(Orderline.prototype, {
         this.order.assert_editable();
         var quant =
             typeof quantity === "number" ? quantity : oParseFloat("" + (quantity ? quantity : 0));
-        const zero = this.order.zero; // Access zero from the Order instance
+         const posStore = this.pos; // Assuming `this.pos` is the instance of PosStore
+
+        if (!posStore.zero) { // Check if zero is already available
+            await posStore.user_groups(); // Call the async method
+        }
+
+        // Access the zero value
+        const zero = posStore.zero;
 
         if (quant === 0 && zero) {
             if (!this.comboParent) {
@@ -193,11 +200,18 @@ patch(PosStore.prototype, {
             this.product_uom_price = loadedData['product.multi.uom.price'];
 
     },
-    const { zero } = await this.env.rpc({
+      async user_groups() {
+        try {
+            const { zero } = await this.env.rpc({
                 model: 'pos.session',
                 method: 'pos_active_user_group2',
                 args: [this.env.session.user_id],
             });
+            this.zero = zero;  // Store the result in PosStore
+        } catch (error) {
+            console.error('RPC Error:', error);
+        }
+    },
 
 });
 
