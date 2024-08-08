@@ -113,35 +113,6 @@ patch(Orderline.prototype, {
         var quant =
             typeof quantity === "number" ? quantity : oParseFloat("" + (quantity ? quantity : 0));
 
-
-     if (this.env && this.env.session && this.env.session.uid) {
-        const self = this;
-        this.env.services.rpc({
-            model: 'res.users',
-            method: 'read',
-            args: [self.env.session.uid, ['groups_id']],
-        }).then(function(user) {
-            const userGroups = user.groups_id; // This should be an array of group IDs
-            const isSpecialUser = userGroups.some(group => group[1] === 'your_module.group_pos_special_users');
-
-            if (quant === 0) {
-                if (!self.comboParent) {
-                    if (isSpecialUser) {
-                        self.env.services.popup.add(ErrorPopup, {
-                            title: _t("Quantity cannot be zero"),
-                            body: _t("Setting the quantity to zero is not allowed. Please enter a valid quantity."),
-                        });
-                    }
-                }
-                return false;
-            }
-        }).catch(function(error) {
-            console.error('Error fetching user groups:', error);
-        });
-    } else {
-        console.error('Session or UID is undefined.');
-        // Handle the case where session or UID is undefined
-    }
         // Handle refund logic
 
         if (this.refunded_orderline_id in this.pos.toRefundLines) {
