@@ -25,4 +25,8 @@
 	<record id="group_Delete_button" model="res.groups">
 		<field name="name">Disable Delete Button</field>
 	</record>
+	<!--i add group delete to xml -->
+	<record id="group_zero_button" model="res.groups">
+		<field name="name">Disable zero Button</field>
+	</record>
 </odoo>

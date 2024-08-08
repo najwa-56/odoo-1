@@ -1,7 +1,0 @@
-<?xml version="1.0"?>
-<!-- security/security.xml -->
-<odoo>
-    <record id="group_pos_special_users" model="res.groups">
-        <field name="name">POS Special Users</field>
-    </record>
-</odoo>
