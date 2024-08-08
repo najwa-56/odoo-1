@@ -1,0 +1,8 @@
+<?xml version="1.0"?>
+<odoo>
+	<record id="group_pos_special" model="res.groups">
+    <field name="name">POS Special Group</field>
+    <field name="category_id" ref="base.module_category_point_of_sale"/>
+</record>
+
+</odoo>
