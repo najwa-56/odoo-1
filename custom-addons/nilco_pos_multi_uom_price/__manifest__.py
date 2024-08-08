@@ -28,8 +28,6 @@
             'nilco_pos_multi_uom_price/static/src/js/multi_uom_price.js',
             'nilco_pos_multi_uom_price/static/src/js/models.js',
             'nilco_pos_multi_uom_price/static/src/xml/multi_uom_price.xml',
-            'nilco_pos_multi_uom_price/static/src/xml/pos_js.xml',
-
         ],
     },
 }
