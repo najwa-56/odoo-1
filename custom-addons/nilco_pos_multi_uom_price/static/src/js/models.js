@@ -116,17 +116,19 @@ patch(Orderline.prototype, {
 
 
              // Retrieve user group condition (assumed to be available in this context)
-    var can_set_zero = zero;
+    // Retrieve user group condition
+        var can_set_zero = this.pos.zero;
 
-    if (quant === 0 && !can_set_zero) {
-        if (!this.comboParent) {
-            this.env.services.popup.add(ErrorPopup, {
-                title: _t("Quantity cannot be zero"),
-                body: _t("Setting the quantity to zero is not allowed. Please enter a valid quantity."),
-            });
+        if (quant === 0 && !can_set_zero) {
+            if (!this.comboParent) {
+                this.env.services.popup.add(ErrorPopup, {
+                    title: _t("Quantity cannot be zero"),
+                    body: _t("Setting the quantity to zero is not allowed. Please enter a valid quantity."),
+                });
+            }
+            return false;
         }
-        return false;
-    }
+
 
         // Handle refund logic
 
@@ -194,15 +196,13 @@ patch(PosStore.prototype, {
             this.product_uom_price = loadedData['product.multi.uom.price'];
         await this.user_groups();
     },
-    async user_groups(){
-        await this.orm.call(
+    async user_groups() {
+        const result = await this.orm.call(
             "pos.session",
             "pos_active_user_group",
-            [ , this.user],
-        ).then(function (output) {
-            zero = output.zero;
-
-        })
+            [this.user.id]
+        );
+        this.zero = result.zero; // Store the zero value in PosStore
     }
 
 });
