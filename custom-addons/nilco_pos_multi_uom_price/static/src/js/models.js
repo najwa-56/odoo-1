@@ -62,19 +62,6 @@ patch(Orderline.prototype, {
 
     },
 
-       // Define the method to fetch user group information
-    async fetchUserGroupInfo() {
-        try {
-            return await this.rpc({
-                model: 'pos.session',
-                method: 'pos_active_user_group2',
-                args: [this.env.session.user_id],
-            });
-        } catch (error) {
-            console.error('Error fetching user group info:', error);
-            return { zero: false }; // Fallback default value in case of error
-        }
-    },
 
     export_as_JSON() {
         const json = super.export_as_JSON(...arguments);
@@ -208,7 +195,16 @@ patch(PosStore.prototype, {
         await super._processData(...arguments);
             this.product_uom_price = loadedData['product.multi.uom.price'];
     },
-
+ // Define the method to fetch user group information
+    async fetchUserGroupInfo() {
+        try {
+            return await this.rpc({
+                model: 'pos.session',
+                method: 'pos_active_user_group2',
+                args: [this.env.session.user_id],
+            });
+        }
+    }
 
 });
 
