@@ -185,7 +185,7 @@ patch(Orderline.prototype, {
     }
 
 });
-var zero1=True;
+var zero1=true;
 patch(PosStore.prototype, {
     async _processData(loadedData) {
         await super._processData(...arguments);
