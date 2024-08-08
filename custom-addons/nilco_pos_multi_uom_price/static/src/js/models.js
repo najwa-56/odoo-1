@@ -117,7 +117,6 @@ patch(Orderline.prototype, {
 
              // Ensure this.pos.zero is correctly set
         const can_set_zero = this.pos.zero;
-        can_set_zero = false;
 
         if (quant === 0 && !can_set_zero) {
             if (!this.comboParent) {
@@ -190,6 +189,7 @@ patch(Orderline.prototype, {
     }
 
 });
+var  zero = false;
 
 patch(PosStore.prototype, {
     async _processData(loadedData) {
