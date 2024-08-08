@@ -59,11 +59,7 @@ patch(Orderline.prototype, {
     setup(_defaultObj, options) {
         super.setup(...arguments);
         this.product_uom_id = this.product.default_uom_id || this.product_uom_id || this.product.uom_id;
-        this.zero = this.pos ? this.pos.zero : 0;
-         console.log('setup method called', {
-        product_uom_id: this.product_uom_id,
-        zero: this.zero
-    });
+
     },
 
     export_as_JSON() {
@@ -118,19 +114,15 @@ patch(Orderline.prototype, {
         var quant =
             typeof quantity === "number" ? quantity : oParseFloat("" + (quantity ? quantity : 0));
 
-        // Check if zero is set and apply logic
-        if (this.zero) {
-            if (quant === 0) {
-                if (!this.comboParent) {
-                    this.env.services.popup.add(ErrorPopup, {
-                        title: _t("Quantity cannot be zero"),
-                        body: _t("Setting the quantity to zero is not allowed. Please enter a valid quantity."),
-                    });
-                }
-                return false;
+        if (quant === 0 && zero1==false) {
+            if (!this.comboParent) {
+                this.env.services.popup.add(ErrorPopup, {
+                    title: _t("Quantity cannot be zero"),
+                    body: _t("Setting the quantity to zero is not allowed. Please enter a valid quantity."),
+                });
             }
+            return false;
         }
-
 
 
         // Handle refund logic
@@ -193,22 +185,21 @@ patch(Orderline.prototype, {
     }
 
 });
-
+var zero1=false;
 patch(PosStore.prototype, {
     async _processData(loadedData) {
         await super._processData(...arguments);
             this.product_uom_price = loadedData['product.multi.uom.price'];
-             this.zero = await this.user_groups(); // Store the zero value in PosStore
+             this.zero1 = await this.user_groups(); // Store the zero value in PosStore
     },
 
     async user_groups() {
         try {
-            const output = await this.orm.call(
+            zero1 = await this.orm.call(
                 "pos.session",
                 "pos_active_user_group2",
                 [this.env.session.user_id]
             );
-            return output.zero; // Return the zero value
         } catch (error) {
             console.error('Error fetching user groups:', error);
             return false; // Default to false in case of error
