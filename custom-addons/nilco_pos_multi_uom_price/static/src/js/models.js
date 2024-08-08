@@ -59,7 +59,7 @@ patch(Orderline.prototype, {
     setup(_defaultObj, options) {
         super.setup(...arguments);
         this.product_uom_id = this.product.default_uom_id || this.product_uom_id || this.product.uom_id;
-
+        this.zero = this.pos ? this.pos.zero : 0;
     },
 
     export_as_JSON() {
@@ -113,7 +113,22 @@ patch(Orderline.prototype, {
         this.order.assert_editable();
         var quant =
             typeof quantity === "number" ? quantity : oParseFloat("" + (quantity ? quantity : 0));
-       
+
+        // Check if zero is set and apply logic
+        if (this.zero) {
+            if (quant === 0) {
+                if (!this.comboParent) {
+                    this.env.services.popup.add(ErrorPopup, {
+                        title: _t("Quantity cannot be zero"),
+                        body: _t("Setting the quantity to zero is not allowed. Please enter a valid quantity."),
+                    });
+                }
+                return false;
+            }
+        }
+
+
+
         // Handle refund logic
 
         if (this.refunded_orderline_id in this.pos.toRefundLines) {
