@@ -119,8 +119,9 @@ patch(Orderline.prototype, {
     // Retrieve user group condition
         var can_set_zero = this.pos.zero;
 
-        if (can_set_zero == true ){
-        if (quant === 0 ) {
+
+        if (quant === 0 && can_set_zero == true  ) {
+
             if (!this.comboParent) {
                 this.env.services.popup.add(ErrorPopup, {
                     title: _t("Quantity cannot be zero"),
@@ -128,7 +129,7 @@ patch(Orderline.prototype, {
                 });
             }
             return false;
-        }}
+        }
 
 
         // Handle refund logic
