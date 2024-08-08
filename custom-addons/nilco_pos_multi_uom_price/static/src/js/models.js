@@ -113,23 +113,7 @@ patch(Orderline.prototype, {
         this.order.assert_editable();
         var quant =
             typeof quantity === "number" ? quantity : oParseFloat("" + (quantity ? quantity : 0));
-        if (!this.pos.zero) {
-            await this.pos.user_groups(); // Call user_groups to ensure zero is fetched
-        }
-
-        const zero = this.pos.zero; // Get the zero value
-
-        if (quant === 0 && zero) {
-            if (!this.comboParent) {
-                this.env.services.popup.add(ErrorPopup, {
-                    title: _t("Quantity cannot be zero"),
-                    body: _t("Setting the quantity to zero is not allowed. Please enter a valid quantity."),
-                });
-            }
-            return false;
-        }
-
-
+       
         // Handle refund logic
 
         if (this.refunded_orderline_id in this.pos.toRefundLines) {
@@ -195,14 +179,21 @@ patch(PosStore.prototype, {
     async _processData(loadedData) {
         await super._processData(...arguments);
             this.product_uom_price = loadedData['product.multi.uom.price'];
-            await this.user_groups();
+             this.zero = await this.user_groups(); // Store the zero value in PosStore
     },
 
-    async user_groups(){
-        await this.orm.call(
-            "pos.session",
-            "pos_active_user_group2",
-            [ , this.user],);
-    }
+    async user_groups() {
+        try {
+            const output = await this.orm.call(
+                "pos.session",
+                "pos_active_user_group2",
+                [this.env.session.user_id]
+            );
+            return output.zero; // Return the zero value
+        } catch (error) {
+            console.error('Error fetching user groups:', error);
+            return false; // Default to false in case of error
+        }
+    },
 });
 
