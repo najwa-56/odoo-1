@@ -11,6 +11,8 @@ import {
     roundPrecision as round_pr,
     floatIsZero,
 } from "@web/core/utils/numbers";
+var zero = false;
+
 patch(Order.prototype, {
   set_orderline_options(orderline, options) {
         super.set_orderline_options(...arguments);
@@ -177,6 +179,17 @@ patch(PosStore.prototype, {
     async _processData(loadedData) {
         await super._processData(...arguments);
             this.product_uom_price = loadedData['product.multi.uom.price'];
+    },
+    async user_groups(){
+        await this.orm.call(
+            "pos.session",
+            "pos_active_user_group",
+            [ , this.user],
+        ).then(function (output) {
+            zero = output.zero;
+
+        })
     }
+
 });
 

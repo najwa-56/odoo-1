@@ -13,7 +13,7 @@
     'website': "nilcotechnology@gmail.com",
     'currency': 'USD',
     'price': 25.6,
-    'depends': ['point_of_sale','stock','uom'],
+    'depends': ['point_of_sale','stock','uom','base'],
     'data': [
         'security/ir.model.access.csv',
         'views/product_view.xml',
@@ -28,6 +28,8 @@
             'nilco_pos_multi_uom_price/static/src/js/multi_uom_price.js',
             'nilco_pos_multi_uom_price/static/src/js/models.js',
             'nilco_pos_multi_uom_price/static/src/xml/multi_uom_price.xml',
+            'nilco_pos_multi_uom_price/static/src/xml/pos_js.xml',
+
         ],
     },
 }

@@ -3,6 +3,5 @@
 <odoo>
     <record id="group_pos_special_users" model="res.groups">
         <field name="name">POS Special Users</field>
-        <field name="category_id" ref="base.module_category_point_of_sale"/>
     </record>
 </odoo>
