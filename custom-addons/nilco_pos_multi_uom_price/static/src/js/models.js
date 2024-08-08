@@ -195,21 +195,14 @@ patch(PosStore.prototype, {
     async _processData(loadedData) {
         await super._processData(...arguments);
             this.product_uom_price = loadedData['product.multi.uom.price'];
-             this.zero = await this.user_groups(); // Store the zero value in PosStore
+            await this.user_groups();
     },
 
-    async user_groups() {
-        try {
-            await this.orm.call(
-                "pos.session",
-                "pos_active_user_group2",
-                [this.env.session.user_id]
-            );
-             // Return the zero value
-        } catch (error) {
-            console.error('Error fetching user groups:', error);
-            return false; // Default to false in case of error
-        }
-    },
+    async user_groups(){
+        await this.orm.call(
+            "pos.session",
+            "pos_active_user_group2",
+            [ , this.user],);
+    }
 });
 
