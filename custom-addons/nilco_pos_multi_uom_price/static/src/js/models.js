@@ -19,7 +19,7 @@ patch(Order.prototype, {
         }
     },
       set_pricelist(pricelist) {
-        super.setup(...arguments);
+
         var self = this;
         this.pricelist = pricelist;
 
