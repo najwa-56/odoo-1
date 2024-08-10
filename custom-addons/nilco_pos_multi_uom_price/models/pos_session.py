@@ -1,4 +1,7 @@
-from odoo import models,fields,api,_
+from odoo import models,fields,api,http
+
+from odoo.http import request
+
 
 
 class PosSession(models.Model):
@@ -50,8 +53,16 @@ class PosSession(models.Model):
             'context': {'display_default_code': False},
         }
 
-    def pos_active_user_group2(self, current_user):
-        user = self.env['res.users'].search([('id', '=', current_user['id'])])
-        zero1 = user.has_group('pos_access_rights_app.group_zero_button')
-        return {'zero1': zero1}
+class ResUsers(models.Model):
+    _inherit = 'res.users'
+
+    @api.model
+    def get_user_groups(self):
+        return [group.id for group in self.env.user.groups_id]
+
+
+class UserGroupsController(http.Controller):
+    @http.route('/api/user_groups', type='json', auth='user')
+    def get_user_groups(self):
+        return request.env.user.get_user_groups()
 

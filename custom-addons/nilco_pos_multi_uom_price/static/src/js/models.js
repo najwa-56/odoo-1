@@ -108,20 +108,31 @@ patch(Orderline.prototype, {
         }
         return this.product.get_unit();
     },
-
+async function fetchUserGroups() {
+    try {
+        const response = await fetch('/api/user_groups', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': odoo.csrf_token,
+            },
+        });
+        const userGroups = await response.json();
+        return userGroups;
+    } catch (error) {
+        console.error('Failed to fetch user groups:', error);
+        return [];
+    }
+}
     set_quantity(quantity, keep_price) {
         this.order.assert_editable();
         var quant =
             typeof quantity === "number" ? quantity : oParseFloat("" + (quantity ? quantity : 0));
 
-            console.log(this.env); // Check if this.env is defined
-console.log(this.env.session); // Check if this.env.session is defined
-              const userGroups = this.env.session.user_groups;
-             const hasSpecialGroup = userGroups.includes('group_zero_button'); // Replace 'your_special_group_id' with the actual group ID
+            fetchUserGroups().then(userGroups => {
+        const hasSpecialGroup = userGroups.includes('your_special_group_id'); // Replace with the actual group ID
 
-
-
-         if (quant === 0) {
+        if (quant === 0) {
             if (!this.comboParent) {
                 // Show error if the user does not belong to the special group
                 if (!hasSpecialGroup) {
@@ -131,7 +142,6 @@ console.log(this.env.session); // Check if this.env.session is defined
                     });
                 }
             }
-            return false;
         }
 
 
