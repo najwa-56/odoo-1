@@ -12,7 +12,15 @@ import {
     roundPrecision as round_pr,
     floatIsZero,
 } from "@web/core/utils/numbers";
-
+// Fetch the user groups information from the backend
+const fetchUserGroups = async () => {
+    const { zero1 } = await this.rpc({
+        model: 'pos.session',
+        method: 'get_user_groups',
+        args: [this.env.user.id],
+    });
+    return { zero1 };
+};
 patch(Order.prototype, {
   set_orderline_options(orderline, options) {
         super.set_orderline_options(...arguments);
@@ -60,6 +68,7 @@ patch(Orderline.prototype, {
     setup(_defaultObj, options) {
         super.setup(...arguments);
         this.product_uom_id = this.product.default_uom_id || this.product_uom_id || this.product.uom_id;
+                this.userGroups = await fetchUserGroups();
 
     },
 
@@ -117,16 +126,18 @@ patch(Orderline.prototype, {
 
 
 
-            if (quant === 0) {
+           if (quant === 0) {
+            // Check the user group condition
+            if (this.userGroups.zero1) {
                 if (!this.comboParent) {
-                        this.env.services.popup.add(ErrorPopup, {
-                            title: _t("Quantity cannot be zero"),
-                            body: _t("Setting the quantity to zero is not allowed. Please enter a valid quantity."),
-                        });
-
+                    this.env.services.popup.add(ErrorPopup, {
+                        title: _t("Quantity cannot be zero"),
+                        body: _t("Setting the quantity to zero is not allowed. Please enter a valid quantity."),
+                    });
                 }
                 return false;
             }
+        }
 
 
         // Handle refund logic
