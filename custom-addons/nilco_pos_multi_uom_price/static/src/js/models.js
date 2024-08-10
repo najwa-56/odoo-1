@@ -85,12 +85,12 @@ patch(Orderline.prototype, {
         this.product_uom_id = null;  // or some default value
     }
 },
-   async user_groups(){
+  async user_groups(){
         await this.rpc({ model: 'pos.session',
         method: 'get_user_groups',
         args: [this.env.user.id],})
 
-    }
+    },
     set_uom(uom_id) {
         this.product_uom_id = uom_id;
         const unit = this.get_unit();
