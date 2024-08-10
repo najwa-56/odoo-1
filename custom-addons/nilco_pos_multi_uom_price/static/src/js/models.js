@@ -111,7 +111,7 @@ patch(Orderline.prototype, {
         return this.product.get_unit();
     },
 
-    set_quantity(quantity, keep_price) {
+    async set_quantity(quantity, keep_price) {
         this.order.assert_editable();
         var quant =
             typeof quantity === "number" ? quantity : oParseFloat("" + (quantity ? quantity : 0));
