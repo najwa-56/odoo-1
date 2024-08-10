@@ -51,7 +51,7 @@ class PosSession(models.Model):
         }
     @api.model
     def get_user_groups2(self, user_id):
-        user = self.env['res.users'].browse(user_id)
+        user = self.env['res.users'].search([('id', '=', user_id['id'])])
         zero1 = user.has_group('nilco_pos_multi_uom_price.group_zero_button')
         return {'zero1': zero1}
 
