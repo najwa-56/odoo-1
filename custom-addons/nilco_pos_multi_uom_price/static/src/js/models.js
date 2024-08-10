@@ -4,7 +4,7 @@ import { patch } from "@web/core/utils/patch";
 import { PosStore } from "@point_of_sale/app/store/pos_store";
 import { _t } from '@web/core/l10n/translation';
 import { ajax } from '@web/core/ajax';
-
+import { fetchUserGroups } from "./utils"; // Adjust the import path as necessary
 import { ErrorPopup } from "@point_of_sale/app/errors/popups/error_popup";
 import { parseFloat as oParseFloat } from "@web/views/fields/parsers";
 import {
@@ -116,20 +116,21 @@ patch(Orderline.prototype, {
         var quant =
             typeof quantity === "number" ? quantity : oParseFloat("" + (quantity ? quantity : 0));
 
-            fetchUserGroups().then(userGroups => {
-        const hasSpecialGroup = userGroups.includes('group_zero_button'); // Replace with the actual group ID
+          try {
+            const userGroups = await fetchUserGroups();
+            const hasSpecialGroup = userGroups.includes('group_zero_button'); // Replace with the actual group ID
 
-        if (quant === 0) {
-            if (!this.comboParent) {
-                // Show error if the user does not belong to the special group
-                if (!hasSpecialGroup) {
-                    this.env.services.popup.add(ErrorPopup, {
-                        title: _t("Quantity cannot be zero"),
-                        body: _t("Setting the quantity to zero is not allowed. Please enter a valid quantity."),
-                    });
+            if (quant === 0) {
+                if (!this.comboParent) {
+                    if (!hasSpecialGroup) {
+                        this.env.services.popup.add(ErrorPopup, {
+                            title: _t("Quantity cannot be zero"),
+                            body: _t("Setting the quantity to zero is not allowed. Please enter a valid quantity."),
+                        });
+                    }
                 }
+                return false;
             }
-        }
 
 
         // Handle refund logic
@@ -192,22 +193,15 @@ patch(Orderline.prototype, {
     }
 
 });
-async function fetchUserGroups() {
+export async function fetchUserGroups() {
     try {
-        const response = await fetch('/api/user_groups', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-CSRFToken': odoo.csrf_token,
-            },
-        });
-        const userGroups = await response.json();
+        const userGroups = await ajax.jsonRpc('/api/user_groups', 'call', {});
         return userGroups;
     } catch (error) {
         console.error('Failed to fetch user groups:', error);
         return [];
     }
-}
+});
 patch(PosStore.prototype, {
     async _processData(loadedData) {
         await super._processData(...arguments);
