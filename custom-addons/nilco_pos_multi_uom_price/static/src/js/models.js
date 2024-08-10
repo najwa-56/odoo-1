@@ -190,14 +190,14 @@ patch(PosStore.prototype, {
         await super._processData(...arguments);
             this.product_uom_price = loadedData['product.multi.uom.price'];
          try {
-            this.zero1 = await this.user_groups(); // Store the zero value in PosStore
+            this.zero1 = await this.user_groups2(); // Store the zero value in PosStore
             console.log('Stored zero1:', this.zero1); // Check the value stored
         } catch (error) {
             console.error('Error storing zero1:', error);
         }// Store the zero value in PosStore
     },
 
-    async user_groups(){
+    async user_groups2(){
         await this.orm.call(
             "pos.session",
             "get_user_groups2",
