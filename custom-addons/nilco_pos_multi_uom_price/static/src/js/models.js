@@ -59,11 +59,15 @@ patch(Orderline.prototype, {
     setup(_defaultObj, options) {
         super.setup(...arguments);
         this.product_uom_id = this.product.default_uom_id || this.product_uom_id || this.product.uom_id;
-         const posStore = this.pos; // Assuming `this.pos` is an instance of PosStore
+         // Access the PosStore instance to get zero1
+        const posStore = this.pos; // Ensure this is the correct reference to PosStore
         if (posStore && posStore.zero1) {
             console.log('zero1 value:', posStore.zero1);
             // You can use zero1 here as needed
+        } else {
+            console.error('zero1 is not defined in PosStore');
         }
+
 
     },
 
