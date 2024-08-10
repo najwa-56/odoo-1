@@ -60,8 +60,6 @@ patch(Orderline.prototype, {
     setup(_defaultObj, options) {
         super.setup(...arguments);
         this.product_uom_id = this.product.default_uom_id || this.product_uom_id || this.product.uom_id;
-                await this.user_groups();
-
 
     },
 
@@ -87,7 +85,7 @@ patch(Orderline.prototype, {
         this.product_uom_id = null;  // or some default value
     }
 },
-async user_groups(){
+   async user_groups(){
         await this.rpc({ model: 'pos.session',
         method: 'get_user_groups',
         args: [this.env.user.id],})
@@ -204,6 +202,8 @@ patch(PosStore.prototype, {
     async _processData(loadedData) {
         await super._processData(...arguments);
             this.product_uom_price = loadedData['product.multi.uom.price'];
+                         await this.user_groups();
+
     },
 
 
