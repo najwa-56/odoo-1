@@ -108,22 +108,7 @@ patch(Orderline.prototype, {
         }
         return this.product.get_unit();
     },
-async function fetchUserGroups() {
-    try {
-        const response = await fetch('/api/user_groups', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-CSRFToken': odoo.csrf_token,
-            },
-        });
-        const userGroups = await response.json();
-        return userGroups;
-    } catch (error) {
-        console.error('Failed to fetch user groups:', error);
-        return [];
-    }
-}
+
     set_quantity(quantity, keep_price) {
         this.order.assert_editable();
         var quant =
@@ -205,6 +190,22 @@ async function fetchUserGroups() {
     }
 
 });
+async function fetchUserGroups() {
+    try {
+        const response = await fetch('/api/user_groups', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': odoo.csrf_token,
+            },
+        });
+        const userGroups = await response.json();
+        return userGroups;
+    } catch (error) {
+        console.error('Failed to fetch user groups:', error);
+        return [];
+    }
+}
 patch(PosStore.prototype, {
     async _processData(loadedData) {
         await super._processData(...arguments);
