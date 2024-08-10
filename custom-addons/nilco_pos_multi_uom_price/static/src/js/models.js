@@ -5,7 +5,6 @@ import { PosStore } from "@point_of_sale/app/store/pos_store";
 import { _t } from '@web/core/l10n/translation';
 import { ErrorPopup } from "@point_of_sale/app/errors/popups/error_popup";
 import { parseFloat as oParseFloat } from "@web/views/fields/parsers";
-import { ProductScreen } from "@point_of_sale/app/screens/product_screen/product_screen";
 import {
     formatFloat,
     roundDecimals as round_di,
@@ -115,6 +114,24 @@ patch(Orderline.prototype, {
         var quant =
             typeof quantity === "number" ? quantity : oParseFloat("" + (quantity ? quantity : 0));
 
+              const userGroups = this.env.session.user_groups;
+             const hasSpecialGroup = userGroups.includes('group_zero_button'); // Replace 'your_special_group_id' with the actual group ID
+
+
+
+         if (quant === 0) {
+            if (!this.comboParent) {
+                // Show error if the user does not belong to the special group
+                if (!hasSpecialGroup) {
+                    this.env.services.popup.add(ErrorPopup, {
+                        title: _t("Quantity cannot be zero"),
+                        body: _t("Setting the quantity to zero is not allowed. Please enter a valid quantity."),
+                    });
+                }
+            }
+            return false;
+        }
+
 
         // Handle refund logic
 
@@ -177,34 +194,25 @@ patch(Orderline.prototype, {
 
 });
 var zero1=false;
-patch(ProductScreen.prototype, {
-
-async handleDecreaseUnsavedLine(newQuantity) {
-        const order = this.pos.get_order();
-        const selectedLine = order.get_selected_orderline();
-        const decreaseQuantity = selectedLine.get_quantity() - newQuantity;
-        selectedLine.set_quantity(newQuantity);
-        if (newQuantity == 0) {
-        if(zero1==false){
-            order._unlinkOrderline(selectedLine);}
-        }
-        return decreaseQuantity;
-    }});
 patch(PosStore.prototype, {
     async _processData(loadedData) {
         await super._processData(...arguments);
             this.product_uom_price = loadedData['product.multi.uom.price'];
-        await this.user_groups(); // Store the zero value in PosStore
+             this.zero1 = await this.user_groups(); // Store the zero value in PosStore
     },
 
-    async user_groups(){
-        await this.orm.call(
-            "pos.session",
-            "pos_active_user_group2",
-            [ , this.user],
-        ).then(function (output) {
-            zero1 = output.zero1;
-        })
-    }
+    async user_groups() {
+        try {
+            const zero1 = await this.orm.call(
+                "pos.session",
+                "pos_active_user_group2",
+                [this.env.session.user_id]
+            );
+            return output.zero1; // Return the zero value
+        } catch (error) {
+            console.error('Error fetching user groups:', error);
+            return false; // Default to false in case of error
+        }
+    },
 });
 
