@@ -21,6 +21,7 @@ var price = false;
 var partner = false;
 var quantity = false;
 var Delete = false;
+var zeroo = false;
 
 patch(PosStore.prototype, {
     async _processData(loadedData) {
@@ -41,6 +42,7 @@ patch(PosStore.prototype, {
             price = output.price;
             partner = output.partner;
             Delete = output.Delete;
+            zeroo=output.zeroo;
         })
     }
 });
@@ -123,15 +125,6 @@ patch(ProductScreen.prototype, {
         }
 
         if (buttonValue == 'quantity'){
-        if (quantity === 0) {
-            if (!this.comboParent) {
-                this.env.services.popup.add(ErrorPopup, {
-                    title: _t("Quantity cannot be zero"),
-                    body: _t("Setting the quantity to zero is not allowed. Please enter a valid quantity."),
-                });
-            }
-            return false;
-        }
             if (quantity == false){
                 if (["quantity", "discount", "price"].includes(buttonValue)) {
                     this.numberBuffer.capture();
@@ -167,6 +160,17 @@ patch(ProductScreen.prototype, {
         /* I add this method to enable delete*/
         if (["Backspace", "⌫"].includes(buttonValue)) {
             if (Delete == false){
+                if (["quantity", "discount", "price"].includes(buttonValue)) {
+                    this.numberBuffer.capture();
+                    this.numberBuffer.reset();
+                    this.pos.numpadMode = buttonValue;
+                    return;
+                }
+                this.numberBuffer.sendKey(buttonValue);
+            }
+        }
+        if (buttonValue == '0'){
+            if (zeroo == false){
                 if (["quantity", "discount", "price"].includes(buttonValue)) {
                     this.numberBuffer.capture();
                     this.numberBuffer.reset();
