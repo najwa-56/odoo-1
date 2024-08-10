@@ -5,6 +5,7 @@ import { PosStore } from "@point_of_sale/app/store/pos_store";
 import { _t } from '@web/core/l10n/translation';
 import { ErrorPopup } from "@point_of_sale/app/errors/popups/error_popup";
 import { parseFloat as oParseFloat } from "@web/views/fields/parsers";
+import { ProductScreen } from "@point_of_sale/app/screens/product_screen/product_screen";
 import {
     formatFloat,
     roundDecimals as round_di,
@@ -114,16 +115,6 @@ patch(Orderline.prototype, {
         var quant =
             typeof quantity === "number" ? quantity : oParseFloat("" + (quantity ? quantity : 0));
 
-        if (quant === 0 && zero1=false) {
-            if (!this.comboParent) {
-                this.env.services.popup.add(ErrorPopup, {
-                    title: _t("Quantity cannot be zero"),
-                    body: _t("Setting the quantity to zero is not allowed. Please enter a valid quantity."),
-                });
-            }
-            return false;
-        }
-
 
         // Handle refund logic
 
@@ -185,12 +176,25 @@ patch(Orderline.prototype, {
     }
 
 });
+var zero1=false;
+patch(ProductScreen.prototype, {
 
+async handleDecreaseUnsavedLine(newQuantity) {
+        const order = this.pos.get_order();
+        const selectedLine = order.get_selected_orderline();
+        const decreaseQuantity = selectedLine.get_quantity() - newQuantity;
+        selectedLine.set_quantity(newQuantity);
+        if (newQuantity == 0) {
+        if(zero1==false)
+            order._unlinkOrderline(selectedLine);
+        }
+        return decreaseQuantity;
+    }});
 patch(PosStore.prototype, {
     async _processData(loadedData) {
         await super._processData(...arguments);
             this.product_uom_price = loadedData['product.multi.uom.price'];
-             await this.user_groups(); // Store the zero value in PosStore
+             this.zero1 = await this.user_groups(); // Store the zero value in PosStore
     },
 
     async user_groups() {
