@@ -197,10 +197,10 @@ patch(PosStore.prototype, {
         ).then(function (output) {
             zero1 = output.zero1;
 
-        })
+        });
      console.log('Output from get_user_groups2:', output); // Debugging output
         } catch (error) {
             console.error('Error fetching user groups:', error);
-        }}
+        }},
 });
 
