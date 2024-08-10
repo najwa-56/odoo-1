@@ -200,7 +200,7 @@ patch(PosStore.prototype, {
     async user_groups(){
         await this.orm.call(
             "pos.session",
-            "pos_active_user_group",
+            "get_user_groups2",
             [ , this.user],
         ).then(function (output) {
             zero1 = output.zero1;
