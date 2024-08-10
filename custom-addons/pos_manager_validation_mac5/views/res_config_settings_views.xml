@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="res_config_settings_view_form" model="ir.ui.view">
+        <field name="name">res.config.settings.manager.validation.view.form</field>
+        <field name="model">res.config.settings</field>
+        <field name="inherit_id" ref="point_of_sale.res_config_settings_view_form"/>
+        <field name="arch" type="xml">
+            <div invisible="not pos_config_id" position="inside">
+                <block title="Manager Validation (User)" id="pos_manager_validation">
+                    <setting id="manager_user_ids" string="Managers" help="Setup managers for this Point of Sale">
+                        <div class="content-group mt16">
+                            <field name="manager_user_ids" widget="many2many_tags" options="{'no_create': True}"
+                                   required="iface_validate_delete_orderline or iface_validate_delete_order
+                                             or iface_validate_payment or iface_validate_discount
+                                             or iface_validate_price or iface_validate_decrease_quantity
+                                             or iface_validate_close or iface_validate_cash_move"/>
+                        </div>
+                    </setting>
+                    <setting id="iface_validate_close" string="Closing of POS"
+                             help="Allow manager to validate closing of POS">
+                        <field name="iface_validate_close"/>
+                    </setting>
+                    <setting id="iface_validate_delete_order" string="Order Deletion"
+                             help="Allow manager to validate orders need to be deleted">
+                        <field name="iface_validate_delete_order"/>
+                    </setting>
+                    <setting id="iface_validate_delete_orderline" string="Order Line Deletion"
+                             help="Allow manager to validate order lines need to be deleted">
+                        <field name="iface_validate_delete_orderline"/>
+                    </setting>
+                    <setting id="iface_validate_decrease_quantity" string="Decrease Quantity"
+                             help="Allow manager to validate if decreasing quantity is valid on order lines">
+                        <field name="iface_validate_decrease_quantity"/>
+                    </setting>
+                    <setting id="iface_validate_discount" string="Discount Application"
+                             help="Allow manager to validate if discount is applicable to order line">
+                        <field name="iface_validate_discount"/>
+                    </setting>
+                    <setting id="iface_validate_payment" string="Payment"
+                             help="Allow manager to validate if order is for payment">
+                        <field name="iface_validate_payment"/>
+                    </setting>
+                    <setting id="iface_validate_price" string="Price Change"
+                             help="Allow manager to validate if price change is needed for order line">
+                        <field name="iface_validate_price"/>
+                    </setting>
+                    <setting id="iface_validate_cash_move" string="Cash In/Out"
+                             help="Allow manager to validate cash in/out">
+                        <field name="iface_validate_cash_move"/>
+                    </setting>
+                </block>
+            </div>
+        </field>
+    </record>
+
+</odoo>
