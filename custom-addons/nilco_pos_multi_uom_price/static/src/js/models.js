@@ -3,7 +3,6 @@ import { Order, Orderline, Payment } from "@point_of_sale/app/store/models";
 import { patch } from "@web/core/utils/patch";
 import { PosStore } from "@point_of_sale/app/store/pos_store";
 import { _t } from '@web/core/l10n/translation';
-import { ajax } from '@web/core/ajax';
 import { fetchUserGroups } from "./utils"; // Adjust the import path as necessary
 import { ErrorPopup } from "@point_of_sale/app/errors/popups/error_popup";
 import { parseFloat as oParseFloat } from "@web/views/fields/parsers";
@@ -13,15 +12,7 @@ import {
     roundPrecision as round_pr,
     floatIsZero,
 } from "@web/core/utils/numbers";
-export async function fetchUserGroups() {
-    try {
-        const userGroups = await ajax.jsonRpc('/api/user_groups', 'call', {});
-        return userGroups;
-    } catch (error) {
-        console.error('Failed to fetch user groups:', error);
-        return [];
-    }
-}
+
 patch(Order.prototype, {
   set_orderline_options(orderline, options) {
         super.set_orderline_options(...arguments);
