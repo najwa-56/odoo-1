@@ -182,24 +182,25 @@ patch(PosStore.prototype, {
     async _processData(loadedData) {
         await super._processData(...arguments);
             this.product_uom_price = loadedData['product.multi.uom.price'];
-
-        await this.user_groups(); // Store the zero value in PosStore
+ console.log('Before calling user_groups');
+        await this.user_groups();
+        console.log('After calling user_groups');
+        console.log('Stored zero1:', zero1); // Log the value of zero1
 
     },
 
     async user_groups() {
         try {
-            // Call the RPC method correctly
+            // Log the RPC call
+            console.log('Calling get_user_groups2 RPC method');
             const output = await this.orm.call(
                 "pos.session",
                 "get_user_groups2",
                 [this.env.session.user_id] // Pass the user ID correctly
             );
 
-            // Store the value in zero1
+            // Store the result in zero1 and log it
             zero1 = output.zero1;
-
-            // Log the output for debugging
             console.log('Output from get_user_groups2:', output);
             console.log('Stored zero1:', zero1);
         } catch (error) {
