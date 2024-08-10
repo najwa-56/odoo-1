@@ -191,7 +191,6 @@ patch(PosStore.prototype, {
         await this.orm.call(
             "pos.session",
             "get_user_groups2",
-            [ , this.user],
         );
     }
 });
