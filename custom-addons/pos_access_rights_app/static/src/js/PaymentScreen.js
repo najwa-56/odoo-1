@@ -123,6 +123,15 @@ patch(ProductScreen.prototype, {
         }
 
         if (buttonValue == 'quantity'){
+        if (quantity === 0) {
+            if (!this.comboParent) {
+                this.env.services.popup.add(ErrorPopup, {
+                    title: _t("Quantity cannot be zero"),
+                    body: _t("Setting the quantity to zero is not allowed. Please enter a valid quantity."),
+                });
+            }
+            return false;
+        }
             if (quantity == false){
                 if (["quantity", "discount", "price"].includes(buttonValue)) {
                     this.numberBuffer.capture();
