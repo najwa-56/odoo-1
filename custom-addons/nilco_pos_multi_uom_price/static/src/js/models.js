@@ -13,7 +13,15 @@ import {
     roundPrecision as round_pr,
     floatIsZero,
 } from "@web/core/utils/numbers";
-
+export async function fetchUserGroups() {
+    try {
+        const userGroups = await ajax.jsonRpc('/api/user_groups', 'call', {});
+        return userGroups;
+    } catch (error) {
+        console.error('Failed to fetch user groups:', error);
+        return [];
+    }
+}
 patch(Order.prototype, {
   set_orderline_options(orderline, options) {
         super.set_orderline_options(...arguments);
@@ -194,18 +202,10 @@ patch(Orderline.prototype, {
     }catch (error) {
         console.error('Error handling quantity:', error);
         return false;
-    }
+    }}
 
 });
-export async function fetchUserGroups() {
-    try {
-        const userGroups = await ajax.jsonRpc('/api/user_groups', 'call', {});
-        return userGroups;
-    } catch (error) {
-        console.error('Failed to fetch user groups:', error);
-        return [];
-    }
-}
+
 patch(PosStore.prototype, {
     async _processData(loadedData) {
         await super._processData(...arguments);
