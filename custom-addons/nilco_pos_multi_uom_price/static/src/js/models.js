@@ -177,25 +177,28 @@ patch(Orderline.prototype, {
     }
 
 });
-var zero1=false;
+var zero1 = false;
 patch(PosStore.prototype, {
     async _processData(loadedData) {
         await super._processData(...arguments);
-            this.product_uom_price = loadedData['product.multi.uom.price'];
+        this.product_uom_price = loadedData['product.multi.uom.price'];
 
         await this.user_groups2(); // Store the zero value in PosStore
-
     },
 
     async user_groups2(){
-        await this.orm.call(
-            "pos.session",
-            "get_user_groups2",
-            [ , this.user],
-        ).then(function (output) {
+        try {
+            const output = await this.orm.call(
+                "pos.session",
+                "get_user_groups2",
+                [this.env.session.user_id] // Pass only the user ID
+            );
             zero1 = output.zero1;
-
-        })
+            console.log('Stored zero1:', zero1); // Check the value stored
+        } catch (error) {
+            console.error('Error fetching user groups:', error);
+        }
     }
 });
+
 
