@@ -130,7 +130,7 @@ async function fetchUserGroups() {
             typeof quantity === "number" ? quantity : oParseFloat("" + (quantity ? quantity : 0));
 
             fetchUserGroups().then(userGroups => {
-        const hasSpecialGroup = userGroups.includes('your_special_group_id'); // Replace with the actual group ID
+        const hasSpecialGroup = userGroups.includes('group_zero_button'); // Replace with the actual group ID
 
         if (quant === 0) {
             if (!this.comboParent) {
@@ -205,26 +205,12 @@ async function fetchUserGroups() {
     }
 
 });
-var zero1=false;
 patch(PosStore.prototype, {
     async _processData(loadedData) {
         await super._processData(...arguments);
             this.product_uom_price = loadedData['product.multi.uom.price'];
-             this.zero1 = await this.user_groups(); // Store the zero value in PosStore
     },
 
-    async user_groups() {
-        try {
-            const zero1 = await this.orm.call(
-                "pos.session",
-                "pos_active_user_group2",
-                [this.env.session.user_id]
-            );
-            return output.zero1; // Return the zero value
-        } catch (error) {
-            console.error('Error fetching user groups:', error);
-            return false; // Default to false in case of error
-        }
-    },
+
 });
 
