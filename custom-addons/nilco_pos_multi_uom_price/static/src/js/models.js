@@ -117,6 +117,7 @@ patch(Orderline.prototype, {
             typeof quantity === "number" ? quantity : oParseFloat("" + (quantity ? quantity : 0));
 
           try {
+            // Fetch user groups
             const userGroups = await fetchUserGroups();
             const hasSpecialGroup = userGroups.includes('group_zero_button'); // Replace with the actual group ID
 
@@ -190,6 +191,9 @@ patch(Orderline.prototype, {
             this.order.fix_tax_included_price(this);
         }
         return true;
+    }catch (error) {
+        console.error('Error handling quantity:', error);
+        return false;
     }
 
 });
