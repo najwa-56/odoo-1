@@ -6,7 +6,7 @@ import { _t } from '@web/core/l10n/translation';
 import { useService } from "@web/core/utils/hooks";
 import { ErrorPopup } from "@point_of_sale/app/errors/popups/error_popup";
 import { reactive, Component, onMounted, onWillStart } from "@odoo/owl";
-
+import { session } from "@web/session";
 import { parseFloat as oParseFloat } from "@web/views/fields/parsers";
 import {
     formatFloat,
@@ -185,30 +185,17 @@ patch(PosStore.prototype, {
     async _processData(loadedData) {
         await super._processData(...arguments);
             this.product_uom_price = loadedData['product.multi.uom.price'];
- console.log('Before calling user_groups');
-        await this.user_groups();
-        console.log('After calling user_groups');
-        console.log('Stored zero1:', zero1); // Log the value of zero1
-
+    await this.user_groups();
     },
-
-    async user_groups() {
-        try {
-            // Log the RPC call
-            console.log('Calling get_user_groups2 RPC method');
-            const output = await this.orm.call(
-                "pos.session",
-                "get_user_groups2",
-                [this.env.session.user_id] // Pass the user ID correctly
-            );
-
-            // Store the result in zero1 and log it
+    async user_groups(){
+        await this.orm.call(
+            "pos.session",
+            "pos_active_user_group",
+            [ , this.user],
+        ).then(function (output) {
             zero1 = output.zero1;
-            console.log('Output from get_user_groups2:', output);
-            console.log('Stored zero1:', zero1);
-        } catch (error) {
-            console.error('Error fetching user groups:', error);
-        }
+
+        })
     }
 });
 
