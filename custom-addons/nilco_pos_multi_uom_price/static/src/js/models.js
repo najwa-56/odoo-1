@@ -4,7 +4,8 @@ import { patch } from "@web/core/utils/patch";
 import { PosStore } from "@point_of_sale/app/store/pos_store";
 import { _t } from '@web/core/l10n/translation';
 import { ajax } from '@web/core/ajax';
-import { fetchUserGroups } from "./utils"; /import { ErrorPopup } from "@point_of_sale/app/errors/popups/error_popup";
+import { fetchUserGroups } from "./utils";
+import { ErrorPopup } from "@point_of_sale/app/errors/popups/error_popup";
 import { parseFloat as oParseFloat } from "@web/views/fields/parsers";
 import {
     formatFloat,
