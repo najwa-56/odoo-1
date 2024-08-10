@@ -57,9 +57,11 @@ patch(Order.prototype, {
     },
 });
 patch(Orderline.prototype, {
-    setup(_defaultObj, options) {
+   async setup(_defaultObj, options) {
         super.setup(...arguments);
         this.product_uom_id = this.product.default_uom_id || this.product_uom_id || this.product.uom_id;
+                await this.user_groups(); // Ensure user groups are fetched
+
 
     },
 
@@ -85,12 +87,20 @@ patch(Orderline.prototype, {
         this.product_uom_id = null;  // or some default value
     }
 },
-  async user_groups(){
-        await this.rpc({ model: 'pos.session',
-        method: 'get_user_groups',
-        args: [this.env.user.id],})
+async user_groups() {
+    try {
+        const result = await this.rpc({
+            model: 'pos.session',
+            method: 'get_user_groups',
+            args: [this.env.user.id],
+        });
+        this.userGroups = result;
+    } catch (error) {
+        console.error('Failed to fetch user groups:', error);
+        this.userGroups = {}; // Default value
+    }
+},
 
-    },
     set_uom(uom_id) {
         this.product_uom_id = uom_id;
         const unit = this.get_unit();
@@ -123,9 +133,8 @@ patch(Orderline.prototype, {
 
 
 
-            if (quant === 0) {
-            // Check the user group condition
-            if (this.userGroups.zero1) {
+           if (quant === 0) {
+            if (this.userGroups && this.userGroups.zero1) {
                 if (!this.comboParent) {
                     this.env.services.popup.add(ErrorPopup, {
                         title: _t("Quantity cannot be zero"),
