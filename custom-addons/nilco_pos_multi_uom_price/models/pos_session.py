@@ -49,7 +49,6 @@ class PosSession(models.Model):
             },
             'context': {'display_default_code': False},
         }
-
     @api.model
     def get_user_groups(self, user_id):
         user = self.env['res.users'].browse(user_id)

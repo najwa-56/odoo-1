@@ -59,6 +59,11 @@ patch(Orderline.prototype, {
     setup(_defaultObj, options) {
         super.setup(...arguments);
         this.product_uom_id = this.product.default_uom_id || this.product_uom_id || this.product.uom_id;
+         const posStore = this.pos; // Assuming `this.pos` is an instance of PosStore
+        if (posStore && posStore.zero1) {
+            console.log('zero1 value:', posStore.zero1);
+            // You can use zero1 here as needed
+        }
 
     },
 
@@ -114,7 +119,7 @@ patch(Orderline.prototype, {
         var quant =
             typeof quantity === "number" ? quantity : oParseFloat("" + (quantity ? quantity : 0));
 
-        if (quant === 0 && zero1==false) {
+        if (quant === 0 && !zero1) {
             if (!this.comboParent) {
                 this.env.services.popup.add(ErrorPopup, {
                     title: _t("Quantity cannot be zero"),
@@ -185,12 +190,11 @@ patch(Orderline.prototype, {
     }
 
 });
-var zero1=false;
 patch(PosStore.prototype, {
     async _processData(loadedData) {
         await super._processData(...arguments);
             this.product_uom_price = loadedData['product.multi.uom.price'];
-         await this.user_groups(); // Store the zero value in PosStore
+        this.zero1 = await this.user_groups(); // Store the zero value in PosStore
     },
 
     async user_groups() {
@@ -200,7 +204,7 @@ patch(PosStore.prototype, {
                 "get_user_groups",
                 [this.env.session.user_id]
             );
-            return output.zero1; // Return the zero value
+            return zero1; // Return the zero value
         } catch (error) {
             console.error('Error fetching user groups:', error);
             return false; // Default to false in case of error
