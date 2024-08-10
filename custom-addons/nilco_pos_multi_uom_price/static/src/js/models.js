@@ -205,7 +205,7 @@ export async function fetchUserGroups() {
         console.error('Failed to fetch user groups:', error);
         return [];
     }
-});
+}
 patch(PosStore.prototype, {
     async _processData(loadedData) {
         await super._processData(...arguments);
