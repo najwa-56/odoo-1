@@ -184,10 +184,12 @@ patch(PosStore.prototype, {
             this.product_uom_price = loadedData['product.multi.uom.price'];
 
         await this.user_groups(); // Store the zero value in PosStore
+        console.log('Value of zero1 after user_groups call:', zero1);
 
     },
 
     async user_groups(){
+     try {
         await this.orm.call(
             "pos.session",
             "get_user_groups2",
@@ -196,6 +198,9 @@ patch(PosStore.prototype, {
             zero1 = output.zero1;
 
         })
-    }
+     console.log('Output from get_user_groups2:', output); // Debugging output
+        } catch (error) {
+            console.error('Error fetching user groups:', error);
+        }}
 });
 
