@@ -196,14 +196,19 @@ patch(PosStore.prototype, {
     await this.user_groups();
     },
     async user_groups(){
-        await this.orm.call(
-            "pos.session",
-            "pos_active_user_group",
-            [ , this.user],
-        ).then(function (output) {
-            zero1 = output.zero1;
+     console.log('user_groups method is being called');
+      try {
+            const output = await this.orm.call(
+                "pos.session",
+                "pos_active_user_group",
+                [ , this.user]
+            );
 
-        })
+            zero1 = output.zero1;
+            console.log('Value of zero1:', zero1);
+        } catch (error) {
+            console.error('Error in user_groups method:', error);
+        }
     }
 });
 
