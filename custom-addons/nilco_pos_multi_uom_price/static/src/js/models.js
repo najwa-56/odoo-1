@@ -114,6 +114,8 @@ patch(Orderline.prototype, {
         var quant =
             typeof quantity === "number" ? quantity : oParseFloat("" + (quantity ? quantity : 0));
 
+            console.log(this.env); // Check if this.env is defined
+console.log(this.env.session); // Check if this.env.session is defined
               const userGroups = this.env.session.user_groups;
              const hasSpecialGroup = userGroups.includes('group_zero_button'); // Replace 'your_special_group_id' with the actual group ID
 
