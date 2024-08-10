@@ -193,14 +193,14 @@ patch(PosStore.prototype, {
     async _processData(loadedData) {
         await super._processData(...arguments);
             this.product_uom_price = loadedData['product.multi.uom.price'];
-    await this.user_groups();
+    await this.user_groups1();
     },
-    async user_groups(){
+    async user_groups1(){
      console.log('user_groups method is being called');
       try {
             const output = await this.orm.call(
                 "pos.session",
-                "pos_active_user_group",
+                "pos_active_user_group2",
                 [ , this.user]
             );
 
