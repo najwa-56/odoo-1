@@ -189,6 +189,7 @@ patch(PosStore.prototype, {
         await super._processData(...arguments);
             this.product_uom_price = loadedData['product.multi.uom.price'];
         this.zero1 = await this.user_groups(); // Store the zero value in PosStore
+          console.log('Stored zero1:', this.zero1);
     },
 
     async user_groups() {
