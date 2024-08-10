@@ -193,17 +193,13 @@ patch(PosStore.prototype, {
     },
 
     async user_groups() {
-        try {
             const zero1 = await this.orm.call(
                 "pos.session",
-                "get_user_groups",
+                "get_user_groups2",
                 [this.env.session.user_id]
             );
-            return zero1; // Return the zero value
-        } catch (error) {
-            console.error('Error fetching user groups:', error);
-            return false; // Default to false in case of error
-        }
+
+
     },
 });
 
