@@ -192,10 +192,7 @@ patch(PosStore.prototype, {
             "pos.session",
             "get_user_groups2",
             [ , this.user],
-        ).then(function (output) {
-            zero1 = output.zero1;
-
-        })
+        );
     }
 });
 
