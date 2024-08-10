@@ -3,7 +3,6 @@ import { Order, Orderline, Payment } from "@point_of_sale/app/store/models";
 import { patch } from "@web/core/utils/patch";
 import { PosStore } from "@point_of_sale/app/store/pos_store";
 import { _t } from '@web/core/l10n/translation';
-
 import { ErrorPopup } from "@point_of_sale/app/errors/popups/error_popup";
 import { parseFloat as oParseFloat } from "@web/views/fields/parsers";
 import {
@@ -57,11 +56,9 @@ patch(Order.prototype, {
     },
 });
 patch(Orderline.prototype, {
-   async setup(_defaultObj, options) {
+    setup(_defaultObj, options) {
         super.setup(...arguments);
         this.product_uom_id = this.product.default_uom_id || this.product_uom_id || this.product.uom_id;
-                await this.user_groups(); // Ensure user groups are fetched
-
 
     },
 
@@ -87,20 +84,6 @@ patch(Orderline.prototype, {
         this.product_uom_id = null;  // or some default value
     }
 },
-async user_groups() {
-    try {
-        const result = await this.rpc({
-            model: 'pos.session',
-            method: 'get_user_groups',
-            args: [this.env.user.id],
-        });
-        this.userGroups = result;
-    } catch (error) {
-        console.error('Failed to fetch user groups:', error);
-        this.userGroups = {}; // Default value
-    }
-},
-
     set_uom(uom_id) {
         this.product_uom_id = uom_id;
         const unit = this.get_unit();
@@ -126,23 +109,19 @@ async user_groups() {
         return this.product.get_unit();
     },
 
-    async set_quantity(quantity, keep_price) {
+    set_quantity(quantity, keep_price) {
         this.order.assert_editable();
         var quant =
             typeof quantity === "number" ? quantity : oParseFloat("" + (quantity ? quantity : 0));
 
-
-
-           if (quant === 0) {
-            if (this.userGroups && this.userGroups.zero1) {
-                if (!this.comboParent) {
-                    this.env.services.popup.add(ErrorPopup, {
-                        title: _t("Quantity cannot be zero"),
-                        body: _t("Setting the quantity to zero is not allowed. Please enter a valid quantity."),
-                    });
-                }
-                return false;
+        if (quant === 0 && zero1==false) {
+            if (!this.comboParent) {
+                this.env.services.popup.add(ErrorPopup, {
+                    title: _t("Quantity cannot be zero"),
+                    body: _t("Setting the quantity to zero is not allowed. Please enter a valid quantity."),
+                });
             }
+            return false;
         }
 
 
@@ -206,15 +185,26 @@ async user_groups() {
     }
 
 });
-
+var zero1=false;
 patch(PosStore.prototype, {
     async _processData(loadedData) {
         await super._processData(...arguments);
             this.product_uom_price = loadedData['product.multi.uom.price'];
-                         await this.user_groups();
-
+         await this.user_groups(); // Store the zero value in PosStore
     },
 
-
+    async user_groups() {
+        try {
+            const zero1 = await this.orm.call(
+                "pos.session",
+                "get_user_groups",
+                [this.env.session.user_id]
+            );
+            return output.zero1; // Return the zero value
+        } catch (error) {
+            console.error('Error fetching user groups:', error);
+            return false; // Default to false in case of error
+        }
+    },
 });
 
