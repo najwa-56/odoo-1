@@ -123,16 +123,6 @@ patch(Orderline.prototype, {
         var quant =
             typeof quantity === "number" ? quantity : oParseFloat("" + (quantity ? quantity : 0));
 
-        if (quant === 0 && !zero1) {
-            if (!this.comboParent) {
-                this.env.services.popup.add(ErrorPopup, {
-                    title: _t("Quantity cannot be zero"),
-                    body: _t("Setting the quantity to zero is not allowed. Please enter a valid quantity."),
-                });
-            }
-            return false;
-        }
-
 
         // Handle refund logic
 
