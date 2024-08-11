@@ -14,7 +14,7 @@
                                    required="iface_validate_delete_orderline or iface_validate_delete_order
                                              or iface_validate_payment or iface_validate_discount
                                              or iface_validate_price or iface_validate_decrease_quantity
-                                             or iface_validate_close or iface_validate_cash_move"/>
+                                             or iface_validate_close or iface_validate_cash_move or iface_validate_Refund"/>
                         </div>
                     </setting>
                     <setting id="iface_validate_close" string="Closing of POS"
@@ -48,6 +48,10 @@
                     <setting id="iface_validate_cash_move" string="Cash In/Out"
                              help="Allow manager to validate cash in/out">
                         <field name="iface_validate_cash_move"/>
+                    </setting>
+                    <setting id="iface_validate_Refund" string="Cash In/Out"
+                             help="Allow manager to validate Refund">
+                        <field name="iface_validate_Refund"/>
                     </setting>
                 </block>
             </div>

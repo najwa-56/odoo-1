@@ -13,3 +13,4 @@ class ResConfigSettings(models.TransientModel):
     iface_validate_payment = fields.Boolean(related="pos_config_id.iface_validate_payment", readonly=False)
     iface_validate_price = fields.Boolean(related="pos_config_id.iface_validate_price", readonly=False)
     iface_validate_cash_move = fields.Boolean(related="pos_config_id.iface_validate_cash_move", readonly=False)
+    iface_validate_Refund = fields.Boolean(related="pos_config_id.iface_validate_Refund", readonly=False)

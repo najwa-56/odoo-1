@@ -31,3 +31,6 @@ class POSConfig(models.Model):
     iface_validate_cash_move = fields.Boolean(string='Enable Validation for Cash In/Out',
                                               help=('Enabling this will allow manager to '
                                                     'validate if POS needs to cash in/out'))
+    iface_validate_Refund = fields.Boolean(string='Enable Validation for Refund',
+                                              help=('Enabling this will allow manager to '
+                                                    'validate if POS needs to Refund'))
