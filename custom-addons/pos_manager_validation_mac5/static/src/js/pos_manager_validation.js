@@ -8,7 +8,6 @@ import { Order } from "@point_of_sale/app/store/models";
 import { patch } from "@web/core/utils/patch";
 import { PosStore } from "@point_of_sale/app/store/pos_store";
 import { ProductScreen } from "@point_of_sale/app/screens/product_screen/product_screen";
-import { RefundButton } from "@point_of_sale/app/screens/product_screen/refund_button";
 import { TicketScreen } from "@point_of_sale/app/screens/ticket_screen/ticket_screen";
 
 
@@ -340,8 +339,4 @@ patch(TicketScreen.prototype, {
             super.onClickRefundOrderUid(orderUid);
         }
     },
-
-
 });
-
-
