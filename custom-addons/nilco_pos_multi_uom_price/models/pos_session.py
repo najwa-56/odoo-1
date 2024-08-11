@@ -13,7 +13,7 @@ class PosSession(models.Model):
 
 
     def _loader_params_product_multi_uom_price(self):
-        return {'search_params': {'domain': [], 'fields': ['product_id', 'uom_id', 'price','name_field'],},}
+        return {'search_params': {'domain': [], 'fields': ['product_id', 'uom_id', 'price'],},}
 
     def _get_pos_ui_product_multi_uom_price(self, params):
         products_uom_price = self.env['product.multi.uom.price'].search_read(**params['search_params'])
@@ -33,7 +33,7 @@ class PosSession(models.Model):
                             'id': uom_id[0],
                             'name': uom_id[1],
                             'price': unit['price']*.85,
-                            'name_field': unit.get('name_field', ''),
+                            
                         }
 
         return product_uom_price
@@ -45,7 +45,7 @@ class PosSession(models.Model):
                 'fields': [
                     'display_name', 'lst_price', 'standard_price', 'categ_id', 'pos_categ_ids', 'taxes_id', 'barcode',
                     'default_code', 'to_weight', 'uom_id', 'description_sale', 'description', 'product_tmpl_id', 'tracking',
-                    'write_date', 'available_in_pos', 'attribute_line_ids', 'active', 'image_128', 'combo_ids', 'name_field', ],
+                    'write_date', 'available_in_pos', 'attribute_line_ids', 'active', 'image_128', 'combo_ids',],
                 'order': 'sequence,default_code,name',
             },
             'context': {'display_default_code': False},
