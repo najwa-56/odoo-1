@@ -28,10 +28,8 @@ export class UOMButton extends Component {
 					       id:	uomPrice.id,
 					        label: uomPrice.name_field,
 					       isSelected: true,
- item: {  // Update item to include name_field
-                                ...uomPrice,
-                                name_field: uomPrice.name_field || uomPrice.name,  // Include name_field in the item
-                            },				       });
+					       item:	uomPrice.name_field,
+				       });
 				       });
 		       }
 		       const { confirmed, payload: selectedUOM } = await this.env.services.popup.add(
