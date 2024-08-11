@@ -11,7 +11,7 @@ class multi_uom(models.Model):
     price = fields.Float(string='Price',required=True,digits='Product Price')
     cost = fields.Float(string='Cost',required=True,digits='Product Cost')
     qty = fields.Float(string="Quantity" )
-    name_field = fields.Char(string="name")
+    name_field = fields.Char(string="Name Field")
 
 
    # _sql_constraints = [
