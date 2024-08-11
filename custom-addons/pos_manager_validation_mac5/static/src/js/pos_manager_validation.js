@@ -301,42 +301,41 @@ patch(TicketScreen.prototype, {
             await super.onDeleteOrder(order);
         }
     },
-    onClickRefundOrderUid(orderUid) {
+    async onClickRefundOrderUid(orderUid) {
         // Open the refund order.
-        if (this.pos.config.iface_validate_Refund) {
+         if (this.pos.config.iface_validate_Refund) {
             var managerUserIDs = this.pos.config.manager_user_ids;
             var cashier = this.pos.get_cashier().user_id;
             if( cashier && managerUserIDs.indexOf(cashier[0]) > -1 ){
-                return super.onClickRefundOrderUid(orderUid);
+                return await super.onClickRefundOrderUid(orderUid);
             }
 
-            this.popup.add(NumberPopup, {
+            const { confirmed, payload } = await this.popup.add(NumberPopup, {
                 title: _t("Manager Validation"),
                 isPassword: true,
-            }).then(({ confirmed, payload }) => {
-                var password = payload ? payload.toString() : ''
+            });
+            var password = payload ? payload.toString() : ''
 
-                if (confirmed) {
-                    this.pos.manager = false;
-                    var users = this.pos.users;
-                    for (var i = 0; i < users.length; i++) {
-                        if (managerUserIDs.indexOf(users[i].id) > -1
-                                && password === (users[i].pos_security_pin || '')) {
-                            this.pos.manager = users[i];
-                        }
-                    }
-                    if (this.pos.manager) {
-                        super.onClickRefundOrderUid();
-                    } else {
-                        this.popup.add(ErrorPopup, {
-                            title: _t("Access Denied"),
-                            body: _t("Incorrect password!"),
-                        })
+            if (confirmed) {
+                this.pos.manager = false;
+                var users = this.pos.users;
+                for (var i = 0; i < users.length; i++) {
+                    if (managerUserIDs.indexOf(users[i].id) > -1
+                            && password === (users[i].pos_security_pin || '')) {
+                        this.pos.manager = users[i];
                     }
                 }
-            });
+                if (this.pos.manager) {
+                    await super.onClickRefundOrderUid(orderUid);
+                } else {
+                    await this.popup.add(ErrorPopup, {
+                        title: _t("Access Denied"),
+                        body: _t("Incorrect password!"),
+                    })
+                }
+            }
         } else {
-            super.onClickRefundOrderUid();
+            await super.onClickRefundOrderUid(orderUid);
         }
     },
 });
