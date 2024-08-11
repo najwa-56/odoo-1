@@ -81,7 +81,7 @@ patch(Orderline.prototype, {
     if (json.product_uom_id && this.pos && this.pos.units_by_id && this.pos.units_by_id[json.product_uom_id]) {
         this.product_uom_id = {
             0: this.pos.units_by_id[json.product_uom_id].id,
-            1: this.pos.units_by_id[json.product_uom_id].name
+            1: this.pos.units_by_id[json.product_uom_id].name_field
         };
     } else {
         console.error('Invalid product_uom_id or units_by_id not found', json.product_uom_id, this.pos.units_by_id);
