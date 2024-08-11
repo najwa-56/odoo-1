@@ -22,13 +22,14 @@ export class UOMButton extends Component {
 	         if (line && pupList.find(element => element === product.toString())) {
 		       const uomList = [ ];
 		       let uomPrices = line.pos.product_uom_price[product].uom_id;
+		       console.log(uomPrices);
 		       if (uomPrices) {
 		       	Object.values(uomPrices).forEach(uomPrice => {
 				       uomList.push({
 					       id:	uomPrice.id,
-					        label: uomPrice.name_field,
+					       label:	uomPrice.name,
 					       isSelected: true,
-					       item:	uomPrice.name_field,
+					       item:	uomPrice,
 				       });
 				       });
 		       }
