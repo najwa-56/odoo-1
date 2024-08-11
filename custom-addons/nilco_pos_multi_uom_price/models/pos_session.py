@@ -13,7 +13,7 @@ class PosSession(models.Model):
 
 
     def _loader_params_product_multi_uom_price(self):
-        return {'search_params': {'domain': [], 'fields': ['product_id', 'uom_id', 'price'],},}
+        return {'search_params': {'domain': [], 'fields': ['product_id', 'uom_id', 'price','name_field'],},}
 
     def _get_pos_ui_product_multi_uom_price(self, params):
         products_uom_price = self.env['product.multi.uom.price'].search_read(**params['search_params'])
