@@ -8,6 +8,7 @@ import { Order } from "@point_of_sale/app/store/models";
 import { patch } from "@web/core/utils/patch";
 import { PosStore } from "@point_of_sale/app/store/pos_store";
 import { ProductScreen } from "@point_of_sale/app/screens/product_screen/product_screen";
+import { RefundButton } from "@point_of_sale/app/screens/product_screen/refund_button";
 import { TicketScreen } from "@point_of_sale/app/screens/ticket_screen/ticket_screen";
 
 
@@ -339,4 +340,51 @@ patch(TicketScreen.prototype, {
             super.onClickRefundOrderUid(orderUid);
         }
     },
+
+
 });
+
+
+patch(RefundButton.prototype, {
+
+  click() {
+        // Open the refund order.
+        if (this.pos.config.iface_validate_Refund) {
+            var managerUserIDs = this.pos.config.manager_user_ids;
+            var cashier = this.pos.get_cashier().user_id;
+            if( cashier && managerUserIDs.indexOf(cashier[0]) > -1 ){
+                return super.onClickRefundOrderUid(orderUid);
+            }
+
+            this.popup.add(NumberPopup, {
+                title: _t("Manager Validation"),
+                isPassword: true,
+            }).then(({ confirmed, payload }) => {
+                var password = payload ? payload.toString() : ''
+
+                if (confirmed) {
+                    this.pos.manager = false;
+                    var users = this.pos.users;
+                    for (var i = 0; i < users.length; i++) {
+                        if (managerUserIDs.indexOf(users[i].id) > -1
+                                && password === (users[i].pos_security_pin || '')) {
+                            this.pos.manager = users[i];
+                        }
+                    }
+                    if (this.pos.manager) {
+                        super.onClickRefundOrderUid(orderUid);
+                    } else {
+                        this.popup.add(ErrorPopup, {
+                            title: _t("Access Denied"),
+                            body: _t("Incorrect password!"),
+                        })
+                    }
+                }
+            });
+        } else {
+            super.onClickRefundOrderUid(orderUid);
+        }
+    },
+
+});
+
