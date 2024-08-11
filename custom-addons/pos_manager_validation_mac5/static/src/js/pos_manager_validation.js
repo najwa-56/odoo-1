@@ -315,7 +315,7 @@ patch(RefundButton.prototype, {
             return super.click();
         }
 
-        this.popup.add(NumberPopup, {
+        this.env.services.popup.add(NumberPopup, {
             title: _t("Manager Validation"),
             isPassword: true,
         }).then(({ confirmed, payload }) => {
@@ -343,7 +343,7 @@ patch(RefundButton.prototype, {
                         destinationOrder: order,
                     });
                 } else {
-                    this.popup.add(ErrorPopup, {
+                    this.env.services.popup.add(ErrorPopup, {
                         title: _t("Access Denied"),
                         body: _t("Incorrect password!"),
                     });
@@ -364,6 +364,7 @@ patch(RefundButton.prototype, {
         });
     }
 }
+
 
 
 
