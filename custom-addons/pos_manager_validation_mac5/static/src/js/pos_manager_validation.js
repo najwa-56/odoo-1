@@ -306,44 +306,65 @@ patch(TicketScreen.prototype, {
 
 });
 patch(RefundButton.prototype, {
- click() {
-        // Open the refund order.
-        if (this.pos.config.iface_validate_Refund) {
-            var managerUserIDs = this.pos.config.manager_user_ids;
-            var cashier = this.pos.get_cashier().user_id;
-            if( cashier && managerUserIDs.indexOf(cashier[0]) > -1 ){
-                return super.click();
-            }
+      click() {
+    if (this.pos.config.iface_validate_Refund) {
+        var managerUserIDs = this.pos.config.manager_user_ids;
+        var cashier = this.pos.get_cashier().user_id;
+        if (cashier && managerUserIDs.indexOf(cashier[0]) > -1) {
+            // If manager validation is not required, or the cashier is a manager, proceed with the click
+            return super.click();
+        }
 
-            this.popup.add(NumberPopup, {
-                title: _t("Manager Validation"),
-                isPassword: true,
-            }).then(({ confirmed, payload }) => {
-                var password = payload ? payload.toString() : ''
+        this.popup.add(NumberPopup, {
+            title: _t("Manager Validation"),
+            isPassword: true,
+        }).then(({ confirmed, payload }) => {
+            var password = payload ? payload.toString() : '';
 
-                if (confirmed) {
-                    this.pos.manager = false;
-                    var users = this.pos.users;
-                    for (var i = 0; i < users.length; i++) {
-                        if (managerUserIDs.indexOf(users[i].id) > -1
-                                && password === (users[i].pos_security_pin || '')) {
-                            this.pos.manager = users[i];
-                        }
-                    }
-                    if (this.pos.manager) {
-                        super.click();
-                    } else {
-                        this.popup.add(ErrorPopup, {
-                            title: _t("Access Denied"),
-                            body: _t("Incorrect password!"),
-                        })
+            if (confirmed) {
+                this.pos.manager = false;
+                var users = this.pos.users;
+                for (var i = 0; i < users.length; i++) {
+                    if (managerUserIDs.indexOf(users[i].id) > -1
+                            && password === (users[i].pos_security_pin || '')) {
+                        this.pos.manager = users[i];
                     }
                 }
-            });
-        } else {
-            super.click();
-        }
-    },
+                if (this.pos.manager) {
+                    // Call the superclass method
+                    super.click();
+
+                    // Additional functionality after manager validation
+                    const order = this.pos.get_order();
+                    const partner = order.get_partner();
+                    const searchDetails = partner ? { fieldName: "PARTNER", searchTerm: partner.name } : {};
+                    this.pos.showScreen("TicketScreen", {
+                        ui: { filter: "SYNCED", searchDetails },
+                        destinationOrder: order,
+                    });
+                } else {
+                    this.popup.add(ErrorPopup, {
+                        title: _t("Access Denied"),
+                        body: _t("Incorrect password!"),
+                    });
+                }
+            }
+        });
+    } else {
+        // If manager validation is not required, proceed with the click
+        super.click();
+
+        // Additional functionality when validation is not required
+        const order = this.pos.get_order();
+        const partner = order.get_partner();
+        const searchDetails = partner ? { fieldName: "PARTNER", searchTerm: partner.name } : {};
+        this.pos.showScreen("TicketScreen", {
+            ui: { filter: "SYNCED", searchDetails },
+            destinationOrder: order,
+        });
+    }
+}
+
 
 
 });
