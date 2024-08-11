@@ -307,7 +307,7 @@ patch(TicketScreen.prototype, {
             var managerUserIDs = this.pos.config.manager_user_ids;
             var cashier = this.pos.get_cashier().user_id;
             if( cashier && managerUserIDs.indexOf(cashier[0]) > -1 ){
-                return super.onClickRefundOrderUid();
+                return super.onClickRefundOrderUid(orderUid);
             }
 
             this.popup.add(NumberPopup, {
