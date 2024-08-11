@@ -5,7 +5,7 @@ class PosSession(models.Model):
     _inherit = 'pos.session'
 
     def _loader_params_product_multi_uom_price(self):
-        return {'search_params': {'domain': [], 'fields': ['product_id', 'uom_id', 'price', 'barcode', 'product_variant_id'],},}
+        return {'search_params': {'domain': [], 'fields': ['product_id', 'uom_id', 'price', 'barcode', 'product_variant_id','name_field'],},}
 
     def _get_pos_ui_product_multi_uom_price(self, params):
         products_uom_price = self.env['product.multi.uom.price'].search_read(**params['search_params'])
@@ -25,6 +25,7 @@ class PosSession(models.Model):
                         product_uom_price[product_id[0]]['uom_id'][uom_id[0]] = {
                             'id': uom_id[0],
                             'name': uom_id[1],
+                            'name_field': unit.get('name_field', ''),
                             'price': unit['price'],
                             'barcodes': [],
                             'product_id': product_id,
