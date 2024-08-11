@@ -384,3 +384,9 @@ patch(RefundButton.prototype, {
 
 
 });
+ProductScreen.addControlButton({
+    component: RefundButton,
+    condition: function () {
+        return true;
+    },
+});
