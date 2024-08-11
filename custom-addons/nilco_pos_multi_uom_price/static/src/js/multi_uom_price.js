@@ -26,7 +26,7 @@ export class UOMButton extends Component {
 		       	Object.values(uomPrices).forEach(uomPrice => {
 				       uomList.push({
 					       id:	uomPrice.id,
-					       label: uomPrice.name_field,
+					       label:	uomPrice.name,
 					       isSelected: true,
 					       item:	uomPrice,
 				       });
