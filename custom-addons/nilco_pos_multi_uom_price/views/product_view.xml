@@ -12,7 +12,9 @@
 			    <field name="multi_uom_price_id" nolabel="1" colspan="2">
                             <tree editable="bottom">
                                 <field name="category_id" invisible="1" column_invisible="1"/>
-                                <field name="uom_id"/>
+
+                                <field name="name_field"/>
+                                 <field name="uom_id"/>
                                 <field name="price"/>
                                 <field name="qty"/>
                                   <field name="cost"/>
