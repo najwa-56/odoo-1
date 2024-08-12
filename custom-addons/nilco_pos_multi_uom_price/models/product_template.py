@@ -44,7 +44,8 @@ class SaleOrderLine(models.Model):
     selected_uom_ids = fields.Many2many(string="Uom Ids", related='product_id.selected_uom_ids')
 
     sales_multi_uom_id = fields.Many2one("product.multi.uom.price", string="Cust UOM", domain="[('id', 'in', selected_uom_ids)]")
-    
+    sale_multi_uom_name = fields.Char(string="UOM Cost", related='sales_multi_uom_id.name_field')
+
 
     @api.onchange('sales_multi_uom_id')
     def sales_multi_uom_id_change(self):
@@ -150,9 +151,14 @@ class Pricelist(models.Model):
 class AccountInvoiceLine(models.Model):
     _inherit = "account.move.line"
 
-    sales_multi_uom_id = fields.Many2one("product.multi.uom.price", string="Cust UOM")
+    selected_uom_ids = fields.Many2many(string="Uom Ids", related='product_id.selected_uom_ids')
 
-    @api.onchange('product_id')
+    sales_multi_uom_id = fields.Many2one("product.multi.uom.price", string="Cust UOM",
+                                         domain="[('id', 'in', selected_uom_ids)]")
+    sale_multi_uom_name = fields.Char(string="UOM Cost", related='sales_multi_uom_id.name_field')
+
+
+@api.onchange('product_id')
     def _onchange_product_id(self):
         # Check if the super class has the method _onchange_product_id
         if hasattr(super(AccountInvoiceLine, self), '_onchange_product_id'):
