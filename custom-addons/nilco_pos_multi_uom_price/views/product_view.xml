@@ -55,6 +55,8 @@
                     <field name="selected_uom_ids" invisible="1"/>
 
                     <field name="sales_multi_uom_id" readonly="state in ('sale','done', 'cancel')"/>
+
+                     <field name="sale_multi_uom_name" invisible="1" />
                 </xpath>
             </field>
     </record>
@@ -74,7 +76,7 @@
             </xpath>
             </field>
      </record>
-    
+
 
 
 
