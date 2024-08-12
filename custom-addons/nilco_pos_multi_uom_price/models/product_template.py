@@ -158,7 +158,7 @@ class AccountInvoiceLine(models.Model):
     sale_multi_uom_name = fields.Char(string="UOM Cost", related='sales_multi_uom_id.name_field')
 
 
-@api.onchange('product_id')
+    @api.onchange('product_id')
     def _onchange_product_id(self):
         # Check if the super class has the method _onchange_product_id
         if hasattr(super(AccountInvoiceLine, self), '_onchange_product_id'):
