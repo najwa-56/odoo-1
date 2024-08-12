@@ -792,9 +792,7 @@
                                          <td class="second_table" style="text-align:right;">
                                               <span t-esc="line.product_uom_id.name"/>
                                         </td>
-                                        <td class="second_table" style="text-align:right;">
-                                              <span t-esc="line.multi_uom_price_id.sale_multi_uom_name"/>
-                                        </td>
+                                        
                                                 <!-- Editeing-->
 
                                        <!-- <td class="second_table" style="text-align:right;">
