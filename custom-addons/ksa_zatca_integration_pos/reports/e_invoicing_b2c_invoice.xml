@@ -784,7 +784,7 @@
 
                                         </td>
                                          <td class="second_table" style="text-align:right;">
-                                              <span t-esc="line.multi_uom_price_id.name_field"/>
+                                              <span t-esc="line.name_field"/>
                                         </td>
                                                 <!-- Editeing-->
 
