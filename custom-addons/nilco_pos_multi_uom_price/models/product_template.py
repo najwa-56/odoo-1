@@ -22,6 +22,21 @@ class ProductTemplate(models.Model):
                 record.selected_uom_ids = []
 
       ###########################
+
+    # Computed field to aggregate `name_field` values
+    uom_name_fields = fields.Char(
+        string="UOM Names",
+        compute='_compute_uom_name_fields',
+        store=True
+    )
+
+    @api.depends('multi_uom_price_id')
+    def _compute_uom_name_fields(self):
+        for record in self:
+            uom_names = record.multi_uom_price_id.mapped('name_field')
+            record.uom_name_fields = ', '.join(uom_names)
+
+
 # we add this calss down to find multi uom and price in sale order line and account
 class SaleOrderLine(models.Model):
     _inherit = 'sale.order.line'
@@ -29,6 +44,8 @@ class SaleOrderLine(models.Model):
     selected_uom_ids = fields.Many2many(string="Uom Ids", related='product_id.selected_uom_ids')
 
     sales_multi_uom_id = fields.Many2one("product.multi.uom.price", string="Cust UOM", domain="[('id', 'in', selected_uom_ids)]")
+    sales_multi_uom_name = fields.Float(string="UOM Cost", related='purchase_multi_uom_id.name_field')
+
 
     @api.onchange('sales_multi_uom_id')
     def sales_multi_uom_id_change(self):
@@ -135,6 +152,11 @@ class AccountInvoiceLine(models.Model):
     _inherit = "account.move.line"
 
     sales_multi_uom_id = fields.Many2one("product.multi.uom.price", string="Cust UOM")
+    selected_uom_ids = fields.Many2many(string="Uom Ids", related='product_id.selected_uom_ids')
+
+    account_multi_uom_id = fields.Many2one("product.multi.uom.price", string="Cust UOM",
+                                         domain="[('id', 'in', selected_uom_ids)]")
+    sales_multi_uom_name = fields.Float(string="UOM Cost", related='account_multi_uom_id.name_field')
 
     @api.onchange('product_id')
     def _onchange_product_id(self):
