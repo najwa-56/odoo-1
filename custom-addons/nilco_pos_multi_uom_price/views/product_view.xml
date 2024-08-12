@@ -74,7 +74,21 @@
             </xpath>
             </field>
      </record>
+ <record id="view_move_form_inherit" model="ir.ui.view">
+        <field name="model">account.move</field>
+        <field name="inherit_id" ref="account.view_move_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='invoice_line_ids']/tree//field[@name='name']" position="after">
+                  <field name="selected_uom_ids" invisible="1"/>
 
+                    <field name="sales_multi_uom_id" readonly="state in ('sale','done', 'cancel')"/>
+                                     <field name="sale_multi_uom_name" />
+
+
+            </xpath>
+
+        </field>
+    </record>
 
 
 
