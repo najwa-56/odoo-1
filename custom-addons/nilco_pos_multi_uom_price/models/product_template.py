@@ -44,6 +44,7 @@ class SaleOrderLine(models.Model):
     selected_uom_ids = fields.Many2many(string="Uom Ids", related='product_id.selected_uom_ids')
 
     sales_multi_uom_id = fields.Many2one("product.multi.uom.price", string="Cust UOM", domain="[('id', 'in', selected_uom_ids)]")
+    selected_uom_2 = fields.Many2many(string="Uom Ids", related='product_id.uom_name_fields')
 
 
     @api.onchange('sales_multi_uom_id')
