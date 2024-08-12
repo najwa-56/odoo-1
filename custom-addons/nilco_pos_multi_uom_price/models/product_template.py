@@ -150,12 +150,9 @@ class Pricelist(models.Model):
 
 class AccountInvoiceLine(models.Model):
     _inherit = "account.move.line"
-    selected_uom_ids = fields.Many2many(string="Uom Ids", related='product_id.selected_uom_ids')
 
-    sales_multi_uom_id = fields.Many2one("product.multi.uom.price", string="Cust UOM",domain="[('id', 'in', selected_uom_ids)]")
+    sales_multi_uom_id = fields.Many2one("product.multi.uom.price", string="Cust UOM")
 
-
-    sales_multi_uom_name = fields.Float(string="UOM Cost", related='sales_multi_uom_id.name_field')
 
     @api.onchange('product_id')
     def _onchange_product_id(self):
