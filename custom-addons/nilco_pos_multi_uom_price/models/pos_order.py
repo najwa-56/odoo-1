@@ -11,8 +11,11 @@ class PosOrderLine(models.Model):
     _inherit = 'pos.order.line'
 
     product_uom_id = fields.Many2one('uom.uom', string='Product UoM', related='')
+    #add field Ratio#####
     Ratio = fields.Float("Ratio", compute="_compute_ratio",
                          store=False)  # Ratio field  # Related field to the ratio in uom.uom
+#Edit----#
+
 
     @api.depends('product_uom_id')
     def _compute_price(self):
@@ -25,6 +28,8 @@ class PosOrderLine(models.Model):
                 if uom_price:
                     line.price_unit = uom_price.price
 
+
+#Edit cost ------########
     @api.depends('product_uom_id')
     def _compute_ratio(self):
         for record in self:
@@ -40,6 +45,7 @@ class PosOrderLine(models.Model):
         for line in self:
             line.total_cost = line.total_cost * line.Ratio if line.Ratio else line.total_cost
 
+###################################
 
     @api.depends('price_subtotal', 'total_cost')
     def _compute_margin(self):
