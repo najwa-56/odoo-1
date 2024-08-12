@@ -23,19 +23,6 @@ class ProductTemplate(models.Model):
 
       ###########################
 
-    # Computed field to aggregate `name_field` values
-    uom_name_fields = fields.Char(
-        string="UOM Names",
-        compute='_compute_uom_name_fields',
-        store=True
-    )
-
-    @api.depends('multi_uom_price_id')
-    def _compute_uom_name_fields(self):
-        for record in self:
-            uom_names = record.multi_uom_price_id.mapped('name_field')
-            record.uom_name_fields = ', '.join(uom_names)
-
 
 # we add this calss down to find multi uom and price in sale order line and account
 class SaleOrderLine(models.Model):
