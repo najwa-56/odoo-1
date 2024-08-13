@@ -35,6 +35,10 @@
                 <xpath expr="//field[@name='lines']/tree/field[@name='full_product_name']" position="after">
                     <field name="product_uom_id"/>
                     <field name="Ratio"/>
+                     <field name="selected_uom_ids" invisible="1"/>
+                  <field name="sales_multi_uom_id" widget="many2one"/>
+                                     <field name="sale_multi_uom_name" />
+
                 </xpath>
             </field>
      </record>
