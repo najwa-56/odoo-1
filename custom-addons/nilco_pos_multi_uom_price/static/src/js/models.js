@@ -99,7 +99,7 @@ patch(Orderline.prototype, {
     }
     },
     set_name_field(sale_multi_uom_name){
-    this.sale_multi_uom_name=sale_multi_uom_name}
+    this.sale_multi_uom_name=sale_multi_uom_name},
     get_unit(){
         if (this.product.default_uom_price > 0 & this.price_type == "original" & this.product.default_uom_id != false){
             this.price = this.product.default_uom_price;
