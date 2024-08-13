@@ -174,5 +174,5 @@ class AccountInvoiceLine(models.Model):
             product_uom_id = vals.get('product_uom_id')
             multi_uom = product_uom_id
             if multi_uom:
-                vals['sales_multi_uom_id'] = multi_uom.id
+                vals['sales_multi_uom_id'] = multi_uom
         return super(AccountInvoiceLine, self).create(vals)
