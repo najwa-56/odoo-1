@@ -11,6 +11,10 @@ class ProductTemplate(models.Model):
     #we add this field wich give me all idss for multi uom record in product
 
     selected_uom_ids = fields.Many2many(comodel_name="product.multi.uom.price", string="Uom Ids", compute='_get_all_uom_id', store=True)
+    sales_multi_uom_id = fields.Many2one("product.multi.uom.price", string="Cust UOM", domain="[('id', 'in', selected_uom_ids)]")
+
+    sale_multi_uom_name = fields.Char(string="name field", related='sales_multi_uom_id.name_field')
+
 
 
     @api.depends('multi_uom_price_id')
