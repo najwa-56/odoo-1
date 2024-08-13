@@ -39,10 +39,10 @@ export class UOMButton extends Component {
 			       list: uomList,
 		       });
 		       if (confirmed) {
-			      line.set_uom({0:selectedUOM.id,1:selectedUOM.name});
+		        const selectedUOMName = selectedUOM.item.name_field;
+			      line.set_uom({0:selectedUOM.id,1:selectedUOMName});
 			      line.price_manually_set = true;
 			      line.set_unit_price(selectedUOM.price);
-			      line.set_name_field(selectedUOM.name_field)
 		       }
 	         }
 	       }

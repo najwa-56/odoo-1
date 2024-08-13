@@ -95,11 +95,8 @@ patch(Orderline.prototype, {
         const unit = this.get_unit();
     if (unit) {
         this.set_unit_price(unit.price);
-        this.set_name_field(unit.name_field)
     }
     },
-    set_name_field(sale_multi_uom_name){
-    this.sale_multi_uom_name=sale_multi_uom_name},
     get_unit(){
         if (this.product.default_uom_price > 0 & this.price_type == "original" & this.product.default_uom_id != false){
             this.price = this.product.default_uom_price;
