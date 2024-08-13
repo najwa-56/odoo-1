@@ -80,7 +80,7 @@ class PosOrderLine(models.Model):
 
         return res
 
- def write(self, vals):
+    def write(self, vals):
         # Update sales_multi_uom_id when product_uom_id changes
         if 'product_uom_id' in vals:
             uom_price = self.env['product.multi.uom.price'].search([
