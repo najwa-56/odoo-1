@@ -21,6 +21,16 @@ class PosOrderLine(models.Model):
     sale_multi_uom_name = fields.Char(string=" name field", related='sales_multi_uom_id.name_field', store=True,
                                       readonly=True)
 
+    @api.onchange('product_uom_id')
+    def _onchange_product_uom_id(self):
+        if self.product_uom_id:
+            # Find the corresponding multi UOM record for the selected UOM
+            multi_uom = self.env['product.multi.uom.price'].search([
+                ('uom_id', '=', self.product_uom_id.id),
+                ('id', 'in', self.selected_uom_ids.ids)
+            ], limit=1)
+            self.sales_multi_uom_id = multi_uom.id
+
     #Edit----#
 
 
