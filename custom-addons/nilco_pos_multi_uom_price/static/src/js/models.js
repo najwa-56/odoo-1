@@ -66,7 +66,7 @@ patch(Orderline.prototype, {
 
 
     },
-   
+
 
     export_as_JSON() {
         const json = super.export_as_JSON(...arguments);
