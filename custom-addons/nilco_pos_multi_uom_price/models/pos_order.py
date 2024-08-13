@@ -22,12 +22,17 @@ class PosOrderLine(models.Model):
                                       readonly=True)
 
     @api.depends('product_uom_id')
-    def _compute_ratio(self):
+    def _compute_price(self):
         for line in self:
             if line.product_uom_id:
-                line.sales_multi_uom_id = line.product_uom_id.id  # Assuming `ratio` is a field on `uom.uom`
-            else:
-                line.sales_multi_uom_id = 0.0
+                uom_price = self.env['product.multi.uom.price'].search([
+                    ('product_id', '=', line.product_id.id),
+                    ('uom_id', '=', line.product_uom_id.id)
+                ], limit=1)
+                if uom_price:
+                    line.price_unit = uom_price.price
+                    line.sales_multi_uom_id = uom_price.id
+
     #Edit----#
 
 
@@ -74,3 +79,14 @@ class PosOrderLine(models.Model):
         res.update({'product_uom_id': orderline.product_uom_id.id})
 
         return res
+
+ def write(self, vals):
+        # Update sales_multi_uom_id when product_uom_id changes
+        if 'product_uom_id' in vals:
+            uom_price = self.env['product.multi.uom.price'].search([
+                ('product_id', '=', self.product_id.id),
+                ('uom_id', '=', vals['product_uom_id'])
+            ], limit=1)
+            if uom_price:
+                vals['sales_multi_uom_id'] = uom_price.id
+        return super(PosOrderLine, self).write(vals)
