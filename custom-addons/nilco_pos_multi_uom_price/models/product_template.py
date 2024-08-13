@@ -149,60 +149,12 @@ class AccountInvoiceLine(models.Model):
     sale_multi_uom_name = fields.Char(string=" name field", related='sales_multi_uom_id.name_field',store=True, readonly=True)
 
 
-    @api.onchange('product_id')
-    def _onchange_product_id(self):
-        # Check if the super class has the method _onchange_product_id
-        if hasattr(super(AccountInvoiceLine, self), '_onchange_product_id'):
-            super(AccountInvoiceLine, self)._onchange_product_id()
-
-        result = {
-            'domain': {'sales_multi_uom_id': [('product_id', '=', self.product_id.id)]},
-        }
-        print("Result", result)
-        return result
-
-    @api.onchange('sales_multi_uom_id')
-    def sales_multi_uom_id_change(self):
-        self.ensure_one()
-        if self.sales_multi_uom_id:
-            domain = {'product_uom_id': [('id', '=', self.sales_multi_uom_id.uom_id.id)]}
-            return {'domain': domain}
-
-    @api.onchange('product_uom_id', 'quantity')
-    def _onchange_uom_id(self):
-        warning = {}
-        result = {}
-        values = {}
-
-        if not self.product_uom_id:
-            self.price_unit = 0.0
-
-        if self.sales_multi_uom_id:
-            # Update sales_multi_uom_id to match product_uom_id
-            matching_uom = self.env['product.multi.uom.price'].search([
-                ('uom_id', '=', self.product_uom_id.id),
-                ('product_id', '=', self.product_id.id)
-            ], limit=1)
-            self.sales_multi_uom_id = matching_uom.id
-
-        if self.sales_multi_uom_id:
-            # Set product_uom_id based on sales_multi_uom_id
-            values = {
-                "product_uom_id": self.sales_multi_uom_id.uom_id.id,
-            }
-            self.update(values)
-            self.price_unit = self.sales_multi_uom_id.price
-
-        if self.product_id and self.product_uom_id:
-            if self.product_id.uom_id.category_id.id != self.product_uom_id.category_id.id:
-                warning = {
-                    'title': _('Warning!'),
-                    'message': _(
-                        'The selected unit of measure is not compatible with the unit of measure of the product.'),
-                }
-                self.product_uom_id = self.product_id.uom_id.id
-
-        if warning:
-            result['warning'] = warning
-        return result
-
+    @api.model
+    def create(self, vals):
+      if 'product_uom_id' in vals:
+        product_uom_id = vals.get('product_uom_id')
+        # Fetch the UOM that matches the product_uom_id from the multi UOM model
+        multi_uom = self.env['product.multi.uom.price'].search([('product_uom_id', '=', product_uom_id)], limit=1)
+        if multi_uom:
+            vals['sales_multi_uom_id'] = multi_uom.id
+      return super(AccountInvoiceLine, self).create(vals)
