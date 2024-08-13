@@ -154,7 +154,7 @@ class AccountInvoiceLine(models.Model):
       if 'product_uom_id' in vals:
         product_uom_id = vals.get('product_uom_id')
         # Fetch the UOM that matches the product_uom_id from the multi UOM model
-        multi_uom = self.env['product.multi.uom.price'].search([('product_uom_id', '=', product_uom_id)], limit=1)
+        multi_uom = self.env['account.move.line'].search([('product_uom_id', '=', product_uom_id)], limit=1)
         if multi_uom:
             vals['sales_multi_uom_id'] = multi_uom.id
       return super(AccountInvoiceLine, self).create(vals)
