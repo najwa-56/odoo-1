@@ -746,7 +746,7 @@
                                             <span t-esc='doc._get_zatca_product_name(line)["name"]["value"]'/>
                                         </td>
                                          <td class="second_table" style="text-align:right;">
-        <span t-esc="line.sales_multi_uom_id.name_field or 'Not Available'"/>
+        <span t-esc="line.sale_multi_uom_name or 'Not Available'"/>
         </td>
                                         <td class="second_table" style="text-align:right;">
                                             <span t-esc="doc.get_bt_146(line.zatca_id)"
