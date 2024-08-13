@@ -31,7 +31,7 @@ class SaleOrderLine(models.Model):
     selected_uom_ids = fields.Many2many(string="Uom Ids", related='product_id.selected_uom_ids')
 
     sales_multi_uom_id = fields.Many2one("product.multi.uom.price", string="Cust UOM", domain="[('id', 'in', selected_uom_ids)]")
-    sale_multi_uom_name = fields.Char(string="UOM Cost", related='sales_multi_uom_id.name_field')
+    sale_multi_uom_name = fields.Char(string="name field", related='sales_multi_uom_id.name_field')
 
 
     @api.onchange('sales_multi_uom_id')
@@ -142,7 +142,7 @@ class AccountInvoiceLine(models.Model):
 
     sales_multi_uom_id = fields.Many2one("product.multi.uom.price", string="Cust UOM",
                                          domain="[('id', 'in', selected_uom_ids)]")
-    sale_multi_uom_name = fields.Char(string="UOM Cost", related='sales_multi_uom_id.name_field')
+    sale_multi_uom_name = fields.Char(string=" name field", related='sales_multi_uom_id.name_field')
 
 
     @api.onchange('product_id')
