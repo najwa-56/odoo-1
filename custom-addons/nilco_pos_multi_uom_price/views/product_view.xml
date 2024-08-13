@@ -81,7 +81,7 @@
         <field name="arch" type="xml">
             <xpath expr="//field[@name='invoice_line_ids']/tree//field[@name='name']" position="after">
                   <field name="selected_uom_ids" invisible="1"/>
-
+                  <field name="sales_multi_uom_id" widget="many2one"/>
                                      <field name="sale_multi_uom_name" />
 
 
