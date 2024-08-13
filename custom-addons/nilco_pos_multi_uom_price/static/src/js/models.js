@@ -66,6 +66,12 @@ patch(Orderline.prototype, {
 
 
     },
+    getDisplayData() {
+        return {
+            ...super.getDisplayData(),
+            sale_multi_uom_name: this.get_product().sale_multi_uom_name,
+        };
+    },
 
     export_as_JSON() {
         const json = super.export_as_JSON(...arguments);
