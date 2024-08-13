@@ -149,12 +149,30 @@ class AccountInvoiceLine(models.Model):
     sale_multi_uom_name = fields.Char(string=" name field", related='sales_multi_uom_id.name_field',store=True, readonly=True)
 
 
+    @api.onchange('product_id')
+    def _onchange_product_id(self):
+        # Check if the super class has the method _onchange_product_id
+        if hasattr(super(AccountInvoiceLine, self), '_onchange_product_id'):
+            super(AccountInvoiceLine, self)._onchange_product_id()
+
+        result = {
+            'domain': {'sales_multi_uom_id': [('product_id', '=', self.product_id.id)]},
+        }
+        print("Result", result)
+        return result
+
+    @api.onchange('sales_multi_uom_id')
+    def sales_multi_uom_id_change(self):
+        self.ensure_one()
+        if self.sales_multi_uom_id:
+            domain = {'product_uom_id': [('id', '=', self.sales_multi_uom_id.uom_id.id)]}
+            return {'domain': domain}
+
     @api.model
     def create(self, vals):
-      if 'product_uom_id' in vals:
-        product_uom_id = vals.get('product_uom_id')
-        # Fetch the UOM that matches the product_uom_id from the multi UOM model
-        multi_uom = self.env['account.move'].search([('product_uom_id', '=', product_uom_id)], limit=1)
-        if multi_uom:
-            vals['sales_multi_uom_id'] = multi_uom.id
-      return super(AccountInvoiceLine, self).create(vals)
+        if 'product_uom_id' in vals:
+            product_uom_id = vals.get('product_uom_id')
+            multi_uom = product_uom_id
+            if multi_uom:
+                vals['sales_multi_uom_id'] = multi_uom.id
+        return super(AccountInvoiceLine, self).create(vals)
