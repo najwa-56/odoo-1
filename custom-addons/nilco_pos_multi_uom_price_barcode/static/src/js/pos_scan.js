@@ -1,4 +1,4 @@
-/** @odoo-module */
+/* @odoo-module */
 import { unaccent } from "@web/core/utils/strings";
 var DB = require('@point_of_sale/app/store/db');
 import { patch } from "@web/core/utils/patch";
@@ -47,7 +47,27 @@ patch(ProductScreen.prototype, {
             });
             return;
         }
+
+        // Debugging: Log current orderlines
+        console.log('Current Orderlines:', currentOrder.get_orderlines());
+
+        // Check if the product already exists in the order
+        const existingOrderline = currentOrder.get_orderlines().find(line => line.product.id === product.id);
+
+        if (existingOrderline) {
+            // Debugging: Log removal of existing orderline
+            console.log('Removing existing orderline:', existingOrderline);
+
+            // Remove the existing line
+            currentOrder.remove_orderline(existingOrderline);
+        }
+
+        // Add the product to the end of the order
         this.currentOrder.add_product(product, options);
+
+        // Debugging: Log new orderlines
+        console.log('New Orderlines:', currentOrder.get_orderlines());
+
         this.numberBuffer.reset();
     }
 });
