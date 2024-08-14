@@ -66,40 +66,92 @@ patch(DB.PosDB.prototype, {
     get_product_by_barcode(barcode) {
         if (!barcode) return undefined;
 
+        console.log("get_product_by_barcode called with barcode:", barcode);
+
         const barcodes = Object.values(this.product_multi_barcodes);
+        console.log("product_multi_barcodes:", barcodes);
+
+        let product = null;
         if (this.product_by_barcode[barcode]) {
-            return this.product_by_barcode[barcode];
+            product = this.product_by_barcode[barcode];
         } else if (this.product_packaging_by_barcode[barcode]) {
-            return this.product_by_id[this.product_packaging_by_barcode[barcode].product_id[0]];
+            product = this.product_by_id[this.product_packaging_by_barcode[barcode].product_id[0]];
         } else if (barcodes.length > 0) {
-            for (const product of barcodes) {
-                const uoms = Object.values(product.uom_id);
-                for (const uom of uoms) {
-                    if (uom.barcodes.includes(barcode)) {
-                        const result = this.product_by_id[uom.product_variant_id[0]];
-                        const line = new Orderline(
-                            { env: result.env },
-                            { pos: result.pos, order: result.pos.selectedOrder, product: result }
-                        );
-                        const orderlines = result.pos.selectedOrder.get_orderlines();
-                        for (const orderline of orderlines) {
-                            if (orderline.product.id === result.id &&
-                                orderline.product_uom_id[0] === uom.id &&
-                                orderline.price === uom.price) {
-                                orderline.set_quantity(orderline.quantity + 1, uom.price);
-                                return true;
-                            }
-                        }
-                        result.pos.selectedOrder.add_orderline(line);
-                        result.pos.selectedOrder.selected_orderline.set_uom({ 0: uom.id, 1: uom.name });
-                        result.pos.selectedOrder.selected_orderline.price_manually_set = true;
-                        result.pos.selectedOrder.selected_orderline.set_unit_price(uom.price);
+            product = this.find_product_by_barcode_in_barcodes(barcodes, barcode);
+        }
+
+        if (!product) {
+            console.log("No product found for barcode:", barcode);
+            return undefined;
+        }
+
+        console.log("Product found:", product);
+
+        // Proceed with order line processing
+        return this.process_order_line(product, barcode);
+    },
+    find_product_by_barcode_in_barcodes(barcodes, barcode) {
+        for (const product of barcodes) {
+            const uoms = Object.values(product.uom_id);
+            for (const uom of uoms) {
+                if (uom.barcodes.includes(barcode)) {
+                    return this.product_by_id[uom.product_variant_id[0]];
+                }
+            }
+        }
+        return null;
+    },
+    process_order_line(product, barcode) {
+        const result = product;
+        const uoms = Object.values(product.uom_id);
+        const orderlines = result.pos.selectedOrder.get_orderlines();
+
+        for (const uom of uoms) {
+            if (uom.barcodes.includes(barcode)) {
+                console.log("Processing order line for uom:", uom);
+
+                for (const orderline of orderlines) {
+                    if (orderline.product.id === result.id &&
+                        orderline.product_uom_id[0] === uom.id &&
+                        orderline.price === uom.price) {
+
+                        console.log("Existing order line found:", orderline);
+
+                        // Update the quantity of the order line
+                        orderline.set_quantity(orderline.quantity + 1, uom.price);
+
+                        // Move the updated product to the end of the order lines
+                        this.move_order_line_to_end(orderlines, orderline);
+
                         return true;
                     }
                 }
+                // If no existing order line, add a new one
+                this.add_new_orderline(result, uom);
+                return true;
             }
-            return undefined;
         }
         return undefined;
     },
+    move_order_line_to_end(orderlines, orderline) {
+        const index = orderlines.indexOf(orderline);
+        if (index > -1) {
+            orderlines.splice(index, 1); // Remove the existing order line
+            orderlines.push(orderline); // Add it to the end
+            console.log("Order line moved to end:", orderline);
+        }
+        // Re-select the moved order line to ensure UI consistency
+        result.pos.selectedOrder.select_orderline(orderline);
+    },
+    add_new_orderline(result, uom) {
+        const line = new Orderline(
+            { env: result.env },
+            { pos: result.pos, order: result.pos.selectedOrder, product: result }
+        );
+        result.pos.selectedOrder.add_orderline(line);
+        result.pos.selectedOrder.selected_orderline.set_uom({ 0: uom.id, 1: uom.name });
+        result.pos.selectedOrder.selected_orderline.price_manually_set = true;
+        result.pos.selectedOrder.selected_orderline.set_unit_price(uom.price);
+        console.log("New order line added:", line);
+    }
 });
