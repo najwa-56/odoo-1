@@ -71,7 +71,6 @@ patch(Orderline.prototype, {
     export_as_JSON() {
         const json = super.export_as_JSON(...arguments);
         json.product_uom_id = this.product_uom_id[0];
-                json.name_field = this.product_uom_id[1];  // Assuming name_field is available in product_uom_id
 
         return json;
     },
@@ -90,9 +89,7 @@ patch(Orderline.prototype, {
         console.error('Invalid product_uom_id or units_by_id not found', json.product_uom_id, this.pos.units_by_id);
         // Handle the case where product_uom_id is not found, e.g., by setting a default value or showing an error message
         this.product_uom_id = null;  // or some default value
-    }if (json.name_field) {
-            this.name_field = json.name_field;
-        }
+    }
 },
     set_uom(uom_id) {
         this.product_uom_id = uom_id;
@@ -114,8 +111,7 @@ patch(Orderline.prototype, {
             unit_id = unit_id[0];
             if(!this.pos){
                 return undefined;
-            }            console.log('Unit name_field:', this.name_field);  // Access name_field here
-
+            }
             return this.pos.units_by_id[unit_id];
         }
         return this.product.get_unit();

@@ -134,11 +134,7 @@ class Pricelist(models.Model):
 class AccountInvoiceLine(models.Model):
     _inherit = "account.move.line"
 
-    selected_uom_ids = fields.Many2many(string="Uom Ids", related='product_id.selected_uom_ids')
-
-    sales_multi_uom_id = fields.Many2one("product.multi.uom.price", string="Cust UOM",
-                                         domain="[('id', 'in', selected_uom_ids)]")
-    name_field = fields.Char(String="Name_uom",related='sales_multi_uom_id.name_field')
+    sales_multi_uom_id = fields.Many2one("product.multi.uom.price", string="Cust UOM")
 
     @api.onchange('product_id')
     def _onchange_product_id(self):
@@ -179,7 +175,6 @@ class AccountInvoiceLine(models.Model):
                 }
             self.update(values)
             self.price_unit = self.sales_multi_uom_id.price
-            self.name_field=self.sales_multi_uom_id.name_field
             # if self.invoice_id.partner_id:
             #     context_partner = dict(self.env.context, partner_id=self.invoice_id.partner_id.id)
             #     pricelist_context = dict(context_partner, uom=False, date=self.invoice_id.date_order)
