@@ -6,12 +6,10 @@ class PosSession(models.Model):
 
     def _pos_ui_models_to_load(self):
         result = super()._pos_ui_models_to_load()
-        new_models = ['product.multi.uom.price', 'pos.order.line']
+        new_model = 'product.multi.uom.price'
 
-        for model in new_models:
-            if model not in result:
-                result.append(model)
-
+        if new_model not in result:
+            result.append(new_model)
         return result
 
 
