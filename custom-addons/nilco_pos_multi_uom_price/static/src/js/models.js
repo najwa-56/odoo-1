@@ -249,7 +249,7 @@ patch(PosStore.prototype, {
             console.error('Error in user_groups method:', error);
         }
     }
-}
+});
 patch(DB.PosDB.prototype, {
     init(options) {
         this._super.apply(this, arguments);
