@@ -76,6 +76,12 @@
             </field>
      </record>
 
-
+<template id="orderline_template" inherit_id="point_of_sale.orderline">
+    <xpath expr="//li[contains(@class, 'orderline')]" position="inside">
+        <div class="name-field">
+            <t t-esc="line.name_field"/>
+        </div>
+    </xpath>
+</template>
 </odoo>
 
