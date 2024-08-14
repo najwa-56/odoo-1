@@ -76,10 +76,10 @@
             </xpath>
             </field>
      </record>
+<templates>
+<t t-name="Orderline" t-inherit="point_of_sale.Orderline" t-inherit-mode="extension" owl="1">
 
-<template id="orderline_template" inherit_id="point_of_sale.Orderline">
-
-     <xpath expr="//ul[@class='info-list ms-2']" position="inside">
+    <xpath expr="//ul[hasclass('info-list ms-2')]" position="inside">
             <!-- Add a new list item -->
             <li class="additional-info">
                  <div class="name-field">
@@ -87,7 +87,8 @@
         </div>
             </li>
         </xpath>
-</template>
-        </data>
+</t>
+</templates>
+      </data>
 </odoo>
 
