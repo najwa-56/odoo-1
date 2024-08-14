@@ -14,7 +14,19 @@ class PosOrderLine(models.Model):
     #add field Ratio#####
     Ratio = fields.Float("Ratio", compute="_compute_ratio",
                          store=False)  # Ratio field  # Related field to the ratio in uom.uom
-    uom_name = fields.Char(string="UOM Name")
+
+    name_field = fields.Char(string="Name Field")
+
+    @api.onchange('product_id')
+    def _onchange_product_id(self):
+        super()._onchange_product_id()
+        if self.product_id:
+            # Get the related multi_uom_price record
+            multi_uom_price = self.env['product.multi.uom.price'].search([
+                ('product_id', '=', self.product_id.id),
+                ('uom_id', '=', self.product_uom_id.id)
+            ], limit=1)
+            self.name_field = multi_uom_price.name_field if multi_uom_price else ''
 #Edit----#
 
 
@@ -59,5 +71,7 @@ class PosOrderLine(models.Model):
     def _export_for_ui(self, orderline):
         res = super()._export_for_ui(orderline)
         res.update({'product_uom_id': orderline.product_uom_id.id})
-
+        res.update({
+            'name_field': self.name_field,
+        })
         return res
