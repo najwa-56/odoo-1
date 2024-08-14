@@ -95,7 +95,7 @@ patch(Orderline.prototype, {
         const unit = this.get_unit();
     if (unit) {
         this.set_unit_price(unit.price);
-        this.set_name_field(unit.name_field)
+        set_name_field(unit.name_field);
     }
     },
 
