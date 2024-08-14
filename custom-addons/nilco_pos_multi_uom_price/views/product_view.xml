@@ -75,7 +75,7 @@
             </xpath>
             </field>
      </record>
-<template>
+<template id="custom_orderline_template">
 <t t-name="Orderline" t-inherit="point_of_sale.Orderline" t-inherit-mode="extension" owl="1">
 
     <xpath expr="//ul[hasclass('info-list ms-2')]" position="inside">
