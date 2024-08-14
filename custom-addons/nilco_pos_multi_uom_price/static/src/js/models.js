@@ -62,9 +62,7 @@ patch(Orderline.prototype, {
     setup(_defaultObj, options) {
         super.setup(...arguments);
         this.product_uom_id = this.product.default_uom_id || this.product_uom_id || this.product.uom_id;
-        this.uom_name_field = this.get_uom_name();  // Initialize the UOM name field
-
-
+                    this._update_sales_multi_uom_id();
 
 
     },
@@ -73,7 +71,6 @@ patch(Orderline.prototype, {
     export_as_JSON() {
         const json = super.export_as_JSON(...arguments);
         json.product_uom_id = this.product_uom_id[0];
-        json.uom_name_field = this.uom_name_field;  // Export the UOM name field
 
         return json;
     },
@@ -88,27 +85,35 @@ patch(Orderline.prototype, {
             0: this.pos.units_by_id[json.product_uom_id].id,
             1: this.pos.units_by_id[json.product_uom_id].name
         };
-                    this.uom_name_field = this.pos.units_by_id[json.product_uom_id].name_field;  // Initialize the UOM name field
-
     } else {
         console.error('Invalid product_uom_id or units_by_id not found', json.product_uom_id, this.pos.units_by_id);
         // Handle the case where product_uom_id is not found, e.g., by setting a default value or showing an error message
         this.product_uom_id = null;  // or some default value
-        this.uom_name_field = '';
     }
 },
+_update_sales_multi_uom_id() {
+            if (this.product_uom_id) {
+                const uom_id = this.product_uom_id[0];
+                const uom = this.pos.units_by_id[uom_id];
+                if (uom) {
+                    // Assuming `sales_multi_uom_id` should be set based on `product_uom_id`
+                    const matchingUOMs = this.pos.db.get_multi_uom_prices().filter(uom => uom.uom_id === uom_id);
+                    this.sales_multi_uom_id = matchingUOMs.length > 0 ? matchingUOMs[0].id : null;
+                } else {
+                    this.sales_multi_uom_id = null;
+                }
+            }
+        },
+
     set_uom(uom_id) {
         this.product_uom_id = uom_id;
+            this._update_sales_multi_uom_id();
         const unit = this.get_unit();
     if (unit) {
         this.set_unit_price(unit.price);
-        this.uom_name_field = unit.name_field || '';
     }
     },
-  get_uom_name() {
-        const unit = this.get_unit();
-        return unit ? unit.name_field || '' : '';
-    },
+
     get_unit(){
         if (this.product.default_uom_price > 0 & this.price_type == "original" & this.product.default_uom_id != false){
             this.price = this.product.default_uom_price;

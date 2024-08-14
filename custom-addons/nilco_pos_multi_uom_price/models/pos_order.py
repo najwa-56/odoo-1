@@ -14,23 +14,19 @@ class PosOrderLine(models.Model):
     #add field Ratio#####
     Ratio = fields.Float("Ratio", compute="_compute_ratio",
                          store=False)  # Ratio field  # Related field to the ratio in uom.uom
+    selected_uom_ids = fields.Many2many(string="Uom Ids", related='product_id.selected_uom_ids')
 
     sales_multi_uom_id = fields.Many2one("product.multi.uom.price", string="Cust UOM",
-                                         domain=lambda self: self._get_sales_multi_uom_domain())
+                                         domain="[('id', 'in', selected_uom_ids)]")
     name_field = fields.Char(String="Name_uom", related='sales_multi_uom_id.name_field')
 
-    @api.depends('product_uom_id')
-    def _get_sales_multi_uom_domain(self):
-        # Compute the domain for sales_multi_uom_id based on product_uom_id
-        uom_id = self.product_uom_id.id
-        if uom_id:
-            return [('uom_id', '=', uom_id)]
-        return []
+    @api.onchange('product_uom_id')
+    def _onchange_product_uom_id(self):
+        if self.product_uom_id:
+            # Filter sales_multi_uom_id based on the selected product_uom_id
+            matching_uoms = self.env['product.multi.uom.price'].search([('uom_id', '=', self.product_uom_id.id)])
+            self.sales_multi_uom_id = matching_uoms[:1]  # Set default or filter logic
 
-    @api.depends('product_uom_id')
-    def _compute_ratio(self):
-        # Your logic to compute ratio
-        pass
 #Edit----#
 
 
