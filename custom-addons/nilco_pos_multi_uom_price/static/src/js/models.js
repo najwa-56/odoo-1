@@ -99,6 +99,15 @@ patch(Orderline.prototype, {
     }
     },
 
+    set_uom({ uom_id, name_field }) {
+    this.product_uom_id = uom_id;
+    this.product_uom_name = name_field; // Store the name if needed
+    const unit = this.get_unit();
+    if (unit) {
+        this.set_unit_price(unit.price);
+    }
+}
+
     get_unit(){
         if (this.product.default_uom_price > 0 & this.price_type == "original" & this.product.default_uom_id != false){
             this.price = this.product.default_uom_price;
