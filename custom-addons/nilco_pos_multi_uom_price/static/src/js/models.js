@@ -254,7 +254,7 @@ patch(DB.PosDB.prototype, {
 
     },
      load_product_multi_uom_prices(data) {
-                   const data = Object.values(this.product_multi_uom);
+                   const datas = Object.values(this.product_multi_uom);
 
         },
 
