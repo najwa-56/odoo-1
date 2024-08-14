@@ -8,6 +8,8 @@ import { useService } from "@web/core/utils/hooks";
 import { ErrorPopup } from "@point_of_sale/app/errors/popups/error_popup";
 import { reactive, Component, onMounted, onWillStart } from "@odoo/owl";
 import { session } from "@web/session";
+import { PosModel } from '@point_of_sale/app/store/pos_model';
+
 import { parseFloat as oParseFloat } from "@web/views/fields/parsers";
 import {
     formatFloat,
