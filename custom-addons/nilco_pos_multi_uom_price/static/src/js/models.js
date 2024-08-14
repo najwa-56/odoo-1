@@ -23,6 +23,19 @@ patch(Order.prototype, {
 
         }
     },
+     async load_product_multi_uom_prices() {
+            try {
+                const data = await this.rpc({
+                    model: 'product.multi.uom.price',
+                    method: 'search_read',
+                    fields: ['id', 'uom_id', 'price','name_field'],
+                    domain: [],  // Modify domain as needed
+                });
+                this.db.load_product_multi_uom_prices(data);
+            } catch (error) {
+                console.error('Error loading product_multi_uom_prices:', error);
+            }
+        },
       set_pricelist(pricelist) {
 
         var self = this;
@@ -236,5 +249,19 @@ patch(PosStore.prototype, {
             console.error('Error in user_groups method:', error);
         }
     }
-});
+}
+patch(DB.PosDB.prototype, {
+    init(options) {
+        this._super.apply(this, arguments);
+                    this.product_uom_price = [];
+
+    },
+     load_product_multi_uom_prices(data) {
+            this.product_uom_price = data;
+        },
+
+    },
+
+
+);
 
