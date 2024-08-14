@@ -8,7 +8,7 @@ import { useService } from "@web/core/utils/hooks";
 import { ErrorPopup } from "@point_of_sale/app/errors/popups/error_popup";
 import { reactive, Component, onMounted, onWillStart } from "@odoo/owl";
 import { session } from "@web/session";
-
+import { PosModel } from '@point_of_sale/app/store/pos_model';
 import { parseFloat as oParseFloat } from "@web/views/fields/parsers";
 import {
     formatFloat,
@@ -256,9 +256,25 @@ patch(DB.PosDB.prototype, {
             this.product_uom_price = data;
         },
 
-    },
+    }
 
 
 );
 
- 
+ patch(PosModel.prototype, {
+        async load_product_multi_uom_prices() {
+            try {
+                const data = await this.rpc({
+                    model: 'product.multi.uom.price',
+                    method: 'search_read',
+                    fields: ['id', 'uom_id', 'price','name_field'],
+                    domain: [],  // Modify domain as needed
+                });
+                this.db.load_product_multi_uom_prices(data);
+            } catch (error) {
+                console.error('Error loading product_multi_uom_prices:', error);
+            }
+        },
+
+});
+
