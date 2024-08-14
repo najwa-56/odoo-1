@@ -724,12 +724,7 @@
                                             <br/>
                                             <span class="lable_bold">الوحدة</span>
                                         </th>
-                                        <th align="center" name="discount" class="second_table"
-                                            style="background-color:#4f4d4d;text-align:center;color:white;">
-                                            <span class="lable_bold">name field</span>
-                                            <br/>
-                                            <span class="lable_bold"> تفصيل الوحدة</span>
-                                        </th>
+                                       
 
                                         <th align="center" name="taxable_rate" class="second_table"
                                             style="background-color:#4f4d4d;text-align:center;color:white;">
@@ -792,7 +787,7 @@
                                          <td class="second_table" style="text-align:right;">
                                               <span t-esc="line.product_uom_id.name"/>
                                         </td>
-                                        
+
 
                                                 <!-- Editeing-->
 
