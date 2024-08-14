@@ -98,10 +98,10 @@ patch(Orderline.prototype, {
                 const uom_id = this.product_uom_id[0];
                 const uom = this.pos.units_by_id[uom_id];
                 if (uom) {
-                    console.log('Available multi_uom_prices:', this.pos.db.load_product_multi_uom_prices);
+                    console.log('Available multi_uom_prices:', this.pos.db.product_uom_price);
 
                     if (this.pos.db.product_multi_uom_prices) {
-                        const all_multi_uom_prices = this.pos.db.load_product_multi_uom_prices;
+                        const all_multi_uom_prices = this.pos.db.product_uom_price;
                         console.log('Filtered multi_uom_prices:', all_multi_uom_prices);
 
                         const matchingUOMs = all_multi_uom_prices.filter(uom_price => uom_price.uom_id === uom_id);
@@ -227,7 +227,7 @@ patch(PosStore.prototype, {
     async _processData(loadedData) {
         await super._processData(...arguments);
             this.product_uom_price = loadedData['product.multi.uom.price'];
-            this.db.load_product_multi_uom_prices(this.product_uom_price);
+                    this.db.product_multi_uom = this.product_uom_price;
 
     await this.user_groups1();
     },
@@ -250,14 +250,13 @@ patch(PosStore.prototype, {
 patch(DB.PosDB.prototype, {
     init(options) {
         this._super.apply(this, arguments);
-        this.product_uom_price = [];
+                    this.product_uom_price = [];
 
     },
      load_product_multi_uom_prices(data) {
-        // Use a different name for the local variable to avoid conflict
-        const productUOMPrices = data;
-        this.product_uom_price = productUOMPrices;
-    },
+                   const data = Object.values(this.product_multi_uom);
+
+        },
 
     }
 
