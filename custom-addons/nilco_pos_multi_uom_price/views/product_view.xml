@@ -39,6 +39,14 @@
                 </xpath>
             </field>
      </record>
+    <!-- Add this to your POS XML template -->
+<template id="orderline_template" inherit_id="point_of_sale.orderline">
+    <xpath expr="//div[@class='orderline-details']" position="inside">
+        <div class="name-field">
+            <t t-esc="line.name_field"/>
+        </div>
+    </xpath>
+</template>
 
                          <!--Edit-->
 
