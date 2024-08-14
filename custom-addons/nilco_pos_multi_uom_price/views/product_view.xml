@@ -76,18 +76,16 @@
             </field>
      </record>
 
-  <!-- Inherit the existing orderline template -->
-        <template id="custom_orderline_template" inherit_id="point_of_sale.assets">
-            <xpath expr="//t[@t-name='point_of_sale.Orderline']" position="inside">
-                <!-- Add a new list item to the existing info-list -->
-                <xpath expr="//ul[@class='info-list ms-2']" position="inside">
-                    <li class="additional-info">
-                        <div class="name-field">
-                            <t t-esc="line.name_field"/>
-                        </div>
-                    </li>
-                </xpath>
-            </xpath>
-        </template>
+<template id="orderline_template" inherit_id="point_of_sale.Orderline">
+   
+     <xpath expr="//ul[@class='info-list ms-2']" position="inside">
+            <!-- Add a new list item -->
+            <li class="additional-info">
+                 <div class="name-field">
+            <t t-esc="line.name_field"/>
+        </div>
+            </li>
+        </xpath>
+</template>
 </odoo>
 
