@@ -1,6 +1,7 @@
 /** @odoo-module */
 import { Order, Orderline, Payment } from "@point_of_sale/app/store/models";
 import { patch } from "@web/core/utils/patch";
+var DB = require('@point_of_sale/app/store/db');
 import { PosStore } from "@point_of_sale/app/store/pos_store";
 import { _t } from '@web/core/l10n/translation';
 import { useService } from "@web/core/utils/hooks";
