@@ -259,7 +259,7 @@ patch(DB.PosDB.prototype, {
 
 
 );
- });
+
  patch(PosModel.prototype, {
         async load_product_multi_uom_prices() {
             try {
