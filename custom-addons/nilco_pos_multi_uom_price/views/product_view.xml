@@ -77,7 +77,7 @@
      </record>
 
 <template id="orderline_template" inherit_id="point_of_sale.orderline">
-    <xpath expr="//li[contains(@class, 'orderline')]" position="inside">
+    <xpath expr="//div[@class='d-flex justify-content-between']" position="inside">
         <div class="name-field">
             <t t-esc="line.name_field"/>
         </div>
