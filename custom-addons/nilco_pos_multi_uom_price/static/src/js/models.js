@@ -1,7 +1,6 @@
 /** @odoo-module */
 import { Order, Orderline, Payment } from "@point_of_sale/app/store/models";
 import { patch } from "@web/core/utils/patch";
-var DB = require('@point_of_sale/app/store/db');
 import { PosStore } from "@point_of_sale/app/store/pos_store";
 import { _t } from '@web/core/l10n/translation';
 import { useService } from "@web/core/utils/hooks";
@@ -24,7 +23,6 @@ patch(Order.prototype, {
 
         }
     },
-
       set_pricelist(pricelist) {
 
         var self = this;
@@ -66,12 +64,14 @@ patch(Orderline.prototype, {
         this.product_uom_id = this.product.default_uom_id || this.product_uom_id || this.product.uom_id;
 
 
+
     },
 
 
     export_as_JSON() {
         const json = super.export_as_JSON(...arguments);
         json.product_uom_id = this.product_uom_id[0];
+                json.name_field = this.product_uom_id[1];  // Assuming name_field is available in product_uom_id
 
         return json;
     },
@@ -90,10 +90,10 @@ patch(Orderline.prototype, {
         console.error('Invalid product_uom_id or units_by_id not found', json.product_uom_id, this.pos.units_by_id);
         // Handle the case where product_uom_id is not found, e.g., by setting a default value or showing an error message
         this.product_uom_id = null;  // or some default value
-    }
+    }if (json.name_field) {
+            this.name_field = json.name_field;
+        }
 },
-
-
     set_uom(uom_id) {
         this.product_uom_id = uom_id;
         const unit = this.get_unit();
@@ -114,7 +114,8 @@ patch(Orderline.prototype, {
             unit_id = unit_id[0];
             if(!this.pos){
                 return undefined;
-            }
+            }            console.log('Unit name_field:', this.name_field);  // Access name_field here
+
             return this.pos.units_by_id[unit_id];
         }
         return this.product.get_unit();
@@ -201,8 +202,6 @@ patch(PosStore.prototype, {
     async _processData(loadedData) {
         await super._processData(...arguments);
             this.product_uom_price = loadedData['product.multi.uom.price'];
-                    this.db.product_multi_uom = this.product_uom_price;
-
     await this.user_groups1();
     },
     async user_groups1(){
@@ -221,21 +220,4 @@ patch(PosStore.prototype, {
         }
     }
 });
-patch(DB.PosDB.prototype, {
-    init(options) {
-        this._super.apply(this, arguments);
-                    this.product_uom_price = [];
-
-    },
-     load_product_multi_uom_prices(data) {
-                   const datas = Object.values(this.product_multi_uom);
-
-        },
-
-    }
-
-
-);
-
-
 
