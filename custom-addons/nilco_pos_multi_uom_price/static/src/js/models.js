@@ -91,13 +91,14 @@ patch(Orderline.prototype, {
         this.product_uom_id = null;  // or some default value
     }
 },
- _update_sales_multi_uom_id() {
+  _update_sales_multi_uom_id() {
             if (this.product_uom_id) {
                 const uom_id = this.product_uom_id[0];
                 const uom = this.pos.units_by_id[uom_id];
                 if (uom) {
-                    // Use an existing method or adjust logic to filter the correct UOM prices
-                    const matchingUOMs = this.pos.db.get_all('product.multi.uom.price').filter(uom => uom.uom_id === uom_id);
+                    // Use the available data in the POS cache
+                    const all_multi_uom_prices = this.pos.db.product_multi_uom_prices || [];
+                    const matchingUOMs = all_multi_uom_prices.filter(uom_price => uom_price.uom_id === uom_id);
                     this.sales_multi_uom_id = matchingUOMs.length > 0 ? matchingUOMs[0].id : null;
                 } else {
                     this.sales_multi_uom_id = null;
