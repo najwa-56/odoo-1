@@ -86,23 +86,10 @@ patch(DB.PosDB.prototype, {
                             if (orderline.product.id === result.id &&
                                 orderline.product_uom_id[0] === uom.id &&
                                 orderline.price === uom.price) {
-                                // Update the quantity of the order line
                                 orderline.set_quantity(orderline.quantity + 1, uom.price);
-
-                                // Move the updated product to the end of the order lines
-                                const index = orderlines.indexOf(orderline);
-                                if (index > -1) {
-                                    orderlines.splice(index, 1); // Remove the existing order line
-                                    orderlines.push(orderline); // Add it to the end
-                                }
-
-                                // Re-select the moved order line to ensure UI consistency
-                                result.pos.selectedOrder.select_orderline(orderline);
-
                                 return true;
                             }
                         }
-                        // If no existing order line, add a new one
                         result.pos.selectedOrder.add_orderline(line);
                         result.pos.selectedOrder.selected_orderline.set_uom({ 0: uom.id, 1: uom.name });
                         result.pos.selectedOrder.selected_orderline.price_manually_set = true;
