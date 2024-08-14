@@ -24,19 +24,7 @@ patch(Order.prototype, {
 
         }
     },
-     async load_product_multi_uom_prices() {
-            try {
-                const data = await this.rpc({
-                    model: 'product.multi.uom.price',
-                    method: 'search_read',
-                    fields: ['id', 'uom_id', 'price','name_field'],
-                    domain: [],  // Modify domain as needed
-                });
-                this.db.load_product_multi_uom_prices(data);
-            } catch (error) {
-                console.error('Error loading product_multi_uom_prices:', error);
-            }
-        },
+
       set_pricelist(pricelist) {
 
         var self = this;
@@ -105,20 +93,26 @@ patch(Orderline.prototype, {
         this.product_uom_id = null;  // or some default value
     }
 },
-  _update_sales_multi_uom_id() {
+   _update_sales_multi_uom_id() {
             if (this.product_uom_id) {
                 const uom_id = this.product_uom_id[0];
                 const uom = this.pos.units_by_id[uom_id];
-                if (uom) {            console.log('Available multi_uom_prices:', this.pos.db.product_multi_uom_prices);
+                if (uom) {
+                    console.log('Available multi_uom_prices:', this.pos.db.product_uom_price);
 
-                    // Use the available data in the POS cache
-                    const all_multi_uom_prices = this.pos.db.product_multi_uom_prices || [];
-                                console.log('Filtered multi_uom_prices:', all_multi_uom_prices);
+                    if (this.pos.db.product_multi_uom_prices) {
+                        const all_multi_uom_prices = this.pos.db.product_uom_price;
+                        console.log('Filtered multi_uom_prices:', all_multi_uom_prices);
 
-                    const matchingUOMs = all_multi_uom_prices.filter(uom_price => uom_price.uom_id === uom_id);
-                                console.log('Matching UOMs:', matchingUOMs);
+                        const matchingUOMs = all_multi_uom_prices.filter(uom_price => uom_price.uom_id === uom_id);
+                        console.log('Matching UOMs:', matchingUOMs);
 
-                    this.sales_multi_uom_id = matchingUOMs.length > 0 ? matchingUOMs[0].id : null;
+                        this.sales_multi_uom_id = matchingUOMs.length > 0 ? matchingUOMs[0].id : null;
+                        console.log('Sales Multi UOM ID:', this.sales_multi_uom_id);
+                    } else {
+                        console.error('No multi_uom_prices data available');
+                        this.sales_multi_uom_id = null;
+                    }
                 } else {
                     this.sales_multi_uom_id = null;
                 }
@@ -265,4 +259,21 @@ patch(DB.PosDB.prototype, {
 
 
 );
+
+ patch(PosModel.prototype, {
+        async load_product_multi_uom_prices() {
+            try {
+                const data = await this.rpc({
+                    model: 'product.multi.uom.price',
+                    method: 'search_read',
+                    fields: ['id', 'uom_id', 'price'],
+                    domain: [],  // Modify domain as needed
+                });
+                this.db.load_product_multi_uom_prices(data);
+            } catch (error) {
+                console.error('Error loading product_multi_uom_prices:', error);
+            }
+        },
+    });
+});
 
