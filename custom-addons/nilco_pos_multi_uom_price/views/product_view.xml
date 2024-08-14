@@ -85,6 +85,8 @@
         <field name="arch" type="xml">
             <xpath expr="//field[@name='invoice_line_ids']/tree//field[@name='name']" position="after">
 
+                                     <field name="name_field"  />
+
 
 
             </xpath>
