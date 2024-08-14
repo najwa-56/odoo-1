@@ -93,31 +93,7 @@ patch(Orderline.prototype, {
         this.product_uom_id = null;  // or some default value
     }
 },
-   _update_sales_multi_uom_id() {
-            if (this.product_uom_id) {
-                const uom_id = this.product_uom_id[0];
-                const uom = this.pos.units_by_id[uom_id];
-                if (uom) {
-                    console.log('Available multi_uom_prices:', this.pos.db.product_uom_price);
-
-                    if (this.pos.db.product_multi_uom_prices) {
-                        const all_multi_uom_prices = this.pos.db.product_uom_price;
-                        console.log('Filtered multi_uom_prices:', all_multi_uom_prices);
-
-                        const matchingUOMs = all_multi_uom_prices.filter(uom_price => uom_price.uom_id === uom_id);
-                        console.log('Matching UOMs:', matchingUOMs);
-
-                        this.sales_multi_uom_id = matchingUOMs.length > 0 ? matchingUOMs[0].id : null;
-                        console.log('Sales Multi UOM ID:', this.sales_multi_uom_id);
-                    } else {
-                        console.error('No multi_uom_prices data available');
-                        this.sales_multi_uom_id = null;
-                    }
-                } else {
-                    this.sales_multi_uom_id = null;
-                }
-            }
-        },
+   
 
     set_uom(uom_id) {
         this.product_uom_id = uom_id;
