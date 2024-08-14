@@ -14,26 +14,8 @@ class PosOrderLine(models.Model):
     #add field Ratio#####
     Ratio = fields.Float("Ratio", compute="_compute_ratio",
                          store=False)  # Ratio field  # Related field to the ratio in uom.uom
-    selected_uom_ids = fields.Many2many(string="Uom Ids", related='product_id.selected_uom_ids')
 
-    sales_multi_uom_id = fields.Many2one("product.multi.uom.price", string="Cust UOM",
-                                         domain="[('id', 'in', selected_uom_ids)]")
-    sale_multi_uom_name = fields.Char(string=" name field", related='sales_multi_uom_id.name_field', store=True,
-                                      readonly=True)
-
-    @api.depends('product_uom_id')
-    def _compute_price(self):
-        for line in self:
-            if line.product_uom_id:
-                uom_price = self.env['product.multi.uom.price'].search([
-                    ('product_id', '=', line.product_id.id),
-                    ('uom_id', '=', line.product_uom_id.id)
-                ], limit=1)
-                if uom_price:
-                    line.price_unit = uom_price.price
-                    line.sales_multi_uom_id = uom_price.id
-
-    #Edit----#
+#Edit----#
 
 
     @api.depends('product_uom_id')
@@ -79,14 +61,3 @@ class PosOrderLine(models.Model):
         res.update({'product_uom_id': orderline.product_uom_id.id})
 
         return res
-
-    def write(self, vals):
-        # Update sales_multi_uom_id when product_uom_id changes
-        if 'product_uom_id' in vals:
-            uom_price = self.env['product.multi.uom.price'].search([
-                ('product_id', '=', self.product_id.id),
-                ('uom_id', '=', vals['product_uom_id'])
-            ], limit=1)
-            if uom_price:
-                vals['sales_multi_uom_id'] = uom_price.id
-        return super(PosOrderLine, self).write(vals)
