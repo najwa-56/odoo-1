@@ -77,11 +77,19 @@
      </record>
 
 <template id="orderline_template" inherit_id="point_of_sale.orderline">
-    <xpath expr="//div[@class='d-flex justify-content-between']" position="inside">
+    <xpath expr="//div[@class='info-list ms-2']" position="inside">
         <div class="name-field">
             <t t-esc="line.name_field"/>
         </div>
     </xpath>
+     <xpath expr="//ul[@class='info-list ms-2']" position="inside">
+            <!-- Add a new list item -->
+            <li class="additional-info">
+                 <div class="name-field">
+            <t t-esc="line.name_field"/>
+        </div>
+            </li>
+        </xpath>
 </template>
 </odoo>
 
