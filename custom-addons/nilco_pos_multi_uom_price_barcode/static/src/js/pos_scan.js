@@ -6,6 +6,8 @@ import { PosStore } from "@point_of_sale/app/store/pos_store";
 import { Order, Orderline, Payment } from "@point_of_sale/app/store/models";
 import { ProductScreen } from "@point_of_sale/app/screens/product_screen/product_screen";
 import { ErrorBarcodePopup } from "@point_of_sale/app/barcode/error_popup/barcode_error_popup";
+import { NumberBuffer } from '@point_of_sale/path_to_number_buffer'; // Adjust the path
+
 
 patch(ProductScreen.prototype, {
     async _barcodeProductAction(code) {
@@ -132,7 +134,12 @@ patch(DB.PosDB.prototype, {
                 }
             }
 
-            this.numberBuffer.reset();
+            if (this.numberBuffer) {
+                this.numberBuffer.reset();
+            } else {
+                console.error('numberBuffer is undefined');
+            }
+
             return true;
         }
         return undefined;
