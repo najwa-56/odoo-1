@@ -62,6 +62,7 @@ patch(Orderline.prototype, {
     setup(_defaultObj, options) {
         super.setup(...arguments);
         this.product_uom_id = this.product.default_uom_id || this.product_uom_id || this.product.uom_id;
+        this.product = options.product;
          this.reorderProduct();
     },
 
