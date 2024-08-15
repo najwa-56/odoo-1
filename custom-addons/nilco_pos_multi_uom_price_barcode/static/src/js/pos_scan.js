@@ -68,8 +68,7 @@ patch(DB.PosDB.prototype, {
 
         const barcodes = Object.values(this.product_multi_barcodes);
 
-
-           // Sort products based on their active status
+        // Sort products based on their active status
         barcodes.sort((a, b) => {
             const aActive = a.active ? 1 : 0;
             const bActive = b.active ? 1 : 0;
@@ -81,13 +80,15 @@ patch(DB.PosDB.prototype, {
         } else if (this.product_packaging_by_barcode[barcode]) {
             return this.product_by_id[this.product_packaging_by_barcode[barcode].product_id[0]];
         } else if (barcodes.length > 0) {
-            for (const product of barcodes) {
+            const productQuantities = {};
 
+            for (const product of barcodes) {
                 const uoms = Object.values(product.uom_id);
                 for (const uom of uoms) {
                     if (uom.barcodes.includes(barcode)) {
                         const result = this.product_by_id[uom.product_variant_id[0]];
-                          if (!productQuantities[result.id]) {
+
+                        if (!productQuantities[result.id]) {
                             productQuantities[result.id] = {
                                 product: result,
                                 uom: uom,
@@ -98,7 +99,7 @@ patch(DB.PosDB.prototype, {
                         productQuantities[result.id].quantity += 1; // Aggregate quantities
                     }
                 }
-            },
+            }
 
             // Process aggregated products
             for (const productId in productQuantities) {
@@ -111,29 +112,28 @@ patch(DB.PosDB.prototype, {
                         body: 'The order has already been finalized and cannot be modified.',
                     });
                     return;
-                },
-                        const line = new Orderline(
-                            { env: result.env },
-                            { pos: result.pos, order: result.pos.selectedOrder, product: result }
-                        );
-                        const orderlines = result.pos.selectedOrder.get_orderlines();
-                        for (const orderline of orderlines) {
-                            if (orderline.product.id === result.id &&
-                                orderline.product_uom_id[0] === uom.id &&
-                                orderline.price === uom.price) {
-                                orderline.set_quantity(orderline.quantity + 1, uom.price);
-                                return true;
-                            }
-                        }
-                        result.pos.selectedOrder.add_orderline(line);
-                        result.pos.selectedOrder.selected_orderline.set_uom({ 0: uom.id, 1: uom.name });
-                        result.pos.selectedOrder.selected_orderline.price_manually_set = true;
-                        result.pos.selectedOrder.selected_orderline.set_unit_price(uom.price);
-                        return true;
-                    }
+                }
+
+                const line = new Orderline(
+                    { env: product.env },
+                    { pos: product.pos, order: currentOrder, product: product }
+                );
+
+                // Check if the product line already exists
+                let existingLine = currentOrder.get_orderlines().find(line => line.product.id === product.id && line.product_uom_id[0] === uom.id);
+                if (existingLine) {
+                    existingLine.set_quantity(existingLine.quantity + quantity, uom.price);
+                } else {
+                    currentOrder.add_orderline(line);
+                    currentOrder.selected_orderline.set_uom({ 0: uom.id, 1: uom.name });
+                    currentOrder.selected_orderline.price_manually_set = true;
+                    currentOrder.selected_orderline.set_unit_price(uom.price);
+                    currentOrder.selected_orderline.set_quantity(quantity, uom.price);
                 }
             }
-            return undefined;
+
+            this.numberBuffer.reset();
+            return true;
         }
         return undefined;
     },
