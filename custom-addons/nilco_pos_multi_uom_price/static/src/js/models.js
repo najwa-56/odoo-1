@@ -99,11 +99,22 @@ patch(Orderline.prototype, {
             this.order.orderlines.push(existingOrderline);
         }
     },
+    get_uom_price_info(uom_id) {
+        if (!this.order || !this.order.pos.product_uom_prices) {
+            return {};
+        }
+        const uomPrices = this.order.pos.product_uom_prices;
+        return uomPrices.find(priceInfo => priceInfo.uom_id[0] === uom_id) || {};
+    },
     set_uom(uom_id) {
         this.product_uom_id = uom_id;
         const unit = this.get_unit();
+                const priceInfo = this.get_uom_price_info(uom_id);
+
     if (unit) {
-        this.set_unit_price(unit.price);
+        this.set_unit_price(priceInfo.price);
+                    console.log('UOM Name Field:', priceInfo.name_field); // Access and use name_field
+
 
     }
     },
