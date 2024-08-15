@@ -9,8 +9,6 @@ _logger = logging.getLogger(__name__)
 class StockPicking(models.Model):
     _inherit='stock.picking'
 
-    last_active_product_id = fields.Many2one('product.product', string="Last Active Product")
-
     def _prepare_stock_move_vals(self, first_line, order_lines):
         res = super()._prepare_stock_move_vals(first_line, order_lines)
         res.update({'product_uom': first_line.product_uom_id.id})
@@ -18,21 +16,6 @@ class StockPicking(models.Model):
 
     def _create_move_from_pos_order_lines(self, lines):
         self.ensure_one()
-
-        # Determine the last active product ID
-        last_active_product_id = self.last_active_product_id.id if self.last_active_product_id else None
-
-        # Sort lines by last active product first, then by product and UOM
-        lines_sorted = sorted(
-            lines,
-            key=lambda l: (
-                l.product_id.id == last_active_product_id,  # Prioritize last active product
-                l.product_id.id,
-                l.product_uom_id.id
-            ),
-            reverse=True
-        )
-
 
         lines_by_product = groupby(sorted(lines, key=lambda l: (l.product_id.id,l.product_uom_id.id)), key=lambda l: (l.product_id.id,l.product_uom_id.id))
         move_vals = []
