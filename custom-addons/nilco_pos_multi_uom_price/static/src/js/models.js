@@ -63,23 +63,17 @@ patch(Orderline.prototype, {
         super.setup(...arguments);
         this.product_uom_id = this.product.default_uom_id || this.product_uom_id || this.product.uom_id;
          this.reorderProduct();
-                 this.name_field = null; // Initialize name_field
-
     },
 
 
     export_as_JSON() {
         const json = super.export_as_JSON(...arguments);
         json.product_uom_id = this.product_uom_id[0];
-        json.name_field = this.name_field; // Export name_field
 
         return json;
     },
     init_from_JSON(json) {
     super.init_from_JSON(...arguments);
-            this.product_uom_id = json.product_uom_id ? { 0: json.product_uom_id } : null;
-
-        this.name_field = json.name_field || null; // Initialize name_field
 
     console.log('init_from_JSON:', json);
 
@@ -110,17 +104,8 @@ patch(Orderline.prototype, {
         const unit = this.get_unit();
     if (unit) {
         this.set_unit_price(unit.price);
-            // Fetch name_field based on the selected uom_id
-            this.name_field = this.get_name_field(uom_id);
 
     }
-    },
-    get_name_field(uom_id) {
-        // Implement logic to fetch name_field based on uom_id
-        if (this.pos.product_uom_prices && this.pos.product_uom_prices[uom_id]) {
-            return this.pos.product_uom_prices[uom_id].name_field;
-        }
-        return '';
     },
 
     get_unit(){
