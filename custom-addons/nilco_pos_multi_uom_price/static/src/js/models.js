@@ -124,8 +124,6 @@ patch(Orderline.prototype, {
             typeof quantity === "number" ? quantity : oParseFloat("" + (quantity ? quantity : 0));
 
 
-         var quantityChanged = quant > this.quantity;
-
  if (quant === 0 && zero1==true) {
         if (!this.comboParent) {
             this.env.services.popup.add(ErrorPopup, {
@@ -191,14 +189,8 @@ patch(Orderline.prototype, {
         if (!keep_price && this.price_type === "original") {
             this.order.fix_tax_included_price(this);
         }
-         // Reorder the product if quantity has increased
-    if (quantityChanged) {
-        // Assuming reorderProduct is a method to handle reordering
-        this.reorderProduct();
+        return true;
     }
-
-    return true;
-},
 
 });
 var zero1=false;
