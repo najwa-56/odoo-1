@@ -39,9 +39,7 @@ export class UOMButton extends Component {
 			       list: uomList,
 		       });
 		       if (confirmed) {
-                    // Make sure selectedUOM includes the necessary data
-                    const uomItem = uomList.find(uom => uom.id === selectedUOM.id);
-                    line.set_uom({0: selectedUOM.id, 1: uomItem ? uomItem.label : selectedUOM.name});
+			      line.set_uom({0:selectedUOM.id,1:selectedUOM.name});
 			      line.price_manually_set = true;
 			      line.set_unit_price(selectedUOM.price);
 

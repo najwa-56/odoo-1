@@ -15,7 +15,12 @@ class PosOrderLine(models.Model):
     Ratio = fields.Float("Ratio", compute="_compute_ratio",
                          store=False)  # Ratio field  # Related field to the ratio in uom.uom
 
-#Edit----#
+    selected_uom_ids = fields.Many2many(string="UOM Ids", related='product_id.selected_uom_ids')
+    sale_multi_uom_id = fields.Many2one("product.multi.uom.price", string="Custom UOM",
+                                            domain="[('id', 'in', selected_uom_ids)]")
+    name_field = fields.Float(string="UOM Cost", related='sale_multi_uom_id.name_field')
+
+    #Edit----#
 
 
     @api.depends('product_uom_id')
