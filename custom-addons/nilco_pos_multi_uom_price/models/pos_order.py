@@ -14,7 +14,8 @@ class PosOrderLine(models.Model):
     #add field Ratio#####
     Ratio = fields.Float("Ratio", compute="_compute_ratio",
                          store=False)  # Ratio field  # Related field to the ratio in uom.uom
-
+    uom_price_id = fields.Many2one('product.multi.uom.price', string="UOM Price")
+    name_field = fields.Char(related='uom_price_id.name_field', string="Name Field", store=True)
     #Edit----#
 
 
