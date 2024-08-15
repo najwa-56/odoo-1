@@ -63,8 +63,6 @@ patch(Orderline.prototype, {
         super.setup(...arguments);
         this.product_uom_id = this.product.default_uom_id || this.product_uom_id || this.product.uom_id;
 
-
-
     },
 
 
@@ -100,8 +98,6 @@ patch(Orderline.prototype, {
     }
     },
 
-
-
     get_unit(){
         if (this.product.default_uom_price > 0 & this.price_type == "original" & this.product.default_uom_id != false){
             this.price = this.product.default_uom_price;
@@ -121,13 +117,12 @@ patch(Orderline.prototype, {
     },
 
 
+set_quantity(quantity, keep_price) {
+    this.order.assert_editable();
+    var quant =
+        typeof quantity === "number" ? quantity : oParseFloat("" + (quantity ? quantity : 0));
 
-    set_quantity(quantity, keep_price) {
-        this.order.assert_editable();
-        var quant =
-            typeof quantity === "number" ? quantity : oParseFloat("" + (quantity ? quantity : 0));
-
- if (quant === 0 && zero1==true) {
+    if (quant === 0 && zero1 === true) {
         if (!this.comboParent) {
             this.env.services.popup.add(ErrorPopup, {
                 title: _t("Quantity cannot be zero"),
@@ -136,64 +131,81 @@ patch(Orderline.prototype, {
         }
         return false;
     }
-        // Handle refund logic
 
-        if (this.refunded_orderline_id in this.pos.toRefundLines) {
-            const toRefundDetail = this.pos.toRefundLines[this.refunded_orderline_id];
-            const maxQtyToRefund =
-                toRefundDetail.orderline.qty - toRefundDetail.orderline.refundedQty;
-            if (quant > 0 ) {
-                if (!this.comboParent) {
-                    this.env.services.popup.add(ErrorPopup, {
-                        title: _t("Positive quantity not allowed"),
-                        body: _t(
-                            "Only a negative quantity is allowed for this refund line. Click on +/- to modify the quantity to be refunded."
-                        ),
-                    });
-                }
-                return false;
-            } else if (quant == 0) {
-                toRefundDetail.qty = 0;
-            } else if (-quant <= maxQtyToRefund) {
-                toRefundDetail.qty = -quant;
-            } else {
-                if(!this.comboParent){
-                    this.env.services.popup.add(ErrorPopup, {
-                        title: _t("Greater than allowed"),
-                        body: _t(
-                            "The requested quantity to be refunded is higher than the refundable quantity of %s.",
-                            this.env.utils.formatProductQty(maxQtyToRefund)
-                        ),
-                    });
-                }
-                return false;
-            }
-        }
-            // Handle unit of measure rounding
-
-        var unit = this.get_unit();
-        if (unit) {
-            if (unit.rounding) {
-                var decimals = this.pos.dp["Product Unit of Measure"];
-                var rounding = Math.max(unit.rounding, Math.pow(10, -decimals));
-                this.quantity = round_pr(quant, rounding);
-                this.quantityStr = formatFloat(this.quantity, {
-                    digits: [69, decimals],
+    // Handle refund logic
+    if (this.refunded_orderline_id in this.pos.toRefundLines) {
+        const toRefundDetail = this.pos.toRefundLines[this.refunded_orderline_id];
+        const maxQtyToRefund =
+            toRefundDetail.orderline.qty - toRefundDetail.orderline.refundedQty;
+        if (quant > 0) {
+            if (!this.comboParent) {
+                this.env.services.popup.add(ErrorPopup, {
+                    title: _t("Positive quantity not allowed"),
+                    body: _t(
+                        "Only a negative quantity is allowed for this refund line. Click on +/- to modify the quantity to be refunded."
+                    ),
                 });
-            } else {
-                this.quantity = round_pr(quant, 1);
-                this.quantityStr = this.quantity.toFixed(0);
             }
+            return false;
+        } else if (quant == 0) {
+            toRefundDetail.qty = 0;
+        } else if (-quant <= maxQtyToRefund) {
+            toRefundDetail.qty = -quant;
         } else {
-            this.quantity = quant;
-            this.quantityStr = "" + this.quantity;
+            if (!this.comboParent) {
+                this.env.services.popup.add(ErrorPopup, {
+                    title: _t("Greater than allowed"),
+                    body: _t(
+                        "The requested quantity to be refunded is higher than the refundable quantity of %s.",
+                        this.env.utils.formatProductQty(maxQtyToRefund)
+                    ),
+                });
+            }
+            return false;
         }
-
-        if (!keep_price && this.price_type === "original") {
-            this.order.fix_tax_included_price(this);
-        }
-        return true;
     }
+
+    // Handle unit of measure rounding
+    var unit = this.get_unit();
+    if (unit) {
+        if (unit.rounding) {
+            var decimals = this.pos.dp["Product Unit of Measure"];
+            var rounding = Math.max(unit.rounding, Math.pow(10, -decimals));
+            this.quantity = round_pr(quant, rounding);
+            this.quantityStr = formatFloat(this.quantity, {
+                digits: [69, decimals],
+            });
+        } else {
+            this.quantity = round_pr(quant, 1);
+            this.quantityStr = this.quantity.toFixed(0);
+        }
+    } else {
+        this.quantity = quant;
+        this.quantityStr = "" + this.quantity;
+    }
+
+    // Check if quantity is increased and sort active products
+    if (quant > (this.previous_quantity || 0)) {
+        this.sort_active_products_by_quantity();
+    }
+
+    if (!keep_price && this.price_type === "original") {
+        this.order.fix_tax_included_price(this);
+    }
+
+    // Store the current quantity for future comparisons
+    this.previous_quantity = quant;
+
+    return true;
+},
+
+sort_active_products_by_quantity() {
+    // Assuming `this.pos.get_order().get_orderlines()` gives the active products
+    let orderlines = this.pos.get_order().get_orderlines();
+    orderlines.sort((a, b) => b.quantity - a.quantity); // Sort by quantity descending
+    this.pos.get_order().set_orderlines(orderlines); // Re-set the sorted orderlines
+},
+
 
 });
 var zero1=false;
