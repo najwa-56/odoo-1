@@ -10,15 +10,12 @@ _logger = logging.getLogger(__name__)
 class PosOrderLine(models.Model):
     _inherit = 'pos.order.line'
 
-    product_uom_id = fields.Many2one('uom.uom', string='Product UoM', related='')
+    selected_uom_ids = fields.Many2many(string="Uom Ids", related='product_id.selected_uom_ids')
+
+    product_uom_id = fields.Many2one('uom.uom', string='Product UoM',  domain="[('id', 'in', selected_uom_ids)]")
     #add field Ratio#####
     Ratio = fields.Float("Ratio", compute="_compute_ratio",
                          store=False)  # Ratio field  # Related field to the ratio in uom.uom
-
-    selected_uom_ids = fields.Many2many(string="UOM Ids", related='product_id.selected_uom_ids')
-    sale_multi_uom_id = fields.Many2one("product.multi.uom.price", string="Custom UOM",
-                                            domain="[('id', 'in', selected_uom_ids)]")
-    name_field = fields.Char(string="UOM Cost", related='sale_multi_uom_id.name_field')
 
     #Edit----#
 
@@ -66,7 +63,3 @@ class PosOrderLine(models.Model):
         res.update({'product_uom_id': orderline.product_uom_id.id})
 
         return res
-    def _get_sale_multi_uom_domain(self):
-        if self.product_uom_id:
-            return [('id', 'in', self.product_id.selected_uom_ids.ids), ('uom_id', '=', self.product_uom_id.id)]
-        return [('id', 'in', self.selected_uom_ids.ids)]
