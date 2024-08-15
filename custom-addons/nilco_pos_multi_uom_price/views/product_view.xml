@@ -36,6 +36,7 @@
                 <xpath expr="//field[@name='lines']/tree/field[@name='full_product_name']" position="after">
                     <field name="selected_uom_ids" invisible="1"/>
                     <field name="product_uom_id"/>
+                      <field name="name_field"/>
                     <field name="Ratio"/>
 
                 </xpath>
