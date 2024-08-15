@@ -202,9 +202,16 @@ set_quantity(quantity, keep_price) {
 sort_active_products_by_quantity() {
     // Assuming `this.pos.get_order().get_orderlines()` gives the active products
     let orderlines = this.pos.get_order().get_orderlines();
-    orderlines.sort((a, b) => b.quantity - a.quantity); // Sort by quantity descending
-    this.pos.get_order().set_orderlines(orderlines); // Re-set the sorted orderlines
-},
+    // Sort by quantity descending
+    orderlines.sort((a, b) => b.quantity - a.quantity);
+
+    // Update the order lines - you might need to trigger a UI update or refresh
+    this.pos.get_order().orderlines = orderlines;
+
+    // Alternatively, trigger a refresh or update method if available
+    // this.pos.get_order().trigger('change');
+}
+
 
 
 });
