@@ -98,7 +98,7 @@ patch(DB.PosDB.prototype, {
                         productQuantities[result.id].quantity += 1; // Aggregate quantities
                     }
                 }
-            }
+            },
 
             // Process aggregated products
             for (const productId in productQuantities) {
@@ -111,7 +111,7 @@ patch(DB.PosDB.prototype, {
                         body: 'The order has already been finalized and cannot be modified.',
                     });
                     return;
-                }
+                },
                         const line = new Orderline(
                             { env: result.env },
                             { pos: result.pos, order: result.pos.selectedOrder, product: result }
