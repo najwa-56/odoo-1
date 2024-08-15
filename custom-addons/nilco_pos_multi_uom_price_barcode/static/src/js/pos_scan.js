@@ -67,6 +67,15 @@ patch(DB.PosDB.prototype, {
         if (!barcode) return undefined;
 
         const barcodes = Object.values(this.product_multi_barcodes);
+
+
+           // Sort products based on their active status
+        barcodes.sort((a, b) => {
+            const aActive = a.active ? 1 : 0;
+            const bActive = b.active ? 1 : 0;
+            return bActive - aActive; // Descending order: active products come first
+        });
+
         if (this.product_by_barcode[barcode]) {
             return this.product_by_barcode[barcode];
         } else if (this.product_packaging_by_barcode[barcode]) {
