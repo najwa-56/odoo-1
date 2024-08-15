@@ -62,7 +62,7 @@ patch(Orderline.prototype, {
     setup(_defaultObj, options) {
         super.setup(...arguments);
         this.product_uom_id = this.product.default_uom_id || this.product_uom_id || this.product.uom_id;
-
+         this.reorderProduct();
     },
 
 
@@ -89,6 +89,16 @@ patch(Orderline.prototype, {
         this.product_uom_id = null;  // or some default value
     }
 },
+ // Method to reorder the product in the orderlines array
+    reorderProduct() {
+        if (!this.order) return;
+        const existingOrderline = this.order.orderlines.find(line => line.product.id === this.product.id);
+        if (existingOrderline) {
+            // Move existing orderline to the end of the orderlines array
+            this.order.orderlines = this.order.orderlines.filter(line => line !== existingOrderline);
+            this.order.orderlines.push(existingOrderline);
+        }
+    },
     set_uom(uom_id) {
         this.product_uom_id = uom_id;
         const unit = this.get_unit();
