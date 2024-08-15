@@ -66,3 +66,7 @@ class PosOrderLine(models.Model):
         res.update({'product_uom_id': orderline.product_uom_id.id})
 
         return res
+    def _get_sale_multi_uom_domain(self):
+        if self.product_uom_id:
+            return [('id', 'in', self.product_id.selected_uom_ids.ids), ('uom_id', '=', self.product_uom_id.id)]
+        return [('id', 'in', self.selected_uom_ids.ids)]
