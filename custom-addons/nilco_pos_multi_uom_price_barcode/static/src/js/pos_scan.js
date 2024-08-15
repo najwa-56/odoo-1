@@ -82,10 +82,36 @@ patch(DB.PosDB.prototype, {
             return this.product_by_id[this.product_packaging_by_barcode[barcode].product_id[0]];
         } else if (barcodes.length > 0) {
             for (const product of barcodes) {
+
                 const uoms = Object.values(product.uom_id);
                 for (const uom of uoms) {
                     if (uom.barcodes.includes(barcode)) {
                         const result = this.product_by_id[uom.product_variant_id[0]];
+                          if (!productQuantities[result.id]) {
+                            productQuantities[result.id] = {
+                                product: result,
+                                uom: uom,
+                                quantity: 0
+                            };
+                        }
+
+                        productQuantities[result.id].quantity += 1; // Aggregate quantities
+                    }
+                }
+            }
+
+            // Process aggregated products
+            for (const productId in productQuantities) {
+                const { product, uom, quantity } = productQuantities[productId];
+                const currentOrder = product.pos.selectedOrder;
+
+                if (currentOrder.is_finalized) {
+                    this.showPopup('ErrorPopup', {
+                        title: 'Cannot Modify Finalized Order',
+                        body: 'The order has already been finalized and cannot be modified.',
+                    });
+                    return;
+                }
                         const line = new Orderline(
                             { env: result.env },
                             { pos: result.pos, order: result.pos.selectedOrder, product: result }
