@@ -131,7 +131,7 @@ patch(Orderline.prototype, {
     set_quantity(quantity, keep_price) {
         this.order.assert_editable();
         var quant =
-            typeof quantity === "number" ? quantity : oParseFloat("" + (quantity ? quantity : 1));
+            typeof quantity === "number" ? quantity : oParseFloat("" + (quantity ? quantity : 0));
 
 
  if (quant === 0 && zero1==true) {
