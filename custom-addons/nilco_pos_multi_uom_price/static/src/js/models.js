@@ -62,6 +62,8 @@ patch(Orderline.prototype, {
     setup(_defaultObj, options) {
         super.setup(...arguments);
         this.product_uom_id = this.product.default_uom_id || this.product_uom_id || this.product.uom_id;
+        this.name_field = null;  // Ensure name_field is initialized
+
 
 
 
@@ -71,6 +73,7 @@ patch(Orderline.prototype, {
     export_as_JSON() {
         const json = super.export_as_JSON(...arguments);
         json.product_uom_id = this.product_uom_id[0];
+        json.name_field = this.name_field;  // Include name_field in JSON export
 
         return json;
     },
@@ -90,14 +93,20 @@ patch(Orderline.prototype, {
         // Handle the case where product_uom_id is not found, e.g., by setting a default value or showing an error message
         this.product_uom_id = null;  // or some default value
     }
+            this.name_field = json.name_field || null;
+
 },
     set_uom(uom_id) {
         this.product_uom_id = uom_id;
         const unit = this.get_unit();
     if (unit) {
         this.set_unit_price(unit.price);
+        this.set_name_field(unit.name_field);
     }
     },
+    set_name_field(value) {
+    this.name_field = value;
+},
 
 
 
