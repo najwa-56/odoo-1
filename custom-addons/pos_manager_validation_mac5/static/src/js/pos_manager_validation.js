@@ -268,39 +268,7 @@ patch(ProductScreen.prototype, {
 
 patch(TicketScreen.prototype, {
     async onDeleteOrder(order) {
-     // Iterate through each order line to check for quantity 0
-    const orderLinesToRemove = order.get_orderlines().filter(line => line.get_quantity() === 0);
 
-    if (orderLinesToRemove.length > 0) {
-        // If there are order lines with quantity 0, remove them
-        for (const line of orderLinesToRemove) {
-            order.remove_orderline(line);
-        }
-
-        // Optionally notify the user about the removal
-        this.popup.add(InfoPopup, {
-            title: _t("Order Lines Removed"),
-            body: _t("Order lines with quantity 0 have been removed."),
-        });
-
-        // Update the order after removing lines
-        if (order.get_orderlines().length === 0) {
-            // If all lines are removed, proceed with the full order deletion
-            const screen = order.get_screen_data();
-            if (
-                ["ProductScreen", "PaymentScreen"].includes(screen.name) &&
-                order.get_orderlines().length === 0
-            ) {
-                const { confirmed } = await this.popup.add(ConfirmPopup, {
-                    title: _t("Empty Order"),
-                    body: _t("This order is now empty. Are you sure you want to delete it?"),
-                });
-                if (!confirmed) {
-                    return confirmed;
-                }
-            }
-        }
-    }
         if (this.pos.config.iface_validate_delete_order) {
             var managerUserIDs = this.pos.config.manager_user_ids;
             var cashier = this.pos.get_cashier().user_id;
