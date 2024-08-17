@@ -901,7 +901,7 @@
     </template>
 
 
-    <template id="custom_report_header" inherit_id="web.external_layout_header">
+    <template id="custom_report_header" inherit_id="web.external_layout">
         <xpath expr="//div[@class='header']" position="replace">
             <div class="header">
                 <div class="row">
