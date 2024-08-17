@@ -19,10 +19,7 @@
                         font-size:10px;
                         }
                     </style>
-                     <div class="col-4">
-                                <img style="text-align:center;width:200px;max-height:200px;float:right;margin-top:-10px;padding-top:0px;"
-                                     alt="Barcode" t-att-src="doc.get_qrcode()"/>
-                     </div>
+
                     <t t-if="doc.debit_origin_id">
                         <t t-set="invoice_type" t-value="'Debit Note'"/>
                         <t t-set="invoice_type_ar" t-value="'اشعار ﻣﺪﻳﻦ'"/>
@@ -902,4 +899,21 @@
             </t>
         </t>
     </template>
+
+
+    <template id="custom_report_header" inherit_id="web.external_layout_header">
+        <xpath expr="//div[@class='header']" position="replace">
+            <div class="header">
+                <div class="row">
+                    <div class="col-xs-3">
+                        <img style="text-align:center;width:200px;max-height:200px;float:right;margin-top:-10px;padding-top:0px;"
+                                     alt="Barcode" t-att-src="doc.get_qrcode()"/>
+                    </div>
+                    <div class="col-xs-9" t-raw="company_id.rml_header2"/>
+                </div>
+            </div>
+        </xpath>
+    </template>
+
+
 </odoo>
