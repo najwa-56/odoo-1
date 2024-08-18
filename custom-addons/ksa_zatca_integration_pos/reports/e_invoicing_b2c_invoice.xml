@@ -28,7 +28,10 @@
                         <t t-set="invoice_type_ar" t-value="'اشعار دائن'"/>
                     </t>
                     <t t-else="">
-                        <t t-set="invoice_type" t-value="'Tax Invoice'"/>
+                        <div class="col-4">
+        <img style="text-align:center;width:200px;max-height:200px;float:right;margin-top:-10px;padding-top:0px;"
+             alt="Barcode" t-att-src="doc.get_qrcode()"/>
+    </div>
                         <t t-set="invoice_type_ar" t-value="'فاتورة ضريبية'"/>
                     </t>
 
@@ -48,10 +51,7 @@
                        t-value="doc.partner_id.buyer_identification if doc.l10n_is_self_billed_invoice else doc.company_id.license"/>
                     <t t-set="license_no"
                        t-value="doc.partner_id.buyer_identification_no if doc.l10n_is_self_billed_invoice else doc.company_id.license_no"/>
-<div class="col-4">
-                                <img style="text-align:center;width:200px;max-height:200px;float:right;margin-top:-10px;padding-top:0px;"
-                                     alt="Barcode" t-att-src="doc.get_qrcode()"/>
-                            </div>
+
                     <h3 style="text-align:center;">
                         <t t-esc="invoice_type_ar"/>
                     </h3>
