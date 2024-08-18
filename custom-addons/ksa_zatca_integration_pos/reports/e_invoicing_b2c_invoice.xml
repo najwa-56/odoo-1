@@ -529,7 +529,39 @@
                                         <span class="lable_bold">الحي</span>
                                     </td>
                                 </t>
-                            </tr>-->
+                            </tr>--> <tr>
+    <td class="second_table left_column">
+        <span>
+            <b>City - Postal Code</b>
+        </span>
+    </td>
+    <td class="second_table">
+        <span>
+            <!-- Combine City and Postal Code for the Company -->
+            <t t-esc="conf_company['city']['value'] + ' - ' + _company_id.zip"/>
+        </span>
+    </td>
+    <td class="second_table" style="text-align:right;">
+        <span class="lable_bold">اﺳﻢ المدينة - الرمز البريدي</span>
+    </td>
+    <t t-if="conf_partner['city']['value'] and partner_id.zip">
+        <td class="second_table left_column">
+            <span>
+                <b>City - Postal Code</b>
+            </span>
+        </td>
+        <td class="second_table">
+            <span>
+                <!-- Combine City and Postal Code for the Partner -->
+                <t t-esc="conf_partner['city']['value'] + ' - ' + partner_id.zip"/>
+            </span>
+        </td>
+        <td class="second_table" style="text-align:right;">
+            <span class="lable_bold">اﺳﻢ المدينة - الرمز البريدي</span>
+        </td>
+    </t>
+</tr>
+
                             <tr>
                                 <td class="second_table left_column">
                                     <span>
