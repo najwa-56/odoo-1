@@ -226,29 +226,29 @@
                             <col style="width:21%"/>
 
                             <tr style="background-color:#878484;">
-                             <!--   <th class="second_table left_column" colspan="2" style="color:white;">
+                                <th class="second_table left_column" colspan="2" style="color:white;">
                                     <span>
                                         <b>Seller</b>
                                     </span>
-                                </th>-->
-                                <th class="second_table" colspan="1" style="text-align:right;color:white;">
-                                    <span>المورد/Seller</span>
                                 </th>
-                               <!-- <th class="second_table left_column" colspan="2" style="color:white;">
+                                <th class="second_table" colspan="1" style="text-align:right;color:white;">
+                                    <span>المورد</span>
+                                </th>
+                                <th class="second_table left_column" colspan="2" style="color:white;">
                                     <span>
                                         <b>Buyer</b>
                                     </span>
-                                </th>-->
+                                </th>
                                 <th class="second_table" colspan="1" style="text-align:right;color:white;">
-                                    <span>العميل/Buyer</span>
+                                    <span>العميل</span>
                                 </th>
                             </tr>
                             <tr>
-                               <!-- <td class="second_table left_column">
+                                <td class="second_table left_column">
                                     <span>
                                         <b>Name</b>
                                     </span>
-                                </td>-->
+                                </td>
                                 <td class="second_table">
                                     <span>
                                         <t t-esc="conf_company['name']['value']"/>
@@ -257,11 +257,11 @@
                                 <td class="second_table" style="text-align:right;">
                                     <span class="lable_bold">الاسم</span>
                                 </td>
-                               <!-- <td class="second_table left_column">
+                                <td class="second_table left_column">
                                     <span>
                                         <b>Name</b>
                                     </span>
-                                </td>-->
+                                </td>
                                 <td class="second_table">
                                     <span>
                                         <t t-esc="conf_partner['name']['value']"/>
@@ -271,7 +271,7 @@
                                     <span class="lable_bold">الاسم</span>
                                 </td>
                             </tr>
-                            <tr>
+                           <!-- <tr>
                                 <td class="second_table left_column">
                                     <span>
                                         <b>Street Name</b>
@@ -300,7 +300,41 @@
                                         <span class="lable_bold">اسم الشارع</span>
                                     </td>
                                 </t>
-                            </tr>
+                            </tr>-->
+                            <tr>
+    <td class="second_table left_column">
+        <span>
+            <b>Street Name - Building No</b>
+        </span>
+    </td>
+    <td class="second_table">
+        <span>
+            <!-- Combine Street Name and Building No for the Company -->
+            <t t-esc="conf_company['street']['value'] + ' - ' + _company_id.building_no"/>
+        </span>
+    </td>
+    <td class="second_table" style="text-align:right;">
+        <span class="lable_bold">اسم الشارع - رقم المبنى</span>
+    </td>
+    <t t-if="conf_partner['street']['value'] and partner_id.building_no">
+        <td class="second_table left_column">
+            <span>
+                <b>Street Name - Building No</b>
+            </span>
+        </td>
+        <td class="second_table">
+            <span>
+                <!-- Combine Street Name and Building No for the Partner -->
+                <t t-esc="conf_partner['street']['value'] + ' - ' + partner_id.building_no"/>
+            </span>
+        </td>
+        <td class="second_table" style="text-align:right;">
+            <span class="lable_bold">اسم الشارع - رقم المبنى</span>
+        </td>
+    </t>
+</tr>
+
+
                             <!--<tr>
                                 <t t-if="conf_company['street2']['value']">
                                     <td class="second_table left_column">
@@ -336,7 +370,7 @@
                                     </td>
                                 </t>
                             </tr>-->
-                            <tr>
+                           <!-- <tr>
                                 <td class="second_table left_column">
                                     <span>
                                         <b>Building No</b>
@@ -365,7 +399,7 @@
                                         <span class="lable_bold">رقم المبنى</span>
                                     </td>
                                 </t>
-                            </tr>
+                            </tr>-->
                            <!-- <tr>
                                 <t t-if="_company_id.additional_no">
                                     <td class="second_table left_column">
