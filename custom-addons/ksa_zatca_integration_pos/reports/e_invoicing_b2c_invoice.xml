@@ -65,7 +65,7 @@
                                     <col style="width:10%"/>
                                     <col style="width:20%"/>
                                     <col style="width:20%"/>
-                                    <!--<tr>
+                                    <tr>
                                         <td class="second_table left_column">
                                             <span>
                                                 <b>Invoice Type</b>
@@ -82,7 +82,7 @@
                                         <td class="second_table" style="text-align:right;">
                                             <span class="lable_bold">نوع الفاتورة</span>
                                         </td>
-                                    </tr>-->
+                                    </tr>
                                     <tr>
                                         <td class="second_table left_column">
                                             <span>
@@ -606,7 +606,7 @@
                                     </span>
                                 </td>
                                 <td class="second_table" style="text-align:right;">
-                                    <span class="lable_bold">رقم تسجيل ضريبة القيمة المضافة</span>
+                                    <span class="lable_bold">رقم ضريبة القيمة المضافة</span>
                                 </td>
                                 <t t-if="partner_id.vat">
                                     <td class="second_table left_column">
@@ -620,7 +620,7 @@
                                         </span>
                                     </td>
                                     <td class="second_table" style="text-align:right;">
-                                        <span class="lable_bold">رقم تسجيل ضريبة القيمة المضافة</span>
+                                        <span class="lable_bold">رقم ضريبة القيمة المضافة</span>
                                     </td>
                                 </t>
                             </tr>
