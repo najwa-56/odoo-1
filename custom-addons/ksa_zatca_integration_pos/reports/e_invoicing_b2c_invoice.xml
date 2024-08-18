@@ -230,32 +230,32 @@
                                     <span>
                                         <b>Seller</b>
                                     </span>
-                                </th>-->
+                                </th>
                                 <th class="second_table" colspan="1" style="text-align:right;color:white;">
                                     <span>المورد/Seller</span>
                                 </th>
                                 <th class="second_table left_column" colspan="2" style="color:white;">
-                                 <!--   <span>
+                                    <span>
                                         <b>Buyer</b>
                                     </span>
-                                </th>-->
+                                </th>
                                 <th class="second_table" colspan="1" style="text-align:right;color:white;">
-                                    <span>العميل/Buyer</span>
+                                    <span>العميل</span>
                                 </th>
                             </tr>
                             <tr>
-                                <!--<td class="second_table left_column">
+                                <td class="second_table left_column">
                                     <span>
                                         <b>Name</b>
                                     </span>
-                                </td>-->
+                                </td>
                                 <td class="second_table">
                                     <span>
                                         <t t-esc="conf_company['name']['value']"/>
                                     </span>
                                 </td>
                                 <td class="second_table" style="text-align:right;">
-                                    <span class="lable_bold">الاسم/Name</span>
+                                    <span class="lable_bold">الاسم</span>
                                 </td>
                                 <td class="second_table left_column">
                                     <span>
