@@ -435,7 +435,7 @@
                                     </td>
                                 </t>
                             </tr>-->
-                            <tr>
+                          <!--  <tr>
                                 <td class="second_table left_column">
                                     <span>
                                         <b>City</b>
@@ -494,7 +494,7 @@
                                         <span class="lable_bold">الرمز البريدي</span>
                                     </td>
                                 </t>
-                            </tr>
+                            </tr>-->
                             <!--<tr>
                                 <t t-if="conf_company['state_id_name']['value']">
                                     <td class="second_table left_column">
