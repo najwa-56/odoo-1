@@ -301,38 +301,39 @@
                                     </td>
                                 </t>
                             </tr>-->
-                            <tr>
+                           <tr>
     <td class="second_table left_column">
         <span>
-            <b>Street Name - Building No</b>
+            <b>Address</b>
         </span>
     </td>
     <td class="second_table">
         <span>
-            <!-- Combine Street Name and Building No for the Company -->
-            <t t-esc="conf_company['street']['value'] + ' - ' + _company_id.building_no"/>
+            <!-- Combine all address components for the Company -->
+            <t t-esc="conf_company['street']['value'] + ' - ' + _company_id.building_no + ' - ' + conf_company['district']['value'] + ' - ' + conf_company['country_id_name']['value'] + ' - ' + conf_company['city']['value'] + ' - ' + _company_id.zip"/>
         </span>
     </td>
     <td class="second_table" style="text-align:right;">
-        <span class="lable_bold">اسم الشارع - رقم المبنى</span>
+        <span class="lable_bold">العنوان</span>
     </td>
-    <t t-if="conf_partner['street']['value'] and partner_id.building_no">
+    <t t-if="conf_partner['street']['value'] and partner_id.building_no and conf_partner['district']['value'] and conf_partner['country_id_name']['value'] and conf_partner['city']['value'] and partner_id.zip">
         <td class="second_table left_column">
             <span>
-                <b>Street Name - Building No</b>
+                <b>Address</b>
             </span>
         </td>
         <td class="second_table">
             <span>
-                <!-- Combine Street Name and Building No for the Partner -->
-                <t t-esc="conf_partner['street']['value'] + ' - ' + partner_id.building_no"/>
+                <!-- Combine all address components for the Partner -->
+                <t t-esc="conf_partner['street']['value'] + ' - ' + partner_id.building_no + ' - ' + conf_partner['district']['value'] + ' - ' + conf_partner['country_id_name']['value'] + ' - ' + conf_partner['city']['value'] + ' - ' + partner_id.zip"/>
             </span>
         </td>
         <td class="second_table" style="text-align:right;">
-            <span class="lable_bold">اسم الشارع - رقم المبنى</span>
+            <span class="lable_bold">العنوان</span>
         </td>
     </t>
 </tr>
+
 
 
                             <!--<tr>
@@ -529,38 +530,7 @@
                                         <span class="lable_bold">الحي</span>
                                     </td>
                                 </t>
-                            </tr>--> <tr>
-    <td class="second_table left_column">
-        <span>
-            <b>City - Postal Code</b>
-        </span>
-    </td>
-    <td class="second_table">
-        <span>
-            <!-- Combine City and Postal Code for the Company -->
-            <t t-esc="conf_company['city']['value'] + ' - ' + _company_id.zip"/>
-        </span>
-    </td>
-    <td class="second_table" style="text-align:right;">
-        <span class="lable_bold">اﺳﻢ المدينة - الرمز البريدي</span>
-    </td>
-    <t t-if="conf_partner['city']['value'] and partner_id.zip">
-        <td class="second_table left_column">
-            <span>
-                <b>City - Postal Code</b>
-            </span>
-        </td>
-        <td class="second_table">
-            <span>
-                <!-- Combine City and Postal Code for the Partner -->
-                <t t-esc="conf_partner['city']['value'] + ' - ' + partner_id.zip"/>
-            </span>
-        </td>
-        <td class="second_table" style="text-align:right;">
-            <span class="lable_bold">اﺳﻢ المدينة - الرمز البريدي</span>
-        </td>
-    </t>
-</tr>
+                            </tr>-->
 
                           <!--  <tr>
                                 <td class="second_table left_column">
@@ -622,38 +592,7 @@
                                     </td>
                                 </t>
                             </tr>-->
-                            <tr>
-    <td class="second_table left_column">
-        <span>
-            <b>District - Country</b>
-        </span>
-    </td>
-    <td class="second_table">
-        <span>
-            <!-- Combine District and Country for the Company -->
-            <t t-esc="conf_company['district']['value'] + ' - ' + conf_company['country_id_name']['value']"/>
-        </span>
-    </td>
-    <td class="second_table" style="text-align:right;">
-        <span class="lable_bold">اﺳﻢ الحي - البلد</span>
-    </td>
-    <t t-if="conf_partner['district']['value'] and conf_partner['country_id_name']['value']">
-        <td class="second_table left_column">
-            <span>
-                <b>District - Country</b>
-            </span>
-        </td>
-        <td class="second_table">
-            <span>
-                <!-- Combine District and Country for the Partner -->
-                <t t-esc="conf_partner['district']['value'] + ' - ' + conf_partner['country_id_name']['value']"/>
-            </span>
-        </td>
-        <td class="second_table" style="text-align:right;">
-            <span class="lable_bold">اﺳﻢ الحي - البلد</span>
-        </td>
-    </t>
-</tr>
+
 
                             <tr>
                                 <td class="second_table left_column">
