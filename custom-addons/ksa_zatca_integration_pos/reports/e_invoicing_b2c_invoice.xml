@@ -562,7 +562,7 @@
     </t>
 </tr>
 
-                            <tr>
+                          <!--  <tr>
                                 <td class="second_table left_column">
                                     <span>
                                         <b>District</b>
@@ -621,7 +621,40 @@
                                         <span class="lable_bold">البلد</span>
                                     </td>
                                 </t>
-                            </tr>
+                            </tr>-->
+                            <tr>
+    <td class="second_table left_column">
+        <span>
+            <b>District - Country</b>
+        </span>
+    </td>
+    <td class="second_table">
+        <span>
+            <!-- Combine District and Country for the Company -->
+            <t t-esc="conf_company['district']['value'] + ' - ' + conf_company['country_id_name']['value']"/>
+        </span>
+    </td>
+    <td class="second_table" style="text-align:right;">
+        <span class="lable_bold">اﺳﻢ الحي - البلد</span>
+    </td>
+    <t t-if="conf_partner['district']['value'] and conf_partner['country_id_name']['value']">
+        <td class="second_table left_column">
+            <span>
+                <b>District - Country</b>
+            </span>
+        </td>
+        <td class="second_table">
+            <span>
+                <!-- Combine District and Country for the Partner -->
+                <t t-esc="conf_partner['district']['value'] + ' - ' + conf_partner['country_id_name']['value']"/>
+            </span>
+        </td>
+        <td class="second_table" style="text-align:right;">
+            <span class="lable_bold">اﺳﻢ الحي - البلد</span>
+        </td>
+    </t>
+</tr>
+
                             <tr>
                                 <td class="second_table left_column">
                                     <span>
