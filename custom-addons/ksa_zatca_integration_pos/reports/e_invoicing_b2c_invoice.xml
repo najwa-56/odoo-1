@@ -226,11 +226,19 @@
                             <col style="width:21%"/>
 
                             <tr style="background-color:#878484;">
-                               
+                                <th class="second_table left_column" colspan="2" style="color:white;">
+                                    <span>
+                                        <b>Seller</b>
+                                    </span>
+                                </th>
                                 <th class="second_table" colspan="1" style="text-align:right;color:white;">
                                     <span>المورد</span>
                                 </th>
-
+                                <th class="second_table left_column" colspan="2" style="color:white;">
+                                    <span>
+                                        <b>Buyer</b>
+                                    </span>
+                                </th>
                                 <th class="second_table" colspan="1" style="text-align:right;color:white;">
                                     <span>العميل</span>
                                 </th>
