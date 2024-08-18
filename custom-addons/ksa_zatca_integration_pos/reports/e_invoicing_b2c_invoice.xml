@@ -226,29 +226,29 @@
                             <col style="width:21%"/>
 
                             <tr style="background-color:#878484;">
-                                <th class="second_table left_column" colspan="2" style="color:white;">
+                             <!--   <th class="second_table left_column" colspan="2" style="color:white;">
                                     <span>
                                         <b>Seller</b>
                                     </span>
-                                </th>
+                                </th>-->
                                 <th class="second_table" colspan="1" style="text-align:right;color:white;">
-                                    <span>المورد</span>
+                                    <span>المورد/Seller</span>
                                 </th>
-                                <th class="second_table left_column" colspan="2" style="color:white;">
+                               <!-- <th class="second_table left_column" colspan="2" style="color:white;">
                                     <span>
                                         <b>Buyer</b>
                                     </span>
-                                </th>
+                                </th>-->
                                 <th class="second_table" colspan="1" style="text-align:right;color:white;">
-                                    <span>العميل</span>
+                                    <span>العميل/Buyer</span>
                                 </th>
                             </tr>
                             <tr>
-                                <td class="second_table left_column">
+                               <!-- <td class="second_table left_column">
                                     <span>
                                         <b>Name</b>
                                     </span>
-                                </td>
+                                </td>-->
                                 <td class="second_table">
                                     <span>
                                         <t t-esc="conf_company['name']['value']"/>
@@ -257,11 +257,11 @@
                                 <td class="second_table" style="text-align:right;">
                                     <span class="lable_bold">الاسم</span>
                                 </td>
-                                <td class="second_table left_column">
+                               <!-- <td class="second_table left_column">
                                     <span>
                                         <b>Name</b>
                                     </span>
-                                </td>
+                                </td>-->
                                 <td class="second_table">
                                     <span>
                                         <t t-esc="conf_partner['name']['value']"/>
