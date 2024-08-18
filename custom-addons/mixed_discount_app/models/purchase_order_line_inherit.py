@@ -88,7 +88,19 @@ class PurchaseOrderLine(models.Model):
 		#	super(PurchaseOrderLine, sale_id)._compute_amount()
 		#	if price_unit:
 			#	sale_id.price_unit = price_unit
-
+	@api.depends('product_qty', 'discount', 'price_unit', 'taxes_id')
+	def _compute_amount(self):
+		for line in self:
+			# Calculate the price after applying the discount
+			discounted_price = line.recalculate_amount()
+			# Compute taxes based on the discounted price (tax-exclusive)
+			taxes = line.taxes_id.compute_all(discounted_price, line.order_id.currency_id, line.product_qty,
+											  product=line.product_id, partner=line.order_id.partner_id)
+			line.update({
+				'price_subtotal': taxes['total_excluded'],
+				'price_total': taxes['total_included'],
+				'price_tax': taxes['total_included'] - taxes['total_excluded'],
+			})
 	def recalculate_amount(self):
 		self.ensure_one()
 		if self.discount:
