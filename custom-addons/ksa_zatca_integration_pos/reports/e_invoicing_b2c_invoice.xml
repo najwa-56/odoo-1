@@ -782,12 +782,18 @@
                                         </th>
                                                 <!-- Editeing-->
 
-                                        <!--<th align="right" name="item_subtotal" class="second_table"
+                                       <th align="right" name="item_subtotal" class="second_table"
                                             style="background-color:#4f4d4d;text-align:center;color:white;">
-                                            <span class="lable_bold">Subtotal Exclusive of VAT</span>
+                                            <span class="lable_bold">Subtotal </span>
                                             <br/>
-                                            <span class="lable_bold">إﺟﻤﺎﻟﻲ اﻟﻤﺒﻠﻎ ﻏﻴﺮ ﺷﺎﻣﻞ ﺿﺮﻳﺒﺔ اﻟﻘﻴﻤﺔ اﻟﻤﻀﺎﻓﺔ</span>
-                                        </th>-->
+                                            <span class="lable_bold">Exclusive of VAT</span>
+                                            <br/>
+                                            <span class="lable_bold">إﺟﻤﺎﻟﻲ اﻟﻤﺒﻠﻎ  </span>
+                                              <br/>
+                                            <span class="lable_bold"> ﻏﻴﺮ ﺷﺎﻣﻞ ﺿﺮﻳﺒﺔ</span>
+                                              <br/>
+                                            <span class="lable_bold">  اﻟﻘﻴﻤﺔ اﻟﻤﻀﺎﻓﺔ</span>
+                                        </th>
                                         <th align="right" name="item_subtotal" class="second_table"
                                             style="background-color:#4f4d4d;text-align:center;color:white;">
                                             <span class="lable_bold">Subtotal </span>
