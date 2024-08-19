@@ -71,6 +71,20 @@ class SaleOrderLine(models.Model):
                 self.price_unit = self.env['account.tax']._fix_tax_included_price_company(
                     self._get_display_price(), product.taxes_id, self.tax_id, self.company_id)
 
+    @api.model
+    def create(self, vals):
+        # Ensure that the invoice lines are created with the correct UOM values
+        result = super(SaleOrderLine, self).create(vals)
+        if result.invoice_lines:
+            for invoice_line in result.invoice_lines:
+                invoice_line.sales_multi_uom_id = result.sales_multi_uom_id
+        return result
+
+    @api.onchange('invoice_lines')
+    def _onchange_invoice_lines(self):
+        for line in self.invoice_lines:
+            line.sales_multi_uom_id = self.sales_multi_uom_id
+
 
 class Pricelist(models.Model):
     _inherit = "product.pricelist"
@@ -145,28 +159,16 @@ class AccountInvoiceLine(models.Model):
             else:
                 line.name_field = False
 
-    @api.onchange('product_id')
-    def _onchange_product_id(self):
-        # Check if the super class has the method _onchange_product_id
-        if hasattr(super(AccountInvoiceLine, self), '_onchange_product_id'):
-            super(AccountInvoiceLine, self)._onchange_product_id()
 
-        result = {
-            'domain': {'sales_multi_uom_id': [('product_id', '=', self.product_id.id)]},
-        }
-        print("Result", result)
-        return result
 
     @api.onchange('sales_multi_uom_id')
     def sales_multi_uom_id_change(self):
         self.ensure_one()
         if self.sales_multi_uom_id:
-            # Update the 'name_field' based on the selected UOM
             self.name_field = self.sales_multi_uom_id.name_field
             domain = {'product_uom_id': [('id', '=', self.sales_multi_uom_id.uom_id.id)]}
             return {'domain': domain}
         else:
-            # Clear the 'name_field' if no UOM is selected
             self.name_field = False
             return {'domain': {'product_uom_id': []}}
 
@@ -184,11 +186,6 @@ class AccountInvoiceLine(models.Model):
                 }
             self.update(values)
             self.price_unit = self.sales_multi_uom_id.price
-            # if self.invoice_id.partner_id:
-            #     context_partner = dict(self.env.context, partner_id=self.invoice_id.partner_id.id)
-            #     pricelist_context = dict(context_partner, uom=False, date=self.invoice_id.date_order)
-            #     price, rule_id = self.invoice_id.pricelist_id.with_context(pricelist_context).get_product_price_rule12(self.product_id, self.sales_multi_uom_id.qty or 1.0, self.invoice_id.partner_id.id,pro_price=self.sales_multi_uom_id.price)
-            #     self.price_unit = self.env['account.tax']._fix_tax_included_price(price, self.product_id.taxes_id, self.tax_id)
 
         if self.product_id and self.product_uom_id:
             if self.product_id.uom_id.category_id.id != self.product_uom_id.category_id.id:
