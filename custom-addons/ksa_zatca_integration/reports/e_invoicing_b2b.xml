@@ -683,7 +683,12 @@
                                             <br/>
                                             <span class="lable_bold">ﺳﻌﺮ اﻟﻮﺣﺪة</span>
                                         </th>
-
+                                          <th align="center" name="disa" class="second_table"
+                                            style="background-color:#4f4d4d;text-align:center;color:white;">
+                                            <span class="lable_bold">UOMs</span>
+                                            <br/>
+                                            <span class="lable_bold">hsl الوحدة</span>
+                                        </th>
 
                                         <th align="center" name="quantity" class="second_table"
                                             style="background-color:#4f4d4d;text-align:center;color:white;">
@@ -742,12 +747,26 @@
                                             <span t-esc="doc.get_bt_146(line.zatca_id)"
                                                   t-options='{"widget": "monetary", "display_currency": doc.currency_id}'/>
                                         </td>
+                                                <!-- Editeing-->
+
+                                        <!--we add product name english to invoice -->
+                                         <td class="second_table" style="text-align:right;">
+                                              <span t-esc="line.product_arabic"/>
+                                        </td>
+                                        <td class="second_table" style="text-align:right;">
+                                              <span t-esc="line.name_field"/>
+                                        </td>
+                                        <!--w -->
+
                                         <td class="second_table" style="text-align:right;">
                                             <span t-esc="'{:,}'.format(line.quantity)"/>
                                         </td>
                                         <td class="second_table" style="text-align:right;">
                                             <span t-esc="doc.get_bt_136(line.zatca_id)"
                                                   t-options='{"widget": "monetary", "display_currency": doc.currency_id}'/>
+                                        </td>
+                                         <td class="second_table" style="text-align:right;">
+                                              <span t-esc="line.product_uom_id.name"/>
                                         </td>
                                         <td class="second_table" style="text-align:right;">
                                             <t t-if="not len(line.tax_ids.ids)">
