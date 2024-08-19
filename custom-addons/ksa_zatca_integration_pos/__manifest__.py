@@ -24,6 +24,7 @@
         'views/pos_payment_method.xml',
         'reports/e_invoicing_b2c_invoice.xml',
         'reports/report.xml',
+        'reports/report2as.xml',
     ],
     'assets': {
         'point_of_sale._assets_pos': [
