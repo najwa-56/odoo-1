@@ -31,7 +31,7 @@
                     <div style="text-align:center; margin-top:-10px; padding-top:0px;">
     <img style="width:200px; max-height:200px;" alt="Barcode" t-att-src="doc.get_qrcode()"/>
 </div>
-                        <t t-set="invoice_type_ar" t-value="'فاتورة ضريبية'"/>
+                        <t t-set="invoice_type_ar" t-value="'فاتورة ضريبية/Tax Invoice'"/>
                     </t>
 
                     <t t-set="conf_partner"
