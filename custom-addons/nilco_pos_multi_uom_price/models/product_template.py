@@ -144,33 +144,30 @@ class Pricelist(models.Model):
 
         self and self.ensure_one()  # self is at most one record
         return self._compute_price_rule12(product,*args, **kwargs)[product.id]
+class SaleOrder(models.Model):
+    _inherit = 'sale.order'
+
+    def _prepare_invoice_line(self, order_line):
+        invoice_line_vals = super(SaleOrder, self)._prepare_invoice_line(order_line)
+        invoice_line_vals['sales_multi_uom_id'] = order_line.sales_multi_uom_id.id
+        return invoice_line_vals
+
 
 class AccountInvoiceLine(models.Model):
     _inherit = "account.move.line"
 
-    sales_multi_uom_id = fields.Many2one("product.multi.uom.price", string="Cust UOM")
+    selected_uom_ids = fields.Many2many(string="Uom Ids", related='product_id.selected_uom_ids')
+    sales_multi_uom_id = fields.Many2one("product.multi.uom.price", string="Cust UOM",domain="[('id', 'in', selected_uom_ids)]")
     name_field = fields.Char(string="Name Field", compute="_compute_name_field", store=True)
 
-    @api.depends('sales_multi_uom_id')
-    def _compute_name_field(self):
-        for line in self:
-            if line.sales_multi_uom_id:
-                line.name_field = line.sales_multi_uom_id.name_field
-            else:
-                line.name_field = False
-
-
-
-    @api.onchange('sales_multi_uom_id')
-    def sales_multi_uom_id_change(self):
-        self.ensure_one()
-        if self.sales_multi_uom_id:
-            self.name_field = self.sales_multi_uom_id.name_field
-            domain = {'product_uom_id': [('id', '=', self.sales_multi_uom_id.uom_id.id)]}
-            return {'domain': domain}
-        else:
-            self.name_field = False
-            return {'domain': {'product_uom_id': []}}
+    @api.model
+    def create(self, vals):
+        # If the sales_multi_uom_id is not explicitly provided, fetch it from the corresponding sale.order.line
+        if 'sale_line_ids' in vals and not vals.get('sales_multi_uom_id'):
+            sale_line = self.env['sale.order.line'].browse(vals['sale_line_ids'][0][1])
+            if sale_line:
+                vals['sales_multi_uom_id'] = sale_line.sales_multi_uom_id.id
+        return super(AccountInvoiceLine, self).create(vals)
 
     @api.onchange('product_uom_id', 'quantity')
     def _onchange_uom_id(self):
