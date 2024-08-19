@@ -5,10 +5,10 @@
         <t t-call="web.html_container">
             <t t-foreach="docs" t-as="doc">
                 <t t-call="web.external_layout_boxed">
-                        <xpath expr="//div[@class='o_boxed_header']/div[@class='row mb8']/div[@class='col-6']" position="inside">
+                        <xpath expr="//div[@class='o_boxed_header']/div[@class='row mb8']" position="inside">
 
                          <div style="text-align:center; margin-top:-2px; padding-top:0px;">
-    <img style="width:2px; max-height:2px;" alt="Barcode" t-att-src="doc.get_qrcode()"/>
+    <img style="width:5px; max-height:5px;" alt="Barcode" t-att-src="doc.get_qrcode()"/>
 </div>    </xpath>
 
                      </t>
