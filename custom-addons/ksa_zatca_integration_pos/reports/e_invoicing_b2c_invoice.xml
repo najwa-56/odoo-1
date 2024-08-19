@@ -28,10 +28,9 @@
                         <t t-set="invoice_type_ar" t-value="'اشعار دائن'"/>
                     </t>
                     <t t-else="">
-                        <div class="col-4">
-        <img style="text-align:center;width:200px;max-height:200px;float:left;margin-top:-10px;padding-top:0px;"
-             alt="Barcode" t-att-src="doc.get_qrcode()"/>
-    </div>
+                    <div style="text-align:center; margin-top:-10px; padding-top:0px;">
+    <img style="width:200px; max-height:200px;" alt="Barcode" t-att-src="doc.get_qrcode()"/>
+</div>
                         <t t-set="invoice_type_ar" t-value="'فاتورة ضريبية'"/>
                     </t>
 
