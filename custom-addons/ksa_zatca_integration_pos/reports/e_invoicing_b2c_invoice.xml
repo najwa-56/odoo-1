@@ -7,8 +7,8 @@
                 <t t-call="web.external_layout_boxed">
                         <xpath expr="//div[@class='o_boxed_header']/div[@class='row mb8']/div[@class='col-6']" position="inside">
 
-                         <div style="text-align:center; margin-top:-10px; padding-top:0px;">
-    <img style="width:10px; max-height:10px;" alt="Barcode" t-att-src="doc.get_qrcode()"/>
+                         <div style="text-align:center; margin-top:-2px; padding-top:0px;">
+    <img style="width:2px; max-height:2px;" alt="Barcode" t-att-src="doc.get_qrcode()"/>
 </div>    </xpath>
 
                      </t>
