@@ -762,11 +762,11 @@
                                             <br/>
                                             <span class="lable_bold">الوحدة</span>
                                         </th>
-                                         <th align="center" name="discount" class="second_table"
+                                         <th align="center" name="disa" class="second_table"
                                             style="background-color:#4f4d4d;text-align:center;color:white;">
-                                            <span class="lable_bold">UOM-name</span>
+                                            <span class="lable_bold">UOMna</span>
                                             <br/>
-                                            <span class="lable_bold">اسم الوحدة</span>
+                                            <span class="lable_bold">hsl الوحدة</span>
                                         </th>
 
 
@@ -846,9 +846,6 @@
                                         </td>
                                          <td class="second_table" style="text-align:right;">
                                               <span t-esc="line.product_uom_id.name"/>
-                                        </td>
-                                        <td class="second_table" style="text-align:right;">
-                                              <span t-esc="line.name_field"/>
                                         </td>
                                                 <!-- Editeing-->
 
