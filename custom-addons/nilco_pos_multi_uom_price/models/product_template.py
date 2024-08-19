@@ -158,8 +158,14 @@ class AccountInvoiceLine(models.Model):
 
     selected_uom_ids = fields.Many2many(string="Uom Ids", related='product_id.selected_uom_ids')
     sales_multi_uom_id = fields.Many2one("product.multi.uom.price", string="Cust UOM",domain="[('id', 'in', selected_uom_ids)]")
-    name_field = fields.Char(string="Name Field",  related='sales_multi_uom_id.name_field', store=True)
+    # Compute name_field from the related sales_multi_uom_id
+    name_field = fields.Char(string="Name Field", compute="_compute_name_field", store=True)
 
+    @api.depends('sales_multi_uom_id')
+    def _compute_name_field(self):
+        for line in self:
+            line.name_field = line.sales_multi_uom_id.name_field if line.sales_multi_uom_id else ''
+            
     @api.model
     def create(self, vals):
         # If the sales_multi_uom_id is not explicitly provided, fetch it from the corresponding sale.order.line
