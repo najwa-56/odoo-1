@@ -5,7 +5,6 @@
             <t t-foreach="docs" t-as="doc">
                 <t t-call="web.external_layout">
                     <style>
-                        .head{ margin-top: 0; }
                         .lable_bold { font-weight: bold; }
                         .main_table td:nth-child(1) {white-space: nowrap;}
                         .main_table td:nth-child(3) {white-space: nowrap;}
@@ -49,7 +48,7 @@
                     <t t-set="license_no"
                        t-value="doc.partner_id.buyer_identification_no if doc.l10n_is_self_billed_invoice else doc.company_id.license_no"/>
 <div class="col-4">
-                                <img style="text-align:center;width:100px;max-height:100px;float:right;margin-top:-0px;padding-top:0px;"
+                                <img style="text-align:center;width:200px;max-height:200px;float:right;margin-top:-10px;padding-top:0px;"
                                      alt="Barcode" t-att-src="doc.get_qrcode()"/>
                             </div>
                     <h3 style="text-align:center;">
