@@ -1,11 +1,11 @@
 <odoo>
-    <template id="custom_external_layout_boxed" inherit_id="module_name.external_layout_boxed">
-        <!-- Inherit the template to modify the content -->
-        <xpath expr="//div[@class='o_report_layout_boxed']" position="inside">
-            <!-- Add your custom barcode in the desired location -->
-            <div style="text-align:center; margin-top:-10px; padding-top:0px;">
-                <img style="width:200px; max-height:200px;" alt="Barcode" t-att-src="doc.get_qrcode()"/>
-            </div>
-        </xpath>
-    </template>
+  <data inherit_id="web.external_layout_boxed">
+    <!-- Inherit the template to modify the content -->
+    <xpath expr="//div[@class='o_report_layout_boxed']" position="inside">
+        <!-- Add your custom barcode in the desired location -->
+        <div style="text-align:center; margin-top:-10px; padding-top:0px;">
+            <img style="width:200px; max-height:200px;" alt="Barcode" t-att-src="doc.get_qrcode()"/>
+        </div>
+    </xpath>
+</data>
 </odoo>
