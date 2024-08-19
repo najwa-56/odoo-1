@@ -768,13 +768,17 @@
                                             style="background-color:#4f4d4d;text-align:center;color:white;">
                                             <span class="lable_bold">VAT Rate</span>
                                             <br/>
-                                            <span class="lable_bold">ﻣﻌﺪل ﺿﺮﻳﺒﺔ اﻟﻘﻴﻤﺔ اﻟﻤﻀﺎﻓﺔ</span>
+                                            <span class="lable_bold">ﻣﻌﺪل ﺿﺮﻳﺒﺔ </span>
+                                            <br/>
+                                            <span class="lable_bold"> اﻟﻘﻴﻤﺔ اﻟﻤﻀﺎﻓﺔ</span>
                                         </th>
                                         <th align="center" name="tax_amount" class="second_table"
                                             style="background-color:#4f4d4d;text-align:center;color:white;">
                                             <span class="lable_bold">VAT Amount</span>
                                             <br/>
-                                            <span class="lable_bold">مبلغ ﺿﺮﻳﺒﺔ اﻟﻘﻴﻤﺔ اﻟﻤﻀﺎﻓﺔ</span>
+                                            <span class="lable_bold">مبلغ ﺿﺮﻳﺒﺔ </span>
+                                            <br/>
+                                            <span class="lable_bold"> اﻟﻘﻴﻤﺔ اﻟﻤﻀﺎﻓﺔ</span>
                                         </th>
                                                 <!-- Editeing-->
 
@@ -786,11 +790,15 @@
                                         </th>-->
                                         <th align="right" name="item_subtotal" class="second_table"
                                             style="background-color:#4f4d4d;text-align:center;color:white;">
-                                            <span class="lable_bold">Subtotal Inclusive of VAT</span>
+                                            <span class="lable_bold">Subtotal Inclusive</span>
                                             <br/>
-                                            <span class="lable_bold">إﺟﻤﺎﻟﻲ اﻟﻤﺒﻠﻎ ﺷﺎﻣﻞ </span>
+                                            <span class="lable_bold">of VAT</span>
+                                            <br/>
+                                            <span class="lable_bold">إﺟﻤﺎﻟﻲ اﻟﻤﺒﻠﻎ  </span>
                                               <br/>
-                                            <span class="lable_bold"> ﺿﺮﻳﺒﺔ اﻟﻘﻴﻤﺔ اﻟﻤﻀﺎﻓﺔ</span>
+                                            <span class="lable_bold"> ﺷﺎﻣﻞ ﺿﺮﻳﺒﺔ</span>
+                                              <br/>
+                                            <span class="lable_bold">  اﻟﻘﻴﻤﺔ اﻟﻤﻀﺎﻓﺔ</span>
                                         </th>
                                     </tr>
                                 </thead>
