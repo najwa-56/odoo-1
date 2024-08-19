@@ -1,14 +1,18 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <odoo>
- <template id="report_e_invoicing_b2c_invoice_template_inherit" inherit_id="web.external_layout_boxed">
+ <template id="report_e_invoicing_b2c_invoice_template_inherit" >
         <!-- Inherit the header section -->
-        <xpath expr="//div[@t-attf-class='article o_report_layout_boxed o_company_#{company.id}_layout {{  'o_report_layout_background' if company.layout_background in ['Geometric', 'Custom']  else  '' }}']" position="inside">
-            <!-- Add Barcode Image at the top of the content -->
-            <div style="text-align:center; margin-top:-10px; padding-top:0px;">
-                <img style="width:200px; max-height:200px;" alt="Barcode" t-att-src="doc.get_qrcode()"/>
-            </div>
-        </xpath>
-    </template> 
+        <t t-call="web.html_container">
+            <t t-foreach="docs" t-as="doc">
+                <t t-call="web.external_layout_boxed">
+                         <div style="text-align:center; margin-top:-10px; padding-top:0px;">
+    <img style="width:200px; max-height:200px;" alt="Barcode" t-att-src="doc.get_qrcode()"/>
+</div>
+                     </t>
+            </t>
+        </t>
+
+    </template>
     <template id="report_e_invoicing_b2c_invoice_template">
 
         <t t-call="web.html_container">
