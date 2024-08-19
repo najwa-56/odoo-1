@@ -19,6 +19,10 @@
                         font-size:11px;
                         }
                     </style>
+                    <t t-if="doc.debit_origin_id">
+                        <t t-set="invoice_type" t-value="'Debit Note'"/>
+                        <t t-set="invoice_type_ar" t-value="'اشعار ﻣﺪﻳﻦ'"/>
+                    </t>
                    
                     <t t-else="">
                         <t t-set="invoice_type" t-value="'Tax Invoice'"/>
