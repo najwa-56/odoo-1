@@ -165,7 +165,7 @@ class AccountInvoiceLine(models.Model):
     def _compute_name_field(self):
         for line in self:
             line.name_field = line.sales_multi_uom_id.name_field if line.sales_multi_uom_id else ''
-            
+
     @api.model
     def create(self, vals):
         # If the sales_multi_uom_id is not explicitly provided, fetch it from the corresponding sale.order.line
