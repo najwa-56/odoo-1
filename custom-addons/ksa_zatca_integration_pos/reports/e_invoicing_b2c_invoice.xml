@@ -1,15 +1,24 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <odoo>
-
-    <templates id="report_e_invoicing_b2c_invoice_template">
-            <t t-name="custom_external_layout_boxed" t-inherit="web.external_layout_boxed" t-inherit-mode="extension" owl="1">
-                <xpath expr="//div[@class='o_report_layout_boxed']" position="inside">
-            <!-- Add your custom barcode in the desired location -->
+ <template id="report_e_invoicing_b2c_invoice_template_inherit" inherit_id="web.external_layout_boxed">
+        <!-- Inherit the header section -->
+        <xpath expr="//div[@t-attf-class='article o_report_layout_boxed o_company_#{company.id}_layout {{  'o_report_layout_background' if company.layout_background in ['Geometric', 'Custom']  else  '' }}']" position="inside">
+            <!-- Add Barcode Image at the top of the content -->
             <div style="text-align:center; margin-top:-10px; padding-top:0px;">
                 <img style="width:200px; max-height:200px;" alt="Barcode" t-att-src="doc.get_qrcode()"/>
             </div>
         </xpath>
- </t>
+    </template> <template id="report_e_invoicing_b2c_invoice_template_inherit" inherit_id="module_name.external_layout_boxed">
+        <!-- Inherit the header section -->
+        <xpath expr="//div[@t-attf-class='article o_report_layout_boxed o_company_#{company.id}_layout {{  'o_report_layout_background' if company.layout_background in ['Geometric', 'Custom']  else  '' }}']" position="inside">
+            <!-- Add Barcode Image at the top of the content -->
+            <div style="text-align:center; margin-top:-10px; padding-top:0px;">
+                <img style="width:200px; max-height:200px;" alt="Barcode" t-att-src="doc.get_qrcode()"/>
+            </div>
+        </xpath>
+    </template>
+    <template id="report_e_invoicing_b2c_invoice_template">
+
         <t t-call="web.html_container">
             <t t-foreach="docs" t-as="doc">
                 <t t-call="web.external_layout">
@@ -992,5 +1001,5 @@
                 </t>
             </t>
         </t>
-    </templates>
+    </template>
 </odoo>
