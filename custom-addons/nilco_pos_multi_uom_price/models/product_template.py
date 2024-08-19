@@ -135,6 +135,15 @@ class AccountInvoiceLine(models.Model):
     _inherit = "account.move.line"
 
     sales_multi_uom_id = fields.Many2one("product.multi.uom.price", string="Cust UOM")
+    name_field = fields.Char(string="Name Field", compute="_compute_name_field", store=True)
+
+    @api.depends('sales_multi_uom_id')
+    def _compute_name_field(self):
+        for line in self:
+            if line.sales_multi_uom_id:
+                line.name_field = line.sales_multi_uom_id.name_field
+            else:
+                line.name_field = False
 
     @api.onchange('product_id')
     def _onchange_product_id(self):
