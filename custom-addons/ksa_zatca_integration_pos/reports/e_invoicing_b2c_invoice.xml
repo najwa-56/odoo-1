@@ -793,7 +793,10 @@
                                             style="background-color:#4f4d4d;text-align:center;color:white;">
                                             <span class="lable_bold">Subtotal Inclusive of VAT</span>
                                             <br/>
-                                            <span class="lable_bold">إﺟﻤﺎﻟﻲ اﻟﻤﺒﻠﻎ ﺷﺎﻣﻞ ﺿﺮﻳﺒﺔ اﻟﻘﻴﻤﺔ اﻟﻤﻀﺎﻓﺔ</span>
+                                            <span class="lable_bold">إﺟﻤﺎﻟﻲ اﻟﻤﺒﻠﻎ ﺷﺎﻣﻞ </span>
+                                            <br/>
+                                            <span class="lable_bold"> ﺿﺮﻳﺒﺔ اﻟﻘﻴﻤﺔ اﻟﻤﻀﺎﻓﺔ</span>
+
                                         </th>
                                     </tr>
                                 </thead>
