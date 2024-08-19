@@ -5,6 +5,7 @@
             <t t-foreach="docs" t-as="doc">
                 <t t-call="web.external_layout">
                     <style>
+                        .head{ margin-top: 0; }
                         .lable_bold { font-weight: bold; }
                         .main_table td:nth-child(1) {white-space: nowrap;}
                         .main_table td:nth-child(3) {white-space: nowrap;}
