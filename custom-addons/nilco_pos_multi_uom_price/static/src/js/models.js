@@ -109,8 +109,8 @@ patch(Orderline.prototype, {
 
     }
     },
-    set_uom-name(uom-name) {
-        this.name_field = uom-name;
+    set_uom_name(uom_name) {
+        this.name_field = uom_name;
 
     },
 
