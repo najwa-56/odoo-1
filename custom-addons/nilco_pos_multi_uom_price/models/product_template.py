@@ -1,5 +1,6 @@
 
 from odoo import models, fields, _,api
+_logger = logging.getLogger(__name__)
 
 
 class ProductTemplate(models.Model):
@@ -177,6 +178,8 @@ class AccountInvoiceLine(models.Model):
             sale_line = self.env['sale.order.line'].browse(vals['sale_line_id'])
             if sale_line:
                 vals['name_field'] = sale_line.name_field
+                _logger.debug('Creating account move line with values: %s', vals)
+
         return super(AccountInvoiceLine, self).create(vals)
 
     @api.onchange('product_uom_id', 'quantity')
