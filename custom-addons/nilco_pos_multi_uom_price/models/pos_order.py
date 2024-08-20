@@ -14,34 +14,12 @@ class PosOrderLine(models.Model):
     #add field Ratio#####
     Ratio = fields.Float("Ratio", compute="_compute_ratio",
                          store=False)  # Ratio field  # Related field to the ratio in uom.uom
-    selected_uom_ids = fields.Many2many(string="Uom Ids", related='product_id.selected_uom_ids')
-
-    sales_multi_uom_id = fields.Many2one("product.multi.uom.price", string="Cust UOM", domain="[('id', 'in', selected_uom_ids)]")
 
     name_field = fields.Char(string="Name Field", store=True)
 
-    @api.onchange('product_uom_id')
-    def _onchange_product_uom_id(self):
-        if self.product_uom_id:
-            # Update the sales_multi_uom_id based on the selected product_uom_id
-            multi_uom_price = self.env['product.multi.uom.price'].search([
-                ('uom_id', '=', self.product_uom_id.id),
-                ('product_tmpl_id', '=', self.product_id.product_tmpl_id.id)
-            ], limit=1)
-            self.sales_multi_uom_id = multi_uom_price.id if multi_uom_price else False
-        else:
-            self.sales_multi_uom_id = False
+
+
     #Edit----#
-    def _prepare_invoice_line(self, **optional_values):
-        invoice_line_vals = super(PosOrderLine, self)._prepare_invoice_line(**optional_values)
-
-        # Add custom fields to the invoice line values
-        invoice_line_vals.update({
-            'name_field': self.name_field,
-        })
-        _logger.info(f"Prepared invoice line values: {invoice_line_vals}")
-
-        return invoice_line_vals
 
     @api.depends('product_uom_id')
     def _compute_price(self):
@@ -83,6 +61,6 @@ class PosOrderLine(models.Model):
 
     def _export_for_ui(self, orderline):
         res = super()._export_for_ui(orderline)
-        res.update({'product_uom_id': orderline.product_uom_id.id})
+        res.update({'product_uom_id': orderline.product_uom_id.id, 'name_field': orderline.name_field,})
 
         return res
