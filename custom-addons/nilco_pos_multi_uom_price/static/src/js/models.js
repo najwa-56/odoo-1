@@ -115,6 +115,7 @@ patch(Orderline.prototype, {
     },
     set_uom_name(uom_name) {
         this.name_field = uom_name;
+    console.log("name_field set to:", this.name_field);
 
     },
   get_unit_name(){
