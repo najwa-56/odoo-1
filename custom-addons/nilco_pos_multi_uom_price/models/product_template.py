@@ -170,10 +170,10 @@ class AccountInvoiceLine(models.Model):
     @api.model
     def create(self, vals):
         # If the sales_multi_uom_id is not explicitly provided, fetch it from the corresponding sale.order.line
-        if 'sale_line_ids' in vals and not vals.get('sales_multi_uom_id'):
+        if 'sale_line_ids' in vals and not vals.get('name_field'):
             sale_line = self.env['sale.order.line'].browse(vals['sale_line_ids'][0][1])
             if sale_line:
-                vals['sales_multi_uom_id'] = sale_line.sales_multi_uom_id.id
+                vals['name_field'] = sale_line.name_field
         return super(AccountInvoiceLine, self).create(vals)
 
     @api.onchange('product_uom_id', 'quantity')
