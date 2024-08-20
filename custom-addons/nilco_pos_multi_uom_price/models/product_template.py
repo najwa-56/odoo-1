@@ -156,10 +156,9 @@ class SaleOrder(models.Model):
 class AccountInvoiceLine(models.Model):
     _inherit = "account.move.line"
 
-    selected_uom_ids = fields.Many2many(string="Uom Ids", related='product_id.selected_uom_ids')
-    sales_multi_uom_id = fields.Many2one("product.multi.uom.price", string="Cust UOM",domain="[('id', 'in', selected_uom_ids)]")
+    sales_multi_uom_id = fields.Many2one("product.multi.uom.price", string="Cust UOM")
     # Compute name_field from the related sales_multi_uom_id
-    name_field = fields.Char(string="Name Field", compute="_compute_name_field", store=True)
+    name_field = fields.Char(string="Name Field")
 
  #   @api.depends('sales_multi_uom_id')
  #   def _compute_name_field(self):
