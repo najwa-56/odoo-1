@@ -677,6 +677,12 @@
                                             <br/>
                                             <span class="lable_bold">التفاصيل السلع أو الخدمات</span>
                                         </th>
+                                         <!--we add product name english to invoice -->
+                                         <th align="center" name="eng-name" class="second_table"
+                                            style="background-color:#4f4d4d;text-align:center;color:white;">
+                                            <span class="lable_bold">الاسم اللاتيني </span>
+                                        </th>
+                                        <!--w -->
                                         <th align="right" name="item_subtotal" class="second_table"
                                             style="background-color:#4f4d4d;text-align:center;color:white;">
                                             <span class="lable_bold">Unit Price</span>
@@ -743,6 +749,13 @@
                                             <span t-esc='doc._get_zatca_product_name(line)["name"]["value"]'/>
                                         </td>
 
+                                                 <!-- Editeing-->
+
+                                        <!--we add product name english to invoice -->
+                                         <td class="second_table" style="text-align:right;">
+                                              <span t-esc="line.product_arabic"/>
+                                        </td>
+
                                         <td class="second_table" style="text-align:right;">
                                             <span t-esc="doc.get_bt_146(line.zatca_id)"
                                                   t-options='{"widget": "monetary", "display_currency": doc.currency_id}'/>
@@ -750,9 +763,7 @@
                                                 <!-- Editeing-->
 
                                         <!--we add product name english to invoice -->
-                                         <td class="second_table" style="text-align:right;">
-                                              <span t-esc="line.product_arabic"/>
-                                        </td>
+
                                         <td class="second_table" style="text-align:right;">
                                               <span t-esc="line.name_field"/>
                                         </td>
