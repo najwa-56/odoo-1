@@ -9,13 +9,12 @@ _logger = logging.getLogger(__name__)
     
 class PosOrderLine(models.Model):
     _inherit = 'pos.order.line'
-    account_move_line_ids = fields.Many2many('account.move.line', string="Account Move Lines")
 
     product_uom_id = fields.Many2one('uom.uom', string='Product UoM', related='')
     #add field Ratio#####
     Ratio = fields.Float("Ratio", compute="_compute_ratio",
                          store=False)  # Ratio field  # Related field to the ratio in uom.uom
-    name_field = fields.Char(string="Name Field")
+    name_field = fields.Char(string="Name Field", store=True)
 
     #Edit----#
     def _prepare_invoice_line(self, **optional_values):
@@ -25,6 +24,7 @@ class PosOrderLine(models.Model):
         invoice_line_vals.update({
             'name_field': self.name_field,
         })
+        _logger.info(f"Prepared invoice line values: {invoice_line_vals}")
 
         return invoice_line_vals
 
@@ -68,6 +68,6 @@ class PosOrderLine(models.Model):
 
     def _export_for_ui(self, orderline):
         res = super()._export_for_ui(orderline)
-        res.update({'product_uom_id': orderline.product_uom_id.id,'name_field': orderline.name_field})
+        res.update({'product_uom_id': orderline.product_uom_id.id})
 
         return res
