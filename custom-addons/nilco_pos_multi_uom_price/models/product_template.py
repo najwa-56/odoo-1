@@ -31,12 +31,12 @@ class SaleOrderLine(models.Model):
     selected_uom_ids = fields.Many2many(string="Uom Ids", related='product_id.selected_uom_ids')
 
     sales_multi_uom_id = fields.Many2one("product.multi.uom.price", string="Cust UOM", domain="[('id', 'in', selected_uom_ids)]")
-    name_field_2 = fields.Char(string="Name Field", compute="_compute_name_field", store=True)
+    name_field = fields.Char(string="Name Field", compute="_compute_name_field", store=True)
 
     @api.depends('sales_multi_uom_id')
     def _compute_name_field(self):
         for line in self:
-            line.name_field_2 = line.sales_multi_uom_id.name_field if line.sales_multi_uom_id else ''
+            line.name_field = line.sales_multi_uom_id.name_field if line.sales_multi_uom_id else ''
 
     def _prepare_invoice_line(self, **optional_values):
         # Call the original method and get the result
@@ -45,7 +45,7 @@ class SaleOrderLine(models.Model):
         # Update the result with custom fields
         invoice_line_vals.update({
             'sales_multi_uom_id': self.sales_multi_uom_id.id,
-            'name_field_2': self.name_field_2,
+            'name_field': self.name_field,
         })
 
         return invoice_line_vals
@@ -161,13 +161,12 @@ class AccountInvoiceLine(models.Model):
 
     sales_multi_uom_id = fields.Many2one("product.multi.uom.price", string="Cust UOM",
                                          domain="[('id', 'in', selected_uom_ids)]")
-    name_field_2 = fields.Char(string="Name Field", compute="_compute_name_field", store=True)
-    name_field = fields.Char(string="Name Field_2", store=True)
+    name_field = fields.Char(string="Name Field", compute="_compute_name_field", store=True)
 
     @api.depends('sales_multi_uom_id')
     def _compute_name_field(self):
         for line in self:
-            line.name_field_2 = line.sales_multi_uom_id.name_field if line.sales_multi_uom_id else ''
+            line.name_field = line.sales_multi_uom_id.name_field if line.sales_multi_uom_id else ''
 
     @api.onchange('product_uom_id', 'quantity')
     def _onchange_uom_id(self):
