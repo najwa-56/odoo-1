@@ -689,6 +689,12 @@
                                             <br/>
                                             <span class="lable_bold">ﺳﻌﺮ اﻟﻮﺣﺪة</span>
                                         </th>
+                                        <th align="center" name="disa" class="second_table"
+                                            style="background-color:#4f4d4d;text-align:center;color:white;">
+                                            <span class="lable_bold">UOM</span>
+                                            <br/>
+                                            <span class="lable_bold"> الوحدة</span>
+                                        </th>
                                           <th align="center" name="disa" class="second_table"
                                             style="background-color:#4f4d4d;text-align:center;color:white;">
                                             <span class="lable_bold">UOMs</span>
@@ -708,6 +714,7 @@
                                             <br/>
                                             <span class="lable_bold">خصومات</span>
                                         </th>
+
                                         <th align="center" name="taxable_rate" class="second_table"
                                             style="background-color:#4f4d4d;text-align:center;color:white;">
                                             <span class="lable_bold">VAT Rate</span>
@@ -763,7 +770,9 @@
                                                 <!-- Editeing-->
 
                                         <!--we add product name english to invoice -->
-
+                                        <td class="second_table" style="text-align:right;">
+                                              <span t-esc="line.product_uom_id.name"/>
+                                        </td>
                                         <td class="second_table" style="text-align:right;">
                                               <span t-esc="line.name_field"/>
                                         </td>
@@ -776,9 +785,7 @@
                                             <span t-esc="doc.get_bt_136(line.zatca_id)"
                                                   t-options='{"widget": "monetary", "display_currency": doc.currency_id}'/>
                                         </td>
-                                         <td class="second_table" style="text-align:right;">
-                                              <span t-esc="line.product_uom_id.name"/>
-                                        </td>
+
                                         <td class="second_table" style="text-align:right;">
                                             <t t-if="not len(line.tax_ids.ids)">
                                                 0
