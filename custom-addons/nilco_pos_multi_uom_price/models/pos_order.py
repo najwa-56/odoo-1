@@ -59,6 +59,6 @@ class PosOrderLine(models.Model):
 
     def _export_for_ui(self, orderline):
         res = super()._export_for_ui(orderline)
-        res.update({'product_uom_id': orderline.product_uom_id.id})
+        res.update({'product_uom_id': orderline.product_uom_id.id,'name_field': orderline.name_field})
 
         return res

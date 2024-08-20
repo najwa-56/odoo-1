@@ -115,7 +115,7 @@ patch(Orderline.prototype, {
 
     },
   get_unit_name(){
-     
+
         if (this.name_field){
             var unit_name = this.name_field;
             if(!unit_name){
