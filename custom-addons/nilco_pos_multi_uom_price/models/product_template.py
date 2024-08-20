@@ -155,33 +155,20 @@ class Pricelist(models.Model):
 
         self and self.ensure_one()  # self is at most one record
         return self._compute_price_rule12(product,*args, **kwargs)[product.id]
-class SaleOrder(models.Model):
-    _inherit = 'sale.order'
-
-    def _prepare_invoice_line(self, order_line):
-        invoice_line_vals = super(SaleOrder, self)._prepare_invoice_line(order_line)
-        invoice_line_vals['sales_multi_uom_id'] = order_line.sales_multi_uom_id.id
-        return invoice_line_vals
-
 
 class AccountInvoiceLine(models.Model):
     _inherit = "account.move.line"
 
-    sale_line_id = fields.Many2one('sale.order.line', string="Sale Order Line")
+    selected_uom_ids = fields.Many2many(string="Uom Ids", related='product_id.selected_uom_ids')
 
-    # Compute name_field from the related sales_multi_uom_id
-    name_field = fields.Char(string="Name Field",related="sale_line_id.name_field", store=True)
+    sales_multi_uom_id = fields.Many2one("product.multi.uom.price", string="Cust UOM",
+                                         domain="[('id', 'in', selected_uom_ids)]")
+    name_field = fields.Char(string="Name Field", compute="_compute_name_field", store=True)
 
-    @api.model
-    def create(self, vals):
-        # Handle creation logic if necessary
-        if 'sale_line_id' in vals:
-            sale_line = self.env['sale.order.line'].browse(vals['sale_line_id'])
-            if sale_line:
-                vals['name_field'] = sale_line.name_field
-        _logger.debug('Creating account move line with values: %s', vals)
-
-        return super(AccountInvoiceLine, self).create(vals)
+    @api.depends('sales_multi_uom_id')
+    def _compute_name_field(self):
+        for line in self:
+            line.name_field = line.sales_multi_uom_id.name_field if line.sales_multi_uom_id else ''
 
     @api.onchange('product_uom_id', 'quantity')
     def _onchange_uom_id(self):
