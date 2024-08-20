@@ -156,23 +156,24 @@ class SaleOrder(models.Model):
 class AccountInvoiceLine(models.Model):
     _inherit = "account.move.line"
 
-    sales_multi_uom_id = fields.Many2one("product.multi.uom.price", string="Cust UOM")
+    selected_uom_ids = fields.Many2many(string="Uom Ids", related='product_id.selected_uom_ids')
+    sales_multi_uom_id = fields.Many2one("product.multi.uom.price", string="Cust UOM",domain="[('id', 'in', selected_uom_ids)]")
     # Compute name_field from the related sales_multi_uom_id
-    name_field = fields.Char(string="Name Field")
+    name_field = fields.Char(string="Name Field", compute="_compute_name_field", store=True)
 
- #   @api.depends('sales_multi_uom_id')
- #   def _compute_name_field(self):
-  #      for line in self:
-   #         line.name_field = line.sales_multi_uom_id.name_field if line.sales_multi_uom_id else ''
+    @api.depends('sales_multi_uom_id')
+    def _compute_name_field(self):
+        for line in self:
+            line.name_field = line.sales_multi_uom_id.name_field if line.sales_multi_uom_id else ''
 
-  #  @api.model
-  #  def create(self, vals):
+    @api.model
+    def create(self, vals):
         # If the sales_multi_uom_id is not explicitly provided, fetch it from the corresponding sale.order.line
-    #    if 'sale_line_ids' in vals and not vals.get('sales_multi_uom_id'):
-       #     sale_line = self.env['sale.order.line'].browse(vals['sale_line_ids'][0][1])
-       #     if sale_line:
-        #        vals['sales_multi_uom_id'] = sale_line.sales_multi_uom_id.id
-      #  return super(AccountInvoiceLine, self).create(vals)
+        if 'sale_line_ids' in vals and not vals.get('sales_multi_uom_id'):
+            sale_line = self.env['sale.order.line'].browse(vals['sale_line_ids'][0][1])
+            if sale_line:
+                vals['sales_multi_uom_id'] = sale_line.sales_multi_uom_id.id
+        return super(AccountInvoiceLine, self).create(vals)
 
     @api.onchange('product_uom_id', 'quantity')
     def _onchange_uom_id(self):
