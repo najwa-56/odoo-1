@@ -71,19 +71,7 @@ class SaleOrderLine(models.Model):
                 self.price_unit = self.env['account.tax']._fix_tax_included_price_company(
                     self._get_display_price(), product.taxes_id, self.tax_id, self.company_id)
 
-    @api.model
-    def create(self, vals):
-        # Ensure that the invoice lines are created with the correct UOM values
-        result = super(SaleOrderLine, self).create(vals)
-        if result.invoice_lines:
-            for invoice_line in result.invoice_lines:
-                invoice_line.sales_multi_uom_id = result.sales_multi_uom_id
-        return result
-
-    @api.onchange('invoice_lines')
-    def _onchange_invoice_lines(self):
-        for line in self.invoice_lines:
-            line.sales_multi_uom_id = self.sales_multi_uom_id
+   
 
 
 class Pricelist(models.Model):
