@@ -79,21 +79,7 @@ class SaleOrderLine(models.Model):
                 self.price_unit = self.env['account.tax']._fix_tax_included_price_company(
                     self._get_display_price(), product.taxes_id, self.tax_id, self.company_id)
 
-    @api.onchange('name_field')
-    def _onchange_name_field(self):
-        if self.sale_line_id:
-            # Update related account.move.line records
-            account_move_lines = self.env['account.move.line'].search([('sale_line_id', '=', self.id)])
-            for move_line in account_move_lines:
-                move_line.name_field = self.name_field
-
-    def write(self, vals):
-        res = super(SaleOrderLine, self).write(vals)
-        if 'name_field' in vals:
-            account_move_lines = self.env['account.move.line'].search([('sale_line_id', '=', self.id)])
-            for move_line in account_move_lines:
-                move_line.name_field = vals['name_field']
-        return res
+    
 
 
 
