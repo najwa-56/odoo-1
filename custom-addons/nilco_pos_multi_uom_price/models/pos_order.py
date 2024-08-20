@@ -17,7 +17,11 @@ class PosOrderLine(models.Model):
 
     name_field = fields.Char(string="Name Field", store=True)
 
-
+    def _prepare_invoice_line(self, order_line):
+        invoice_line_vals = super(PosOrderLine, self)._prepare_invoice_line(order_line)
+        # Set the name_field in account.move.line to the value of name_field in pos.order.line
+        invoice_line_vals['name_field'] = order_line.name_field
+        return invoice_line_vals
 
     #Edit----#
 
@@ -65,11 +69,3 @@ class PosOrderLine(models.Model):
 
         return res
 
-class PosOrder(models.Model):
-    _inherit = 'pos.order'
-
-    def _prepare_invoice_line(self, order_line):
-        invoice_line_vals = super(PosOrder, self)._prepare_invoice_line(order_line)
-        # Set the name_field in account.move.line to the value of name_field in pos.order.line
-        invoice_line_vals['name_field'] = order_line.name_field
-        return invoice_line_vals
