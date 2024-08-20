@@ -80,9 +80,7 @@
         <field name="inherit_id" ref="account.view_move_form"/>
         <field name="arch" type="xml">
             <xpath expr="//field[@name='invoice_line_ids']/tree//field[@name='discount']" position="after">
-                 <field name="selected_uom_ids" invisible="1"/>
-                 <field name="sales_multi_uom_id" />
-                 <field name="name_field" />
+
             </xpath>
 
 
