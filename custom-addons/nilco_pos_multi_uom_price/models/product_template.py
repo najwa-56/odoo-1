@@ -38,12 +38,16 @@ class SaleOrderLine(models.Model):
         for line in self:
             line.name_field = line.sales_multi_uom_id.name_field if line.sales_multi_uom_id else ''
 
-    def _prepare_invoice_line(self):
-        invoice_line_vals = super(SaleOrderLine, self)._prepare_invoice_line()
+    def _prepare_invoice_line(self, **optional_values):
+        # Call the original method and get the result
+        invoice_line_vals = super(SaleOrderLine, self)._prepare_invoice_line(**optional_values)
+
+        # Update the result with custom fields
         invoice_line_vals.update({
             'sales_multi_uom_id': self.sales_multi_uom_id.id,
             'name_field': self.name_field,
         })
+
         return invoice_line_vals
 
     @api.onchange('sales_multi_uom_id')
