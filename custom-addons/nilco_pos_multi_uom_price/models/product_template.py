@@ -38,6 +38,14 @@ class SaleOrderLine(models.Model):
         for line in self:
             line.name_field = line.sales_multi_uom_id.name_field if line.sales_multi_uom_id else ''
 
+    def _prepare_invoice_line(self):
+        invoice_line_vals = super(SaleOrderLine, self)._prepare_invoice_line()
+        invoice_line_vals.update({
+            'sales_multi_uom_id': self.sales_multi_uom_id.id,
+            'name_field': self.name_field,
+        })
+        return invoice_line_vals
+
     @api.onchange('sales_multi_uom_id')
     def sales_multi_uom_id_change(self):
         self.ensure_one()
@@ -79,7 +87,7 @@ class SaleOrderLine(models.Model):
                 self.price_unit = self.env['account.tax']._fix_tax_included_price_company(
                     self._get_display_price(), product.taxes_id, self.tax_id, self.company_id)
 
-    
+
 
 
 
