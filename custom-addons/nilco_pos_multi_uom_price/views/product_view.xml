@@ -90,8 +90,6 @@
                     <field name="sales_multi_uom_id" widget="many2one"/>
                                                           <field name="name_field" />
             </xpath>
-
-
         </field>
     </record>
 
