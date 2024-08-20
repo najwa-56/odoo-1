@@ -18,23 +18,15 @@ class PosOrderLine(models.Model):
     name_field = fields.Char(string="Name Field")
 
     #Edit----#
-    @api.onchange('name_field')
-    def _onchange_name_field(self):
-        # Get the related account.move.line records
-        move_line_ids = self.mapped('account_move_line_ids')
-        for move_line in self.env['account.move.line'].browse(move_line_ids):
-            # Update the name_field on the related account.move.line records
-            move_line.name_field = self.name_field
+    def _prepare_invoice_line(self, **optional_values):
+        invoice_line_vals = super(PosOrderLine, self)._prepare_invoice_line(**optional_values)
 
-    def write(self, vals):
-        res = super(PosOrderLine, self).write(vals)
-        if 'name_field' in vals:
-            # Get the related account.move.line records
-            move_line_ids = self.mapped('account_move_line_ids')
-            for move_line in self.env['account.move.line'].browse(move_line_ids):
-                # Update the name_field on the related account.move.line records
-                move_line.name_field = vals['name_field']
-        return res
+        # Add custom fields to the invoice line values
+        invoice_line_vals.update({
+            'name_field': self.name_field,
+        })
+
+        return invoice_line_vals
 
     @api.depends('product_uom_id')
     def _compute_price(self):
