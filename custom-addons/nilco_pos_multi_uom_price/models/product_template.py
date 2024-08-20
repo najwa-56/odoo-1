@@ -167,7 +167,7 @@ class AccountInvoiceLine(models.Model):
     @api.depends('sales_multi_uom_id')
     def _compute_name_field(self):
         for line in self:
-            line.name_field_2 = line.sales_multi_uom_id.name_field_2 if line.sales_multi_uom_id else ''
+            line.name_field_2 = line.sales_multi_uom_id.name_field if line.sales_multi_uom_id else ''
 
     @api.onchange('product_uom_id', 'quantity')
     def _onchange_uom_id(self):
