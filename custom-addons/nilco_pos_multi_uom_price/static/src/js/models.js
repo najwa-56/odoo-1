@@ -114,7 +114,21 @@ patch(Orderline.prototype, {
         this.name_field = uom_name;
 
     },
-
+  get_unit_name(){
+     
+        if (this.name_field){
+            var unit_name = this.name_field;
+            if(!unit_name){
+                return undefined;
+            }
+            unit_name = unit_name[0];
+            if(!this.pos){
+                return undefined;
+            }
+            return this.pos.units_by_id[unit_name];
+        }
+        return this.product.get_unit_name();
+    },
     get_unit(){
         if (this.product.default_uom_price > 0 & this.price_type == "original" & this.product.default_uom_id != false){
             this.price = this.product.default_uom_price;
