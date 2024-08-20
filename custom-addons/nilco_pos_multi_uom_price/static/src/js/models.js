@@ -20,6 +20,7 @@ patch(Order.prototype, {
         super.set_orderline_options(...arguments);
         if(options.product_uom_id !== undefined){
             orderline.product_uom_id = options.product_uom_id;
+            orderline.name_field = options.name_field;
 
         }
     },
@@ -62,6 +63,7 @@ patch(Orderline.prototype, {
     setup(_defaultObj, options) {
         super.setup(...arguments);
         this.product_uom_id = this.product.default_uom_id || this.product_uom_id || this.product.uom_id;
+        this.name_field = this.name_field;
          this.reorderProduct();
     },
 
@@ -106,6 +108,10 @@ patch(Orderline.prototype, {
         this.set_unit_price(unit.price);
 
     }
+    },
+    set_uom-name(uom-name) {
+        this.name_field = uom-name;
+
     },
 
     get_unit(){
