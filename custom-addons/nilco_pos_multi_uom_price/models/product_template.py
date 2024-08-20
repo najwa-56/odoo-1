@@ -71,7 +71,19 @@ class SaleOrderLine(models.Model):
                 self.price_unit = self.env['account.tax']._fix_tax_included_price_company(
                     self._get_display_price(), product.taxes_id, self.tax_id, self.company_id)
 
+    @api.model
+    def create(self, vals):
+        # Ensure that the invoice lines are created with the correct UOM values
+        result = super(SaleOrderLine, self).create(vals)
+        if result.invoice_lines:
+            for invoice_line in result.invoice_lines:
+                invoice_line.sales_multi_uom_id = result.sales_multi_uom_id
+        return result
 
+    @api.onchange('invoice_lines')
+    def _onchange_invoice_lines(self):
+        for line in self.invoice_lines:
+            line.sales_multi_uom_id = self.sales_multi_uom_id
 
 
 class Pricelist(models.Model):
@@ -149,6 +161,19 @@ class AccountInvoiceLine(models.Model):
     # Compute name_field from the related sales_multi_uom_id
     name_field = fields.Char(string="Name Field", compute="_compute_name_field", store=True)
 
+    @api.depends('sales_multi_uom_id')
+    def _compute_name_field(self):
+        for line in self:
+            line.name_field = line.sales_multi_uom_id.name_field if line.sales_multi_uom_id else ''
+
+    @api.model
+    def create(self, vals):
+        # If the sales_multi_uom_id is not explicitly provided, fetch it from the corresponding sale.order.line
+        if 'sale_line_ids' in vals and not vals.get('sales_multi_uom_id'):
+            sale_line = self.env['sale.order.line'].browse(vals['sale_line_ids'][0][1])
+            if sale_line:
+                vals['sales_multi_uom_id'] = sale_line.sales_multi_uom_id.id
+        return super(AccountInvoiceLine, self).create(vals)
 
     @api.onchange('product_uom_id', 'quantity')
     def _onchange_uom_id(self):
