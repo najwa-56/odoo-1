@@ -37,8 +37,8 @@
                     <field name="product_uom_id"/>
                     <field name="Ratio"/>
                       <field name="selected_uom_ids" invisible="1"/>
-                    <field name="purchase_multi_uom_id" widget="many2one"/>
-                     <field name="name_field" />
+    <field name="sales_multi_uom_id" widget="many2one"/>
+                    <field name="name_field" />
                 </xpath>
             </field>
      </record>
