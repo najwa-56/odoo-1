@@ -45,7 +45,7 @@ class SaleOrderLine(models.Model):
         # Update the result with custom fields
         invoice_line_vals.update({
             'sales_multi_uom_id': self.sales_multi_uom_id.id,
-            'name_field_2': self.name_field_2,
+            'name_field_2': self.name_field,
         })
 
         return invoice_line_vals
