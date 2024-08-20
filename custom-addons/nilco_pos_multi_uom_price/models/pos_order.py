@@ -14,12 +14,10 @@ class PosOrderLine(models.Model):
     #add field Ratio#####
     Ratio = fields.Float("Ratio", compute="_compute_ratio",
                          store=False)  # Ratio field  # Related field to the ratio in uom.uom
+
     name_field = fields.Char(string="Name Field", store=True)
-    def _prepare_invoice_line(self, order_line):
-        invoice_line_vals = super(PosOrderLine, self)._prepare_invoice_line(order_line)
-        # Set the name_field in account.move.line to the value of name_field in pos.order.line
-        invoice_line_vals['name_field'] = order_line.name_field
-        return invoice_line_vals
+
+
 
     #Edit----#
 
@@ -67,3 +65,10 @@ class PosOrderLine(models.Model):
 
         return res
 
+class PosOrder(models.Model):
+    _inherit = 'pos.order'
+
+    def _prepare_account_move_line(self, order, line, session=None):
+        res = super(PosOrder, self)._prepare_account_move_line(order, line, session)
+        res['name_field'] = line.name_field
+        return res
