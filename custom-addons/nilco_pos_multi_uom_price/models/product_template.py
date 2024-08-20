@@ -168,21 +168,13 @@ class AccountInvoiceLine(models.Model):
 
     @api.model
     def create(self, vals):
+        # If the sales_multi_uom_id is not explicitly provided, fetch it from the corresponding sale.order.line
         if 'sale_line_ids' in vals and not vals.get('sales_multi_uom_id'):
-            sale_line_id = None
-            # Handle different command formats for sale_line_ids
-            for command in vals['sale_line_ids']:
-                if command[0] in (4, 6) and command[2]:
-                    sale_line_id = command[2][0] if command[0] == 6 else command[1]
-                    break
-
-            if sale_line_id:
-                sale_line = self.env['sale.order.line'].browse(sale_line_id)
-                if sale_line and sale_line.sales_multi_uom_id:
-                    vals['sales_multi_uom_id'] = sale_line.sales_multi_uom_id.id
-
+            sale_line = self.env['sale.order.line'].browse(vals['sale_line_ids'][0][1])
+            if sale_line:
+                vals['sales_multi_uom_id'] = sale_line.sales_multi_uom_id.id
         return super(AccountInvoiceLine, self).create(vals)
-    
+
     @api.onchange('product_uom_id', 'quantity')
     def _onchange_uom_id(self):
         warning = {}

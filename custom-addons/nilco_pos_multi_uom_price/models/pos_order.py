@@ -14,7 +14,28 @@ class PosOrderLine(models.Model):
     #add field Ratio#####
     Ratio = fields.Float("Ratio", compute="_compute_ratio",
                          store=False)  # Ratio field  # Related field to the ratio in uom.uom
+    selected_uom_ids = fields.Many2many(string="Uom Ids", related='product_id.selected_uom_ids')
 
+    sales_multi_uom_id = fields.Many2one("product.multi.uom.price", string="Cust UOM",
+                                         domain="[('id', 'in', selected_uom_ids)]")
+
+    @api.onchange('product_uom_id')
+    def _onchange_product_uom_id(self):
+        """
+        Updates the `sales_multi_uom_id` field to match the selected `product_uom_id`.
+        """
+        if self.product_uom_id:
+            # Search for the corresponding product.multi.uom.price record
+            uom_price = self.env['product.multi.uom.price'].search([
+                ('product_id', '=', self.product_id.id),
+                ('uom_id', '=', self.product_uom_id.id)
+            ], limit=1)
+            if uom_price:
+                self.sales_multi_uom_id = uom_price
+            else:
+                self.sales_multi_uom_id = False  # Clear the field if no matching UOM price is found
+        else:
+            self.sales_multi_uom_id = False  # Clear the field if no UOM is selected
     #Edit----#
 
 
