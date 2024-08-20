@@ -104,6 +104,12 @@ patch(Orderline.prototype, {
             this.order.orderlines.push(existingOrderline);
         }
     },
+    getDisplayData() {
+        return {
+            ...super.getDisplayData(),
+            name_field: this.get_product().name_field,
+        };
+    },
     set_uom(uom_id) {
         this.product_uom_id = uom_id;
         const unit = this.get_unit();
@@ -118,24 +124,7 @@ patch(Orderline.prototype, {
     console.log("name_field set to:", this.name_field);
 
     },
-  get_unit_name(){
 
-        if (this.name_field){
-            var unit_name = this.name_field;
-            if(!unit_name){
-                return undefined;
-            }
-            unit_name = unit_name[0];
-            if(!this.pos){
-                return undefined;
-            }
-            return this.pos.units_by_id[unit_name];
-        }
-        return this.product.get_unit_name();
-    },
-    get nameField() {
-    return this.props.line.name_field || "";
-}
     get_unit(){
         if (this.product.default_uom_price > 0 & this.price_type == "original" & this.product.default_uom_id != false){
             this.price = this.product.default_uom_price;
