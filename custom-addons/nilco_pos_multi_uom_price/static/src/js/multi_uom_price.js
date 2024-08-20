@@ -43,7 +43,6 @@ export class UOMButton extends Component {
 			      line.price_manually_set = true;
 			      line.set_unit_price(selectedUOM.price);
 			      line.set_uom_name(selectedUOM.name_field);
-			      console.log(selectedUOM.name_field)
 
 
 		       }
