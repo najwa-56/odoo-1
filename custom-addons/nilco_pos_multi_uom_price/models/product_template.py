@@ -150,13 +150,6 @@ class Pricelist(models.Model):
 
         self and self.ensure_one()  # self is at most one record
         return self._compute_price_rule12(product,*args, **kwargs)[product.id]
-class SaleOrder(models.Model):
-    _inherit = 'sale.order'
-
-    def _prepare_invoice_line(self, order_line):
-        invoice_line_vals = super(SaleOrder, self)._prepare_invoice_line(order_line)
-        invoice_line_vals['sales_multi_uom_id'] = order_line.sales_multi_uom_id.id
-        return invoice_line_vals
 
 
 class AccountInvoiceLine(models.Model):
