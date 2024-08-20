@@ -9,6 +9,7 @@ _logger = logging.getLogger(__name__)
     
 class PosOrderLine(models.Model):
     _inherit = 'pos.order.line'
+    account_move_line_ids = fields.Many2many('account.move.line', string="Account Move Lines")
 
     product_uom_id = fields.Many2one('uom.uom', string='Product UoM', related='')
     #add field Ratio#####
@@ -17,7 +18,23 @@ class PosOrderLine(models.Model):
     name_field = fields.Char(string="Name Field")
 
     #Edit----#
+    @api.onchange('name_field')
+    def _onchange_name_field(self):
+        # Get the related account.move.line records
+        move_line_ids = self.mapped('account_move_line_ids')
+        for move_line in self.env['account.move.line'].browse(move_line_ids):
+            # Update the name_field on the related account.move.line records
+            move_line.name_field = self.name_field
 
+    def write(self, vals):
+        res = super(PosOrderLine, self).write(vals)
+        if 'name_field' in vals:
+            # Get the related account.move.line records
+            move_line_ids = self.mapped('account_move_line_ids')
+            for move_line in self.env['account.move.line'].browse(move_line_ids):
+                # Update the name_field on the related account.move.line records
+                move_line.name_field = vals['name_field']
+        return res
 
     @api.depends('product_uom_id')
     def _compute_price(self):
