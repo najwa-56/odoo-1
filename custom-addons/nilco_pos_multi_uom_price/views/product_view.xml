@@ -88,6 +88,7 @@
 
                   <field name="selected_uom_ids" invisible="1"/>
                     <field name="sales_multi_uom_id" widget="many2one"/>
+                   <field name="name_field_2" />
                                                           <field name="name_field" />
             </xpath>
         </field>
