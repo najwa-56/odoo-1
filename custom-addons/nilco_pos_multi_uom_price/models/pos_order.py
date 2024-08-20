@@ -14,7 +14,6 @@ class PosOrderLine(models.Model):
     #add field Ratio#####
     Ratio = fields.Float("Ratio", compute="_compute_ratio",
                          store=False)  # Ratio field  # Related field to the ratio in uom.uom
-
     name_field = fields.Char(string="Name Field", store=True)
     def _prepare_invoice_line(self, order_line):
         invoice_line_vals = super(PosOrderLine, self)._prepare_invoice_line(order_line)
