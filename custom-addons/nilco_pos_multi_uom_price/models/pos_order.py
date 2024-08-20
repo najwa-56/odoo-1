@@ -15,13 +15,16 @@ class PosOrderLine(models.Model):
     Ratio = fields.Float("Ratio", compute="_compute_ratio",
                          store=False)  # Ratio field  # Related field to the ratio in uom.uom
 
-    name_field = fields.Char(string="Name Field", store=True)
+    selected_uom_ids = fields.Many2many(string="Uom Ids", related='product_id.selected_uom_ids')
 
-    def _prepare_invoice_line(self, order_line):
-        invoice_line_vals = super(PosOrderLine, self)._prepare_invoice_line(order_line)
-        # Set the name_field in account.move.line to the value of name_field in pos.order.line
-        invoice_line_vals['name_field'] = order_line.name_field
-        return invoice_line_vals
+    sales_multi_uom_id = fields.Many2one("product.multi.uom.price", string="Cust UOM",
+                                         domain="[('id', 'in', selected_uom_ids)]")
+    name_field_2 = fields.Char(string="Name Field", compute="_compute_name_field", store=True)
+
+    @api.depends('sales_multi_uom_id')
+    def _compute_name_field(self):
+        for line in self:
+            line.name_field_2 = line.sales_multi_uom_id.name_field if line.sales_multi_uom_id else ''
 
     #Edit----#
 
