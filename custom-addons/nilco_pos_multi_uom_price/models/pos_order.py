@@ -21,8 +21,16 @@ class PosOrderLine(models.Model):
                                          domain="[('id', 'in', selected_uom_ids)]")
     name_field = fields.Char(string="Name Field", store=True)
 
-   
-
+    @api.model
+    def create(self, vals):
+        if 'product_uom_id' in vals:
+            multi_uom = self.env['product.multi.uom.price'].search([('id', '=', vals['product_uom_id'])], limit=1)
+            if multi_uom:
+                vals['sales_multi_uom_id'] = vals['product_uom_id']
+            else:
+                # Handle the case where the UoM doesn't exist, maybe raise an error or set a default
+                raise ValueError("The selected UOM does not exist in product.multi.uom.price.")
+        return super(PosOrderLine, self).create(vals)
 
     #Edit----#
 
