@@ -63,8 +63,7 @@ patch(Orderline.prototype, {
     setup(_defaultObj, options) {
         super.setup(...arguments);
         this.product_uom_id = this.product.default_uom_id || this.product_uom_id || this.product.uom_id;
-         this.name_field = options.name_field || this.name_field || "";  // Ensure initialization
-         this.sales_multi_uom_id = this.product_uom_id;  // Set sales_multi_uom_id equal to product_uom_id
+                this.name_field = options.name_field || this.name_field || "";  // Ensure initialization
          this.reorderProduct();
     },
 
@@ -72,16 +71,13 @@ patch(Orderline.prototype, {
     export_as_JSON() {
         const json = super.export_as_JSON(...arguments);
         json.product_uom_id = this.product_uom_id[0];
-        json.name_field = this.name_field;  // Add this line
-        json.sales_multi_uom_id = this.sales_multi_uom_id ? this.sales_multi_uom_id[0] : null;
-
+            json.name_field = this.name_field;  // Add this line
 
 
         return json;
     },
     init_from_JSON(json) {
     super.init_from_JSON(...arguments);
-
     this.name_field = json.name_field || "";  // Add this line
 
     console.log('init_from_JSON:', json);
@@ -92,10 +88,6 @@ patch(Orderline.prototype, {
             0: this.pos.units_by_id[json.product_uom_id].id,
             1: this.pos.units_by_id[json.product_uom_id].name
         };
-        this.sales_multi_uom_id = json.sales_multi_uom_id ? {
-            0: json.sales_multi_uom_id,
-            1: this.pos.units_by_id[json.sales_multi_uom_id].name,
-        } : null;
     } else {
         console.error('Invalid product_uom_id or units_by_id not found', json.product_uom_id, this.pos.units_by_id);
         // Handle the case where product_uom_id is not found, e.g., by setting a default value or showing an error message
@@ -116,7 +108,6 @@ patch(Orderline.prototype, {
         return {
             ...super.getDisplayData(),
             name_field: this.get_product().name_field,
-            sales_multi_uom_id: this.get_product().sales_multi_uom_id,
         };
     },
     set_uom(uom_id) {
