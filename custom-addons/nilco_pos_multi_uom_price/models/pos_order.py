@@ -24,7 +24,7 @@ class PosOrderLine(models.Model):
     @api.depends('sales_multi_uom_id')
     def _compute_name_field(self):
         for line in self:
-            line.name_field_2 = line.sales_multi_uom_id.name_field if line.sales_multi_uom_id else ''
+            line.name_field = line.sales_multi_uom_id.name_field if line.sales_multi_uom_id else ''
 
     def _prepare_invoice_line(self, **optional_values):
         # Call the original method and get the result
