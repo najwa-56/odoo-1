@@ -22,18 +22,12 @@ class PosOrderLine(models.Model):
     name_field = fields.Char(string="Name Field", store=True)
 
     @api.model
-    def _prepare_invoice_line(self, **optional_values):
-        # Call the original method and get the result
-        invoice_line_vals = super(PosOrderLine, self)._prepare_invoice_line(**optional_values)
+    def create(self, vals):
+        if 'product_uom_id' in vals:
+            vals['sales_multi_uom_id'] = vals['product_uom_id']
+        return super(PosOrderLine, self).create(vals)
 
-        # Update the result with custom fields
-        invoice_line_vals.update({
-            'name_field': self.name_field,
-        })
 
-        _logger.info('Updated Invoice Line with Name Field: %s', invoice_line_vals)
-
-        return invoice_line_vals
     #Edit----#
 
     @api.depends('product_uom_id')

@@ -63,7 +63,8 @@ patch(Orderline.prototype, {
     setup(_defaultObj, options) {
         super.setup(...arguments);
         this.product_uom_id = this.product.default_uom_id || this.product_uom_id || this.product.uom_id;
-                this.name_field = options.name_field || this.name_field || "";  // Ensure initialization
+         this.name_field = options.name_field || this.name_field || "";  // Ensure initialization
+         this.sales_multi_uom_id = this.product_uom_id;  // Set sales_multi_uom_id equal to product_uom_id
          this.reorderProduct();
     },
 
@@ -71,13 +72,20 @@ patch(Orderline.prototype, {
     export_as_JSON() {
         const json = super.export_as_JSON(...arguments);
         json.product_uom_id = this.product_uom_id[0];
-            json.name_field = this.name_field;  // Add this line
+        json.name_field = this.name_field;  // Add this line
+        json.sales_multi_uom_id = this.sales_multi_uom_id[0];  // Add this line
+
 
 
         return json;
     },
     init_from_JSON(json) {
     super.init_from_JSON(...arguments);
+     this.product_uom_id = {
+            0: json.product_uom_id,
+            1: this.pos.units_by_id[json.product_uom_id].name
+        };
+        this.sales_multi_uom_id = this.product_uom_id;  // Ensure sales_multi_uom_id is set from product_uom_id
     this.name_field = json.name_field || "";  // Add this line
 
     console.log('init_from_JSON:', json);
