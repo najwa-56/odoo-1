@@ -21,12 +21,6 @@ class PosOrderLine(models.Model):
                                          domain="[('id', 'in', selected_uom_ids)]")
     name_field = fields.Char(string="Name Field", store=True)
 
-    @api.model
-    def create(self, vals):
-        if 'product_uom_id' in vals:
-            vals['sales_multi_uom_id'] = vals['product_uom_id']
-        return super(PosOrderLine, self).create(vals)
-
 
     #Edit----#
 
