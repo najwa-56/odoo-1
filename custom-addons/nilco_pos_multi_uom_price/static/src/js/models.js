@@ -64,6 +64,8 @@ patch(Orderline.prototype, {
         super.setup(...arguments);
         this.product_uom_id = this.product.default_uom_id || this.product_uom_id || this.product.uom_id;
                 this.name_field = options.name_field || this.name_field || "";  // Ensure initialization
+                    this.sales_multi_uom_id = options.sales_multi_uom_id || this.sales_multi_uom_id || "";  // Ensure initialization
+
          this.reorderProduct();
     },
 
@@ -72,6 +74,8 @@ patch(Orderline.prototype, {
         const json = super.export_as_JSON(...arguments);
         json.product_uom_id = this.product_uom_id[0];
             json.name_field = this.name_field;  // Add this line
+                json.sales_multi_uom_id = this.sales_multi_uom_id;  // Ensure this line is present
+
 
 
         return json;
@@ -79,6 +83,7 @@ patch(Orderline.prototype, {
     init_from_JSON(json) {
     super.init_from_JSON(...arguments);
     this.name_field = json.name_field || "";  // Add this line
+      this.sales_multi_uom_id = json.sales_multi_uom_id || "";  // Ensure this line is present
 
     console.log('init_from_JSON:', json);
 
