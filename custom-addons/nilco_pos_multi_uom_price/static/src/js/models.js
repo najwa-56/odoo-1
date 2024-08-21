@@ -73,7 +73,7 @@ patch(Orderline.prototype, {
         const json = super.export_as_JSON(...arguments);
         json.product_uom_id = this.product_uom_id[0];
         json.name_field = this.name_field;  // Add this line
-        json.sales_multi_uom_id = this.sales_multi_uom_id[0];  // Add this line
+        json.sales_multi_uom_id = this.sales_multi_uom_id ? this.sales_multi_uom_id[0] : null;
 
 
 
@@ -81,11 +81,7 @@ patch(Orderline.prototype, {
     },
     init_from_JSON(json) {
     super.init_from_JSON(...arguments);
-     this.product_uom_id = {
-            0: json.product_uom_id,
-            1: this.pos.units_by_id[json.product_uom_id].name
-        };
-        this.sales_multi_uom_id = this.product_uom_id;  // Ensure sales_multi_uom_id is set from product_uom_id
+
     this.name_field = json.name_field || "";  // Add this line
 
     console.log('init_from_JSON:', json);
@@ -96,6 +92,10 @@ patch(Orderline.prototype, {
             0: this.pos.units_by_id[json.product_uom_id].id,
             1: this.pos.units_by_id[json.product_uom_id].name
         };
+        this.sales_multi_uom_id = json.sales_multi_uom_id ? {
+            0: json.sales_multi_uom_id,
+            1: this.pos.units_by_id[json.sales_multi_uom_id].name,
+        } : null;
     } else {
         console.error('Invalid product_uom_id or units_by_id not found', json.product_uom_id, this.pos.units_by_id);
         // Handle the case where product_uom_id is not found, e.g., by setting a default value or showing an error message
