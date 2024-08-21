@@ -31,6 +31,8 @@ class PosOrderLine(models.Model):
             'name_field': self.name_field,
         })
 
+        _logger.info('Updated Invoice Line with Name Field: %s', invoice_line_vals)
+
         return invoice_line_vals
     #Edit----#
 
