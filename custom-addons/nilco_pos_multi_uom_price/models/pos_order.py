@@ -4,7 +4,6 @@ import logging
 
 from odoo import models, fields, api, _
 from odoo.tools import float_is_zero
-from odoo.tools import float_is_zero, float_round, float_repr, float_compare
 
 _logger = logging.getLogger(__name__)
     
@@ -20,8 +19,19 @@ class PosOrderLine(models.Model):
 
     sales_multi_uom_id = fields.Many2one("product.multi.uom.price", string="Cust UOM",
                                          domain="[('id', 'in', selected_uom_ids)]")
-    name_field = fields.Char(string="Name Field", compute="_compute_name_field", store=True)
+    name_field = fields.Char(string="Name Field", store=True)
 
+    @api.model
+    def _prepare_invoice_line(self, **optional_values):
+        # Call the original method and get the result
+        invoice_line_vals = super(PosOrderLine, self)._prepare_invoice_line(**optional_values)
+
+        # Update the result with custom fields
+        invoice_line_vals.update({
+            'name_field': self.name_field,
+        })
+
+        return invoice_line_vals
     #Edit----#
 
     @api.depends('product_uom_id')
@@ -67,19 +77,3 @@ class PosOrderLine(models.Model):
         res.update({'product_uom_id': orderline.product_uom_id.id})
 
         return res
-
-
-class PosOrder(models.Model):
-    _inherit = 'pos.order'
-
-    @api.model
-    def _prepare_invoice_line(self, **optional_values):
-        # Call the original method and get the result
-        invoice_line_vals = super(PosOrder, self)._prepare_invoice_line(**optional_values)
-
-        # Update the result with custom fields
-        invoice_line_vals.update({
-            'name_field': self.name_field,
-        })
-
-        return invoice_line_vals
