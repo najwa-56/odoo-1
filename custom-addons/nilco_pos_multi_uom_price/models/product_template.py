@@ -170,7 +170,7 @@ class AccountInvoiceLine(models.Model):
         store=True,
     )
 
-   
+
     @api.onchange('product_uom_id', 'quantity')
     def _onchange_uom_id(self):
         warning = {}
