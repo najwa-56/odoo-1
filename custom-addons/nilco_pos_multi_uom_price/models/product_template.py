@@ -164,7 +164,6 @@ class AccountInvoiceLine(models.Model):
 
     sales_multi_uom_id = fields.Many2one("product.multi.uom.price", string="Cust UOM",
                                          domain="[('id', 'in', selected_uom_ids)]")
-    name_field = fields.Char(string="Name Field", compute="_compute_name_field", store=True)
     name_field = fields.Char(
         related='pos_order_line_id.name_field',
         string='Custom Field from POS',
