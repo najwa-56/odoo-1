@@ -774,7 +774,7 @@
                                               <span t-esc="line.product_uom_id.name"/>
                                         </td>
                                         <td class="second_table" style="text-align:right;">
-                                              <span t-esc="line.name_field_2"/>
+                                              <span t-esc="line.name_field"/>
                                         </td>
                                         <!--w -->
 

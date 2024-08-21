@@ -36,7 +36,9 @@
                 <xpath expr="//field[@name='lines']/tree/field[@name='full_product_name']" position="after">
                     <field name="product_uom_id"/>
                     <field name="Ratio"/>
-                     <field name="name_field" />
+                           <field name="selected_uom_ids" invisible="1"/>
+                    <field name="sales_multi_uom_id" />
+                    <field name="name_field" />
                 </xpath>
             </field>
      </record>
@@ -52,14 +54,14 @@
                 <xpath expr="//field[@name='order_line']/tree/field[@name='product_uom_qty']" position="after">
                     <field name="selected_uom_ids" invisible="1"/>
                     <field name="sales_multi_uom_id" readonly="state in ('sale','done', 'cancel')"/>
-                                                          <field name="name_field_2" />
+                                                          <field name="name_field" />
 
                 </xpath>
                  <xpath expr="//field[@name='order_line']/form/group/group/field[@name='product_id']" position="after">
                     <field name="selected_uom_ids" invisible="1"/>
 
                     <field name="sales_multi_uom_id" readonly="state in ('sale','done', 'cancel')"/>
-                                      <field name="name_field_2" />
+                                      <field name="name_field" />
 
                 </xpath>
             </field>
@@ -88,8 +90,8 @@
 
                   <field name="selected_uom_ids" invisible="1"/>
                     <field name="sales_multi_uom_id" widget="many2one"/>
-                  <field name="name_field_2" />
-                                                          <field name="name_field" />
+                  <field name="name_field" />
+
             </xpath>
         </field>
     </record>
