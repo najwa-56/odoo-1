@@ -22,7 +22,7 @@ class PosOrderLine(models.Model):
 
     name_field = fields.Char(string="Name Field", store=True)
 
-  
+
 
     #Edit----#
 
