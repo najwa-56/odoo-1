@@ -122,12 +122,12 @@ patch(Orderline.prototype, {
         this.update_sales_multi_uom_id(uom_id);
 
     },
-    async update_sales_multi_uom_id(uom_id) {
+    async update_sales_multi_uom_id(product_uom_id) {
     try {
         await this.rpc({
             model: 'pos.order.line',
             method: 'update_sales_multi_uom_id',
-            args: [this.id, uom_id],
+            args: [this.id, product_uom_id],
         });
     } catch (error) {
         console.error('Failed to update sales_multi_uom_id:', error);

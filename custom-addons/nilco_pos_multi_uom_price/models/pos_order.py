@@ -28,18 +28,18 @@ class PosOrderLine(models.Model):
             line.name_field = line.sales_multi_uom_id.name_field if line.sales_multi_uom_id else ''
 
     @api.model
-    def update_sales_multi_uom_id(self, order_line_id, uom_id):
+    def update_sales_multi_uom_id(self, order_line_id, product_uom_id):
         order_line = self.browse(order_line_id)
-        if order_line and uom_id:
+        if order_line and product_uom_id:
             # Fetch the correct product.multi.uom.price record based on the selected uom_id
             multi_uom_price = self.env['product.multi.uom.price'].search([
-                ('uom_id', '=', uom_id),
+                ('uom_id', '=', product_uom_id),
                 ('product_id', '=', order_line.product_id.id)
             ], limit=1)
             if multi_uom_price:
                 order_line.sales_multi_uom_id = multi_uom_price.id
             else:
-                _logger.warning(f"No matching product.multi.uom.price found for UOM ID: {uom_id}")
+                _logger.warning(f"No matching product.multi.uom.price found for UOM ID: {product_uom_id}")
 
     #Edit----#
 
