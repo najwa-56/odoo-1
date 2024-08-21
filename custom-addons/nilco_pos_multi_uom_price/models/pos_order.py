@@ -10,18 +10,18 @@ _logger = logging.getLogger(__name__)
 class PosOrderLine(models.Model):
     _inherit = 'pos.order.line'
 
-    product_uom_id = fields.Many2one('uom.uom', string='Product UoM', related='')
+    product_uom_id = fields.Many2one('uom.uom', string='Product UoM', related='p')
     #add field Ratio#####
     Ratio = fields.Float("Ratio", compute="_compute_ratio",
                          store=False)  # Ratio field  # Related field to the ratio in uom.uom
 
+    name_field = fields.Char(string="Name Field", store=True)
 
-    selected_uom_ids = fields.Many2many(string="Uom Ids", related='product_id.selected_uom_ids')
+    def _prepare_account_move_line(self, order, line, session=None):
+        res = super(PosOrderLine, self)._prepare_account_move_line(order, line, session)
+        res['name_field'] = line.name_field
+        return res
 
-    sales_multi_uom_id = fields.Many2one("product.multi.uom.price", string="Cust UOM", domain="[('id', 'in', selected_uom_ids)]")
-    name_field = fields.Char(string="Name Field", compute="_compute_name_field", store=True)
-
- 
     #Edit----#
 
     @api.depends('product_uom_id')
