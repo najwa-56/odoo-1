@@ -158,18 +158,16 @@ class Pricelist(models.Model):
 class AccountInvoiceLine(models.Model):
     _inherit = "account.move.line"
 
-    pos_order_line_id = fields.Many2one('pos.order.line', string='POS Order Line')
-
     selected_uom_ids = fields.Many2many(string="Uom Ids", related='product_id.selected_uom_ids')
 
     sales_multi_uom_id = fields.Many2one("product.multi.uom.price", string="Cust UOM",
                                          domain="[('id', 'in', selected_uom_ids)]")
-    name_field = fields.Char(
-        related='pos_order_line_id.name_field',
-        string='Custom Field from POS',
-        store=True,
-    )
+    name_field = fields.Char(string="Name Field", compute="_compute_name_field", store=True)
 
+    @api.depends('sales_multi_uom_id')
+    def _compute_name_field(self):
+        for line in self:
+            line.name_field = line.sales_multi_uom_id.name_field if line.sales_multi_uom_id else ''
 
     @api.onchange('product_uom_id', 'quantity')
     def _onchange_uom_id(self):

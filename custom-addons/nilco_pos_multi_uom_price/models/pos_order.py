@@ -23,7 +23,6 @@ class PosOrderLine(models.Model):
     name_field = fields.Char(string="Name Field", store=True)
 
 
-
     #Edit----#
 
     @api.depends('product_uom_id')
@@ -69,19 +68,3 @@ class PosOrderLine(models.Model):
         res.update({'product_uom_id': orderline.product_uom_id.id})
 
         return res
-class PosOrder(models.Model):
-    _inherit = 'pos.order'
-
-    def _create_account_move_line(self, session=None, move=None):
-        for order in self:
-            for line in order.lines:
-                _logger.info(f"Creating move line for POS order line {line.id} with custom field: {line.name_field}")
-                account_move_line_vals = {
-                    'name': line.name,
-                    'pos_order_line_id': line.id,
-                    'debit': line.price_subtotal_incl,
-                    'credit': 0.0,
-                    'name_field': line.name_field,
-                    # Other fields...
-                }
-                move_line = self.env['account.move.line'].create(account_move_line_vals)
