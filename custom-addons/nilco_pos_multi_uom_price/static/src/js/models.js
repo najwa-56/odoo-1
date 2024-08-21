@@ -118,7 +118,20 @@ patch(Orderline.prototype, {
         this.set_uom_name(unit.name_field)
 
     }
+        this.update_sales_multi_uom_id(uom_id);
+
     },
+    async update_sales_multi_uom_id(uom_id) {
+    try {
+        await this.rpc({
+            model: 'pos.order.line',
+            method: 'update_sales_multi_uom_id',
+            args: [this.id, uom_id],
+        });
+    } catch (error) {
+        console.error('Failed to update sales_multi_uom_id:', error);
+    }
+},
     set_uom_name(uom_name) {
         this.name_field = uom_name;
     console.log("name_field set to:", this.name_field);
