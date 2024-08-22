@@ -112,7 +112,6 @@ patch(Orderline.prototype, {
         return {
             ...super.getDisplayData(),
             name_field: this.get_product().name_field,
-            sales_multi_uom_id: this.get_product().sales_multi_uom_id,
         };
     },
     set_uom(uom_id) {
@@ -129,11 +128,7 @@ patch(Orderline.prototype, {
     console.log("name_field set to:", this.name_field);
 
     },
-    set_idn(idn) {
-        this.sales_multi_uom_id = idn;
-    console.log("sales_multi_uom_id set to:", this.sales_multi_uom_id);
 
-    },
 
     get_unit(){
         if (this.product.default_uom_price > 0 & this.price_type == "original" & this.product.default_uom_id != false){
