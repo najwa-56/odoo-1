@@ -128,15 +128,19 @@ patch(Orderline.prototype, {
     console.log("name_field set to:", this.name_field);
 
     },
-     // Method to get the name_field by uom_id
-    get_uom_name_field(uom_id) {
-        if (this.pos && this.pos.units_by_id && this.pos.units_by_id[uom_id]) {
-            return this.pos.units_by_id[uom_id].name_field;
-        } else {
-            console.error('UOM ID not found:', uom_id);
-            return null;  // or some default value
+    getMatchingUomValue(orderline) {
+    // Ensure sales_multi_uom_id is an array (it might be a single record or undefined)
+    const salesMultiUomIds = Array.isArray(orderline.sales_multi_uom_id) ? orderline.sales_multi_uom_id : [orderline.sales_multi_uom_id];
+
+    for (let i = 0; i < salesMultiUomIds.length; i++) {
+        const uomId = salesMultiUomIds[i];
+
+        // Check if the current UoM ID matches the product_uom_id
+        if (uomId.id === orderline.product_uom_id.id) {
+            // Return the corresponding sales_multi_uom_id value
+            return uomId.value; // Replace `value` with the actual field you want to return
         }
-    },
+    }
 
     get_unit(){
         if (this.product.default_uom_price > 0 & this.price_type == "original" & this.product.default_uom_id != false){

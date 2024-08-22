@@ -36,14 +36,6 @@ class PosOrderLine(models.Model):
 
         return invoice_line_vals
 
-    @api.model
-    def _prepare_account_move_line(self, pos_order_line, move):
-        res = super(PosOrderLine, self)._prepare_account_move_line(pos_order_line, move)
-        # Add the name_field to the account move line
-        _logger.info(f"Copying name_field to account.move.line: {self.name_field}")
-
-        res['pos_name_field'] = pos_order_line.name_field
-        return res
     #Edit----#
 
     @api.depends('product_uom_id')
