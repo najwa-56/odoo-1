@@ -197,3 +197,6 @@ class AccountInvoiceLine(models.Model):
         if warning:
             result['warning'] = warning
         return result
+
+
+    
