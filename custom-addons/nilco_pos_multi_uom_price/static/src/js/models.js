@@ -90,7 +90,7 @@ patch(Orderline.prototype, {
     if (json.product_uom_id && this.pos && this.pos.units_by_id && this.pos.units_by_id[json.product_uom_id]) {
         this.product_uom_id = {
             0: this.pos.units_by_id[json.product_uom_id].id,
-            1: this.pos.units_by_id[json.product_uom_id].name_field
+            1: this.pos.units_by_id[json.product_uom_id].name
         };
     } else {
         console.error('Invalid product_uom_id or units_by_id not found', json.product_uom_id, this.pos.units_by_id);
@@ -128,13 +128,15 @@ patch(Orderline.prototype, {
     console.log("name_field set to:", this.name_field);
 
     },
-
-     set_uom_name(uom_name) {
-        this.name_field = uom_name;
-    console.log("name_field set to:", this.name_field);
-
+     // Method to get the name_field by uom_id
+    get_uom_name_field(uom_id) {
+        if (this.pos && this.pos.units_by_id && this.pos.units_by_id[uom_id]) {
+            return this.pos.units_by_id[uom_id].name_field;
+        } else {
+            console.error('UOM ID not found:', uom_id);
+            return null;  // or some default value
+        }
     },
-
 
     get_unit(){
         if (this.product.default_uom_price > 0 & this.price_type == "original" & this.product.default_uom_id != false){
