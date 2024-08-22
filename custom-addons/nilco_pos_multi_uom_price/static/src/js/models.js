@@ -139,6 +139,11 @@ patch(Orderline.prototype, {
                 return undefined;
             }
             return this.pos.units_by_id[unit_id];
+             const unit = this.pos.units_by_id[unit_id];
+            if (unit) {
+                this.name_field = unit.name_field;  // Set the name_field
+                return unit;
+            }
         }
         return this.product.get_unit();
     },

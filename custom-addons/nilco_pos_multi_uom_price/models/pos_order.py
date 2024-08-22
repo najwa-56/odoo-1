@@ -20,9 +20,7 @@ class PosOrderLine(models.Model):
     sales_multi_uom_id = fields.Many2one("product.multi.uom.price", string="Cust UOM",
                                          domain="[('id', 'in', selected_uom_ids)]")
 
-    name_field = fields.Char(string="Name Field", store=True)
-
-    pos_name_field = fields.Char(string="POS Name Field", compute="_compute_pos_name_field")
+    name_field = fields.Char(string="Name Field", store=True,compute="_compute_pos_name_field")
 
     @api.depends('product_uom_id', 'sales_multi_uom_id')
     def _compute_pos_name_field(self):
@@ -30,10 +28,10 @@ class PosOrderLine(models.Model):
             if line.product_uom_id and line.sales_multi_uom_id:
                 for uom_record in line.sales_multi_uom_id:
                     if uom_record.uom_id.id == line.product_uom_id.id:
-                        line.pos_name_field = uom_record.pos_name_field
+                        line.name_field = uom_record.name_field
                         break
             else:
-                line.pos_name_field = "Default Name"  # or handle this case appropriatel
+                line.name_field = "Default Name"  # or handle this case appropriatel
 
     @api.model
     def _prepare_account_move_line(self, pos_order_line, move):
