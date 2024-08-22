@@ -33,7 +33,7 @@ class PosOrderLine(models.Model):
                         line.pos_name_field = uom_record.pos_name_field
                         break
             else:
-                line.name_field = "Default Name"  # or handle this case appropriatel
+                line.pos_name_field = "Default Name"  # or handle this case appropriatel
 
     @api.model
     def _prepare_account_move_line(self, pos_order_line, move):
