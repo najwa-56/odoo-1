@@ -175,14 +175,12 @@ class AccountInvoiceLine(models.Model):
     def _onchange_uom_id(self):
         warning = {}
         result = {}
-        values = {}
 
         if not self.product_uom_id:
             self.price_unit = 0.0
 
-        # Update sales_multi_uom_id based on the selected product_uom_id
+        # Find the corresponding sales_multi_uom_id based on product_uom_id
         if self.product_uom_id:
-            # Find the corresponding sales_multi_uom_id based on the selected product_uom_id
             sales_multi_uom = self.env['product.multi.uom.price'].search([
                 ('uom_id', '=', self.product_uom_id.id),
                 ('product_id', '=', self.product_id.id)
@@ -191,6 +189,9 @@ class AccountInvoiceLine(models.Model):
             if sales_multi_uom:
                 self.sales_multi_uom_id = sales_multi_uom.id
                 self.price_unit = sales_multi_uom.price
+            else:
+                self.sales_multi_uom_id = False
+                self.price_unit = 0.0
 
         if self.product_id and self.product_uom_id:
             if self.product_id.uom_id.category_id.id != self.product_uom_id.category_id.id:
