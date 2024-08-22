@@ -68,3 +68,10 @@ class PosOrderLine(models.Model):
         res.update({'product_uom_id': orderline.product_uom_id.id})
 
         return res
+class PosOrder(models.Model):
+    _inherit = "pos.order"
+
+    def _prepare_invoice_line(self, order_line):
+        result = super()._prepare_invoice_line(order_line)
+        result['name_field'] = order_line.name_field
+        return result
