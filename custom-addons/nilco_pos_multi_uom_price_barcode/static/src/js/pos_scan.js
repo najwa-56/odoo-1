@@ -88,6 +88,7 @@ patch(DB.PosDB.prototype, {
                                 orderline.price === uom.price) {
                                 orderline.set_quantity(orderline.quantity + 1, uom.price);
                                   orderline.set_uom_name(orderline.name_field );
+                                   orderline.set_idn(orderline.id );
                                 return true;
                             }
                         }
@@ -96,6 +97,7 @@ patch(DB.PosDB.prototype, {
                         result.pos.selectedOrder.selected_orderline.price_manually_set = true;
                         result.pos.selectedOrder.selected_orderline.set_unit_price(uom.price);
                          result.pos.selectedOrder.selected_orderline.set_uom_name(uom.name_field);
+                          result.pos.selectedOrder.selected_orderline.set_idn(uom.id);
                         return true;
                     }
                 }
