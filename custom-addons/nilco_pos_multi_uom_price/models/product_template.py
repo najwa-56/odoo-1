@@ -164,11 +164,17 @@ class AccountInvoiceLine(models.Model):
                                          domain="[('id', 'in', selected_uom_ids)]")
     name_field = fields.Char(string="Name Field", compute="_compute_name_field", store=True)
 
-    @api.depends('sales_multi_uom_id')
+    product_uom_id = fields.Many2one('uom.uom', string='Product UoM', related='sales_multi_uom_id.uom_id')
+
+    @api.depends('sales_multi_uom_id', 'product_uom_id')
     def _compute_name_field(self):
         for line in self:
-            line.name_field = line.sales_multi_uom_id.name_field if line.sales_multi_uom_id else ''
-
+            # Loop through the related sales_multi_uom_id records
+            if line.sales_multi_uom_id and line.sales_multi_uom_id.uom_id.id == line.product_uom_id.id:
+                line.name_field = line.sales_multi_uom_id.name_field
+            else:
+                line.name_field = False  # or set a default value if needed
+                
     @api.onchange('product_uom_id', 'quantity')
     def _onchange_uom_id(self):
         warning = {}
@@ -195,3 +201,5 @@ class AccountInvoiceLine(models.Model):
         if warning:
             result['warning'] = warning
         return result
+
+
