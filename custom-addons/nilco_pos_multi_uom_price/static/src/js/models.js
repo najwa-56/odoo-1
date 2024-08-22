@@ -140,7 +140,7 @@ patch(Orderline.prototype, {
             // Return the corresponding sales_multi_uom_id value
             return uomId.value; // Replace `value` with the actual field you want to return
         }
-    }
+    }},
 
     get_unit(){
         if (this.product.default_uom_price > 0 & this.price_type == "original" & this.product.default_uom_id != false){
