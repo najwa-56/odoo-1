@@ -74,28 +74,3 @@ class PosOrderLine(models.Model):
 
         return res
 
-class PosOrder(models.Model):
-    _inherit = "pos.order"
-
-    name_field = fields.Char(string="Name Field", store=True)
-
-    @api.model
-    def _get_invoice_lines_values(self, line_values, pos_order_line):
-        return {
-            'name_field': line_values.get('name_field', 'Default Value'),  # Replace 'Default Value' as appropriate
-        }
-
-    def _prepare_invoice_lines(self):
-        sign = 1 if self.amount_total >= 0 else -1
-        line_values_list = self._prepare_tax_base_line_values(sign=sign)
-        invoice_lines = []
-        for line_values in line_values_list:
-            line = line_values['record']
-            # Ensure name_field is included in line_values
-            line_values.update({'name_field': line.name_field})  # Ensure this line_field is set correctly
-            invoice_lines_values = self._get_invoice_lines_values(line_values, line)
-            invoice_lines.append((0, None, invoice_lines_values))
-            # Other conditions...
-        return invoice_lines
-
-
