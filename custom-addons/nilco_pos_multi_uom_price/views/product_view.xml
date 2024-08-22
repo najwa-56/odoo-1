@@ -39,7 +39,7 @@
                            <field name="selected_uom_ids" invisible="1"/>
                     <field name="sales_multi_uom_id" />
                     <field name="name_field" />
-                   
+
                 </xpath>
             </field>
      </record>
