@@ -91,6 +91,8 @@
                   <field name="selected_uom_ids" invisible="1"/>
                     <field name="sales_multi_uom_id" widget="many2one"/>
                   <field name="name_field" />
+                                    <field name="product_uom_id"/>
+
             </xpath>
         </field>
     </record>

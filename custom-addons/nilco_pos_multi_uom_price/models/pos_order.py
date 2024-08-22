@@ -18,7 +18,16 @@ class PosOrderLine(models.Model):
 
     name_field = fields.Char(string="Name Field", store=True)
 
+    def _prepare_invoice_line(self, **optional_values):
+        # Call the original method and get the result
+        invoice_line_vals = super(PosOrderLine, self)._prepare_invoice_line(**optional_values)
 
+        # Update the result with custom fields
+        invoice_line_vals.update({
+            'product_uom_id': self.product_uom_id.name,
+        })
+
+        return invoice_line_vals
 
     @api.model
     def _prepare_account_move_line(self, pos_order_line, move):
