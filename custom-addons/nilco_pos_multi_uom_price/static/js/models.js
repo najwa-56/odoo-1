@@ -14,7 +14,7 @@ patch(Order.prototype, {
   set_orderline_options(orderline, options) {
         super.set_orderline_options(...arguments);
         if(options.product_uom_id !== undefined){
-            orderline.sales_multi_uom_id = options.sales_multi_uom_id;
+            orderline.product_uom_id = options.product_uom_id;
 
         }
     }
