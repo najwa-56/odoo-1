@@ -112,6 +112,7 @@ patch(Orderline.prototype, {
         return {
             ...super.getDisplayData(),
             name_field: this.get_product().name_field,
+            sales_multi_uom_id: this.get_product().sales_multi_uom_id,
         };
     },
     set_uom(uom_id) {
@@ -128,19 +129,11 @@ patch(Orderline.prototype, {
     console.log("name_field set to:", this.name_field);
 
     },
-    getMatchingUomValue(orderline) {
-    // Ensure sales_multi_uom_id is an array (it might be a single record or undefined)
-    const salesMultiUomIds = Array.isArray(orderline.sales_multi_uom_id) ? orderline.sales_multi_uom_id : [orderline.sales_multi_uom_id];
+    set_idn(idn) {
+        this.sales_multi_uom_id = idn;
+    console.log("sales_multi_uom_id set to:", this.sales_multi_uom_id);
 
-    for (let i = 0; i < salesMultiUomIds.length; i++) {
-        const uomId = salesMultiUomIds[i];
-
-        // Check if the current UoM ID matches the product_uom_id
-        if (uomId.id === orderline.product_uom_id.id) {
-            // Return the corresponding sales_multi_uom_id value
-            return uomId.value; // Replace `value` with the actual field you want to return
-        }
-    }},
+    },
 
     get_unit(){
         if (this.product.default_uom_price > 0 & this.price_type == "original" & this.product.default_uom_id != false){
