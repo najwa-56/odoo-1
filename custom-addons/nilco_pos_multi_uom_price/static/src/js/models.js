@@ -125,6 +125,10 @@ patch(Orderline.prototype, {
 
     },
 
+    get_name_field(){
+    console.log("Current value of name_field:", this.name_field);
+    return this.name_field;
+    }
     get_unit(){
         if (this.product.default_uom_price > 0 & this.price_type == "original" & this.product.default_uom_id != false){
             this.price = this.product.default_uom_price;
