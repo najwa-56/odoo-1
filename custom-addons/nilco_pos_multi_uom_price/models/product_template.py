@@ -198,3 +198,22 @@ class AccountInvoiceLine(models.Model):
         if warning:
             result['warning'] = warning
         return result
+
+class AccountMove(models.Model):
+    _inherit = 'account.move'
+
+    sales_multi_uom_id = fields.Many2one('uom.uom', string="Sales UOM")
+
+class PosOrder(models.Model):
+    _inherit = 'pos.order'
+
+    def _create_account_move(self):
+        # Call super to get the move_id from pos.order creation
+        move = super(PosOrder, self)._create_account_move()
+
+        # Assign sales_multi_uom_id to the created account.move record
+        move.write({
+            'sales_multi_uom_id': self.sales_multi_uom_id.id,
+        })
+
+        return move
