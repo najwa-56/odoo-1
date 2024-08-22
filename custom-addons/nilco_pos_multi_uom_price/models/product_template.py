@@ -162,13 +162,13 @@ class AccountInvoiceLine(models.Model):
 
     sales_multi_uom_id = fields.Many2one("product.multi.uom.price", string="Cust UOM",
                                          domain="[('id', 'in', selected_uom_ids)]")
-    name_field = fields.Char(string="Name Field", compute="_compute_name_field", store=True)
-    pos_name_field = fields.Char(string="POS Name Field")
+    name_field = fields.Char(string="Name Field",  store=True)
 
     @api.depends('sales_multi_uom_id')
     def _compute_name_field(self):
         for line in self:
             line.name_field = line.sales_multi_uom_id.name_field if line.sales_multi_uom_id else ''
+
 
     @api.onchange('product_uom_id', 'quantity')
     def _onchange_uom_id(self):

@@ -108,7 +108,6 @@ patch(Orderline.prototype, {
         return {
             ...super.getDisplayData(),
             name_field: this.get_product().name_field,
-             sales_multi_uom_id: this.sales_multi_uom_id,
         };
     },
     set_uom(uom_id) {
@@ -117,7 +116,6 @@ patch(Orderline.prototype, {
     if (unit) {
         this.set_unit_price(unit.price);
         this.set_uom_name(unit.name_field)
-        this.sales_multi_uom_id= unit.name_field
 
     }
     },

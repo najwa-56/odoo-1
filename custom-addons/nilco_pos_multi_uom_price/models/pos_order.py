@@ -4,6 +4,7 @@ import logging
 
 from odoo import models, fields, api, _
 from odoo.tools import float_is_zero
+from odoo.tools import float_is_zero, float_round, float_repr, float_compare
 
 _logger = logging.getLogger(__name__)
     
@@ -74,6 +75,76 @@ class PosOrderLine(models.Model):
 
     def _export_for_ui(self, orderline):
         res = super()._export_for_ui(orderline)
-        res.update({'product_uom_id': orderline.product_uom_id.id})
+        res.update({'product_uom_id': orderline.product_uom_id.id,'name_field': orderline.name_field})
 
         return res
+
+class PosOrder(models.Model):
+    _inherit = "pos.order"
+
+    @api.model
+    def _get_invoice_lines_values(self, line_values, pos_order_line):
+        return {
+
+            'name_field': line_values['name_field'],
+
+        }
+
+    def _prepare_invoice_lines(self):
+        """ Prepare a list of orm commands containing the dictionaries to fill the
+        'invoice_line_ids' field when creating an invoice.
+
+        :return: A list of Command.create to fill 'invoice_line_ids' when calling account.move.create.
+        """
+        sign = 1 if self.amount_total >= 0 else -1
+        line_values_list = self._prepare_tax_base_line_values(sign=sign)
+        invoice_lines = []
+        for line_values in line_values_list:
+            line = line_values['record']
+            invoice_lines_values = self._get_invoice_lines_values(line_values, line)
+            invoice_lines.append((0, None, invoice_lines_values))
+            if line.order_id.pricelist_id.discount_policy == 'without_discount' and float_compare(
+                    line.price_subtotal_incl, line.product_id.lst_price * line.qty,
+                    precision_rounding=self.currency_id.rounding) < 0:
+                invoice_lines.append((0, None, {
+                    'name': _('Price discount from %s -> %s',
+                              float_repr(line.product_id.lst_price * line.qty, self.currency_id.decimal_places),
+                              float_repr(line.price_subtotal_incl, self.currency_id.decimal_places)),
+                    'display_type': 'line_note',
+                }))
+            if line.customer_note:
+                invoice_lines.append((0, None, {
+                    'name': line.customer_note,
+                    'display_type': 'line_note',
+                }))
+
+        return invoice_lines
+
+
+class AccountMove(models.Model):
+    _inherit = 'account.move'
+
+
+
+def _get_invoiced_lot_values(self):
+        self.ensure_one()
+
+        lot_values = super(AccountMove, self)._get_invoiced_lot_values()
+
+        if self.state == 'draft':
+            return lot_values
+
+        # user may not have access to POS orders, but it's ok if they have
+        # access to the invoice
+        for order in self.sudo().pos_order_ids:
+            for line in order.lines:
+                lots = line.pack_lot_ids or False
+                if lots:
+                    for lot in lots:
+                        lot_values.append({
+
+                            'name_field': line.name_field,
+
+                        })
+
+        return lot_values
