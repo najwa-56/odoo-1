@@ -11,21 +11,14 @@ import {
     floatIsZero,
 } from "@web/core/utils/numbers";
 patch(Order.prototype, {
-    set_orderline_options(orderline, options) {
-        console.log("Options received:", options); // Debugging line
+  set_orderline_options(orderline, options) {
         super.set_orderline_options(...arguments);
+        if(options.product_uom_id !== undefined){
+            orderline.sales_multi_uom_id = options.sales_multi_uom_id;
 
-        if (options.product_uom_id !== undefined) {
-            orderline.product_uom_id = options.product_uom_id;
-        }
-
-        if (options.sales_multi_uom_id !== undefined) {
-            this.sales_multi_uom_id = options.sales_multi_uom_id;
         }
     }
 });
-
-
 patch(Orderline.prototype, {
     setup(_defaultObj, options) {
         super.setup(...arguments);
