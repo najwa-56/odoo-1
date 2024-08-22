@@ -20,6 +20,7 @@ patch(Order.prototype, {
         super.set_orderline_options(...arguments);
         if(options.product_uom_id !== undefined){
             orderline.product_uom_id = options.product_uom_id;
+             orderline.sales_multi_uom_id = options.sales_multi_uom_id;
             orderline.name_field = options.name_field;
 
         }
@@ -64,6 +65,7 @@ patch(Orderline.prototype, {
         super.setup(...arguments);
         this.product_uom_id = this.product.default_uom_id || this.product_uom_id || this.product.uom_id;
                 this.name_field = options.name_field || this.name_field || "";  // Ensure initialization
+                 this.sales_multi_uom_id = options.sales_multi_uom_id || this.sales_multi_uom_id || "";  // Ensure initialization
          this.reorderProduct();
     },
 
@@ -72,6 +74,7 @@ patch(Orderline.prototype, {
         const json = super.export_as_JSON(...arguments);
         json.product_uom_id = this.product_uom_id[0];
             json.name_field = this.name_field;  // Add this line
+              json.sales_multi_uom_id = this.sales_multi_uom_id;  // Add this line
 
 
         return json;
@@ -79,6 +82,7 @@ patch(Orderline.prototype, {
     init_from_JSON(json) {
     super.init_from_JSON(...arguments);
     this.name_field = json.name_field || "";  // Add this line
+    this.sales_multi_uom_id = json.sales_multi_uom_id || "";  // Add this line
 
     console.log('init_from_JSON:', json);
 
@@ -125,10 +129,13 @@ patch(Orderline.prototype, {
 
     },
 
-    get_name_field(){
-    console.log("Current value of name_field:", this.name_field);
-    return this.name_field;
-    }
+     set_uom_name(uom_name) {
+        this.name_field = uom_name;
+    console.log("name_field set to:", this.name_field);
+
+    },
+
+
     get_unit(){
         if (this.product.default_uom_price > 0 & this.price_type == "original" & this.product.default_uom_id != false){
             this.price = this.product.default_uom_price;
