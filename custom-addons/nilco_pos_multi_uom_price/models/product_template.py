@@ -155,13 +155,11 @@ class Pricelist(models.Model):
         self and self.ensure_one()  # self is at most one record
         return self._compute_price_rule12(product,*args, **kwargs)[product.id]
 
-
-
-
 class AccountInvoiceLine(models.Model):
     _inherit = "account.move.line"
 
-    selected_uom_ids = fields.Many2many(string="UOM Ids", related='product_id.selected_uom_ids')
+    selected_uom_ids = fields.Many2many(string="Uom Ids", related='product_id.selected_uom_ids')
+
     sales_multi_uom_id = fields.Many2one("product.multi.uom.price", string="Cust UOM",
                                          domain="[('id', 'in', selected_uom_ids)]")
     name_field = fields.Char(string="Name Field", compute="_compute_name_field", store=True)
@@ -175,23 +173,16 @@ class AccountInvoiceLine(models.Model):
     def _onchange_uom_id(self):
         warning = {}
         result = {}
-
+        values = {}
         if not self.product_uom_id:
             self.price_unit = 0.0
-
-        # Find the corresponding sales_multi_uom_id based on product_uom_id
-        if self.product_uom_id:
-            sales_multi_uom = self.env['product.multi.uom.price'].search([
-                ('uom_id', '=', self.product_uom_id.id),
-                ('product_id', '=', self.product_id.id)
-            ], limit=1)
-
-            if sales_multi_uom:
-                self.sales_multi_uom_id = sales_multi_uom.id
-                self.price_unit = sales_multi_uom.price
-            else:
-                self.sales_multi_uom_id = False
-                self.price_unit = 0.0
+        if self.sales_multi_uom_id:
+            if self.sales_multi_uom_id:
+                values = {
+                    "product_uom_id": self.sales_multi_uom_id.uom_id.id,
+                }
+            self.update(values)
+            self.price_unit = self.sales_multi_uom_id.price
 
         if self.product_id and self.product_uom_id:
             if self.product_id.uom_id.category_id.id != self.product_uom_id.category_id.id:
@@ -201,8 +192,6 @@ class AccountInvoiceLine(models.Model):
                         'The selected unit of measure is not compatible with the unit of measure of the product.'),
                 }
                 self.product_uom_id = self.product_id.uom_id.id
-
         if warning:
             result['warning'] = warning
-
         return result
