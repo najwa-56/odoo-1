@@ -23,6 +23,7 @@ class PosOrderLine(models.Model):
     name_field = fields.Char(string="Name Field", store=True)
 
 
+
     @api.model
     def _prepare_account_move_line(self, pos_order_line, move):
         res = super(PosOrderLine, self)._prepare_account_move_line(pos_order_line, move)
