@@ -184,7 +184,7 @@ class AccountInvoiceLine(models.Model):
             else:
                 _logger.info("No corresponding POS order line found for product: %s", line.product_id.name)
 
-                
+
     @api.onchange('product_uom_id', 'quantity')
     def _onchange_uom_id(self):
         warning = {}
