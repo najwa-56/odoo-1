@@ -67,3 +67,12 @@ class PosOrderLine(models.Model):
 
         return res
 
+class PosOrder(models.Model):
+    _inherit = 'pos.order'
+
+    def _prepare_invoice_line(self, order_line):
+        res = super(PosOrder, self)._prepare_invoice_line(order_line)
+        res.update({
+            'uom_name': order_line.uom_name,
+        })
+        return res

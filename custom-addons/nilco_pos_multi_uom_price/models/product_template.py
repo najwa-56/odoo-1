@@ -15,6 +15,7 @@ class ProductTemplate(models.Model):
     selected_uom_ids = fields.Many2many(comodel_name="product.multi.uom.price", string="Uom Ids", compute='_get_all_uom_id', store=True)
     sales_multi_uom_id = fields.Many2one("product.multi.uom.price", string="Cust UOM",
                                          domain="[('id', 'in', selected_uom_ids)]")
+
     @api.depends('multi_uom_price_id')
     def _get_all_uom_id(self):
         for record in self:
@@ -164,6 +165,7 @@ class AccountInvoiceLine(models.Model):
                                          domain="[('id', 'in', selected_uom_ids)]")
     name_field = fields.Char(string="Name Field", compute="_compute_name_field", store=True)
     product_uom_id = fields.Many2one('uom.uom', string='Product UoM', related='')
+    uom_name = fields.Char(string="Unit of Measure Name",store=True)
 
 
     @api.depends('sales_multi_uom_id')
