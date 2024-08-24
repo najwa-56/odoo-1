@@ -23,7 +23,7 @@ class PosOrderLine(models.Model):
 
     name_field = fields.Char(string="Name Field", store=True)
 
-    @api.depends('sales_multi_uom_id')
+    @api.depends('product_uom_id')
     def _compute_name_field(self):
         for line in self:
             line.name_field = line.product_uom_id.name_field if line.product_uom_id else ''
