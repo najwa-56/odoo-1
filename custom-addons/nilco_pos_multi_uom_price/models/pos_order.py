@@ -16,6 +16,7 @@ class PosOrderLine(models.Model):
     Ratio = fields.Float("Ratio", compute="_compute_ratio",
                          store=False)  # Ratio field  # Related field to the ratio in uom.uom
 
+    uom_name = fields.Char(string="Unit of Measure Name")
 
 
     name_field = fields.Char(string="Name Field", store=True)

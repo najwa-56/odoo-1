@@ -37,7 +37,7 @@
                     <field name="product_uom_id"/>
                     <field name="Ratio"/>
 
-                    <field name="name_field" />
+                    <field name="uom_name" />
 
                 </xpath>
             </field>
