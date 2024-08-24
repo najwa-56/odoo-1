@@ -172,7 +172,7 @@ class AccountInvoiceLine(models.Model):
             line.name_field = line.sales_multi_uom_id.name_field if line.sales_multi_uom_id else ''
 
 
-    @api.depends('product_uom_id.id')
+    @api.depends('product_uom_id')
     def _compute_name_field(self):
         for line in self:
             line.name_field = line.product_uom_id.id.name_field if line.product_uom_id.id else ''
