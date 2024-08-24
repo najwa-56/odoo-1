@@ -29,10 +29,12 @@ patch(Orderline.prototype, {
     export_as_JSON() {
         const json = super.export_as_JSON(...arguments);
         json.product_uom_id = this.product_uom_id[0];
+        json.name_field = this.name_field; // Add this line
         return json;
     },
     init_from_JSON(json) {
     super.init_from_JSON(...arguments);
+      this.name_field = json.name_field; // Add this line
 
     console.log('init_from_JSON:', json);
 
