@@ -763,14 +763,19 @@
                                             <br/>
                                             <span class="lable_bold">الوحدة</span>
                                         </th>
-                                        <th align="center" name="discount" class="second_table"
+
+                                         <th align="right" name="item_subtotal" class="second_table"
                                             style="background-color:#4f4d4d;text-align:center;color:white;">
-                                            <span class="lable_bold">UOMname</span>
+                                            <span class="lable_bold">Subtotal </span>
                                             <br/>
-                                            <span class="lable_bold">اسم الوحدة</span>
+                                            <span class="lable_bold">Exclusive of VAT</span>
+                                            <br/>
+                                            <span class="lable_bold">إﺟﻤﺎﻟﻲ اﻟﻤﺒﻠﻎ  </span>
+                                              <br/>
+                                            <span class="lable_bold"> ﻏﻴﺮ ﺷﺎﻣﻞ ﺿﺮﻳﺒﺔ</span>
+                                              <br/>
+                                            <span class="lable_bold">  اﻟﻘﻴﻤﺔ اﻟﻤﻀﺎﻓﺔ</span>
                                         </th>
-
-
                                         <th align="center" name="taxable_rate" class="second_table"
                                             style="background-color:#4f4d4d;text-align:center;color:white;">
                                             <span class="lable_bold">VAT Rate</span>
@@ -789,18 +794,7 @@
                                         </th>
                                                 <!-- Editeing-->
 
-                                       <th align="right" name="item_subtotal" class="second_table"
-                                            style="background-color:#4f4d4d;text-align:center;color:white;">
-                                            <span class="lable_bold">Subtotal </span>
-                                            <br/>
-                                            <span class="lable_bold">Exclusive of VAT</span>
-                                            <br/>
-                                            <span class="lable_bold">إﺟﻤﺎﻟﻲ اﻟﻤﺒﻠﻎ  </span>
-                                              <br/>
-                                            <span class="lable_bold"> ﻏﻴﺮ ﺷﺎﻣﻞ ﺿﺮﻳﺒﺔ</span>
-                                              <br/>
-                                            <span class="lable_bold">  اﻟﻘﻴﻤﺔ اﻟﻤﻀﺎﻓﺔ</span>
-                                        </th>
+
                                         <th align="right" name="item_subtotal" class="second_table"
                                             style="background-color:#4f4d4d;text-align:center;color:white;">
                                             <span class="lable_bold">Subtotal </span>
@@ -848,15 +842,17 @@
                                          <td class="second_table" style="text-align:right;">
                                               <span t-esc="line.product_uom_id.name"/>
                                         </td>
-                                         <td class="second_table" style="text-align:right;">
-                                              <span t-esc="line.name_field"/>
-                                        </td>
+
                                                 <!-- Editeing-->
 
                                        <!-- <td class="second_table" style="text-align:right;">
                                             <span t-esc="doc.get_bt_136(line.zatca_id)"
                                                   t-options='{"widget": "monetary", "display_currency": doc.currency_id}'/>
                                         </td>-->
+                                         <td class="second_table" style="text-align:right;">
+                                            <span t-esc="doc.get_ksa_11(line.zatca_id)"
+                                                  t-options='{"widget": "monetary", "display_currency": doc.currency_id}'/>
+                                        </td>
                                         <td class="second_table" style="text-align:right;">
                                             <t t-if="not len(line.tax_ids.ids)">
                                                 0
@@ -866,10 +862,7 @@
                                             </t>
                                             %
                                         </td>
-                                       <td class="second_table" style="text-align:right;">
-                                            <span t-esc="doc.get_ksa_11(line.zatca_id)"
-                                                  t-options='{"widget": "monetary", "display_currency": doc.currency_id}'/>
-                                        </td>
+
                                                 <!-- Editeing-->
 
                                          <td class="second_table" style="text-align:right;">
