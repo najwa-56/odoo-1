@@ -28,6 +28,7 @@ class PosOrderLine(models.Model):
         for line in self:
             line.name_field = line.product_uom_id.name_field if line.product_uom_id else ''
 
+
     def _prepare_invoice_line(self, **optional_values):
         # Call the original method and get the result
         invoice_line_vals = super(PosOrderLine, self)._prepare_invoice_line(**optional_values)
