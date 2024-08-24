@@ -849,8 +849,8 @@
                                             <span t-esc="doc.get_bt_136(line.zatca_id)"
                                                   t-options='{"widget": "monetary", "display_currency": doc.currency_id}'/>
                                         </td>-->
-                                         <td class="second_table" style="text-align:right;">
-                                            <span t-esc="doc.get_ksa_11(line.zatca_id)"
+                                        <td class="second_table" style="text-align:right;">
+                                            <span t-esc="doc.get_bt_131(line.zatca_id)"
                                                   t-options='{"widget": "monetary", "display_currency": doc.currency_id}'/>
                                         </td>
                                         <td class="second_table" style="text-align:right;">
@@ -862,13 +862,13 @@
                                             </t>
                                             %
                                         </td>
-
-                                                <!-- Editeing-->
-
-                                         <td class="second_table" style="text-align:right;">
-                                            <span t-esc="doc.get_bt_131(line.zatca_id)"
+                                       <td class="second_table" style="text-align:right;">
+                                            <span t-esc="doc.get_ksa_11(line.zatca_id)"
                                                   t-options='{"widget": "monetary", "display_currency": doc.currency_id}'/>
                                         </td>
+                                                <!-- Editeing-->
+
+
                                         <td class="second_table" style="text-align:right;">
                                             <span t-esc="doc.get_ksa_12(line.zatca_id)"
                                                   t-options='{"widget": "monetary", "display_currency": doc.currency_id}'/>
