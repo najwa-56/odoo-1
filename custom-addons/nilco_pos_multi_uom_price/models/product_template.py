@@ -171,7 +171,7 @@ class AccountInvoiceLine(models.Model):
         for line in self:
             line.name_field = line.sales_multi_uom_id.name_field if line.sales_multi_uom_id else ''
 
-    
+
     @api.onchange('product_uom_id', 'quantity')
     def _onchange_uom_id(self):
         warning = {}
