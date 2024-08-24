@@ -92,7 +92,7 @@ patch(DB.PosDB.prototype, {
                             }
                         }
                         result.pos.selectedOrder.add_orderline(line);
-                        result.pos.selectedOrder.selected_orderline.set_uom({ 0: uom.id, 1: uom.name_field });
+                        result.pos.selectedOrder.selected_orderline.set_uom({ 0: uom.id, 1: uom.name });
                         result.pos.selectedOrder.selected_orderline.price_manually_set = true;
                         result.pos.selectedOrder.selected_orderline.set_unit_price(uom.price);
                          result.pos.selectedOrder.selected_orderline.set_uom_name(uom.name_field);
