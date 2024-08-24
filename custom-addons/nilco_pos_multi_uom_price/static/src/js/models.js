@@ -116,6 +116,7 @@ patch(Orderline.prototype, {
     },
     set_uom(uom_id) {
         this.product_uom_id = uom_id;
+         this.sales_multi_uom_id = uom_id;
         const unit = this.get_unit();
     if (unit) {
         this.set_unit_price(unit.price);
