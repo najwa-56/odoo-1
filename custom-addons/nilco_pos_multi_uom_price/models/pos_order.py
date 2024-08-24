@@ -16,33 +16,11 @@ class PosOrderLine(models.Model):
     Ratio = fields.Float("Ratio", compute="_compute_ratio",
                          store=False)  # Ratio field  # Related field to the ratio in uom.uom
 
-    selected_uom_ids = fields.Many2many(string="Uom Ids", related='product_id.selected_uom_ids')
 
-    sales_multi_uom_id = fields.Many2one("product.multi.uom.price", string="Cust UOM",
-                                         domain="[('id', 'in', selected_uom_ids)]")
 
     name_field = fields.Char(string="Name Field", store=True)
 
-    @api.depends('product_uom_id')
-    def _compute_name_field(self):
-        for line in self:
-            line.name_field = line.product_uom_id.id.name_field if line.product_uom_id.id else ''
 
-
-    def _prepare_invoice_line(self, **optional_values):
-        # Call the original method and get the result
-        invoice_line_vals = super(PosOrderLine, self)._prepare_invoice_line(**optional_values)
-
-        # Update the result with custom fields
-        invoice_line_vals.update({
-            'sales_multi_uom_id': self.product_uom_id.id,
-            'name_field': self.name_field,
-
-        })
-
-        return invoice_line_vals
-
-    #Edit----#
 
     @api.depends('product_uom_id')
     def _compute_price(self):
