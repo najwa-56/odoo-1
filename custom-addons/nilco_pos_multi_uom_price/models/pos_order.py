@@ -35,7 +35,7 @@ class PosOrderLine(models.Model):
 
         # Update the result with custom fields
         invoice_line_vals.update({
-            'product_uom_id': self.product_uom_id.id,
+            'sales_multi_uom_id': self.product_uom_id.id,
             'name_field': self.name_field,
 
         })
