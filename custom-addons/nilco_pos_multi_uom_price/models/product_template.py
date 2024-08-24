@@ -165,7 +165,6 @@ class AccountInvoiceLine(models.Model):
                                          domain="[('id', 'in', selected_uom_ids)]")
     name_field = fields.Char(string="Name Field", compute="_compute_name_field", store=True)
     product_uom_id = fields.Many2one('uom.uom', string='Product UoM', related='')
-    uom_name = fields.Char(string="Unit of Measure Name",store=True)
 
 
     @api.depends('sales_multi_uom_id')
@@ -173,7 +172,19 @@ class AccountInvoiceLine(models.Model):
         for line in self:
             line.name_field = line.sales_multi_uom_id.name_field if line.sales_multi_uom_id else ''
 
+    @api.depends('product_id')
+    def _compute_name_field(self):
+        for line in self:
+            pos_order_line = self.env['pos.order.line'].search([
+                ('product_id', '=', line.product_id.id),
+                ('order_id.partner_id', '=', line.move_id.partner_id.id)
+            ], limit=1)
+            if pos_order_line:
+                line.name_field = pos_order_line.name_field
+            else:
+                _logger.info("No corresponding POS order line found for product: %s", line.product_id.name)
 
+                
     @api.onchange('product_uom_id', 'quantity')
     def _onchange_uom_id(self):
         warning = {}
