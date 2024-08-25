@@ -114,6 +114,19 @@ class ShProductTemplate(models.Model):
             record.uom_id_2 = uoms[1] if len(uoms) > 1 else False
             record.uom_id_3 = uoms[2] if len(uoms) > 2 else False
 
+
+    uom_id_1_onhand1 = fields.Float('On Hand',compute='_compute_secondary_unit_on_hand_qty2')
+    def _compute_secondary_unit_on_hand_qty2(self):
+        if self:
+            for rec in self:
+                if rec.uom_id_1:
+                    rec.uom_id_1_onhand1 = rec.uom_id._compute_quantity(
+                        rec.qty_available,
+                        rec.uom_id_1
+                    )
+                else:
+                    rec.uom_id_1_onhand1 = 00
+
     '''test'''
 class ShStockQuant(models.Model):
     _inherit = 'stock.quant'

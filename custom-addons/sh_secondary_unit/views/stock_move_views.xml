@@ -96,6 +96,7 @@
             <field name="sh_secondary_uom_onhand2" string="onhand Secondary Qty2" />
 
             <field name="uom_id_1" string="test niclo" />
+            <field name="uom_id_1_onhand1" string="test niclo" />
             <field name="uom_id_2" string="test niclo" />
             <field name="uom_id_3" string="test niclo" />
 
