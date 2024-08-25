@@ -93,6 +93,12 @@ class ShProductTemplate(models.Model):
                     rec.sh_secondary_uom_onhand2 = 00
 
     '''test'''
+
+    '''test uom3'''
+    sales_multi_uom_id = fields.Many2one("product.multi.uom.price", string="Cust UOM",
+                                         domain="[('id', 'in', selected_uom_ids)]")
+
+    '''test'''
 class ShStockQuant(models.Model):
     _inherit = 'stock.quant'
 
