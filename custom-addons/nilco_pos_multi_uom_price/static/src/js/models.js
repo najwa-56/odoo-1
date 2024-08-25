@@ -113,7 +113,7 @@ patch(Orderline.prototype, {
     },
     set_uom(uom_id) {
         this.product_uom_id = uom_id;
-            console.log("name_field set to:", this.product_uom_id);
+            console.log("uom_id set to:", this.product_uom_id);
 
         const unit = this.get_unit();
     if (unit) {
