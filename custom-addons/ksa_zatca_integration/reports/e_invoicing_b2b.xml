@@ -49,7 +49,10 @@
                        t-value="doc.partner_id.buyer_identification if doc.l10n_is_self_billed_invoice else doc.company_id.license"/>
                     <t t-set="license_no"
                        t-value="doc.partner_id.buyer_identification_no if doc.l10n_is_self_billed_invoice else doc.company_id.license_no"/>
-
+                    <div class="col-4">
+                                <img style="text-align:center;width:150px;max-height:150px;float:right;margin-top:-10px;padding-top:0px;"
+                                     alt="Barcode" t-att-src="doc.get_qrcode()"/>
+                        </div>
                     <h3 style="text-align:center;">
                         <t t-esc="invoice_type_ar"/>
                     </h3>
