@@ -92,7 +92,6 @@ class ShProductTemplate(models.Model):
     uom_id_3 = fields.Many2one('product.multi.uom.price', string='UOM 3', compute='_compute_uom_columns')
     uom_id_4 = fields.Many2one('product.multi.uom.price', string='UOM 4', compute='_compute_uom_columns')
     uom_id_5 = fields.Many2one('product.multi.uom.price', string='UOM 5', compute='_compute_uom_columns')
-    uom_id_6 = fields.Many2one('product.multi.uom.price', string='UOM 6', compute='_compute_uom_columns')
     @api.depends('selected_uom_ids')
     def _compute_uom_columns(self):
         for record in self:
@@ -102,7 +101,6 @@ class ShProductTemplate(models.Model):
             record.uom_id_3 = uoms[2] if len(uoms) > 2 else False
             record.uom_id_4 = uoms[3] if len(uoms) > 3 else False
             record.uom_id_5 = uoms[4] if len(uoms) > 4 else False
-            record.uom_id_6 = uoms[5] if len(uoms) > 5 else False
 
     '''show uoms in column'''
 
@@ -112,7 +110,6 @@ class ShProductTemplate(models.Model):
     uom_id_3_onhand3 = fields.Float('On Hand', compute='_compute_secondary_unit_on_hand_qty3')
     uom_id_4_onhand4 = fields.Float('On Hand', compute='_compute_secondary_unit_on_hand_qty4')
     uom_id_5_onhand5 = fields.Float('On Hand', compute='_compute_secondary_unit_on_hand_qty5')
-    uom_id_6_onhand6 = fields.Float('On Hand', compute='_compute_secondary_unit_on_hand_qty6')
     def _compute_secondary_unit_on_hand_qty1(self):
         for rec in self:
             if rec.uom_id and rec.uom_id_1 and rec.uom_id_1.uom_id:
@@ -157,14 +154,7 @@ class ShProductTemplate(models.Model):
             else:
                 rec.uom_id_5_onhand5 = 0.0
 
-    def _compute_secondary_unit_on_hand_qty5(self):
-        for rec in self:
-            if rec.uom_id and rec.uom_id_6 and rec.uom_id_6.uom_id:
-                # Assuming uom_id_1 has a field 'uom_id' that is of type 'uom.uom'
-                rec.uom_id_6_onhand6 = rec.uom_id._compute_quantity(
-                    rec.qty_available, rec.uom_id_6.uom_id)
-            else:
-                rec.uom_id_6_onhand6 = 0.0
+
 
     '''UOMs'''
 class ShStockQuant(models.Model):
