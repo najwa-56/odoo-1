@@ -24,7 +24,7 @@ so your customer/vendor also easily understand that.
         "account",
         "purchase",
         "stock",
-        "product_multi_uom_price",
+        "nilco_pos_multi_uom_price",
     ],
     "application": True,
     "data": [
