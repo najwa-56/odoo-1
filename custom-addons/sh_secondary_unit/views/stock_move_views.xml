@@ -104,6 +104,9 @@
             <field name="uom_id_3" string="UOM3" />
             <field name="uom_id_3_onhand3" string="QTY3" />
 
+            <field name="uom_id_4" string="UOM4" />
+            <field name="uom_id_4_onhand4" string="QTY4" />
+
         </xpath>
     </field>
     </record>
