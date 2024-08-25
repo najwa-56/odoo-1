@@ -95,8 +95,23 @@ class ShProductTemplate(models.Model):
     '''test'''
 
     '''test uom3'''
+    multi_uom_price_id = fields.One2many('product.multi.uom.price', 'product_id', string="UOM Price")
+    category_id = fields.Many2one(related='uom_id.category_id')
+
+    # we add this field wich give me all idss for multi uom record in product
+
+    selected_uom_ids = fields.Many2many(comodel_name="product.multi.uom.price", string="Uom Ids",
+                                        compute='_get_all_uom_id', store=True)
     sales_multi_uom_id = fields.Many2one("product.multi.uom.price", string="Cust UOM",
                                          domain="[('id', 'in', selected_uom_ids)]")
+
+    @api.depends('multi_uom_price_id')
+    def _get_all_uom_id(self):
+        for record in self:
+            if record.multi_uom_price_id:
+                record.selected_uom_ids = self.env['product.multi.uom.price'].browse(record.multi_uom_price_id.ids)
+            else:
+                record.selected_uom_ids = []
 
     '''test'''
 class ShStockQuant(models.Model):
