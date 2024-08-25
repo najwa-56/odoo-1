@@ -10,10 +10,6 @@
                 <field name="sh_is_secondary_unit" groups="sh_secondary_unit.group_secondary_unit_product"/>
                 <field name="sh_secondary_uom" widget="selection" invisible="not sh_is_secondary_unit" required="sh_is_secondary_unit" 
                     domain="[('category_id','=',category_id)]" groups="sh_secondary_unit.group_secondary_unit_product"/>
-                <!--tessst najwa -->
-                <field name="sh_secondary_uom2" widget="selection" invisible="not sh_is_secondary_unit" required="sh_is_secondary_unit"
-                    domain="[('category_id','=',category_id)]" groups="sh_secondary_unit.group_secondary_unit_product"/>
-                <!--tessst najwa -->
             </xpath>
         </field>
     </record>
