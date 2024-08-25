@@ -110,15 +110,22 @@ class ShProductTemplate(models.Model):
     uom_id_3_onhand3 = fields.Float('On Hand', compute='_compute_secondary_unit_on_hand_qty3')
     uom_id_4_onhand4 = fields.Float('On Hand', compute='_compute_secondary_unit_on_hand_qty4')
     uom_id_5_onhand5 = fields.Float('On Hand', compute='_compute_secondary_unit_on_hand_qty5')
-    def _compute_secondary_unit_on_hand_qty1(self):
-        for rec in self:
-            if rec.uom_id and rec.uom_id_1 and rec.uom_id_1.uom_id:
-                # Assuming uom_id_1 has a field 'uom_id' that is of type 'uom.uom'
-                rec.uom_id_1_onhand1 = rec.uom_id._compute_quantity(
-                    rec.qty_available, rec.uom_id_1.uom_id)
-            else:
-                rec.uom_id_1_onhand1 = 0.0
 
+    def _compute_secondary_unit_on_hand_qty2(self):
+        for rec in self:
+            try:
+                # Assume that uom_id_1 has a field 'uom_id' that is of type 'uom.uom'
+                if rec.uom_id and rec.uom_id_1 and rec.uom_id_1.uom_id:
+                    rec.uom_id_1_onhand1 = rec.uom_id._compute_quantity(
+                        rec.qty_available, rec.uom_id_1.uom_id
+                    )
+                else:
+                    rec.uom_id_1_onhand1 = 0.0
+            except Exception as e:
+                # Log error if necessary
+                rec.uom_id_1_onhand1 = 0.0  # Fallback assignment to avoid missing assignment error
+
+    '''
     def _compute_secondary_unit_on_hand_qty2(self):
         for rec in self:
             if rec.uom_id and rec.uom_id_2 and rec.uom_id_2.uom_id:
@@ -156,7 +163,7 @@ class ShProductTemplate(models.Model):
 
 
 
-    '''UOMs'''
+  UOMs'''
 class ShStockQuant(models.Model):
     _inherit = 'stock.quant'
 
