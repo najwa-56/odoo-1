@@ -80,4 +80,19 @@
             </xpath>
         </field>
     </record>
+
+    
+    <!-- -->
+    <record model="ir.ui.view" id="inherit_product_product_stock_tree">
+    <field name="name">product.product.stock.tree.inherit</field>
+    <field name="model">product.product</field>
+    <field name="inherit_id" ref="stock.product_product_stock_tree"/>
+    <field name="arch" type="xml">
+        <xpath expr="//field[@name='uom_id']" position="after">
+            <field name="sh_sec_qty" string="Secondary Qty" groups="sh_secondary_unit.group_secondary_unit_inventory" />
+            <field name="sh_sec_uom" options="{'no_open': True, 'no_create': True}" string="Secondary UOM" groups="sh_secondary_unit.group_secondary_unit_inventory" />
+        </xpath>
+    </field>
+    </record>
+
 </odoo>
