@@ -116,16 +116,15 @@ class ShProductTemplate(models.Model):
 
 
     uom_id_1_onhand1 = fields.Float('On Hand',compute='_compute_secondary_unit_on_hand_qty2')
+
     def _compute_secondary_unit_on_hand_qty2(self):
-        if self:
-            for rec in self:
-                if rec.uom_id_1:
-                    rec.uom_id_1_onhand1 = rec.uom_id._compute_quantity(
-                        rec.qty_available,
-                        rec.uom_id_1
-                    )
-                else:
-                    rec.uom_id_1_onhand1 = 00
+        for rec in self:
+            if rec.uom_id and rec.uom_id_1 and rec.uom_id_1.uom_id:
+                # Assuming uom_id_1 has a field 'uom_id' that is of type 'uom.uom'
+                rec.uom_id_1_onhand1 = rec.uom_id._compute_quantity(
+                    rec.qty_available, rec.uom_id_1.uom_id)
+            else:
+                rec.uom_id_1_onhand1 = 0.0
 
     '''test'''
 class ShStockQuant(models.Model):
