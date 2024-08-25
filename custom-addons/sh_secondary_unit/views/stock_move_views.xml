@@ -91,6 +91,9 @@
         <xpath expr="//field[@name='uom_id']" position="after">
             <field name="sh_secondary_uom" string="Secondary Qty" />
             <field name="sh_secondary_uom_onhand" string="onhand Secondary Qty" />
+
+            <field name="sh_secondary_uom2" string="Secondary Qty2" />
+            <field name="sh_secondary_uom_onhand2" string="onhand Secondary Qty2" />
         </xpath>
     </field>
     </record>

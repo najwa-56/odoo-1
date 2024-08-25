@@ -75,7 +75,24 @@ class ShProductTemplate(models.Model):
         else:
             return None
 
+    '''test uom2'''
+    sh_secondary_uom2 = fields.Many2one('uom.uom', 'Secondary UOM')
+    sh_secondary_uom_onhand2 = fields.Float(
+        'On Hand',
+        compute='_compute_secondary_unit_on_hand_qty2'
+    )
+    def _compute_secondary_unit_on_hand_qty2(self):
+        if self:
+            for rec in self:
+                if rec.sh_secondary_uom2:
+                    rec.sh_secondary_uom_onhand2 = rec.uom_id._compute_quantity(
+                        rec.qty_available,
+                        rec.sh_secondary_uom2
+                    )
+                else:
+                    rec.sh_secondary_uom_onhand2 = 00
 
+    '''test'''
 class ShStockQuant(models.Model):
     _inherit = 'stock.quant'
 
