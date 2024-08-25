@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+
+    <record model="ir.ui.view" id="sh_view_account_invoice_report_search_inherit_secondary_unit">
+        <field name="name">account.invoice.report.search</field>
+        <field name="model">account.invoice.report</field>
+        <field name="inherit_id" ref="account.view_account_invoice_report_search" />
+        <field name="arch" type="xml">
+            <search>
+                <field name="sh_sec_uom" />
+            </search>
+            <filter name="user" position="after">
+                <filter string="Secondary UOM" name="groupby_sh_sec_uom"
+                    context="{'group_by': 'sh_sec_uom'}" />
+            </filter>
+        </field>
+    </record>
+</odoo>
