@@ -95,23 +95,24 @@ class ShProductTemplate(models.Model):
     '''test'''
 
     '''test uom3'''
-    multi_uom_price_id = fields.One2many('product.multi.uom.price', 'product_id', string="UOM Price")
-    category_id = fields.Many2one(related='uom_id.category_id')
+    selected_uom_ids = fields.Many2many(
+        comodel_name="product.multi.uom.price",
+        string="Uom Ids",
+        compute='_get_all_uom_id',
+        store=True
+    )
 
-    # we add this field wich give me all idss for multi uom record in product
+    uom_id_1 = fields.Many2one('product.multi.uom.price', string='UOM 1', compute='_compute_uom_columns')
+    uom_id_2 = fields.Many2one('product.multi.uom.price', string='UOM 2', compute='_compute_uom_columns')
+    uom_id_3 = fields.Many2one('product.multi.uom.price', string='UOM 3', compute='_compute_uom_columns')
 
-    selected_uom_ids = fields.Many2many(comodel_name="product.multi.uom.price", string="Uom Ids",
-                                        compute='_get_all_uom_id', store=True)
-    sales_multi_uom_id = fields.Many2one("product.multi.uom.price", string="Cust UOM",
-                                         domain="[('id', 'in', selected_uom_ids)]")
-
-    @api.depends('multi_uom_price_id')
-    def _get_all_uom_id(self):
+    @api.depends('selected_uom_ids')
+    def _compute_uom_columns(self):
         for record in self:
-            if record.multi_uom_price_id:
-                record.selected_uom_ids = self.env['product.multi.uom.price'].browse(record.multi_uom_price_id.ids)
-            else:
-                record.selected_uom_ids = []
+            uoms = record.selected_uom_ids
+            record.uom_id_1 = uoms[0] if len(uoms) > 0 else False
+            record.uom_id_2 = uoms[1] if len(uoms) > 1 else False
+            record.uom_id_3 = uoms[2] if len(uoms) > 2 else False
 
     '''test'''
 class ShStockQuant(models.Model):

@@ -95,8 +95,10 @@
             <field name="sh_secondary_uom2" string="Secondary Qty2" />
             <field name="sh_secondary_uom_onhand2" string="onhand Secondary Qty2" />
 
-            <field name="sales_multi_uom_id" string="test niclo" />
-            <field name="selected_uom_ids" string="test niclo" />
+            <field name="uom_id_1" string="test niclo" />
+            <field name="uom_id_2" string="test niclo" />
+            <field name="uom_id_3" string="test niclo" />
+
         </xpath>
     </field>
     </record>
