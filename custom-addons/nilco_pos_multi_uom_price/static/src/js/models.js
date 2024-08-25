@@ -119,7 +119,6 @@ patch(Orderline.prototype, {
     if (unit) {
         this.set_unit_price(unit.price);
         this.set_uom_name(unit.name_field)
-
     }
     },
     set_uom_name(uom_name) {

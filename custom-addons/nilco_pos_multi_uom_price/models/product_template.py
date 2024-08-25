@@ -165,7 +165,6 @@ class AccountInvoiceLine(models.Model):
                                          domain="[('id', 'in', selected_uom_ids)]")
     name_field = fields.Char(string="Name Field", compute="_compute_name_field", store=True)
     product_uom_id = fields.Many2one('uom.uom', string='Product UoM', related='')
-    name_field2 = fields.Char(string="Name Field",  store=True)
 
 
     @api.depends('sales_multi_uom_id')
@@ -174,15 +173,6 @@ class AccountInvoiceLine(models.Model):
             line.name_field = line.sales_multi_uom_id.name_field if line.sales_multi_uom_id else ''
 
 
-    @api.model_create_multi
-    def create(self, vals_list):
-        # Ensure name_field is passed from pos_order_line to account_move_line
-        for vals in vals_list:
-            if vals.get('pos_order_line_id'):
-                pos_order_line = self.env['pos.order.line'].browse(vals['pos_order_line_id'])
-                if pos_order_line:
-                    vals['name_field2'] = pos_order_line.name_field
-        return super(AccountInvoiceLine, self).create(vals_list)
 
     @api.onchange('product_uom_id', 'quantity')
     def _onchange_uom_id(self):
