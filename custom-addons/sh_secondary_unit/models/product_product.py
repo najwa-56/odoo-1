@@ -112,7 +112,7 @@ class ShProductTemplate(models.Model):
     uom_id_3_onhand3 = fields.Float('On Hand', compute='_compute_secondary_unit_on_hand_qty3')
     uom_id_4_onhand4 = fields.Float('On Hand', compute='_compute_secondary_unit_on_hand_qty4')
     uom_id_5_onhand5 = fields.Float('On Hand', compute='_compute_secondary_unit_on_hand_qty5')
-    uom_id_5_onhand6 = fields.Float('On Hand', compute='_compute_secondary_unit_on_hand_qty6')
+    uom_id_6_onhand6 = fields.Float('On Hand', compute='_compute_secondary_unit_on_hand_qty6')
 
     def _compute_secondary_unit_on_hand_qty1(self):
         for rec in self:
