@@ -111,7 +111,7 @@ class ShProductTemplate(models.Model):
     uom_id_4_onhand4 = fields.Float('On Hand', compute='_compute_secondary_unit_on_hand_qty4')
     uom_id_5_onhand5 = fields.Float('On Hand', compute='_compute_secondary_unit_on_hand_qty5')
 
-    def _compute_secondary_unit_on_hand_qty2(self):
+    def _compute_secondary_unit_on_hand_qty1(self):
         for rec in self:
             try:
                 # Assume that uom_id_1 has a field 'uom_id' that is of type 'uom.uom'
@@ -125,7 +125,7 @@ class ShProductTemplate(models.Model):
                 # Log error if necessary
                 rec.uom_id_1_onhand1 = 0.0  # Fallback assignment to avoid missing assignment error
 
-    '''
+
     def _compute_secondary_unit_on_hand_qty2(self):
         for rec in self:
             if rec.uom_id and rec.uom_id_2 and rec.uom_id_2.uom_id:
@@ -162,8 +162,7 @@ class ShProductTemplate(models.Model):
                 rec.uom_id_5_onhand5 = 0.0
 
 
-
-  UOMs'''
+'''UOMs'''
 class ShStockQuant(models.Model):
     _inherit = 'stock.quant'
 
