@@ -80,4 +80,42 @@
             </xpath>
         </field>
     </record>
+
+
+    <!--tessst najwa -->
+    <record model="ir.ui.view" id="inherit_product_product_stock_tree">
+    <field name="name">product.product.stock.tree.inherit</field>
+    <field name="model">product.product</field>
+    <field name="inherit_id" ref="stock.product_product_stock_tree"/>
+    <field name="arch" type="xml">
+        <xpath expr="//field[@name='uom_id']" position="after">
+            <!--<field name="sh_secondary_uom" string="Secondary Qty" />
+            <field name="sh_secondary_uom_onhand" string="onhand Secondary Qty" />
+
+            <field name="sh_secondary_uom2" string="Secondary Qty2" />
+            <field name="sh_secondary_uom_onhand2" string="onhand Secondary Qty2" /> -->
+
+            <field name="uom_id_1" string="الوحدة ١" />
+            <field name="uom_id_1_onhand1" string="الكمية ١" />
+
+            <field name="uom_id_2" string="الوحدة ٢" />
+            <field name="uom_id_2_onhand2" string="الكمية ٢" />
+
+            <field name="uom_id_3" string="الوحدة ٣" />
+            <field name="uom_id_3_onhand3" string="الكمية ٣" />
+
+            <field name="uom_id_4" string="الوحدة ٤" />
+            <field name="uom_id_4_onhand4" string="الكمية ٤" />
+
+            <field name="uom_id_5" string="الوحدة ٥" />
+            <field name="uom_id_5_onhand5" string="الكمية ٥" />
+
+            <field name="uom_id_6" string="الوحدة ٦" />
+            <field name="uom_id_6_onhand6" string="الكمية ٦" />
+
+
+        </xpath>
+    </field>
+    </record>
+    <!--tessst najwa -->
 </odoo>

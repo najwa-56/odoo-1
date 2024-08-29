@@ -76,6 +76,104 @@ class ShProductTemplate(models.Model):
             return None
 
 
+
+    '''UOMs'''
+
+    '''show uoms in column'''
+    selected_uom_ids = fields.Many2many(
+        comodel_name="product.multi.uom.price",
+        string="Uom Ids",
+        compute='_get_all_uom_id',
+        store=True
+    )
+
+    uom_id_1 = fields.Many2one('product.multi.uom.price', string='UOM 1', compute='_compute_uom_columns')
+    uom_id_2 = fields.Many2one('product.multi.uom.price', string='UOM 2', compute='_compute_uom_columns')
+    uom_id_3 = fields.Many2one('product.multi.uom.price', string='UOM 3', compute='_compute_uom_columns')
+    uom_id_4 = fields.Many2one('product.multi.uom.price', string='UOM 4', compute='_compute_uom_columns')
+    uom_id_5 = fields.Many2one('product.multi.uom.price', string='UOM 5', compute='_compute_uom_columns')
+    uom_id_6 = fields.Many2one('product.multi.uom.price', string='UOM 6', compute='_compute_uom_columns')
+    @api.depends('selected_uom_ids')
+    def _compute_uom_columns(self):
+        for record in self:
+            uoms = record.selected_uom_ids
+            record.uom_id_1 = uoms[0] if len(uoms) > 0 else False
+            record.uom_id_2 = uoms[1] if len(uoms) > 1 else False
+            record.uom_id_3 = uoms[2] if len(uoms) > 2 else False
+            record.uom_id_4 = uoms[3] if len(uoms) > 3 else False
+            record.uom_id_5 = uoms[4] if len(uoms) > 4 else False
+            record.uom_id_6 = uoms[5] if len(uoms) > 5 else False
+
+    '''show uoms in column'''
+
+    '''show uoms in qty'''
+    uom_id_1_onhand1 = fields.Float('On Hand',compute='_compute_secondary_unit_on_hand_qty1')
+    uom_id_2_onhand2 = fields.Float('On Hand', compute='_compute_secondary_unit_on_hand_qty2')
+    uom_id_3_onhand3 = fields.Float('On Hand', compute='_compute_secondary_unit_on_hand_qty3')
+    uom_id_4_onhand4 = fields.Float('On Hand', compute='_compute_secondary_unit_on_hand_qty4')
+    uom_id_5_onhand5 = fields.Float('On Hand', compute='_compute_secondary_unit_on_hand_qty5')
+    uom_id_6_onhand6 = fields.Float('On Hand', compute='_compute_secondary_unit_on_hand_qty6')
+
+    def _compute_secondary_unit_on_hand_qty1(self):
+        for rec in self:
+            try:
+                # Assume that uom_id_1 has a field 'uom_id' that is of type 'uom.uom'
+                if rec.uom_id and rec.uom_id_1 and rec.uom_id_1.uom_id:
+                    rec.uom_id_1_onhand1 = rec.uom_id._compute_quantity(
+                        rec.qty_available, rec.uom_id_1.uom_id
+                    )
+                else:
+                    rec.uom_id_1_onhand1 = 0.0
+            except Exception as e:
+                # Log error if necessary
+                rec.uom_id_1_onhand1 = 0.0  # Fallback assignment to avoid missing assignment error
+
+
+    def _compute_secondary_unit_on_hand_qty2(self):
+        for rec in self:
+            if rec.uom_id and rec.uom_id_2 and rec.uom_id_2.uom_id:
+                # Assuming uom_id_1 has a field 'uom_id' that is of type 'uom.uom'
+                rec.uom_id_2_onhand2 = rec.uom_id._compute_quantity(
+                    rec.qty_available, rec.uom_id_2.uom_id)
+            else:
+                rec.uom_id_2_onhand2 = 0.0
+    def _compute_secondary_unit_on_hand_qty3(self):
+        for rec in self:
+            if rec.uom_id and rec.uom_id_3 and rec.uom_id_3.uom_id:
+                # Assuming uom_id_1 has a field 'uom_id' that is of type 'uom.uom'
+                rec.uom_id_3_onhand3 = rec.uom_id._compute_quantity(
+                    rec.qty_available, rec.uom_id_3.uom_id)
+            else:
+                rec.uom_id_3_onhand3 = 0.0
+
+    def _compute_secondary_unit_on_hand_qty4(self):
+        for rec in self:
+            if rec.uom_id and rec.uom_id_4 and rec.uom_id_4.uom_id:
+                # Assuming uom_id_1 has a field 'uom_id' that is of type 'uom.uom'
+                rec.uom_id_4_onhand4 = rec.uom_id._compute_quantity(
+                    rec.qty_available, rec.uom_id_4.uom_id)
+            else:
+                rec.uom_id_4_onhand4 = 0.0
+
+    def _compute_secondary_unit_on_hand_qty5(self):
+        for rec in self:
+            if rec.uom_id and rec.uom_id_5 and rec.uom_id_5.uom_id:
+                # Assuming uom_id_1 has a field 'uom_id' that is of type 'uom.uom'
+                rec.uom_id_5_onhand5 = rec.uom_id._compute_quantity(
+                    rec.qty_available, rec.uom_id_5.uom_id)
+            else:
+                rec.uom_id_5_onhand5 = 0.0
+    def _compute_secondary_unit_on_hand_qty6(self):
+        for rec in self:
+            if rec.uom_id and rec.uom_id_6 and rec.uom_id_6.uom_id:
+                # Assuming uom_id_1 has a field 'uom_id' that is of type 'uom.uom'
+                rec.uom_id_6_onhand6 = rec.uom_id._compute_quantity(
+                    rec.qty_available, rec.uom_id_6.uom_id)
+            else:
+                rec.uom_id_6_onhand6 = 0.0
+
+
+'''UOMs'''
 class ShStockQuant(models.Model):
     _inherit = 'stock.quant'
 
