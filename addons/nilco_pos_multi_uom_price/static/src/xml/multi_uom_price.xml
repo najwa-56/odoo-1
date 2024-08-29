@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates id="template" xml:space="preserve">
+
+	<t t-name="point_of_sale.UOMButton" owl="1">
+
+		 <button class="control-button btn btn-light rounded-0 fw-bolder" t-on-click="() => this.onClick()">
+            <i class="fa fa-tag" role="img" aria-label="UOM" title="UOM" />
+            UOM
+        </button>
+         <button class="delete-orderline-btn btn btn-danger btn-sm" t-on-click="delete_orderline">
+                <i class="fa fa-trash"></i> <!-- Font Awesome icon for delete -->
+            </button>
+	</t>
+
+</templates>

@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates id="template" xml:space="preserve">
+    <t t-name="MulitUOMWidget" owl="1">
+        <div role="dialog" class="modal-dialog">
+            <Draggable>
+                <div class="popup popup-textarea">
+                    <header class="title drag-handle">
+                        <t t-esc="props.title" />
+                    </header>
+                    <main class="body" style="height: 270px;">
+                    <div class="content-container ">
+                        <t t-if="props.ss_uom_list">
+                            <style>
+                                .multi_uom_button{
+                                    transition: all 150ms linear;
+                                    background: rgb(230,230,230);
+                                    cursor: pointer;
+                                }
+                                .multi_uom_button:nth-child(even) {
+                                    background: rgb(247,247,247);
+                                }
+                            </style>
+                            <div style="height: 277px;overflow: scroll;">
+                                <table style="font-size: 16px;width: 100%;line-height: 40px;">
+                                    <thead>
+                                        <tr class='label' style="background: rgb(247,247,247);">
+                                            <th>Uom</th>
+                                            <th>Price</th>
+                                            <th>Ratio</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <t t-foreach="props.ss_uom_list" t-as="ss_uom" >
+                                            <tr t-on-click="multi_uom_button(ss_uom.id,ss_uom.price)">
+                                                <td><t t-esc="ss_uom.name"/></td>
+                                                <td><t t-esc="env.pos.format_currency(ss_uom.price)"/></td>
+                                                <td><t t-esc="ss_uom.factor_inv"/> <t t-esc="props.product.uom_id[1]"/></td>
+                                            </tr>
+                                        </t>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </t>
+                    </div>
+                    </main>
+                    <footer class="footer">
+                        <div class="button cancel" t-on-click="cancel">
+                            Cancel
+                        </div>
+                    </footer>
+                </div>
+            </Draggable>
+        </div>
+    </t>
+
+    <t t-name="Orderline" t-inherit="point_of_sale.Orderline" t-inherit-mode="extension" owl="1">
+        <xpath expr="//ul[hasclass('info-list')]" position="after">
+            <t t-if="env.pos.config.allow_multi_uom">
+                <t t-if="props.line.product.has_multi_uom">
+                    <span class="uom-button" style="margin-left: 7px;" t-att-data-id="props.line.id" t-on-click="change_uom_order_line">
+                        <i class="fa fa-tachometer" aria-hidden="true"></i>
+                    </span>
+                </t>
+            </t>
+        </xpath>
+    </t>   
+</templates>

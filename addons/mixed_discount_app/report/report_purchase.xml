@@ -1,0 +1,15 @@
+<?xml version="1.0"?>
+<odoo>
+
+    <template id="report_inherit_purchase_discount" inherit_id="purchase.report_purchaseorder_document">
+               <!--  <xpath expr="//table[@class='table table-sm o_main_table mt-4']/thead/tr/th[5]" position="after">
+                    <th><strong>Total Discount(%) </strong></th>
+                </xpath>
+                 <xpath expr="//tbody/t/tr/t/td[5]" position="after">
+                        <td class="text-center">
+                            <span t-field="line.discount"/>
+                        </td>                      
+                </xpath> -->
+    </template>
+
+</odoo>

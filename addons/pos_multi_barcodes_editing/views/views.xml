@@ -1,0 +1,49 @@
+
+
+<odoo>
+    <data>
+ <!-- tessssst-->
+        <!-- Tree View Definition -->
+        <record model="ir.ui.view" id="product_barcode_tree_view">
+            <field name="name">product.product.tree.view</field>
+            <field name="model">pos.multi.barcode.options</field>
+            <field name="arch" type="xml">
+                <tree editable="bottom">
+                    <field name="name"/>
+                    <field name="unit" required="True"/>
+                    <field name="price"/>
+                    <field name="product_id"/>
+                </tree>
+            </field>
+        </record>
+
+        <!-- Action Definition -->
+        <record id="actionـbarcode_tree" model="ir.actions.act_window">
+            <field name="name">الباركود المتعدد</field>
+            <field name="res_model">pos.multi.barcode.options</field>
+            <field name="view_mode">tree,form</field>
+            <field name="view_id" ref="product_barcode_tree_view"/>
+        </record>
+
+        <!-- Menu Item Definition -->
+        <menuitem id="menu_product_product_tree"
+                  name="رفع الباركود المتعدد"
+                  action="actionـbarcode_tree"
+                  parent="sale.product_menu_catalog"
+                  sequence="10"/>
+
+      <!-- Inherit the existing product.product.tree view -->
+        <record id="product_product_tree_view_inherit2" model="ir.ui.view">
+            <field name="name">product.product.tree.inherit.multi.uom</field>
+            <field name="model">product.product</field>
+            <field name="inherit_id" ref="product.product_product_tree_view"/>
+            <field name="arch" type="xml">
+                <!-- Use xpath to locate the position after the 'name' field -->
+                <xpath expr="//field[@name='name']" position="after">
+                    <field name='pos_multi_barcode_option' widget="many2many_tags" />
+                </xpath>
+            </field>
+        </record>
+
+    </data>
+</odoo>

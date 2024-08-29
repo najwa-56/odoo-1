@@ -1,0 +1,48 @@
+<?xml version="1.0"?>
+<odoo>
+    <data>
+
+    <record id="sale_multi_inherit_form_view" model="ir.ui.view">
+        <field name="model">sale.order</field>
+        <field name="inherit_id" ref="sale.view_order_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='order_line']/tree//field[@name='discount']" position="before">
+                <field name="multi_discount" groups="mixed_discount_app.mixed_discount_sale"/>
+            </xpath>
+            <xpath expr="//field[@name='order_line']/form//field[@name='discount']" position="before">
+                <field name="multi_discount" groups="mixed_discount_app.mixed_discount_sale"/>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="purchase_multi_inherit_form_view" model="ir.ui.view">
+        <field name="model">purchase.order</field>
+        <field name="inherit_id" ref="purchase.purchase_order_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='order_line']/tree//field[@name='price_unit']" position="after">
+                <field name="multi_discount" groups="mixed_discount_app.mixed_discount_purchase"/>
+                <field name="discount" groups="mixed_discount_app.mixed_discount_purchase"/>
+            </xpath>
+            <xpath expr="//field[@name='order_line']/form//field[@name='price_unit']" position="after">
+                <field name="multi_discount" groups="mixed_discount_app.mixed_discount_purchase"/>
+                <field name="discount" groups="mixed_discount_app.mixed_discount_purchase"/>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="view_move_form_inherit" model="ir.ui.view">
+        <field name="model">account.move</field>
+        <field name="inherit_id" ref="account.view_move_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='invoice_line_ids']/tree//field[@name='discount']" position="before">
+                <field name="multi_discount" groups="mixed_discount_app.mixed_discount_invoice"/>
+            </xpath>
+
+            <xpath expr="//field[@name='invoice_line_ids']/form//field[@name='discount']" position="before">
+                <field name="multi_discount" groups="mixed_discount_app.mixed_discount_invoice"/>
+            </xpath>
+        </field>
+    </record>
+
+    </data>
+</odoo>

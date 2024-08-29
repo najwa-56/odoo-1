@@ -92,9 +92,8 @@ class PurchaseOrderLine(models.Model):
 	def recalculate_amount(self):
 		self.ensure_one()
 		if self.discount:
-			# Recalculate based on price_subtotal with discount applied
-			return self.price_subtotal / (1 - self.discount / 100)
-		return self.price_subtotal
+			return self.price_unit * (1 - self.discount / 100)
+		return self.price_unit
 
 	def _get_stock_move_price_unit(self):
 		price = self.recalculate_amount()

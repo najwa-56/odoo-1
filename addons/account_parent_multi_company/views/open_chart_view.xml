@@ -1,0 +1,52 @@
+<odoo>
+	<record id="view_account_chart_consolidated" model="ir.ui.view">
+		<field name="name">account.open.chart.form</field>
+		<field name="model">account.open.chart</field>
+		<field name="inherit_id" ref="account_parent.view_account_chart" />
+		<field name="arch" type="xml">
+			<xpath expr="//group/field[@name='company_id']"
+				position="attributes">
+				<attribute name="invisible">consolidated_coa == True</attribute>
+			</xpath>
+			<xpath expr="//group/field[@name='company_id']"
+				position="after">
+				<field name="view_consolidation" invisible="1" />
+				<field name="consolidated_coa" invisible="view_consolidation == False"
+					groups="base.group_multi_company" />
+				<field name="company_ids" widget="many2many_tags" domain="[('id', 'in', allowed_company_ids)]"
+					options="{'no_create': True, 'no_open': True}"
+					invisible="consolidated_coa == False"
+					required="consolidated_coa == True"
+					groups="base.group_multi_company" />
+				<!-- <field name="consolidated_report_type" invisible="consolidated_coa == False" required="consolidated_coa == True" /> -->
+			</xpath>
+			<xpath expr="//group[@name='company']" position="after">
+				<group>
+					<field name="target_currency_id"
+						options="{'no_create': True, 'no_open': True}"
+						invisible="consolidated_coa == False"
+						required="consolidated_coa == True"
+						groups="base.group_multi_company" />
+
+				</group>
+			</xpath>
+		</field>
+	</record>
+
+	<record id="account_parent.action_account_chart" model="ir.actions.act_window">
+		<field name="context">{'default_consolidated_coa':False}</field>
+	</record>
+	
+	<record id="action_account_consolidated_chart" model="ir.actions.act_window">
+		<field name="name">Consolidated Chart of Accounts</field>
+		<field name="res_model">account.open.chart</field>
+		<field name="view_mode">tree,form</field>
+		<field name="context">{'default_consolidated_coa':True}</field>
+		<field name="view_id" ref="account_parent.view_account_chart" />
+		<field name="target">new</field>
+	</record>
+
+	<menuitem action="action_account_consolidated_chart"
+		id="menu_action_account_consolidated_chart" parent="account.menu_finance_reports"
+		sequence="22" />
+</odoo>

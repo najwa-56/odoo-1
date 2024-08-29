@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="limit_cash__view_pos_config_form" model="ir.ui.view">
+        <field name="name">limit_cash__view_pos_config</field>
+        <field name="model">pos.config</field>
+        <field name="inherit_id" ref="point_of_sale.pos_config_view_form" />
+        <field name="arch" type="xml">
+            <xpath expr="//div[@class='row mt16 o_settings_container'][last()]" position="after">
+                <h2>Limit Cash Control</h2>
+                <div class="row mt16 o_settings_container" id="limit_cash_control">
+                    <div class="col-12 col-lg-6 o_setting_box">
+                        <div class="o_setting_left_pane">
+                            <field name="allow_default_cash" readonly="has_active_session==True" />
+                        </div>
+                        <div class="o_setting_right_pane">
+                            <label for="allow_default_cash" string="Default Opening Amount" />
+                            <div class="text-muted mb16">
+                                    Set a default opening amount for every new session
+                                </div>
+                            <div class="content-group limit_cash_control" invisible="allow_default_cash==False">
+                                <div class="row">
+                                    <label for="default_opening" class="col-lg-4 o_light_label" />
+                                    <field name="default_opening" readonly="has_active_session==True" />
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div id="hide_closing" class="col-12 col-lg-6 o_setting_box">
+                        <div class="o_setting_left_pane">
+                            <field name="hide_closing" readonly="has_active_session==True" />
+                        </div>
+                        <div class="o_setting_right_pane">
+                            <label for="hide_closing" />
+                            <div class="text-muted">
+                                This will stop Cashiers from seeing the session payment summary
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </xpath>
+        </field>
+    </record>
+</odoo>

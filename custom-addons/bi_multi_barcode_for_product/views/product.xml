@@ -1,0 +1,92 @@
+<?xml version="1.0" ?>
+<odoo>
+	<data>
+
+		<record id="product_template_barcode_form_view_inherit" model="ir.ui.view">
+			<field name="name">product.template.form.view.inherite</field>
+			<field name="model">product.template</field>
+			<field name="inherit_id" ref="product.product_template_only_form_view"/>
+			<field name="arch" type="xml">
+				<xpath expr="//field[@name='default_code']" position="after">
+					<field name="company_barcode_id" invisible="1"/>
+					<field name="multi_barcode_for_product" invisible="1"/>
+				</xpath>
+				<xpath expr="//notebook" position="inside">
+					<page string="Barcodes" editable="True" invisible="product_variant_count > 1">
+						<field name="product_barcode" nolabel="1" context="{'search_by_vat': True}">
+							<tree>
+								<field name="product_tmpl_id" column_invisible="1" context="{'default_product_tmpl_id': parent.id,}"/> 
+								<field name="product_id" column_invisible="1"/>       
+								<field name="barcode" />
+								<field name="model_ids" column_invisible = 'parent.multi_barcode_for_product == False'/>
+							</tree>
+						</field>   
+					</page>
+				</xpath>
+			</field>
+		</record>
+
+		<record id="view_product_product_form_inherit" model="ir.ui.view">
+			<field name="name">product.product.form.extended</field>
+			<field name="model">product.product</field>
+			<field name="inherit_id" ref="product.product_normal_form_view"/>
+			<field name="arch" type="xml">
+				<xpath expr="//field[@name='default_code']" position="after">
+					<field name="company_barcode_id" invisible="1"/>
+					<field name="multi_barcode_for_product" invisible="1"/>
+				</xpath>
+				<xpath expr="//notebook" position="inside">
+					<page string="Barcodes" editable="True">
+						<field name="product_barcode" nolabel="1" context="{'search_by_vat': True}">
+							<tree>
+								<field name="product_tmpl_id" column_invisible="1"/>
+								<field name="product_id" column_invisible="1" context="{'default_product_id': parent.id,}"/>    
+								<field name="barcode"/>
+								<field name="model_ids" column_invisible="not parent.multi_barcode_for_product"/>
+							</tree>
+						</field>   
+					</page>
+				</xpath>                
+			</field>
+		</record>
+
+		<record id="product_barcode_view" model="ir.ui.view">
+			<field name="name">Product Barcode</field>
+			<field name="model">product.barcode</field>
+			<field name="arch" type="xml">
+				<form>
+					<group>
+						<field name="product_id" invisible="1"/>
+						<field name="barcode" />
+						<field name="company_id" invisible="1"/>
+						<field name="multi_barcode_for_product" invisible="1"/>
+						<field name="model_ids" invisible="multi_barcode_for_product == False" required = 'multi_barcode_for_product ==  True'/>
+					</group>
+				</form>
+			</field>
+		</record>
+
+
+		<record id="view_product_template_inherit_search" model="ir.ui.view">
+		  <field name="name">product.template.search.expand</field>
+		  <field name="model">product.template</field>
+		  <field name="inherit_id" ref="product.product_template_search_view"/>
+		  <field name="arch" type="xml">
+			<field name="name" position="attributes">
+				<attribute name="filter_domain">['|', '|', '|','|', ('default_code', 'ilike', self), ('product_variant_ids.default_code', 'ilike', self),('name', 'ilike', self), ('barcode', 'ilike', self),('product_barcode.barcode', 'ilike', self)]</attribute>
+			</field>
+		  </field>
+		</record>
+
+		<record id="view_product_product_inherit_search" model="ir.ui.view">
+		  <field name="name">product.product.search.expand</field>
+		  <field name="model">product.product</field>
+		  <field name="inherit_id" ref="product.product_search_form_view"/>
+		  <field name="arch" type="xml">
+			<field name="name" position="attributes">
+				<attribute name="filter_domain">['|', '|','|', ('default_code', 'ilike', self), ('name', 'ilike', self), ('barcode', 'ilike', self),('product_barcode.barcode', 'ilike', self)]</attribute>
+			</field>
+		  </field>
+		</record>
+	</data>
+</odoo>
