@@ -64,7 +64,6 @@ patch(DB.PosDB.prototype, {
         this._super.apply(this, arguments);
     },
     get_product_by_barcode(barcode) {
-        if (!barcode) return undefined;
 
         const barcodes = Object.values(this.product_multi_barcodes);
         if (this.product_by_barcode[barcode]) {
