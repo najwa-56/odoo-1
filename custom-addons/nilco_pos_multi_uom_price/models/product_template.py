@@ -206,7 +206,7 @@ class AccountInvoiceLine(models.Model):
     """
 
     multi_uom_id = fields.Many2one('product.multi.uom.price', string='Multi UoM Price')
-    name_field = fields.Char(related='product_id.multi_uom_id.name_field', string='Name Field', store=True)
+    name_field = fields.Char(related='multi_uom_id.name_field', string='Name Field', store=True)
 
 
     
