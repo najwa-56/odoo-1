@@ -8,7 +8,7 @@ class PosSession(models.Model):
     _inherit = "pos.session"
 
     def _loader_params_res_users(self):
-        result = super(PosSession,
+        result1 = super(PosSession,
                        self)._loader_params_res_users()
-        result['search_params']['fields'].append('sh_is_direct_logout')
-        return result
+        result1['search_params']['fields'].append('sh_is_direct_logout')
+        return result1
