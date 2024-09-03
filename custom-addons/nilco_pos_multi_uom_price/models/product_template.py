@@ -158,7 +158,7 @@ class Pricelist(models.Model):
 
 class AccountInvoiceLine(models.Model):
     _inherit = "account.move.line"
-
+    """ 
     selected_uom_ids = fields.Many2many(string="Uom Ids", related='product_id.selected_uom_ids')
 
     sales_multi_uom_id = fields.Many2one("product.multi.uom.price", string="Cust UOM",
@@ -200,6 +200,11 @@ class AccountInvoiceLine(models.Model):
         if warning:
             result['warning'] = warning
         return result
+     
+    """
+
+    multi_uom_id = fields.Many2one('product.multi.uom.price', string='Multi UoM Price')
+    name_field = fields.Char(related='multi_uom_id.name_field', string='Name Field', store=True)
 
 
     
