@@ -750,13 +750,6 @@
                                             <br/>
                                             <span class="lable_bold">الكمية</span>
                                         </th>
-                                        <!-- test -->
-                                        <th align="center" name="test" class="second_table"
-                                            style="background-color:#4f4d4d;text-align:center;color:white;">
-                                            <span class="lable_bold">test</span>
-                                            <br/>
-                                            <span class="lable_bold">اسم الوحدة test</span>
-                                        </th>
 
                                        <th align="center" name="discount" class="second_table"
                                             style="background-color:#4f4d4d;text-align:center;color:white;">
@@ -845,10 +838,6 @@
                                         <td class="second_table" style="text-align:right;">
                                             <span t-esc="'{:,}'.format(line.quantity)"/>
 
-                                        </td>
-
-                                         <td class="second_table" style="text-align:right;">
-                                              <span t-esc="line.name_field"/>
                                         </td>
 
                                                 <!-- Editeing-->

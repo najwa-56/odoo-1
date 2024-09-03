@@ -156,7 +156,6 @@ class Pricelist(models.Model):
         self and self.ensure_one()  # self is at most one record
         return self._compute_price_rule12(product,*args, **kwargs)[product.id]
 
-""" 
 class AccountInvoiceLine(models.Model):
     _inherit = "account.move.line"
 
@@ -202,5 +201,5 @@ class AccountInvoiceLine(models.Model):
             result['warning'] = warning
         return result
 
-"""
+
     
