@@ -5,6 +5,7 @@
        t-inherit="point_of_sale.OrderReceipt" t-inherit-mode="extension">
         <xpath expr="//Orderline" position="inside">
                     <t t-if="line.product_arabic" t-esc="line.product_arabic"/>
+                    <t t-if="line.name_field" t-esc="line.name_field"/>
         </xpath>
     </t>
     <t t-name="product_arabic.ProductCard" t-inherit="point_of_sale.ProductCard"

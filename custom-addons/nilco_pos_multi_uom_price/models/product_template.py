@@ -15,8 +15,6 @@ class ProductTemplate(models.Model):
     selected_uom_ids = fields.Many2many(comodel_name="product.multi.uom.price", string="Uom Ids", compute='_get_all_uom_id', store=True)
     sales_multi_uom_id = fields.Many2one("product.multi.uom.price", string="Cust UOM",
                                          domain="[('id', 'in', selected_uom_ids)]")
-    multi_uom_id = fields.Many2one('product.multi.uom.price', string='Multi UoM Price')
-    name_field = fields.Char(related='multi_uom_id.name_field', string='Name Field', store=True)
 
     @api.depends('multi_uom_price_id')
     def _get_all_uom_id(self):
@@ -158,9 +156,10 @@ class Pricelist(models.Model):
         self and self.ensure_one()  # self is at most one record
         return self._compute_price_rule12(product,*args, **kwargs)[product.id]
 
+""" 
 class AccountInvoiceLine(models.Model):
     _inherit = "account.move.line"
-    """ 
+
     selected_uom_ids = fields.Many2many(string="Uom Ids", related='product_id.selected_uom_ids')
 
     sales_multi_uom_id = fields.Many2one("product.multi.uom.price", string="Cust UOM",
@@ -202,11 +201,6 @@ class AccountInvoiceLine(models.Model):
         if warning:
             result['warning'] = warning
         return result
-     
-    """
 
-    multi_uom_id = fields.Many2one('product.multi.uom.price', string='Multi UoM Price')
-    name_field = fields.Char(related='multi_uom_id.name_field', string='Name Field', store=True)
-
-
+"""
     

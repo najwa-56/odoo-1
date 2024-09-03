@@ -29,12 +29,18 @@ class ProductTemplate(models.Model):
     product_arabic = fields.Char(string='Arabic name', default="",
                                  help='Here you can set the Arabic name of the'
                                       'Product')
+    multi_uom_id = fields.Many2one('product.multi.uom.price', string='Multi UoM Price')
+    name_field = fields.Char(related='multi_uom_id.name_field', string='Name Field', store=True)
+
 
 # we inhirt product_arabic field to tow module sale account ,
 class AccountMoveLine(models.Model):
     _inherit = 'account.move.line'
 
     product_arabic = fields.Char(related='product_id.product_tmpl_id.product_arabic', string='Arabic Name', store=True, readonly=True)
+    multi_uom_id = fields.Many2one('product.multi.uom.price', string='Multi UoM Price')
+    name_field = fields.Char(related='multi_uom_id.name_field', string='Name Field', store=True)
+
 
 class SaleOrderLine(models.Model):
     _inherit = 'sale.order.line'
