@@ -343,7 +343,7 @@
                                         <col width='20%'/>
                                     </colgroup>
                                     <tr style="line-height: 1;">
-                                        <th colspan='3' class="invline_column"
+                                        <th colspan='4' class="invline_column"
                                             style="text-align:center;border-top:1pt dashed black;border-bottom:0pt;">
                                             <span class="label_column">الوصف</span>
                                             <br/>
@@ -381,7 +381,7 @@
                                     <t t-foreach="invoice_line_ids" t-as="line" t-key="line.id">
                                         <t t-set="bt_141" t-value="doc.get_bt_141(line.zatca_id)"/>
                                         <tr>
-                                            <td colspan='3'
+                                            <td colspan='4'
                                                 class="invline_data"
                                                 style="text-align:center;max-width:100%">
                                                 <span t-esc="doc._get_zatca_product_name(line)['name']['value']"/>
@@ -409,7 +409,7 @@
                                             <!--                                    </td>-->
                                         </tr>
                                         <tr>
-                                            <td colspan="3"
+                                            <td colspan="4"
                                                 style="border-bottom:1pt dashed black;vertical-align:bottom;"/>
                                         </tr>
                                     </t>
