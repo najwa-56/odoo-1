@@ -343,7 +343,7 @@
                                         <col width='20%'/>
                                     </colgroup>
                                     <tr style="line-height: 1;">
-                                        <th colspan='5' class="invline_column"
+                                        <th colspan='4' class="invline_column"
                                             style="text-align:center;border-top:1pt dashed black;border-bottom:0pt;">
                                             <span class="label_column">الوصف</span>
                                             <br/>
@@ -358,11 +358,11 @@
                                             <br/>
                                             <span class="label_column">Total Inclusive of VAT</span>
                                         </th>
-                                        <th class="invline_column">
+                                        <!--<th class="invline_column">
                                             <span class="label_column arabic_label">خصومات</span>
                                             <br/>
                                             <span class="label_column">Discount</span>
-                                        </th>
+                                        </th>-->
                                         <th class="invline_column">
                                             <span class="label_column arabic_label">السعر</span>
                                             <br/>
@@ -384,22 +384,22 @@
                                     </tr>
                                     <t t-foreach="invoice_line_ids" t-as="line" t-key="line.id">
                                         <t t-set="bt_141" t-value="doc.get_bt_141(line.zatca_id)"/>
-                                        <!--<tr>
+                                        <tr>
                                             <td colspan='4'
                                                 class="invline_data"
                                                 style="text-align:center;max-width:100%">
                                                 <span t-esc="doc._get_zatca_product_name(line)['name']['value']"/>
                                             </td>
-                                        </tr>-->
+                                        </tr>
                                         <tr>
                                             <td class="invline_data">
                                                 <span t-esc="doc.get_ksa_12(line.zatca_id)"
                                                       t-options='{"widget": "monetary", "display_currency": doc.currency_id}'/>
                                             </td>
-                                            <td class="invline_data">
+                                           <!-- <td class="invline_data">
                                                 <span t-esc="doc.get_bt_136(line.zatca_id)"
                                                       t-options='{"widget": "monetary", "display_currency": doc.currency_id}'/>
-                                            </td>
+                                            </td>-->
                                             <td class="invline_data">
                                                 <span t-esc="doc.get_bt_146(line.zatca_id)"
                                                       t-options='{"widget": "monetary", "display_currency": doc.currency_id}'/>
@@ -407,15 +407,13 @@
                                             <td class="invline_data">
                                                 <t t-esc="line.quantity"/>
                                             </td>
-                                            <td class="invline_data">
-                                                <span t-esc="doc._get_zatca_product_name(line)['name']['value']"/>
-                                            </td>
+
                                             <!--                                    <td class="invline_data">-->
                                             <!--                                        <t t-esc="line.product_uom_id.name"/>-->
                                             <!--                                    </td>-->
                                         </tr>
                                         <tr>
-                                            <td colspan="5"
+                                            <td colspan="4"
                                                 style="border-bottom:1pt dashed black;vertical-align:bottom;"/>
                                         </tr>
                                     </t>
@@ -564,7 +562,7 @@
                              style="page-break-inside: avoid !important;
                              page-break-after: avoid !important;
                              page-break-before: auto !important;">
-                            <img id="phase2qrcode" alt="Barcode" t-att-src="doc.get_qrcode()" style="width: 200px;"/>
+                            <img id="phase2qrcode" alt="Barcode" t-att-src="doc.get_qrcode()" style="width: 300px;"/>
                         </div>
                         <div class="pos-receipt page_block">
                             <span style="text-align:center">Thank You</span>
