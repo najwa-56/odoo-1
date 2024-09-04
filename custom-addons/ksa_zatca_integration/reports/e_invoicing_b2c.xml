@@ -96,7 +96,7 @@
                             }
                             .invline_data{
                             text-align:left;
-                            font-size:12px;
+                            font-size:15px;
                             padding: 2px 0;
                             }
                         </style>
