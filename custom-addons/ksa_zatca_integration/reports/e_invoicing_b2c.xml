@@ -373,6 +373,9 @@
                                             <br/>
                                             <span class="label_column">Quantity</span>
                                         </th>
+                                        <th class="invline_column">
+                                            
+                                        </th>
 
                                         <!--                                <th class="invline_column" style="text-align:center;">-->
                                         <!--                                    نوع<br/>Type-->
@@ -393,7 +396,7 @@
                                                       t-options='{"widget": "monetary", "display_currency": doc.currency_id}'/>
                                             </td>
                                             <td class="invline_data">
-                                                
+
                                             </td>
                                             <td class="invline_data">
                                                 <span t-esc="doc.get_bt_146(line.zatca_id)"
