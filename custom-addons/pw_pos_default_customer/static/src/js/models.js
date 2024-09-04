@@ -10,7 +10,7 @@ patch(Order.prototype, {
         super.setup(...arguments);
         if (this.pos.config.pos_customer_id) {
             var default_customer = this.pos.config.pos_customer_id[0];
-            
+
         }
     },
 });
