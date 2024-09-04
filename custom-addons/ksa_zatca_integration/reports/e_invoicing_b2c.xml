@@ -173,7 +173,7 @@
                                             <span class="label_column arabic_label">تاريخ إصدار الفاتورة</span>
                                         </td>
                                     </tr>
-                                    <tr>
+                                    <!--<tr>
                                         <td>
                                             <span class="label_column">
                                                 <b>Tax Currency</b>
@@ -185,7 +185,7 @@
                                         <td>
                                             <span class="label_column arabic_label">العملة الضريبية</span>
                                         </td>
-                                    </tr>
+                                    </tr>-->
                                     <t t-if="doc.reversed_entry_id or doc.debit_origin_id">
                                         <tr>
                                             <td>
@@ -281,7 +281,7 @@
                                         </td>
                                     </tr>
                                     <!--                            Customer/Buyer details -->
-                                    <tr t-if="conf_partner['name']['value']">
+                                   <!-- <tr t-if="conf_partner['name']['value']">
                                         <td>
                                             <span class="label_column">
                                                 <b>Customer Name</b>
@@ -326,7 +326,7 @@
                                         <td>
                                             <span class="label_column arabic_label">معرف آخر</span>
                                         </td>
-                                    </tr>
+                                    </tr>-->
                                 </table>
                                 <hr/>
                                 <t t-if="not doc._is_downpayment()"
@@ -465,7 +465,7 @@
                                         </td>
                                     </tr>
                                     <!--                            Not required by zatca-->
-                                    <tr>
+                                    <!--<tr>
                                         <td class="left_column">
                                             <span>Amount Due</span>
                                         </td>
@@ -476,7 +476,7 @@
                                         <td class="right_column arabic_label">
                                             <span>المبلغ المتبقي</span>
                                         </td>
-                                    </tr>
+                                    </tr>-->
                                 </table>
                                 <hr></hr>
                                 <t t-if="doc.env['ir.module.module'].sudo().search([('name', '=', 'point_of_sale')]) == 'installed'">
