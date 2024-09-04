@@ -41,11 +41,11 @@
                             float:right;
                             }
                             .label_column{
-                            font-size:10px;
+                            font-size:12px;
                             font-weight:bold
                             }
                             .total_table td.right_column.arabic_label, .reason_table span.right_column.arabic_label{
-                            font-size:9px !important;
+                            font-size:11px !important;
                             font-weight:bold;
                             }
                             .total_table td.right_column, .reason_table span.right_column{
