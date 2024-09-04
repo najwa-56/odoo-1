@@ -14,7 +14,7 @@
     'category': 'Invoicing',
     'version': '16.1.1',
     'price': 300, 'currency': 'USD',
-    'depends': ['ksa_zatca_integration', 'point_of_sale','nilco_pos_multi_uom_price'],
+    'depends': ['ksa_zatca_integration', 'point_of_sale'],
     'external_dependencies': {
         'python': ['cryptography', 'lxml']
     },
