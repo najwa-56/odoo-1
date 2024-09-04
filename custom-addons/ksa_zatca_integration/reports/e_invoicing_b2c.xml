@@ -337,9 +337,9 @@
                                    t-value="doc.invoice_line_ids.filtered(lambda x: x.display_type not in ['line_section', 'line_note'])"/>
                                 <table width="100%" id="invline">
                                     <colgroup>
-                                        <col width='40%'/>
-                                        <col width='20%'/>
-                                        <col width='20%'/>
+                                        <col width='50%'/>
+                                        <col width='30%'/>
+                                        <col width='30%'/>
                                         <col width='20%'/>
                                     </colgroup>
                                     <tr style="line-height: 1;">
@@ -407,8 +407,7 @@
                                             <td class="invline_data">
                                                 <t t-esc="line.quantity"/>
                                             </td>
-                                            <td class="invline_data"
-                                                style="text-align:center;max-width:100%">
+                                            <td class="invline_data">
                                                 <span t-esc="doc._get_zatca_product_name(line)['name']['value']"/>
                                             </td>
                                             <!--                                    <td class="invline_data">-->
