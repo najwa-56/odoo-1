@@ -343,7 +343,7 @@
                                         <col width='20%'/>
                                     </colgroup>
                                     <tr style="line-height: 1;">
-                                        <th colspan='4' class="invline_column"
+                                        <th colspan='5' class="invline_column"
                                             style="text-align:center;border-top:1pt dashed black;border-bottom:0pt;">
                                             <span class="label_column">الوصف</span>
                                             <br/>
@@ -415,7 +415,7 @@
                                             <!--                                    </td>-->
                                         </tr>
                                         <tr>
-                                            <td colspan="4"
+                                            <td colspan="5"
                                                 style="border-bottom:1pt dashed black;vertical-align:bottom;"/>
                                         </tr>
                                     </t>
