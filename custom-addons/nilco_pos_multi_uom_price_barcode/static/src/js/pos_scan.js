@@ -21,6 +21,12 @@ patch(ProductScreen.prototype, {
             return;
         }
 
+        // Check for the existence of db
+        if (!this.env.pos || !this.env.pos.db) {
+            console.error('POS or DB is not initialized');
+            return;
+        }
+
         if (code.type === "price") {
             Object.assign(options, {
                 price: code.value,
@@ -29,9 +35,12 @@ patch(ProductScreen.prototype, {
                 },
             });
         } else if (code.type === "weight" || code.type === "quantity") {
-            // If dealing with weight, calculate the price based on the weight.
             if (code.type === "weight") {
-                const uom = this.env.pos.db.getUOMByBarcode(code.barcode); // Fetch the UOM linked to this barcode.
+                const uom = this.env.pos.db.getUOMByBarcode(code.barcode); // Ensure getUOMByBarcode is available
+                if (!uom) {
+                    console.error('UOM not found for barcode');
+                    return;
+                }
                 const unitPrice = uom.price; // Price per UOM unit.
                 const weight = code.value; // Weight value scanned from the barcode.
                 const calculatedPrice = unitPrice * weight; // Calculate total price based on weight.
@@ -42,7 +51,6 @@ patch(ProductScreen.prototype, {
                     merge: false,
                 });
             } else {
-                // If it's quantity without weight, just use the value as is.
                 Object.assign(options, {
                     quantity: code.value,
                     merge: false,
@@ -95,16 +103,14 @@ patch(DB.PosDB.prototype, {
                             { pos: result.pos, order: result.pos.selectedOrder, product: result }
                         );
 
-                        // Determine price based on whether the barcode is weight-based
                         let calculatedPrice;
                         if (barcode.type === 'weight') {
-                            const weight = barcode.value; // Weight value from the barcode.
-                            calculatedPrice = uom.price * weight; // Calculate price based on weight.
+                            const weight = barcode.value;
+                            calculatedPrice = uom.price * weight;
                         } else {
-                            calculatedPrice = uom.price; // Use standard UOM price if not weight-based.
+                            calculatedPrice = uom.price;
                         }
 
-                        // Update or create the order line with the calculated price
                         const orderlines = result.pos.selectedOrder.get_orderlines();
                         for (const orderline of orderlines) {
                             if (orderline.product.id === result.id &&
@@ -116,7 +122,6 @@ patch(DB.PosDB.prototype, {
                             }
                         }
 
-                        // If no matching order line found, create a new one
                         result.pos.selectedOrder.add_orderline(line);
                         result.pos.selectedOrder.selected_orderline.set_uom({ 0: uom.id, 1: uom.name });
                         result.pos.selectedOrder.selected_orderline.price_manually_set = true;
