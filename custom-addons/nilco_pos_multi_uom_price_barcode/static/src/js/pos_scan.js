@@ -9,6 +9,12 @@ import { ErrorBarcodePopup } from "@point_of_sale/app/barcode/error_popup/barcod
 
 patch(ProductScreen.prototype, {
     async _barcodeProductAction(code) {
+        // Ensure `this.env.pos` is defined and accessible
+        if (!this.env || !this.env.pos) {
+            console.error('POS environment not initialized.');
+            return;
+        }
+
         const product = await this._getProductByBarcode(code);
         if (product === true) {
             return;
@@ -16,6 +22,7 @@ patch(ProductScreen.prototype, {
         if (!product) {
             return this.showPopup('ErrorBarcodePopup', { code: code.base_code });
         }
+
         const options = await product.getAddProductOptions(code);
         if (!options) {
             return;
@@ -39,7 +46,14 @@ patch(ProductScreen.prototype, {
                 merge: false,
             });
         }
+
+        // Fetch the current order safely
         const currentOrder = this.env.pos.get_order();
+        if (!currentOrder) {
+            console.error('No current order available.');
+            return;
+        }
+
         if (currentOrder.is_finalized) {
             this.showPopup('ErrorPopup', {
                 title: 'Cannot Modify Finalized Order',
@@ -47,18 +61,12 @@ patch(ProductScreen.prototype, {
             });
             return;
         }
-         this.currentOrder.add_product(product, options);
-            var line = this.currentOrder.get_last_orderline();
-            var pos_multi_op = this.db.product_multi_barcodes;
-            for(var i=0;i<pos_multi_op.length;i++){
-                if(pos_multi_op[i].barcode == code.code){
-                    line.set_unit_price(pos_multi_op[i].price);
-                    line.price_manually_set = true;
-                }
-            }
+
+        currentOrder.add_product(product, options);
         this.numberBuffer.reset();
     }
 });
+
 
 patch(PosStore.prototype, {
     async _processData(loadedData) {
@@ -72,10 +80,11 @@ patch(DB.PosDB.prototype, {
         this._super.apply(this, arguments);
     },
     get_product_by_barcode(barcode) {
-
         const barcodes = Object.values(this.product_multi_barcodes);
+         // Check if the barcode exists in the original product_by_barcode
         if (this.product_by_barcode[barcode]) {
             return this.product_by_barcode[barcode];
+        // Check if the barcode exists in the original packaging barcodes
         } else if (this.product_packaging_by_barcode[barcode]) {
             return this.product_by_id[this.product_packaging_by_barcode[barcode].product_id[0]];
         } else if (barcodes.length > 0) {
