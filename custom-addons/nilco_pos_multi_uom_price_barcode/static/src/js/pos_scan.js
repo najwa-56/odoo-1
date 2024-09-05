@@ -90,8 +90,8 @@ patch(DB.PosDB.prototype, {
                         for (const orderline of orderlines) {
                             if (orderline.product.id === result.id &&
                                 orderline.product_uom_id[0] === uom.id &&
-                                orderline.price === uom.price) {
-                                orderline.set_quantity(orderline.quantity + 1, uom.price);
+                                orderline.price === price) {
+                                orderline.set_quantity(orderline.quantity + 1, price);
                                   orderline.set_uom_name(orderline.name_field );
                                 return true;
                             }
