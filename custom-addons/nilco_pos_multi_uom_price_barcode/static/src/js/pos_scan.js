@@ -21,12 +21,6 @@ patch(ProductScreen.prototype, {
             return;
         }
 
-        // Check for the existence of db
-        if (!this.env.pos || !this.env.pos.db) {
-            console.error('POS or DB is not initialized');
-            return;
-        }
-
         if (code.type === "price") {
             Object.assign(options, {
                 price: code.value,
@@ -35,27 +29,10 @@ patch(ProductScreen.prototype, {
                 },
             });
         } else if (code.type === "weight" || code.type === "quantity") {
-            if (code.type === "weight") {
-                const uom = this.env.pos.db.getUOMByBarcode(code.barcode); // Ensure getUOMByBarcode is available
-                if (!uom) {
-                    console.error('UOM not found for barcode');
-                    return;
-                }
-                const unitPrice = uom.price; // Price per UOM unit.
-                const weight = code.value; // Weight value scanned from the barcode.
-                const calculatedPrice = unitPrice * weight; // Calculate total price based on weight.
-
-                Object.assign(options, {
-                    price: calculatedPrice,
-                    quantity: weight, // Treat weight as quantity in this context.
-                    merge: false,
-                });
-            } else {
-                Object.assign(options, {
-                    quantity: code.value,
-                    merge: false,
-                });
-            }
+            Object.assign(options, {
+                quantity: code.value,
+                merge: false,
+            });
         } else if (code.type === "discount") {
             Object.assign(options, {
                 discount: code.value,
@@ -70,7 +47,7 @@ patch(ProductScreen.prototype, {
             });
             return;
         }
-        currentOrder.add_product(product, options);
+        this.currentOrder.add_product(product, options);
         this.numberBuffer.reset();
     }
 });
@@ -87,6 +64,7 @@ patch(DB.PosDB.prototype, {
         this._super.apply(this, arguments);
     },
     get_product_by_barcode(barcode) {
+
         const barcodes = Object.values(this.product_multi_barcodes);
         if (this.product_by_barcode[barcode]) {
             return this.product_by_barcode[barcode];
@@ -102,35 +80,26 @@ patch(DB.PosDB.prototype, {
                             { env: result.env },
                             { pos: result.pos, order: result.pos.selectedOrder, product: result }
                         );
-
-                        let calculatedPrice;
-                        if (barcode.type === 'weight') {
-                            const weight = barcode.value;
-                            calculatedPrice = uom.price * weight;
-                        } else {
-                            calculatedPrice = uom.price;
-                        }
-
                         const orderlines = result.pos.selectedOrder.get_orderlines();
                         for (const orderline of orderlines) {
                             if (orderline.product.id === result.id &&
                                 orderline.product_uom_id[0] === uom.id &&
-                                orderline.price === calculatedPrice) {
-                                orderline.set_quantity(orderline.quantity + 1, calculatedPrice);
-                                orderline.set_uom_name(uom.name_field);
+                                orderline.price === uom.price) {
+                                orderline.set_quantity(orderline.quantity + 1, uom.price);
+                                  orderline.set_uom_name(orderline.name_field );
                                 return true;
                             }
                         }
-
                         result.pos.selectedOrder.add_orderline(line);
                         result.pos.selectedOrder.selected_orderline.set_uom({ 0: uom.id, 1: uom.name });
                         result.pos.selectedOrder.selected_orderline.price_manually_set = true;
-                        result.pos.selectedOrder.selected_orderline.set_unit_price(calculatedPrice);
-                        result.pos.selectedOrder.selected_orderline.set_uom_name(uom.name_field);
+                        result.pos.selectedOrder.selected_orderline.set_unit_price(uom.price);
+                         result.pos.selectedOrder.selected_orderline.set_uom_name(uom.name_field);
                         return true;
                     }
                 }
             }
+            return undefined;
         }
         return undefined;
     },
