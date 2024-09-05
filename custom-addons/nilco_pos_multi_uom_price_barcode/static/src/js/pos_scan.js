@@ -9,12 +9,15 @@ import { ErrorBarcodePopup } from "@point_of_sale/app/barcode/error_popup/barcod
 
 patch(ProductScreen.prototype, {
     async _barcodeProductAction(code) {
-        // Ensure `this.env.pos` is defined and accessible
+        // Wait until the POS environment is fully ready
         if (!this.env || !this.env.pos) {
             console.error('POS environment not initialized.');
+            // Optionally, retry after a short delay
+            setTimeout(() => this._barcodeProductAction(code), 100);
             return;
         }
 
+        // Rest of the method logic
         const product = await this._getProductByBarcode(code);
         if (product === true) {
             return;
@@ -47,7 +50,6 @@ patch(ProductScreen.prototype, {
             });
         }
 
-        // Fetch the current order safely
         const currentOrder = this.env.pos.get_order();
         if (!currentOrder) {
             console.error('No current order available.');
@@ -66,7 +68,6 @@ patch(ProductScreen.prototype, {
         this.numberBuffer.reset();
     }
 });
-
 
 patch(PosStore.prototype, {
     async _processData(loadedData) {
