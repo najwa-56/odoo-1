@@ -9,15 +9,6 @@ import { ErrorBarcodePopup } from "@point_of_sale/app/barcode/error_popup/barcod
 
 patch(ProductScreen.prototype, {
     async _barcodeProductAction(code) {
-        // Wait until the POS environment is fully ready
-        if (!this.env || !this.env.pos) {
-            console.error('POS environment not initialized.');
-            // Optionally, retry after a short delay
-            setTimeout(() => this._barcodeProductAction(code), 100);
-            return;
-        }
-
-        // Rest of the method logic
         const product = await this._getProductByBarcode(code);
         if (product === true) {
             return;
@@ -25,7 +16,6 @@ patch(ProductScreen.prototype, {
         if (!product) {
             return this.showPopup('ErrorBarcodePopup', { code: code.base_code });
         }
-
         const options = await product.getAddProductOptions(code);
         if (!options) {
             return;
@@ -49,13 +39,7 @@ patch(ProductScreen.prototype, {
                 merge: false,
             });
         }
-
         const currentOrder = this.env.pos.get_order();
-        if (!currentOrder) {
-            console.error('No current order available.');
-            return;
-        }
-
         if (currentOrder.is_finalized) {
             this.showPopup('ErrorPopup', {
                 title: 'Cannot Modify Finalized Order',
@@ -63,8 +47,7 @@ patch(ProductScreen.prototype, {
             });
             return;
         }
-
-        currentOrder.add_product(product, options);
+        this.currentOrder.add_product(product, options);
         this.numberBuffer.reset();
     }
 });
@@ -81,11 +64,10 @@ patch(DB.PosDB.prototype, {
         this._super.apply(this, arguments);
     },
     get_product_by_barcode(barcode) {
+
         const barcodes = Object.values(this.product_multi_barcodes);
-         // Check if the barcode exists in the original product_by_barcode
         if (this.product_by_barcode[barcode]) {
             return this.product_by_barcode[barcode];
-        // Check if the barcode exists in the original packaging barcodes
         } else if (this.product_packaging_by_barcode[barcode]) {
             return this.product_by_id[this.product_packaging_by_barcode[barcode].product_id[0]];
         } else if (barcodes.length > 0) {
