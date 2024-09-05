@@ -81,17 +81,11 @@ patch(DB.PosDB.prototype, {
                             { pos: result.pos, order: result.pos.selectedOrder, product: result }
                         );
                         const orderlines = result.pos.selectedOrder.get_orderlines();
-                         let price = uom.price;
-
-                        // Compute the price based on weight or quantity
-                        if (product.weight && code.type === 'weight') {
-                            price = uom.price * code.value; // Assuming code.value is weight
-                        }
                         for (const orderline of orderlines) {
                             if (orderline.product.id === result.id &&
                                 orderline.product_uom_id[0] === uom.id &&
-                                orderline.price === price) {
-                                orderline.set_quantity(orderline.quantity + 1, price);
+                                orderline.price === uom.price) {
+                                orderline.set_quantity(orderline.quantity + 1, uom.price);
                                   orderline.set_uom_name(orderline.name_field );
                                 return true;
                             }
@@ -99,7 +93,7 @@ patch(DB.PosDB.prototype, {
                         result.pos.selectedOrder.add_orderline(line);
                         result.pos.selectedOrder.selected_orderline.set_uom({ 0: uom.id, 1: uom.name });
                         result.pos.selectedOrder.selected_orderline.price_manually_set = true;
-                        result.pos.selectedOrder.selected_orderline.set_unit_price(price);
+                        result.pos.selectedOrder.selected_orderline.set_unit_price(uom.price);
                          result.pos.selectedOrder.selected_orderline.set_uom_name(uom.name_field);
                         return true;
                     }
