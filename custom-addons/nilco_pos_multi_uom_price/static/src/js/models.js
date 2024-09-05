@@ -65,6 +65,7 @@ patch(Orderline.prototype, {
         this.product_uom_id = this.product.default_uom_id || this.product_uom_id || this.product.uom_id;
                 this.name_field = options.name_field || this.name_field || "";  // Ensure initialization
          this.reorderProduct();
+
     },
 
 

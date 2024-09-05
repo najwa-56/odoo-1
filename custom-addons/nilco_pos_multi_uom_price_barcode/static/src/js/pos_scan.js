@@ -47,7 +47,15 @@ patch(ProductScreen.prototype, {
             });
             return;
         }
-        this.currentOrder.add_product(product, options);
+         this.currentOrder.add_product(product, options);
+            var line = this.currentOrder.get_last_orderline();
+            var pos_multi_op = this.db.product_multi_barcodes;
+            for(var i=0;i<pos_multi_op.length;i++){
+                if(pos_multi_op[i].barcode == code.code){
+                    line.set_unit_price(pos_multi_op[i].price);
+                    line.price_manually_set = true;
+                }
+            }
         this.numberBuffer.reset();
     }
 });
