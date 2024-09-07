@@ -24,8 +24,15 @@ class KSduplicateDashboardWizard(models.TransientModel):
         dup_dash = self.env['ks_dashboard_ninja.board'].browse(dashboard_id).copy({'ks_dashboard_top_menu_id': self.ks_top_menu_id.id})
         context = {'ks_reload_menu': True, 'ks_menu_id': dup_dash.ks_dashboard_menu_id.id}
         dash_id = self.env['ks_dashboard_ninja.board'].browse(dashboard_id)
-        if not dup_dash.ks_dashboard_items_ids:
+        length_to_skip = len(dup_dash.ks_dashboard_items_ids.ids)
+
+        count = 0
+
+        if dup_dash.ks_dashboard_items_ids or length_to_skip == 0:
             for item in dash_id.ks_dashboard_items_ids:
+                if count < length_to_skip:
+                    count += 1
+                    continue
                 item.sudo().copy({'ks_dashboard_ninja_board_id': dup_dash.id})
         return {
             'type': 'ir.actions.client',

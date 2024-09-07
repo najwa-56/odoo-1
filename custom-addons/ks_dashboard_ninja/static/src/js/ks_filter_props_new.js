@@ -70,6 +70,13 @@ patch(KsDashboardNinja.prototype,{
             self._ksAppendDynamicFilter(ev.currentTarget.dataset['filterId']);
             $(ev.currentTarget).addClass('dn_dynamic_filter_selected');
         }
+        var storedData = this.getObjectFromCookie('FilterOrderData' + self.ks_dashboard_id);
+        if(storedData !== null ){
+            this.eraseCookie('FilterOrderData' + self.ks_dashboard_id);
+        }
+        if(Object.keys(self.ks_dashboard_data.ks_dashboard_domain_data).length !==0){
+            this.setObjectInCookie('FilterOrderData' + self.ks_dashboard_id, self.ks_dashboard_data.ks_dashboard_domain_data, 1);
+        }
     },
 
     _ksAppendDynamicFilter(filterId){
@@ -193,6 +200,20 @@ patch(KsDashboardNinja.prototype,{
         domain_data['domain'] = self._ksMakeDomainFromDomainIndex(domain_data.ks_domain_index_data);
         domain_data['ks_remove'] = true
          self.state.pre_defined_filter = {...domain_data}
+         if(domain_data['domain'].length != 0){
+                var storedData = this.getObjectFromCookie('FilterOrderData' + self.ks_dashboard_id);
+                if(storedData !== null ){
+                    this.eraseCookie('FilterOrderData' + self.ks_dashboard_id);
+                }
+                if(Object.keys(self.ks_dashboard_data.ks_dashboard_domain_data).length !==0){
+                    this.setObjectInCookie('FilterOrderData' + self.ks_dashboard_id, self.ks_dashboard_data.ks_dashboard_domain_data, 1);
+                }
+            }else{
+                var storedData = this.getObjectFromCookie('FilterOrderData' + self.ks_dashboard_id);
+                if(storedData){
+                   this.eraseCookie('FilterOrderData' + self.ks_dashboard_id);
+                }
+            }
          self.state.ksDateFilterSelection = 'none'
          self.state.custom_filter = {}
     },
@@ -245,6 +266,19 @@ patch(KsDashboardNinja.prototype,{
             self.state.pre_defined_filter = {}
             self.state.ksDateFilterSelection = 'none'
             self.state.custom_filter = {...domain_data}
+            if(domain_data['domain'].length != 0){
+                var storedData = this.getObjectFromCookie('FilterOrderData' + self.ks_dashboard_id);
+                if(storedData !== null ){
+                    this.eraseCookie('FilterOrderData' + self.ks_dashboard_id);
+                }
+                this.setObjectInCookie('FilterOrderData' + self.ks_dashboard_id, self.ks_dashboard_data.ks_dashboard_domain_data, 1);
+            }else{
+                var storedData = this.getObjectFromCookie('FilterOrderData' + self.ks_dashboard_id);
+                if(storedData){
+                   this.eraseCookie('FilterOrderData' + self.ks_dashboard_id);
+                }
+            }
+
         }
     },
 
@@ -428,6 +462,41 @@ patch(KsDashboardNinja.prototype,{
         this._ksAddCustomDomain(model_domain);
     },
 
+    eraseCookie(name) {
+    document.cookie = name + '=; Max-Age=-99999999; path=/';
+    },
+
+    setCookie(name, value, days) {
+        var expires = "";
+        if (days) {
+            var date = new Date();
+            date.setTime(date.getTime() + (days*24*60*60*1000));
+            expires = "; expires=" + date.toUTCString();
+        }
+        document.cookie = name + "=" + (value || "") + expires + "; path=/";
+    },
+
+     setObjectInCookie(name, object, days) {
+        var jsonString = JSON.stringify(object);
+        this.setCookie(name, jsonString, days);
+    },
+
+    getCookie(name) {
+        var nameEQ = name + "=";
+        var ca = document.cookie.split(';');
+        for (var i = 0; i < ca.length; i++) {
+            var c = ca[i];
+            while (c.charAt(0) == ' ') c = c.substring(1, c.length);
+            if (c.indexOf(nameEQ) == 0) return c.substring(nameEQ.length, c.length);
+        }
+        return null;
+    },
+
+    getObjectFromCookie(name) {
+        var jsonString = this.getCookie(name);
+        return jsonString ? JSON.parse(jsonString) : null;
+    },
+
     _ksAddCustomDomain(model_domain){
         var self = this;
         $(".ks_dn_filter_applied_container").removeClass('ks_hide');
@@ -458,6 +527,15 @@ patch(KsDashboardNinja.prototype,{
 
             domain_data['domain'] = self._ksMakeDomainFromDomainIndex(domain_data.ks_domain_index_data);
             self.state.custom_filter = {...domain_data}
+
+            if(domain_data['domain'][0] !== undefined && domain_data['domain'].length != 0){
+                var storedData = this.getObjectFromCookie('FilterOrderData' + self.ks_dashboard_id);
+                if(storedData !== null ){
+                    this.eraseCookie('FilterOrderData' + self.ks_dashboard_id);
+                }
+                this.setObjectInCookie('FilterOrderData' + self.ks_dashboard_id, self.ks_dashboard_data.ks_dashboard_domain_data, 1);
+            }
+
             self.state.pre_defined_filter = {}
             self.state.ksDateFilterSelection = 'none'
         })

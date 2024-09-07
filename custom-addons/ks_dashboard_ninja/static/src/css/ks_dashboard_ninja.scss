@@ -537,6 +537,7 @@ ul.nav li.dropdown:hover ul.dropdown-menu{ display: block; }
 #ks_dashboard_title{
     position: absolute;
     left: 60px !important;
+    z-index: 1;
 }
 
 .ks_preview_item {
@@ -698,4 +699,14 @@ ul.nav li.dropdown:hover ul.dropdown-menu{ display: block; }
 }
 .ks_user{
     position:relative !important;
+}
+.o_rtl .o_action_manager .ks_dashboard_main_content .ks_dashboard_item_content{
+    direction:rtl !important;
+}
+.o_rtl .o_action_manager .ks_dashboard_main_content .grid-stack-item{
+    direction:ltr !important;
+}
+
+.ks_list_item_table{
+    overflow: scroll !important;
 }

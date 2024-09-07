@@ -13,8 +13,22 @@
     </t>
 
     <t t-name="ks_dashboard_item_layout1">
-        <div t-att-class="'ks_item_click ' + ks_container_class" t-att-id="item.id">
-            <div t-att-class="'ks_dashboarditem_id ks_dashboard_item ks_dashboard_item_hover ' + ks_inner_container_class"
+        <div t-att-class="'ks_item_click ' + ks_container_class" t-att-id="item.id" t-ref="ks_tile">
+            <t t-if="ks_ai_analysis">
+                <div class="ks_ai_explain_body">
+                    <t t-call="ks_tile_layout_1"/>
+                    <t t-call="ks_item_explanation"/>
+                </div>
+            </t>
+            <t t-else="">
+                <t t-call="ks_tile_layout_1"/>
+            </t>
+
+        </div>
+    </t>
+
+    <t t-name="ks_tile_layout_1">
+        <div t-att-class="'ks_dashboarditem_id ks_dashboard_item ks_dashboard_item_hover ' + ks_inner_container_class"
                  t-att-style="style_main_body"
                  t-att-title="item.ks_info"
                  t-att-id="item.id">
@@ -173,12 +187,24 @@
                     </div>
                 </div>
             </div>
-        </div>
     </t>
 
     <t t-name="ks_dashboard_item_layout2">
-        <div t-att-id="item.id" t-att-class="'ks_item_click ' + ks_container_class">
-            <div t-att-class="'ks_dashboarditem_id ks_dashboard_item_l2 ks_dashboard_item_hover ' + ks_inner_container_class"
+        <div t-att-id="item.id" t-att-class="'ks_item_click ' + ks_container_class" t-ref="ks_tile">
+            <t t-if="ks_ai_analysis">
+                <div class="ks_ai_explain_body">
+                    <t t-call="ks_tile_layout_2"/>
+                    <t t-call="ks_item_explanation"/>
+                </div>
+            </t>
+            <t t-else="">
+                <t t-call="ks_tile_layout_2"/>
+            </t>
+        </div>
+    </t>
+
+    <t t-name="ks_tile_layout_2">
+        <div t-att-class="'ks_dashboarditem_id ks_dashboard_item_l2 ks_dashboard_item_hover ' + ks_inner_container_class"
                  t-att-style="style_main_body"
                  t-att-title="item.ks_info" t-att-id="item.id">
                 <div class="ks_dashboard_icon_l2" t-att-style="style_image_body_l2">
@@ -334,12 +360,25 @@
                     </t>
                 </div>
             </div>
-        </div>
     </t>
 
     <t t-name="ks_dashboard_item_layout3">
-        <div t-att-id="item.id" t-att-class="'ks_item_click ' + ks_container_class">
-            <div t-att-class="'ks_dashboarditem_id ks_dashboard_item ks_dashboard_item_hover '+ ks_inner_container_class"
+        <div t-att-id="item.id" t-att-class="'ks_item_click ' + ks_container_class" t-ref="ks_tile">
+            <t t-if="ks_ai_analysis">
+                <div class="ks_ai_explain_body">
+                    <t t-call="ks_tile_layout_3"/>
+                    <t t-call="ks_item_explanation"/>
+                </div>
+            </t>
+            <t t-else="">
+                <t t-call="ks_tile_layout_3"/>
+            </t>
+        </div>
+
+    </t>
+
+    <t t-name="ks_tile_layout_3">
+        <div t-att-class="'ks_dashboarditem_id ks_dashboard_item ks_dashboard_item_hover '+ ks_inner_container_class"
                  t-att-style="style_main_body"
                  t-att-title="item.ks_info" t-att-id="item.id">
 
@@ -499,12 +538,24 @@
                     </div>
                 </div>
             </div>
-        </div>
     </t>
 
     <t t-name="ks_dashboard_item_layout4">
-        <div t-att-id="item.id" t-att-class="'ks_item_click ' + ks_container_class">
-            <div t-att-class="'ks_dashboarditem_id ks_dashboard_item_l2 ks_dashboard_item_hover '+ ks_inner_container_class"
+        <div t-att-id="item.id" t-att-class="'ks_item_click ' + ks_container_class" t-ref="ks_tile">
+             <t t-if="ks_ai_analysis">
+                <div class="ks_ai_explain_body">
+                    <t t-call="ks_tile_layout_4"/>
+                    <t t-call="ks_item_explanation"/>
+                </div>
+            </t>
+            <t t-else="">
+                <t t-call="ks_tile_layout_4"/>
+            </t>
+        </div>
+    </t>
+
+    <t t-name="ks_tile_layout_4">
+        <div t-att-class="'ks_dashboarditem_id ks_dashboard_item_l2 ks_dashboard_item_hover '+ ks_inner_container_class"
                  t-att-style="style_main_body_l4"
                  t-att-title="item.ks_info" t-att-id="item.id">
                 <div class="ks_dashboard_icon_l4" t-att-style="style_image_body_l4">
@@ -662,12 +713,25 @@
                 </div>
 
             </div>
-        </div>
+
     </t>
 
     <t t-name="ks_dashboard_item_layout5">
-        <div t-att-id="item.id" t-att-class="'ks_item_click ' + ks_container_class">
-            <div t-att-class="'ks_dashboarditem_id ks_dashboard_item_l5 ks_dashboard_item_hover '+ ks_inner_container_class"
+        <div t-att-id="item.id" t-att-class="'ks_item_click ' + ks_container_class" t-ref="ks_tile">
+            <t t-if="ks_ai_analysis">
+                <div class="ks_ai_explain_body">
+                    <t t-call="ks_tile_layout_5"/>
+                    <t t-call="ks_item_explanation"/>
+                </div>
+            </t>
+            <t t-else="">
+                <t t-call="ks_tile_layout_5"/>
+            </t>
+        </div>
+    </t>
+
+    <t t-name="ks_tile_layout_5">
+        <div t-att-class="'ks_dashboarditem_id ks_dashboard_item_l5 ks_dashboard_item_hover '+ ks_inner_container_class"
                  t-att-style="style_main_body"
                  t-att-title="item.ks_info" t-att-id="item.id">
                 <div class="ks_dashboard_icon_l5">
@@ -823,12 +887,25 @@
                     </t>
                 </div>
             </div>
-        </div>
+
     </t>
 
     <t t-name="ks_dashboard_item_layout6">
-        <div t-att-id="item.id" t-att-class="'ks_item_click ' + ks_container_class">
-            <div t-att-class="'ks_dashboarditem_id ks_dashboard_item_l2 ks_dashboard_item_hover '+ ks_inner_container_class"
+        <div t-att-id="item.id" t-att-class="'ks_item_click ' + ks_container_class" t-ref="ks_tile">
+             <t t-if="ks_ai_analysis">
+                <div class="ks_ai_explain_body">
+                    <t t-call="ks_tile_layout_6"/>
+                    <t t-call="ks_item_explanation"/>
+                </div>
+            </t>
+            <t t-else="">
+                <t t-call="ks_tile_layout_6"/>
+            </t>
+        </div>
+    </t>
+
+    <t t-name="ks_tile_layout_6">
+        <div t-att-class="'ks_dashboarditem_id ks_dashboard_item_l2 ks_dashboard_item_hover '+ ks_inner_container_class"
                  t-att-style="style_main_body"
                  t-att-title="item.ks_info" t-att-id="item.id">
 
@@ -991,7 +1068,7 @@
                 </div>
 
             </div>
-        </div>
+
     </t>
 
     <t t-name="ks_dashboard_item_layout_default">
@@ -1011,6 +1088,17 @@
                 <p>Layout Coming Soon</p>
             </div>
         </div>
+    </t>
+
+    <t t-name="ks_item_explanation">
+        <div class="ks_ai_explanation">
+            <p><t t-esc="ks_ai_analysis_1"/></p>
+            <p><t t-esc="ks_ai_analysis_2"/></p>
+        </div>
+        <div class="ks_speaker" t-on-click="props.ks_speak">
+            <span class="fa fa-volume-up"/>
+            <audio></audio>
+         </div>
     </t>
 
 </templates>

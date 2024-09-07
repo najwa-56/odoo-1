@@ -1,7 +1,7 @@
 /** @odoo-module **/
 
 import { _t } from "@web/core/l10n/translation";
-import { Component, onWillStart, useState ,onMounted, onWillRender, useRef, onWillPatch, onRendered, useEffect, onWillUpdateProps  } from "@odoo/owl";
+import { Component, onWillStart, useState ,onMounted, onWillRender, useRef, useEffect,onWillUnmount  } from "@odoo/owl";
 import { registry } from "@web/core/registry";
 import { jsonrpc } from "@web/core/network/rpc_service";
 import { useService } from "@web/core/utils/hooks";
@@ -161,27 +161,61 @@ export class KsDashboardNinja extends Component {
         }
         this.dn_state = {}
         this.dn_state['user_context']=context
+        this.ks_speeches = [];
         onWillStart(this.willStart);
         onWillRender(this.dashboard_mount);
-        onMounted(() => this.grid_initiate());
+        onWillUnmount(()=>this.ks_switch_default_dashboard());
+
+        onMounted(() => {
+            this.grid_initiate();
+            var filter_date_data = this.getObjectFromCookie('FilterDateData' + this.ks_dashboard_id);
+            if (filter_date_data != null){
+                $(this.header.el).find('.ks_date_filter_selected').removeClass('ks_date_filter_selected');
+                $('#ks_date_filter_selection').text(this.ks_date_filter_selections[filter_date_data]);
+
+                var element_selected = document.getElementById(filter_date_data);
+                element_selected.classList.add('ks_date_filter_selected')
+                this.state.ksDateFilterSelection = filter_date_data;
+                if(filter_date_data==='l_custom'){
+                    var custom_range = this.getObjectFromCookie('custom_range' + this.ks_dashboard_id);
+                    if(custom_range){
+                        this.state.ksDateFilterStartDate = custom_range['start_date']
+                        this.state.ksDateFilterEndDate = custom_range['end_date']
+                    }
+                    $('.ks_date_input_fields').removeClass("ks_hide");
+                    $('.ks_date_filter_dropdown').addClass("ks_btn_first_child_radius");
+                }
+
+            }
+
+            if (this.getObjectFromCookie('FilterDateData' + this.ks_dashboard_id) || this.getObjectFromCookie('FilterOrderData' + this.ks_dashboard_id)){
+                this._onKsApplyDateFilter();
+            }
+        });
     }
 
 
     willStart(){
         var self = this;
         var def;
+        var storedData = this.getObjectFromCookie('FilterOrderData' + self.ks_dashboard_id);
         if (this.reload_menu_option.reload && this.reload_menu_option.menu_id) {
             def = this.getParent().actionService.ksDnReloadMenu(this.reload_menu_option.menu_id);
         }
         return $.when(def, loadBundle("ks_dashboard_ninja.ks_dashboard_lib")).then(function() {
             return self.ks_fetch_data().then(function(){
-                return self.ks_fetch_items_data()
+                return self.ks_fetch_items_data().then(function(){
+                    if(storedData != null ){
+                        self.ks_dashboard_data.ks_dashboard_domain_data = storedData;
+                        }
+                    });
             });
         });
     }
 
     grid_initiate(){
         var self=this;
+        const ks_element = this.main_body.el;
         var $gridstackContainer = $(".grid-stack");
         if($gridstackContainer.length){
             this.grid = GridStack.init(this.gridstack_options,$gridstackContainer[0]);
@@ -192,7 +226,7 @@ export class KsDashboardNinja extends Component {
             for (var i = 0; i < item.length; i++) {
                 var graphs = ['ks_scatter_chart','ks_bar_chart', 'ks_horizontalBar_chart', 'ks_line_chart', 'ks_area_chart', 'ks_doughnut_chart','ks_polarArea_chart','ks_pie_chart','ks_flower_view', 'ks_radar_view','ks_radialBar_chart','ks_map_view','ks_funnel_chart','ks_bullet_chart', 'ks_to_do', 'ks_list_view']
                 var $ks_preview = $('#' + item[i].id)
-                if ($ks_preview.length) {
+                if ($ks_preview.length && !this.ks_dashboard_data.ks_ai_explain_dash) {
                     if (item[i].id in self.gridstackConfig) {
                         var min_width = graphs.includes(item[i].ks_dashboard_item_type)? 3:2
                          self.grid.addWidget($ks_preview[0], {x:self.gridstackConfig[item[i].id].x, y:self.gridstackConfig[item[i].id].y, w:self.gridstackConfig[item[i].id].w, h: self.gridstackConfig[item[i].id].h, autoPosition:false, minW:min_width, maxW:null, minH:2, maxH:null, id:item[i].id});
@@ -201,13 +235,29 @@ export class KsDashboardNinja extends Component {
                     }else{
                         self.grid.addWidget($ks_preview[0], {x:0, y:0, w:3, h:2,autoPosition:true,minW:3,maxW:null,minH:2,maxH:2,id:item[i].id});
                     }
+                }else{
+                if (item[i].id in self.gridstackConfig) {
+                        var min_width = graphs.includes(item[i].ks_dashboard_item_type)? 3:2
+                         self.grid.addWidget($ks_preview[0], {x:self.gridstackConfig[item[i].id].x, y:self.gridstackConfig[item[i].id].y, w:12, h: 6, autoPosition:false, minW:min_width, maxW:null, minH:2, maxH:null, id:item[i].id});
+                    } else  {
+                         self.grid.addWidget($ks_preview[0], {x:0, y:0, w:12, h:6,autoPosition:true,minW:4,maxW:null,minH:3,maxH:null, id :item[i].id});
+                    }
+                   Object.values(ks_element.querySelectorAll(".ks_dashboard_item_button_container")).map((item) => {
+                        $(item).addClass('d-none')
+                        $(item).removeClass('d-md-flex')
+                   })
+                   Object.values(ks_element.querySelectorAll(".ks_pager_name")).map((item) => {
+                        $(item).addClass('d-none')
+                   })
+
+
                 }
             }
             this.grid.setStatic(true);
         }
         this.ksRenderDashboard();
         // Events //
-        const ks_element = this.main_body.el;
+
         Object.values(ks_element.querySelectorAll(".ks_duplicate_item")).map((item) => { item.addEventListener('click', this.onKsDuplicateItemClick.bind(this))})
         Object.values(ks_element.querySelectorAll(".ks_move_item")).map((item) => { item.addEventListener('click', this.onKsMoveItemClick.bind(this))})
         Object.values(ks_element.querySelectorAll(".ks_dashboard_item_delete")).map((item) => { item.addEventListener('click', this._onKsDeleteItemClick.bind(this))})
@@ -255,7 +305,7 @@ export class KsDashboardNinja extends Component {
             self.ks_dashboard_data['context'] = self.getContext()
             self.ks_dashboard_data['ks_ai_dashboard'] = false
             if(self.dn_state['domain_data'] != undefined){
-                self.ks_dashboard_data.ks_dashboard_domain_data=self.dn_state['domain_data']
+//                self.ks_dashboard_data.ks_dashboard_domain_data=self.dn_state['domain_data']
                 Object.values(self.ks_dashboard_data.ks_dashboard_pre_domain_filter).map((x)=>{
                     if(self.dn_state['domain_data'][x['model']] != undefined){
                         if(self.dn_state['domain_data'][x['model']]['ks_domain_index_data'][0]['label'].indexOf(x['name']) ==-1){
@@ -310,8 +360,15 @@ export class KsDashboardNinja extends Component {
         self.state.ksDateFilterSelection = self.state.ksDateFilterSelection == false ? 'none' : self.state.ksDateFilterSelection,
         self.state.pre_defined_filter = {}
         self.state.custom_filter = {}
-        self.state.ksDateFilterStartDate = DateTime.now()
-        self.state.ksDateFilterEndDate = DateTime.now()
+        var custom_range = this.getObjectFromCookie('custom_range' + this.ks_dashboard_id);
+        if(custom_range){
+            this.state.ksDateFilterStartDate = parseDateTime(custom_range['start_date'], self.datetime_format)
+            this.state.ksDateFilterEndDate = parseDateTime(custom_range['end_date'], self.datetime_format)
+        }else{
+            self.state.ksDateFilterStartDate = DateTime.now()
+            self.state.ksDateFilterEndDate = DateTime.now()
+        }
+
         self.state.ks_user_name = session.name
         return Promise.all(items_promises)
 
@@ -413,6 +470,11 @@ export class KsDashboardNinja extends Component {
                 $(self.header.el).find(".apply-dashboard-date-filter").removeClass("ks_hide");
                 $(self.header.el).find(".clear-dashboard-date-filter").removeClass("ks_hide");
             }
+            if(self.state.ksDateFilterSelection === 'l_none'){
+                this.eraseCookie('FilterDateData' + self.ks_dashboard_id);
+            }else{
+                this.setObjectInCookie('FilterDateData' + self.ks_dashboard_id, self.state.ksDateFilterSelection, 1);
+            }
         }
     }
 
@@ -457,6 +519,7 @@ export class KsDashboardNinja extends Component {
                         self.ksDateFilterSelection = $(self.header.el).find('.ks_date_filter_selected').attr('id');
                         self.ksDateFilterStartDate = start_date;
                         self.ksDateFilterEndDate = end_date;
+                        this.setObjectInCookie('custom_range' + self.ks_dashboard_id, {'start_date': start_date, 'end_date':end_date}, 1);
                         var res = {};
                         for (const [key, value] of Object.entries(self.ks_dashboard_data.ks_item_data)) {
                             if (value.ks_dashboard_item_type != "ks_to_do") {
@@ -472,6 +535,7 @@ export class KsDashboardNinja extends Component {
                             $(self.header.el).find(".apply-dashboard-date-filter").addClass("ks_hide");
                             $(self.header.el).find(".clear-dashboard-date-filter").addClass("ks_hide");
                             self.state.ksDateFilterSelection = $(self.header.el).find('.ks_date_filter_selected').attr('id');
+                            this.setObjectInCookie('FilterDateData' + self.ks_dashboard_id, self.state.ksDateFilterSelection, 1);
                             self.state.pre_defined_filter = {}
                             self.state.custom_filter = {}
                             self.state.ksDateFilterStartDate = parseDateTime(self.ksDateFilterStartDate,self.datetime_format);
@@ -484,6 +548,38 @@ export class KsDashboardNinja extends Component {
                 alert(_t("Please enter start date and end date"));
             }
         }
+    }
+
+    setCookie(name, value, days) {
+        var expires = "";
+        if (days) {
+            var date = new Date();
+            date.setTime(date.getTime() + (days*24*60*60*1000));
+            expires = "; expires=" + date.toUTCString();
+        }
+        document.cookie = name + "=" + (value || "") + expires + "; path=/";
+    }
+
+     setObjectInCookie(name, object, days) {
+        var jsonString = JSON.stringify(object);
+        this.setCookie(name, jsonString, days);
+    }
+
+
+    getCookie(name) {
+        var nameEQ = name + "=";
+        var ca = document.cookie.split(';');
+        for (var i = 0; i < ca.length; i++) {
+            var c = ca[i];
+            while (c.charAt(0) == ' ') c = c.substring(1, c.length);
+            if (c.indexOf(nameEQ) == 0) return c.substring(nameEQ.length, c.length);
+        }
+        return null;
+    }
+
+    getObjectFromCookie(name) {
+        var jsonString = this.getCookie(name);
+        return jsonString ? JSON.parse(jsonString) : null;
     }
 
     _onKsClearDateValues(ks_l_none=false) {
@@ -704,7 +800,6 @@ export class KsDashboardNinja extends Component {
     }
     ks_dashboard_item_action(e){
         this.ksAllowItemClick = false;
-        e.stopPropagation();
     }
 
     _onKsDeleteItemClick(e) {
@@ -863,35 +958,44 @@ export class KsDashboardNinja extends Component {
         var chart_id = e.currentTarget.dataset.chartId;
         var name = this.ks_dashboard_data.ks_item_data[chart_id].name;
         var base64_image
-        base64_image = $($(e.target).parentsUntil(".grid-stack-item").slice(-1)[0]).find("canvas")[0].toDataURL("image/png")
+        base64_image = $($(e.target).parentsUntil(".grid-stack-item").slice(-1)[0]).find('.ks_chart_card_body')[0]
         var $ks_el = $($($(self.main_body.el).find(".grid-stack-item[gs-id=" + chart_id + "]")).find('.ks_chart_card_body'));
         var ks_height = $ks_el.height()
-        var ks_image_def = {
+        html2canvas(base64_image, {useCORS: true, allowTaint: false}).then(function(canvas){
+            var ks_image = canvas.toDataURL("image/png");
+            var ks_image_def = {
             content: [{
-                    image: base64_image,
+                    image: ks_image,
                     width: 500,
                     height: ks_height,
                     }],
             images: {
-                bee: base64_image
+                bee: ks_image
             }
         };
         pdfMake.createPdf(ks_image_def).download(name + '.pdf');
+        })
+
     }
     ksChartExportimage(e){
         var self = this;
         var chart_id = e.currentTarget.dataset.chartId;
         var name = this.ks_dashboard_data.ks_item_data[chart_id].name;
         var base64_image
-        base64_image = $($(e.target).parentsUntil(".grid-stack-item").slice(-1)[0]).find("canvas")[0].toDataURL("image/png")
-        const link = document.createElement('a');
-        link.href =  base64_image;
-        link.download = name + 'png'
-        document.body.appendChild(link);
-        link.click()
-        document.body.removeChild(link);
+        base64_image = $($(e.target).parentsUntil(".grid-stack-item").slice(-1)[0]).find(".ks_chart_card_body")[0]
+        html2canvas(base64_image,{useCORS: true, allowTaint: false}).then(function(canvas){
+            var ks_image = canvas.toDataURL("image/png");
+            const link = document.createElement('a');
+            link.href =  ks_image;
+            link.download = name + 'png'
+            document.body.appendChild(link);
+            link.click()
+            document.body.removeChild(link);
+        })
+
     }
     async ksItemExportJson(e) {
+        e.stopPropagation();
         var itemId = $(e.target).parents('.ks_dashboard_item_button_container')[0].dataset.item_id;
         var name = this.ks_dashboard_data.ks_item_data[itemId].name;
         var data = {
@@ -907,7 +1011,6 @@ export class KsDashboardNinja extends Component {
             complete: () => unblockUI,
             error: (error) => self.call('crash_manager', 'rpc_error', error),
         });
-        e.stopPropagation();
     }
     ksRenderChartColorOptions(e) {
         var self = this;
@@ -962,7 +1065,8 @@ export class KsDashboardNinja extends Component {
         });
     }
     stoppropagation(ev){
-        ev.stopPropagation();
+//        ev.stopPropagation();
+        this.ksAllowItemClick = false;
     }
 
     ksOnDashboardImportClick(ev){
@@ -1380,10 +1484,117 @@ export class KsDashboardNinja extends Component {
            }
            self.actionService.doAction(action)
         }
+    ks_gen_ai_analysis(ev){
+        var self = this;
+        var ks_items = Object.values(self.ks_dashboard_data.ks_item_data);
+        var ks_items_explain = []
+        var ks_rest_items = []
+        if (ks_items.length>0){
+            ks_items.map((item)=>{
+                if (!item.ks_ai_analysis){
+                    ks_items_explain.push({
+                        name:item.name,
+                        id:item.id,
+                        ks_chart_data:item.ks_chart_data?{...JSON.parse(item.ks_chart_data),...{domains:[],previous_domain:[]}}:item.ks_chart_data,
+                        ks_list_view_data:item.ks_list_view_data?JSON.parse(item.ks_list_view_data):item.ks_list_view_data,
+                        item_type:item.ks_dashboard_item_type,
+                        groupedby:item.ks_chart_relation_groupby_name,
+                        subgroupedby:item.ks_chart_relation_sub_groupby_name,
+                        stacked_bar_chart:item.ks_bar_chart_stacked,
+                        count_type:item.ks_record_count_type,
+                        count:item.ks_record_count,
+                        model_name:item.ks_model_display_name,
+                        kpi_data:item.ks_kpi_data
+                    })
+                }
+                else{
+                    ks_rest_items.push(item)
+                }
 
+            });
+            this.dialogService.add(ConfirmationDialog, {
+                body: _t("Do you agree that AI should be used to produce the explanation? It will take a few minutes to finish the process?"),
+                confirm: () => {
+                    self._rpc("/web/dataset/call_kw/ks_dashboard_ninja.arti_int/ks_generate_analysis",{
+                        model: 'ks_dashboard_ninja.arti_int',
+                        method: 'ks_generate_analysis',
+                        args: [ks_items_explain,ks_rest_items,self.ks_dashboard_id],
+                        kwargs:{},
+                }).then(function(result) {
+                    if (result){
+                        var js_id = self.actionService.currentController.jsId
+                        self.actionService.restore(js_id)
+                    }
+                });
+                }
+        });
+        }else{
+            self.notification.add(_t('Plese make few items to explain with AI'),{
+                title:_t("Failed"),
+                type: 'warning',
+            });
+        }
+    }
+    ks_switch_default_dashboard(ev){
+        var self = this;
+        if (self.ks_dashboard_data.ks_ai_explain_dash){
+            self._rpc("/web/dataset/call_kw/ks_dashboard_ninja.arti_int/ks_switch_default_dashboard",{
+                        model: 'ks_dashboard_ninja.arti_int',
+                        method: 'ks_switch_default_dashboard',
+                        args: [self.ks_dashboard_id],
+                        kwargs:{},
+                }).then(function(result) {
+                    var js_id = self.actionService.currentController.jsId
+                    self.actionService.restore(js_id)
+                });
+        }
+    }
+   async speak_once(ev,item){
+        this.ksAllowItemClick = false;
+        ev.preventDefault()
+        var ks_audio = ev.currentTarget
+        $(document.querySelectorAll('audio')).each((index,item)=>{
+            if ($(item).attr('src') && $(ks_audio).find('audio').attr('src') != $(item).attr('src')){
+                item.pause()
+                $(item).parent().find('.fa.fa-volume-up').addClass('d-none');
+                if (!$(item).parent().find(".fa-pause").length){
+                    $(item).parent().append('<span class="fa fa-pause"></span>');
+                }
 
+            }
+        })
+        if (!this.ks_speeches.length){
+            if ($(ks_audio).find('audio').attr('src') && $(ks_audio).find('audio')[0].paused){
+                $(ks_audio).find('audio')[0].play();
+                $(ks_audio).find('.fa.fa-volume-up').removeClass('d-none');
+                $(ks_audio).find('.fa.fa-pause').remove();
+            }else if ($(ks_audio).find('audio').attr('src') && !$(ks_audio).find('audio')[0].paused){
+                $(ks_audio).find('audio')[0].pause();
+                $(ks_audio).find('.fa.fa-volume-up').addClass('d-none');
+                $(ks_audio).append('<span class="fa fa-pause"></span>');
+            }else{
+                $(ks_audio).find('span').addClass('d-none')
+                $(ks_audio).append('<div class="spinner-grow" role="status"><span class="sr-only"></span></div>')
+                this.ks_speeches.push(this._rpc('web/dataset/call_kw/ks_dashboard_ninja.arti_int/ks_generatetext_to_speech',{
+                model : "ks_dashboard_ninja.arti_int",
+                method:"ks_generatetext_to_speech",
+                args:[item.id],
+                kwargs:{}
+                }).then(function(result){
+                    if (result){
+                        $(ks_audio).find('.spinner-grow').remove()
+                        $(ks_audio).find('span').removeClass('d-none')
+                        var audio = (JSON.parse(result)).snd;
+                        $(ks_audio).find('audio')[0].src="data:audio/wav;base64, "+audio;
+                        $(ks_audio).find('audio')[0].play()
+                        this.ks_speeches.pop()
+                    }
+                }.bind(this)))
+                return Promise.resolve(this.ks_speeches)
+            }
 
-
+        }
+    }
 
 }
 

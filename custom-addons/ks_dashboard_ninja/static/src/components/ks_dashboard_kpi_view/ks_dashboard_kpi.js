@@ -18,6 +18,18 @@ export class Ksdashboardkpiview extends Component{
         onMounted(() => this._update_view());
         this.item = this.props.item
         this.ks_dashboard_data = this.props.dashboard_data
+        this.classname = 'ks_dashboard_kpi ks_dashboard_kpi_dashboard ks_dashboard_custom_srollbar ks_dashboarditem_id ks_dashboard_item_hover ks_db_item_preview_color_picker grid-stack-item-content'
+        this.ks_ai_analysis = this.props.dashboard_data.ks_ai_explain_dash
+        if (this.ks_ai_analysis){
+            this.reviewclass = 'ks_ai_explain_tile'
+        }else{
+             this.reviewclass = ''
+        }
+        if (this.item.ks_ai_analysis && this.item.ks_ai_analysis){
+            var ks_analysis = this.item.ks_ai_analysis.split('ks_gap')
+            this.ks_ai_analysis_1 = ks_analysis[0]
+            this.ks_ai_analysis_2 = ks_analysis[1]
+        }
         this.prepareKpiData();
         var update_interval = this.props.dashboard_data.ks_set_interval
         onWillUpdateProps(async(nextprops)=>{
@@ -59,7 +71,7 @@ export class Ksdashboardkpiview extends Component{
             }).then(function(new_item_data) {
                 this.ks_dashboard_data.ks_item_data[item_id] = new_item_data[item_id];
                 this.item = this.ks_dashboard_data.ks_item_data[item_id] ;
-               this.__owl__.parent.component.ks_dashboard_data.ks_item_data[this.item.id] = new_item_data[item_id]
+                this.__owl__.parent.component.ks_dashboard_data.ks_item_data[this.item.id] = new_item_data[item_id]
                 this.prepareKpiData()
             }.bind(this));
         }
@@ -68,10 +80,10 @@ export class Ksdashboardkpiview extends Component{
     _update_view(){
         if(!this.kpi_data[1]){
             if (this.field.ks_target_view === "Progress Bar" && this.field.ks_goal_enable) {
-                $('#' + this.item.id).find('#ks_progressbar').val(parseInt(this.state.item_info_kpi1.target_progress_deviation));
+                $('#' + this.item.id).find('#ks_progressbar').val(parseInt(this.target_deviation));
             }
             if (this.field.ks_goal_enable) {
-                    if (this.state.item_info_kpi1.pre_arrow == 'up') {
+                    if (this.state.item_info_kpi1.target_arrow == 'up') {
                         $('#' + this.item.id).find(".target_deviation").css({
                             "color": "green",
                         });
@@ -102,7 +114,7 @@ export class Ksdashboardkpiview extends Component{
                     "color": this.state.item_info_kpi2.ks_color
                 });
                 if (this.field.ks_target_view === "Progress Bar") {
-                    $('#' + this.item.id).find('#ks_progressbar').val(parseInt(this.state.item_info_kpi1.target_progress_deviation))
+                    $('#' + this.item.id).find('#ks_progressbar').val(parseInt(this.ks_target_deviation == Infinity || this.ks_target_deviation == -Infinity ? 0:this.ks_target_deviation))
                 }
             }
             if(this.field.ks_data_comparison == 'Percentage'){
@@ -110,7 +122,7 @@ export class Ksdashboardkpiview extends Component{
                     "color": this.state.item_info_kpi2.ks_color
                 });
                 if (this.field.ks_target_view === "Progress Bar") {
-                    if (this.state.item_info_kpi2.count) $('#' + this.item.id).find('#ks_progressbar').val(parseInt(this.state.item_info_kpi2.count));
+                    if (this.state.item_info_kpi2.count) $('#' + this.item.id).find('#ks_progressbar').val(parseInt(this.count == Infinity || this.count == -Infinity ? 0 :this.count));
                     else $('#' + this.item.id).find('#ks_progressbar').val(0);
                 }
             }
@@ -126,11 +138,11 @@ export class Ksdashboardkpiview extends Component{
         var self = this;
         var count = count_1 + count_2;
         if (field.ks_multiplier_active){
-            item_info['count'] = globalfunction._onKsGlobalFormatter(count* field.ks_multiplier, field.ks_data_formatting, field.ks_precision_digits);
+            item_info['count'] = globalfunction._onKsGlobalFormatter(count* field.ks_multiplier, field.ks_data_format, field.ks_precision_digits);
             item_info['count_tooltip'] = formatFloat(count * field.ks_multiplier,{digits:[0,field.ks_precision_digits]});
         }else{
 
-            item_info['count'] = globalfunction._onKsGlobalFormatter(count, field.ks_data_formatting, field.ks_precision_digits);
+            item_info['count'] = globalfunction._onKsGlobalFormatter(count, field.ks_data_format, field.ks_precision_digits);
             item_info['count_tooltip'] = formatFloat(parseFloat(count), Float64Array, {digits:[0,field.ks_precision_digits]});
         }
          if (field.ks_multiplier_active){
@@ -150,10 +162,11 @@ export class Ksdashboardkpiview extends Component{
         item_info['ks_color'] = (target_1 - count) > 0 ? "red" : "green";
         item_info.pre_arrow = (target_1 - count) > 0 ? "down" : "up";
         item_info['ks_comparison'] = true;
-        var target_deviation = (target_1 - count) > 0 ? Math.round(((target_1 - count) / target_1) * 100) : Math.round((Math.abs((target_1 - count)) / target_1) * 100);
-        if (target_deviation !== Infinity) item_info.target_deviation = formatInteger(target_deviation) + "%";
+        this.target_deviation = (target_1 - count) > 0 ? Math.round(((target_1 - count) / target_1) * 100) : Math.round((Math.abs((target_1 - count)) / target_1) * 100);
+        this.ks_target_deviation = Math.round((count / target_1) * 100);
+        if (this.target_deviation !== Infinity) item_info.target_deviation = formatInteger(this.target_deviation) + "%";
         else {
-            item_info.target_deviation = target_deviation;
+            item_info.target_deviation = this.target_deviation;
             item_info.pre_arrow = false;
         }
         var target_progress_deviation = target_1 == 0 ? 0 : Math.round((count / target_1) * 100);
@@ -166,11 +179,22 @@ export class Ksdashboardkpiview extends Component{
             count_1 = count_1 * field.ks_multiplier;
             count_2 = count_2 * field.ks_multiplier;
         }
-        var count = parseInt((count_1 / count_2) * 100);
+        if (field.ks_data_format=="exact"){
+              var count = (count_1 / count_2) * 100;
+        }
+        else{
+           var count = parseInt((count_1 / count_2) * 100);
+        }
         if (field.ks_multiplier_active){
             count = count * field.ks_multiplier;
         }
-        item_info['count'] = count ? formatInteger(count) + "%" : "0%";
+        if (field.ks_data_format=='exact'){
+                item_info['count'] = count ? formatFloat(count, {digits: [0, 2]}) + "%" : "0%";
+         }
+         else{
+            item_info['count'] = count ? formatInteger(count) + "%" : "0%";
+
+         }
         item_info['count_tooltip'] = count ? count + "%" : "0%";
         item_info.target_progress_deviation = item_info['count']
         target_1 = target_1 > 100 ? 100 : target_1;
@@ -180,6 +204,7 @@ export class Ksdashboardkpiview extends Component{
         item_info['target_enable'] = field.ks_goal_enable;
         item_info['ks_comparison'] = false;
         item_info.target_deviation = item_info.target > 100 ? 100 : item_info.target;
+        this.count = Math.round(count)  ? Math.round(count) :0
         return item_info
     }
 
@@ -273,16 +298,17 @@ export class Ksdashboardkpiview extends Component{
             ks_info: ks_description,
         }
 
+        this.target_deviation = parseInt(item_info.target_progress_deviation) ? parseInt(item_info.target_progress_deviation) : "0"
         if (item_info.target_deviation === Infinity) item_info.target_arrow = false;
         item_info.target_progress_deviation = parseInt(item_info.target_progress_deviation) ? formatInteger(parseInt(item_info.target_progress_deviation)) : "0"
         if (field.ks_multiplier_active){
-            item_info['count_1'] = globalfunction._onKsGlobalFormatter(kpi_data[0]['record_data'] * field.ks_multiplier, field.ks_data_formatting, field.ks_precision_digits);
+            item_info['count_1'] = globalfunction._onKsGlobalFormatter(kpi_data[0]['record_data'] * field.ks_multiplier, field.ks_data_format, field.ks_precision_digits);
             item_info['count_1_tooltip'] = kpi_data[0]['record_data'] * field.ks_multiplier
         }else{
-            item_info['count_1'] = globalfunction._onKsGlobalFormatter(kpi_data[0]['record_data'], field.ks_data_formatting, field.ks_precision_digits);
+            item_info['count_1'] = globalfunction._onKsGlobalFormatter(kpi_data[0]['record_data'], field.ks_data_format, field.ks_precision_digits);
         }
          if (kpi_data[0].target){
-            item_info['target'] = globalfunction._onKsGlobalFormatter(kpi_data[0].target, field.ks_data_formatting, field.ks_precision_digits);
+            item_info['target'] = globalfunction._onKsGlobalFormatter(kpi_data[0].target, field.ks_data_format, field.ks_precision_digits);
         }
         if (field.ks_unit){
             if (field.ks_multiplier_active){
@@ -293,14 +319,14 @@ export class Ksdashboardkpiview extends Component{
             var ks_selection = field.ks_unit_selection;
             if (ks_selection === 'monetary') {
                 var ks_currency_id = field.ks_currency_id;
-                var ks_data = globalfunction._onKsGlobalFormatter(ks_record_count, field.ks_data_formatting, field.ks_precision_digits);
+                var ks_data = globalfunction._onKsGlobalFormatter(ks_record_count, field.ks_data_format, field.ks_precision_digits);
                 ks_data = globalfunction.ks_monetary(ks_data, ks_currency_id);
                 item_info['count_1'] = ks_data;
             } else if (ks_selection === 'custom') {
                 var ks_field = field.ks_chart_unit;
-                item_info['count_1']= ks_field+" "+globalfunction._onKsGlobalFormatter(ks_record_count, field.ks_data_formatting, field.ks_precision_digits);
+                item_info['count_1']= ks_field+" "+globalfunction._onKsGlobalFormatter(ks_record_count, field.ks_data_format, field.ks_precision_digits);
             }else {
-                item_info['count_1']= globalfunction._onKsGlobalFormatter(ks_record_count, field.ks_data_formatting, field.ks_precision_digits);
+                item_info['count_1']= globalfunction._onKsGlobalFormatter(ks_record_count, field.ks_data_format, field.ks_precision_digits);
             }
         }
         this.kpi_data = kpi_data
@@ -312,8 +338,8 @@ export class Ksdashboardkpiview extends Component{
                     if (field.ks_multiplier_active){
                         var count_tooltip = String(count_1 * field.ks_multiplier) + "/" + String(count_2 * field.ks_multiplier);
                         var count = String(globalfunction.ksNumFormatter(count_1 * field.ks_multiplier, 1)) + "/" + String(globalfunction.ksNumFormatter(count_2 * field.ks_multiplier, 1));
-                        var data1 = globalfunction._onKsGlobalFormatter(count_1 * field.ks_multiplier, field.ks_data_formatting, field.ks_precision_digits);
-                        var data2 = globalfunction._onKsGlobalFormatter(count_2 * field.ks_multiplier, field.ks_data_formatting, field.ks_precision_digits);
+                        var data1 = globalfunction._onKsGlobalFormatter(count_1 * field.ks_multiplier, field.ks_data_format, field.ks_precision_digits);
+                        var data2 = globalfunction._onKsGlobalFormatter(count_2 * field.ks_multiplier, field.ks_data_format, field.ks_precision_digits);
                         if (field.ks_unit){
                             var ks_selection = field.ks_unit_selection;
                             if (ks_selection === 'monetary') {
@@ -328,13 +354,13 @@ export class Ksdashboardkpiview extends Component{
                                 item_info['count']= data1+"/"+data2
                             }
                         }else {
-                            item_info['count']=String(globalfunction._onKsGlobalFormatter(count_1*field.ks_multiplier, field.ks_data_formatting, field.ks_precision_digits)) + "/" + String(globalfunction._onKsGlobalFormatter(count_2*field.ks_multiplier, field.ks_data_format, field.ks_precision_digits));
+                            item_info['count']=String(globalfunction._onKsGlobalFormatter(count_1*field.ks_multiplier, field.ks_data_format, field.ks_precision_digits)) + "/" + String(globalfunction._onKsGlobalFormatter(count_2*field.ks_multiplier, field.ks_data_format, field.ks_precision_digits));
                         }
                     }else{
                         var count_tooltip = String(count_1) + "/" + String(count_2);
                         var count = String(globalfunction.ksNumFormatter(count_1, 1)) + "/" + String(globalfunction.ksNumFormatter(count_2, 1));
-                        var data1 = globalfunction._onKsGlobalFormatter(count_1 , field.ks_data_formatting, field.ks_precision_digits);
-                        var data2 = globalfunction._onKsGlobalFormatter(count_2 , field.ks_data_formatting, field.ks_precision_digits);
+                        var data1 = globalfunction._onKsGlobalFormatter(count_1 , field.ks_data_format, field.ks_precision_digits);
+                        var data2 = globalfunction._onKsGlobalFormatter(count_2 , field.ks_data_format, field.ks_precision_digits);
                         if (field.ks_unit){
                             var ks_selection = field.ks_unit_selection;
                             if (ks_selection === 'monetary') {
@@ -349,7 +375,7 @@ export class Ksdashboardkpiview extends Component{
                             item_info['count']= data1+"/"+data2
                             }
                         }else {
-                            item_info['count']=String(globalfunction._onKsGlobalFormatter(count_1, field.ks_data_formatting, field.ks_precision_digits)) + "/" + String(globalfunction._onKsGlobalFormatter(count_2, field.ks_data_formatting, field.ks_precision_digits));
+                            item_info['count']=String(globalfunction._onKsGlobalFormatter(count_1, field.ks_data_format, field.ks_precision_digits)) + "/" + String(globalfunction._onKsGlobalFormatter(count_2, field.ks_data_format, field.ks_precision_digits));
                         }
                     }
                     item_info['count_tooltip'] = count_tooltip;
@@ -364,7 +390,7 @@ export class Ksdashboardkpiview extends Component{
                     break;
                 case "Ratio":
                     var gcd = self.ks_get_gcd(Math.round(count_1), Math.round(count_2));
-                    if (this.item.ks_data_formatting == 'exact'){
+                    if (this.item.ks_data_format == 'exact'){
                         if (count_1 && count_2) {
                             item_info['count_tooltip'] = count_1 / gcd + ":" + count_2 / gcd;
                             item_info['count'] = formatFloat(count_1 / gcd, Float64Array,{digits: [0, field.ks_precision_digits]}) + ":" + formatFloat(count_2 / gcd, Float64Array, {digits: [0, field.ks_precision_digits]});
@@ -416,7 +442,8 @@ Ksdashboardkpiview.props = {
     dashboard_data: { type: Object, Optional:true},
     ksdatefilter :{type :String, Optional:true},
     pre_defined_filter:{type: Object, Optional:true},
-    custom_filter :{type:Object, Optional:true}
+    custom_filter :{type:Object, Optional:true},
+    ks_speak:{type:Function , Optional:true},
 };
 
 Ksdashboardkpiview.template = "Ksdashboardkpiview";

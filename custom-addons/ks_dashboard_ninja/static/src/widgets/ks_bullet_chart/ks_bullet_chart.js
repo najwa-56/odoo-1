@@ -55,6 +55,7 @@ export class ks_bullet_chart extends Component{
         }
     }
     get_bullet_chart(rec){
+        var self = this;
 
         if($(this.bulletRef.el).find(".graph_text").length){
             $(this.bulletRef.el).find(".graph_text").remove();
@@ -164,6 +165,19 @@ export class ks_bullet_chart extends Component{
                     tooltipY: 0,
                     strokeOpacity: 0
                 });
+
+                if (this.props.record.data.ks_show_data_value == true && series){
+                        series.bullets.push(function () {
+                            return am5.Bullet.new(self.root, {
+                                sprite: am5.Label.new(self.root, {
+                                    text:  "{valueY}",
+                                    centerX:am5.p50,
+                                    centerY:am5.p100,
+                                    populateText: true
+                                 })
+                            });
+                        });
+                    }
                 series.data.setAll(data);
             }
 
@@ -187,6 +201,7 @@ export class ks_bullet_chart extends Component{
             if (this.props.record.data.ks_show_data_value == true){
                 var cursor = chart.set("cursor", am5xy.XYCursor.new(this.root, {}));
             }
+
             var cursor = chart.set("cursor", am5xy.XYCursor.new(this.root, {
                 behavior: "none"
                 })

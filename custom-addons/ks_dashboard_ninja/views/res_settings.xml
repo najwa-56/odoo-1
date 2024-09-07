@@ -31,6 +31,14 @@
 
                             </div>
                         </div>
+                        <div class="col-12 col-lg-6 o_setting_box" id="dn_ai_api_key">
+                            <div class="o_setting_right_pane">
+                                 <label for="ks_analysis_word_length" class="col-sm-5 col-form-label">
+                                    AI Analysis length
+                                </label>
+                                <field name="ks_analysis_word_length"/>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </xpath>

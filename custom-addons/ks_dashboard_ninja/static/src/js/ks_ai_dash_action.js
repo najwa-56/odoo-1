@@ -139,7 +139,8 @@ export class KsAIDashboardNinja extends Component {
             ks_dashboard_item_length:0,
             ks_dashboard_items:[],
             ksDateFilterSelection:'none',
-            pre_defined_filter:{}
+            pre_defined_filter:{},
+            custom_filter:{}
         })
         this.ksChartColorOptions = ['default', 'cool', 'warm', 'neon'];
         //       this.ksUpdateDashboardItem = this.ksUpdateDashboardItem.bind(this);
@@ -222,7 +223,8 @@ export class KsAIDashboardNinja extends Component {
         if(self.dn_state['user_context']['ksDateFilterSelection'] !== undefined && self.ksDateFilterSelection !== 'l_none'){
             context = self.dn_state['user_context']
         }
-        return Object.assign(context, session.user_context);
+        var ks_new_obj = {...session.user_context,...{allowed_company_ids:this.env.services.company.activeCompanyIds}}
+        return Object.assign(context, ks_new_obj);
     }
 
     ks_fetch_data(){
@@ -231,8 +233,7 @@ export class KsAIDashboardNinja extends Component {
             model: 'ks_dashboard_ninja.board',
             method: 'ks_fetch_dashboard_data',
             args: [self.ks_dashboard_id],
-            kwargs : {},
-            context: self.getContext()
+            kwargs : {context: self.getContext()},
         }).then(function(result) {
             self.ks_dashboard_data = result;
             self.ks_dashboard_data['ks_ai_dashboard'] = true
@@ -267,9 +268,8 @@ export class KsAIDashboardNinja extends Component {
             items_promises.push(self._rpc("/web/dataset/call_kw/ks_dashboard_ninja.board/ks_fetch_item",{
                 model: "ks_dashboard_ninja.board",
                 method: "ks_fetch_item",
-                context: self.getContext(),
                 args : [[item_id], self.ks_dashboard_id, self.ksGetParamsForItemFetch(item_id)],
-                kwargs:{}
+                kwargs:{context: self.getContext()}
             }).then(function(result){
                 self.ks_dashboard_data.ks_item_data[item_id] = result[item_id];
             }));
@@ -383,19 +383,19 @@ export class KsAIDashboardNinja extends Component {
             this.ksSelectedgraphid = []
             document.querySelectorAll(".modal-body .ks_list_view_container").forEach((item) =>{
                 $(item).addClass('ks_img_selected')
-                $('.ks_img_display').removeClass("d-none");
+                $(item).find('.ks_img_display').removeClass("d-none");
                 this.ksSelectedgraphid.push(parseInt($(item).parent()[0].id))
             });
             document.querySelectorAll(".modal-body .ks_dashboard_kpi_dashboard").forEach((item) =>{
                 $(item).parent().addClass('ks_img_selected')
-                $('.ks_img_display').removeClass("d-none");
+                $(item).find('.ks_img_display').removeClass("d-none");
                 this.ksSelectedgraphid.push(parseInt($(item).parent()[0].id))
             });
 
 
             document.querySelectorAll(".modal-body .ks_dashboarditem_chart_container").forEach((item) =>{
                 $(item).addClass('ks_img_selected')
-                $('.ks_img_display').removeClass("d-none");
+                $(item).find('.ks_img_display').removeClass("d-none");
                 this.ksSelectedgraphid.push(parseInt($(item).parent()[0].id))
             });
 
@@ -408,17 +408,17 @@ export class KsAIDashboardNinja extends Component {
 
            document.querySelectorAll(".modal-body .ks_list_view_container").forEach((item) =>{
                 $(item).removeClass('ks_img_selected')
-                $('.ks_img_display').addClass("d-none");
+                $(item).find('.ks_img_display').addClass("d-none");
             })
 
             document.querySelectorAll(".modal-body .ks_dashboard_kpi_dashboard").forEach((item) =>{
                 $(item).parent().removeClass('ks_img_selected')
-                $('.ks_img_display').addClass("d-none");
+                $(item).find('.ks_img_display').addClass("d-none");
             });
 
             document.querySelectorAll(".modal-body .ks_dashboarditem_chart_container").forEach((item) =>{
                 $(item).removeClass('ks_img_selected')
-                $('.ks_img_display').addClass("d-none");
+                $(item).find('.ks_img_display').addClass("d-none");
             });
             this.ksSelectedgraphid = [];
              $('#ks_ai_add_item').addClass("d-none")
@@ -460,7 +460,9 @@ export class KsAIDashboardNinja extends Component {
             });
 
         }
-
+    speak_once(ev,item){
+        console.log(true)
+    }
 
 }
 

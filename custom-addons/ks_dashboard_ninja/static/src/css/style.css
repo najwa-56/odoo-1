@@ -93,9 +93,6 @@
     /*background-color: #e9ecef;*/
 
 }
-.o_list_renderer .o_list_table thead th:not(.o_list_record_selector) {
-    border-left: 1px solid #dee2e6;
-}
 
 
 .flex_column_datetimerow .apply-dashboard-date-filter{margin:0}
@@ -756,6 +753,7 @@ body:not(.o_touch_device) .o_field_selection:not(:hover):not(:focus-within) sele
 [data-color-mode="ks-dn-dark"] .ks_dashboard_header {
     background: var(--ks-dn-gray-200) !important;
     border: 0 !important;
+    height:135px;
 }
 
 /*[data-color-mode="ks-dn-dark"] .welcome_note h3 {
@@ -777,7 +775,9 @@ body:not(.o_touch_device) .o_field_selection:not(:hover):not(:focus-within) sele
 
 .ks_dn_create_chart .ks_dashboard_top_settings #ks_ai_item_dash,
 .ks_dn_create_chart .ks_dashboard_top_settings .ks_add_item_type_button,
+.ks_dn_create_chart .ks_dashboard_top_settings #ks_ai_item_exp_dash,
  .ks_new_button_div .ks_dashboard_top_settings #ks_ai_item_dash,
+ .ks_dn_create_chart .ks_dashboard_top_settings #ks_ai_item_exp_dash,
  .ks_new_button_div .ks_dashboard_top_settings .ks_add_item_type_button{
     padding: 12px;
     border-radius: 8px;
@@ -790,16 +790,26 @@ body:not(.o_touch_device) .o_field_selection:not(:hover):not(:focus-within) sele
 }
 
 .ks_dn_create_chart .ks_dashboard_top_settings #ks_ai_item_dash,
- .ks_new_button_div .ks_dashboard_top_settings #ks_ai_item_dash{
+ .ks_new_button_div .ks_dashboard_top_settings #ks_ai_item_dash,
+  .ks_new_button_div .ks_dashboard_top_settings #ks_ai_item_exp_dash,
+   .ks_dn_create_chart .ks_dashboard_top_settings #ks_ai_item_exp_dash
+ {
     background: var(--ks-dn-blue-400);
     display: flex;
     align-items: center;
     justify-content: center;
 
 }
+#ks_ai_item_exp_dash{
+    border-radius:6px;
+    margin-left:8px;
+    background: #1D4D94 !important;
+}
 
 .ks_dn_create_chart .ks_dashboard_top_settings #ks_ai_item_dash img,
- .ks_new_button_div .ks_dashboard_top_settings  #ks_ai_item_dash img{
+.ks_dn_create_chart .ks_dashboard_top_settings #ks_ai_item_exp_dash img,
+.ks_new_button_div .ks_dashboard_top_settings  #ks_ai_item_dash img,
+.ks_new_button_div .ks_dashboard_top_settings  #ks_ai_item_exp_dash img{
     margin-right: 8px;
 }
 
@@ -1011,4 +1021,7 @@ body:not(.o_touch_device) .o_field_selection:not(:hover):not(:focus-within) sele
     .ks-generateAI-body .o_inner_group.grid.col-lg-6 .o_cell .o_field_many2one_selection {
         position: static;
     }
+}
+.ks_chart_card_body{
+    padding: 5px 5px !important;
 }

@@ -76,16 +76,16 @@
 
         <t t-foreach="state.ks_dashboard_items" t-as="items" t-key="items.id">
             <t t-if="items.ks_dashboard_item_type === 'ks_tile'">
-                <Ksdashboardtile item="items" dashboard_data="ks_dashboard_data" ksdatefilter = "state.ksDateFilterSelection" pre_defined_filter = "state.pre_defined_filter" custom_filter="state.custom_filter"/>
+                <Ksdashboardtile item="items" dashboard_data="ks_dashboard_data" ksdatefilter = "state.ksDateFilterSelection" pre_defined_filter = "state.pre_defined_filter" custom_filter="state.custom_filter" ks_speak="(ev)=>this.speak_once(ev,items)"/>
             </t>
             <t t-elif="items.ks_dashboard_item_type === 'ks_kpi'">
-                <Ksdashboardkpiview item="items" dashboard_data="ks_dashboard_data" ksdatefilter = "state.ksDateFilterSelection" pre_defined_filter = "state.pre_defined_filter" custom_filter="state.custom_filter"/>
+                <Ksdashboardkpiview item="items" dashboard_data="ks_dashboard_data" ksdatefilter = "state.ksDateFilterSelection" pre_defined_filter = "state.pre_defined_filter" custom_filter="state.custom_filter" ks_speak="(ev)=>this.speak_once(ev,items)"/>
             </t>
             <t t-elif="items.ks_dashboard_item_type === 'ks_to_do'">
                 <Ksdashboardtodo item="items" dashboard_data="ks_dashboard_data"/>
             </t>
             <t t-else="">
-                <Ksdashboardgraph item="items" dashboard_data="ks_dashboard_data" ksdatefilter = "state.ksDateFilterSelection" pre_defined_filter = "state.pre_defined_filter" custom_filter="state.custom_filter"/>
+                <Ksdashboardgraph item="items" dashboard_data="ks_dashboard_data" ksdatefilter = "state.ksDateFilterSelection" pre_defined_filter = "state.pre_defined_filter" custom_filter="state.custom_filter" ks_speak="(ev)=>this.speak_once(ev,items)"/>
             </t>
         </t>
     </t>

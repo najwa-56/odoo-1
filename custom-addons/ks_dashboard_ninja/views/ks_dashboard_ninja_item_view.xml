@@ -193,7 +193,7 @@
                                 <field name="ks_graph_preview" string="Preview"
                                        widget="ks_dashboard_graph_preview"
                                        invisible="ks_dashboard_item_type in
-                                   ['ks_to_do', 'ks_tile', 'ks_list_view', 'ks_kpi', 'ks_map_view', 'ks_funnel_chart', 'ks_flower_view', 'ks_bullet_chart', 'ks_radialBar_chart', 'ks_kpi', 'ks_radialBar_chart']"/>
+                                   ['ks_to_do', 'ks_tile', 'ks_list_view', 'ks_kpi', 'ks_map_view', 'ks_funnel_chart',  'ks_bullet_chart',  'ks_kpi']"/>
                                 <field name="ks_list_view_preview"
                                        widget="ks_dashboard_list_view_preview"
                                        invisible="ks_dashboard_item_type != 'ks_list_view'"/>
@@ -204,18 +204,6 @@
                                        string="Preview"
                                        widget="ks_dashboard_to_do_preview"
                                        invisible="ks_dashboard_item_type != 'ks_to_do'"
-                                />
-
-                                <field name="ks_radial_preview"
-                                       string="Preview"
-                                       widget="ks_dashboard_radial_chart"
-                                       invisible="ks_dashboard_item_type != 'ks_radialBar_chart'"
-                                />
-
-                                <field name="ks_flower_view_preview"
-                                       string="Preview"
-                                       widget="ks_dashboard_flower_chart"
-                                       invisible="ks_dashboard_item_type != 'ks_flower_view'"
                                 />
                                 <field name="ks_funnel_preview" string="Preview"
                                        widget="ks_funnel_chart"
@@ -468,7 +456,7 @@
                                         </group>
                                     </page>
                                     <page string="Display" name="display_settings"
-                                          invisible="(ks_dashboard_item_type == 'ks_map_view')">
+                                          invisible="(ks_dashboard_item_type in ['ks_map_view', 'ks_list_view'])">
 
                                         <group name="ks_layouts"
                                                invisible="(ks_dashboard_item_type != 'ks_tile') and (ks_dashboard_item_type != 'ks_kpi')">
@@ -511,18 +499,14 @@
                                                    context="{'current_id': id}"
                                                    required="(ks_dashboard_item_type != 'ks_tile') and (ks_dashboard_item_type != 'ks_list_view') and (ks_dashboard_item_type != 'ks_kpi')"
                                             />
-                                            <field name="ks_radial_legend" string="Show Legend"
-                                                   invisible="(ks_dashboard_item_type != 'ks_radialBar_chart')"
-                                                   required="(ks_dashboard_item_type == 'ks_radialBar_chart')"/>
                                             <field name="ks_bar_chart_stacked" string="Stacked Bar Chart"
                                                    context="{'current_id': id}"
                                                    invisible="(ks_dashboard_item_type != 'ks_bar_chart') and (ks_dashboard_item_type != 'ks_horizontalBar_chart')"/>
                                             <field name="ks_show_data_value"
-                                                   invisible="(ks_dashboard_item_type in ['ks_bar_chart','ks_horizontalBar_chart','ks_line_chart','ks_area_chart',
-                                                   'ks_pie_chart','ks_doughnut_chart','ks_polarArea_chart','ks_radar_view','ks_flower_view','ks_scatter_chart','ks_radialBar_chart','ks_bullet_chart','ks_list_view','ks_map_view'])"/>
+                                                   invisible="(ks_dashboard_item_type in ['ks_polarArea_chart','ks_radar_view','ks_flower_view','ks_scatter_chart','ks_radialBar_chart','ks_list_view','ks_map_view'])"/>
                                             <field name="ks_data_label_type"
                                                    invisible="(ks_dashboard_item_type in ['ks_bar_chart','ks_horizontalBar_chart','ks_line_chart','ks_area_chart',
-                                                   'ks_pie_chart','ks_doughnut_chart','ks_polarArea_chart','ks_radar_view','ks_flower_view','ks_scatter_chart','ks_radialBar_chart','ks_bullet_chart','ks_list_view','ks_map_view'])or(ks_show_data_value == False)"/>
+                                                   'ks_polarArea_chart','ks_radar_view','ks_flower_view','ks_scatter_chart','ks_radialBar_chart','ks_bullet_chart','ks_list_view','ks_map_view'])or(ks_show_data_value == False)"/>
                                             <!--                                <field name="ks_unit"-->
                                             <!--                                invisible="(ks_dashboard_item_type =='ks_dashboard_graphs') or (ks_dashboard_item_type == 'ks_bullet_chart') or (ks_dashboard_item_type == 'ks_radialBar_chart') or (ks_dashboard_item_type == 'ks_flower_view')"/>-->
                                             <!--                                <field name="ks_unit_selection" invisible="ks_unit == False"-->
@@ -592,14 +576,20 @@
                                         </group>
                                     </page>
                                     <page string="Target" name="target_settings"
-                                          invisible="((ks_dashboard_item_type  in ['ks_scatter_chart','ks_bar_chart', 'ks_horizontalBar_chart', 'ks_line_chart', 'ks_area_chart', 'ks_doughnut_chart','ks_polarArea_chart','ks_pie_chart','ks_flower_view', 'ks_list_view', 'ks_tile','ks_radar_view','ks_radialBar_chart','ks_to_do','ks_map_view','ks_funnel_chart','ks_bullet_chart']) or((ks_dashboard_item_type == 'ks_list_view') and(ks_list_view_type == 'ungrouped')) or((ks_dashboard_item_type == 'ks_kpi') and(ks_model_id_2 != False) and(ks_data_comparison in ['None', 'Ratio'])))">
+                                          invisible="(((ks_dashboard_item_type  not in ['ks_bar_chart','ks_horizontalBar_chart','ks_line_chart','ks_area_chart','ks_list_view','ks_kpi']) or ((ks_chart_groupby_type != 'date_type') and (ks_dashboard_item_type != 'ks_kpi'))) or((ks_dashboard_item_type == 'ks_list_view') and (ks_list_view_type == 'ungrouped')) or((ks_dashboard_item_type == 'ks_kpi') and (ks_model_id_2 != False) and (ks_data_comparison in ['None', 'Ratio'])))">
                                         <group style="width: 50% !important;">
                                             <field name="ks_goal_enable" context="{'current_id': id}"/>
                                             <field name="ks_goal_bar_line"
                                                    context="{'current_id': id}"
-                                                   invisible="(ks_goal_enable == False) or (ks_dashboard_item_type != 'ks_bar_chart')"/>
+                                                   invisible="(ks_goal_enable == False) or (ks_dashboard_item_type not in ['ks_bar_chart','ks_horizontalBar_chart'])"/>
                                             <field name="ks_standard_goal_value"
                                                    invisible="(ks_goal_enable == False)"/>
+                                            <div colspan="2">
+                                                <span name="ks_target_span" style="font-style: italic; color: #888888;"
+                                                      invisible="(ks_goal_enable == False)">
+                                                    ** Please enter positive standard target.
+                                                </span>
+                                            </div>
                                             <field name="ks_target_view" widget="radio"
                                                    invisible="(ks_goal_enable == False) or (ks_dashboard_item_type != 'ks_kpi')"/>
                                             <field name="ks_send_mail"
@@ -633,7 +623,7 @@
                                         <group
                                                invisible="(ks_dashboard_item_type == 'ks_to_do') or (ks_dashboard_item_type == 'ks_tile') or (ks_dashboard_item_type == 'ks_kpi')">
                                             <field name="ks_hide_legend" context="{'current_id': id}"
-                                                   invisible="(ks_dashboard_item_type in ['ks_tile', 'ks_kpi', 'ks_list_view','ks_radialBar_chart'])"/>
+                                                   invisible="(ks_dashboard_item_type in ['ks_tile', 'ks_kpi', 'ks_list_view'])"/>
                                             <!--                                <field name="ks_chart_cumulative_field" widget='many2many_tags'-->
                                             <!--                                       options="{'no_create': True, 'no_create_edit':True, 'no_open': True}"-->
                                             <!--                                       invisible="(ks_chart_data_count_type == 'count') or (ks_chart_relation_sub_groupby != False) or (ks_model_id == False) or (ks_dashboard_item_type == 'ks_list_view') or (ks_dashboard_item_type != 'ks_bar_chart') or (ks_data_calculation_type != 'custom')"-->

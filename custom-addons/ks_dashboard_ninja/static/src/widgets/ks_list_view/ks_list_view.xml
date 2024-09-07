@@ -60,7 +60,7 @@
                             <t t-esc="ks_list_view_name"/>
                         </h6>
                     </div>
-                    <div class="card-body table-responsive ksMaxTableContent">
+                    <div class="card-body table-responsive ksMaxTableContent ks_list_item_table">
                         <t t-if="state.list_view_data">
                             <table id="ksListViewTable" class="table table-hover"
                                    t-att-data-model="state.list_view_data['model']">

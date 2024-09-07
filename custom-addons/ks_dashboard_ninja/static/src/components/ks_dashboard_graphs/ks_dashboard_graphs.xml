@@ -16,7 +16,7 @@
                  t-att-title="ks_info">
 
                 <div class="p-3 py-3 d-flex flex-row align-items-center justify-content-between ">
-                    <div class="d-flex align-items-center w-50">
+                    <div class="d-flex align-items-center">
                         <h6 class="m-0 font-weight-bold h3 ks_chart_heading mr-3" t-att-title="ks_chart_title">
                             <t t-esc="ks_chart_title"/>
                         </h6>
@@ -198,7 +198,22 @@
                 </div>
                     </t>
                 </div>
-                <div class="card-body ks_chart_card_body"/>
+                <t t-if="ks_ai_analysis">
+                    <div class="ks_ai_explain_body">
+                        <div class="card-body ks_chart_card_body"></div>
+                        <div class="ks_ai_explanation">
+                            <p><t t-esc="ks_ai_analysis_1"/></p>
+                            <p><t t-esc="ks_ai_analysis_2"/></p>
+                        </div>
+                        <div class="ks_speaker" t-on-click="props.ks_speak">
+                            <span class="fa fa-volume-up"/>
+                            <audio></audio>
+                        </div>
+                    </div>
+                </t>
+                <t t-else="">
+                    <div class="card-body ks_chart_card_body"></div>
+                </t>
             </div>
         </div>
     </t>

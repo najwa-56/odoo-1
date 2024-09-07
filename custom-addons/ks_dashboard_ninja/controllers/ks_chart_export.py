@@ -22,6 +22,10 @@ class KsChartExport(http.Controller):
         params = json.loads(data)
         header,chart_data = operator.itemgetter('header','chart_data')(params)
         chart_data = json.loads(chart_data)
+
+        if isinstance(chart_data['labels'], list):
+            chart_data['labels'] = [str(label) for label in chart_data['labels']]
+
         chart_data['labels'].insert(0,'Measure')
         columns_headers = chart_data['labels']
         import_data = []
@@ -36,9 +40,6 @@ class KsChartExport(http.Controller):
                      ('Content-Type', self.content_type)],
             # cookies={'fileToken': token}
                                      )
-
-
-
 
 class KsChartExcelExport(KsChartExport, http.Controller):
 

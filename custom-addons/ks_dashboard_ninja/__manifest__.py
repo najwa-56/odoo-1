@@ -69,7 +69,7 @@ Dashboard Ninja v16.0,
 
 	'currency': 'EUR',
 
-	'price': '422.35',
+	'price': '405.96',
 
 	'website': 'https://store.ksolves.com/',
 
@@ -78,7 +78,7 @@ Dashboard Ninja v16.0,
 	'live_test_url': 'https://dashboardninja17.ksolves.net/',
 
 	'category': 'Services',
-	'version': '17.0.1.8.3',
+	'version': '17.0.2.2.3',
 
 	'support': 'sales@ksolves.com',
 
@@ -165,6 +165,7 @@ Dashboard Ninja v16.0,
 					# 'ks_dashboard_ninja/static/src/js/ks_dashboard_ninja.js',
 					# 'ks_dashboard_ninja/static/src/js/ks_to_do_dashboard.js',
 					'ks_dashboard_ninja/static/src/js/ks_filter_props_new.js',
+					'ks_dashboard_ninja/static/src/js/domainfix.js',
 					# 'ks_dashboard_ninja/static/src/js/ks_dashboard_item_theme.js',
 					# 'ks_dashboard_ninja/static/src/js/ks_import_dashboard.js',
 					# 'ks_dashboard_ninja/static/src/js/ks_domain_fix.js',
@@ -185,7 +186,7 @@ Dashboard Ninja v16.0,
 			   },
 
 	'external_dependencies': {
-    	'python': ['pandas','xlrd','openpyxl']
+    	'python': ['pandas','xlrd','openpyxl','gTTS']
     },
 
 	'uninstall_hook': 'uninstall_hook',

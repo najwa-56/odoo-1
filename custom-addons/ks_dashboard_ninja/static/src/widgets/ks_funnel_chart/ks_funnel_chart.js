@@ -114,9 +114,9 @@ export class ks_funnel_chart extends Component{
             series.appear(1000);
 
             if(this.props.record.data.ks_show_data_value && this.props.record.data.ks_data_label_type=="value"){
-                series.labels.template.set("text", "{category}: {value}");
+                series.labels.template.set("text", "{value}");
             }else if(this.props.record.data.ks_show_data_value && this.props.record.data.ks_data_label_type=="percent"){
-                series.labels.template.set("text", "{category}: {valuePercentTotal.formatNumber('0.00')}%");
+                series.labels.template.set("text", "{valuePercentTotal.formatNumber('0.00')}%");
             }else{
                 series.ticks.template.set("forceHidden", true);
                 series.labels.template.set("forceHidden", true);

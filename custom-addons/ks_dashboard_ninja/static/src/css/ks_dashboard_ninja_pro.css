@@ -210,3 +210,117 @@ table#ksListViewTable {
     overflow: auto !important;
     background-clip:unset;
 }
+/*.ks_ai_chart_body{
+width:49% !important;
+padding:0px !important
+}
+.ks_ai_explanation{
+    width: 49%;
+    position: absolute;
+    right: 8px;
+    top: 60px;
+    font-size: medium;
+    font-family: serif;
+}
+.ks_speaker{
+    width: 25px;
+    height: 25px;
+    bottom: 20px;
+    right: 30px;
+    position: absolute;
+}
+.ks_speaker span.fa.fa-volume-up, .ks_speaker span.fa.fa-pause {
+    border: 1px solid #71639e;
+    background: #71639e;
+    height: 35px;
+    width: 36px;
+    line-height: 35px;
+    text-align: center;
+    color: #fff;
+    font-size: 20px;
+    border-radius: 5px;
+}
+.ks_ai_dashboard_item {
+    height: auto !important;
+}
+.ks_ai_explain_tile{
+    background: #fff;
+    box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15) !important;
+    margin: 0px 10px;
+    width: -webkit-fill-available !important;
+    border-radius: 5px;
+    height:calc(100vh - 290px)!important;
+}
+.ks_ai_explain_tile .ks_ai_dashboard_item, .ks_ai_explain_tile .ks_ai_dashboard_item:hover{    box-shadow: none !important;}*/
+
+.ks_ai_explain_body{
+    display: flex;
+    position:relative;
+    flex-wrap: wrap;
+}
+.ks_ai_explain_body .ks_ai_dashboard_item{
+    flex: 0 0 50%;
+    max-width: 50%;
+}
+.ks_ai_explain_body{
+    height:100%;
+
+}
+.ks_ai_explain_body .ks_ai_explanation{
+    flex: 0 0 50%;
+    max-width: 50%;
+    padding:10px 20px;
+    height: 400px;
+    overflow-x: hidden;
+    overflow-y: auto;
+}
+.ks_speaker span.fa.fa-volume-up, .ks_speaker span.fa.fa-pause {
+    border: 1px solid #71639e;
+    background: #71639e;
+    height: 35px;
+    width: 36px;
+    line-height: 35px;
+    text-align: center;
+    color: #fff;
+    font-size: 20px;
+    border-radius: 5px;
+}
+.ks_speaker{
+    width: 25px;
+    height: 25px;
+    bottom: 20px;
+    right: 30px;
+    position: absolute;
+}
+.ks_ai_explain_body .ks_chart_card_body,.ks_ai_explain_body .ks_list_card_body{
+    position:relative !important;
+    top:inherit !important;
+    bottom:inherit !important;
+    right:inherit !important;
+    left: inherit !important;
+    flex: 0 0 50%;
+    max-width: 50%;
+    padding:inherit;
+}
+.ks_ai_explain_tile{
+    border-radius: 6px;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.12), 0 1px 2px rgba(0, 0, 0, 0.24);
+    background-color:white;
+    width: 98% !important;
+    left: 50% !important;
+    transform: translate(-50%, 0) !important;
+}
+.ks_ai_dashboard_item {
+    height: auto !important;
+}
+.ks_ai_explanation{
+    font-size: medium;
+    font-family: serif;
+}
+.ks_ai_explain_body .ks_list_card_body{
+ overflow-y: auto;
+ height: calc(100% - 75px);
+ }
+ .ks_list_view_container .ks_speaker{
+ bottom: 65px !important
+ }

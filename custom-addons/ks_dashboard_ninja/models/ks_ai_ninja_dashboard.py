@@ -3,6 +3,9 @@ import logging
 import requests
 from odoo import  http, api, fields, models, _
 from odoo.exceptions import ValidationError
+from gtts import gTTS
+import base64
+import os
 
 _logger = logging.getLogger(__name__)
 
@@ -16,7 +19,7 @@ class KsDashboardNInjaAI(models.TransientModel):
 
     ks_import_model_id = fields.Many2one('ir.model', string='Model ID',
                                   domain="[('access_ids','!=',False),('transient','=',False),"
-                                         "('model','not ilike','base_import%'),('model','not ilike','ir.%'),"
+                                         "('model','not ilike','base_import%'),'|',('model','not ilike','ir.%'),('model','=ilike','_%ir.%'),"
                                          "('model','not ilike','web_editor.%'),('model','not ilike','web_tour.%'),"
                                          "('model','!=','mail.thread'),('model','not ilike','ks_dash%'),('model','not ilike','ks_to%')]",
                                   help="Data source to fetch and read the data for the creation of dashboard items. ")
@@ -210,11 +213,86 @@ class KsDashboardNInjaAI(models.TransientModel):
             else:
                 raise ValidationError(_("Enter the input keywords to render the item"))
 
+    @api.model
+    def ks_generate_analysis(self,ks_items_explain,ks_rest_items,dashboard_id):
+        if ks_items_explain:
+            result = []
+            api_key = self.env['ir.config_parameter'].sudo().get_param(
+                'ks_dashboard_ninja.dn_api_key')
+            ks_url = self.env['ir.config_parameter'].sudo().get_param(
+                'ks_dashboard_ninja.url')
+            words = self.env['ir.config_parameter'].sudo().get_param(
+                'ks_dashboard_ninja.ks_analysis_word_length')
+            url = ks_url + "/api/v1/ks_dn_main_api"
+            for i in range(0,len(ks_items_explain)):
+                if api_key and url :
+                    json_data = {'name': api_key,
+                                 'items':json.dumps(ks_items_explain[i]),
+                                 'type':'ks_ai_explain',
+                                 'url': self.env['ir.config_parameter'].sudo().get_param('web.base.url'),
+                                 'db_name': self.env.cr.dbname,
+                                 'words':  words if words else 100
+                                 }
+                    ks_response = requests.post(url, data=json_data)
+                    if ks_response.status_code == 200 and json.loads(ks_response.text):
+                        ks_ai_response = json.loads(ks_response.text)
+                        item = ks_ai_response[0]
+                        if item['analysis'] and item['insights']:
+                            try:
+                                self.env['ks_dashboard_ninja.item'].browse(item['id']).write({
+                                'ks_ai_analysis': item['analysis']+'ks_gap'+item['insights']
+                                })
+                                result.append(True)
+                            except:
+                                result
+                        else:
+                            result
 
+                    else:
+                        result
+                else:
+                    raise ValidationError(_("Please put API key and URL"))
+            if len(result):
+                self.env['ks_dashboard_ninja.board'].browse(dashboard_id).write({
+                    'ks_ai_explain_dash': True
+                })
+                return True
+            else:
+                raise ValidationError(_("AI Responds with the wrong analysis. Please try again "))
+        elif ks_rest_items:
+            self.env['ks_dashboard_ninja.board'].browse(dashboard_id).write({
+                'ks_ai_explain_dash': True
+            })
+            return True
+        else:
+            return False
 
+    @api.model
+    def ks_switch_default_dashboard(self,dashboard_id):
+        self.env['ks_dashboard_ninja.board'].browse(dashboard_id).write({
+            'ks_ai_explain_dash':False
+        })
+        return True
+    @api.model
+    def ks_generatetext_to_speech(self,item_id):
+        if (item_id):
+            try:
+                ks_text = self.env['ks_dashboard_ninja.item'].browse(item_id).ks_ai_analysis
+                if ks_text:
+                    language = 'en'
+                    ks_myobj = gTTS(text=ks_text, lang=language, slow=False)
+                    ks_file = ks_myobj.save('ks_audio.mp3')
+                    with open('ks_audio.mp3', 'rb') as audio_file:
+                        binary_data = audio_file.read()
+                        wav_file = base64.b64encode( binary_data).decode('UTF-8')
+                    data = {"snd": wav_file}
+                    return json.dumps(data)
+                else:
+                    return False
+            except Exception as e:
+                print(e)
+                raise ValidationError(_("Some problem in audio generation."))
 
-
-
-
-
+        else:
+            return False
 

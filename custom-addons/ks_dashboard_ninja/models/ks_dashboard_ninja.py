@@ -101,7 +101,7 @@ class KsDashboardNinjaBoard(models.Model):
     multi_layouts = fields.Boolean(string='Enable Multi-Dashboard Layouts',
                                    help='Allow user to have multiple layouts of the same Dashboard')
 
-
+    ks_ai_explain_dash = fields.Boolean(default=False);
     @api.constrains('ks_dashboard_start_date', 'ks_dashboard_end_date')
     def ks_date_validation(self):
         for rec in self:
@@ -262,6 +262,7 @@ class KsDashboardNinjaBoard(models.Model):
                                             ks_dashboard_rec.ks_dashboard_items_ids.read(
                                                 ['ks_model_name', 'ks_model_name_2'])]),
             'ks_model_item_relation': {},
+            'ks_ai_explain_dash':ks_dashboard_rec.ks_ai_explain_dash
         }
 
         default_grid_id = ks_dashboard_rec.ks_get_grid_config()
@@ -462,6 +463,7 @@ class KsDashboardNinjaBoard(models.Model):
             'ks_radial_legend': rec.ks_radial_legend,
             'ks_data_calculation_type': rec.ks_data_calculation_type,
             'ks_export_all_records': rec.ks_export_all_records,
+            'ks_data_format': rec.ks_data_format,
             'ks_data_formatting': rec.ks_data_format,
             'ks_is_client_action': rec.ks_is_client_action,
             'ks_pagination_limit': rec.ks_pagination_limit,
@@ -490,7 +492,8 @@ class KsDashboardNinjaBoard(models.Model):
             'ks_funnel_record_field':rec.ks_funnel_record_field,
             'ks_map_record_field':rec.ks_map_record_field,
             'ks_country_id':rec.ks_country_id.id,
-            'ks_action_name':ks_action_name if ks_action_name else False
+            'ks_action_name':ks_action_name if ks_action_name else False,
+            'ks_ai_analysis':rec.ks_ai_analysis
             # 'ks_last_index':ks_last_index
             # 'ks_id_name':','.join(ks_id_name)
         }

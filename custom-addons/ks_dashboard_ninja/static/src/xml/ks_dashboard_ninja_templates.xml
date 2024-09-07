@@ -6,7 +6,7 @@
 
         <div class="ks_dashboard_header d-flex p-3 w-100 bg-white justify-content-between flex-column flex-lg-row"
              t-ref="ks_dashboard_header">
-            <t t-if="state.ks_dashboard_manager">
+            <t t-if="state.ks_dashboard_manager and !this.ks_dashboard_data.ks_ai_explain_dash">
                 <div class="dropdown config_dropdown">
                     <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton"
                             data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false"
@@ -66,7 +66,7 @@
                 <input id="ks_dashboard_title_input" typ="text" maxlength="30"
                        class="form-control form-control-lg ks_em_element ks_hide"
                 />
-                <t t-if="state.ks_dashboard_manager">
+                <t t-if="state.ks_dashboard_manager and !this.ks_dashboard_data.ks_ai_explain_dash">
                     <div class="ks_dashboard_top_settings dropdown d-md-block d-lg-none">
                         <span class="ks_dashboard_ninja_toggle_menu  m-2"
                               title="Customize Dashboard" data-bs-toggle="dropdown"
@@ -95,24 +95,43 @@
             </div>
 
             <!--            <t t-call="ks_dn_filter_container"/>-->
-            <div class="ks_new_button_div">
+            <div class="ks_new_button_div w-100">
                 <t t-if="state.ks_dashboard_manager">
                     <div class="ks_dashboard_top_settings dropdown d-none d-lg-block">
-                        <button id='ks_ai_item_dash' class="btn btn-primary mr-1"
+                        <t t-if="this.ks_dashboard_data.ks_ai_explain_dash">
+                            <button id='ks_ai_item_exp_dash' class="btn btn-primary mr-1"
+                                t-on-click="ks_switch_default_dashboard">
+                                <img src="/ks_dashboard_ninja/static/description/images/icons/generate-ai.svg" alt=""/>
+                                <span class="fa fa-lg"/>
+                                    Switch to Default Dashboard
+                                <span class="caret"/>
+                            </button>
+                        </t>
+                        <t t-else="">
+                            <button id='ks_ai_item_dash' class="btn btn-primary mr-1"
                                 t-on-click="kscreateaiitem">
-                            <img src="/ks_dashboard_ninja/static/images/icons/generate-ai.svg" alt=""/>
-                            <span class="fa fa-lg"/>
-                            Generate with AI
-                            <span class="caret"/>
-                        </button>
-                        <button class="btn  btn-outline-secondary ks_add_item_type_button" t-on-click="onAddItemTypeClick">
+                                <img src="/ks_dashboard_ninja/static/description/images/icons/generate-ai.svg" alt=""/>
+                                <span class="fa fa-lg"/>
+                                    Generate with AI
+                                <span class="caret"/>
+                            </button>
+                            <button id='ks_ai_item_exp_dash' class="btn btn-primary mr-1"
+                                t-on-click="ks_gen_ai_analysis">
+                                <img src="/ks_dashboard_ninja/static/description/images/icons/Vector.svg" alt=""/>
+                                <span class="fa fa-lg"/>
+                                    Explain with AI
+                                <span class="caret"/>
+                            </button>
+                            <button class="btn  btn-outline-secondary ks_add_item_type_button" t-on-click="onAddItemTypeClick">
                             <span>
                                 Create new chart
                             </span>
                         </button>
+                        </t>
                     </div>
                 </t>
-                <div class="flex_column_datetimerow ks_dashboard_top_menu ks_select_none">
+                <t t-if="!this.ks_dashboard_data.ks_ai_explain_dash">
+                  <div class="flex_column_datetimerow ks_dashboard_top_menu ks_select_none">
                 <!--  Date Filter Selection Options (Hide default for no content view)-->
                     <div class="ks_dashboard_link ks_am_content_element ks_custom_date_filter ks_hide mr-4">
                     <div class="ks_date_filter_selection_input">
@@ -177,85 +196,87 @@
                                        t-on-change="ksImportItem"/>
 
                     </div>
-                    <div class="ks_dashboard_top_menu ks_select_none filter_design">
+                </t>
+                <div class="ks_dashboard_top_menu ks_select_none filter_design">
 
-                            <!--  Date Filter Selection Options (Hide default for no content view)-->
-                            <div class="ks_dashboard_link ks_am_content_element ks_hide mr-4"
-                                 t-if="Object.keys(state.ks_dashboard_data.ks_dashboard_custom_domain_filter).length || Object.keys(state.ks_dashboard_data.ks_dashboard_pre_domain_filter).length"
-                            >
-                                <div class="ks_dn_filter_selection_input">
-                                    <div class="ks_dn_selection_box">
-                                        <div class="btn-group ">
-                                            <button class="o_dropdown_toggler_btn btn btn-secondary dropdown-toggle ks_date_filter_dropdown"
-                                                    data-bs-toggle="dropdown"
-                                                    aria-expanded="false">
-                                                <span class="fa fa-lg fa-filter"/>
-                                                <span class="ks_dn_filter_selection">Filter</span>
-                                                <span class="caret"/>
-                                            </button>
-                                            <div class="ks_dn_filter_dropdown_container dropdown-menu dropdown-max-height ks_date_filters_menu_drop_down ks_dashboard_custom_srollbar">
-                                                <div>
-                                                    <ul id="ks_dn_filter_pre_domain_selector_container"
-                                                        class="ks_dn_pre_filter_menu"
-                                                        role="menu">
-                                                        <t t-foreach="state.ks_dn_pre_defined_filters" t-as="pre_filter" t-key="pre_filter_index">
-                                                            <t t-if="pre_filter['type']==='filter'">
-                                                                <li t-att-class="pre_filter['active'] ? 'dn_dynamic_filter_selected dn_filter_click_event_selector': 'dn_filter_click_event_selector' "
-                                                                    t-att-data-ks-categ="pre_filter['categ']"
-                                                                    t-att-data-filter-id="pre_filter['id']" t-on-click="onKsDnDynamicFilterSelect">
-                                                                    <span class="df_selection_text">
-                                                                        <t t-esc="pre_filter['name']"/>
-                                                                        <span class="ks_dn_pre_model_text">
-                                                                            <t t-esc="'(' + pre_filter['model_name'] + ')'"/>
-                                                                        </span>
+                        <!--  Date Filter Selection Options (Hide default for no content view)-->
+                        <div class="ks_dashboard_link ks_am_content_element ks_hide mr-4"
+                             t-if="Object.keys(state.ks_dashboard_data.ks_dashboard_custom_domain_filter).length || Object.keys(state.ks_dashboard_data.ks_dashboard_pre_domain_filter).length"
+                        >
+                            <div class="ks_dn_filter_selection_input">
+                                <div class="ks_dn_selection_box">
+                                    <div class="btn-group ">
+                                        <button class="o_dropdown_toggler_btn btn btn-secondary dropdown-toggle ks_date_filter_dropdown"
+                                                data-bs-toggle="dropdown"
+                                                aria-expanded="false">
+                                            <span class="fa fa-lg fa-filter"/>
+                                            <span class="ks_dn_filter_selection">Filter</span>
+                                            <span class="caret"/>
+                                        </button>
+                                        <div class="ks_dn_filter_dropdown_container dropdown-menu dropdown-max-height ks_date_filters_menu_drop_down ks_dashboard_custom_srollbar">
+                                            <div>
+                                                <ul id="ks_dn_filter_pre_domain_selector_container"
+                                                    class="ks_dn_pre_filter_menu"
+                                                    role="menu">
+                                                    <t t-foreach="state.ks_dn_pre_defined_filters" t-as="pre_filter" t-key="pre_filter_index">
+                                                        <t t-if="pre_filter['type']==='filter'">
+                                                            <li t-att-class="pre_filter['active'] ? 'dn_dynamic_filter_selected dn_filter_click_event_selector': 'dn_filter_click_event_selector' "
+                                                                t-att-data-ks-categ="pre_filter['categ']"
+                                                                t-att-data-filter-id="pre_filter['id']" t-on-click="onKsDnDynamicFilterSelect">
+                                                                <span class="df_selection_text">
+                                                                    <t t-esc="pre_filter['name']"/>
+                                                                    <span class="ks_dn_pre_model_text">
+                                                                        <t t-esc="'(' + pre_filter['model_name'] + ')'"/>
                                                                     </span>
+                                                                </span>
 
-                                                                </li>
-                                                            </t>
-                                                            <t t-else="">
-                                                                <hr/>
-                                                            </t>
+                                                            </li>
                                                         </t>
-                                                        <hr t-if="Object.keys(state.ks_dashboard_data.ks_dashboard_custom_domain_filter).length"/>
-                                                    </ul>
-
-                        <!-- This should only be shown on : Edit Mode Layout-->
-
-                                                    <div class="o_generator_menu"
-                                                         t-if="Object.keys(state.ks_dashboard_data.ks_dashboard_custom_domain_filter).length">
-                                                        <span>Custom Filter</span>
-                                                        <div id="ks_dn_custom_filters_container"
-                                                             class="o_filter_condition dropdown-item-text">
-
-                                                        </div>
-                                                        <div class="o_add_filter_menu dropdown-item-text">
-                                                            <button type="button"
-                                                                    class="btn btn-primary o_apply_filter ks_dn_filter_apply" t-on-click="ksOnCustomFilterApply">
-                                                                Apply
-                                                            </button>
-                                                            <button type="button"
-                                                                    class="btn btn-secondary ks_custom_filter_add_condition" t-on-click="ksOnCustomFilterConditionAdd">
-                                                                <i class="fa fa-plus-circle"/>
-                                                                Add a condition
-                                                            </button>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                                <div t-att-class="Object.keys(state.ks_dashboard_data.ks_dashboard_domain_data).length ? 'ks_dn_filter_applied_container': 'ks_dn_filter_applied_container ks_hide'">
-                                                    <t t-foreach="Object.keys(state.ks_dashboard_data.ks_dashboard_domain_data)" t-as="data_key" t-key="data_key_index">
-                                                        <t t-call="ks_dn_filter_section_container_template">
-                                                            <t t-set="ks_domain_data"
-                                                               t-value="state.ks_dashboard_data.ks_dashboard_domain_data[data_key]"/>
-                                                            <t t-set="ks_model" t-value="data_key"/>
+                                                        <t t-else="">
+                                                            <hr/>
                                                         </t>
                                                     </t>
+                                                    <hr t-if="Object.keys(state.ks_dashboard_data.ks_dashboard_custom_domain_filter).length"/>
+                                                </ul>
+
+                    <!-- This should only be shown on : Edit Mode Layout-->
+
+                                                <div class="o_generator_menu"
+                                                     t-if="Object.keys(state.ks_dashboard_data.ks_dashboard_custom_domain_filter).length">
+                                                    <span>Custom Filter</span>
+                                                    <div id="ks_dn_custom_filters_container"
+                                                         class="o_filter_condition dropdown-item-text">
+
+                                                    </div>
+                                                    <div class="o_add_filter_menu dropdown-item-text">
+                                                        <button type="button"
+                                                                class="btn btn-primary o_apply_filter ks_dn_filter_apply" t-on-click="ksOnCustomFilterApply">
+                                                            Apply
+                                                        </button>
+                                                        <button type="button"
+                                                                class="btn btn-secondary ks_custom_filter_add_condition" t-on-click="ksOnCustomFilterConditionAdd">
+                                                            <i class="fa fa-plus-circle"/>
+                                                            Add a condition
+                                                        </button>
+                                                    </div>
                                                 </div>
+                                            </div>
+                                            <div t-att-class="Object.keys(state.ks_dashboard_data.ks_dashboard_domain_data).length ? 'ks_dn_filter_applied_container': 'ks_dn_filter_applied_container ks_hide'">
+                                                <t t-foreach="Object.keys(state.ks_dashboard_data.ks_dashboard_domain_data)" t-as="data_key" t-key="data_key_index">
+                                                    <t t-call="ks_dn_filter_section_container_template">
+                                                        <t t-set="ks_domain_data"
+                                                           t-value="state.ks_dashboard_data.ks_dashboard_domain_data[data_key]"/>
+                                                        <t t-set="ks_model" t-value="data_key"/>
+                                                    </t>
+                                                </t>
                                             </div>
                                         </div>
                                     </div>
                                 </div>
                             </div>
-                    </div>
+                        </div>
+                </div>
+                <t t-if="state.ks_dashboard_manager">
                         <button class="btn btn btn-primary" id="ks_import_item" data-toggle="tooltip" t-on-click="ksImportItemJson"
                                 data-placement="top" title="Import-item">
                             <img src="ks_dashboard_ninja/static/images/icons/import-btn.svg" alt=""/>
@@ -316,6 +337,7 @@
                 </t>
 
             </div>
+                </t>
             </div>
         </div>
         <t t-call="ks_dashboard_ninja.ks_main_body_container"/>
@@ -409,16 +431,16 @@
     <t t-name="ks_dashboard_item_template">
         <t t-foreach="state.ks_dashboard_items" t-as="items" t-key="items.id">
             <t t-if="items.ks_dashboard_item_type === 'ks_tile'">
-                <Ksdashboardtile item="items" dashboard_data="ks_dashboard_data" ksdatefilter = "state.ksDateFilterSelection" pre_defined_filter = "state.pre_defined_filter" custom_filter="state.custom_filter"/>
+                <Ksdashboardtile item="items" dashboard_data="ks_dashboard_data" ksdatefilter = "state.ksDateFilterSelection" pre_defined_filter = "state.pre_defined_filter" custom_filter="state.custom_filter" ks_speak="(ev)=>this.speak_once(ev,items)"/>
             </t>
             <t t-elif="items.ks_dashboard_item_type === 'ks_kpi'">
-                <Ksdashboardkpiview item="items" dashboard_data="ks_dashboard_data" ksdatefilter="state.ksDateFilterSelection" pre_defined_filter = "state.pre_defined_filter" custom_filter="state.custom_filter"/>
+                <Ksdashboardkpiview item="items" dashboard_data="ks_dashboard_data" ksdatefilter="state.ksDateFilterSelection" pre_defined_filter = "state.pre_defined_filter" custom_filter="state.custom_filter" ks_speak="(ev)=>this.speak_once(ev,items)"/>
             </t>
             <t t-elif="items.ks_dashboard_item_type === 'ks_to_do'">
                 <Ksdashboardtodo item="items" dashboard_data="ks_dashboard_data"/>
             </t>
             <t t-else="">
-                <Ksdashboardgraph item="items" dashboard_data="ks_dashboard_data" ksdatefilter="state.ksDateFilterSelection" pre_defined_filter = "state.pre_defined_filter" custom_filter="state.custom_filter"/>
+                <Ksdashboardgraph item="items" dashboard_data="ks_dashboard_data" ksdatefilter="state.ksDateFilterSelection" pre_defined_filter = "state.pre_defined_filter" custom_filter="state.custom_filter" ks_speak="(ev)=>this.speak_once(ev,items)"/>
             </t>
         </t>
     </t>

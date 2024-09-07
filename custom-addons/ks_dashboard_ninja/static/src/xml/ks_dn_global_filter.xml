@@ -8,19 +8,19 @@
             </span>
             <span>
                 <div class="o_searchview">
-                    <div class="o_searchview_input_container">
+                    <div class="o_searchview_input_container d-flex flex-grow-1 flex-wrap gap-1">
                         <t t-foreach="ks_domain_data.ks_domain_index_data" t-as="ks_domain_data_new" t-key="ks_domain_data_new_index">
-                            <div class="o_searchview_facet" t-att-ksmodel="ks_model"
+                            <div class="o_searchview_facet position-relative d-inline-flex align-items-stretch rounded-2 bg-200 text-nowrap opacity-trigger-hover" t-att-ksmodel="ks_model"
                                  t-att-modelname="ks_domain_data.model_name"
                                  t-att-kscateg="ks_domain_data_new.categ || '0'">
-                                <span class="o_searchview_facet_label fa fa-filter"/>
-                                <div class="o_facet_values">
-                                    <span class="o_facet_value">
+                                <span class="o_searchview_facet_label btn btn-primary rounded-end-0 p-1 fa fa-filter"/>
+                                <div class="o_facet_values position-relative d-flex flex-wrap align-items-center ps-2 rounded-end-2 text-wrap">
+                                    <span class="o_facet_value ">
                                         <t t-esc="ks_domain_data_new.label.join(' or ')"/>
                                     </span>
                                 </div>
                                 <i role="img" aria-label="Remove" title="Remove"
-                                   class="fa fa-sm fa-remove o_facet_remove ks_dn_filter_remove_event" t-on-click="ksOnRemoveFilterFromSearchPanel"/>
+                                   class="fa fa-sm fa-remove o_facet_remove ks_dn_filter_remove_event oi oi-close btn btn-link py-1 px-2 text-danger" t-on-click="ksOnRemoveFilterFromSearchPanel"/>
                             </div>
                         </t>
                     </div>

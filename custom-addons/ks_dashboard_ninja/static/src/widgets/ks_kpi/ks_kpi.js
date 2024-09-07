@@ -59,7 +59,7 @@ class KsKpiPreview extends Component {
             item_info.pre_arrow = (target_1 - count) > 0 ? "down" : "up";
             item_info['ks_comparison'] = true;
             var target_deviation = (target_1 - count) > 0 ? Math.round(((target_1 - count) / target_1) * 100) : Math.round((Math.abs((target_1 - count)) / target_1) * 100);
-            if (target_deviation !== Infinity) item_info.target_deviation = formatInteger(target_deviation) + "%";
+            if (target_deviation !== Infinity) item_info.target_deviation = formatInteger(target_deviation)+"%";
             else {
                 item_info.pre_arrow = false;
                 item_info.target_deviation = target_deviation;
@@ -73,12 +73,22 @@ class KsKpiPreview extends Component {
                 count_1 = count_1 * field.ks_multiplier;
                 count_2 = count_2 * field.ks_multiplier;
             }
-            var count = parseInt((count_1 / count_2) * 100);
+            if (field.ks_data_format=="exact"){
+              var count = (count_1 / count_2) * 100;
+            }
+            else{
+               var count = parseInt((count_1 / count_2) * 100);
+            }
             if (field.ks_multiplier_active){
                 count = count * field.ks_multiplier;
             }
-            if (!count) count = 0;
-            item_info['count'] = count ? formatInteger(count) + "%" : "0%";
+            if (field.ks_data_format=='exact'){
+                item_info['count'] = count ? formatFloat(count, {digits: [0, 2]}) + "%" : "0%";
+             }
+             else{
+                item_info['count'] = count ? formatInteger(count) + "%" : "0%";
+
+             }
             item_info['count_tooltip'] = count ? count + "%" : "0%";
             item_info.target_progress_deviation = item_info['count']
             target_1 = target_1 > 100 ? 100 : target_1;
@@ -225,7 +235,7 @@ class KsKpiPreview extends Component {
                                     item_info['count']= data1+"/"+data2
                                 }
                                 }else {
-                                    item_info['count']=String(globalfunction._onKsGlobalFormatter(count_1, field.ks_data_format, field.ks_precision_digits)) + "/" + String(globalfunction._onKsGlobalFormatter(count_2, field.ks_data_format, field.ks_precision_digits));
+                                    item_info['count']=String(globalfunction._onKsGlobalFormatter(count_1 * field.ks_multiplier, field.ks_data_format, field.ks_precision_digits)) + "/" + String(globalfunction._onKsGlobalFormatter(count_2 * field.ks_multiplier, field.ks_data_format, field.ks_precision_digits));
                                 }
                          }else{
                             var count_tooltip = String(count_1) + "/" + String(count_2);
@@ -294,41 +304,59 @@ class KsKpiPreview extends Component {
             var ks_valid_date_selection = ['l_day', 't_week', 't_month', 't_quarter', 't_year'];
             if (field.ks_kpi_data){
                 var kpi_data = JSON.parse(field.ks_kpi_data);
-                var count_1 = kpi_data[0].record_data;
-                var count_2 = kpi_data[1] ? kpi_data[1].record_data : undefined;
-                var target_1 = kpi_data[0].target;
+                var count_1 =  kpi_data[0].record_data
+                if (kpi_data[1]?.record_data){
+                    var count_2 = kpi_data[1].record_data
+                }
+                if (field.ks_data_comparison === 'Percentage' && field.ks_model_id_2){
+                    var target_1 = kpi_data[0].target >100 ?100:kpi_data[0].target;
+
+                }else{
+                    var target_1 = kpi_data[0].target
+                }
+
                 // target deviation //
-                if (field.ks_data_comparison === 'Sum'){
+                if (field.ks_data_comparison === 'Sum' && field.ks_model_id_2 && field.ks_target_view == "Progress Bar"){
                     var count = count_1 + count_2
-                    var target_progress_deviation = String(Math.round((count / target_1) * 100))
-                }else if (field.ks_data_comparison === 'Percentage'){
+                    if (field.ks_multiplier_active){
+                        count = count * field.ks_multiplier
+                    }
+                    var target_progress_deviation = String(Math.round(((count) / target_1) * 100))
+                }else if (field.ks_data_comparison === 'Percentage'&& field.ks_model_id_2 && field.ks_target_view == "Progress Bar"){
                     var count = parseInt((count_1 / count_2) * 100)
-                    var target_progress_deviation = String(Math.round((count / target_1) * 100))
+                    if (field.ks_multiplier_active){
+                        count = count * field.ks_multiplier
+                    }
+                    var target_progress_deviation = String(Math.round(count))
                 }
                 else{
+                    if (field.ks_multiplier_active && field.ks_target_view == "Progress Bar"){
+                        count_1 = count_1 * field.ks_multiplier
+                    }
                     var target_progress_deviation = String(Math.round((count_1  / target_1) * 100));
                 }
-                if(field.ks_multiplier_active && (field.ks_data_comparison === 'Percentage' || field.ks_data_comparison === 'Sum')){
-                    var target_progress_deviation = String(Math.round(((count * field.ks_multiplier) / target_1) * 100));
-                }else if (field.ks_multiplier_active){
-                    var target_progress_deviation = String(Math.round(((count_1 * field.ks_multiplier) / target_1) * 100));
-                }
+
+
                 // goal enable color //
                 if (field.ks_goal_enable) {
                     var diffrence = 0.0
-                    if (field.ks_data_comparison === 'Sum'){
+                    if (field.ks_data_comparison === 'Sum' && field.ks_model_id_2 && field.ks_target_view == "Number"){
                         var count = count_1 + count_2
+                        if (field.ks_multiplier_active){
+                            count = count * field.ks_multiplier
+                        }
                         var diffrence = count - target_1
-                    }else if (field.ks_data_comparison === 'Percentage'){
+                    }else if (field.ks_data_comparison === 'Percentage' && field.ks_model_id_2 && field.ks_target_view == "Number"){
                         var count = parseInt((count_1 / count_2) * 100)
+                        if (field.ks_multiplier_active){
+                            count = count * field.ks_multiplier
+                        }
                         var diffrence = count - target_1
                     }
                     else{
-                        var diffrence = count - target_1
+                        if (field.ks_multiplier_active){
+                            count_1 = count_1 * field.ks_multiplier
                     }
-                    if(field.ks_multiplier_active && (field.ks_data_comparison === 'Percentage' || field.ks_data_comparison === 'Sum')){
-                        var  diffrence = (count_1 * field.ks_multiplier) - target_1
-                    }else if (field.ks_multiplier_active){
                         var diffrence = count_1 - target_1
                     }
 
@@ -367,6 +395,9 @@ class KsKpiPreview extends Component {
                 if (field.ks_target_view === "Progress Bar" && field.ks_goal_enable && field.ks_standard_goal_value && field.ks_model_id_2){
                     $(this.ks_kpi_ref.el).find('#ks_progressbar').val(parseInt(target_progress_deviation));
                 }
+                if (field.ks_target_view=== "Progress Bar" && field.ks_goal_enable && field.ks_standard_goal_value) {
+                $(this.ks_kpi_ref.el).find('#ks_progressbar').val(parseInt(target_progress_deviation));
+            }
 
             }
 

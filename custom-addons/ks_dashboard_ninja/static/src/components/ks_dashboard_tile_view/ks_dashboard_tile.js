@@ -1,5 +1,5 @@
 /** @odoo-module **/
-import { Component, useState ,useEffect,onWillUpdateProps,useRef} from "@odoo/owl";
+import { Component, useState ,useEffect,onWillUpdateProps,useRef, onMounted} from "@odoo/owl";
 import {globalfunction } from '@ks_dashboard_ninja/js/ks_global_functions';
 import { loadBundle } from "@web/core/assets";
 import { useService } from "@web/core/utils/hooks";
@@ -13,11 +13,26 @@ export class Ksdashboardtile extends Component{
         var self = this;
         this._rpc = useService("rpc");
         this.actionService = useService("action");
+        this.ks_tile = useRef('ks_tile');
         this.ks_container_class = 'grid-stack-item';
         this.ks_inner_container_class = 'grid-stack-item-content';
         this.state = useState({data_count:""})
         this.item = this.props.item
+        this.file_type_magic_word= {'/': 'jpg','R': 'gif','i': 'png','P': 'svg+xml'}
         this.ks_dashboard_data = this.props.dashboard_data
+        this.ks_ai_analysis = this.ks_dashboard_data.ks_ai_explain_dash
+        if (this.ks_ai_analysis){
+            this.ks_container_class = 'grid-stack-item ks_ai_explain_tile'
+            this.ks_inner_container_class = 'grid-stack-item-content ks_ai_dashboard_item'
+        }else{
+            this.ks_container_class = 'grid-stack-item'
+            this.ks_inner_container_class = 'grid-stack-item-content'
+        }
+        if (this.item.ks_ai_analysis && this.item.ks_ai_analysis){
+            var ks_analysis = this.item.ks_ai_analysis.split('ks_gap')
+            this.ks_ai_analysis_1 = ks_analysis[0]
+            this.ks_ai_analysis_2 = ks_analysis[1]
+        }
         this.prepare_item();
         var update_interval = this.props.dashboard_data.ks_set_interval
         onWillUpdateProps(async(nextprops)=>{
@@ -43,6 +58,12 @@ export class Ksdashboardtile extends Component{
                 }, update_interval);
                 return () => clearInterval(interval);
             }
+        })
+        onMounted(()=>{
+            if (this.ks_ai_analysis){
+                $(this.ks_tile.el).find('.ks_dashboarditem_id').addClass('ks_ai_chart_body')
+            }
+
         })
 
     }
@@ -83,15 +104,15 @@ export class Ksdashboardtile extends Component{
                 var ks_selection = this.item.ks_unit_selection;
                 if (ks_selection === 'monetary') {
                     var ks_currency_id = this.item.ks_currency_id;
-                    var ks_data = globalfunction._onKsGlobalFormatter(ks_record_count, this.item.ks_data_formatting, this.item.ks_precision_digits);
+                    var ks_data = globalfunction._onKsGlobalFormatter(ks_record_count, this.item.ks_data_format, this.item.ks_precision_digits);
                     ks_data = globalfunction.ks_monetary(ks_data, ks_currency_id);
                     var data_count = ks_data;
                 } else{
                     var ks_field = this.item.ks_chart_unit;
-                    var data_count= ks_field+" "+globalfunction._onKsGlobalFormatter(ks_record_count, this.item.ks_data_formatting, this.item.ks_precision_digits);
+                    var data_count= ks_field+" "+globalfunction._onKsGlobalFormatter(ks_record_count, this.item.ks_data_format, this.item.ks_precision_digits);
                 }
             }else {
-                var data_count= globalfunction._onKsGlobalFormatter(ks_record_count, this.item.ks_data_formatting, this.item.ks_precision_digits);
+                var data_count= globalfunction._onKsGlobalFormatter(ks_record_count, this.item.ks_data_format, this.item.ks_precision_digits);
             }
             var count = ks_record_count;
         }else{
@@ -100,15 +121,15 @@ export class Ksdashboardtile extends Component{
                 var ks_selection = this.item.ks_unit_selection;
                 if (ks_selection === 'monetary') {
                     var ks_currency_id = this.item.ks_currency_id;
-                    var ks_data = globalfunction._onKsGlobalFormatter(ks_record_count, this.item.ks_data_formatting, this.item.ks_precision_digits);
+                    var ks_data = globalfunction._onKsGlobalFormatter(ks_record_count, this.item.ks_data_format, this.item.ks_precision_digits);
                     ks_data = globalfunction.ks_monetary(ks_data, ks_currency_id);
                     var data_count = ks_data;
                 } else{
                     var ks_field = this.item.ks_chart_unit;
-                    var data_count= ks_field+" "+globalfunction._onKsGlobalFormatter(ks_record_count, this.item.ks_data_formatting, this.item.ks_precision_digits);
+                    var data_count= ks_field+" "+globalfunction._onKsGlobalFormatter(ks_record_count, this.item.ks_data_format, this.item.ks_precision_digits);
                 }
             }else {
-                var data_count= globalfunction._onKsGlobalFormatter(ks_record_count, this.item.ks_data_formatting, this.item.ks_precision_digits);
+                var data_count= globalfunction._onKsGlobalFormatter(ks_record_count, this.item.ks_data_format, this.item.ks_precision_digits);
             }
             var count = ks_record_count;
         }
@@ -125,8 +146,8 @@ export class Ksdashboardtile extends Component{
 //        if (this.item.ks_tv_play){
 //            this.item.ksIsUser = false;
 //        }
-        ks_rgba_background_color = self._ks_get_rgba_format(this.item.ks_background_color);
-        ks_rgba_font_color = self._ks_get_rgba_format(this.item.ks_font_color);
+        this.ks_rgba_background_color = self._ks_get_rgba_format(this.item.ks_background_color);
+        this.ks_rgba_font_color = self._ks_get_rgba_format(this.item.ks_font_color);
         this.ks_rgba_default_icon_color = self._ks_get_rgba_format(this.item.ks_default_icon_color);
         this.ks_rgba_button_color = self._ks_get_rgba_format(this.item.ks_button_color);
         if (this.item.ks_info){
@@ -140,7 +161,7 @@ export class Ksdashboardtile extends Component{
         this.count = count
         this.ks_info = ks_description
         this.ks_dashboard_list= self.ks_dashboard_data.ks_dashboard_list
-        this.style_main_body = this._ksMainBodyStyle(ks_rgba_background_color, ks_rgba_font_color, this.item).background_style;
+        this.style_main_body = this._ksMainBodyStyle(this.ks_rgba_background_color, this.ks_rgba_font_color, this.item).background_style;
     }
 
     get style_image_body_l2(){
@@ -190,7 +211,8 @@ Ksdashboardtile.props = {
     dashboard_data: { type: Object, Optional:true},
     ksdatefilter : {type:String,Optional:true},
     pre_defined_filter :{type:Object, Optional:true},
-    custom_filter :{type:Object, Optional:true}
+    custom_filter :{type:Object, Optional:true},
+    ks_speak:{type:Function , Optional:true},
 };
 
 Ksdashboardtile.template = "ksdashboardtile";

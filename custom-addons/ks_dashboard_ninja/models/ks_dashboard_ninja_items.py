@@ -199,7 +199,7 @@ class KsDashboardNinjaItems(models.Model):
     ks_info = fields.Text(string="Item Description",  translate=True)
     ks_model_id = fields.Many2one('ir.model', string='Model',
                                   domain="[('access_ids','!=',False),('transient','=',False),"
-                                         "('model','not ilike','base_import%'),('model','not ilike','ir.%'),"
+                                         "('model','not ilike','base_import%'),'|',('model','not ilike','ir.%'),('model','=ilike','_%ir.%'),"
                                          "('model','not ilike','web_editor.%'),('model','not ilike','web_tour.%'),"
                                          "('model','!=','mail.thread'),('model','not ilike','ks_dash%'),('model','not ilike','ks_to%')]",
                                   help="Data source to fetch and read the data for the creation of dashboard items. ")
@@ -678,6 +678,8 @@ class KsDashboardNinjaItems(models.Model):
     data_source = fields.Selection(
         [('odoo', 'Odoo'), ('excel', 'Excel'), ('csv', 'CSV')],
         string="Data Source",default='odoo')
+
+    ks_ai_analysis = fields.Char(string='AI Analysis')
 
 
 
@@ -1159,18 +1161,12 @@ class KsDashboardNinjaItems(models.Model):
                     final_values = []
                     final_heading = []
                     try:
-                        for final in values:
-                            if values.get(final) != 'Null':
-                                final_values.append(str(values.get(final)))
-                                final_heading.append('x_' + final.lower().replace(' ', '_'))
-                        resultString = ", ".join(["'{}'".format(item) for item in final_values if item])
-                        resultHeading = ", ".join(['{}'.format(item) for item in final_heading if item])
-                        if resultString and resultHeading != "":
-                            data_query = """INSERT INTO {} ({}) VALUES ({})""".format(tablemodel, resultHeading, resultString)
-                            self.env.cr.execute(data_query)
+                        if values.keys():
+                            data_values = dict([('x_' + key.lower().replace(' ', '_'), values[key]) for key in values if
+                                                values[key] != 'Null'])
+                            self.env[tablemodel].sudo().create(data_values)
                     except Exception as e:
                         raise ValidationError("found error while Table creation {}".format(e))
-                    self._cr.commit()
 
     def csv_create_table(self):
         records = self.ks_csv_group_by_lines
@@ -1381,20 +1377,12 @@ class KsDashboardNinjaItems(models.Model):
                     final_values = []
                     final_heading = []
                     try:
-                        for final in values:
-                            if values.get(final) != 'Null':
-                                final_values.append(str(values.get(final)))
-                                final_heading.append('x_' + final.lower().replace(' ', '_'))
-                        resultString = ", ".join(["'{}'".format(item) for item in final_values if item])
-                        resultHeading = ", ".join(['{}'.format(item) for item in final_heading if item])
-                        if resultString and resultHeading != "":
-                            data_query = """INSERT INTO {} ({}) VALUES ({})""".format(tablemodel, resultHeading,
-                                                                                      resultString)
-                            self.env.cr.execute(data_query)
+                        if values.keys():
+                            data_values = dict([('x_' + key.lower().replace(' ', '_'), values[key]) for key in values if
+                                                values[key] != 'Null'])
+                            self.env[tablemodel].sudo().create(data_values)
                     except Exception as e:
                         raise ValidationError("found error while Table creation error {}".format(e))
-                    self._cr.commit()
-
 
     def check_target(self):
         base_url = self.env['ir.config_parameter'].sudo().get_param('web.base.url')
@@ -2049,9 +2037,6 @@ class KsDashboardNinjaItems(models.Model):
             ks_date_domain = []
 
         proper_domain = safe_eval(ks_domain) if ks_domain else []
-        if rec.ks_company_id:
-            ks_company_domain = [('company_id','=',rec.ks_company_id.id)]
-            proper_domain.extend(ks_company_domain)
         if ks_date_domain:
             proper_domain.extend(ks_date_domain)
         if rec.ks_domain_extension:
@@ -2250,11 +2235,12 @@ class KsDashboardNinjaItems(models.Model):
                 if not rec.ks_sort_by_field:
                     ks_chart_measure_field_with_type.append('count:count(id)')
                 elif rec.ks_sort_by_field:
-                    if not rec.ks_sort_by_field.ttype == "datetime":
+                    if rec.ks_sort_by_field.ttype == "many2one" and rec.ks_sort_by_field.name == rec.ks_chart_relation_groupby.name:
+                        ks_chart_measure_field_with_type.append(rec.ks_sort_by_field.name)
+                    elif not rec.ks_sort_by_field.ttype in ["datetime",'date']:
                         ks_chart_measure_field_with_type.append(rec.ks_sort_by_field.name + ':' + 'sum')
                     else:
                         ks_chart_measure_field_with_type.append(rec.ks_sort_by_field.name)
-
 
                 ks_chart_data['datasets'].append({'data': [], 'label': "Count"})
             else:
@@ -2389,9 +2375,12 @@ class KsDashboardNinjaItems(models.Model):
                             labels = self.generate_timeserise(ks_date_data['start_date'], ks_date_data['end_date'],
                                                               ks_chart_date_groupby)
 
-                        ks_goal_records = self.env['ks_dashboard_ninja.item_goal'].read_group(
-                            ks_goal_domain, ['ks_goal_value'],
-                            ['ks_goal_date' + ":" + ks_chart_date_groupby], lazy=False)
+                        try:
+                            ks_goal_records = self.env['ks_dashboard_ninja.item_goal'].read_group(
+                                ks_goal_domain, ['ks_goal_value'],
+                                ['ks_goal_date' + ":" + ks_chart_date_groupby], lazy=False)
+                        except:
+                            ks_goal_records = []
                         ks_goal_labels = []
                         ks_goal_dataset = []
                         goal_dataset = []
@@ -2936,15 +2925,18 @@ class KsDashboardNinjaItems(models.Model):
                 ks_list_view_data['list_view_type'] = 'date_type'
                 ks_list_field = []
                 ks_chart_date_groupby = self.ks_chart_date_groupby
+                name = ''
                 if self.ks_chart_date_groupby == 'month_year':
                     ks_chart_date_groupby = 'month'
+                    name = 'month_year'
                 ks_list_view_data[
                     'groupby'] = self.ks_chart_relation_groupby.name + ':' + ks_chart_date_groupby
                 ks_list_field.append(self.ks_chart_relation_groupby.name)
                 ks_list_fields.append(self.ks_chart_relation_groupby.name + ':' + ks_chart_date_groupby)
                 ks_list_view_data['label'].append(
-                    self.ks_chart_relation_groupby.field_description + ' : ' + ks_chart_date_groupby
-                    .capitalize())
+                    self.ks_chart_relation_groupby.field_description + ' : ' + (
+                        'Month-Year' if name == 'month_year' else ks_chart_date_groupby.capitalize())
+                )
                 ks_list_view_data['fields'].append(self.ks_chart_relation_groupby.ids[0])
                 ks_list_view_data['fields_type'].append(self.ks_chart_relation_groupby.ttype)
                 ks_list_view_data['store'].append(self.ks_chart_relation_groupby.store)
@@ -3161,9 +3153,12 @@ class KsDashboardNinjaItems(models.Model):
         if ks_date_data['start_date'] and ks_date_data['end_date'] and rec.ks_goal_lines:
             labels = self.generate_timeserise(ks_date_data['start_date'], ks_date_data['end_date'],
                                               ks_chart_date_groupby)
-        ks_goal_records = self.env['ks_dashboard_ninja.item_goal'].read_group(
-            ks_goal_domain, ['ks_goal_value'],
-            ['ks_goal_date' + ":" + ks_chart_date_groupby], lazy=False)
+        try:
+            ks_goal_records = self.env['ks_dashboard_ninja.item_goal'].read_group(
+                ks_goal_domain, ['ks_goal_value'],
+                ['ks_goal_date' + ":" + ks_chart_date_groupby], lazy=False)
+        except:
+            ks_goal_records = []
 
         ks_goal_labels = []
         ks_goal_dataset = {}
@@ -3683,9 +3678,6 @@ class KsDashboardNinjaItems(models.Model):
         proper_domain = safe_eval(ks_domain_2) if ks_domain_2 else []
         if ks_date_domain:
             proper_domain.extend(ks_date_domain)
-        if rec.ks_company_id:
-            ks_company_domain = [('company_id','=',rec.ks_company_id.id)]
-            proper_domain.extend(ks_company_domain)
         if rec.ks_domain_extension_2:
             ks_domain_extension = rec.ks_convert_domain_extension(rec.ks_domain_extension_2, rec)
             proper_domain.extend(ks_domain_extension)
@@ -3732,8 +3724,8 @@ class KsDashboardNinjaItems(models.Model):
             if all(measure_field in res for measure_field in ks_chart_measure_field):
                 if ks_chart_groupby_type == "relational_type":
                     if res[ks_chart_groupby_field]:
-                        ks_chart_data['groupByIds'].append(res[ks_chart_groupby_field])
-                        label = res[ks_chart_groupby_field]
+                        ks_chart_data['groupByIds'].append(res[ks_chart_groupby_field][0])
+                        label = res[ks_chart_groupby_field][1]
                     else:
                         label = res[ks_chart_groupby_field]
                 elif ks_chart_groupby_type == "selection":
@@ -3998,7 +3990,7 @@ class KsDashboardNinjaItems(models.Model):
                                               index] * ks_multiplier.ks_multiplier_value
                             ks_list_view_data['data_rows'][i]['data'][index] = data_values
             return {"ks_list_view_data": json.dumps(ks_list_view_data), "ks_list_view_type": "grouped",
-                    'sequence': sequence + 1, }
+                    'sequence': sequence + 1, 'ks_action_name': "".join(ks_action_name.split(" "))}
         else:
             ks_chart_measure_field = []
             ks_chart_measure_field_with_type = []
@@ -4465,7 +4457,7 @@ class KsDashboardItemsActions(models.Model):
                                       ('ks_polarArea_chart', 'Polar Area Chart'),
                                       ('ks_radialBar_chart', 'Radial Bar Chart'),
                                       ('ks_scatter_chart', 'Scatter Chart'),
-                                      # ('ks_list_view' , 'List View'),
+                                      ('ks_list_view' , 'List View'),
                                       ('ks_radar_view', 'Radar View'),
                                       ('ks_flower_view', 'Flower View'),
                                       ('ks_funnel_chart', 'Funnel Chart'),

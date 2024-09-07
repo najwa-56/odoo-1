@@ -11,7 +11,7 @@ class ResConfig(models.TransientModel):
     url = fields.Char(string="URL", store=True,
                       config_parameter="ks_dashboard_ninja.url")
     ks_email_id = fields.Char(string="Email ID",store=True,config_parameter="ks_dashboard_ninja.ks_email_id")
-
+    ks_analysis_word_length = fields.Selection([("50","50 words"),("100","100 words"),("150","150 words"),("200","200 words"),],default ="100", string="AI Analysis length", store=True,config_parameter="ks_dashboard_ninja.ks_analysis_word_length")
     def Open_wizard(self):
         if self.url and self.ks_email_id:
             try:

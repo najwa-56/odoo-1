@@ -29,6 +29,14 @@ export class Ksdashboardgraph extends Component{
         this.ks_gridstack_container = useRef("ks_gridstack_container");
         this.ks_list_view = useRef("ks_list_view")
         var update_interval = this.props.dashboard_data.ks_set_interval
+        this.ks_ai_analysis = this.ks_dashboard_data.ks_ai_explain_dash
+        if (this.item.ks_ai_analysis && this.item.ks_ai_analysis){
+            var ks_analysis = this.item.ks_ai_analysis.split('ks_gap')
+            this.ks_ai_analysis_1 = ks_analysis[0]
+            this.ks_ai_analysis_2 = ks_analysis[1]
+        }
+
+
          onWillUpdateProps(async(nextprops)=>{
             if(nextprops.ksdatefilter !='none'){
                 await this.ksFetchUpdateItem(this.item.id)
@@ -186,6 +194,7 @@ export class Ksdashboardgraph extends Component{
         this.intial_count = length
         this.ks_company= this.item.ks_company
         this.calculation_type = this.ks_dashboard_data.ks_item_data[this.item_id].ks_data_calculation_type
+        this.self = this
 
         if (this.item.ks_list_view_type === "ungrouped" && list_view_data) {
             if (list_view_data.date_index) {
@@ -277,7 +286,7 @@ export class Ksdashboardgraph extends Component{
                 let data2={};
                 for (let j=0 ;j<ks_data.length ; j++){
                     if (ks_data[j].type == "line"){
-                    data2[ks_data[j].label+'line'] = ks_data[j].data[i]
+                    data2[ks_data[j].label] = ks_data[j].data[i]
                     }else{
                     data2[ks_data[j].label] = ks_data[j].data[i]
                     }
@@ -339,13 +348,23 @@ export class Ksdashboardgraph extends Component{
 
             xAxis.data.setAll(data);
 
-            var yAxis = chart.yAxes.push(am5xy.ValueAxis.new(root, {min: 0,
+            var yAxis = chart.yAxes.push(am5xy.ValueAxis.new(root, {extraMin: 0,
             extraMax: 0.1,renderer: am5xy.AxisRendererY.new(root, {strokeOpacity: 0.1}) }));
 
             // Add series
 
             for (let k = 0;k<ks_data.length ; k++){
                 if (item.ks_dashboard_item_type == "ks_bar_chart" && item.ks_bar_chart_stacked == true && ks_data[k].type != "line"){
+                    var tooltip = am5.Tooltip.new(root, {
+                        pointerOrientation: "horizontal",
+                        textAlign: "center",
+                        centerX: am5.percent(96),
+                        labelText: "{categoryX}, {name}: {valueY}"
+                    });
+                    tooltip.label.setAll({
+                        direction: "rtl"
+                    })
+
                     var series = chart.series.push(am5xy.ColumnSeries.new(root, {
                         stacked: true,
                         name: `${ks_data[k].label}`,
@@ -353,10 +372,7 @@ export class Ksdashboardgraph extends Component{
                         yAxis: yAxis,
                         valueYField:`${ks_data[k].label}`,
                         categoryXField: "category",
-                        tooltip: am5.Tooltip.new(root, {
-                        pointerOrientation: "horizontal",
-                        labelText: "{categoryX}, {name}: {valueY}"
-                        })
+                        tooltip: tooltip
                     }));
                     series.columns.template.events.on("click",function(ev){
                         if (item.ks_data_calculation_type === 'custom' && !self.ks_dashboard_data['ks_ai_dashboard']){
@@ -365,16 +381,23 @@ export class Ksdashboardgraph extends Component{
                     });
                     series.data.setAll(data);
                 }else if (item.ks_dashboard_item_type == "ks_bar_chart" && ks_data[k].type != "line"){
+                    var tooltip = am5.Tooltip.new(root, {
+                        textAlign: "center",
+                        centerX: am5.percent(96),
+                        pointerOrientation: "horizontal",
+                        labelText: "{categoryX}, {name}: {valueY}"
+                    });
+                    tooltip.label.setAll({
+                        direction: "rtl"
+                    })
+
                     var series = chart.series.push(am5xy.ColumnSeries.new(root, {
                         name: `${ks_data[k].label}`,
                         xAxis: xAxis,
                         yAxis: yAxis,
                         valueYField:`${ks_data[k].label}`,
                         categoryXField: "category",
-                        tooltip: am5.Tooltip.new(root, {
-                        pointerOrientation: "horizontal",
-                        labelText: "{categoryX}, {name}: {valueY}"
-                        })
+                        tooltip: tooltip
 
                     }));
                     series.columns.template.events.on("click",function(ev){
@@ -385,6 +408,15 @@ export class Ksdashboardgraph extends Component{
                     series.data.setAll(data);
 
                 }else if (item.ks_dashboard_item_type == "ks_bullet_chart"){
+                    var tooltip = am5.Tooltip.new(root, {
+                        textAlign: "center",
+                        centerX: am5.percent(96),
+                        labelText: `${ks_data[k].label}: {valueY}`
+                    });
+                    tooltip.label.setAll({
+                        direction: "rtl"
+                    })
+
                     var series = chart.series.push(am5xy.ColumnSeries.new(root, {
                     name: `${ks_data[k].label}`,
                     xAxis: xAxis,
@@ -392,9 +424,7 @@ export class Ksdashboardgraph extends Component{
                     valueYField:`${ks_data[k].label}`,
                     categoryXField: "category",
                     clustered: false,
-                    tooltip: am5.Tooltip.new(root, {
-                    labelText: `${ks_data[k].label}: {valueY}`
-                    })
+                    tooltip: tooltip
                     }));
 
                     series.columns.template.setAll({
@@ -421,19 +451,38 @@ export class Ksdashboardgraph extends Component{
                    cursor.lineY.set("forceHidden", true);
                    cursor.lineX.set("forceHidden", true);
                 }
-
+                if (item.ks_show_data_value == true && series){
+                    series.bullets.push(function () {
+                        return am5.Bullet.new(root, {
+//                            locationY:1,
+                                sprite: am5.Label.new(root, {
+                                  text:  "{valueY}",
+                                  centerY: am5.p100,
+                                  centerX: am5.p50,
+                                  populateText: true
+                                })
+                        });
+                    });
+                }
                 if (item.ks_dashboard_item_type == "ks_bar_chart" && item.ks_chart_measure_field_2 && ks_data[k].type == "line"){
+                    var tooltip = am5.Tooltip.new(root, {
+                        textAlign: "center",
+                        centerX: am5.percent(96),
+                        pointerOrientation: "horizontal",
+                        labelText: "{categoryX}, {name}: {valueY}"
+                    });
+                    tooltip.label.setAll({
+                        direction: "rtl"
+                    })
+
                     var series2 = chart.series.push(
                         am5xy.LineSeries.new(root, {
                             name: `${ks_data[k].label}`,
                             xAxis: xAxis,
                             yAxis: yAxis,
-                            valueYField:`${ks_data[k].label + "line"}`,
+                            valueYField:`${ks_data[k].label}`,
                             categoryXField: "category",
-                            tooltip: am5.Tooltip.new(root, {
-                                pointerOrientation: "horizontal",
-                                labelText: "{categoryX}, {name}: {valueY}"
-                            })
+                            tooltip: tooltip
                         })
                     );
 
@@ -463,9 +512,10 @@ export class Ksdashboardgraph extends Component{
                 wheelX: "panX",wheelY: "zoomX",layout: root.verticalLayout}));
                 var yRenderer = am5xy.AxisRendererY.new(root, {
                         inversed: true,
-                        minGridDistance: 10,
-                        minorGridEnabled: true
-
+                        minGridDistance: 30,
+                        minorGridEnabled: true,
+                        cellStartLocation: 0.1,
+                        cellEndLocation: 0.9
                     })
                 yRenderer.labels.template.setAll({
                   direction: "rtl",
@@ -484,6 +534,17 @@ export class Ksdashboardgraph extends Component{
                     min: 0
                 }));
                 for (let k = 0;k<ks_data.length ; k++){
+                    var tooltip = am5.Tooltip.new(root, {
+                        textAlign: "center",
+                        centerX: am5.percent(96),
+                        pointerOrientation: "horizontal",
+                        labelText: "{categoryY}, {name}: {valueX}"
+                    });
+
+                    tooltip.label.setAll({
+                        direction: "rtl"
+                    })
+
                 if (item.ks_bar_chart_stacked == true){
                     var series = chart.series.push(am5xy.ColumnSeries.new(root, {
                         stacked: true,
@@ -493,13 +554,10 @@ export class Ksdashboardgraph extends Component{
                         valueXField:`${ks_data[k].label}`,
                         categoryYField: "category",
                         sequencedInterpolation: true,
-                        tooltip: am5.Tooltip.new(root, {
-                        pointerOrientation: "horizontal",
-                        labelText: "{categoryY}, {name}: {valueX}"
-                        })
+                        tooltip: tooltip
                     }));
 
-                }else {
+                }else if (item.ks_dashboard_item_type == "ks_horizontalBar_chart" && ks_data[k].type != "line"){
                     var series = chart.series.push(am5xy.ColumnSeries.new(root, {
                         name: `${ks_data[k].label}`,
                         xAxis: xAxis,
@@ -507,31 +565,82 @@ export class Ksdashboardgraph extends Component{
                         valueXField:`${ks_data[k].label}`,
                         categoryYField: "category",
                         sequencedInterpolation: true,
-                        tooltip: am5.Tooltip.new(root, {
-                        pointerOrientation: "horizontal",
-                        labelText: "{categoryY}, {name}: {valueX}"
-                        })
+                        tooltip: tooltip
 
                 }));
                 }
-                if (item.ks_show_records == true && series){
-                    series.columns.template.setAll({
-//                        width: am5.percent(80-(10*k)),
-                        height: am5.p100,
-                        strokeOpacity: 0
-                   });
-                   var cursor = chart.set("cursor", am5xy.XYCursor.new(root, {
-                            behavior: "zoomY"
-                    }));
-                   cursor.lineY.set("forceHidden", true);
-                   cursor.lineX.set("forceHidden", true);
-                }
-                series.columns.template.events.on("click",function(ev){
-                    if (item.ks_data_calculation_type === 'custom' && !self.ks_dashboard_data['ks_ai_dashboard']){
-                        self.onChartCanvasClick_funnel(ev,`${item.id}`, item)
+                    if (item.ks_show_records == true && series){
+                        series.columns.template.setAll({
+    //                        width: am5.percent(80-(10*k)),
+                            height: am5.p100,
+                            strokeOpacity: 0
+                       });
+                       var cursor = chart.set("cursor", am5xy.XYCursor.new(root, {
+                                behavior: "zoomY"
+                        }));
+                       cursor.lineY.set("forceHidden", true);
+                       cursor.lineX.set("forceHidden", true);
                     }
-                });
-                 series.data.setAll(data);
+                    if (item.ks_show_data_value == true && series){
+                        series.bullets.push(function () {
+                            return am5.Bullet.new(root, {
+    //                            locationX: 1,
+                                    sprite: am5.Label.new(root, {
+                                      text:  "{valueX}",
+                                      centerY: am5.p50,
+                                      centerX: am5.p50,
+                                      populateText: true
+                                    })
+                            });
+                        });
+                    }
+                    if (series){
+                        series.columns.template.events.on("click",function(ev){
+                            if (item.ks_data_calculation_type === 'custom' && !self.ks_dashboard_data['ks_ai_dashboard']){
+                                self.onChartCanvasClick_funnel(ev,`${item.id}`, item)
+                            }
+                        });
+
+                        series.data.setAll(data);
+                    }
+
+                 if (item.ks_dashboard_item_type == "ks_horizontalBar_chart" && ks_data[k].type == "line"){
+                    var series2 = chart.series.push(
+                        am5xy.LineSeries.new(root, {
+                            name: `${ks_data[k].label}`,
+                            xAxis: xAxis,
+                            yAxis: yAxis,
+                            valueXField:`${ks_data[k].label}`,
+                            categoryYField: "category",
+                            sequencedInterpolation: true,
+                            tooltip: am5.Tooltip.new(root, {
+                                pointerOrientation: "horizontal",
+                                labelText: "{categoryY}, {name}: {valueX}"
+                            })
+                        })
+                    );
+
+                    series2.strokes.template.setAll({strokeWidth: 3,templateField: "strokeSettings"});
+                    series2.strokes.template.events.on("click",function(ev){
+                        if (item.ks_data_calculation_type === 'custom' && !self.ks_dashboard_data['ks_ai_dashboard']){
+                            self.onChartCanvasClick_funnel(ev,`${item.id}`, item)
+                        }
+                    });
+
+
+                    series2.bullets.push(function() {
+                        return am5.Bullet.new(root, {
+                            sprite: am5.Circle.new(root, {
+                                strokeWidth: 3,
+                                stroke: series2.get("stroke"),
+                                radius: 5,
+                                fill: root.interfaceColors.get("background")
+                            })
+                        });
+                    });
+                     series2.data.setAll(data);
+
+                }
             }
             break;
             case "ks_line_chart":
@@ -557,10 +666,20 @@ export class Ksdashboardgraph extends Component{
                 }));
                 xAxis.data.setAll(data);
 
-                var yAxis = chart.yAxes.push(am5xy.ValueAxis.new(root, {min: 0,
+                var yAxis = chart.yAxes.push(am5xy.ValueAxis.new(root, {extraMin: 0,
                 extraMax: 0.1,renderer: am5xy.AxisRendererY.new(root, {strokeOpacity: 0.1}) }));
 
                 for (let k = 0;k<ks_data.length ; k++){
+
+                    var tooltip = am5.Tooltip.new(root, {
+                        textAlign: "center",
+                        centerX: am5.percent(96),
+                        labelText: "[bold]{categoryX}[/]\n{name}: {valueY}"
+                    });
+                    tooltip.label.setAll({
+                        direction: "rtl"
+                    })
+
                     var series = chart.series.push(am5xy.LineSeries.new(root, {
                         name: `${ks_data[k].label}`,
                         xAxis: xAxis,
@@ -568,9 +687,7 @@ export class Ksdashboardgraph extends Component{
                         valueYField: `${ks_data[k].label}`,
                         categoryXField: "category",
                         alignLabels: true,
-                        tooltip: am5.Tooltip.new(root, {
-                            labelText: "[bold]{categoryX}[/]\n{name}: {valueY}"
-                        })
+                        tooltip: tooltip
                     }));
                     series.strokes.template.setAll({strokeWidth: 2,templateField: "strokeSettings"});
 
@@ -593,6 +710,18 @@ export class Ksdashboardgraph extends Component{
                             sprite: graphics
                         });
                     });
+                    if (item.ks_show_data_value == true && series){
+                        series.bullets.push(function () {
+                            return am5.Bullet.new(root, {
+                                sprite: am5.Label.new(root, {
+                                    text:  "{valueY}",
+                                    centerX:am5.p50,
+                                    centerY:am5.p100,
+                                    populateText: true
+                                 })
+                            });
+                        });
+                    }
                     if (item.ks_dashboard_item_type === "ks_area_chart"){
                         series.fills.template.setAll({
                             fillOpacity: 0.5,
@@ -647,7 +776,7 @@ export class Ksdashboardgraph extends Component{
                                 name: `${ks_data[k].label}`,
                                 valueField: `${ks_data[k].label}`,
                                 categoryField: "category",
-                                alignLabels: true,
+                                alignLabels: false,
                                 startAngle: 180,
                                 endAngle: 360,
                             }));
@@ -666,8 +795,7 @@ export class Ksdashboardgraph extends Component{
                                 layout: root.verticalLayout,
                             }));
                         }
-//                        chart.rtl=true;
-//                        root.rtl=true;
+
                        var legend = chart.children.push(am5.Legend.new(root, {
                           centerX: am5.percent(50),
                           x: am5.percent(50),
@@ -678,20 +806,13 @@ export class Ksdashboardgraph extends Component{
 //                          reverseChildren: true
                         }));
 
-//                        legend.labels.template.setAll({
-//                          width: 250,
-//                          textAlign: "start",
-//                          padding:30,
-//                          markerLabelGap:80,
-//                        });
-
                         for (let k = 0;k<ks_data.length ; k++){
                             series[k] = chart.series.push(
                                 am5percent.PieSeries.new(root, {
                                 name: `${ks_data[k].label}`,
                                 valueField: `${ks_data[k].label}`,
                                 categoryField: "category",
-                                alignLabels: true,
+                                alignLabels: false,
                             })
                             );
                         }
@@ -699,7 +820,6 @@ export class Ksdashboardgraph extends Component{
                     var bgColor = root.interfaceColors.get("background");
                     for (let rec of series){
                         rec.ticks.template.setAll({ forceHidden: true })
-                        rec.labels.template.setAll({ forceHidden: true })
                         rec.slices.template.setAll({
                             stroke: bgColor,
                             strokeWidth: 2,
@@ -707,21 +827,39 @@ export class Ksdashboardgraph extends Component{
                             });
                             rec.slices.template.events.on("click", function(ev) {
                                 rec.slices.each(function(slice) {
-                                    if(slice == ev.target && !self.ks_dashboard_data['ks_ai_dashboard']){
+                                    if(slice == ev.target && !self.ks_dashboard_data['ks_ai_dashboard'] && item.ks_data_calculation_type === 'custom'){
                                         self.onChartCanvasClick_funnel(ev,`${item.id}`, item)
                                     }
                                 })
                             });
 
                         if (item.ks_show_records == true){
-                            rec.slices.template.setAll({
-                                tooltipText:
-                                    "[bold]{category}[/]\n{name}: {value}"
+                            var tooltip = am5.Tooltip.new(root, {
+                                textAlign: "center",
+                                centerX: am5.percent(96)
                             });
+                            tooltip.label.setAll({
+                                direction: "rtl"
+                            })
+                            rec.slices.template.setAll({
+                                tooltipText: "[bold]{category}[/]\n{name}: {value}",
+                                tooltip: tooltip
+                            });
+                        }
+                        if (item.ks_show_data_value == true){
+                            rec.labels.template.setAll({
+                                text: item.ks_data_label_type == 'value'? "{value}":("{valuePercentTotal}%") ,
+                                inside: true,
+                                textType: data?.length>10? "radial" : "circular",
+                                centerX: am5.percent(80)
+                            })
+                        }
+                        else{
+                            rec.labels.template.setAll({forceHidden:true})
                         }
                         rec.data.setAll(data)
                          if(item.ks_hide_legend == true && series){
-                         legend.data.setAll(rec.dataItems);
+                            legend.data.setAll(rec.dataItems);
                          }
 
                         rec.appear(1000, 100);
@@ -806,10 +944,18 @@ export class Ksdashboardgraph extends Component{
 
                         series.set("stroke", root.interfaceColors.get("background"));
                         if (item.ks_show_records == true){
+                            var tooltip = am5.Tooltip.new(root, {
+                                textAlign: "center",
+                                centerX: am5.percent(96)
+                            });
+                            tooltip.label.setAll({
+                                direction: "rtl"
+                            })
                             series.columns.template.setAll({
                                 width: am5.p100,
                                 strokeOpacity: 0.1,
-                                tooltipText: "{name}: {valueY}"
+                                tooltipText: "{name}: {valueY}",
+                                tooltip: tooltip
                             });
                         }
                         series.columns.template.events.on("click",function(ev){
@@ -832,9 +978,18 @@ export class Ksdashboardgraph extends Component{
                              })
                             );
 
+                            var tooltip = am5.Tooltip.new(root, {
+                                textAlign: "center",
+                                centerX: am5.percent(96)
+                            });
+                            tooltip.label.setAll({
+                                direction: "rtl"
+                            })
+
                             series.columns.template.setAll({
-                            tooltipText: "{name}: {valueY}",
-                            width: am5.percent(100)
+                                tooltip: tooltip,
+                                tooltipText: "{name}: {valueY}",
+                                width: am5.percent(100)
                             });
                             series.columns.template.events.on("click",function(ev){
                                 if (item.ks_data_calculation_type === 'custom' && !self.ks_dashboard_data['ks_ai_dashboard']){
@@ -856,10 +1011,19 @@ export class Ksdashboardgraph extends Component{
                             }));
 
                             series.set("stroke",root.interfaceColors.get("background"));
+                            var tooltip = am5.Tooltip.new(root, {
+                                textAlign: "center",
+                                centerX: am5.percent(96)
+                            });
+                            tooltip.label.setAll({
+                                direction: "rtl"
+                            })
+
                             series.columns.template.setAll({
                                 width: am5.p100,
                                 strokeOpacity: 0.1,
-                                tooltipText: "{name}: {valueX}  {category}"
+                                tooltipText: "{name}: {valueX}  {category}",
+                                tooltip: tooltip
                             });
                             series.columns.template.events.on("click",function(ev){
                                 if (item.ks_data_calculation_type === 'custom' && !self.ks_dashboard_data['ks_ai_dashboard']){
@@ -871,18 +1035,23 @@ export class Ksdashboardgraph extends Component{
                         yAxis.data.setAll(data);
                    }else{
                         for (let k = 0;k<ks_data.length ; k++){
-                        var series = chart.series.push(am5radar.RadarLineSeries.new(root, {
-                            name:`${ks_data[k].label}`,
-                            xAxis: xAxis,
-                            yAxis: yAxis,
-                            valueYField: `${ks_data[k].label}`,
-                            categoryXField: "category",
-                            alignLabels: true,
-                            tooltip: am5.Tooltip.new(root, {
-                                 labelText: "{valueY}"
+                            var tooltip = am5.Tooltip.new(root, {
+                                textAlign: "center",
+                                centerX: am5.percent(96),
+                                labelText: "{valueY}"
+                            });
+                            tooltip.label.setAll({
+                                direction: "rtl"
                             })
-
-                        }));
+                            var series = chart.series.push(am5radar.RadarLineSeries.new(root, {
+                                name:`${ks_data[k].label}`,
+                                xAxis: xAxis,
+                                yAxis: yAxis,
+                                valueYField: `${ks_data[k].label}`,
+                                categoryXField: "category",
+                                alignLabels: true,
+                                tooltip: tooltip
+                            }));
 
                             series.strokes.template.setAll({
                             strokeWidth: 2,
@@ -924,6 +1093,15 @@ export class Ksdashboardgraph extends Component{
                     }));
                     yAxis.ghostLabel.set("forceHidden", true);
 
+                    var tooltip = am5.Tooltip.new(root, {
+                        textAlign: "center",
+                        centerX: am5.percent(96),
+                        labelText: "{name_1}:{valueX} {name}:{valueY}"
+                    });
+                    tooltip.label.setAll({
+                        direction: "rtl"
+                    })
+
                     for (let k = 0;k<ks_data.length ; k++){
                         var series = chart.series.push(am5xy.LineSeries.new(root, {
                             name:`${ks_data[k].label}`,
@@ -933,9 +1111,7 @@ export class Ksdashboardgraph extends Component{
                             yAxis: yAxis,
                             valueYField: `${ks_data[k].label}`,
                             valueXField: "category",
-                            tooltip: am5.Tooltip.new(root, {
-                                 labelText: "{name_1}:{valueX} {name}:{valueY}"
-                            })
+                            tooltip: tooltip
                         }));
 
                         series.bullets.push(function() {
@@ -972,6 +1148,7 @@ export class Ksdashboardgraph extends Component{
                           layout: root.horizontalLayout,
                           centerX: am5.percent(100),
                            x: am5.percent(100),
+
                     })
                 );
                   legend.labels.template.setAll({
@@ -980,8 +1157,8 @@ export class Ksdashboardgraph extends Component{
                 legend.itemContainers.template.setAll({
                       reverseChildren: true
                     });
-                }
-                else{
+            }
+                else {
                     root.rtl=true;
                     var legend = chart.children.push(
                     am5.Legend.new(root, {
@@ -994,33 +1171,34 @@ export class Ksdashboardgraph extends Component{
                 );
 
                 legend.labels.template.setAll({
-                  textAlign: "right"
+                  textAlign: "right",
+                  marginRight:5
                 });
                 legend.itemContainers.template.setAll({
                       reverseChildren: true
                     });
                 }
-                if(item.ks_hide_legend == true && series){
+                if(item.ks_hide_legend == true && series && chart_type !='ks_pie_chart' && chart_type != 'ks_doughnut_chart'){
                     legend.data.setAll(chart.series.values);
                 }
 
 
             if (item.ks_data_format && item.ks_data_format == 'global'){
                 root.numberFormatter.setAll({
-                    numberFormat: "#a",
+                    numberFormat: "#.0a",
                     bigNumberPrefixes: [{"number":1e+3,"suffix":"k"},{ "number": 1e+6, "suffix": "M" },
                     { "number": 1e+9, "suffix": "G" },{ "number": 1e+12, "suffix": "T" },
                     { "number": 1e+15, "suffix": "P" },{ "number": 1e+18, "suffix": "E" }]
                 });
             }else if (item.ks_data_format && item.ks_data_format == 'indian'){
                 root.numberFormatter.setAll({
-                    numberFormat: "#a",
+                    numberFormat: "#.0a",
                     bigNumberPrefixes: [{"number":1e+3,"suffix":"Th"},{"number":1e+5,"suffix":"Lakh"},
                     { "number": 1e+7, "suffix": "Cr" },{ "number": 1e+9, "suffix": "Arab" }],
                 });
             }else if (item.ks_data_format && item.ks_data_format == 'colombian'){
                 root.numberFormatter.setAll({
-                    numberFormat: "#a",
+                    numberFormat: "#.a",
                     bigNumberPrefixes: [{"number":1e+6,"suffix":"M"},{ "number": 1e+9, "suffix": "M" },{ "number": 1e+12, "suffix": "M" },
                     { "number": 1e+15, "suffix": "M" },{ "number": 1e+18, "suffix": "M" }]
                 });
@@ -1099,10 +1277,11 @@ export class Ksdashboardgraph extends Component{
                         })
                     );
                     series.data.setAll(data);
+                     series.appear(1000);
                     if(item.ks_show_data_value && item.ks_data_label_type=="value"){
-                        series.labels.template.set("text", "{category}: {value}");
+                        series.labels.template.set("text", "{value}");
                     }else if(item.ks_show_data_value && item.ks_data_label_type=="percent"){
-                        series.labels.template.set("text", "{category}: {valuePercentTotal.formatNumber('0.00')}%");
+                        series.labels.template.set("text", "{valuePercentTotal.formatNumber('0.00')}%");
                     }else{
                         series.ticks.template.set("forceHidden", true);
                         series.labels.template.set("forceHidden", true);
@@ -1177,6 +1356,7 @@ export class Ksdashboardgraph extends Component{
                         self.ks_dashboard_data.ks_item_data[item_id]['ks_dashboard_item_type'] = 'ks_list_view';
                         self.ks_dashboard_data.ks_item_data[item_id]['sequnce'] = result.sequence;
                         $(".ks_dashboard_main_content").find(".grid-stack-item[gs-id=" + item_id + "]").find(".ks_chart_heading").addClass("d-none")
+                        $(".ks_dashboard_main_content").find(".grid-stack-item[gs-id=" + item_id + "]").find(".ks_list_view_heading").addClass("d-none")
                         $($(".ks_dashboard_main_content").find(".grid-stack-item[gs-id=" + item_id + "]").children()[0]).find(".card-body").empty();
                         $($(".ks_dashboard_main_content").find(".grid-stack-item[gs-id=" + item_id + "]").children()[0]).find(chart_id_name).removeClass('d-none');
                         $($(".ks_dashboard_main_content").find(".grid-stack-item[gs-id=" + item_id + "]").children()[0]).find(".ks_search_plus").addClass('d-none')
@@ -1188,9 +1368,14 @@ export class Ksdashboardgraph extends Component{
                         $($(".ks_dashboard_main_content").find(".grid-stack-item[gs-id=" + item_id + "]").children()[0]).find(".ks_dashboard_item_action_export").addClass('d-none');
                         $($(".ks_dashboard_main_content").find(".grid-stack-item[gs-id=" + item_id + "]").children()[0]).find(".ks_dashboard_quick_edit_action_popup").removeClass('d-sm-block ');
 
-                        var item_data = self.ks_dashboard_data.ks_item_data[item_id]
-                        var $container = self.prepare_list(item_data);
-                        $(self.$el.find(".grid-stack-item[gs-id=" + item_id + "]").children()[0]).find(".card-body").append($container);
+                         var item_data = self.ks_dashboard_data.ks_item_data[item_id]
+                         var list_view_data = JSON.parse(item_data['ks_list_view_data'])
+
+                        var $container = renderToElement('ks_dashboard_ninja.ks_new_list_view_table',{
+                        list_view_data,item_id:self.item_id,self
+                        })
+                        $($(".ks_dashboard_main_content").find(".grid-stack-item[gs-id=" + item_id + "]").children()[0]).find(".card-body").append($container);
+
                     } else {
                         self.ks_dashboard_data.ks_item_data[item_id]['ks_chart_data'] = result.ks_chart_data;
                         self.ks_dashboard_data.ks_item_data[item_id]['sequnce'] = result.sequence;
@@ -1324,13 +1509,21 @@ export class Ksdashboardgraph extends Component{
                             self.ks_dashboard_data.ks_item_data[item_id]['domains'] = {}
                             self.ks_dashboard_data.ks_item_data[item_id]['domains'][result.sequence] = JSON.parse(result.ks_list_view_data).previous_domain;
                         }
+                        var chart_id_name = '#item'+'_' +'-1'
+                        var id_name = '#'+result.ks_action_name + '_' + (result.sequence-1)
                         self.ks_dashboard_data.ks_item_data[item_id]['isDrill'] = true;
                         self.ks_dashboard_data.ks_item_data[item_id]['sequnce'] = result.sequence;
                         self.ks_dashboard_data.ks_item_data[item_id]['ks_list_view_data'] = result.ks_list_view_data;
                         self.ks_dashboard_data.ks_item_data[item_id]['ks_list_view_type'] = result.ks_list_view_type;
                         self.ks_dashboard_data.ks_item_data[item_id]['ks_dashboard_item_type'] = 'ks_list_view';
 
+                        $(".ks_dashboard_main_content").find(".grid-stack-item[gs-id=" + item_id + "]").find(".ks_chart_heading").addClass("d-none")
+                        $($(".ks_dashboard_main_content").find(".grid-stack-item[gs-id=" + item_id + "]").children()[0]).find(chart_id_name).removeClass('d-none');
+
                         $($(".ks_dashboard_main_content").find(".grid-stack-item[gs-id=" + item_id + "]").children()[0]).find(".ks_dashboard_item_drill_up").removeClass('d-none');
+
+                        $($(".ks_dashboard_main_content").find(".grid-stack-item[gs-id=" + item_id + "]").children()[0]).find(chart_title).removeClass('d-none');
+                        $($(".ks_dashboard_main_content").find(".grid-stack-item[gs-id=" + item_id + "]").children()[0]).find(id_name).removeClass('d-none');
 
                         $($(".ks_dashboard_main_content").find(".grid-stack-item[gs-id=" + item_id + "]").children()[0]).find(".ks_dashboard_item_chart_info").addClass('d-none')
                         $($(".ks_dashboard_main_content").find(".grid-stack-item[gs-id=" + item_id + "]").children()[0]).find(".ks_dashboard_color_option").addClass('d-none')
@@ -1338,10 +1531,17 @@ export class Ksdashboardgraph extends Component{
                         $($(".ks_dashboard_main_content").find(".grid-stack-item[gs-id=" + item_id + "]").children()[0]).find(".ks_dashboard_quick_edit_action_popup").removeClass('d-sm-block ');
 
                         $($(".ks_dashboard_main_content").find(".grid-stack-item[gs-id=" + item_id + "]").children()[0]).find(".ks_dashboard_more_action").addClass('d-none');
+                        $($(".ks_dashboard_main_content").find(".grid-stack-item[gs-id=" + item_id + "]").children()[0]).find(".card-body").addClass('table-responsive');
                         var item_data = self.ks_dashboard_data.ks_item_data[item_id]
                         self.item = item_data
                         self.prepare_list();
-                        $($(".ks_dashboard_main_content").find(".grid-stack-item[gs-id=" + item_id + "]").children()[0]).find(".card-body").append($container).addClass('ks_overflow');
+                        var list_view_data = JSON.parse(item_data['ks_list_view_data'])
+
+                        var $container = renderToElement('ks_dashboard_ninja.ks_new_list_view_table',{
+                        list_view_data,item_id:self.item_id,self
+                        })
+
+                        $($(".ks_dashboard_main_content").find(".grid-stack-item[gs-id=" + item_id + "]").children()[0]).find(".card-body").append($container);
                     }
                 });
             } else {
@@ -1447,6 +1647,11 @@ export class Ksdashboardgraph extends Component{
                             $($(".ks_dashboard_main_content").find(".grid-stack-item[gs-id=" + item_id + "]").children()[0]).find(".ks_pager").addClass('d-none');
                             $($(".ks_dashboard_main_content").find(".grid-stack-item[gs-id=" + item_id + "]").children()[0]).find(".ks_dashboard_item_chart_info").addClass('d-none')
                             $($(".ks_dashboard_main_content").find(".grid-stack-item[gs-id=" + item_id + "]").children()[0]).find(".ks_dashboard_color_option").addClass('d-none')
+                            var list_view_data = JSON.parse(item_data['ks_list_view_data'])
+
+                            var $container = renderToElement('ks_dashboard_ninja.ks_new_list_view_table',{
+                            list_view_data,item_id:self.item_id,self
+                            })
                             $($(".ks_dashboard_main_content").find(".grid-stack-item[gs-id=" + item_id + "]").children()[0]).find(".card-body").append($container);
                         }
 
@@ -1547,11 +1752,11 @@ export class Ksdashboardgraph extends Component{
     async ksrendermapview($ks_map_view_tmpl,item){
         console.log("render")
         var self =this;
-        if($ks_map_view_tmpl.find('.ks_map_card_body').length){
-            var mapRender = $ks_map_view_tmpl.find('.ks_map_card_body');
+        if($ks_map_view_tmpl.find('.ks_chart_card_body').length){
+            var mapRender = $ks_map_view_tmpl.find('.ks_chart_card_body');
         }else{
-            $($ks_map_view_tmpl.find('.ks_dashboarditem_chart_container')[0]).append("<div class='card-body ks_map_card_body'>");
-            var mapRender = $ks_map_view_tmpl.find('.ks_map_card_body');
+            $($ks_map_view_tmpl.find('.ks_dashboarditem_chart_container')[0]).append("<div class='card-body ks_chart_card_body'>");
+            var mapRender = $ks_map_view_tmpl.find('.ks_chart_card_body');
         }
         var map_data = JSON.parse(item.ks_chart_data);
         var ks_data=[];
@@ -1810,10 +2015,10 @@ export class Ksdashboardgraph extends Component{
 //               $ks_map_view_tmpl.find('.ks_li_' + item.ks_flower_item_color).addClass('ks_date_filter_selected');
 
         }else{
-            $ks_map_view_tmpl.find('.ks_map_card_body').append($("<div class='map_text'>").text("No Data Available."))
+            $ks_map_view_tmpl.find('.ks_chart_card_body').append($("<div class='map_text'>").text("No Data Available."))
         }
         }else{
-            $ks_map_view_tmpl.find('.ks_map_card_body').append($("<div class='map_text'>").text("No Data Available."))
+            $ks_map_view_tmpl.find('.ks_chart_card_body').append($("<div class='map_text'>").text("No Data Available."))
         }
 //       }else{
 //        $ks_map_view_tmpl.find('.ks_map_card_body').append($("<div class='map_text'>").text("Please select Groupby that has Address."))}
@@ -1962,6 +2167,8 @@ export class Ksdashboardgraph extends Component{
             self.actionService.doAction(action)
         }
 
+
+
 };
 
 Ksdashboardgraph.props = {
@@ -1969,7 +2176,8 @@ Ksdashboardgraph.props = {
     dashboard_data: { type: Object, Optional:true},
     ksdatefilter : {type: String ,Optional:true},
     pre_defined_filter :{type:Object, Optional:true},
-    custom_filter :{type:Object, Optional:true}
+    custom_filter :{type:Object, Optional:true},
+    ks_speak:{type:Function , Optional:true},
 
 };
 
