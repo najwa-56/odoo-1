@@ -8,7 +8,7 @@ class PurchaseOrderLine(models.Model):
     _inherit = 'purchase.order.line'
 
     selected_uom_ids = fields.Many2many(string="UOM Ids", related='product_id.selected_uom_ids')
-    purchase_multi_uom_id = fields.Many2one("product.multi.uom.price", string="Custom UOM",
+    purchase_multi_uom_id = fields.Many2one("product.multi.uom.price", string="الوحدة",
                                             domain="[('id', 'in', selected_uom_ids)]")
     purchase_multi_uom_cost = fields.Float(string="UOM Cost", related='purchase_multi_uom_id.cost')
 

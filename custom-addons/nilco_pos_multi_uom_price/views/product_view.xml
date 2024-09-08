@@ -17,7 +17,6 @@
                                 <field name="name_field"/>
                                  <field name="uom_id"/>
                                 <field name="price"/>
-                                <field name="qty"/>
                                   <field name="cost"/>
                             </tree>
                         </field>                                

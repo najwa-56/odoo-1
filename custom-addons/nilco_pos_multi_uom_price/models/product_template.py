@@ -33,7 +33,7 @@ class SaleOrderLine(models.Model):
     selected_uom_ids = fields.Many2many(string="Uom Ids", related='product_id.selected_uom_ids')
 
     sales_multi_uom_id = fields.Many2one("product.multi.uom.price", string="Cust UOM", domain="[('id', 'in', selected_uom_ids)]")
-    name_field = fields.Char(string="Name Field", compute="_compute_name_field", store=True)
+    name_field = fields.Char(string="أسم الوحدة", compute="_compute_name_field", store=True)
 
     @api.depends('sales_multi_uom_id')
     def _compute_name_field(self):
@@ -163,8 +163,8 @@ class AccountInvoiceLine(models.Model):
 
     sales_multi_uom_id = fields.Many2one("product.multi.uom.price", string="Cust UOM",
                                          domain="[('id', 'in', selected_uom_ids)]")
-    name_field = fields.Char(string="Name Field", compute="_compute_name_field", store=True)
-    product_uom_id = fields.Many2one('uom.uom', string='Product UoM', related='')
+    name_field = fields.Char(string="أسم الوحدة", compute="_compute_name_field", store=True)
+    product_uom_id = fields.Many2one('uom.uom', string='الوحدة', related='')
 
 
     @api.depends('sales_multi_uom_id')
