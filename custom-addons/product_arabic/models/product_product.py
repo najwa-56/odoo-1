@@ -26,7 +26,7 @@ class ProductTemplate(models.Model):
     """Adding the field Arabic name in Products"""
     _inherit = 'product.template'
 
-    product_arabic = fields.Char(string='Arabic name', default="",
+    product_arabic = fields.Char(string='الاسم اللاتيني', default="",
                                  help='Here you can set the Arabic name of the'
                                       'Product')
 
@@ -34,9 +34,9 @@ class ProductTemplate(models.Model):
 class AccountMoveLine(models.Model):
     _inherit = 'account.move.line'
 
-    product_arabic = fields.Char(related='product_id.product_tmpl_id.product_arabic', string='Arabic Name', store=True, readonly=True)
+    product_arabic = fields.Char(related='product_id.product_tmpl_id.product_arabic', string='الاسم اللاتيني', store=True, readonly=True)
 
 class SaleOrderLine(models.Model):
     _inherit = 'sale.order.line'
 
-    product_arabic = fields.Char(related='product_id.product_tmpl_id.product_arabic', string='Arabic Name', store=True, readonly=True)
+    product_arabic = fields.Char(related='product_id.product_tmpl_id.product_arabic', string='الاسم اللاتيني', store=True, readonly=True)

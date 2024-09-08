@@ -7,7 +7,7 @@ _logger = logging.getLogger(__name__)
 class ProductTemplate(models.Model):
     _inherit = 'product.template'
     
-    multi_uom_price_id = fields.One2many('product.multi.uom.price', 'product_id', string="UOM Price")
+    multi_uom_price_id = fields.One2many('product.multi.uom.price', 'product_id', string="الوحدات المتعددة")
     category_id = fields.Many2one(related='uom_id.category_id')
 
     #we add this field wich give me all idss for multi uom record in product
