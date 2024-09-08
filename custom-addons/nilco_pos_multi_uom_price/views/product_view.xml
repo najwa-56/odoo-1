@@ -9,7 +9,7 @@
                 <group>
                  <field name="category_id" invisible="1" column_invisible="1"/>
             </group>
-                    <group name="uom_price" string="UOM Price"  >
+                    <group name="uom_price" string="الوحدات المتعددة"  >
 			    <field name="multi_uom_price_id" nolabel="1" colspan="2">
                             <tree editable="bottom">
                                 <field name="category_id" invisible="1" column_invisible="1"/>
