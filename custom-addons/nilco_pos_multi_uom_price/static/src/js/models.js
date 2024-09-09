@@ -80,7 +80,7 @@ patch(Orderline.prototype, {
     init_from_JSON(json) {
     super.init_from_JSON(...arguments);
     this.name_field = json.name_field || "";  // Add this line
-    this.sales_multi_uom_id = json.sales_multi_uom_id || "";  // Add this line
+    //this.sales_multi_uom_id = json.sales_multi_uom_id || "";  // Add this line
 
     console.log('init_from_JSON:', json);
 
