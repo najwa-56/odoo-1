@@ -564,7 +564,7 @@
                              style="page-break-inside: avoid !important;
                              page-break-after: avoid !important;
                              page-break-before: auto !important;">
-                            <img id="phase2qrcode" alt="Barcode" t-att-src="doc.get_qrcode()" style="width: 300px;"/>
+                            <img id="phase2qrcode" alt="Barcode" t-att-src="doc.get_qrcode()" style="width: 150px;"/>
                         </div>
                         <div class="pos-receipt page_block">
                             <span style="text-align:center">Thank You</span>
