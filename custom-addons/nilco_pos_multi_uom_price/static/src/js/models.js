@@ -24,40 +24,40 @@ patch(Order.prototype, {
 
         }
     },
-      set_pricelist(pricelist) {
+    //  set_pricelist(pricelist) {
 
-        var self = this;
-        this.pricelist = pricelist;
+    //    var self = this;
+    //    this.pricelist = pricelist;
 
-        const orderlines = this.get_orderlines();
+      //  const orderlines = this.get_orderlines();
 
-        const lines_to_recompute = orderlines.filter(
-            (line) =>
-                line.price_type === "original" && !(line.comboLines?.length || line.comboParent)
-        );
-        const combo_parent_lines = orderlines.filter(
-            (line) => line.price_type === "original" && line.comboLines?.length
-        );
-        const attributes_prices = {};
-        combo_parent_lines.forEach((parentLine) => {
-            attributes_prices[parentLine.id] = this.compute_child_lines(
-                parentLine.product,
-                parentLine.comboLines.map((childLine) => {
-                    const comboLineCopy = { ...childLine.comboLine };
-                    if (childLine.attribute_value_ids) {
-                        comboLineCopy.configuration = {
-                            attribute_value_ids: childLine.attribute_value_ids,
-                        };
-                    }
-                    return comboLineCopy;
-                }),
-                pricelist
-            );
-        });
-        const combo_children_lines = orderlines.filter(
-            (line) => line.price_type === "original" && line.comboParent
-        );
-    },
+     //   const lines_to_recompute = orderlines.filter(
+     //       (line) =>
+      //          line.price_type === "original" && !(line.comboLines?.length || line.comboParent)
+      //  );
+      //  const combo_parent_lines = orderlines.filter(
+         //   (line) => line.price_type === "original" && line.comboLines?.length
+     //   );
+     //   const attributes_prices = {};
+      //  combo_parent_lines.forEach((parentLine) => {
+         //   attributes_prices[parentLine.id] = this.compute_child_lines(
+            //    parentLine.product,
+              //  parentLine.comboLines.map((childLine) => {
+               //     const comboLineCopy = { ...childLine.comboLine };
+         //           if (childLine.attribute_value_ids) {
+         //               comboLineCopy.configuration = {
+          //                  attribute_value_ids: childLine.attribute_value_ids,
+         //               };
+          //          }
+         //           return comboLineCopy;
+         //       }),
+         //       pricelist
+      //      );
+     //   });
+      //  const combo_children_lines = orderlines.filter(
+      //      (line) => line.price_type === "original" && line.comboParent
+      //  );
+   // },
 });
 patch(Orderline.prototype, {
     setup(_defaultObj, options) {
@@ -80,7 +80,6 @@ patch(Orderline.prototype, {
     init_from_JSON(json) {
     super.init_from_JSON(...arguments);
     this.name_field = json.name_field || "";  // Add this line
-    this.sales_multi_uom_id = json.sales_multi_uom_id || "";  // Add this line
 
     console.log('init_from_JSON:', json);
 
@@ -153,18 +152,6 @@ patch(Orderline.prototype, {
         this.order.assert_editable();
         var quant =typeof quantity === "number" ? quantity : oParseFloat("" + (quantity ? quantity : 0));
 
-
- //if (quant === 0 && zero1==true) {
-  //      if (!this.comboParent) {
-   //         this.env.services.popup.add(ErrorPopup, {
-    //            title: _t("Quantity cannot be zero"),
-    //            body: _t("Setting the quantity to zero is not allowed. Please enter a valid quantity."),
-     //       });
-     //   }
-    //    return false;
-  //  }
-        // Handle refund logic
-
         if (this.refunded_orderline_id in this.pos.toRefundLines) {
             const toRefundDetail = this.pos.toRefundLines[this.refunded_orderline_id];
             const maxQtyToRefund =
@@ -223,27 +210,11 @@ patch(Orderline.prototype, {
     }
 
 });
-//var zero1=false;
 patch(PosStore.prototype, {
     async _processData(loadedData) {
         await super._processData(...arguments);
             this.product_uom_price = loadedData['product.multi.uom.price'];
-   // await this.user_groups1();
     },
-   // async user_groups1(){
-    // console.log('user_groups method is being called');
-    //  try {
-         //   const output = await this.orm.call(
-          //      "pos.session",
-          //      "pos_active_user_group2",
-          //      [ , this.user]
-         //   );
 
-         //   zero1 = output.zero1;
-        //    console.log('Value of zero1:', zero1);
-      //  } catch (error) {
-        //    console.error('Error in user_groups method:', error);
-     //   }
-   // }
 });
 
