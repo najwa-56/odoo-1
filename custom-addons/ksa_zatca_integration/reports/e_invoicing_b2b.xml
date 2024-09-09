@@ -151,7 +151,7 @@
                                             </td>
                                         </tr>
                                     </t>
-                                    <t t-elif="doc.invoice_origin">
+                                  <!--  <t t-elif="doc.invoice_origin">
                                         <tr>
                                             <td class="second_table left_column">
                                                 <span>
@@ -195,7 +195,7 @@
                                         <td class="second_table" style="text-align:right;">
                                             <span class="lable_bold">ﺗﺎرﻳﺦ اﻟﺘﻮرﻳﺪ</span>
                                         </td>
-                                    </tr>
+                                    </tr>-->
                                     <tr t-if="doc.get_bt_120() not in [0, False, '', None] and len(doc.get_bt_120()) > 0">
                                         <td class="second_table left_column">
                                             <span>
@@ -272,7 +272,7 @@
                                     <span class="lable_bold">الاسم</span>
                                 </td>
                             </tr>
-                            <tr>
+                            <!--<tr>
                                 <td class="second_table left_column">
                                     <span>
                                         <b>Street Name</b>
@@ -300,8 +300,42 @@
                                     <span class="lable_bold">اسم الشارع</span>
                                 </td>
 
-                            </tr>
+                            </tr>-->
                             <tr>
+    <td class="second_table left_column">
+        <span>
+            <b>Address</b>
+        </span>
+    </td>
+    <td class="second_table">
+        <span>
+            <!-- Combine all address components for the Company -->
+            <t t-esc="conf_company['street']['value'] + ' - ' + _company_id.building_no + ' - ' + conf_company['district']['value'] + ' - ' + conf_company['country_id_name']['value'] + ' - ' + conf_company['city']['value'] + ' - ' + _company_id.zip"/>
+        </span>
+    </td>
+    <td class="second_table" style="text-align:right;">
+        <span class="lable_bold">العنوان</span>
+    </td>
+    <t t-if="conf_partner['street']['value'] and partner_id.building_no and conf_partner['district']['value'] and conf_partner['country_id_name']['value'] and conf_partner['city']['value'] and partner_id.zip">
+        <td class="second_table left_column">
+            <span>
+                <b>Address</b>
+            </span>
+        </td>
+        <td class="second_table">
+            <span>
+                <!-- Combine all address components for the Partner -->
+                <t t-esc="conf_partner['street']['value'] + ' - ' + partner_id.building_no + ' - ' + conf_partner['district']['value'] + ' - ' + conf_partner['country_id_name']['value'] + ' - ' + conf_partner['city']['value'] + ' - ' + partner_id.zip"/>
+            </span>
+        </td>
+        <td class="second_table" style="text-align:right;">
+            <span class="lable_bold">العنوان</span>
+        </td>
+    </t>
+</tr>
+
+
+                          <!--  <tr>
                                 <t t-if="conf_company['street2']['value']">
                                     <td class="second_table left_column">
                                         <span>
@@ -545,7 +579,7 @@
                                 <td class="second_table" style="text-align:right;">
                                     <span class="lable_bold">البلد</span>
                                 </td>
-                            </tr>
+                            </tr>-->
                             <tr>
                                 <td class="second_table left_column">
                                     <span>
@@ -574,7 +608,7 @@
                                     <span class="lable_bold">رقم تسجيل ضريبة القيمة المضافة</span>
                                 </td>
                             </tr>
-                            <tr>
+                           <!-- <tr>
                                 <td class="second_table left_column">
                                     <span>
                                         <b>Other Seller Type</b>
@@ -645,7 +679,7 @@
                                         <span class="lable_bold">معرف آخر</span>
                                     </td>
                                 </t>
-                            </tr>
+                            </tr>-->
                         </table>
 
                         <t t-if="not doc._is_downpayment()"
@@ -913,7 +947,7 @@
                                                   t-options='{"widget": "monetary", "display_currency": doc.currency_id}'/>
                                         </td>
                                     </tr>
-                                    <tr>
+                                   <!-- <tr>
                                         <td class="second_table left_column">
                                             <span class="lable_bold">Amount Due</span>
                                         </td>
@@ -924,7 +958,7 @@
                                             <span t-esc="doc.get_bt_115()"
                                                   t-options='{"widget": "monetary", "display_currency": doc.currency_id}'/>
                                         </td>
-                                    </tr>
+                                    </tr>-->
                                 </table>
                             </div>
                         </div>
