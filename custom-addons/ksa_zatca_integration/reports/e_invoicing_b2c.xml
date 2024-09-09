@@ -115,7 +115,7 @@
                             ]]>
                         </style>
                         <div class="pos-receipt page_block"
-                             style="text-align: left;padding-bottom: 0px;display: inline-block;overflow: hidden;">
+                             style="text-align: center;padding-bottom: 0px;display: inline-block;overflow: hidden;">
                             <t t-if="doc.company_id.parent_root_id.logo">
                                 <img t-attf-src="data:image/*;base64,{{doc.company_id.parent_root_id.logo}}"
                                      style="max-height:500px; max-width:50%;display: block;margin: 0 auto;"
