@@ -32,7 +32,7 @@ patch(ProductScreen.prototype, {
                         await retryBarcodeAction(code); // Retry the barcode action
                     },
                 });
-            }
+            }}
         const options = await product.getAddProductOptions(code);
         if (!options) {
             return;
