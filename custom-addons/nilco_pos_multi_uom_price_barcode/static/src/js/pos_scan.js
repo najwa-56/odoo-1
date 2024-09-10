@@ -22,12 +22,19 @@ patch(ProductScreen.prototype, {
             return;
         }
           if (!product) {
-            // Show popup and block further scanning
             console.log('Showing error popup.');
             this.popupIsVisible = true;
-            await this.showPopup('ErrorBarcodePopup', { code: code.base_code });
-            console.log('Popup closed.');
-            this.popupIsVisible = false; // Reset flag when popup is closed
+
+            // Show popup and use a callback to handle when it's closed
+            this.showPopup('ErrorBarcodePopup', { code: code.base_code })
+                .then(() => {
+                    console.log('Popup closed.');
+                    this.popupIsVisible = false; // Reset flag when popup is closed
+                })
+                .catch(() => {
+                    console.log('Popup was not closed properly.');
+                    this.popupIsVisible = false; // Ensure flag is reset even if there's an error
+                });
             return;
         }
 
