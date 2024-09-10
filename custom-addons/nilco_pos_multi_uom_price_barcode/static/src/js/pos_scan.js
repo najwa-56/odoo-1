@@ -10,6 +10,8 @@ import { ErrorBarcodePopup } from "@point_of_sale/app/barcode/error_popup/barcod
 patch(ProductScreen.prototype, {
     async _barcodeProductAction(code) {
     if (this.popupIsVisible) {
+                console.log('Popup is visible. Scanning is blocked.');
+
             // Block scanning if popup is visible
             return;
         }
@@ -19,10 +21,12 @@ patch(ProductScreen.prototype, {
         if (product === true) {
             return;
         }
-         if (!product) {
+          if (!product) {
             // Show popup and block further scanning
+            console.log('Showing error popup.');
             this.popupIsVisible = true;
             await this.showPopup('ErrorBarcodePopup', { code: code.base_code });
+            console.log('Popup closed.');
             this.popupIsVisible = false; // Reset flag when popup is closed
             return;
         }
