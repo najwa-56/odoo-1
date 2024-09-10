@@ -9,29 +9,13 @@ import { ErrorBarcodePopup } from "@point_of_sale/app/barcode/error_popup/barcod
 
 patch(ProductScreen.prototype, {
     async _barcodeProductAction(code) {
-    if (this.popupIsVisible) {
-                console.log('Popup is visible. Scanning is blocked.');
-
-            // Block scanning if popup is visible
-            return;
-        }
-                this.popupIsVisible = false; // Ensure popup visibility is tracked
-
-          const product = await this._getProductByBarcode(code);
+    
+        const product = await this._getProductByBarcode(code);
         if (product === true) {
             return;
         }
-         if (!product) {
-            console.log('Showing error popup.');
-            this.popupIsVisible = true;
-
-            // Show popup with callback to handle popup closure
-            this.showPopup('ErrorBarcodePopup', { code: code.base_code });
-            this.onPopupClosed = () => {
-                console.log('Popup closed.');
-                this.popupIsVisible = false; // Reset flag when popup is closed
-            };
-            return;
+        if (!product) {
+            return this.showPopup('ErrorBarcodePopup', { code: code.base_code });
         }
 
         const options = await product.getAddProductOptions(code);
@@ -57,13 +41,10 @@ patch(ProductScreen.prototype, {
                 merge: false,
             });
         }
-      onPopupClosed() {
-        // This function can be called from the popup's close handler
-    }
+
         this.currentOrder.add_product(product, options);
         this.numberBuffer.reset();
     }
-
 });
 
 patch(PosStore.prototype, {
