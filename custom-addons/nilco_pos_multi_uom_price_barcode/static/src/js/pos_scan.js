@@ -21,20 +21,16 @@ patch(ProductScreen.prototype, {
         if (product === true) {
             return;
         }
-          if (!product) {
+         if (!product) {
             console.log('Showing error popup.');
             this.popupIsVisible = true;
 
-            // Show popup and use a callback to handle when it's closed
-            this.showPopup('ErrorBarcodePopup', { code: code.base_code })
-                .then(() => {
-                    console.log('Popup closed.');
-                    this.popupIsVisible = false; // Reset flag when popup is closed
-                })
-                .catch(() => {
-                    console.log('Popup was not closed properly.');
-                    this.popupIsVisible = false; // Ensure flag is reset even if there's an error
-                });
+            // Show popup with callback to handle popup closure
+            this.showPopup('ErrorBarcodePopup', { code: code.base_code });
+            this.onPopupClosed = () => {
+                console.log('Popup closed.');
+                this.popupIsVisible = false; // Reset flag when popup is closed
+            };
             return;
         }
 
@@ -64,6 +60,9 @@ patch(ProductScreen.prototype, {
 
         this.currentOrder.add_product(product, options);
         this.numberBuffer.reset();
+    }
+    onPopupClosed() {
+        // This function can be called from the popup's close handler
     }
 });
 
