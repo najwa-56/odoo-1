@@ -1,0 +1,8 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_pos_cache,pos.cache,model_pos_cache,,1,1,1,1
+access_pos_product_cache,pos.product.cache,model_pos_product_cache,,1,1,1,1
+access_pos_data_partner_cache,pos.data.partner.cache,model_pos_data_partner_cache,,1,1,1,1
+access_pos_partner_cache,pos.partner.cache,model_pos_partner_cache,,1,1,1,1
+
+
+
