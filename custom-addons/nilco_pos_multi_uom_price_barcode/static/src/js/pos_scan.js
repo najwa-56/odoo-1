@@ -8,8 +8,8 @@ import { ProductScreen } from "@point_of_sale/app/screens/product_screen/product
 import { ErrorBarcodePopup } from "@point_of_sale/app/barcode/error_popup/barcode_error_popup";
 
 patch(ProductScreen.prototype, {
-setup() {
-        this._super(...arguments);
+ setup() {
+        super.setup();  // Correct usage of super instead of this._super()
         this.isErrorActive = false; // Initialize the error flag
     },
     async _barcodeProductAction(code) {
