@@ -7,14 +7,25 @@ import { Order, Orderline, Payment } from "@point_of_sale/app/store/models";
 import { ProductScreen } from "@point_of_sale/app/screens/product_screen/product_screen";
 import { ErrorBarcodePopup } from "@point_of_sale/app/barcode/error_popup/barcode_error_popup";
 
+// Flag to track if error popup is active
+let errorPopupActive = false;
 patch(ProductScreen.prototype, {
     async _barcodeProductAction(code) {
+     if (errorPopupActive) {
+            return;
+        }
         const product = await this._getProductByBarcode(code);
         if (product === true) {
             return;
         }
-        if (!product) {
-            return this.popup.add(ErrorBarcodePopup, { code: code.base_code });
+         if (!product) {
+            // Show error popup and set the flag to true
+            errorPopupActive = true;
+            this.popup.add(ErrorBarcodePopup, { code: code.base_code }).then(() => {
+                // Reset the flag once the popup is closed/confirmed
+                errorPopupActive = false;
+            });
+            return;
         }
 
         const options = await product.getAddProductOptions(code);
