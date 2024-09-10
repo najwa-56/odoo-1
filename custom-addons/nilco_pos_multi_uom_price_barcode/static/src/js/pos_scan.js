@@ -8,11 +8,9 @@ import { ProductScreen } from "@point_of_sale/app/screens/product_screen/product
 import { ErrorBarcodePopup } from "@point_of_sale/app/barcode/error_popup/barcode_error_popup";
 
 patch(ProductScreen.prototype, {
- 
+
     async _barcodeProductAction(code) {
-       if (this.isPopupActive) {
-            return; // Do nothing if a popup is active
-        }
+
         const product = await this._getProductByBarcode(code);
         if (product === true) {
             return;
@@ -47,7 +45,7 @@ patch(ProductScreen.prototype, {
 
         this.currentOrder.add_product(product, options);
         this.numberBuffer.reset();
-    }
+    },
 });
 
 patch(PosStore.prototype, {
