@@ -7,32 +7,21 @@ import { Order, Orderline, Payment } from "@point_of_sale/app/store/models";
 import { ProductScreen } from "@point_of_sale/app/screens/product_screen/product_screen";
 import { ErrorBarcodePopup } from "@point_of_sale/app/barcode/error_popup/barcode_error_popup";
 
-// Flag to track if error popup is active
-let errorPopupActive = false;
 patch(ProductScreen.prototype, {
     async _barcodeProductAction(code) {
-     if (errorPopupActive) {
-            return;
-        }
+
         const product = await this._getProductByBarcode(code);
         if (product === true) {
             return;
         }
          if (!product) {
-            // Show error popup and set the flag to true
-            errorPopupActive = true;
-            this.popup.add(ErrorBarcodePopup, { code: code.base_code }).then(() => {
-                // Reset the flag once the popup is closed/confirmed
-                errorPopupActive = false;
-            });
+            await this._showErrorBarcodePopup(code.base_code);
             return;
         }
-
         const options = await product.getAddProductOptions(code);
         if (!options) {
             return;
         }
-
         if (code.type === "price") {
             Object.assign(options, {
                 price: code.value,
@@ -54,7 +43,16 @@ patch(ProductScreen.prototype, {
 
         this.currentOrder.add_product(product, options);
         this.numberBuffer.reset();
-    }
+    },
+    async _showErrorBarcodePopup(base_code) {
+        // Create a promise that resolves when the user confirms the popup
+        return new Promise((resolve) => {
+            this.popup.add(ErrorBarcodePopup, {
+                code: base_code,
+                confirm: () => resolve(true),  // Resolve the promise when "OK" is clicked
+            });
+        });
+    },
 });
 
 patch(PosStore.prototype, {
