@@ -8,27 +8,13 @@ import { ProductScreen } from "@point_of_sale/app/screens/product_screen/product
 import { ErrorBarcodePopup } from "@point_of_sale/app/barcode/error_popup/barcode_error_popup";
 
 patch(ProductScreen.prototype, {
-    _barcodeScanBlocked: false,
-
     async _barcodeProductAction(code) {
-
-     // Check if barcode scanning is currently blocked
-        if (this._barcodeScanBlocked) {
-            return; // Do not proceed with barcode action if blocked
-        }
-
-
         const product = await this._getProductByBarcode(code);
         if (product === true) {
             return;
         }
         if (!product) {
-         // Set the blocking flag before showing the popup
-            this._barcodeScanBlocked = true;
-
-            await this.popup.add(ErrorBarcodePopup, { code: code.base_code });
-             this._barcodeScanBlocked = false;
-              return;
+            return this.popup.add(ErrorBarcodePopup, { code: code.base_code });
         }
 
         const options = await product.getAddProductOptions(code);
