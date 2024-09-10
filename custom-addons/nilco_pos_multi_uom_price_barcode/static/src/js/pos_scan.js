@@ -19,12 +19,12 @@ patch(ProductScreen.prototype, {
         if (product === true) {
             return;
         }
-        if (!product) {
+         if (!product) {
             // Show popup and block further scanning
             this.popupIsVisible = true;
-            return this.showPopup('ErrorBarcodePopup', { code: code.base_code }).then(() => {
-                this.popupIsVisible = false; // Reset flag when popup is closed
-            });
+            await this.showPopup('ErrorBarcodePopup', { code: code.base_code });
+            this.popupIsVisible = false; // Reset flag when popup is closed
+            return;
         }
 
         const options = await product.getAddProductOptions(code);
