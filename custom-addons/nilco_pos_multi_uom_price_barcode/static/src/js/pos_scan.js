@@ -57,6 +57,7 @@ patch(PosStore.prototype, {
     async _processData(loadedData) {
         await super._processData(...arguments);
         this.db.product_multi_barcodes = this.product_uom_price;
+         this.popupActive = false;
     }
 });
 
