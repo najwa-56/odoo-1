@@ -16,30 +16,19 @@ patch(ProductScreen.prototype, {
     if (this.isErrorActive) {
             return;
         }
-         // Function to handle the barcode processing logic, with retry on error
-        const processBarcode = async (code) => {
-            try {
-                // Fetch the product using barcode
-                const product = await this._getProductByBarcode(code);
-
-                // Check if product retrieval was successful
-                if (!product) {
-                    this.isErrorActive = true;  // Block further scans
-                    // Show the error popup and wait for user confirmation
-                    await this.showPopup('ErrorBarcodePopup', {
-                        code: code.base_code,
-                        confirm: async () => {
-                            this.isErrorActive = false; // Reset flag after pressing OK
-                            await processBarcode(code); // Retry the barcode action
-                        },
-                    });
-                    return; // Exit to wait for user action
-                }
-
-                if (product === true) {
-                    // Product found and processed correctly
-                    return;
-                }}}
+        const product = await this._getProductByBarcode(code);
+        if (product === true) {
+            return;
+        }
+        if (!product) {
+           this.isErrorActive = true;
+            return this.showPopup('ErrorBarcodePopup', {
+                code: code.base_code,
+                confirm: () => {
+                    this.isErrorActive = false; // Reset the flag when OK is pressed
+                },
+            });
+        }
         const options = await product.getAddProductOptions(code);
         if (!options) {
             return;
