@@ -8,29 +8,27 @@ import { ProductScreen } from "@point_of_sale/app/screens/product_screen/product
 import { ErrorBarcodePopup } from "@point_of_sale/app/barcode/error_popup/barcode_error_popup";
 
 patch(ProductScreen.prototype, {
+    _init() {
+        this._super(...arguments);
+        this.isPopupActive = false;
+    },
+
+    async showPopup(popup, options) {
+        this.isPopupActive = true;
+        await this._super(popup, options);
+        this.isPopupActive = false;
+    }
 
     async _barcodeProductAction(code) {
-     console.log("Popup active state before action:", this.popupActive);
-
-        if (this.popupActive) {
-            console.log("Action blocked due to active popup");
-            return; // If popup is active, skip processing
+      if (this.isPopupActive) {
+            return; // Do nothing if a popup is active
         }
-
         const product = await this._getProductByBarcode(code);
         if (product === true) {
             return;
         }
-       if (!product) {
-            this.popupActive = true;
-            console.log("Showing popup, setting popupActive to true");
-            return this.showPopup('ErrorBarcodePopup', { code: code.base_code }).then(() => {
-                this.popupActive = false;
-                console.log("Popup closed, setting popupActive to false");
-            }).catch(() => {
-                this.popupActive = false;
-                console.log("Popup error, setting popupActive to false");
-            });
+        if (!product) {
+            return this.showPopup('ErrorBarcodePopup', { code: code.base_code });
         }
 
         const options = await product.getAddProductOptions(code);
@@ -66,7 +64,6 @@ patch(PosStore.prototype, {
     async _processData(loadedData) {
         await super._processData(...arguments);
         this.db.product_multi_barcodes = this.product_uom_price;
-         this.popupActive = false;
     }
 });
 
