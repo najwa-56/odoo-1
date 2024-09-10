@@ -16,7 +16,7 @@ patch(ProductScreen.prototype, {
             return;
         }
         if (!product) {
-            return this.showPopup('ErrorBarcodePopup', { code: code.base_code });
+            return this.popup.add('ErrorBarcodePopup', { code: code.base_code });
         }
 
         const options = await product.getAddProductOptions(code);
