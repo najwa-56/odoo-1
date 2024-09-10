@@ -8,11 +8,7 @@ import { ProductScreen } from "@point_of_sale/app/screens/product_screen/product
 import { ErrorBarcodePopup } from "@point_of_sale/app/barcode/error_popup/barcode_error_popup";
 
 patch(ProductScreen.prototype, {
- setup() {
-        await super.setup();
-        
-        this.popupActive = false; // Add this line to initialize the popup flag
-    },
+
     async _barcodeProductAction(code) {
      if (this.popupActive) {
             return; // If popup is active, skip processing
