@@ -10,17 +10,26 @@ import { ErrorBarcodePopup } from "@point_of_sale/app/barcode/error_popup/barcod
 patch(ProductScreen.prototype, {
 
     async _barcodeProductAction(code) {
-     if (this.popupActive) {
+     console.log("Popup active state before action:", this.popupActive);
+
+        if (this.popupActive) {
+            console.log("Action blocked due to active popup");
             return; // If popup is active, skip processing
         }
+
         const product = await this._getProductByBarcode(code);
         if (product === true) {
             return;
         }
        if (!product) {
-            this.popupActive = true; // Set popupActive to true when showing popup
+            this.popupActive = true;
+            console.log("Showing popup, setting popupActive to true");
             return this.showPopup('ErrorBarcodePopup', { code: code.base_code }).then(() => {
-                this.popupActive = false; // Reset the flag when popup is closed
+                this.popupActive = false;
+                console.log("Popup closed, setting popupActive to false");
+            }).catch(() => {
+                this.popupActive = false;
+                console.log("Popup error, setting popupActive to false");
             });
         }
 
