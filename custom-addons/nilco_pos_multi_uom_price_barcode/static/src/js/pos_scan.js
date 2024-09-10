@@ -9,7 +9,7 @@ import { ErrorBarcodePopup } from "@point_of_sale/app/barcode/error_popup/barcod
 
 patch(ProductScreen.prototype, {
  setup() {
-        this._super.apply(this, arguments);
+        await super.setup();
         this.popupActive = false; // Add this line to initialize the popup flag
     },
     async _barcodeProductAction(code) {
