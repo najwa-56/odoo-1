@@ -9,21 +9,25 @@ import { ErrorBarcodePopup } from "@point_of_sale/app/barcode/error_popup/barcod
 
 patch(ProductScreen.prototype, {
     async _barcodeProductAction(code) {
-        const product = await this._getProductByBarcode(code);
-        if (product === true) {
+     if (this.popupIsVisible) {
+            // Block scanning if popup is visible
             return;
         }
-        if (!product) {
-            // Show the popup and await its confirmation before allowing further actions
-            await this.showPopup('ErrorBarcodePopup', {
-                code: code.base_code,
-            }).then(() => {
-                // This will execute when the "OK" button is pressed in the popup
-                // Scanning will remain blocked until this promise resolves
-            });
 
-            return; // Exit the function to block further actions until "OK" is pressed
-        }
+                this.popupIsVisible = false; // Ensure popup visibility is tracked
+
+         this._getProductByBarcode(code).then(async (product) => {
+            if (product === true) {
+                return;
+            }
+            if (!product) {
+                // Show popup and block further scanning
+                this.popupIsVisible = true;
+                return this.showPopup('ErrorBarcodePopup', { code: code.base_code }).then(() => {
+                    this.popupIsVisible = false; // Reset flag when popup is closed
+                });
+            }}
+
         const options = await product.getAddProductOptions(code);
         if (!options) {
             return;
