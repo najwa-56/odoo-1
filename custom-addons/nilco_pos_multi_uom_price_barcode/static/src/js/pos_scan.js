@@ -20,15 +20,19 @@ patch(ProductScreen.prototype, {
         if (product === true) {
             return;
         }
-        if (!product) {
-           this.isErrorActive = true;
-            return this.showPopup('ErrorBarcodePopup', {
-                code: code.base_code,
-                confirm: () => {
-                    this.isErrorActive = false; // Reset the flag when OK is pressed
-                },
-            });
-        }
+        const retryBarcodeAction = async (code) => {
+            const product = await this._getProductByBarcode(code);
+            if (!product) {
+                this.isErrorActive = true;
+                // Show the error popup and reset the flag once the user acknowledges
+                return this.showPopup('ErrorBarcodePopup', {
+                    code: code.base_code,
+                    confirm: async () => {
+                        this.isErrorActive = false; // Reset the flag when OK is pressed
+                        await retryBarcodeAction(code); // Retry the barcode action
+                    },
+                });
+            }
         const options = await product.getAddProductOptions(code);
         if (!options) {
             return;
