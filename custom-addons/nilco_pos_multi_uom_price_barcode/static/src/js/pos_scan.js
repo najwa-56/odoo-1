@@ -26,7 +26,7 @@ patch(ProductScreen.prototype, {
          // Set the blocking flag before showing the popup
             this._barcodeScanBlocked = true;
 
-            return this.popup.add(ErrorBarcodePopup, { code: code.base_code });
+            await this.showPopup(ErrorBarcodePopup, { code: code.base_code });
              this._barcodeScanBlocked = false;
               return;
         }
