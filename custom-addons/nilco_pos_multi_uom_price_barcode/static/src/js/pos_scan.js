@@ -12,7 +12,7 @@ patch(ProductScreen.prototype, {
         this.isPopupActive = true;
         await super.showPopup(popup, options);
         this.isPopupActive = false;
-    }
+    },
     async _barcodeProductAction(code) {
        if (this.isPopupActive) {
             return; // Do nothing if a popup is active
