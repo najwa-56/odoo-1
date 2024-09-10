@@ -57,13 +57,13 @@ patch(ProductScreen.prototype, {
                 merge: false,
             });
         }
-
+      onPopupClosed() {
+        // This function can be called from the popup's close handler
+    }
         this.currentOrder.add_product(product, options);
         this.numberBuffer.reset();
     }
-    onPopupClosed() {
-        // This function can be called from the popup's close handler
-    }
+
 });
 
 patch(PosStore.prototype, {
