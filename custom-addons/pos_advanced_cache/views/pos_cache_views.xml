@@ -8,7 +8,7 @@
             <field name="inherit_id" ref="point_of_sale.pos_config_view_form" />
             <field name="arch" type="xml">
                 <!-- Find the 'other_devices' setting element and insert the new fields after it -->
-                <xpath expr="//setting[@id='other_devices']" position="after">
+               <xpath expr="//div[@class='row mt16 o_settings_container'][last()]" position="after">
                     <field name='oldest_cache_time'/>
                     <button name='delete_cache' type="object" string="Invalidate cache"/>
                 </xpath>
