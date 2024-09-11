@@ -160,6 +160,7 @@ export class PartnerListScreen extends Component {
         this.state.editModeProps.partner = partner;
         this.activateEditMode();
     }
+
     createPartner() {
         // initialize the edit screen with default details about country, state, and lang
         const { country_id, state_id } = this.pos.company;

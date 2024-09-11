@@ -14,5 +14,20 @@
                 </xpath>
             </field>
         </record>
+         <record id="pos_config_view_form_inherit_pos_default_customer" model="ir.ui.view">
+            <field name="name">pos.config.view.form.inherit.pos.default.customer</field>
+            <field name="model">res.config.settings</field>
+            <field name="inherit_id" ref="point_of_sale.res_config_settings_view_form"/>
+            <field name="arch" type="xml">
+                <xpath expr="//block[@id='pos_interface_section']" position="inside">
+                    <setting string="Default Customer" help="Set default payment method">
+                        <div class="content-group mt16">
+                             <field name='oldest_cache_time'/>
+                    <button name='delete_cache' type="object" string="Invalidate cache"/>
+                        </div>
+                    </setting>
+                </xpath>
+            </field>
+        </record>
     </data>
 </odoo>
