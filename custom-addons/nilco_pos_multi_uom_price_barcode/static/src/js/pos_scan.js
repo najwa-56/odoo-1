@@ -15,8 +15,7 @@ patch(ProductScreen.prototype, {
             return;
         }
          if (!product) {
-            await this._showErrorBarcodePopup(code.base_code);
-            return;
+          return this.popup.add(ErrorBarcodePopup, { code: code.base_code });
         }
         const options = await product.getAddProductOptions(code);
         if (!options) {
@@ -44,15 +43,7 @@ patch(ProductScreen.prototype, {
         this.currentOrder.add_product(product, options);
         this.numberBuffer.reset();
     },
-    async _showErrorBarcodePopup(base_code) {
-        // Create a promise that resolves when the user confirms the popup
-        return new Promise((resolve) => {
-            this.popup.add(ErrorBarcodePopup, {
-                code: base_code,
-                confirm: () => resolve(true),  // Resolve the promise when "OK" is clicked
-            });
-        });
-    },
+
 });
 
 patch(PosStore.prototype, {
