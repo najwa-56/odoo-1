@@ -58,43 +58,54 @@ patch(DB.PosDB.prototype, {
         this._super.apply(this, arguments);
     },
     get_product_by_barcode(barcode) {
-
-        const barcodes = Object.values(this.product_multi_barcodes);
+        // Check existing mappings first to reduce lookup time.
         if (this.product_by_barcode[barcode]) {
             return this.product_by_barcode[barcode];
-        } else if (this.product_packaging_by_barcode[barcode]) {
+        }
+        if (this.product_packaging_by_barcode[barcode]) {
             return this.product_by_id[this.product_packaging_by_barcode[barcode].product_id[0]];
-        } else if (barcodes.length > 0) {
-            for (const product of barcodes) {
-                const uoms = Object.values(product.uom_id);
-                for (const uom of uoms) {
-                    if (uom.barcodes.includes(barcode)) {
-                        const result = this.product_by_id[uom.product_variant_id[0]];
-                        const line = new Orderline(
-                            { env: result.env },
-                            { pos: result.pos, order: result.pos.selectedOrder, product: result }
-                        );
-                        const orderlines = result.pos.selectedOrder.get_orderlines();
-                        for (const orderline of orderlines) {
-                            if (orderline.product.id === result.id &&
-                                orderline.product_uom_id[0] === uom.id &&
-                                orderline.price === uom.price) {
-                                orderline.set_quantity(orderline.quantity + 1, uom.price);
-                                  orderline.set_uom_name(orderline.name_field );
-                                return true;
-                            }
-                        }
+        }
+
+        // Precompute barcodes once instead of multiple times.
+        const barcodes = Object.values(this.product_multi_barcodes);
+        if (barcodes.length === 0) {
+            return undefined;
+        }
+
+        for (const product of barcodes) {
+            // Use Array.some to exit early from the loop if a condition is met.
+            const found = Object.values(product.uom_id).some((uom) => {
+                if (uom.barcodes.includes(barcode)) {
+                    const result = this.product_by_id[uom.product_variant_id[0]];
+                    const orderlines = result.pos.selectedOrder.get_orderlines();
+                    const existingLine = orderlines.find(orderline =>
+                        orderline.product.id === result.id &&
+                        orderline.product_uom_id[0] === uom.id &&
+                        orderline.price === uom.price
+                    );
+
+                    if (existingLine) {
+                        existingLine.set_quantity(existingLine.quantity + 1, uom.price);
+                        existingLine.set_uom_name(uom.name_field);
+                    } else {
+                        const line = new Orderline({ env: result.env }, { pos: result.pos, order: result.pos.selectedOrder, product: result });
                         result.pos.selectedOrder.add_orderline(line);
                         result.pos.selectedOrder.selected_orderline.set_uom({ 0: uom.id, 1: uom.name });
                         result.pos.selectedOrder.selected_orderline.price_manually_set = true;
                         result.pos.selectedOrder.selected_orderline.set_unit_price(uom.price);
-                         result.pos.selectedOrder.selected_orderline.set_uom_name(uom.name_field);
-                        return true;
+                        result.pos.selectedOrder.selected_orderline.set_uom_name(uom.name_field);
                     }
+
+                    return true;  // Exit the loop early.
                 }
+                return false;
+            });
+
+            if (found) {
+                return true;
             }
-            return undefined;
         }
+
         return undefined;
     },
 });
