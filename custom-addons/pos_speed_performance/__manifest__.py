@@ -21,14 +21,15 @@
         'views/product_product_view.xml',
     ],
     'assets': {
-        'point_of_sale.assets': [
-            # '/pos_speed_performance/static/src/js/models.js',
-            # '/pos_speed_performance/static/src/js/screens/ClientListScreen/ClientListScreen.js',
-            # '/pos_speed_performance/static/src/js/screens/ProductsWidget/ProductsWidget.js',
-        ],
-        'web.assets_qweb': [
-        ],
-    },
+    'point_of_sale.assets': [
+        '/pos_speed_performance/static/src/js/models.js',
+        '/pos_speed_performance/static/src/js/screens/ClientListScreen/ClientListScreen.js',
+        '/pos_speed_performance/static/src/js/screens/ProductsWidget/ProductsWidget.js',
+    ],
+    'web.assets_qweb': [
+    ],
+},
+
 
     'live_test_url':'https://youtu.be/Y6NOPP6gMYE',
     'images':['static/description/banner.png'],
