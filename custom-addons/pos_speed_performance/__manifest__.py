@@ -10,7 +10,7 @@
     'author': "Dev Happy",
     'website': "https://www.dev-happy.com",
     'category': 'Point of Sale',
-    'version': '17.0.2',
+    'version': '17.0',
 
     # any module necessary for this one to work correctly
     'depends': ['point_of_sale'],
