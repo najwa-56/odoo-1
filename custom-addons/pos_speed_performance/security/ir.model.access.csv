@@ -1,0 +1,2 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_pos_speed_performance_pos_speed_performance,pos_speed_performance.pos_speed_performance,model_pos_speed_performance_pos_speed_performance,base.group_user,1,1,1,1

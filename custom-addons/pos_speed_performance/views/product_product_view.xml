@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="product_product_view_form_inherit_pos_speed" model="ir.ui.view">
+        <field name="name">product.normal.form.view.pos.speed</field>
+        <field name="model">product.template</field>
+        <field name="inherit_id" ref="point_of_sale.product_template_form_view"/>
+        <field name="arch" type="xml">
+            <field name="available_in_pos" position="after">
+                <field name="load_pos_default"/>
+            </field>
+        </field>
+    </record>
+
+</odoo>
