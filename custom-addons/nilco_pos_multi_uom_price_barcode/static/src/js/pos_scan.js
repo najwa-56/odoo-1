@@ -6,6 +6,17 @@ import { PosStore } from "@point_of_sale/app/store/pos_store";
 import { Order, Orderline, Payment } from "@point_of_sale/app/store/models";
 import { ProductScreen } from "@point_of_sale/app/screens/product_screen/product_screen";
 import { ErrorBarcodePopup } from "@point_of_sale/app/barcode/error_popup/barcode_error_popup";
+let lastBarcodeTime = 0;
+const debounceTime = 100;  // Adjust delay as needed
+
+function handleBarcode(barcode, callback) {
+    const currentTime = new Date().getTime();
+    if (currentTime - lastBarcodeTime < debounceTime) {
+        return;  // Ignore this barcode event if it comes too soon
+    }
+    lastBarcodeTime = currentTime;
+    callback();  // Call the original barcode processing logic
+}
 
 patch(ProductScreen.prototype, {
     async _barcodeProductAction(code) {
@@ -58,23 +69,10 @@ patch(DB.PosDB.prototype, {
         this._super.apply(this, arguments);
     },
     get_product_by_barcode(barcode) {
+            if (!barcode) return undefined;
 
         const barcodes = Object.values(this.product_multi_barcodes);
-          // Search for product using multiple fields
-        const filter_product = (product) => {
-            const searchTerm = barcode.toLowerCase();
-            return (
-                (product.default_code && product.default_code.toLowerCase().includes(searchTerm)) ||
-                (product.product_variant_ids && product.product_variant_ids.some(variant =>
-                    variant.default_code && variant.default_code.toLowerCase().includes(searchTerm))) ||
-                (product.name && product.name.toLowerCase().includes(searchTerm)) ||
-                (product.barcode && product.barcode.toLowerCase().includes(searchTerm)) ||
-                (product.multi_uom_price_id && product.multi_uom_price_id.barcode &&
-                    product.multi_uom_price_id.barcode.toLowerCase().includes(searchTerm))
-            );
-        };
 
-        // First check for the default barcode match
         if (this.product_by_barcode[barcode]) {
             return this.product_by_barcode[barcode];
         } else if (this.product_packaging_by_barcode[barcode]) {
