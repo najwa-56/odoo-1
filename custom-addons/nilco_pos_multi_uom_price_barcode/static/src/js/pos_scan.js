@@ -6,17 +6,17 @@ import { PosStore } from "@point_of_sale/app/store/pos_store";
 import { Order, Orderline, Payment } from "@point_of_sale/app/store/models";
 import { ProductScreen } from "@point_of_sale/app/screens/product_screen/product_screen";
 import { ErrorBarcodePopup } from "@point_of_sale/app/barcode/error_popup/barcode_error_popup";
-let lastBarcodeTime = 0;
-const debounceTime = 100;  // Adjust delay as needed
+//let lastBarcodeTime = 0;
+//const debounceTime = 100;  // Adjust delay as needed
 
-function handleBarcode(barcode, callback) {
-    const currentTime = new Date().getTime();
-    if (currentTime - lastBarcodeTime < debounceTime) {
-        return;  // Ignore this barcode event if it comes too soon
-    }
-    lastBarcodeTime = currentTime;
-    callback();  // Call the original barcode processing logic
-}
+//function handleBarcode(barcode, callback) {
+ //   const currentTime = new Date().getTime();
+ //   if (currentTime - lastBarcodeTime < debounceTime) {
+ //       return;  // Ignore this barcode event if it comes too soon
+ //   }
+ //   lastBarcodeTime = currentTime;
+ //   callback();  // Call the original barcode processing logic
+//}
 
 patch(ProductScreen.prototype, {
     async _barcodeProductAction(code) {
@@ -92,7 +92,7 @@ patch(DB.PosDB.prototype, {
                             if (orderline.product.id === result.id &&
                                 orderline.product_uom_id[0] === uom.id &&
                                 orderline.price === uom.price) {
-                                orderline.set_quantity(orderline.quantity , uom.price);
+                                orderline.set_quantity(orderline.quantity + 1, uom.price);
                                   orderline.set_uom_name(orderline.name_field );
                                 return true;
                             }
