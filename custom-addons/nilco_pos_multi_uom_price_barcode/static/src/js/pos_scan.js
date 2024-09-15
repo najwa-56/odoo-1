@@ -60,6 +60,21 @@ patch(DB.PosDB.prototype, {
     get_product_by_barcode(barcode) {
 
         const barcodes = Object.values(this.product_multi_barcodes);
+          // Search for product using multiple fields
+        const filter_product = (product) => {
+            const searchTerm = barcode.toLowerCase();
+            return (
+                (product.default_code && product.default_code.toLowerCase().includes(searchTerm)) ||
+                (product.product_variant_ids && product.product_variant_ids.some(variant =>
+                    variant.default_code && variant.default_code.toLowerCase().includes(searchTerm))) ||
+                (product.name && product.name.toLowerCase().includes(searchTerm)) ||
+                (product.barcode && product.barcode.toLowerCase().includes(searchTerm)) ||
+                (product.multi_uom_price_id && product.multi_uom_price_id.barcode &&
+                    product.multi_uom_price_id.barcode.toLowerCase().includes(searchTerm))
+            );
+        };
+
+        // First check for the default barcode match
         if (this.product_by_barcode[barcode]) {
             return this.product_by_barcode[barcode];
         } else if (this.product_packaging_by_barcode[barcode]) {
