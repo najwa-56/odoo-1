@@ -17,8 +17,6 @@ function handleBarcode(barcode, callback) {
     lastBarcodeTime = currentTime;
     callback();  // Call the original barcode processing logic
 
-    // Reset number buffer to prevent concatenation of barcode input
-    this.numberBuffer.reset();  // Ensure the buffer is cleared after processing
 }
 
 patch(ProductScreen.prototype, {
@@ -55,13 +53,7 @@ patch(ProductScreen.prototype, {
             });
         }
         const currentOrder = this.env.pos.get_order();
-        if (currentOrder.is_finalized) {
-            this.showPopup('ErrorPopup', {
-                title: 'Cannot Modify Finalized Order',
-                body: 'The order has already been finalized and cannot be modified.',
-            });
-            return;
-        }
+
         this.currentOrder.add_product(product, options);
         this.numberBuffer.reset();
     },
