@@ -207,7 +207,10 @@ patch(Orderline.prototype, {
             this.order.fix_tax_included_price(this);
         }
         return true;
-    }
+    },
+    get_quantity() {
+        return this.quantity;
+    },
 
 });
 patch(PosStore.prototype, {
