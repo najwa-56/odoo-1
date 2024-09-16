@@ -6,7 +6,20 @@ import { PosStore } from "@point_of_sale/app/store/pos_store";
 import { Order, Orderline, Payment } from "@point_of_sale/app/store/models";
 import { ProductScreen } from "@point_of_sale/app/screens/product_screen/product_screen";
 import { ErrorBarcodePopup } from "@point_of_sale/app/barcode/error_popup/barcode_error_popup";
+let lastBarcodeTime = 0;
+const debounceTime = 100;  // Adjust delay as needed
 
+function handleBarcode(barcode, callback) {
+    const currentTime = new Date().getTime();
+    if (currentTime - lastBarcodeTime < debounceTime) {
+        return;  // Ignore this barcode event if it comes too soon
+    }
+    lastBarcodeTime = currentTime;
+    callback();  // Call the original barcode processing logic
+
+    // Reset number buffer to prevent concatenation of barcode input
+    this.numberBuffer.reset();  // Ensure the buffer is cleared after processing
+}
 
 patch(ProductScreen.prototype, {
     async _barcodeProductAction(code) {
@@ -86,21 +99,26 @@ patch(DB.PosDB.prototype, {
                             { pos: result.pos, order: result.pos.selectedOrder, product: result }
                         );
                         const orderlines = result.pos.selectedOrder.get_orderlines();
-                        for (const orderline of orderlines) {
-                            if (orderline.product.id === result.id &&
-                                orderline.product_uom_id[0] === uom.id &&
-                                orderline.price === uom.price) {
-                                orderline.set_quantity(orderline.quantity + 1, uom.price);
-                                  orderline.set_uom_name(orderline.name_field );
-                                return true;
+                         let existingOrderline = false;
+                    for (const orderline of orderlines) {
+                        if (orderline.product.id === result.id &&
+                            orderline.product_uom_id[0] === uom.id &&
+                            orderline.price === uom.price) {
+                            orderline.set_quantity(orderline.quantity + 1, uom.price);
+                            orderline.set_uom_name(orderline.name_field);
+                            existingOrderline = true;
+                            break;
                             }
                         }
+                        if (!existingOrderline) {
+                        line.set_quantity(1);  // Reset quantity for new orderline
                         result.pos.selectedOrder.add_orderline(line);
                         result.pos.selectedOrder.selected_orderline.set_uom({ 0: uom.id, 1: uom.name });
                         result.pos.selectedOrder.selected_orderline.price_manually_set = true;
                         result.pos.selectedOrder.selected_orderline.set_unit_price(uom.price);
-                         result.pos.selectedOrder.selected_orderline.set_uom_name(uom.name_field);
-                        return true;
+                        result.pos.selectedOrder.selected_orderline.set_uom_name(uom.name_field);
+                    }
+                    return true;
                     }
                 }
             }
