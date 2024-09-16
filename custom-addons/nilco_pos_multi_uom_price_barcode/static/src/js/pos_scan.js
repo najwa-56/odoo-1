@@ -108,7 +108,7 @@ patch(DB.PosDB.prototype, {
                                 return true;
                             }
                         }
-                        let quantity = code.value || 1;
+                        let quantity = 1;
                         result.pos.selectedOrder.add_orderline(line);
                         result.pos.selectedOrder.selected_orderline.set_uom({ 0: uom.id, 1: uom.name });
                         result.pos.selectedOrder.selected_orderline.price_manually_set = true;
