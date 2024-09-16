@@ -45,7 +45,7 @@ patch(ProductScreen.prototype, {
             });
         } else if (code.type === "weight" || code.type === "quantity") {
             Object.assign(options, {
-                quantity: code.value,
+                quantity: code.value||1,
                 merge: false,
             });
         } else if (code.type === "discount") {
@@ -108,12 +108,10 @@ patch(DB.PosDB.prototype, {
                                 return true;
                             }
                         }
-                        let quantity = 1;
                         result.pos.selectedOrder.add_orderline(line);
                         result.pos.selectedOrder.selected_orderline.set_uom({ 0: uom.id, 1: uom.name });
                         result.pos.selectedOrder.selected_orderline.price_manually_set = true;
                         result.pos.selectedOrder.selected_orderline.set_unit_price(uom.price);
-                         result.pos.selectedOrder.selected_orderline.set_quantity(quantity, uom.price);
                          result.pos.selectedOrder.selected_orderline.set_uom_name(uom.name_field);
                         return true;
                     }
