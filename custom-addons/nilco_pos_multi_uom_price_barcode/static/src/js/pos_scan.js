@@ -97,6 +97,16 @@ patch(DB.PosDB.prototype, {
                                 orderline.price === uom.price) {
                                 orderline.set_quantity(orderline.quantity + 1, uom.price);
                                 orderline.set_uom_name(orderline.name_field );
+
+                                  // Remove the orderline from its current position
+                            result.pos.selectedOrder.orderlines.remove(orderline);
+
+                            // Add it back to the end of the array
+                            result.pos.selectedOrder.orderlines.push(orderline);
+
+                            // Re-render the orderlines (optional based on your POS implementation)
+                            result.pos.selectedOrder.trigger('change', result.pos.selectedOrder);
+
                                 return true;
                             }
                         }
