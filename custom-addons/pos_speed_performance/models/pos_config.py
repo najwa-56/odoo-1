@@ -11,12 +11,23 @@ class PosConfig(models.Model):
         if self.company_id.x_allow_online_search == True:
             config_param = self.company_id.x_limit_product
         else:
-            config_param = self.env['ir.config_parameter'].sudo().get_param('point_of_sale.limited_product_count', default_limit)
-        try:
-            return int(config_param)
-        except (TypeError, ValueError, OverflowError):
-            return default_limit
+            config_param = self.env['ir.config_parameter'].sudo().get_param('point_of_sale.limited_product_count',
+                                                                            default_limit)
 
+        try:
+            product_limit = int(config_param)
+        except (TypeError, ValueError, OverflowError):
+            product_limit = default_limit
+
+        # Logic to include hidden products (available_in_pos=False) in the POS search
+        # We assume there's a field 'available_in_pos' in the product model
+        hidden_products_count = self.env['product.product'].search_count([('available_in_pos', '=', False)])
+
+        # Adjust the product limit to also include hidden products in the search
+        total_limit = product_limit + hidden_products_count
+
+        return total_limit
+    
     def get_limited_partners_loading(self):
         default_limit = 100
         if self.company_id.x_allow_online_search == True:
