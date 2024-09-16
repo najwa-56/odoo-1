@@ -208,6 +208,9 @@ patch(Orderline.prototype, {
         }
         return true;
     }
+    get_quantity() {
+        return this.quantity;
+    }
 
 });
 patch(PosStore.prototype, {
