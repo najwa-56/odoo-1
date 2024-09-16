@@ -152,7 +152,6 @@ patch(Orderline.prototype, {
     set_quantity(quantity, keep_price) {
         this.order.assert_editable();
         var quant =typeof quantity === "number" ? quantity : oParseFloat("" + (quantity ? quantity : 0));
-            this.numberBuffer.reset();
 
         if (this.refunded_orderline_id in this.pos.toRefundLines) {
             const toRefundDetail = this.pos.toRefundLines[this.refunded_orderline_id];

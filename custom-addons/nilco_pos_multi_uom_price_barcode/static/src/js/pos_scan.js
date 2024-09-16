@@ -6,20 +6,7 @@ import { PosStore } from "@point_of_sale/app/store/pos_store";
 import { Order, Orderline, Payment } from "@point_of_sale/app/store/models";
 import { ProductScreen } from "@point_of_sale/app/screens/product_screen/product_screen";
 import { ErrorBarcodePopup } from "@point_of_sale/app/barcode/error_popup/barcode_error_popup";
-let lastBarcodeTime = 0;
-const debounceTime = 100;  // Adjust delay as needed
 
-function handleBarcode(barcode, callback) {
-    const currentTime = new Date().getTime();
-    if (currentTime - lastBarcodeTime < debounceTime) {
-        return;  // Ignore this barcode event if it comes too soon
-    }
-    lastBarcodeTime = currentTime;
-    callback();  // Call the original barcode processing logic
-
-    // Reset number buffer to prevent concatenation of barcode input
-    this.numberBuffer.reset();  // Ensure the buffer is cleared after processing
-}
 
 patch(ProductScreen.prototype, {
     async _barcodeProductAction(code) {
