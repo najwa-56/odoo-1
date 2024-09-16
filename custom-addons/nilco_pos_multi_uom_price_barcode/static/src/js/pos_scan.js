@@ -20,7 +20,16 @@ function handleBarcode(barcode, callback) {
     // Reset number buffer to prevent concatenation of barcode input
     this.numberBuffer.reset();  // Ensure the buffer is cleared after processing
 }
-
+// Helper function to reorder product in orderlines
+function reorderProduct(order, product) {
+    if (!order) return;
+    const existingOrderline = order.orderlines.find(line => line.product.id === product.id);
+    if (existingOrderline) {
+        // Move existing orderline to the end of the orderlines array
+        order.orderlines = order.orderlines.filter(line => line !== existingOrderline);
+        order.orderlines.push(existingOrderline);
+    }
+}
 patch(ProductScreen.prototype, {
     async _barcodeProductAction(code) {
 
@@ -105,6 +114,8 @@ patch(DB.PosDB.prototype, {
                                 orderline.price === uom.price) {
                                 orderline.set_quantity(orderline.quantity + 1, uom.price);
                                   orderline.set_uom_name(orderline.name_field );
+                                                                  reorderProduct(result.pos.selectedOrder, result);
+
                                 return true;
                             }
                         }
@@ -113,6 +124,8 @@ patch(DB.PosDB.prototype, {
                         result.pos.selectedOrder.selected_orderline.price_manually_set = true;
                         result.pos.selectedOrder.selected_orderline.set_unit_price(uom.price);
                          result.pos.selectedOrder.selected_orderline.set_uom_name(uom.name_field);
+                                                 reorderProduct(result.pos.selectedOrder, result);
+
                         return true;
                     }
                 }
