@@ -207,6 +207,10 @@ patch(Orderline.prototype, {
             this.order.fix_tax_included_price(this);
         }
         return true;
+          if (!keep_price) {
+        // Logic for handling quantity changes due to barcode scans
+        this.numberBuffer.reset();  // Reset after setting quantity
+    }
     }
 
 });

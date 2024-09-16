@@ -31,6 +31,7 @@ patch(ProductScreen.prototype, {
          if (!product) {
           return this.popup.add(ErrorBarcodePopup, { code: code.base_code });
         }
+         this.numberBuffer.reset();
         const options = await product.getAddProductOptions(code);
         if (!options) {
             return;
