@@ -6,7 +6,6 @@ import { unaccent } from "@web/core/utils/strings";
 
 patch(PosDB.prototype, {
 
-    // Function to add products, including handling of barcodes
     bi_add_products(products) {
         var stored_categories = this.product_by_category_id;
         if (!(products instanceof Array)) {
@@ -23,8 +22,6 @@ patch(PosDB.prototype, {
                     ? product.pos_categ_ids
                     : [this.root_category_id];
                 product.product_tmpl_id = product.product_tmpl_id[0];
-
-                // Store product in category
                 for (const categ_id of all_categ_ids) {
                     if (!stored_categories[categ_id]) {
                         stored_categories[categ_id] = [];
@@ -50,20 +47,15 @@ patch(PosDB.prototype, {
                     }
                 }
             }
-
-            // Store product by ID
             this.product_by_id[product.id] = product;
-
-            // Store product by barcode if barcode and product are active
             if (product.barcode && product.active) {
                 this.product_by_barcode[product.barcode] = product;
             }
         }
     },
-
-    // Function to search products in a specific category
     bi_search_product_in_category(category_id, query) {
         try {
+            // eslint-disable-next-line no-useless-escape
             query = query.replace(/[\[\]\(\)\+\*\?\.\-\!\&\^\$\|\~\_\{\}\:\,\\\/]/g, ".");
             query = query.replace(/ /g, ".+");
             var re = RegExp("([0-9]+):.*?" + unaccent(query), "gi");
@@ -86,17 +78,11 @@ patch(PosDB.prototype, {
         }
         return results;
     },
-
-    // Function to generate a searchable string for products
     bi_product_search_string(product) {
         var str = product.display_name;
-
-        // Include barcode from the product if available
         if (product.barcode) {
             str += "|" + product.barcode;
         }
-
-        // Other product fields that can be part of the search string
         if (product.default_code) {
             str += "|" + product.default_code;
         }
@@ -109,8 +95,6 @@ patch(PosDB.prototype, {
         if (product.plu_number) {
             str += '|' + product.plu_number;
         }
-
-        // Create a final search string for the product
         str = product.id + ":" + str.replace(/[\n:]/g, "") + "\n";
         return str;
     }
