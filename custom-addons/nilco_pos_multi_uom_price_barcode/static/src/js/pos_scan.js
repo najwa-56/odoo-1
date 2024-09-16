@@ -99,26 +99,21 @@ patch(DB.PosDB.prototype, {
                             { pos: result.pos, order: result.pos.selectedOrder, product: result }
                         );
                         const orderlines = result.pos.selectedOrder.get_orderlines();
-                         let existingOrderline = false;
-                    for (const orderline of orderlines) {
-                        if (orderline.product.id === result.id &&
-                            orderline.product_uom_id[0] === uom.id &&
-                            orderline.price === uom.price) {
-                            orderline.set_quantity(orderline.quantity + 1, uom.price);
-                            orderline.set_uom_name(orderline.name_field);
-                            existingOrderline = true;
-                            break;
+                        for (const orderline of orderlines) {
+                            if (orderline.product.id === result.id &&
+                                orderline.product_uom_id[0] === uom.id &&
+                                orderline.price === uom.price) {
+                                orderline.set_quantity(orderline.quantity + 1, uom.price);
+                                  orderline.set_uom_name(orderline.name_field );
+                                return true;
                             }
                         }
-                        if (!existingOrderline) {
-                        line.set_quantity(1);  // Reset quantity for new orderline
                         result.pos.selectedOrder.add_orderline(line);
                         result.pos.selectedOrder.selected_orderline.set_uom({ 0: uom.id, 1: uom.name });
                         result.pos.selectedOrder.selected_orderline.price_manually_set = true;
                         result.pos.selectedOrder.selected_orderline.set_unit_price(uom.price);
-                        result.pos.selectedOrder.selected_orderline.set_uom_name(uom.name_field);
-                    }
-                    return true;
+                         result.pos.selectedOrder.selected_orderline.set_uom_name(uom.name_field);
+                        return true;
                     }
                 }
             }
