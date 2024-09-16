@@ -31,23 +31,6 @@ class ProductTemplate(models.Model):
                 archived_variants.plu_number = self.plu_number
 
 
-
-    def _loader_params_product_product(self):
-        result = super()._loader_params_product_product()
-        result['search_fields'].append('multi_uom_price_ids.barcode')
-        return result
-
-    @api.model
-    def _get_pos_ui_data(self):
-        product_data = super(ProductProduct, self)._get_pos_ui_data()
-        for product in product_data:
-            product_obj = self.browse(product['id'])
-            if product_obj.multi_uom_price_ids:
-                product['barcode'] = product_obj.multi_uom_price_ids[
-                    0].barcode  # Assuming one UOM per product for simplicity
-        return product_data
-
-
 class ProductProduct(models.Model):
     _inherit = 'product.product'
 
