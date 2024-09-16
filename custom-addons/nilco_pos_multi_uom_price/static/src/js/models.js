@@ -103,6 +103,8 @@ patch(Orderline.prototype, {
             // Move existing orderline to the end of the orderlines array
             this.order.orderlines = this.order.orderlines.filter(line => line !== existingOrderline);
             this.order.orderlines.push(existingOrderline);
+             // Set the pointer to the last orderline (i.e., the reordered one)
+        this.order.set_selected_orderline(existingOrderline);
         }
     },
     getDisplayData() {
