@@ -16,6 +16,9 @@ function handleBarcode(barcode, callback) {
     }
     lastBarcodeTime = currentTime;
     callback();  // Call the original barcode processing logic
+
+    // Reset number buffer to prevent concatenation of barcode input
+    this.numberBuffer.reset();  // Ensure the buffer is cleared after processing
 }
 
 patch(ProductScreen.prototype, {
