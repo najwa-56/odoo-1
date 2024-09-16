@@ -22,42 +22,42 @@ function handleBarcode(barcode, callback) {
 patch(ProductScreen.prototype, {
     async _barcodeProductAction(code) {
 
-        const product = await this._getProductByBarcode(code);
-        if (product === true) {
-            return;
-        }
-         if (!product) {
-          return this.popup.add(ErrorBarcodePopup, { code: code.base_code });
-        }
+        // Wrap barcode handling with debounce
+        handleBarcode(code, async () => {
+            const product = await this._getProductByBarcode(code);
+            if (product === true) {
+                return;
+            }
+            if (!product) {
+                return this.popup.add(ErrorBarcodePopup, { code: code.base_code });
+            }
+            const options = await product.getAddProductOptions(code);
+            if (!options) {
+                return;
+            }
+            if (code.type === "price") {
+                Object.assign(options, {
+                    price: code.value,
+                    extras: {
+                        price_type: "manual",
+                    },
+                });
+            } else if (code.type === "weight" || code.type === "quantity") {
+                Object.assign(options, {
+                    quantity: code.value,
+                    merge: false,
+                });
+            } else if (code.type === "discount") {
+                Object.assign(options, {
+                    discount: code.value,
+                    merge: false,
+                });
+            }
 
-        const options = await product.getAddProductOptions(code);
-        if (!options) {
-            return;
-        }
-        if (code.type === "price") {
-            Object.assign(options, {
-                price: code.value,
-                extras: {
-                    price_type: "manual",
-                },
-            });
-        } else if (code.type === "weight" || code.type === "quantity") {
-            Object.assign(options, {
-                quantity: code.value,
-                merge: false,
-            });
-        } else if (code.type === "discount") {
-            Object.assign(options, {
-                discount: code.value,
-                merge: false,
-            });
-        }
-        const currentOrder = this.env.pos.get_order();
-
-        this.currentOrder.add_product(product, options);
-        this.numberBuffer.reset();
+            this.currentOrder.add_product(product, options);
+            this.numberBuffer.reset();
+        });
     },
-
 });
 
 patch(PosStore.prototype, {

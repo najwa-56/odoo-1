@@ -103,7 +103,6 @@ patch(Orderline.prototype, {
             // Move existing orderline to the end of the orderlines array
             this.order.orderlines = this.order.orderlines.filter(line => line !== existingOrderline);
             this.order.orderlines.push(existingOrderline);
-
         }
     },
     getDisplayData() {
@@ -208,7 +207,6 @@ patch(Orderline.prototype, {
             this.order.fix_tax_included_price(this);
         }
         return true;
-
     }
 
 });
