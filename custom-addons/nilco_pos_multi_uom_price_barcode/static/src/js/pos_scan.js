@@ -104,9 +104,7 @@ patch(DB.PosDB.prototype, {
                             // Add it back to the end of the array
                             result.pos.selectedOrder.orderlines.push(orderline);
 
-                            // Re-render the orderlines (optional based on your POS implementation)
-                            result.pos.selectedOrder.trigger('change', result.pos.selectedOrder);
-
+                            
                                 return true;
                             }
                         }
