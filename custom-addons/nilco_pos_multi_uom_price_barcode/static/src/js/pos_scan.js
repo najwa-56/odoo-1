@@ -45,7 +45,7 @@ patch(ProductScreen.prototype, {
             });
         } else if (code.type === "weight" || code.type === "quantity") {
             Object.assign(options, {
-                quantity: code.value||1,
+                quantity: code.value,
                 merge: false,
             });
         } else if (code.type === "discount") {
