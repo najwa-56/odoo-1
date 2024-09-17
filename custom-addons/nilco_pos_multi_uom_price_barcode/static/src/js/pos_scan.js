@@ -21,10 +21,10 @@ function handleBarcode(barcode, callback) {
 
 patch(ProductScreen.prototype, {
     async _barcodeProductAction(code) {
-
+        const product = await this._getProductByBarcode(code);
         // Wrap barcode handling with debounce
         handleBarcode(code, async () => {
-            const product = await this._getProductByBarcode(code);
+
             if (product === true) {
                 return;
             }
