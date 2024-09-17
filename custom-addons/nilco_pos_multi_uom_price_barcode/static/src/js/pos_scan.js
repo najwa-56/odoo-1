@@ -95,8 +95,7 @@ patch(DB.PosDB.prototype, {
                             if (orderline.product.id === result.id &&
                                 orderline.product_uom_id[0] === uom.id &&
                                 orderline.price === uom.price) {
-                                                           const newQuantity = 1; // Set default to 1
-
+                                const newQuantity = parseFloat(orderline.quantity) + 1;
                                 orderline.set_quantity(newQuantity, uom.price);
                                 orderline.set_uom_name(orderline.name_field );
 
