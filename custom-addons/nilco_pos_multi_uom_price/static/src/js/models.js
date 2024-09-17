@@ -64,8 +64,6 @@ patch(Orderline.prototype, {
         super.setup(...arguments);
         this.product_uom_id = this.product.default_uom_id || this.product_uom_id || this.product.uom_id;
                 this.name_field = options.name_field || this.name_field || "";  // Ensure initialization
-                        this.total_quantity = this.total_quantity || 0;
-
        //  this.reorderProduct();
 
     },
@@ -75,7 +73,6 @@ patch(Orderline.prototype, {
         const json = super.export_as_JSON(...arguments);
         json.product_uom_id = this.product_uom_id[0];
             json.name_field = this.name_field;  // Add this line
-        json.total_quantity = this.total_quantity;
 
 
         return json;
@@ -83,7 +80,7 @@ patch(Orderline.prototype, {
     init_from_JSON(json) {
     super.init_from_JSON(...arguments);
     this.name_field = json.name_field || "";  // Add this line
-     this.total_quantity = json.total_quantity || 0;
+
     console.log('init_from_JSON:', json);
 
     // Ensure json.product_uom_id is valid and this.pos.units_by_id is properly initialized
@@ -98,12 +95,6 @@ patch(Orderline.prototype, {
         this.product_uom_id = null;  // or some default value
     }
 },
-  get_total_quantity() {
-        // acc: accumulator, line: current value
-        this.total_quantity = this.orderlines.reduce((acc, line) => acc + line.quantity, 0);
-        console.log('get_total_quantity', this.total_quantity);
-         return this.total_quantity;
-    },
  // Method to reorder the product in the orderlines array
  //  reorderProduct() {
    //     if (!this.order) return;
