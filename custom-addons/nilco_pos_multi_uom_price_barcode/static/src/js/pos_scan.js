@@ -81,7 +81,6 @@ patch(DB.PosDB.prototype, {
 
         const product = this.product_by_barcode[barcode];
         if (product) {
-            const order = this.pos.get_order();
             const existing_orderline = order.get_orderlines().find(orderline => orderline.product.id === product.id);
 
             if (existing_orderline) {
