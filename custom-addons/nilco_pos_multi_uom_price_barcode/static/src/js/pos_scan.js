@@ -16,7 +16,7 @@ function handleBarcode(barcode, callback) {
     }
     lastBarcodeTime = currentTime;
     callback();  // Call the original barcode processing logic
-    this.numberBuffer.reset();
+    
 
 }
 
