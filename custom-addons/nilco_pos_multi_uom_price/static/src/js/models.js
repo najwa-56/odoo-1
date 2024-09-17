@@ -104,11 +104,11 @@ patch(Orderline.prototype, {
             this.order.orderlines = this.order.orderlines.filter(line => line !== existingOrderline);
             this.order.orderlines.push(existingOrderline);
 
-
+        }
+        
         // Increase the quantity of the existing orderline by 1
         const newQuantity = existingOrderline.quantity + 1;
         existingOrderline.set_quantity(newQuantity);
-        }
     },
     getDisplayData() {
         return {
