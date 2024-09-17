@@ -54,9 +54,10 @@ patch(ProductScreen.prototype, {
                 });
             }
 
-            this.currentOrder.add_product(product, options);
-            this.numberBuffer.reset();
+
         });
+          this.currentOrder.add_product(product, options);
+            this.numberBuffer.reset();
     },
 
 
@@ -106,9 +107,8 @@ patch(DB.PosDB.prototype, {
 
                             // Add it back to the end of the array
                             result.pos.selectedOrder.orderlines.push(orderline);
-                              if (numberBuffer) {
-                                    numberBuffer.reset();
-                                }
+
+
                                 return true;
                             }
                         }
@@ -118,9 +118,6 @@ patch(DB.PosDB.prototype, {
                         result.pos.selectedOrder.selected_orderline.set_unit_price(uom.price);
                         result.pos.selectedOrder.selected_orderline.set_quantity(1,uom.price);
                          result.pos.selectedOrder.selected_orderline.set_uom_name(uom.name_field);
-                           if (numberBuffer) {
-                                    numberBuffer.reset();
-                                }
                         return true;
                     }
                 }
