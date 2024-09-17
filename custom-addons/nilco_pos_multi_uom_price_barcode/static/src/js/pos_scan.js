@@ -17,11 +17,13 @@ function handleBarcode(barcode, callback) {
     lastBarcodeTime = currentTime;
     callback();  // Call the original barcode processing logic
 
-
 }
 
 patch(ProductScreen.prototype, {
     async _barcodeProductAction(code) {
+
+        // Wrap barcode handling with debounce
+        handleBarcode(code, async () => {
       this.numberBuffer.reset();
             const product = await this._getProductByBarcode(code);
             if (product === true) {
@@ -56,8 +58,8 @@ patch(ProductScreen.prototype, {
             this.currentOrder.add_product(product, options);
             this.numberBuffer.reset();
 
-    },
-
+    });
+ },
 
 });
 
@@ -96,8 +98,16 @@ patch(DB.PosDB.prototype, {
                             if (orderline.product.id === result.id &&
                                 orderline.product_uom_id[0] === uom.id &&
                                 orderline.price === uom.price) {
-                                orderline.set_quantity(orderline.quantity + 1, uom.price);
+                                const newQuantity = parseFloat(orderline.quantity) + 1;
+                                orderline.set_quantity(newQuantity, uom.price);
                                 orderline.set_uom_name(orderline.name_field );
+
+                                  // Remove the orderline from its current position
+                            result.pos.selectedOrder.orderlines.remove(orderline);
+
+                            // Add it back to the end of the array
+                            result.pos.selectedOrder.orderlines.push(orderline);
+
 
                                 return true;
                             }
