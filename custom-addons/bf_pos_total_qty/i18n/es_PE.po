@@ -1,6 +1,0 @@
-#. module: bf_pos_total_qty
-#. odoo-javascript
-#: code:addons/bf_pos_total_qty/static/src/xml/total_qty.xml:0
-#, python-format
-msgid "Quantity of products:"
-msgstr "Cantidad de productos:"
