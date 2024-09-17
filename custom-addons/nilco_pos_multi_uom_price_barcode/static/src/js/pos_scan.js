@@ -115,7 +115,6 @@ patch(DB.PosDB.prototype, {
                     }
                 }
             }
-            return undefined;
         }
         return undefined;
     },
