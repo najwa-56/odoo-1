@@ -73,7 +73,7 @@ patch(PosStore.prototype, {
 patch(DB.PosDB.prototype, {
     init(options) {
         this._super.apply(this, arguments);
-         this.pos = options.pos; 
+         this.pos = options.pos;
     },
     get_product_by_barcode(barcode) {
             if (!barcode) return undefined;
@@ -82,7 +82,7 @@ patch(DB.PosDB.prototype, {
 
         const product = this.product_by_barcode[barcode];
         if (product) {
-            const order = this.pos.get_order();
+            const order = this.get_order();
             const existing_orderline = order.get_orderlines().find(orderline => orderline.product.id === product.id);
 
             if (existing_orderline) {
