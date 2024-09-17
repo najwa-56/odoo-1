@@ -62,7 +62,6 @@ patch(ProductScreen.prototype, {
         }
             this.currentOrder.add_product(product, options);
             this.numberBuffer.reset();
-            reorderProduct(this.currentOrder, product);
 
     },
 
