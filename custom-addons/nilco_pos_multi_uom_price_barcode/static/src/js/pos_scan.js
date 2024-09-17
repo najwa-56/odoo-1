@@ -59,20 +59,7 @@ patch(ProductScreen.prototype, {
         });
     },
 
-     onNumpadClick(buttonValue) {
-        if (["quantity", "discount", "price"].includes(buttonValue)) {
-            this.numberBuffer.capture();
-            this.numberBuffer.reset();
-            this.pos.numpadMode = buttonValue;
-            return;
-        }
-        this.numberBuffer.sendKey(buttonValue);
-    },
 
-    selectLine(orderline) {
-        this.numberBuffer.reset();
-        this.currentOrder.select_orderline(orderline);
-    },
 });
 
 patch(PosStore.prototype, {
@@ -119,8 +106,7 @@ patch(DB.PosDB.prototype, {
 
                             // Add it back to the end of the array
                             result.pos.selectedOrder.orderlines.push(orderline);
-
-
+                             this.numberBuffer.reset();
                                 return true;
                             }
                         }
@@ -130,6 +116,7 @@ patch(DB.PosDB.prototype, {
                         result.pos.selectedOrder.selected_orderline.set_unit_price(uom.price);
                         result.pos.selectedOrder.selected_orderline.set_quantity(1,uom.price);
                          result.pos.selectedOrder.selected_orderline.set_uom_name(uom.name_field);
+                          this.numberBuffer.reset();
                         return true;
                     }
                 }
