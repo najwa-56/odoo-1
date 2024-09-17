@@ -16,15 +16,17 @@ function handleBarcode(barcode, callback) {
     }
     lastBarcodeTime = currentTime;
     callback();  // Call the original barcode processing logic
+       this.currentOrder.add_product(product, options);
+            this.numberBuffer.reset();
 
 }
 
 patch(ProductScreen.prototype, {
     async _barcodeProductAction(code) {
-        const product = await this._getProductByBarcode(code);
+
         // Wrap barcode handling with debounce
         handleBarcode(code, async () => {
-
+            const product = await this._getProductByBarcode(code);
             if (product === true) {
                 return;
             }
@@ -53,11 +55,7 @@ patch(ProductScreen.prototype, {
                     merge: false,
                 });
             }
-
-
         });
-          this.currentOrder.add_product(product, options);
-            this.numberBuffer.reset();
     },
 
 
