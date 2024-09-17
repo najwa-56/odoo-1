@@ -58,6 +58,21 @@ patch(ProductScreen.prototype, {
             this.numberBuffer.reset();
         });
     },
+
+     onNumpadClick(buttonValue) {
+        if (["quantity", "discount", "price"].includes(buttonValue)) {
+            this.numberBuffer.capture();
+            this.numberBuffer.reset();
+            this.pos.numpadMode = buttonValue;
+            return;
+        }
+        this.numberBuffer.sendKey(buttonValue);
+    }
+
+    selectLine(orderline) {
+        this.numberBuffer.reset();
+        this.currentOrder.select_orderline(orderline);
+    }
 });
 
 patch(PosStore.prototype, {

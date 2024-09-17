@@ -21,8 +21,6 @@ patch(Order.prototype, {
         if(options.product_uom_id !== undefined){
             orderline.product_uom_id = options.product_uom_id;
             orderline.name_field = options.name_field;
-              orderline.quantity = options.quantity;
-              options.quantity ? this.set_quantity(options.quantity) : this.set_quantity(1);
 
         }
     },
@@ -66,7 +64,6 @@ patch(Orderline.prototype, {
         super.setup(...arguments);
         this.product_uom_id = this.product.default_uom_id || this.product_uom_id || this.product.uom_id;
                 this.name_field = options.name_field || this.name_field || "";  // Ensure initialization
-                 this.quantity = options.quantity || this.quantity || "";
          //this.reorderProduct();
 
     },
@@ -76,7 +73,6 @@ patch(Orderline.prototype, {
         const json = super.export_as_JSON(...arguments);
         json.product_uom_id = this.product_uom_id[0];
             json.name_field = this.name_field;  // Add this line
-             json.quantity = this.quantity;
 
 
         return json;
@@ -84,7 +80,6 @@ patch(Orderline.prototype, {
     init_from_JSON(json) {
     super.init_from_JSON(...arguments);
     this.name_field = json.name_field || "";  // Add this line
-     this.quantity = json.quantity || "";
 
     console.log('init_from_JSON:', json);
 
