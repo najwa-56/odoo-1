@@ -78,8 +78,28 @@ patch(DB.PosDB.prototype, {
         const barcodes = Object.values(this.product_multi_barcodes);
 
         if (this.product_by_barcode[barcode]) {
-            return this.product_by_barcode[barcode];
-        } else if (this.product_packaging_by_barcode[barcode]) {
+    const product = this.product_by_barcode[barcode];
+    const order = this.get_order(); // Get the current order
+    let found_orderline = null;
+
+    // Loop through the order lines to find if the product already exists
+    order.get_orderlines().forEach(function(orderline) {
+        if (orderline.product.id === product.id) {
+            found_orderline = orderline;
+        }
+    });
+
+    if (found_orderline) {
+        // If the product is found, just increase the quantity
+        found_orderline.set_quantity(found_orderline.get_quantity() + 1);
+    } else {
+        // If the product is not found, add a new line
+        order.add_product(product, {quantity: 1});
+    }
+
+    return product;
+}
+ else if (this.product_packaging_by_barcode[barcode]) {
             return this.product_by_id[this.product_packaging_by_barcode[barcode].product_id[0]];
         } else if (barcodes.length > 0) {
             for (const product of barcodes) {
