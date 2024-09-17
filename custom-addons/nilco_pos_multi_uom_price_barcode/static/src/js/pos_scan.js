@@ -40,7 +40,7 @@ patch(ProductScreen.prototype, {
                     merge: false,
                 });
             }
-              const currentOrder = this.env.pos.get_order();
+              const currentOrder = this.pos.get_order();
         if (currentOrder.is_finalized) {
             this.showPopup('ErrorPopup', {
                 title: 'Cannot Modify Finalized Order',
