@@ -67,12 +67,12 @@ patch(ProductScreen.prototype, {
             return;
         }
         this.numberBuffer.sendKey(buttonValue);
-    }
+    },
 
     selectLine(orderline) {
         this.numberBuffer.reset();
         this.currentOrder.select_orderline(orderline);
-    }
+    },
 });
 
 patch(PosStore.prototype, {
