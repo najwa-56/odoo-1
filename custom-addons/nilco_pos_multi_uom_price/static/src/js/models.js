@@ -100,14 +100,16 @@ patch(Orderline.prototype, {
         if (!this.order) return;
         const existingOrderline = this.order.orderlines.find(line => line.product.id === this.product.id);
        if (existingOrderline) {
-        // Get the new orderline that you want to remove
+        // Get the last orderline that you want to remove
         const newOrderline = this.order.get_last_orderline();
 
-        // Add the quantities together
-        existingOrderline.set_quantity(existingOrderline.get_quantity() + newOrderline.get_quantity());
+        if (newOrderline && newOrderline.product.id === this.product.id) {
+            // Add the quantities together
+            existingOrderline.set_quantity(existingOrderline.get_quantity() + newOrderline.get_quantity());
 
-        // Remove the new orderline
-        this.order.remove_orderline(newOrderline);
+            // Remove the new orderline
+            this.order.remove_orderline(newOrderline);
+        }
             // Move existing orderline to the end of the orderlines array
             this.order.orderlines = this.order.orderlines.filter(line => line !== existingOrderline);
             this.order.orderlines.push(existingOrderline);
