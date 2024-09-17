@@ -22,7 +22,7 @@ function handleBarcode(barcode, callback) {
 
 patch(ProductScreen.prototype, {
     async _barcodeProductAction(code) {
-
+      this.numberBuffer.reset();
             const product = await this._getProductByBarcode(code);
             if (product === true) {
                 return;
