@@ -52,8 +52,7 @@ patch(ProductScreen.prototype, {
                     merge: false,
                 });
             }
-
-              const currentOrder = this.env.pos.get_order()||this.pos.get_order();
+        const currentOrder = this.pos.get_order();
         if (currentOrder.is_finalized) {
             this.showPopup('ErrorPopup', {
                 title: 'Cannot Modify Finalized Order',
@@ -61,8 +60,9 @@ patch(ProductScreen.prototype, {
             });
             return;
         }
-            currentOrder.add_product(product, options);
+            this.currentOrder.add_product(product, options);
             this.numberBuffer.reset();
+            reorderProduct(this.currentOrder, product);
 
     },
 
