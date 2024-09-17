@@ -103,10 +103,10 @@ patch(DB.PosDB.prototype, {
                                 orderline.set_uom_name(orderline.name_field );
 
                                   // Remove the orderline from its current position
-                           // result.pos.selectedOrder.orderlines.remove(orderline);
+                            result.pos.selectedOrder.orderlines.remove(orderline);
 
                             // Add it back to the end of the array
-                          //  result.pos.selectedOrder.orderlines.push(orderline);
+                            result.pos.selectedOrder.orderlines.push(orderline);
 
 
                                 return true;

@@ -96,24 +96,16 @@ patch(Orderline.prototype, {
     }
 },
  // Method to reorder the product in the orderlines array
-   reorderProduct() {
-        if (!this.order) return;
-        const existingOrderline = this.order.orderlines.find(line => line.product.id === this.product.id);
-       if (existingOrderline) {
-        // Get the new orderline that you want to remove
-        const newOrderline = this.order.get_last_orderline();
-
-        // Add the quantities together
-        existingOrderline.set_quantity(existingOrderline.get_quantity() + newOrderline.get_quantity());
-
-        // Remove the new orderline
-        this.order.remove_orderline(newOrderline);
+ //  reorderProduct() {
+   //     if (!this.order) return;
+     //   const existingOrderline = this.order.orderlines.find(line => line.product.id === this.product.id);
+    //   if (existingOrderline) {
             // Move existing orderline to the end of the orderlines array
-            this.order.orderlines = this.order.orderlines.filter(line => line !== existingOrderline);
-            this.order.orderlines.push(existingOrderline);
+     //       this.order.orderlines = this.order.orderlines.filter(line => line !== existingOrderline);
+     //       this.order.orderlines.push(existingOrderline);
 
-       }
-    },
+      //  }
+ //   },
     getDisplayData() {
         return {
             ...super.getDisplayData(),
