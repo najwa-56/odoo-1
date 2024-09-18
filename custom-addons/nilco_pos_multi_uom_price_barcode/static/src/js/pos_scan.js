@@ -75,48 +75,74 @@ patch(DB.PosDB.prototype, {
         this._super.apply(this, arguments);
     },
     get_product_by_barcode(barcode) {
-            if (!barcode) return undefined;
+        if (!barcode) return undefined;
 
         const barcodes = Object.values(this.product_multi_barcodes);
 
         if (this.product_by_barcode[barcode]) {
-            return this.product_by_barcode[barcode];
+            const product = this.product_by_barcode[barcode];
+            const orderlines = product.pos.selectedOrder.get_orderlines();
+
+            for (const orderline of orderlines) {
+                // Check if the orderline matches the original product barcode
+                if (orderline.product.id === product.id && orderline.price === product.lst_price) {
+                    const newQuantity = parseFloat(orderline.quantity) + 1;
+                    orderline.set_quantity(newQuantity, product.lst_price);
+                    orderline.set_uom_name(orderline.name_field);
+
+                    // Move the orderline to the end of the orderlines array
+                    product.pos.selectedOrder.orderlines.remove(orderline);
+                    product.pos.selectedOrder.orderlines.push(orderline);
+
+                    return true;
+                }
+            }
+
+            // If no matching orderline is found, create a new orderline
+            const line = new Orderline(
+                { env: product.env },
+                { pos: product.pos, order: product.pos.selectedOrder, product: product }
+            );
+            product.pos.selectedOrder.add_orderline(line);
+            return true;
         } else if (this.product_packaging_by_barcode[barcode]) {
             return this.product_by_id[this.product_packaging_by_barcode[barcode].product_id[0]];
         } else if (barcodes.length > 0) {
             for (const product of barcodes) {
                 const uoms = Object.values(product.uom_id);
                 for (const uom of uoms) {
+                    // Check if the UOM barcode matches
                     if (uom.barcodes.includes(barcode)) {
                         const result = this.product_by_id[uom.product_variant_id[0]];
-                        const line = new Orderline(
-                            { env: result.env },
-                            { pos: result.pos, order: result.pos.selectedOrder, product: result }
-                        );
                         const orderlines = result.pos.selectedOrder.get_orderlines();
+
                         for (const orderline of orderlines) {
+                            // Apply the condition to UOM barcode
                             if (orderline.product.id === result.id &&
                                 orderline.product_uom_id[0] === uom.id &&
                                 orderline.price === uom.price) {
                                 const newQuantity = parseFloat(orderline.quantity) + 1;
                                 orderline.set_quantity(newQuantity, uom.price);
-                                orderline.set_uom_name(orderline.name_field );
+                                orderline.set_uom_name(orderline.name_field);
 
-                                  // Remove the orderline from its current position
-                            result.pos.selectedOrder.orderlines.remove(orderline);
-
-                            // Add it back to the end of the array
-                            result.pos.selectedOrder.orderlines.push(orderline);
-
+                                // Move the orderline to the end of the orderlines array
+                                result.pos.selectedOrder.orderlines.remove(orderline);
+                                result.pos.selectedOrder.orderlines.push(orderline);
 
                                 return true;
                             }
                         }
+
+                        // If no matching orderline is found, create a new orderline with UOM
+                        const line = new Orderline(
+                            { env: result.env },
+                            { pos: result.pos, order: result.pos.selectedOrder, product: result }
+                        );
                         result.pos.selectedOrder.add_orderline(line);
                         result.pos.selectedOrder.selected_orderline.set_uom({ 0: uom.id, 1: uom.name });
                         result.pos.selectedOrder.selected_orderline.price_manually_set = true;
                         result.pos.selectedOrder.selected_orderline.set_unit_price(uom.price);
-                         result.pos.selectedOrder.selected_orderline.set_uom_name(uom.name_field);
+                        result.pos.selectedOrder.selected_orderline.set_uom_name(uom.name_field);
                         return true;
                     }
                 }
