@@ -70,6 +70,7 @@ patch(PosStore.prototype, {
     }
 });
 
+
 patch(DB.PosDB.prototype, {
     init(options) {
         this._super.apply(this, arguments);
@@ -105,23 +106,37 @@ patch(DB.PosDB.prototype, {
 
         const barcodes = Object.values(this.product_multi_barcodes);
 
-             if (this.product_by_barcode[barcode]) {
+                if (this.product_by_barcode[barcode]) {
             const product = this.product_by_barcode[barcode];
             const orderlines = product.pos.selectedOrder.get_orderlines();
 
             for (const orderline of orderlines) {
                 // Check if the orderline matches the original product barcode
-            if (orderline.product.id === product.id && orderline.price === product.lst_price) {
-            const newQuantity = parseFloat(orderline.quantity) + (product.set_quantity); // Adjust `product.weight` to the appropriate property
-                    orderline.set_quantity(newQuantity, product.lst_price);
+                if (orderline.product.id === product.id) {
+                    let newQuantity;
+                    if (orderline.price === product.lst_price) {
+                        // Handle weight or quantity barcode types
+                        if (barcode.type === "weight") {
+                            // Assume the barcode.value represents the weight
+                            newQuantity = parseFloat(orderline.quantity) + parseFloat(barcode.value);
+                        } else if (barcode.type === "quantity") {
+                            // Assume the barcode.value represents the quantity
+                            newQuantity = parseFloat(orderline.quantity) + parseFloat(barcode.value);
+                        } else {
+                            // Handle other types as before
+                            newQuantity = parseFloat(orderline.quantity) + 1;
+                        }
 
-                    // Move the orderline to the end of the orderlines array
-                    product.pos.selectedOrder.orderlines.remove(orderline);
-                    product.pos.selectedOrder.orderlines.push(orderline);
+                        // Update the quantity and position of the orderline
+                        orderline.set_quantity(newQuantity, product.lst_price);
+                        product.pos.selectedOrder.orderlines.remove(orderline);
+                        product.pos.selectedOrder.orderlines.push(orderline);
 
-                    return true;
+                        return true;
+                    }
                 }
-            }} else if (this.product_packaging_by_barcode[barcode]) {
+            }
+        } else if (this.product_packaging_by_barcode[barcode]) {
             return this.product_by_id[this.product_packaging_by_barcode[barcode].product_id[0]];
         } else if (barcodes.length > 0) {
             for (const product of barcodes) {
