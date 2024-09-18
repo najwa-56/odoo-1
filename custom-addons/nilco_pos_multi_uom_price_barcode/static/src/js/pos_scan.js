@@ -18,7 +18,6 @@ function handleBarcode(barcode, callback) {
     callback();  // Call the original barcode processing logic
 
 }
-
 patch(ProductScreen.prototype, {
     async _barcodeProductAction(code) {
         // Wrap barcode handling with debounce
@@ -85,59 +84,18 @@ patch(PosStore.prototype, {
     }
 });
 
-
 patch(DB.PosDB.prototype, {
     init(options) {
         this._super.apply(this, arguments);
-    },
-     _product_search_string(product) {
-        // Start with the default product name and reference
-        let str = product.display_name;
-        if (product.reference) {
-            str += '|' + product.reference;
-        }
-
-        // 1. Include the original product barcode in the search string
-        if (product.barcode) {
-            str += '|' + product.barcode;
-        }
-
-        // 2. Add multi-UOM barcodes to the search string
-        if (product.uom_id && product.uom_id.length > 0) {
-            for (const uom of product.uom_id) {
-                if (uom.barcodes && uom.barcodes.length > 0) {
-                    for (const uom_barcode of uom.barcodes) {
-                        str += '|' + uom_barcode;
-                    }
-                }
-            }
-        }
-
-        // 3. Return the search string with all barcodes (original and UOM)
-        return str;
     },
     get_product_by_barcode(barcode) {
             if (!barcode) return undefined;
 
         const barcodes = Object.values(this.product_multi_barcodes);
 
-             if (this.product_by_barcode[barcode]) {
-            const product = this.product_by_barcode[barcode];
-            const orderlines = product.pos.selectedOrder.get_orderlines();
-
-            for (const orderline of orderlines) {
-                // Check if the orderline matches the original product barcode
-            if (orderline.product.id === product.id && orderline.price === product.lst_price) {
-                    const newQuantity = parseFloat(orderline.quantity) + 1;
-                    orderline.set_quantity(newQuantity, product.lst_price);
-
-                    // Move the orderline to the end of the orderlines array
-                    product.pos.selectedOrder.orderlines.remove(orderline);
-                    product.pos.selectedOrder.orderlines.push(orderline);
-
-                    return true;
-                }
-            }} else if (this.product_packaging_by_barcode[barcode]) {
+        if (this.product_by_barcode[barcode]) {
+            return this.product_by_barcode[barcode];
+        } else if (this.product_packaging_by_barcode[barcode]) {
             return this.product_by_id[this.product_packaging_by_barcode[barcode].product_id[0]];
         } else if (barcodes.length > 0) {
             for (const product of barcodes) {
