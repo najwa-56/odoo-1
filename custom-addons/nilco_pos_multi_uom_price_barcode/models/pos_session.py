@@ -36,30 +36,4 @@ class PosSession(models.Model):
 
         return product_uom_price
 
-    def find_product_by_barcode(self, barcode):
-        # Search for the product by barcode in the product.product model
-        product = self.env['product.product'].search([
-            ('barcode', '=', barcode),
-            ('sale_ok', '=', True),
-            ('available_in_pos', '=', True),
-        ])
-        if product:
-            return {'product_id': [product.id]}
-
-        # Search for the product packaging by barcode
-        packaging_params = self._loader_params_product_packaging()
-        packaging_params['search_params']['domain'] = [['barcode', '=', barcode]]
-        packaging = self.env['product.packaging'].search_read(**packaging_params['search_params'])
-        if packaging:
-            product_id = packaging[0]['product_id']
-            if product_id:
-                return {'product_id': [product_id[0]], 'packaging': packaging}
-
-        # Search in the product.multi.uom.price model for barcode2
-        multi_uom = self.env['product.multi.uom.price'].search([('barcode2', '=', barcode)])
-        if multi_uom:
-            product_id = multi_uom.product_tmpl_id.product_variant_id.id
-            return {'product_id': [product_id], 'multi_uom_id': multi_uom.id}
-
-        # Return empty if no match is found
-        return {}
+   
