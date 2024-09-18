@@ -74,6 +74,22 @@ patch(DB.PosDB.prototype, {
     init(options) {
         this._super.apply(this, arguments);
     },
+     // Inherit the _product_search_string method
+    _product_search_string(product) {
+        // Get the default search string
+        let str = this._super.apply(this, arguments);
+
+        // Add custom multi-barcode handling logic
+        if (product.multi_barcodes && product.multi_barcodes.length) {
+            product.multi_barcodes.forEach((barcode) => {
+                str += "|" + barcode;
+            });
+        }
+
+        // Format the string
+        str = product.id + ":" + str.replace(/[\n:]/g, "") + "\n";
+        return str;
+    },
     get_product_by_barcode(barcode) {
         if (!barcode) return undefined;
 
