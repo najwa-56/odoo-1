@@ -18,11 +18,13 @@ function handleBarcode(barcode, callback) {
     callback();  // Call the original barcode processing logic
 
 }
+
 patch(ProductScreen.prototype, {
     async _barcodeProductAction(code) {
+
         // Wrap barcode handling with debounce
         handleBarcode(code, async () => {
-            this.numberBuffer.reset();
+      this.numberBuffer.reset();
             const product = await this._getProductByBarcode(code);
             if (product === true) {
                 return;
@@ -34,7 +36,6 @@ patch(ProductScreen.prototype, {
             if (!options) {
                 return;
             }
-
             if (code.type === "price") {
                 Object.assign(options, {
                     price: code.value,
@@ -54,28 +55,13 @@ patch(ProductScreen.prototype, {
                 });
             }
 
-            // Check if there is an existing order line with the same product id and price
-            const existingOrderLine = this.currentOrder.orderlines.find(line =>
-                line.product.id === product.id &&
-                line.get_unit_price() === options.price
-            );
-
-            if (existingOrderLine) {
-                // Update the existing order line with the new quantity or options
-                existingOrderLine.set_quantity(existingOrderLine.get_quantity() + options.quantity);
-                if (code.type === "discount") {
-                    existingOrderLine.set_discount(options.discount);
-                }
-            } else {
-                // Add a new product line if no matching line is found
-                this.currentOrder.add_product(product, options);
-            }
-
+            this.currentOrder.add_product(product, options);
             this.numberBuffer.reset();
-        });
-    },
-});
 
+    });
+ },
+
+});
 
 patch(PosStore.prototype, {
     async _processData(loadedData) {
@@ -94,8 +80,37 @@ patch(DB.PosDB.prototype, {
         const barcodes = Object.values(this.product_multi_barcodes);
 
         if (this.product_by_barcode[barcode]) {
-            return this.product_by_barcode[barcode];
-        } else if (this.product_packaging_by_barcode[barcode]) {
+    const product = this.product_by_barcode[barcode];
+    const orderlines = product.pos.selectedOrder.get_orderlines();
+
+    for (const orderline of orderlines) {
+        // Check if the orderline matches the original product barcode
+        if (orderline.product.id === product.id && orderline.price === product.lst_price) {
+             let initialQuantity = parseFloat(orderline.quantity);
+
+                    // Calculate the new quantity by adding the current orderline quantity
+                    let newQuantity = initialQuantity + parseFloat(orderline.quantity);
+
+                    // Set the new quantity and update the orderline
+                    orderline.set_quantity(newQuantity, product.lst_price);
+
+                    // Move the orderline to the end of the orderlines array
+                    product.pos.selectedOrder.orderlines.remove(orderline);
+                    product.pos.selectedOrder.orderlines.push(orderline);
+
+
+            return true;
+        }
+    }
+
+    // If no matching orderline is found, create a new orderline
+    const line = new Orderline(
+        { env: product.env },
+        { pos: product.pos, order: product.pos.selectedOrder, product: product }
+    );
+    product.pos.selectedOrder.add_orderline(line);
+    return true;
+} else if (this.product_packaging_by_barcode[barcode]) {
             return this.product_by_id[this.product_packaging_by_barcode[barcode].product_id[0]];
         } else if (barcodes.length > 0) {
             for (const product of barcodes) {
