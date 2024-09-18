@@ -64,7 +64,7 @@ patch(Orderline.prototype, {
         super.setup(...arguments);
         this.product_uom_id = this.product.default_uom_id || this.product_uom_id || this.product.uom_id;
                 this.name_field = options.name_field || this.name_field || "";  // Ensure initialization
-         this.reorderProduct();
+       //  this.reorderProduct();
 
     },
 
@@ -96,30 +96,16 @@ patch(Orderline.prototype, {
     }
 },
  // Method to reorder the product in the orderlines array
-   reorderProduct() {
-    if (!this.order) return;
+ //  reorderProduct() {
+   //     if (!this.order) return;
+     //   const existingOrderline = this.order.orderlines.find(line => line.product.id === this.product.id);
+    //   if (existingOrderline) {
+            // Move existing orderline to the end of the orderlines array
+     //       this.order.orderlines = this.order.orderlines.filter(line => line !== existingOrderline);
+     //       this.order.orderlines.push(existingOrderline);
 
-    // Find if an orderline for the same product already exists
-    const existingOrderline = this.order.orderlines.find(line => line.product.id === this.product.id);
-
-    if (existingOrderline) {
-        // Get the last orderline that was added
-        const newOrderline = this.order.get_last_orderline();
-
-        if (newOrderline && newOrderline.product.id === this.product.id) {
-            // Add the quantities together
-            existingOrderline.set_quantity(existingOrderline.get_quantity() + newOrderline.get_quantity());
-
-            // Instead of remove_orderline, use the correct method
-            this.order.remove_orderline(newOrderline.cid);  // Use the `cid` to identify and remove the orderline
-        }
-
-        // Move the existing orderline to the end of the orderlines array
-        this.order.orderlines = this.order.orderlines.filter(line => line !== existingOrderline);
-        this.order.orderlines.push(existingOrderline);
-    }
-},
-
+      //  }
+ //   },
     getDisplayData() {
         return {
             ...super.getDisplayData(),
