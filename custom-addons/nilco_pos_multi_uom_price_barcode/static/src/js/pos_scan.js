@@ -85,8 +85,8 @@ patch(DB.PosDB.prototype, {
 
     for (const orderline of orderlines) {
         // Check if the orderline matches the original product barcode
-        if (orderline.product.id === product.id && orderline.price === product.lst_price) {
-             let initialQuantity = parseFloat(orderline.quantity);
+                if (orderline.product.id === product.id && orderline.price === product.lst_price) {
+                   let initialQuantity = parseFloat(orderline.quantity);
 
                     // Calculate the new quantity by adding the current orderline quantity
                     let newQuantity = initialQuantity + parseFloat(orderline.quantity);
@@ -97,19 +97,11 @@ patch(DB.PosDB.prototype, {
                     // Move the orderline to the end of the orderlines array
                     product.pos.selectedOrder.orderlines.remove(orderline);
                     product.pos.selectedOrder.orderlines.push(orderline);
-
-
             return true;
         }
     }
 
-    // If no matching orderline is found, create a new orderline
-    const line = new Orderline(
-        { env: product.env },
-        { pos: product.pos, order: product.pos.selectedOrder, product: product }
-    );
-    product.pos.selectedOrder.add_orderline(line);
-    return true;
+
 } else if (this.product_packaging_by_barcode[barcode]) {
             return this.product_by_id[this.product_packaging_by_barcode[barcode].product_id[0]];
         } else if (barcodes.length > 0) {
