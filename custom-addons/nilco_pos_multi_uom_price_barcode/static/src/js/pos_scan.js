@@ -74,10 +74,22 @@ patch(DB.PosDB.prototype, {
     init(options) {
         this._super.apply(this, arguments);
     },
-     // Inherit the _product_search_string method
+      // Inherit and extend the _product_search_string method
     _product_search_string(product) {
-        // Get the default search string
-        let str = this._super.apply(this, arguments);
+        // First, replicate the original logic (without _super)
+        let str = product.display_name;
+        if (product.barcode) {
+            str += "|" + product.barcode;
+        }
+        if (product.default_code) {
+            str += "|" + product.default_code;
+        }
+        if (product.description) {
+            str += "|" + product.description;
+        }
+        if (product.description_sale) {
+            str += "|" + product.description_sale;
+        }
 
         // Add custom multi-barcode handling logic
         if (product.multi_barcodes && product.multi_barcodes.length) {
@@ -90,6 +102,7 @@ patch(DB.PosDB.prototype, {
         str = product.id + ":" + str.replace(/[\n:]/g, "") + "\n";
         return str;
     },
+
     get_product_by_barcode(barcode) {
         if (!barcode) return undefined;
 
