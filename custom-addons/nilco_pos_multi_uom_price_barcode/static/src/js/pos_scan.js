@@ -74,6 +74,32 @@ patch(DB.PosDB.prototype, {
     init(options) {
         this._super.apply(this, arguments);
     },
+     _product_search_string(product) {
+        // Start with the default product name and reference
+        let str = product.display_name;
+        if (product.reference) {
+            str += '|' + product.reference;
+        }
+
+        // 1. Include the original product barcode in the search string
+        if (product.barcode) {
+            str += '|' + product.barcode;
+        }
+
+        // 2. Add multi-UOM barcodes to the search string
+        if (product.uom_id && product.uom_id.length > 0) {
+            for (const uom of product.uom_id) {
+                if (uom.barcodes && uom.barcodes.length > 0) {
+                    for (const uom_barcode of uom.barcodes) {
+                        str += '|' + uom_barcode;
+                    }
+                }
+            }
+        }
+
+        // 3. Return the search string with all barcodes (original and UOM)
+        return str;
+    },
     get_product_by_barcode(barcode) {
             if (!barcode) return undefined;
 
