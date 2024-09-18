@@ -105,13 +105,13 @@ patch(DB.PosDB.prototype, {
 
         const barcodes = Object.values(this.product_multi_barcodes);
 
-        if (this.product_by_barcode[barcode]) {
+             if (this.product_by_barcode[barcode]) {
             const product = this.product_by_barcode[barcode];
             const orderlines = product.pos.selectedOrder.get_orderlines();
 
             for (const orderline of orderlines) {
                 // Check if the orderline matches the original product barcode
-                if (orderline.product.id === product.id ) {
+            if (orderline.product.id === product.id && orderline.price === product.lst_price) {
                     const newQuantity = parseFloat(orderline.quantity) + 1;
                     orderline.set_quantity(newQuantity, product.lst_price);
 
@@ -121,16 +121,7 @@ patch(DB.PosDB.prototype, {
 
                     return true;
                 }
-            }
-
-            // If no matching orderline is found, create a new orderline
-            const line = new Orderline(
-                { env: product.env },
-                { pos: product.pos, order: product.pos.selectedOrder, product: product }
-            );
-            product.pos.selectedOrder.add_orderline(line);
-            return true;
-        } else if (this.product_packaging_by_barcode[barcode]) {
+            }} else if (this.product_packaging_by_barcode[barcode]) {
             return this.product_by_id[this.product_packaging_by_barcode[barcode].product_id[0]];
         } else if (barcodes.length > 0) {
             for (const product of barcodes) {
