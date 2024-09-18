@@ -88,13 +88,7 @@ patch(DB.PosDB.prototype, {
                 // Check if the orderline matches the original product barcode
                 if (orderline.product.id === product.id ) {
                     const newQuantity = parseFloat(orderline.quantity) + 1;
-                     // Modify price based on weight (assuming weight exists)
-                    let price = product.lst_price;
-                    if (product.weight) {
-                        price = product.lst_price * product.weight;
-                    }
-
-                    orderline.set_quantity(newQuantity, price);
+                    orderline.set_quantity(newQuantity, product.lst_price);
 
                     // Move the orderline to the end of the orderlines array
                     product.pos.selectedOrder.orderlines.remove(orderline);
