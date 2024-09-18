@@ -86,7 +86,12 @@ patch(DB.PosDB.prototype, {
     for (const orderline of orderlines) {
         // Check if the orderline matches the original product barcode
                 if (orderline.product.id === product.id && orderline.price === product.lst_price) {
-                   let initialQuantity = parseFloat(orderline.quantity);
+                   const key = `${product.id}-${product.lst_price}`; // Unique key for tracking initial quantity
+
+                    if (!(key in this.initialQuantities)) {
+                        // Store the initial quantity only the first time
+                        this.initialQuantities[key] = parseFloat(orderline.quantity);
+                    }
 
                     // Calculate the new quantity by adding the current orderline quantity
                     let newQuantity = initialQuantity + parseFloat(orderline.quantity);
