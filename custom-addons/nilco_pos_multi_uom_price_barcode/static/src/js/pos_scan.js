@@ -112,9 +112,7 @@ patch(DB.PosDB.prototype, {
             for (const orderline of orderlines) {
                 // Check if the orderline matches the original product barcode
             if (orderline.product.id === product.id && orderline.price === product.lst_price) {
-   // Calculate the new quantity by adding to the existing quantity
-            const existingQuantity = parseFloat(orderline.quantity) || 0;
-            const newQuantity = existingQuantity + parseFloat(product.weight); // Assuming 'weight' is the new quantity
+            const newQuantity = parseFloat(orderline.quantity) + (product.set_quantity(quantity, product.lst_price);); // Adjust `product.weight` to the appropriate property
                     orderline.set_quantity(newQuantity, product.lst_price);
 
                     // Move the orderline to the end of the orderlines array
