@@ -74,34 +74,6 @@ patch(DB.PosDB.prototype, {
     init(options) {
         this._super.apply(this, arguments);
     },
-      // Inherit and extend the _product_search_string method
-    _product_search_string(product) {
-        // First, replicate the original logic (without _super)
-        let str = product.display_name;
-        if (product.barcode) {
-            str += "|" + product.barcode;
-        }
-        if (product.default_code) {
-            str += "|" + product.default_code;
-        }
-        if (product.description) {
-            str += "|" + product.description;
-        }
-        if (product.description_sale) {
-            str += "|" + product.description_sale;
-        }
-
-        // Add custom multi-barcode handling logic
-        if (product.multi_barcodes && product.multi_barcodes.length) {
-            product.multi_barcodes.forEach((barcode) => {
-                str += "|" + barcode;
-            });
-        }
-
-        // Format the string
-        str = product.id + ":" + str.replace(/[\n:]/g, "") + "\n";
-        return str;
-    },
 
     get_product_by_barcode(barcode) {
         if (!barcode) return undefined;
@@ -116,8 +88,13 @@ patch(DB.PosDB.prototype, {
                 // Check if the orderline matches the original product barcode
                 if (orderline.product.id === product.id ) {
                     const newQuantity = parseFloat(orderline.quantity) + 1;
-                    orderline.set_quantity(newQuantity, product.lst_price);
-                    orderline.set_uom_name(orderline.name_field);
+                     // Modify price based on weight (assuming weight exists)
+                    let price = product.lst_price;
+                    if (product.weight) {
+                        price = product.lst_price * product.weight;
+                    }
+
+                    orderline.set_quantity(newQuantity, price);
 
                     // Move the orderline to the end of the orderlines array
                     product.pos.selectedOrder.orderlines.remove(orderline);
