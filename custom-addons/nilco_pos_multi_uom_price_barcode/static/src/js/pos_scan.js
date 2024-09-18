@@ -112,7 +112,7 @@ patch(DB.PosDB.prototype, {
             for (const orderline of orderlines) {
                 // Check if the orderline matches the original product barcode
             if (orderline.product.id === product.id && orderline.price === product.lst_price) {
-                    const newQuantity = parseFloat(orderline.quantity) + 1;
+            const newQuantity = parseFloat(orderline.quantity) + product.qty_available;  // Accumulate previous and new quantity
                     orderline.set_quantity(newQuantity, product.lst_price);
 
                     // Move the orderline to the end of the orderlines array
