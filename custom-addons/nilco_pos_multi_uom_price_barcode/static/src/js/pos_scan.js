@@ -75,11 +75,15 @@ patch(DB.PosDB.prototype, {
         this._super.apply(this, arguments);
         this.initialQuantities = {}; // Initialize initial quantities object
     },
-    // Modify the search string to include UOM barcodes
-    _product_search_string: function(product) {
-        let str = this._super(product);
-        const uoms = Object.values(product.uom_id);
+     // Modify the search string to include UOM barcodes
+    _product_search_string: function (product) {
+        let str = product.display_name;
+        if (product.barcode) {
+            str += '|' + product.barcode;
+        }
 
+        // Check UOM barcodes and add them to the search string
+        const uoms = Object.values(product.uom_id);
         for (const uom of uoms) {
             if (uom.barcodes && uom.barcodes.length) {
                 for (const barcode of uom.barcodes) {
@@ -87,6 +91,8 @@ patch(DB.PosDB.prototype, {
                 }
             }
         }
+
+        str = product.id + ':' + str;
         return str;
     },
     get_product_by_barcode(barcode) {
