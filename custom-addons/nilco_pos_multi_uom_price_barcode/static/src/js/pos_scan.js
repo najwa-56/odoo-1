@@ -28,62 +28,7 @@ patch(ProductsWidget.prototype, {
         super.setup();
         this.pos=usePos();
     },
-async loadProductFromDB() {
-    const { searchProductWord } = this.pos;
-    if (!searchProductWord) {
-        return;
-    }
-    const cleanedProductWord = searchProductWord.replace(/;product_tmpl_id:\d+$/, '');
-    const domain = [
-        "|",
-        "|",
-        ["name", "ilike", cleanedProductWord],
-        ["default_code", "ilike", cleanedProductWord],
-        ["barcode", "ilike", cleanedProductWord],
-        ["available_in_pos", "=", true],
-        ["sale_ok", "=", true],
-    ];
 
-    // Check if there are custom multi barcodes and extend the domain search
-    const barcodes = Object.keys(this.pos.db.product_multi_barcodes || {});
-    if (barcodes.length > 0 && barcodes.includes(cleanedProductWord)) {
-        domain.push(["id", "in", barcodes.map(b => this.pos.db.product_multi_barcodes[b].product_id[0])]);
-    }
-
-    const { limit_categories, iface_available_categ_ids } = this.pos.config;
-    if (limit_categories && iface_available_categ_ids.length > 0) {
-        domain.push(["pos_categ_ids", "in", iface_available_categ_ids]);
-    }
-
-    try {
-        const limit = 30;
-        const ProductIds = await this.orm.call(
-            "product.product",
-            "search",
-            [domain],
-            {
-                offset: this.state.currentOffset,
-                limit: limit,
-            }
-        );
-        if (ProductIds.length) {
-            await this.pos._addProducts(ProductIds, false);
-        }
-        this.updateProductList();
-        return ProductIds;
-    } catch (error) {
-        if (error instanceof ConnectionLostError || error instanceof ConnectionAbortedError) {
-            return this.popup.add(OfflineErrorPopup, {
-                title: _t("Network Error"),
-                body: _t(
-                    "Product is not loaded. Tried loading the product from the server but there is a network error."
-                ),
-            });
-        } else {
-            throw error;
-        }
-    }
-}
 
 });
 patch(ProductScreen.prototype, {
