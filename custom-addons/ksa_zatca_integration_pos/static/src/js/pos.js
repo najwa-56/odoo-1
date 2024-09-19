@@ -4,9 +4,12 @@ import { PartnerDetailsEdit } from "@point_of_sale/app/screens/partner_list/part
 import { patch } from "@web/core/utils/patch";
 import { _t } from "@web/core/l10n/translation";
 
+// Apply the patch
 patch(PartnerDetailsEdit.prototype, {
     setup() {
-        this._super.apply(this, arguments);  // Correctly call super in patched setup method
+        // Call the original setup first
+        PartnerDetailsEdit.prototype.setup.call(this);
+
         const partner = this.props.partner;
 
         // Add new fields to changes state
@@ -23,6 +26,3 @@ patch(PartnerDetailsEdit.prototype, {
         };
     },
 });
-
-
-
