@@ -7,7 +7,7 @@ import { Order, Orderline, Payment } from "@point_of_sale/app/store/models";
 import { ProductScreen } from "@point_of_sale/app/screens/product_screen/product_screen";
 const core = require('web.core');
 const _t = core._t;
-import { ProductsWidget } from "point_of_sale.ProductsWidget";
+import { ProductsWidget } from "@point_of_sale/app/screens/product_screen/product_list/product_list";
 import { useService } from "@web/core/utils/hooks";
 import { useState } from "owl";
 import { ErrorBarcodePopup } from "@point_of_sale/app/barcode/error_popup/barcode_error_popup";
@@ -24,6 +24,10 @@ function handleBarcode(barcode, callback) {
 
 }
 patch(ProductsWidget.prototype, {
+  setup() {
+        super.setup();
+        this.pos=usePos();
+    },
 async loadProductFromDB() {
     const { searchProductWord } = this.pos;
     if (!searchProductWord) {
