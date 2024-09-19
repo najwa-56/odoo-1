@@ -1,9 +1,10 @@
 import { PartnerDetailsEdit } from "@point_of_sale/app/screens/partner_list/partner_editor/partner_editor";
 import { patch } from "@web/core/utils/patch";
+import { _t } from "@web/core/l10n/translation";
 
-patch(PartnerDetailsEdit.prototype, {
+patch(PartnerDetailsEdit.prototype, 'custom-partner-details-edit', {
     setup() {
-        const res = super.setup(...arguments);
+        this._super.apply(this, arguments);  // Correctly call super in patched setup method
         const partner = this.props.partner;
 
         // Add new fields to changes state
@@ -19,5 +20,4 @@ patch(PartnerDetailsEdit.prototype, {
             'District': _t('District'),
         };
     },
-}
-
+});
