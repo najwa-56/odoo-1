@@ -5,6 +5,8 @@ import { patch } from "@web/core/utils/patch";
 import { PosStore } from "@point_of_sale/app/store/pos_store";
 import { Order, Orderline, Payment } from "@point_of_sale/app/store/models";
 import { ProductScreen } from "@point_of_sale/app/screens/product_screen/product_screen";
+const core = require('web.core');
+const _t = core._t;
 import { ErrorBarcodePopup } from "@point_of_sale/app/barcode/error_popup/barcode_error_popup";
 let lastBarcodeTime = 0;
 const debounceTime = 100;  // Adjust delay as needed
@@ -75,14 +77,15 @@ patch(DB.PosDB.prototype, {
         this._super.apply(this, arguments);
         this.initialQuantities = {}; // Initialize initial quantities object
     },
-     // Modify the search string to include UOM barcodes
+     // Modify the product search string to include UOM barcodes
     _product_search_string: function (product) {
+        // Create the initial search string using the product's name and barcode
         let str = product.display_name;
         if (product.barcode) {
             str += '|' + product.barcode;
         }
 
-        // Check UOM barcodes and add them to the search string
+        // Include UOM barcodes in the search string
         const uoms = Object.values(product.uom_id);
         for (const uom of uoms) {
             if (uom.barcodes && uom.barcodes.length) {
@@ -92,9 +95,9 @@ patch(DB.PosDB.prototype, {
             }
         }
 
-        str = product.id + ':' + str;
-        return str;
-    },
+        // Return the complete search string for the product
+        return product.id + ':' + str;
+    }
     get_product_by_barcode(barcode) {
             if (!barcode) return undefined;
 
@@ -133,7 +136,7 @@ patch(DB.PosDB.prototype, {
     }
 
 
-} else if (this.product_packaging_by_barcode[barcode]) {
+       } else if (this.product_packaging_by_barcode[barcode]) {
             return this.product_by_id[this.product_packaging_by_barcode[barcode].product_id[0]];
         } else if (barcodes.length > 0) {
             for (const product of barcodes) {
