@@ -157,6 +157,8 @@ export class ProductsWidget extends Component {
             ["available_in_pos", "=", true],
             ["sale_ok", "=", true],
         ];
+ // Add the condition to search in custom barcodes (product_multi_barcodes)
+    domain.push("|", ["product_multi_barcodes.barcode", "ilike", cleanedProductWord]);
 
         const { limit_categories, iface_available_categ_ids } = this.pos.config;
         if (limit_categories && iface_available_categ_ids.length > 0) {
