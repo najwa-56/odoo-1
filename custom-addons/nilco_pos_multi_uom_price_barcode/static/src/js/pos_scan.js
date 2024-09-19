@@ -5,8 +5,6 @@ import { patch } from "@web/core/utils/patch";
 import { PosStore } from "@point_of_sale/app/store/pos_store";
 import { Order, Orderline, Payment } from "@point_of_sale/app/store/models";
 import { ProductScreen } from "@point_of_sale/app/screens/product_screen/product_screen";
-const core = require('web.core');
-const _t = core._t;
 import { ErrorBarcodePopup } from "@point_of_sale/app/barcode/error_popup/barcode_error_popup";
 let lastBarcodeTime = 0;
 const debounceTime = 100;  // Adjust delay as needed
@@ -20,7 +18,6 @@ function handleBarcode(barcode, callback) {
     callback();  // Call the original barcode processing logic
 
 }
-
 patch(ProductScreen.prototype, {
     async _barcodeProductAction(code) {
 
