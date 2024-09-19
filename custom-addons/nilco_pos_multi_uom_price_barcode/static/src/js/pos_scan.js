@@ -7,6 +7,9 @@ import { Order, Orderline, Payment } from "@point_of_sale/app/store/models";
 import { ProductScreen } from "@point_of_sale/app/screens/product_screen/product_screen";
 const core = require('web.core');
 const _t = core._t;
+import { ProductsWidget } from "point_of_sale.ProductsWidget";
+import { useService } from "@web/core/utils/hooks";
+import { useState } from "owl";
 import { ErrorBarcodePopup } from "@point_of_sale/app/barcode/error_popup/barcode_error_popup";
 let lastBarcodeTime = 0;
 const debounceTime = 100;  // Adjust delay as needed
@@ -20,7 +23,65 @@ function handleBarcode(barcode, callback) {
     callback();  // Call the original barcode processing logic
 
 }
+patch(ProductsWidget.prototype, {
+async loadProductFromDB() {
+    const { searchProductWord } = this.pos;
+    if (!searchProductWord) {
+        return;
+    }
+    const cleanedProductWord = searchProductWord.replace(/;product_tmpl_id:\d+$/, '');
+    const domain = [
+        "|",
+        "|",
+        ["name", "ilike", cleanedProductWord],
+        ["default_code", "ilike", cleanedProductWord],
+        ["barcode", "ilike", cleanedProductWord],
+        ["available_in_pos", "=", true],
+        ["sale_ok", "=", true],
+    ];
 
+    // Check if there are custom multi barcodes and extend the domain search
+    const barcodes = Object.keys(this.pos.db.product_multi_barcodes || {});
+    if (barcodes.length > 0 && barcodes.includes(cleanedProductWord)) {
+        domain.push(["id", "in", barcodes.map(b => this.pos.db.product_multi_barcodes[b].product_id[0])]);
+    }
+
+    const { limit_categories, iface_available_categ_ids } = this.pos.config;
+    if (limit_categories && iface_available_categ_ids.length > 0) {
+        domain.push(["pos_categ_ids", "in", iface_available_categ_ids]);
+    }
+
+    try {
+        const limit = 30;
+        const ProductIds = await this.orm.call(
+            "product.product",
+            "search",
+            [domain],
+            {
+                offset: this.state.currentOffset,
+                limit: limit,
+            }
+        );
+        if (ProductIds.length) {
+            await this.pos._addProducts(ProductIds, false);
+        }
+        this.updateProductList();
+        return ProductIds;
+    } catch (error) {
+        if (error instanceof ConnectionLostError || error instanceof ConnectionAbortedError) {
+            return this.popup.add(OfflineErrorPopup, {
+                title: _t("Network Error"),
+                body: _t(
+                    "Product is not loaded. Tried loading the product from the server but there is a network error."
+                ),
+            });
+        } else {
+            throw error;
+        }
+    }
+}
+
+});
 patch(ProductScreen.prototype, {
     async _barcodeProductAction(code) {
 
@@ -77,27 +138,7 @@ patch(DB.PosDB.prototype, {
         this._super.apply(this, arguments);
         this.initialQuantities = {}; // Initialize initial quantities object
     },
-     // Modify the product search string to include UOM barcodes
-    _product_search_string: function (product) {
-        // Create the initial search string using the product's name and barcode
-        let str = product.display_name;
-        if (product.barcode) {
-            str += '|' + product.barcode;
-        }
 
-        // Include UOM barcodes in the search string
-        const uoms = Object.values(product.uom_id);
-        for (const uom of uoms) {
-            if (uom.barcodes && uom.barcodes.length) {
-                for (const barcode of uom.barcodes) {
-                    str += '|' + barcode;
-                }
-            }
-        }
-
-        // Return the complete search string for the product
-        return product.id + ':' + str;
-    }
     get_product_by_barcode(barcode) {
             if (!barcode) return undefined;
 
