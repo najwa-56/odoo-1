@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <template id="custom_partner_details_edit" inherit_id="point_of_sale.PartnerDetailsEdit">
+        <!-- Insert new fields: building_no, additional_no, and district -->
+        <xpath expr="//div[@class='partner-details-box row row-cols-1 row-cols-sm-2 gy-3 mt-3']" position="inside">
+            <!-- Building No field -->
+            <div class="partner-detail col">
+                <label class="form-label label" for="building_no">Building No</label>
+                <input class="detail form-control" id="building_no" name="building_no" t-model="changes.building_no" placeholder="Building No" />
+            </div>
+
+            <!-- Additional No field -->
+            <div class="partner-detail col">
+                <label class="form-label label" for="additional_no">Additional No</label>
+                <input class="detail form-control" id="additional_no" name="additional_no" t-model="changes.additional_no" placeholder="Additional No" />
+            </div>
+
+            <!-- District field -->
+            <div class="partner-detail col">
+                <label class="form-label label" for="district">District</label>
+                <input class="detail form-control" id="district" name="district" t-model="changes.district" placeholder="District" />
+            </div>
+        </xpath>
+    </template>
+</odoo>
