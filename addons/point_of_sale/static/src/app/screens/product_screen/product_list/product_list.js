@@ -156,6 +156,7 @@ export class ProductsWidget extends Component {
             ["barcode", "ilike", cleanedProductWord],
             ["available_in_pos", "=", true],
             ["sale_ok", "=", true],
+            ["product_multi_barcodes.barcode", "ilike", cleanedProductWord]
         ];
 
         const { limit_categories, iface_available_categ_ids } = this.pos.config;
