@@ -5,10 +5,11 @@ import { patch } from "@web/core/utils/patch";
 import { _t } from "@web/core/l10n/translation";
 
 // Apply the patch
-patch(PartnerDetailsEdit.prototype, {
+patch(PartnerDetailsEdit.prototype, 'custom-partner-details-edit', {
+    // Extending setup without recursion
     setup() {
-        // Call the original setup first
-        PartnerDetailsEdit.prototype.setup.call(this);
+        // Call the original setup first (in the correct way)
+        super.setup(...arguments);  // this invokes the parent's setup correctly
 
         const partner = this.props.partner;
 
