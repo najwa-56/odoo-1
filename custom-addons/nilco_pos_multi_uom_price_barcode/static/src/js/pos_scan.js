@@ -6,89 +6,32 @@ import { PosStore } from "@point_of_sale/app/store/pos_store";
 import { Order, Orderline, Payment } from "@point_of_sale/app/store/models";
 import { ProductScreen } from "@point_of_sale/app/screens/product_screen/product_screen";
 import { ErrorBarcodePopup } from "@point_of_sale/app/barcode/error_popup/barcode_error_popup";
-
 let lastBarcodeTime = 0;
-const debounceTime = 50;  // Adjust delay as needed
-let orderlineBuffer = [];  // Buffer for batch processing
-let batchTimer = null;
-const batchProcessingInterval = 3000;  // Process batch every 3 seconds
-
-// Function to add product and options to buffer
-function addToOrderlineBuffer(product, options) {
-    // Check if the product already exists in the buffer
-    const existingEntry = orderlineBuffer.find(entry => entry.product.id === product.id);
-
-    if (existingEntry) {
-        // If the product exists, accumulate the quantity
-        existingEntry.quantity += options.quantity;
-    } else {
-        // Add new product entry to the buffer
-        orderlineBuffer.push({
-            product: product,
-            quantity: options.quantity,
-            options: options,
-        });
-    }
-
-    // Start the batch timer if it's not already running
-    if (!batchTimer) {
-        startBatchProcessing();
+const debounceTime = 50;  // Fine-tuned debounce delay
+// Define the clearCache function
+async function clearCache() {
+    try {
+        const session = this.env.pos;
+        await session.clear_cache();  // Clears POS session cache
+        console.log("Cache cleared successfully.");
+    } catch (error) {
+        console.error("Error clearing cache: ", error);
     }
 }
 
-// Function to start the batch processing timer
-function startBatchProcessing() {
-    batchTimer = setTimeout(() => {
-        processOrderlineBuffer();
-    }, batchProcessingInterval);
-}
-
-// Function to process and update orderlines in bulk
-function processOrderlineBuffer() {
-    if (orderlineBuffer.length === 0) {
-        // No items to process, stop the timer
-        clearTimeout(batchTimer);
-        batchTimer = null;
-        return;
-    }
-
-    const currentOrder = this.currentOrder;
-
-    // Process each entry in the buffer
-    for (const entry of orderlineBuffer) {
-        const product = entry.product;
-        const options = entry.options;
-
-        // Find if the orderline for this product already exists
-        const orderline = currentOrder.get_orderlines().find(line => line.product.id === product.id);
-
-        if (orderline) {
-            // Update the quantity of the existing orderline
-            const newQuantity = orderline.quantity + entry.quantity;
-            orderline.set_quantity(newQuantity, orderline.price);
-        } else {
-            // Add a new orderline for this product
-            currentOrder.add_product(product, options);
+// Define the cleanUpOrders function
+async function cleanUpOrders() {
+    try {
+        const session = this.env.pos;
+        const maxOrderLimit = 100;  // Customize this limit
+        if (session.db.get_orders().length > maxOrderLimit) {
+            session.db.remove_orders(session.db.get_orders().slice(0, session.db.get_orders().length - maxOrderLimit));
+            console.log("Old orders removed successfully.");
         }
-    }
-
-    // Clear the buffer after processing
-    orderlineBuffer = [];
-
-    // Restart the timer for the next batch
-    startBatchProcessing();
-}
-
-// Function to force immediate processing of the buffer (e.g., before order submission)
-function forceProcessBuffer() {
-    if (batchTimer) {
-        processOrderlineBuffer();  // Process the buffer immediately
-        clearTimeout(batchTimer);  // Clear the timer
-        batchTimer = null;
+    } catch (error) {
+        console.error("Error cleaning up orders: ", error);
     }
 }
-
-// Barcode handler with debounce logic
 function handleBarcode(barcode, callback) {
     const currentTime = new Date().getTime();
     if (currentTime - lastBarcodeTime < debounceTime) {
@@ -96,6 +39,7 @@ function handleBarcode(barcode, callback) {
     }
     lastBarcodeTime = currentTime;
     callback();  // Call the original barcode processing logic
+
 }
 patch(ProductScreen.prototype, {
     async _barcodeProductAction(code) {
@@ -136,6 +80,8 @@ patch(ProductScreen.prototype, {
             this.currentOrder.add_product(product, options);
             this.numberBuffer.reset();
 
+            // Call cleanUpOrders to ensure old orders are cleaned up
+            await cleanUpOrders();
     });
  },
 
@@ -145,6 +91,8 @@ patch(PosStore.prototype, {
     async _processData(loadedData) {
         await super._processData(...arguments);
         this.db.product_multi_barcodes = this.product_uom_price;
+          // Optionally call clearCache after processing data
+        await clearCache();
     }
 });
 
