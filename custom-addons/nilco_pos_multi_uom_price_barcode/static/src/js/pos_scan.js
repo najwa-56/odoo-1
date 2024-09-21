@@ -8,21 +8,20 @@ import { ProductScreen } from "@point_of_sale/app/screens/product_screen/product
 import { ErrorBarcodePopup } from "@point_of_sale/app/barcode/error_popup/barcode_error_popup";
 let lastBarcodeTime = 0;
 const debounceTime = 50;  // Fine-tuned debounce delay
-// Define the clearCache function
-async function clearCache() {
+// Modify clearCache to accept the env parameter
+async function clearCache(env) {
     try {
-        const session = this.env.pos;
-        await session.clear_cache();  // Clears POS session cache
+        await env.pos.clear_cache();  // Clears POS session cache
         console.log("Cache cleared successfully.");
     } catch (error) {
         console.error("Error clearing cache: ", error);
     }
 }
 
-// Define the cleanUpOrders function
-async function cleanUpOrders() {
+// Modify cleanUpOrders to accept the env parameter
+async function cleanUpOrders(env) {
     try {
-        const session = this.env.pos;
+        const session = env.pos;
         const maxOrderLimit = 100;  // Customize this limit
         if (session.db.get_orders().length > maxOrderLimit) {
             session.db.remove_orders(session.db.get_orders().slice(0, session.db.get_orders().length - maxOrderLimit));
@@ -81,8 +80,8 @@ patch(ProductScreen.prototype, {
             this.numberBuffer.reset();
 
             // Call cleanUpOrders to ensure old orders are cleaned up
-            await cleanUpOrders();
-    });
+  // Call cleanUpOrders and pass the current environment (this.env)
+            await cleanUpOrders(this.env);    });
  },
 
 });
