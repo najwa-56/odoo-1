@@ -83,10 +83,7 @@ patch(ProductScreen.prototype, {
                 });
             }
 
-       // Initialize or get the current order
-        const currentOrder = (!this.env || !this.env.pos || !this.env.pos.get_order())
-            ? this.env.pos.add_new_order() && this.env.pos.get_order()
-            : this.env.pos.get_order();
+              const currentOrder = this.env.pos;
 
         if (currentOrder.is_finalized) {
             this.showPopup('ErrorPopup', {
