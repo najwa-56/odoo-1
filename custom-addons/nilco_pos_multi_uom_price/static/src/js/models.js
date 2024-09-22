@@ -81,7 +81,7 @@ patch(Orderline.prototype, {
     super.init_from_JSON(...arguments);
     this.name_field = json.name_field || "";  // Add this line
 
-    console.log('init_from_JSON:', json);
+   // console.log('init_from_JSON:', json);
 
     // Ensure json.product_uom_id is valid and this.pos.units_by_id is properly initialized
     if (json.product_uom_id && this.pos && this.pos.units_by_id && this.pos.units_by_id[json.product_uom_id]) {
@@ -114,7 +114,7 @@ patch(Orderline.prototype, {
     },
     set_uom(uom_id) {
         this.product_uom_id = uom_id;
-            console.log("uom_id set to:", this.product_uom_id);
+        //    console.log("uom_id set to:", this.product_uom_id);
 
         const unit = this.get_unit();
     if (unit) {
@@ -124,7 +124,7 @@ patch(Orderline.prototype, {
     },
     set_uom_name(uom_name) {
         this.name_field = uom_name;
-    console.log("name_field set to:", this.name_field);
+  //  console.log("name_field set to:", this.name_field);
 
     },
 

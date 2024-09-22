@@ -22,7 +22,7 @@ export class UOMButton extends Component {
 	         if (line && pupList.find(element => element === product.toString())) {
 		       const uomList = [ ];
 		       let uomPrices = line.pos.product_uom_price[product].uom_id;
-		       console.log(uomPrices);
+		     //  console.log(uomPrices);
 		       if (uomPrices) {
 		       	Object.values(uomPrices).forEach(uomPrice => {
 				       uomList.push({
@@ -40,7 +40,7 @@ export class UOMButton extends Component {
 		       });
 		       if (confirmed) {
 			      line.set_uom({0:selectedUOM.id,1:selectedUOM.name});
-			      		       console.log(selectedUOM.id);
+			      		   //    console.log(selectedUOM.id);
 			      line.price_manually_set = true;
 			      line.set_unit_price(selectedUOM.price);
 			      line.set_uom_name(selectedUOM.name_field);

@@ -34,7 +34,6 @@ patch(Orderline.prototype, {
     init_from_JSON(json) {
     super.init_from_JSON(...arguments);
 
-    console.log('init_from_JSON:', json);
 
     // Ensure json.product_uom_id is valid and this.pos.units_by_id is properly initialized
     if (json.product_uom_id && this.pos && this.pos.units_by_id && this.pos.units_by_id[json.product_uom_id]) {
