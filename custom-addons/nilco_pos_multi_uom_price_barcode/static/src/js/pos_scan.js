@@ -106,7 +106,7 @@ patch(PosStore.prototype, {
         this.db.product_multi_barcodes = this.product_uom_price;
 
 
-    }
+    },
     async clearCache() {
         try {
             // Assuming you want to clear some cache related to products or orders
@@ -115,7 +115,7 @@ patch(PosStore.prototype, {
         } catch (error) {
             console.error("Error clearing cache: ", error);
         }
-    }
+    },
 });
 
 patch(DB.PosDB.prototype, {
