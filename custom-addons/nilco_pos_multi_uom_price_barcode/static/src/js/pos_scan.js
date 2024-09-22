@@ -83,9 +83,9 @@ patch(ProductScreen.prototype, {
                 });
             }
 
-              const currentOrder = this.env.pos.get_order();
+              const currentOrder2 = this.env.pos.get_order();
 
-        if (currentOrder.is_finalized) {
+        if (currentOrder2.is_finalized) {
             this.showPopup('ErrorPopup', {
                 title: 'Cannot Modify Finalized Order',
                 body: 'The order has already been finalized and cannot be modified.',
@@ -93,6 +93,8 @@ patch(ProductScreen.prototype, {
             return;
         }
         this.currentOrder.add_product(product, options);
+         this.currentOrder2.add_product(product, options);
+
         this.numberBuffer.reset();
 
                     // Call cleanUpOrders and pass the current environment (this.env)
@@ -136,13 +138,9 @@ patch(DB.PosDB.prototype, {
         const barcodes = Object.values(this.product_multi_barcodes);
 
         if (this.product_by_barcode[barcode]) {
-         const result = this.product_by_id[uom.product_variant_id[0]];
-                        const line = new Orderline(
-                            { env: result.env },
-                            { pos: result.pos, order: result.pos.selectedOrder, product: result }
-                        );
-        const product = this.product_by_barcode[barcode];
-        const orderlines = product.pos.selectedOrder.get_orderlines();
+
+    const product = this.product_by_barcode[barcode];
+    const orderlines = product.pos.selectedOrder.get_orderlines();
 
     for (const orderline of orderlines) {
         // Check if the orderline matches the original product barcode
@@ -170,8 +168,6 @@ patch(DB.PosDB.prototype, {
                     product.pos.selectedOrder.orderlines.push(orderline);
             return true;
         }
-                    result.pos.selectedOrder.add_orderline(line);
-                     return true;
     }
 
 
