@@ -8,29 +8,7 @@ import { ProductScreen } from "@point_of_sale/app/screens/product_screen/product
 import { ErrorBarcodePopup } from "@point_of_sale/app/barcode/error_popup/barcode_error_popup";
 let lastBarcodeTime = 0;
 const debounceTime = 50;  // Fine-tuned debounce delay
-// Modify clearCache to accept the env parameter
-async function clearCache(env) {
-    try {
-        await env.pos.clear_cache();  // Clears POS session cache
-        console.log("Cache cleared successfully.");
-    } catch (error) {
-        console.error("Error clearing cache: ", error);
-    }
-}
 
-// Modify cleanUpOrders to accept the env parameter
-async function cleanUpOrders(env) {
-    try {
-        const session = env.pos;
-        const maxOrderLimit = 100;  // Customize this limit
-        if (session.db.get_orders().length > maxOrderLimit) {
-            session.db.remove_orders(session.db.get_orders().slice(0, session.db.get_orders().length - maxOrderLimit));
-            console.log("Old orders removed successfully.");
-        }
-    } catch (error) {
-        console.error("Error cleaning up orders: ", error);
-    }
-}
 function handleBarcode(barcode, callback) {
     const currentTime = new Date().getTime();
     if (currentTime - lastBarcodeTime < debounceTime) {
@@ -76,12 +54,18 @@ patch(ProductScreen.prototype, {
                 });
             }
 
-            this.currentOrder.add_product(product, options);
-            this.numberBuffer.reset();
+            const currentOrder = this.env.pos.get_order();
+        if (currentOrder.is_finalized) {
+            this.showPopup('ErrorPopup', {
+                title: 'Cannot Modify Finalized Order',
+                body: 'The order has already been finalized and cannot be modified.',
+            });
+            return;
+        }
+        this.currentOrder.add_product(product, options);
+        this.numberBuffer.reset();
 
-            // Call cleanUpOrders to ensure old orders are cleaned up
-  // Call cleanUpOrders and pass the current environment (this.env)
-            await cleanUpOrders(this.env);    });
+    });
  },
 
 });
@@ -90,8 +74,6 @@ patch(PosStore.prototype, {
     async _processData(loadedData) {
         await super._processData(...arguments);
         this.db.product_multi_barcodes = this.product_uom_price;
-          // Optionally call clearCache after processing data
-        await clearCache();
     }
 });
 
