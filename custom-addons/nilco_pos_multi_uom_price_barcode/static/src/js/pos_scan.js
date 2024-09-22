@@ -83,16 +83,10 @@ patch(ProductScreen.prototype, {
                 });
             }
 
-              const currentOrder = this.env.pos.get_order();
-
-
-              if (!currentOrder) {
-                this.showPopup('ErrorPopup', {
-                    title: 'No Active Order',
-                    body: 'Please create or select an order before scanning the barcode.',
-                });
-                return;
-            }
+       // Initialize or get the current order
+        const currentOrder = (!this.env || !this.env.pos || !this.env.pos.get_order())
+            ? this.env.pos.add_new_order() && this.env.pos.get_order()
+            : this.env.pos.get_order();
 
         if (currentOrder.is_finalized) {
             this.showPopup('ErrorPopup', {
