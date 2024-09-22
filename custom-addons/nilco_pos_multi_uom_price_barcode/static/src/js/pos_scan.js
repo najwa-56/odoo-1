@@ -101,10 +101,20 @@ patch(ProductScreen.prototype, {
 patch(PosStore.prototype, {
     async _processData(loadedData) {
         await super._processData(...arguments);
+          // Clear cache before processing new data
+        await this.clearCache();
         this.db.product_multi_barcodes = this.product_uom_price;
 
-            // Call clearCache and pass the current environment (this.env)
-        await clearCache(this.env);
+
+    }
+    async clearCache() {
+        try {
+            // Assuming you want to clear some cache related to products or orders
+            this.db.clear('orders');  // Example of clearing order data from cache
+            this.db.clear('products'); // Example of clearing product data from cache
+        } catch (error) {
+            console.error("Error clearing cache: ", error);
+        }
     }
 });
 
