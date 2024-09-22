@@ -44,9 +44,14 @@ function handleBarcode(barcode, callback) {
 }
 patch(ProductScreen.prototype, {
     async _barcodeProductAction(code) {
-
+ // Ensure that the POS environment and the current order are available
+        if (!this.env || !this.env.pos || !this.env.pos.get_order()) {
+            console.error("POS environment or current order is not available.");
+            return;
+        }
         // Wrap barcode handling with debounce
         handleBarcode(code, async () => {
+
       this.numberBuffer.reset();
             const product = await this._getProductByBarcode(code);
             if (product === true) {
@@ -79,6 +84,16 @@ patch(ProductScreen.prototype, {
             }
 
               const currentOrder = this.env.pos.get_order();
+
+
+              if (!currentOrder) {
+                this.showPopup('ErrorPopup', {
+                    title: 'No Active Order',
+                    body: 'Please create or select an order before scanning the barcode.',
+                });
+                return;
+            }
+
         if (currentOrder.is_finalized) {
             this.showPopup('ErrorPopup', {
                 title: 'Cannot Modify Finalized Order',
