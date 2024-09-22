@@ -83,7 +83,7 @@ patch(ProductScreen.prototype, {
                 });
             }
 
-              const currentOrder = this.env.pos;
+              const currentOrder = this.env.pos.get_order();
 
         if (currentOrder.is_finalized) {
             this.showPopup('ErrorPopup', {
@@ -136,8 +136,13 @@ patch(DB.PosDB.prototype, {
         const barcodes = Object.values(this.product_multi_barcodes);
 
         if (this.product_by_barcode[barcode]) {
-    const product = this.product_by_barcode[barcode];
-    const orderlines = product.pos.selectedOrder.get_orderlines();
+         const result = this.product_by_id[uom.product_variant_id[0]];
+                        const line = new Orderline(
+                            { env: result.env },
+                            { pos: result.pos, order: result.pos.selectedOrder, product: result }
+                        );
+        const product = this.product_by_barcode[barcode];
+        const orderlines = product.pos.selectedOrder.get_orderlines();
 
     for (const orderline of orderlines) {
         // Check if the orderline matches the original product barcode
@@ -165,6 +170,8 @@ patch(DB.PosDB.prototype, {
                     product.pos.selectedOrder.orderlines.push(orderline);
             return true;
         }
+                    result.pos.selectedOrder.add_orderline(line);
+                     return true;
     }
 
 
