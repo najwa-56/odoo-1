@@ -44,11 +44,8 @@ function handleBarcode(barcode, callback) {
 }
 patch(ProductScreen.prototype, {
     async _barcodeProductAction(code) {
- // Ensure that the POS environment and the current order are available
-        if (!this.env || !this.env.pos || !this.env.pos.get_order()) {
-            console.error("POS environment or current order is not available.");
-            return;
-        }
+ 
+
         // Wrap barcode handling with debounce
         handleBarcode(code, async () => {
 
@@ -83,9 +80,9 @@ patch(ProductScreen.prototype, {
                 });
             }
 
-              const currentOrder2 = this.env.pos.get_order();
+              const currentOrder = this.env.pos.get_order();
 
-        if (currentOrder2.is_finalized) {
+        if (currentOrder.is_finalized) {
             this.showPopup('ErrorPopup', {
                 title: 'Cannot Modify Finalized Order',
                 body: 'The order has already been finalized and cannot be modified.',
@@ -93,8 +90,6 @@ patch(ProductScreen.prototype, {
             return;
         }
         this.currentOrder.add_product(product, options);
-         this.currentOrder2.add_product(product, options);
-
         this.numberBuffer.reset();
 
                     // Call cleanUpOrders and pass the current environment (this.env)
