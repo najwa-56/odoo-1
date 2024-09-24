@@ -30,6 +30,10 @@ export class CustomPartnerDetailsEdit extends BasePartnerDetailsEdit {
             buyer_identification: partner.buyer_identification || "",
             buyer_identification_no: partner.buyer_identification_no || "",
             // Add any additional fields as needed
+             building_no: partner.building_no || "",  // Add building_no
+            additional_no: partner.additional_no || "", // Add additional_no
+            district: partner.district || "", // Add district
+            country_id_name: partner.country_id_name || "", // Add country_id_name
         });
 
         // Provides translated terms used in the view
