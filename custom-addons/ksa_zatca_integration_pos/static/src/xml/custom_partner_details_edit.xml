@@ -6,7 +6,7 @@
                 <input type="text" t-model="changes.buyer_identification" id="buyer_identification"/>
             </div>-->
             <div>
-                <label for="buyer_identification_no">Buyer Identification No</label>
+                <label for="buyer_identification_no">رقم السجل التجاري </label>
                 <input type="text" t-model="changes.buyer_identification_no" id="buyer_identification_no"/>
             </div>
             <!-- Add any additional fields as needed -->
