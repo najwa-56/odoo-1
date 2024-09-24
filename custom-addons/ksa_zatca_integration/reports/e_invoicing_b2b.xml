@@ -325,7 +325,7 @@
         <td class="second_table">
             <span>
                 <!-- Combine all address components for the Partner -->
-                <t t-esc="conf_partner['street']['value'] + ' - ' + partner_id.building_no + ' - ' + conf_partner['district']['value'] + ' - ' + conf_partner['country_id_name']['value'] + ' - ' + conf_partner['city']['value'] + ' - ' + partner_id.zip"/>
+                <t t-esc="conf_partner['street2']['value'] + ' - ' + partner_id.building_no + ' - ' + conf_partner['district']['value'] + ' - ' + conf_partner['country_id_name']['value'] + ' - ' + conf_partner['city']['value'] + ' - ' + partner_id.zip"/>
             </span>
         </td>
         <td class="second_table" style="text-align:right;">

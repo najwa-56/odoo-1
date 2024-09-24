@@ -316,7 +316,7 @@
     <td class="second_table" style="text-align:right;">
         <span class="lable_bold">العنوان</span>
     </td>
-                               
+    <t t-if="conf_partner['street2']['value'] and partner_id.building_no and conf_partner['district']['value'] and conf_partner['country_id_name']['value'] and conf_partner['city']['value'] and partner_id.zip">
         <td class="second_table left_column">
             <span>
                 <b>Address</b>
@@ -331,7 +331,7 @@
         <td class="second_table" style="text-align:right;">
             <span class="lable_bold">العنوان</span>
         </td>
-
+    </t>
 </tr>
 
 
