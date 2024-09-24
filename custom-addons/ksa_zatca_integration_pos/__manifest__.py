@@ -37,8 +37,8 @@
             'ksa_zatca_integration_pos/static/src/js/invoice_button.js',
             'ksa_zatca_integration_pos/static/src/js/zatca_report_service.js',
             'ksa_zatca_integration_pos/static/src/css/style.css',
-           # 'ksa_zatca_integration_pos/static/src/js/pos.js',
-
+            'ksa_zatca_integration_pos/static/src/js/custom_partner_details_edit.js',
+            'ksa_zatca_integration_pos/static/src/xml/custom_partner_details_edit.xml',
         ],
     },
 

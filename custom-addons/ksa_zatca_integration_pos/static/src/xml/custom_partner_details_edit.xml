@@ -1,0 +1,15 @@
+<templates>
+     <t t-name="point_of_sale.CustomPartnerDetailsEdit" t-inherit="point_of_sale.PartnerDetailsEdit" t-inherit-mode="extension">
+
+           <!-- <div>
+                <label for="buyer_identification">Buyer Identification</label>
+                <input type="text" t-model="changes.buyer_identification" id="buyer_identification"/>
+            </div>-->
+            <div>
+                <label for="buyer_identification_no">Buyer Identification No</label>
+                <input type="text" t-model="changes.buyer_identification_no" id="buyer_identification_no"/>
+            </div>
+            <!-- Add any additional fields as needed -->
+        </t>
+
+</templates>
