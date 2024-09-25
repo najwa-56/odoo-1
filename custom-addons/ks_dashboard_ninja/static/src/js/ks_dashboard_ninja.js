@@ -86,47 +86,6 @@ odoo.define('ks_dashboard_ninja.ks_dashboard', function(require) {
             //            this.is_dateFilter_rendered = false;
             this.ks_date_filter_data;
 
-            // Adding date filter selection options in dictionary format : {'id':{'days':1,'text':"Text to show"}}
-            this.ks_date_filter_selections = {
-                'l_none': _t('Date Filter'),
-                'l_day': _t('Today'),
-                't_week': _t('This Week'),
-                'td_week': _t('Week To Date'),
-                't_month': _t('This Month'),
-                'td_month': _t('Month to Date'),
-                't_quarter': _t('This Quarter'),
-                'td_quarter': _t('Quarter to Date'),
-                't_year': _t('This Year'),
-                'td_year': _t('Year to Date'),
-                'n_day': _t('Next Day'),
-                'n_week': _t('Next Week'),
-                'n_month': _t('Next Month'),
-                'n_quarter': _t('Next Quarter'),
-                'n_year': _t('Next Year'),
-                'ls_day': _t('Last Day'),
-                'ls_week': _t('Last Week'),
-                'ls_month': _t('Last Month'),
-                'ls_quarter': _t('Last Quarter'),
-                'ls_year': _t('Last Year'),
-                'l_week': _t('Last 7 days'),
-                'l_month': _t('Last 30 days'),
-                'l_quarter': _t('Last 90 days'),
-                'l_year': _t('Last 365 days'),
-                'ls_past_until_now': _t('Past Till Now'),
-                'ls_pastwithout_now': _t('Past Excluding Today'),
-                'n_future_starting_now': _t('Future Starting Now'),
-                'n_futurestarting_tomorrow': _t('Future Starting Tomorrow'),
-                'l_custom': _t('Custom Filter'),
-            };
-            // To make sure date filter show date in specific order.
-            this.ks_date_filter_selection_order = ['l_day', 't_week', 't_month', 't_quarter','t_year',
-                'td_week','td_month','td_quarter', 'td_year','n_day','n_week', 'n_month', 'n_quarter', 'n_year',
-                'ls_day','ls_week', 'ls_month', 'ls_quarter', 'ls_year', 'l_week', 'l_month', 'l_quarter', 'l_year',
-                'ls_past_until_now', 'ls_pastwithout_now','n_future_starting_now', 'n_futurestarting_tomorrow',
-                 'l_custom'
-            ];
-
-            this.ks_dashboard_id = state.params.ks_dashboard_id;
 
             this.gridstack_options = {
                 staticGrid:true,
@@ -3539,10 +3498,37 @@ odoo.define('ks_dashboard_ninja.ks_dashboard', function(require) {
             self._KsGetDateValues();
         },
 
+        function replaceArabicNumerals(str) {
+    const arabicToEnglish = {
+        '٠': '0',
+        '١': '1',
+        '٢': '2',
+        '٣': '3',
+        '٤': '4',
+        '٥': '5',
+        '٦': '6',
+        '٧': '7',
+        '٨': '8',
+        '٩': '9'
+    };
+
+    return str.replace(/[٠-٩]/g, (d) => arabicToEnglish[d]);
+},
+
         _onKsApplyDateFilter: function(e) {
             var self = this;
             var start_date = self.ksStartDatePickerWidget.$input.val();
             var end_date = self.ksEndDatePickerWidget.$input.val();
+            // Log the input values to see what's being captured
+    console.log('Start Date:', startDate);
+    console.log('End Date:', endDate);
+             // Replace Arabic numerals with English numerals
+             start_date = replaceArabicNumerals(start_date);
+             end_date = replaceArabicNumerals(end_date);
+ // Log the values after conversion
+    console.log('Converted Start Date:', startDate);
+    console.log('Converted End Date:', endDate);
+
             $('.ks_dashboard_item_drill_up').addClass("d-none")
             if (start_date === "Invalid date") {
                 alert("Invalid Date is given in Start Date.")

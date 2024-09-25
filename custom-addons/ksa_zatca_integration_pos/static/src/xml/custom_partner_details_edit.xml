@@ -1,0 +1,89 @@
+<templates>
+     <t t-name="point_of_sale.CustomPartnerDetailsEdit" t-inherit="point_of_sale.PartnerDetailsEdit" t-inherit-mode="extension">
+
+           <!-- <div>
+                <label for="name">{% t 'Name' %}</label>
+                <input type="text" t-model="changes.name" id="name"/>
+            </div>
+            <div>
+                <label for="street">{% t 'Street' %}</label>
+                <input type="text" t-model="changes.street" id="street"/>
+            </div>
+            <div>
+                <label for="city">{% t 'City' %}</label>
+                <input type="text" t-model="changes.city" id="city"/>
+            </div>
+            <div>
+                <label for="zip">{% t 'Zip' %}</label>
+                <input type="text" t-model="changes.zip" id="zip"/>
+            </div>
+            <div>
+                <label for="email">{% t 'Email' %}</label>
+                <input type="text" t-model="changes.email" id="email"/>
+            </div>
+            <div>
+                <label for="phone">{% t 'Phone' %}</label>
+                <input type="text" t-model="changes.phone" id="phone"/>
+            </div>
+            <div>
+                <label for="mobile">{% t 'Mobile' %}</label>
+                <input type="text" t-model="changes.mobile" id="mobile"/>
+            </div>
+            <div>
+                <label for="barcode">{% t 'Barcode' %}</label>
+                <input type="text" t-model="changes.barcode" id="barcode"/>
+            </div>
+            <div>
+                <label for="vat">{% t 'VAT' %}</label>
+                <input type="text" t-model="changes.vat" id="vat"/>
+            </div>-->
+         <div class="partner-details-box row row-cols-1 row-cols-sm-2 gy-3 mt-3">
+          <div class="partner-detail col">
+           <div>
+                <label class="form-label label" for="building_no">رقم المبنى</label>
+                <input type="text" t-model="changes.building_no" id="building_no"/>
+            </div>
+              </div>
+
+
+            <div>
+                  <div class="partner-detail col">
+                <label class="form-label label" for="additional_no">العنوان الوطني</label>
+                <input type="text" t-model="changes.additional_no" id="additional_no"/>
+            </div>
+                 </div>
+            <div>
+                 <div class="partner-detail col">
+                <label class="form-label label" for="district">الحي</label>
+                <input type="text" t-model="changes.district" id="district"/>
+            </div>
+                </div>
+            <div>
+                 <div class="partner-detail col">
+                <label class="form-label label" for="country_id_name">الدولة</label>
+                <input type="text" t-model="changes.country_id_name" id="country_id_name" />
+                      </div>
+            </div>
+
+           <!-- <div>
+                <label for="buyer_identification">نوع المعرف</label>
+                  <select t-model="changes.buyer_identification" id="buyer_identification">
+                <t t-foreach="buyerIdentificationOptions" t-as="option" t-key="option.id">
+                    <option t-att-value="option.id">
+                        <t t-esc="option.name"/>
+                    </option>
+                </t>
+            </select>
+            </div>-->
+            <div>
+                <div class="partner-detail col">
+                <label class="form-label label" for="buyer_identification_no">السجل التجاري</label>
+                <input type="text" t-model="changes.buyer_identification_no" id="buyer_identification_no"/>
+            </div>
+                 </div>
+         </div>
+
+            <!-- Add any additional fields as needed -->
+        </t>
+
+</templates>

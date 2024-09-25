@@ -39,6 +39,8 @@
             'ksa_zatca_integration_pos/static/src/css/style.css',
             'ksa_zatca_integration_pos/static/src/app/**/*'
 
+            # 'ksa_zatca_integration_pos/static/src/js/custom_partner_details_edit.js',
+            # 'ksa_zatca_integration_pos/static/src/xml/custom_partner_details_edit.xml',
         ],
     },
 
