@@ -64,7 +64,7 @@ class KsDashboardNinjaBoard(models.Model):
         ('n_future_starting_now', 'Future Starting Now'),
         ('n_futurestarting_tomorrow', 'Future Starting Tomorrow'),
         ('l_custom', 'Custom Filter'),
-    ], default='l_none', string="Default Date Filter")
+    ], default='l_none', string="Default Date Filter", translate=False)
 
     # for setting Global/Indian Format
     ks_data_formatting = fields.Selection([
