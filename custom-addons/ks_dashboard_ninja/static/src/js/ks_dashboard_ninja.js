@@ -3499,20 +3499,35 @@ odoo.define('ks_dashboard_ninja.ks_dashboard', function(require) {
         },
 
         function replaceArabicNumerals(str) {
-    const arabicNumerals = ['٠', '١', '٢', '٣', '٤', '٥', '٦', '٧', '٨', '٩'];
-    const englishNumerals = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9'];
+    const arabicToEnglish = {
+        '٠': '0',
+        '١': '1',
+        '٢': '2',
+        '٣': '3',
+        '٤': '4',
+        '٥': '5',
+        '٦': '6',
+        '٧': '7',
+        '٨': '8',
+        '٩': '9'
+    };
 
-    return str.replace(/[٠-٩]/g, function(d) {
-        return englishNumerals[arabicNumerals.indexOf(d)];
-    });
+    return str.replace(/[٠-٩]/g, (d) => arabicToEnglish[d]);
 },
+
         _onKsApplyDateFilter: function(e) {
             var self = this;
             var start_date = self.ksStartDatePickerWidget.$input.val();
             var end_date = self.ksEndDatePickerWidget.$input.val();
+            // Log the input values to see what's being captured
+    console.log('Start Date:', startDate);
+    console.log('End Date:', endDate);
              // Replace Arabic numerals with English numerals
              start_date = replaceArabicNumerals(start_date);
              end_date = replaceArabicNumerals(end_date);
+ // Log the values after conversion
+    console.log('Converted Start Date:', startDate);
+    console.log('Converted End Date:', endDate);
 
             $('.ks_dashboard_item_drill_up').addClass("d-none")
             if (start_date === "Invalid date") {
