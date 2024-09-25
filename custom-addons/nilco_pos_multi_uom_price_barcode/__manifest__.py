@@ -24,7 +24,7 @@
     'auto_install': False,
     'assets': {
         'point_of_sale._assets_pos':[
-            'nilco_pos_multi_uom_price_barcode/static/src/js/pos_scan.js',
+            'nilco_pos_multi_uom_price_barcode/static/src/**/*',
         ],
     },
 }

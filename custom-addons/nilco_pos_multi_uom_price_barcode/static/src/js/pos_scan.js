@@ -1,213 +1,334 @@
 /** @odoo-module */
-import { unaccent } from "@web/core/utils/strings";
-var DB = require('@point_of_sale/app/store/db');
+
+import { parseFloat as oParseFloat } from "@web/views/fields/parsers";
+
 import { patch } from "@web/core/utils/patch";
 import { PosStore } from "@point_of_sale/app/store/pos_store";
-import { Order, Orderline, Payment } from "@point_of_sale/app/store/models";
+import { _t } from "@web/core/l10n/translation";
 import { ProductScreen } from "@point_of_sale/app/screens/product_screen/product_screen";
+import { useService } from "@web/core/utils/hooks";
+import { TextAreaPopup } from "@point_of_sale/app/utils/input_popups/textarea_popup";
+import { Component } from "@odoo/owl";
+import { usePos } from "@point_of_sale/app/store/pos_hook";
+import { AbstractAwaitablePopup } from "@point_of_sale/app/popup/abstract_awaitable_popup";
+import { onMounted, useRef, useState } from "@odoo/owl";
+import { PosDB } from "@point_of_sale/app/store/db";
+import { Order, Orderline, Payment } from "@point_of_sale/app/store/models";
 import { ErrorBarcodePopup } from "@point_of_sale/app/barcode/error_popup/barcode_error_popup";
-let lastBarcodeTime = 0;
-const debounceTime = 50;  // Fine-tuned debounce delay
 
-// Modify clearCache to accept the env parameter
-async function clearCache(env) {
-    try {
-        await env.pos.clear_cache();  // Clears POS session cache
-        console.log("Cache cleared successfully.");
-    } catch (error) {
-        console.error("Error clearing cache: ", error);
-    }
-}
+import {
+    formatFloat,
+    roundDecimals as round_di,
+    roundPrecision as round_pr,
+    floatIsZero,
+} from "@web/core/utils/numbers";
 
-// Modify cleanUpOrders to accept the env parameter
-async function cleanUpOrders(env) {
-    try {
-        const session = env.pos;
-        const maxOrderLimit = 100;  // Customize this limit
-        if (session.db.get_orders().length > maxOrderLimit) {
-            session.db.remove_orders(session.db.get_orders().slice(0, session.db.get_orders().length - maxOrderLimit));
-            console.log("Old orders removed successfully.");
-        }
-    } catch (error) {
-        console.error("Error cleaning up orders: ", error);
-    }
-}
-
-function handleBarcode(barcode, callback) {
-    const currentTime = new Date().getTime();
-    if (currentTime - lastBarcodeTime < debounceTime) {
-        return;  // Ignore this barcode event if it comes too soon
-    }
-    lastBarcodeTime = currentTime;
-    callback();  // Call the original barcode processing logic
-
-}
-patch(ProductScreen.prototype, {
-    async _barcodeProductAction(code) {
- 
-
-        // Wrap barcode handling with debounce
-        handleBarcode(code, async () => {
-
-      this.numberBuffer.reset();
-            const product = await this._getProductByBarcode(code);
-            if (product === true) {
-                return;
-            }
-            if (!product) {
-                return this.popup.add(ErrorBarcodePopup, { code: code.base_code });
-            }
-            const options = await product.getAddProductOptions(code);
-            if (!options) {
-                return;
-            }
-            if (code.type === "price") {
-                Object.assign(options, {
-                    price: code.value,
-                    extras: {
-                        price_type: "manual",
-                    },
-                });
-            } else if (code.type === "weight" || code.type === "quantity") {
-                Object.assign(options, {
-                    quantity: code.value,
-                    merge: false,
-                });
-            } else if (code.type === "discount") {
-                Object.assign(options, {
-                    discount: code.value,
-                    merge: false,
-                });
-            }
-
-              const currentOrder = this.env.pos.get_order();
-
-        if (currentOrder.is_finalized) {
-            this.showPopup('ErrorPopup', {
-                title: 'Cannot Modify Finalized Order',
-                body: 'The order has already been finalized and cannot be modified.',
-            });
-            return;
-        }
-        this.currentOrder.add_product(product, options);
-        this.numberBuffer.reset();
-
-                    // Call cleanUpOrders and pass the current environment (this.env)
-            await cleanUpOrders(this.env);
-
-
-    });
- },
-
-});
 
 patch(PosStore.prototype, {
     async _processData(loadedData) {
         await super._processData(...arguments);
-          // Clear cache before processing new data
-        await this.clearCache();
-        this.db.product_multi_barcodes = this.product_uom_price;
-
-
-    },
-    async clearCache() {
-        try {
-            // Assuming you want to clear some cache related to products or orders
-            this.db.clear('orders');  // Example of clearing order data from cache
-            this.db.clear('products'); // Example of clearing product data from cache
-        } catch (error) {
-            console.error("Error clearing cache: ", error);
-        }
+        this.em_uom_list = loadedData['product.multi.uom.price'];
     },
 });
 
-patch(DB.PosDB.prototype, {
-    init(options) {
-        this._super.apply(this, arguments);
-        this.initialQuantities = {}; // Initialize initial quantities object
+
+
+
+patch(ProductScreen.prototype, {
+    async _barcodeProductAction(code) {
+        const product = await this._getProductByBarcode(code);
+        if (!product) {
+            return this.popup.add(ErrorBarcodePopup, { code: code.base_code });
+        }
+        const options = await product.getAddProductOptions(code);
+
+        if (!options) {
+            return;
+        }
+
+        // Access the UOM list and match barcodes
+        var pos_multi_op = this.pos.em_uom_list;
+        var unit_price = 0;
+        var uom_data_matched = false;
+        let selected_uom_id = null;
+
+        // Get the product template ID
+        let product_tmpl_id = product.product_tmpl_id;
+
+        // Check if the product exists in pos_multi_op
+        if (pos_multi_op[product_tmpl_id]) {
+            let uomPrices = pos_multi_op[product_tmpl_id].uom_id;
+
+            // Loop through the UOM data for the product
+            Object.values(uomPrices).forEach(function(uom_data) {
+                if (uom_data.barcodes.includes(code.base_code)) {
+                    unit_price = uom_data.price;
+                    uom_data_matched = true;
+                    selected_uom_id = uom_data.id;
+
+                    Object.assign(options, {
+                        price: uom_data.price,
+                        extras: {
+                            wvproduct_uom: this.pos.units_by_id[uom_data.id],
+                        },
+                    });
+                }
+            }, this);
+        }
+
+        // If UOM barcode wasn't matched, fallback to original product barcode
+        if (!uom_data_matched) {
+            console.log("here=================== not matched")
+            if (product.barcode === code.base_code) {
+                unit_price = product.lst_price;
+                console.log("product.id=====================",product.uom_id[0])
+                selected_uom_id = product.uom_id[0];
+
+                Object.assign(options, {
+                    price: product.lst_price,
+                    extras: {
+                        wvproduct_uom: this.pos.units_by_id[product.uom_id[0]],  // The original UOM
+                    },
+                });
+            }
+        }
+
+        // Add the product to the order with the updated options
+        this.currentOrder.add_product(product, options);
+
+        // Set the unit price and UoM for the orderline
+        var line = this.currentOrder.selected_orderline;
+        line.set_unit_price(unit_price);
+        line.set_product_uom(selected_uom_id);  // Set UoM explicitly
+        line.price_manually_set = true;
+        line.price_type = "automatic";
+
+        this.numberBuffer.reset();
+    }
+});
+
+patch(Orderline.prototype, {
+    setup() {
+        super.setup(...arguments);
+        // Initialize wvproduct_uom to null instead of an empty string
+        this.wvproduct_uom = null;
     },
 
-    get_product_by_barcode(barcode) {
-            if (!barcode) return undefined;
+    set_product_uom(uom_id){
+        this.wvproduct_uom = this.pos.units_by_id[uom_id] || null;
+        // Trigger change if necessary
+    },
 
-        const barcodes = Object.values(this.product_multi_barcodes);
-
-        if (this.product_by_barcode[barcode]) {
-
-    const product = this.product_by_barcode[barcode];
-    const orderlines = product.pos.selectedOrder.get_orderlines();
-
-    for (const orderline of orderlines) {
-        // Check if the orderline matches the original product barcode
-                if (orderline.product.id === product.id && orderline.price === product.lst_price) {
-                    const key = `${product.id}-${product.lst_price}`; // Unique key for tracking initial quantity
-
-                    // Ensure initialQuantities is initialized
-                    if (typeof this.initialQuantities === 'undefined') {
-                        this.initialQuantities = {};
-                    }
-
-                    if (!(key in this.initialQuantities)) {
-                        // Store the initial quantity only the first time
-                        this.initialQuantities[key] = parseFloat(orderline.quantity);
-                    }
-
-                    // Use the stored initial quantity and add the new quantity
-                    let newQuantity = this.initialQuantities[key] + parseFloat(orderline.quantity);
-
-                    // Set the new quantity and update the orderline
-                    orderline.set_quantity(newQuantity, product.lst_price);
-
-                    // Move the orderline to the end of the orderlines array
-                    product.pos.selectedOrder.orderlines.remove(orderline);
-                    product.pos.selectedOrder.orderlines.push(orderline);
-            return true;
-        }
-    }
-
-
-       } else if (this.product_packaging_by_barcode[barcode]) {
-            return this.product_by_id[this.product_packaging_by_barcode[barcode].product_id[0]];
-        } else if (barcodes.length > 0) {
-            for (const product of barcodes) {
-                const uoms = Object.values(product.uom_id);
-                for (const uom of uoms) {
-                    if (uom.barcodes.includes(barcode)) {
-                        const result = this.product_by_id[uom.product_variant_id[0]];
-                        const line = new Orderline(
-                            { env: result.env },
-                            { pos: result.pos, order: result.pos.selectedOrder, product: result }
-                        );
-                        const orderlines = result.pos.selectedOrder.get_orderlines();
-                        for (const orderline of orderlines) {
-                            if (orderline.product.id === result.id &&
-                                orderline.product_uom_id[0] === uom.id &&
-                                orderline.price === uom.price) {
-                                const newQuantity = parseFloat(orderline.quantity) + 1;
-                                orderline.set_quantity(newQuantity, uom.price);
-                                orderline.set_uom_name(orderline.name_field );
-
-                                  // Remove the orderline from its current position
-                            result.pos.selectedOrder.orderlines.remove(orderline);
-
-                            // Add it back to the end of the array
-                            result.pos.selectedOrder.orderlines.push(orderline);
-
-
-                                return true;
-                            }
-                        }
-                        result.pos.selectedOrder.add_orderline(line);
-                        result.pos.selectedOrder.selected_orderline.set_uom({ 0: uom.id, 1: uom.name });
-                        result.pos.selectedOrder.selected_orderline.price_manually_set = true;
-                        result.pos.selectedOrder.selected_orderline.set_unit_price(uom.price);
-                         result.pos.selectedOrder.selected_orderline.set_uom_name(uom.name_field);
-                        return true;
-                    }
-                }
-            }
+    get_unit(){
+        var unit_id = this.product.uom_id;
+        if(!unit_id){
             return undefined;
         }
-        return undefined;
+        unit_id = unit_id[0];
+        if(!this.pos){
+            return undefined;
+        }
+        // Use wvproduct_uom if available, otherwise fallback to the product's default UoM
+        return this.wvproduct_uom ? this.wvproduct_uom : this.pos.units_by_id[unit_id];
     },
+
+    set_quantity(quantity, keep_price) {
+        keep_price = true;
+        this.order.assert_editable();
+        var quant = typeof quantity === "number" ? quantity : oParseFloat("" + (quantity ? quantity : 0));
+        var unit = this.get_unit();
+        if (unit) {
+            if (unit.rounding) {
+                var decimals = this.pos.dp["Product Unit of Measure"];
+                var rounding = Math.max(unit.rounding, Math.pow(10, -decimals));
+                this.quantity = round_pr(quant, rounding);
+                this.quantityStr = formatFloat(this.quantity, { digits: [69, decimals] });
+            } else {
+                this.quantity = round_pr(quant, 1);
+                this.quantityStr = this.quantity.toFixed(0);
+            }
+        } else {
+            this.quantity = quant;
+            this.quantityStr = "" + this.quantity;
+        }
+
+        // Recompute unit price if necessary
+        if (!keep_price && this.price_type === "original") {
+            this.set_unit_price(this.product.get_price(this.order.pricelist, this.get_quantity(), this.get_price_extra()));
+            this.order.fix_tax_included_price(this);
+        }
+        return true;
+    },
+
+    export_as_JSON(){
+        var unit_id = this.product.uom_id;
+        var json = super.export_as_JSON(...arguments);
+        // Export the UoM used in the orderline
+        json.product_uom = this.wvproduct_uom ? this.wvproduct_uom.id : unit_id[0];
+        return json;
+    },
+
+    init_from_JSON(json){
+        super.init_from_JSON(...arguments);
+        this.wvproduct_uom = this.pos.units_by_id[json.product_uom] || null;
+    },
+
+    can_be_merged_with(orderline) {
+        var result = super.can_be_merged_with(...arguments);
+
+        // Ensure that wvproduct_uom is properly initialized
+        const current_uom = this.wvproduct_uom || '';
+        const orderline_uom = orderline.wvproduct_uom || '';
+
+        console.log("this....wvproduct_uom ================", current_uom, orderline_uom);
+
+        // If either UOM is not defined or empty, return the default result
+        if (current_uom === '' || orderline_uom === '' || !current_uom || !orderline_uom) {
+            return result;
+        }
+
+        // Compare the product name and UOM IDs
+        console.log("this.full_product_name === orderline.full_product_name ====================", this.full_product_name, orderline.full_product_name, current_uom.id, orderline_uom.id);
+
+        if (this.full_product_name === orderline.full_product_name && current_uom.id === orderline_uom.id) {
+            return true;
+        } else if (this.full_product_name === orderline.full_product_name && current_uom.id !== orderline_uom.id) {
+            return false;
+        }
+
+        return result;
+    }
 });
+
+
+
+// patch(Orderline.prototype, {
+//     setup() {
+//         super.setup(...arguments);
+//             this.wvproduct_uom = '';
+//         },
+
+//     set_product_uom(uom_id){
+//         this.wvproduct_uom = this.pos.units_by_id[uom_id];
+//         // this.trigger('change',this);
+//     },
+
+//         get_unit(){
+//             var unit_id = this.product.uom_id;
+//             if(!unit_id){
+//                 return undefined;
+//             }
+//             unit_id = unit_id[0];
+//             if(!this.pos){
+//                 return undefined;
+//             }
+//             return this.wvproduct_uom == '' ? this.pos.units_by_id[unit_id] : this.wvproduct_uom;
+//         },
+
+//         set_quantity(quantity, keep_price) {
+
+            
+//             keep_price = true
+//             this.order.assert_editable();
+//             var quant =
+//                 typeof quantity === "number" ? quantity : oParseFloat("" + (quantity ? quantity : 0));
+//             if (this.refunded_orderline_id in this.pos.toRefundLines) {
+//                 const toRefundDetail = this.pos.toRefundLines[this.refunded_orderline_id];
+//                 const maxQtyToRefund =
+//                     toRefundDetail.orderline.qty - toRefundDetail.orderline.refundedQty;
+//                 if (quant > 0) {
+//                     this.env.services.popup.add(ErrorPopup, {
+//                         title: _t("Positive quantity not allowed"),
+//                         body: _t(
+//                             "Only a negative quantity is allowed for this refund line. Click on +/- to modify the quantity to be refunded."
+//                         ),
+//                     });
+//                     return false;
+//                 } else if (quant == 0) {
+//                     toRefundDetail.qty = 0;
+//                 } else if (-quant <= maxQtyToRefund) {
+//                     toRefundDetail.qty = -quant;
+//                 } else {
+//                     this.env.services.popup.add(ErrorPopup, {
+//                         title: _t("Greater than allowed"),
+//                         body: _t(
+//                             "The requested quantity to be refunded is higher than the refundable quantity of %s.",
+//                             this.env.utils.formatProductQty(maxQtyToRefund)
+//                         ),
+//                     });
+//                     return false;
+//                 }
+//             }
+//             var unit = this.get_unit();
+//             if (unit) {
+//                 if (unit.rounding) {
+//                     var decimals = this.pos.dp["Product Unit of Measure"];
+//                     var rounding = Math.max(unit.rounding, Math.pow(10, -decimals));
+//                     this.quantity = round_pr(quant, rounding);
+//                     this.quantityStr = formatFloat(this.quantity, {
+//                         digits: [69, decimals],
+//                     });
+//                 } else {
+//                     this.quantity = round_pr(quant, 1);
+//                     this.quantityStr = this.quantity.toFixed(0);
+//                 }
+//             } else {
+//                 this.quantity = quant;
+//                 this.quantityStr = "" + this.quantity;
+//             }
+    
+//             // just like in sale.order changing the quantity will recompute the unit price
+//             if (!keep_price && this.price_type === "original") {
+//                 this.set_unit_price(
+//                     this.product.get_price(
+//                         this.order.pricelist,
+//                         this.get_quantity(),
+//                         this.get_price_extra()
+//                     )
+//                 );
+//                 this.order.fix_tax_included_price(this);
+//             }
+//             return true;
+        
+//         },
+
+
+//         export_as_JSON(){
+//             var unit_id = this.product.uom_id;
+//             var json = super.export_as_JSON(...arguments);
+//             json.product_uom = this.wvproduct_uom == '' ? unit_id[0] : this.wvproduct_uom.id;
+//             return json;
+//         },
+//         init_from_JSON(json){
+//             super.init_from_JSON(...arguments);
+//             this.wvproduct_uom = json.wvproduct_uom;
+//         },
+//         can_be_merged_with(orderline) {
+//             var result = super.can_be_merged_with(...arguments);
+            
+//             // Ensure that wvproduct_uom is properly initialized
+//             const current_uom = this.wvproduct_uom || '';
+//             const orderline_uom = orderline.wvproduct_uom || '';
+        
+//             console.log("this.wvproduct_uom ================", current_uom, orderline_uom);
+        
+//             // If either UOM is not defined or empty, return the default result
+//             if (current_uom === '' || orderline_uom === '' || !current_uom || !orderline_uom) {
+//                 return result;
+//             }
+        
+//             // Compare the product name and UOM IDs
+//             console.log("this.full_product_name === orderline.full_product_name ====================", this.full_product_name, orderline.full_product_name, current_uom.id, orderline_uom.id);
+        
+//             if (this.full_product_name === orderline.full_product_name && current_uom.id === orderline_uom.id) {
+//                 return true;
+//             } else if (this.full_product_name === orderline.full_product_name && current_uom.id !== orderline_uom.id) {
+//                 return false;
+//             }
+        
+//             return result;
+//         }
+        
+        
+   
+// });

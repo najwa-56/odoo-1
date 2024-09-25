@@ -10,7 +10,20 @@ class Inheritmulti_uom(models.Model):
     product_variant_count = fields.Integer('Product Variant Count')
 
 
-            #we add the calsses down to add Scan Barcode to multi uom######
+class ProductProduct(models.Model):
+    _inherit = 'product.product'
+
+    def get_barcode_val_batch(self, product_ids):
+        """Return a list of tuples containing the barcode and product ID for all products."""
+        products = self.browse(product_ids)
+        result = []
+        for product in products:
+            for uom in product.multi_uom_price_id:
+                if uom.barcode:
+                    result.append((uom.barcode, product.id))
+        return result
+        
+#we add the calsses down to add Scan Barcode to multi uom######
 
 class SaleOrderLine(models.Model):
     _inherit = 'sale.order.line'
