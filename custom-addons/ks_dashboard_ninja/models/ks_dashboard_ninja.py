@@ -66,6 +66,14 @@ class KsDashboardNinjaBoard(models.Model):
         ('l_custom', 'Custom Filter'),
     ], default='l_none', string="Default Date Filter", translate=False)
 
+    @api.onchange('ks_date_filter_selection')
+    def _set_english_for_date_filter(self):
+        # Change the context's language to English for this field
+        for record in self:
+            self = self.with_context(lang='en_US')
+            # Force the field to render in English
+            record.ks_date_filter_selection = record.ks_date_filter_selection
+
     # for setting Global/Indian Format
     ks_data_formatting = fields.Selection([
         ('global', 'Global'),
