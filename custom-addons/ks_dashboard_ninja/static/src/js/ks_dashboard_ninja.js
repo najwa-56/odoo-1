@@ -3505,15 +3505,15 @@ odoo.define('ks_dashboard_ninja.ks_dashboard', function(require) {
     return str.replace(/[٠-٩]/g, function(d) {
         return englishNumerals[arabicNumerals.indexOf(d)];
     });
-}
+},
         _onKsApplyDateFilter: function(e) {
             var self = this;
             var start_date = self.ksStartDatePickerWidget.$input.val();
             var end_date = self.ksEndDatePickerWidget.$input.val();
              // Replace Arabic numerals with English numerals
-             startDate = replaceArabicNumerals(startDate);
-             endDate = replaceArabicNumerals(endDate);
-             
+             start_date = replaceArabicNumerals(start_date);
+             end_date = replaceArabicNumerals(end_date);
+
             $('.ks_dashboard_item_drill_up').addClass("d-none")
             if (start_date === "Invalid date") {
                 alert("Invalid Date is given in Start Date.")
