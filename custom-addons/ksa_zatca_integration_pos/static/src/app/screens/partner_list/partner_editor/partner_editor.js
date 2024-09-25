@@ -1,5 +1,6 @@
 /** @odoo-module */
 
+import { _t } from "@web/core/l10n/translation";
 
 import {patch} from "@web/core/utils/patch";
 import {PartnerDetailsEdit} from "@point_of_sale/app/screens/partner_list/partner_editor/partner_editor";
@@ -17,7 +18,6 @@ patch(PartnerDetailsEdit.prototype, {
         this.partnerDetailsFields = {
             'buyer_identification_no': _t('buyer_identification_no'),
             'building_no': _t('building_no'),
-            'Zip': _t('Zip'),
             'additional_no': _t('additional_no'),
             'district': _t('district'),
         };
