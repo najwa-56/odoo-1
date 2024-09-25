@@ -37,22 +37,34 @@
                 <label for="vat">{% t 'VAT' %}</label>
                 <input type="text" t-model="changes.vat" id="vat"/>
             </div>-->
+         <div class="partner-details-box row row-cols-1 row-cols-sm-2 gy-3 mt-3">
+          <div class="partner-detail col">
            <div>
-                <label for="building_no">رقم المبنى</label>
+                <label class="form-label label" for="building_no">رقم المبنى</label>
                 <input type="text" t-model="changes.building_no" id="building_no"/>
             </div>
+              </div>
+
+
             <div>
-                <label for="additional_no">العنوان الوطني</label>
+                  <div class="partner-detail col">
+                <label class="form-label label" for="additional_no">العنوان الوطني</label>
                 <input type="text" t-model="changes.additional_no" id="additional_no"/>
             </div>
+                 </div>
             <div>
-                <label for="district">الحي</label>
+                 <div class="partner-detail col">
+                <label class="form-label label" for="district">الحي</label>
                 <input type="text" t-model="changes.district" id="district"/>
             </div>
+                </div>
             <div>
-                <label for="country_id_name">الدولة</label>
+                 <div class="partner-detail col">
+                <label class="form-label label" for="country_id_name">الدولة</label>
                 <input type="text" t-model="changes.country_id_name" id="country_id_name" />
+                      </div>
             </div>
+
            <!-- <div>
                 <label for="buyer_identification">نوع المعرف</label>
                   <select t-model="changes.buyer_identification" id="buyer_identification">
@@ -64,9 +76,13 @@
             </select>
             </div>-->
             <div>
-                <label for="buyer_identification_no">السجل التجاري</label>
+                <div class="partner-detail col">
+                <label class="form-label label" for="buyer_identification_no">السجل التجاري</label>
                 <input type="text" t-model="changes.buyer_identification_no" id="buyer_identification_no"/>
             </div>
+                 </div>
+         </div>
+
             <!-- Add any additional fields as needed -->
         </t>
 
