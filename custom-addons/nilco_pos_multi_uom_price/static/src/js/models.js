@@ -133,8 +133,8 @@ patch(Orderline.prototype, {
         if (this.product.default_uom_price > 0 & this.price_type == "original" & this.product.default_uom_id != false){
             this.price = this.product.default_uom_price;
         }
-        if (this.product_uom_id){
-            var unit_id = this.product_uom_id;
+        if (this.wvproduct_uom){
+            var unit_id = this.wvproduct_uom;
             if(!unit_id){
                 return undefined;
             }

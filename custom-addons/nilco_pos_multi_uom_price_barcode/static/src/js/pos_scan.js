@@ -137,18 +137,18 @@ patch(Orderline.prototype, {
         // Trigger change if necessary
     },
 
-    get_unit(){
-        var unit_id = this.product.uom_id;
-        if(!unit_id){
-            return undefined;
-        }
-        unit_id = unit_id[0];
-        if(!this.pos){
-            return undefined;
-        }
-        // Use wvproduct_uom if available, otherwise fallback to the product's default UoM
-        return this.wvproduct_uom ? this.wvproduct_uom : this.pos.units_by_id[unit_id];
-    },
+   // get_unit(){
+      //  var unit_id = this.product.uom_id;
+      //  if(!unit_id){
+      //      return undefined;
+      //  }
+      //  unit_id = unit_id[0];
+     //   if(!this.pos){
+     //       return undefined;
+     //   }
+     //   // Use wvproduct_uom if available, otherwise fallback to the product's default UoM
+     //   return this.wvproduct_uom ? this.wvproduct_uom : this.pos.units_by_id[unit_id];
+  //  },
 
     set_quantity(quantity, keep_price) {
         keep_price = true;
