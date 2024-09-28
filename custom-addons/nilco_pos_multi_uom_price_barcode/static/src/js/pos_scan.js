@@ -41,11 +41,31 @@ patch(ProductScreen.prototype, {
             return this.popup.add(ErrorBarcodePopup, { code: code.base_code });
         }
         const options = await product.getAddProductOptions(code);
-
+        // Do not proceed on adding the product when no options is returned.
+        // This is consistent with clickProduct.
         if (!options) {
             return;
         }
 
+        // update the options depending on the type of the scanned code
+        if (code.type === "price") {
+            Object.assign(options, {
+                price: code.value,
+                extras: {
+                    price_type: "manual",
+                },
+            });
+        } else if (code.type === "weight" || code.type === "quantity") {
+            Object.assign(options, {
+                quantity: code.value,
+                merge: false,
+            });
+        } else if (code.type === "discount") {
+            Object.assign(options, {
+                discount: code.value,
+                merge: false,
+            });
+        }
         // Access the UOM list and match barcodes
         var pos_multi_op = this.pos.em_uom_list;
         var unit_price = 0;
