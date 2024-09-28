@@ -18,8 +18,8 @@ import {
 patch(Order.prototype, {
   set_orderline_options(orderline, options) {
         super.set_orderline_options(...arguments);
-        if(options.product_uom_id !== undefined){
-            orderline.product_uom_id = options.product_uom_id;
+        if(options.wvproduct_uom !== undefined){
+            orderline.wvproduct_uom = options.wvproduct_uom;
             orderline.name_field = options.name_field;
 
         }
