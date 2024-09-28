@@ -133,7 +133,7 @@ patch(Orderline.prototype, {
     },
 
     set_product_uom(uom_id){
-        this.wvproduct_uom = this.pos.units_by_id[uom_id] || null ||uom_id;
+        this.wvproduct_uom = this.pos.units_by_id[uom_id] || null;
         // Trigger change if necessary
     },
 
