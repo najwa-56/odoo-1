@@ -18,8 +18,8 @@ import {
 patch(Order.prototype, {
   set_orderline_options(orderline, options) {
         super.set_orderline_options(...arguments);
-        if(options.wvproduct_uom !== undefined){
-            orderline.wvproduct_uom = options.wvproduct_uom;
+        if(options.product_uom_id !== undefined){
+            orderline.product_uom_id = options.product_uom_id;
             orderline.name_field = options.name_field;
 
         }
@@ -62,7 +62,7 @@ patch(Order.prototype, {
 patch(Orderline.prototype, {
     setup(_defaultObj, options) {
         super.setup(...arguments);
-        this.wvproduct_uom = this.product.default_uom_id || this.wvproduct_uom || this.product.uom_id;
+        this.product_uom_id = this.product.default_uom_id || this.product_uom_id || this.product.uom_id;
                 this.name_field = options.name_field || this.name_field || "";  // Ensure initialization
        //  this.reorderProduct();
 
@@ -71,7 +71,7 @@ patch(Orderline.prototype, {
 
     export_as_JSON() {
         const json = super.export_as_JSON(...arguments);
-        json.wvproduct_uom = this.wvproduct_uom[0];
+        json.product_uom_id = this.product_uom_id[0];
             json.name_field = this.name_field;  // Add this line
 
 
@@ -84,15 +84,15 @@ patch(Orderline.prototype, {
    // console.log('init_from_JSON:', json);
 
     // Ensure json.product_uom_id is valid and this.pos.units_by_id is properly initialized
-    if (json.product_uom_id && this.pos && this.pos.units_by_id && this.pos.units_by_id[json.wvproduct_uom]) {
-        this.wvproduct_uom = {
-            0: this.pos.units_by_id[json.wvproduct_uom].id,
-            1: this.pos.units_by_id[json.wvproduct_uom].name
+    if (json.product_uom_id && this.pos && this.pos.units_by_id && this.pos.units_by_id[json.product_uom_id]) {
+        this.product_uom_id = {
+            0: this.pos.units_by_id[json.product_uom_id].id,
+            1: this.pos.units_by_id[json.product_uom_id].name
         };
     } else {
-        console.error('Invalid product_uom_id or units_by_id not found', json.wvproduct_uom, this.pos.units_by_id);
+        console.error('Invalid product_uom_id or units_by_id not found', json.product_uom_id, this.pos.units_by_id);
         // Handle the case where product_uom_id is not found, e.g., by setting a default value or showing an error message
-        this.wvproduct_uom = null;  // or some default value
+        this.product_uom_id = null;  // or some default value
     }
 },
  // Method to reorder the product in the orderlines array
@@ -113,7 +113,7 @@ patch(Orderline.prototype, {
         };
     },
     set_uom(uom_id) {
-        this.wvproduct_uom = uom_id;
+        this.product_uom_id = uom_id;
         //    console.log("uom_id set to:", this.product_uom_id);
 
         const unit = this.get_unit();
@@ -133,8 +133,8 @@ patch(Orderline.prototype, {
         if (this.product.default_uom_price > 0 & this.price_type == "original" & this.product.default_uom_id != false){
             this.price = this.product.default_uom_price;
         }
-        if (this.wvproduct_uom){
-            var unit_id = this.wvproduct_uom;
+        if (this.product_uom_id){
+            var unit_id = this.product_uom_id;
             if(!unit_id){
                 return undefined;
             }
