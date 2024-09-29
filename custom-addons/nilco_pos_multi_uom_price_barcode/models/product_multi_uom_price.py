@@ -1,6 +1,8 @@
 from odoo import models, fields, api, _
 import re
 from odoo.osv import expression
+import json
+
 
 class Inheritmulti_uom(models.Model):
     _inherit = 'product.multi.uom.price'
@@ -12,6 +14,19 @@ class Inheritmulti_uom(models.Model):
 
 class ProductProduct(models.Model):
     _inherit = 'product.product'
+
+    new_barcode = fields.Text("New Barcode", compute="_compute_new_barcode")
+
+    def _compute_new_barcode(self):
+        for record in self:
+            if record.multi_uom_price_id:
+                multi_uom_list = []
+                for multi_uom in record.multi_uom_price_id:
+                    multi_uom_list.append(multi_uom.barcode)
+                record.new_barcode = json.dumps(multi_uom_list)
+            else:
+                record.new_barcode = json.dumps([])
+                
 
     def get_barcode_val_batch(self, product_ids):
         """Return a list of tuples containing the barcode and product ID for all products."""

@@ -11,11 +11,27 @@ _logger = logging.getLogger(__name__)
 class PosOrderLine(models.Model):
     _inherit = 'pos.order.line'
 
-    product_uom_id = fields.Many2one('uom.uom', string='الوحدة', related='')
+    
+
+
+
+    
+
+
+
+   
+
     #add field Ratio#####
     Ratio = fields.Float("Ratio", compute="_compute_ratio",
                          store=False)  # Ratio field  # Related field to the ratio in uom.uom
     name_field = fields.Char(string="أسم الوحدة", store=True)
+
+
+
+    
+
+   
+        
 
     @api.depends('product_uom_id')
     def _compute_price(self):
@@ -55,9 +71,5 @@ class PosOrderLine(models.Model):
                 line.margin = line.margin / line.product_uom_id.ratio
             line.margin_percent = not float_is_zero(line.price_subtotal, precision_rounding=line.currency_id.rounding) and line.margin / line.price_subtotal or 0
 
-    def _export_for_ui(self, orderline):
-        res = super()._export_for_ui(orderline)
-        res.update({'product_uom_id': orderline.product_uom_id.id,'name_field': orderline.name_field})
-
-        return res
+    
 

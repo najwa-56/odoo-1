@@ -117,7 +117,8 @@ patch(ProductScreen.prototype, {
         // Set the unit price and UoM for the orderline
         var line = this.currentOrder.selected_orderline;
         line.set_unit_price(unit_price);
-        line.set_product_uom(selected_uom_id);  // Set UoM explicitly
+        line.set_product_uom(selected_uom_id);
+        line.set_uom(selected_uom_id);  // Set UoM explicitly
         line.price_manually_set = true;
         line.price_type = "automatic";
 
@@ -130,59 +131,68 @@ patch(Orderline.prototype, {
         super.setup(...arguments);
         // Initialize wvproduct_uom to null instead of an empty string
         this.wvproduct_uom = null;
+        this.product_uom_id =  this.product_uom_id || this.product.uom_id;
     },
 
     set_product_uom(uom_id){
         this.wvproduct_uom = this.pos.units_by_id[uom_id] || null;
         // Trigger change if necessary
     },
+    set_uom(uom_id) {
+        this.product_uom_id = uom_id;
+       
+    },
+
+    
+
+
+    
+
+    get_uom_unit(){
+        if (this.product.default_uom_price > 0 & this.price_type == "original" & this.product.default_uom_id != false){
+            this.price = this.product.default_uom_price;
+        }
+        if (this.product_uom_id){
+            var unit_id = this.product_uom_id;
+            if(!unit_id){
+                return undefined;
+            }
+            unit_id = unit_id[0];
+            if(!this.pos){
+                return undefined;
+            }
+            return this.pos.units_by_id[unit_id];
+        }
+        return this.product.get_unit();
+    },
+
 
     get_unit(){
-        var unit_id = this.product.uom_id;
-        if(!unit_id){
-            return undefined;
-        }
-        unit_id = unit_id[0];
-        if(!this.pos){
-            return undefined;
-        }
-        // Use wvproduct_uom if available, otherwise fallback to the product's default UoM
-        return this.wvproduct_uom ? this.wvproduct_uom : this.pos.units_by_id[unit_id];
-    },
-
-    set_quantity(quantity, keep_price) {
-        keep_price = true;
-        this.order.assert_editable();
-        var quant = typeof quantity === "number" ? quantity : oParseFloat("" + (quantity ? quantity : 0));
-        var unit = this.get_unit();
-        if (unit) {
-            if (unit.rounding) {
-                var decimals = this.pos.dp["Product Unit of Measure"];
-                var rounding = Math.max(unit.rounding, Math.pow(10, -decimals));
-                this.quantity = round_pr(quant, rounding);
-                this.quantityStr = formatFloat(this.quantity, { digits: [69, decimals] });
-            } else {
-                this.quantity = round_pr(quant, 1);
-                this.quantityStr = this.quantity.toFixed(0);
+        if(this.wvproduct_uom){
+            var unit_id = this.product.uom_id;
+            if(!unit_id){
+                return undefined;
             }
-        } else {
-            this.quantity = quant;
-            this.quantityStr = "" + this.quantity;
+            unit_id = unit_id[0];
+            if(!this.pos){
+                return undefined;
+            }
+            // Use wvproduct_uom if available, otherwise fallback to the product's default UoM
+            return this.wvproduct_uom ? this.wvproduct_uom : this.pos.units_by_id[unit_id];
         }
+        else{
+            return this.get_uom_unit()
 
-        // Recompute unit price if necessary
-        if (!keep_price && this.price_type === "original") {
-            this.set_unit_price(this.product.get_price(this.order.pricelist, this.get_quantity(), this.get_price_extra()));
-            this.order.fix_tax_included_price(this);
         }
-        return true;
     },
 
+    
     export_as_JSON(){
         var unit_id = this.product.uom_id;
         var json = super.export_as_JSON(...arguments);
         // Export the UoM used in the orderline
         json.product_uom = this.wvproduct_uom ? this.wvproduct_uom.id : unit_id[0];
+        json.product_uom_id =  this.wvproduct_uom ? this.wvproduct_uom.id : unit_id[0]
         return json;
     },
 
@@ -198,7 +208,6 @@ patch(Orderline.prototype, {
         const current_uom = this.wvproduct_uom || '';
         const orderline_uom = orderline.wvproduct_uom || '';
 
-        console.log("this....wvproduct_uom ================", current_uom, orderline_uom);
 
         // If either UOM is not defined or empty, return the default result
         if (current_uom === '' || orderline_uom === '' || !current_uom || !orderline_uom) {
@@ -206,7 +215,6 @@ patch(Orderline.prototype, {
         }
 
         // Compare the product name and UOM IDs
-        console.log("this.full_product_name === orderline.full_product_name ====================", this.full_product_name, orderline.full_product_name, current_uom.id, orderline_uom.id);
 
         if (this.full_product_name === orderline.full_product_name && current_uom.id === orderline_uom.id) {
             return true;

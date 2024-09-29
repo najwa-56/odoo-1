@@ -4,6 +4,13 @@ from odoo import models,fields,api,_
 class PosSession(models.Model):
     _inherit = 'pos.session'
 
+
+    def _loader_params_product_product(self):
+        result = super()._loader_params_product_product()
+        result['search_params']['fields'].extend(['new_barcode'])
+        return result
+
+
     def _loader_params_product_multi_uom_price(self):
         return {'search_params': {'domain': [], 'fields': ['product_id', 'uom_id', 'price', 'barcode', 'product_variant_id','name_field'],},}
 

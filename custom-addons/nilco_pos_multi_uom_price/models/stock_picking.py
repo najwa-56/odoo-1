@@ -16,7 +16,6 @@ class StockPicking(models.Model):
 
     def _create_move_from_pos_order_lines(self, lines):
         self.ensure_one()
-
         lines_by_product = groupby(sorted(lines, key=lambda l: (l.product_id.id,l.product_uom_id.id)), key=lambda l: (l.product_id.id,l.product_uom_id.id))
         move_vals = []
         for dummy, olines in lines_by_product:

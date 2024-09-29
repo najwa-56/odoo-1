@@ -46,7 +46,7 @@ class PosSession(models.Model):
                 'fields': [
                     'display_name', 'lst_price', 'standard_price', 'categ_id', 'pos_categ_ids', 'taxes_id', 'barcode',
                     'default_code', 'to_weight', 'uom_id', 'description_sale', 'description', 'product_tmpl_id', 'tracking',
-                    'write_date', 'available_in_pos', 'attribute_line_ids', 'active', 'image_128', 'combo_ids'],
+                    'write_date', 'available_in_pos', 'attribute_line_ids', 'active', 'image_128', 'combo_ids','multi_uom_price_id'],
                 'order': 'sequence,default_code,name',
             },
             'context': {'display_default_code': False},

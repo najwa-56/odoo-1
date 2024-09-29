@@ -19,7 +19,7 @@ patch(PosDB.prototype, {
                 continue;
             }
             if (product.available_in_pos) {
-                var search_string = unaccent(this._product_search_string(product));
+                var search_string = unaccent(this.bi_product_search_string(product));
                 const all_categ_ids = product.pos_categ_ids.length
                     ? product.pos_categ_ids
                     : [this.root_category_id];
@@ -75,6 +75,10 @@ patch(PosDB.prototype, {
 
         return super.add_products(products);
     },
+
+
+
+    
 });
 
 
