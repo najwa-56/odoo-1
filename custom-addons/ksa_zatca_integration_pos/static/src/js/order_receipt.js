@@ -5,15 +5,34 @@ import { ConnectionLostError, ConnectionAbortedError } from "@web/core/network/r
 import { ErrorPopup } from "@point_of_sale/app/errors/popups/error_popup";
 import { useService } from "@web/core/utils/hooks";
 import { patch } from "@web/core/utils/patch";
+import { usePos } from "@point_of_sale/app/store/pos_hook";
+
 import { onRendered } from "@odoo/owl";
 
 patch(OrderReceipt.prototype, {
     setup() {
         super.setup(...arguments);
         this.orm = useService("orm");
+        this.pos = usePos();
 //        onMounted(this.onMounted);
-        onRendered(async() => await this.onRendered());
+        //onRendered(async() => await this.onRendered());
     },
+    get config(){
+    	return this.pos.config;
+    },
+
+  	get order() {
+  		return this.pos.get_order();
+	},
+
+	get orderlines() {
+  		return this.pos.get_order().get_orderlines();
+	},
+
+	get partner() {
+		return this.pos.get_order().get_partner();
+	},
+    
     async get_report(name) {
         let response = await this.orm.call('pos.order', 'get_simplified_zatca_report', [[], name]);
         if (response)
@@ -62,6 +81,7 @@ patch(OrderReceipt.prototype, {
         $('.zatca_status_details').html(message);
         try{
             let zatca_response = await this.orm.call('pos.order', 'send_to_zatca', [[], this.props.data.name]);
+            console.log("zatca_response======================",zatca_response)
             if (zatca_response.hasOwnProperty('name') && zatca_response.name == 'Zatca Response')
                 message = "Successfully send to ZATCA"
             else

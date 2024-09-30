@@ -30,7 +30,7 @@ patch(InvoiceButton.prototype, {
                 { load: false }
             );
             if (orderWithInvoice?.account_move) {
-                await this.report.doAction("ksa_zatca_integration_pos.report_e_invoicing_b2c_invoice", [
+                await this.report.doAction("ksa_zatca_integration.action_report_tax_invoice", [
                     orderWithInvoice.account_move,
                 ]);
             }

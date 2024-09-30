@@ -191,6 +191,24 @@
                         </div>
                     </page>
                 </xpath>
+
+
+                <xpath expr="//group[@name='social_media']" position="before">
+                    <group>
+                        <field name="arabic_name"/>
+                        <label for="arabic_street" string="Arabic Address"/>
+                        <div class="o_address_format">
+                            <field name="arabic_street" placeholder="Arabic Street..." class="o_address_street"/>
+                            <field name="arabic_street2" placeholder="Arabic Street 2..." class="o_address_street"/>
+                            <field name="arabic_city" placeholder="Arabic City" class="o_address_city"/>
+                            <field name="arabic_state" class="o_address_state" placeholder="Arabic State" options="{&quot;no_open&quot;: True}"/>
+                            <field name="arabic_zip" placeholder="Arabic ZIP" class="o_address_zip"/>
+                            <field name="arabic_country" placeholder="Arabic Country" class="o_address_country" options="{&quot;no_open&quot;: True}"/>
+                        </div>
+                    </group>
+                </xpath>
+
+                
             </field>
         </record>
     </data>

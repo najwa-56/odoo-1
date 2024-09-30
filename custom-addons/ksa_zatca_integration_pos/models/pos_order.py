@@ -1,5 +1,7 @@
 # -*- coding: utf-8 -*-
 from odoo import fields, models, api, exceptions
+import logging
+_logger = logging.getLogger(__name__)
 
 
 class PosOrder(models.Model):
@@ -20,7 +22,8 @@ class PosOrder(models.Model):
         if not self.company_id.zatca_send_from_pos:
             if len(self.refunded_order_ids.account_move.ids) > 1:
                 raise exceptions.ValidationError("only 1 invoice can be returned at a time.")
-        report_action = self.env.ref('ksa_zatca_integration.report_e_invoicing_b2c').sudo()
+                
+        report_action = self.env.ref('ksa_zatca_integration.action_report_simplified_tax_invoice').sudo()
         return self.env['ir.actions.report']._render_qweb_html(report_action, self.account_move.ids)[0].decode('utf-8')
 
     def _prepare_invoice_vals(self):
@@ -45,9 +48,12 @@ class PosOrder(models.Model):
                 if len(self_id.refunded_order_ids.account_move.ids) > 1:
                     raise exceptions.ValidationError("only 1 invoice can be returned at a time.")
                 self_id.account_move.create_xml_file(pos_refunded_order_id=self_id.refunded_order_ids.account_move.id)
-
+                self.send_to_zatca(self_id.pos_reference)
         return order_ids
 
     def send_to_zatca(self, pos_reference):
         self = self.sudo().search([('pos_reference', '=', pos_reference)])
         return self.account_move.send_for_reporting(no_xml_generate=1)
+
+
+   

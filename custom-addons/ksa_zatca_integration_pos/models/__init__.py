@@ -1,3 +1,3 @@
 # -*- coding: utf-8 -*-
 
-from . import pos_order, pos_session, pos_payment_method
+from . import pos_order, pos_session, pos_payment_method,product

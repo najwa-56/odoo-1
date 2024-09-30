@@ -7,6 +7,7 @@ import logging
 import base64
 import qrcode
 import io
+from num2words import num2words
 
 _zatca = logging.getLogger('Zatca Debugger for account.move :')
 

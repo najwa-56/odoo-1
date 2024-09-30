@@ -55,6 +55,16 @@ class ResCompany(models.Model):
     industry_id = fields.Many2one(related="partner_id.industry_id", readonly=False)
     country_id_name = fields.Char(related="country_id.name")
 
+    # reports invoice fields
+    other_seller_id = fields.Char(related='partner_id.other_seller_id', store=True, readonly=False, string='Other Seller Id')
+    arabic_name = fields.Char('Name')
+    arabic_street = fields.Char('Street')
+    arabic_street2 = fields.Char('Street2')
+    arabic_city = fields.Char('City')
+    arabic_state = fields.Char('State')
+    arabic_country = fields.Char('Country')
+    arabic_zip = fields.Char('Zip')
+
     def sanitize_int(self, value):
         return re.sub(r'\D', '', str(value))
 

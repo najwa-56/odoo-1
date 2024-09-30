@@ -50,7 +50,7 @@
 
     <!--    report action-->
 
-    <record id="report_zatca_b2b" model="ir.actions.server">
+    <!-- <record id="report_zatca_b2b" model="ir.actions.server">
         <field name="name">E Invoice Standard</field>
         <field name="model_id" ref="account.model_account_move"/>
         <field name="binding_model_id" ref="account.model_account_move"/>
@@ -68,5 +68,44 @@
         <field name="binding_type">report</field>
         <field name="state">code</field>
         <field name="code">action = records.print_einv_b2c()</field>
+    </record> -->
+
+
+    <!-- new saudi report -->
+
+    <record id="action_report_tax_invoice" model="ir.actions.report">
+        <field name="name">Saudi VAT Invoice Report</field>
+        <field name="model">account.move</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">ksa_zatca_integration.report_tax_invoice</field>
+        <field name="report_file">ksa_zatca_integration.report_tax_invoice</field>
+        <field name="print_report_name">(object._get_report_base_filename())</field>
+        <field name="binding_model_id" ref="account.model_account_move"/>
+        <field name="binding_type">report</field>
     </record>
+
+    <record id="preview_action_report_tax_invoice" model="ir.actions.report">
+        <field name="name">Preview Saudi VAT Invoice Report</field>
+        <field name="model">account.move</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">ksa_zatca_integration.preview_report_tax_invoice</field>
+        <field name="report_file">ksa_zatca_integration.preview_report_tax_invoice</field>
+        <field name="print_report_name">(object._get_report_base_filename())</field>
+        <field name="binding_model_id" ref="account.model_account_move"/>
+        <field name="binding_type">report</field>
+    </record>
+
+    <record id="action_report_simplified_tax_invoice" model="ir.actions.report">
+        <field name="name">Simplified VAT Invoice Report</field>
+        <field name="model">account.move</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">ksa_zatca_integration.report_simplified_tax_invoice</field>
+        <field name="report_file">ksa_zatca_integration.report_simplified_tax_invoice</field>
+        <field name="print_report_name">(object._get_report_base_filename())</field>
+        <field name="binding_model_id" ref="account.model_account_move"/>
+        <field name="binding_type">report</field>
+    </record>
+
+
+
 </odoo>

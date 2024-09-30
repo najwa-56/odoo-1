@@ -1,0 +1,15 @@
+
+
+@font-face {
+	font-family: 'DroidArabicKufiBold';
+	src: url('/ksa_zatca_integration_pos/static/src/fonts/DroidKufi-Bold.ttf') format('truetype');
+	font-weight: bold;
+	font-style: normal;
+	  }
+
+@font-face {
+	font-family: 'DroidArabicKufiRegular';
+	src: url('/ksa_zatca_integration_pos/static/src/fonts/DroidKufi-Regular.ttf') format('truetype');
+	font-weight: normal;
+	font-style: normal;
+}

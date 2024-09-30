@@ -1,0 +1,337 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates id="point_of_sale.template" xml:space="preserve">
+
+	<t t-name="ReceiptHeader" t-inherit="point_of_sale.ReceiptHeader" t-inherit-mode="extension" owl="1">
+		<xpath expr="//div[hasclass('pos-receipt-contact')]" position="replace">
+			
+			<div class="pos-receipt-contact" style="width:100%;font-size:14px;">
+				
+
+				<table style="margin-top: 4%;padding:0pt;font-size:10pt;font-weight:bold">
+					<colgroup>
+						<col width='39%'/>
+						<col width='1%'/>
+						<col width='60%'/>
+					</colgroup>
+					<tr>
+						<td style="text-align:right;text-size:12pt;font-family: droidarabickufiregular !important; ">الرقم الضريبي</td> 
+						<td style="padding-left:1pt">:</td>
+						<td style="text-align:center;padding-right:5pt">
+							<t t-if="props.data.company.vat" t-esc="props.data.company.vat" style="text-align:center"/>
+						</td> 
+					</tr>
+					<tr>
+						<td style="text-align:right;text-size:12pt; font-family:droidarabickufiregular !important;">اسم الفرع</td>
+						<td style="padding-left:3pt">:</td>
+						<td style="text-align:center;padding-right:5pt">
+							<t t-esc="props.data.config.name" style="text-align:center"/>
+						</td>
+					</tr>
+				</table>
+				<br/>
+
+				
+	    	
+	    </div>
+
+
+			<div style="border-bottom:4pt solid black;;font-size:14pt; text-align:center; font-weight:bold;padding-bottom:15pt;padding-top:5pt;font-family:droidarabickufiregular !important;" > الفاتورة الإلكترونية المبسطة </div>
+		</xpath>
+
+		<xpath expr="//img[@id='qrcode']" position="replace">
+		</xpath>
+
+		<xpath expr="//span[@id='title_english']" position="replace">
+        </xpath>
+
+        <xpath expr="//span[@id='title_arabic']" position="replace">
+        </xpath>
+
+	</t>
+
+	<t t-name="OrderReceipt" t-inherit="point_of_sale.OrderReceipt" t-inherit-mode="extension" owl="1">
+
+		<xpath expr="//OrderWidget" position="replace">
+			<div class='receipt-orderlines' style="margin-top: -20%;">
+				<table style="border-bottom:4pt solid black;margin-top:-18pt;padding:5pt;font-size:9pt">
+					<colgroup>
+						<col width='24%'/>
+						<col width='1%'/>
+						<col width='49%'/>
+						<col width='1%'/>
+						<col width='25%'/>
+					</colgroup>
+					<tr>
+						<td colspan="5" style="text-align:center;padding-bottom: 15px;">
+							<img t-attf-src="/report/barcode/Code128/{{props.data.name.split(' ')[1]}}"
+								style="width:250px;height:50px;display:block;margin:auto;"
+								alt="Barcode" />
+							<small>
+								<t t-esc="props.data.name.split(' ')[1]" /></small>
+							<br />
+						</td>
+					</tr>
+					<tr>
+						<td> </td>
+						<td style="padding-left:1pt"></td>
+						<td style="text-align:center;padding-right:1pt">
+							<t t-esc="props.data.name"/>
+						</td>
+						<td style="padding-right:1pt"></td>
+						<td ></td>
+					</tr>
+
+					<tr>
+						<td style="text-align:right;text-size:7pt; font-family:droidarabickufiregular !important;">التاريخ</td>
+						<td style="padding-top:3pt;padding-bottom:3pt;padding-left:3pt">:</td>
+						<td style="text-align:center;padding-top:5pt;padding-bottom:3pt;padding-right:3pt">
+							<t t-esc="props.data.date"/>
+						</td>
+						<td style="padding-top:3pt;padding-bottom:3pt">:</td>
+						<td style="text-align:left;text-size:7pt; font-family:droidarabickufiregular !important;">Date</td>
+					</tr>
+
+				</table>
+				<br/>	
+
+				<table style="border-bottom:4pt solid black;margin-top:-18pt;padding:5pt;font-size:10pt;font-weight:bold">
+					<colgroup>
+						<col width='39%'/>
+						<col width='1%'/>
+						<col width='60%'/>
+						
+					</colgroup>
+					<tr t-if='partner'>
+						<td style="text-align:right;text-size:7pt;padding-top:3pt;padding-bottom:3pt; font-family:droidarabickufiregular !important;">اسم الضيف</td>
+						<td style="padding-top:3pt;padding-bottom:3pt;padding-left:3pt">:</td>
+						<td style="text-align:center;padding-right:5pt;padding-top:3pt;padding-bottom:3pt">
+							<t t-esc="partner.name"/>
+						</td>
+					</tr>
+
+					<tr t-if='partner'>
+						<td style="text-align:right;text-size:7pt;padding-top:3pt;padding-bottom:3pt;font-family:droidarabickufiregular !important;">جوال الضيف</td>
+						<td style="padding-top:3pt;padding-bottom:3pt;padding-left:3pt">:</td>
+						<td style="text-align:center;padding-right:5pt;padding-top:3pt;padding-bottom:3pt">
+							<t t-esc="partner.phone" />
+						</td>
+					</tr>
+					<tr t-if='partner'>
+						<td style="text-align:right;text-size:7pt;padding-top:3pt;padding-bottom:3pt;font-family:droidarabickufiregular !important;">الرقم الضريبي</td>
+						<td style="padding-top:3pt;padding-bottom:3pt;padding-left:3pt">:</td>
+						<td style="text-align:center;padding-right:5pt;padding-top:3pt;padding-bottom:3pt">
+						   <t t-esc="partner.vat"/>
+						</td>
+					</tr>
+				</table>
+
+				<div style="display:none; !important">
+					<OrderWidget  lines="props.data.orderlines" t-slot-scope="scope">
+		                <t t-set="line" t-value="scope.line"/>
+		                <Orderline line="omit(scope.line, 'customerNote')" class="{ 'pe-none': true }">
+		                    <li t-if="line.customerNote" class="customer-note w-100 p-2 my-1 rounded text-break">
+		                        <i class="fa fa-sticky-note me-1" role="img" aria-label="Customer Note" title="Customer Note"/>
+		                        <t t-esc="line.customerNote" />
+		                    </li>
+		                   
+		                </Orderline>
+		            </OrderWidget>
+				</div>
+				
+
+	<div style="text-align:center; font-weight:bold;padding-bottom:0pt;padding-top:0pt;font-family:droidarabickufiregular !important;" >
+						<h3 style=" padding: 5px; font-family: droidarabickufiregular !important;;font-weight:bold ">بيانات الأصناف</h3>
+					</div>
+	
+				<table style="margin-top:5pt;padding:5pt;border-bottom:4pt solid black;font-size:10pt;width:100%;" class='receipt-orderlines'>
+					 <colgroup>
+						<col width='22%'/>
+						<col width='21%'/>
+						<col width='12%'/>
+						<col width='45%'/>
+					</colgroup>
+					<tr style="border-bottom:1pt solid black;">
+						 <th style="border-bottom:1pt dashed black;text-align:center;margin-bottom:5pt;padding-bottom:3pt;    font-family: droidarabickufiregular !important;;font-weight:bold">الإجمالي<br/>Amount
+						</th>
+
+						<th style="border-bottom:1pt dashed black;text-align:center;margin-bottom:5pt;padding-bottom:3pt;    font-family: droidarabickufiregular !important;;font-weight:bold">الكود<br/>Itemcode.
+						</th>
+						<th style="border-bottom:1pt dashed black;text-align:center;margin-bottom:5pt;padding-bottom:3pt;    font-family: droidarabickufiregular !important;;font-weight:bold">الكمية<br/>Qty.
+						</th>
+						 <th style="border-bottom:1pt dashed black;text-align:center;margin-bottom:5pt;padding-bottom:3pt;    font-family: droidarabickufiregular !important;;font-weight:bold">المبلغ<br/>Price
+						</th>
+					</tr>
+					<t t-foreach="orderlines" t-as="orderline" t-key="orderline.id" style="margin-top:5pt">
+						<tr>
+							<td colspan="4" style="text-align:right;vertical-align:top;font-size:12px;font-weight:bold">
+								<t t-esc="orderline.get_product().display_name"/>
+								<t t-if="orderline.get_product().name_arabic">
+									<br/>
+									<t t-esc="orderline.get_product().name_arabic"/>
+								</t> - 
+								<t t-if="orderline.get_product().barcode">
+									<t t-esc="orderline.get_product().barcode"/>
+								</t>
+								<t t-if="orderline.discount > 0">
+									<div class="pos-disc-font">
+										With a<t t-esc="orderline.discount"/>% discount
+									</div>
+								</t>
+							</td>
+						</tr>
+						<tr>
+							<td style="vertical-align:top;border-left: 1px solid black;width: 28%;text-align:center;" class="pos-center-align">
+								<t t-esc="props.formatCurrency(orderline.get_display_price())"/>
+							</td>
+							<td style="vertical-align:top;border-left: 1px solid black;width: 37%;text-align:center;" class="pos-center-align">
+								<t t-if="orderline.get_product().default_code">
+									<t t-esc="orderline.get_product().default_code"/>
+								</t>
+								
+							</td>
+							<td style="vertical-align:top;border-left: 1px solid black;width: 7%;text-align:center;" class="pos-center-align">
+								<t t-esc="orderline.get_quantity()"/>
+							</td>
+							<td style="vertical-align:top;border-left: 1px solid black;width: 28%;text-align:center;" class="pos-center-align">
+								<t t-esc="props.formatCurrency(orderline.get_lst_price())"/>
+							</td>
+						</tr>
+					</t>
+					<tr>
+						<td colspan="4" style="text-align:right;vertical-align:top;font-size: 11px;">
+							<p></p>
+						</td>
+					</tr>
+				</table>
+
+				<table style="border-bottom:4pt solid black;font-size:9pt;width: 100%;" class='receipt-total table table-bordered'>
+					<colgroup>
+						<col width='34%'/>
+						<col width='1%'/>
+						<col width='30%'/>
+						<col width='1%'/>
+						<col width='34%'/>
+					</colgroup>
+					<tr>
+						<td style="text-align:right;text-size:7pt;padding-top:3pt;padding-bottom:3pt;font-family:droidarabickufiregular !important;">الاجمالي قبل الخصم</td>
+						<td style="padding-top:3pt;padding-bottom:3pt">:</td>
+						<td style="text-align:center;padding-bottom:3pt;padding-top:3pt;padding-right:3pt">
+						   <t t-esc="props.formatCurrency(order.get_total_without_tax() + order.get_total_discount())"/>
+						</td>
+						<td style="padding-bottom:3pt;padding-top:3pt">:</td>
+						<td style="text-align:left;text-size:7pt;padding-top:3pt;padding-bottom:3pt;font-family:droidarabickufiregular !important;">Total Before Discount</td>
+					</tr>
+					 <tr>
+						<td style="text-align:right;text-size:7pt;padding-top:3pt;padding-bottom:3pt;font-family:droidarabickufiregular !important;">اجمالي الخصم</td>
+						<td style="padding-bottom:3pt;padding-top:3pt">:</td>
+						<td style="text-align:center;padding-bottom:3pt;padding-top:3pt;padding-right:6pt">
+							<t t-esc="props.formatCurrency(order.get_total_discount())"/>
+						</td>
+						<td style="padding-bottom:3pt;padding-top:3pt">:</td>
+						<td style="text-align:left;text-size:7pt;padding-top:3pt;padding-bottom:3pt;font-family:droidarabickufiregular !important;">Total Discount Value</td>
+					</tr>
+					<tr>
+						<td style="text-align:right;text-size:7pt;padding-top:3pt;padding-bottom:3pt; font-family:droidarabickufiregular !important;">الاجمالي بعد الخصم</td>
+						<td style="padding-bottom:3pt;padding-top:3pt">:</td>
+						<td style="text-align:center;padding-bottom:3pt;padding-top:3pt;padding-right:6pt">
+							<t t-esc="props.formatCurrency(order.get_total_without_tax())"/>
+						</td>
+						<td style="padding-bottom:3pt;padding-top:3pt">:</td>
+						<td style="text-align:left;text-size:7pt;padding-top:3pt;padding-bottom:3pt; font-family:droidarabickufiregular !important;">Total After Discount</td>
+					</tr>
+
+					<t t-foreach="props.data.tax_details" t-as="taxdetail" t-key="taxdetail.id">
+						<tr>
+							<td style="text-align:right;text-size:7pt;padding-top:3pt;padding-bottom:3pt; font-family:droidarabickufiregular !important;">الضريبة 15%</td>
+							
+							<td style="padding-bottom:3pt;padding-top:3pt">:</td>
+							<td style="text-align:center;padding-bottom:3pt;padding-top:3pt;padding-right:6pt">
+								<t t-esc="props.formatCurrency(taxdetail.amount)"/>
+							</td>
+							<td style="padding-bottom:3pt;padding-top:3pt">:</td>
+							<td style="text-align:left;text-size:7pt;padding-top:3pt;padding-bottom:3pt; font-family:droidarabickufiregular !important;">%VAT 15</td>
+		
+											</tr>
+					</t>
+				   
+					<tr style="border-bottom:4pt solid black;font-weight:bold;font-size:10pt">
+						<td style="text-align:right;padding-bottom:5pt;font-family: droidarabickufiregular !important;">الصافي</td>
+						<td style="padding-bottom:5pt">:</td>
+						<td style="font-weight:bold;text-align:center;padding-bottom:5pt;padding-right:6pt">
+							<t t-esc="props.formatCurrency(props.data.amount_total)"/>
+						</td>
+						<td style="padding-bottom:5pt">:</td>
+						<td style="text-align:left;padding-bottom:5pt;font-family:droidarabickufiregular !important;">Net Amount</td>
+					</tr>
+
+					<t t-foreach="props.data.paymentlines" t-as="line" t-key='line_index'>
+						<tr>
+							<td style="text-align:right;vertical-align:bottom;    font-family: droidarabickufiregular !important;padding-top: 5px;">طريقة الدفع</td>
+							
+							<td style="vertical-align:bottom">:</td>
+							<td style="vertical-align:bottom;padding-right:6pt" class="pos-receipt-center-align">
+								<t t-esc="props.formatCurrency(line.amount)"/>
+							</td>
+							<td style="vertical-align:bottom">:</td>
+							<td style="vertical-align:bottom;text-align:left;">
+								<t t-esc="line.name"/>
+							</td>
+							</tr>
+					</t>
+
+					 <tr>
+						<td style="padding-bottom:5pt;text-align:right;    font-family:droidarabickufiregular !important;">الباقي</td>
+						<td style="padding-bottom:5pt">:</td>
+						<td style="padding-bottom: 5pt;padding-right: 6pt;text-align: center;" class="pos-receipt-center-align">
+							<t t-esc="props.formatCurrency(props.data.change)"/>
+						</td>
+						<td style="padding-bottom:5pt">:</td>
+						<td style="padding-bottom:5pt;text-align:left;font-family:droidarabickufiregular !important;">Change</td>
+					</tr>
+				</table>
+			</div>
+		</xpath>
+
+		<xpath expr="//div[hasclass('paymentlines')]" position="replace">
+			
+		</xpath>
+
+		<xpath expr="//div[hasclass('receipt-change')]" position="replace">
+			<div class="receipt-change"></div>
+		</xpath>
+
+		<xpath expr="//div[hasclass('pos-receipt-right-align')]" position="replace">
+		</xpath> 
+
+		<xpath expr="//div[hasclass('pos-receipt-amount')]" position="replace">
+		</xpath>     
+
+		<xpath expr="//t[@t-if='props.data.total_discount']" position="replace">
+		</xpath>  
+
+		<xpath expr="//div[hasclass('pos-receipt-taxes')]" position="replace">
+		</xpath>       
+
+		<xpath expr="//div[hasclass('pos-receipt')]/div[hasclass('pos-receipt-order-data')]" position="replace">
+			<div class="pos-receipt-order-data">
+				
+				<div t-if="props.data.ksa_qr_code" style="margin-top: -30%;">
+	                <img id="KSAposqrcode" t-att-src="props.data.ksa_qr_code" class="pos-receipt-logo" style=" border: 2px solid black; padding: 5px; border-radius: 5px; margin-bottom: 5px; "/>
+	            </div>
+				<div t-esc="props.data.date" />
+			</div>
+		</xpath>
+
+        <xpath expr="//div[hasclass('pos-receipt-amount-arabic')]" position="replace">
+		</xpath>
+
+		<xpath expr="//div[@t-if='props.data.is_gcc_country']" position="replace">
+		</xpath>  
+
+		
+
+
+	</t>
+
+
+</templates>

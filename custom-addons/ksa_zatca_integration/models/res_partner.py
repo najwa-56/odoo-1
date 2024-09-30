@@ -32,7 +32,13 @@ class ResPartner(models.Model):
                                                "||) In case of multiple commercial registrations, the seller should "
                                                "fill the commercial registration of the branch in respect of which "
                                                "the Tax Invoice is being issued.")
-
+# reports invoice fields
+    building_no = fields.Char('Building No')
+    additional_no = fields.Char('Additional No')
+    other_seller_id = fields.Char('Other Seller Id')
+    
+   
+   
     @api.constrains('zip')
     def constrains_brksa64(self):
         for record in self:

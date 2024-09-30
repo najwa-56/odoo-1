@@ -34,6 +34,8 @@
         'reports/e_invoicing_b2b.xml',
         'reports/e_invoicing_b2c.xml',
         'reports/report.xml',
+        'reports/vat_invoice_report_print.xml',
+        'reports/simpli_vat_invoice_report.xml',
         'wizard/account_debit_note.xml',
         'wizard/account_move_reversal.xml',
     ],

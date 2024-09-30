@@ -6,6 +6,8 @@ import { ConnectionLostError } from "@web/core/network/rpc_service";
 import { useService } from "@web/core/utils/hooks";
 import { _t } from "@web/core/l10n/translation";
 import { patch } from "@web/core/utils/patch";
+import { OrderReceipt } from "@point_of_sale/app/screens/receipt_screen/receipt/order_receipt";
+
 
 patch(PaymentScreen.prototype, {
     setup() {
@@ -36,6 +38,12 @@ patch(PaymentScreen.prototype, {
             }
         return res
     },
+    shouldDownloadInvoice() {
+        if (this.currentOrder.is_invoice) {
+            return true
+        }
+        return false
+    },
     toggleIsThirdParty() {
         this.currentOrder.l10n_is_third_party_invoice = this.currentOrder.l10n_is_third_party_invoice ? 0 : 1;
     },
@@ -48,12 +56,16 @@ patch(PaymentScreen.prototype, {
     Refund_Reason() {
         this.currentOrder.credit_debit_reason = arguments[0].currentTarget.value;
     },
+    toggleIsInvoice() {
+        this.currentOrder.is_invoice = this.currentOrder.is_invoice ? 0 : 1;
+    },
     async get_report(name) {
         let response = await this.orm.call('pos.order', 'get_simplified_zatca_report', [[], name]);
         if (response)
             response = $($(response)).find('.pos-receipt').parent().html()
         return response
     },
+
     async afterOrderValidation(suggestToSync = true) {
         // Remove the order from the local storage so that when we refresh the page, the order
         // won't be there
@@ -85,9 +97,16 @@ patch(PaymentScreen.prototype, {
                 ? this.currentOrder.finalized
                 : true;
 
-            if (this.hardwareProxy.printer && invoiced_finalized) {
-                let report = await this.get_report(this.props.order.name)
-                const printResult = await this.printer.printHtml($(report)[0], { webPrintFallback: true });
+            if (invoiced_finalized) {
+                const printResult = await this.printer.print(
+                    OrderReceipt,
+                    {
+                        data: this.pos.get_order().export_for_printing(),
+                        formatCurrency: this.env.utils.formatCurrency,
+                    },
+                    { webPrintFallback: true }
+                );
+
                 if (printResult && this.pos.config.iface_print_skip_screen) {
                     this.pos.removeOrder(this.currentOrder);
                     this.pos.add_new_order();
@@ -98,6 +117,52 @@ patch(PaymentScreen.prototype, {
 
         this.pos.showScreen(nextScreen);
     },
+
+
+    // async afterOrderValidation(suggestToSync = true) {
+    //     // Remove the order from the local storage so that when we refresh the page, the order
+    //     // won't be there
+    //     this.pos.db.remove_unpaid_order(this.currentOrder);
+
+    //     // Ask the user to sync the remaining unsynced orders.
+    //     if (suggestToSync && this.pos.db.get_orders().length) {
+    //         const { confirmed } = await this.popup.add(ConfirmPopup, {
+    //             title: _t("Remaining unsynced orders"),
+    //             body: _t("There are unsynced orders. Do you want to sync these orders?"),
+    //         });
+    //         if (confirmed) {
+    //             // NOTE: Not yet sure if this should be awaited or not.
+    //             // If awaited, some operations like changing screen
+    //             // might not work.
+    //             this.pos.push_orders();
+    //         }
+    //     }
+    //     // Always show the next screen regardless of error since pos has to
+    //     // continue working even offline.
+    //     let nextScreen = this.nextScreen;
+
+    //     if (
+    //         nextScreen === "ReceiptScreen" &&
+    //         !this.currentOrder._printed &&
+    //         this.pos.config.iface_print_auto
+    //     ) {
+    //         const invoiced_finalized = this.currentOrder.is_to_invoice()
+    //             ? this.currentOrder.finalized
+    //             : true;
+
+    //         if (this.hardwareProxy.printer && invoiced_finalized) {
+    //             let report = await this.get_report(this.props.order.name)
+    //             const printResult = await this.printer.printHtml($(report)[0], { webPrintFallback: true });
+    //             if (printResult && this.pos.config.iface_print_skip_screen) {
+    //                 this.pos.removeOrder(this.currentOrder);
+    //                 this.pos.add_new_order();
+    //                 nextScreen = "ProductScreen";
+    //             }
+    //         }
+    //     }
+
+    //     this.pos.showScreen(nextScreen);
+    // },
     async _finalizeValidation() {
         if (this.currentOrder.is_paid_with_cash() || this.currentOrder.get_change()) {
             this.hardwareProxy.openCashbox();
@@ -127,7 +192,7 @@ patch(PaymentScreen.prototype, {
             // 2. Invoice.
             if (this.shouldDownloadInvoice() && this.currentOrder.is_to_invoice()) {
                 if (syncOrderResult[0]?.account_move) {
-                    await this.report.doAction("ksa_zatca_integration_pos.report_e_invoicing_b2c_invoice", [
+                    await this.report.doAction("ksa_zatca_integration.action_report_tax_invoice", [
                         syncOrderResult[0].account_move,
                     ]);
                 } else {

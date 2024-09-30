@@ -847,7 +847,7 @@
                                                   t-options='{"widget": "monetary", "display_currency": doc.currency_id}'/>
                                         </td>
                                         <td class="second_table" style="text-align:right;">
-                                              <span t-esc="line.wvproduct_uom.name"/>
+                                              <span t-esc="line.product_uom_id.name"/>
                                         </td>
                                         <td class="second_table" style="text-align:right;">
                                             <span t-esc="doc.get_bt_131(line.zatca_id)"

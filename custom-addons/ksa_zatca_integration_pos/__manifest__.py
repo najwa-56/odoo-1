@@ -14,7 +14,7 @@
     'category': 'Invoicing',
     'version': '16.1.1',
     'price': 300, 'currency': 'USD',
-    'depends': ['ksa_zatca_integration', 'point_of_sale'],
+    'depends': ['ksa_zatca_integration', 'point_of_sale','l10n_gcc_pos','l10n_sa_pos'],
     'external_dependencies': {
         'python': ['cryptography', 'lxml']
     },
@@ -22,6 +22,8 @@
         'views/pos_order.xml',
         'views/res_company.xml',
         'views/pos_payment_method.xml',
+        'views/product_view.xml',
+        'views/cron.xml',
         'reports/e_invoicing_b2c_invoice.xml',
         'reports/report.xml',
     ],
@@ -29,18 +31,18 @@
         'point_of_sale._assets_pos': [
             'ksa_zatca_integration_pos/static/src/xml/payment_screen.xml',
             'ksa_zatca_integration_pos/static/src/xml/receipt_screen.xml',
+            'ksa_zatca_integration_pos/static/src/xml/receipt.xml',
             'ksa_zatca_integration_pos/static/src/js/reprint_receipt_screen.js',
             'ksa_zatca_integration_pos/static/src/js/payment_screen.js',
             'ksa_zatca_integration_pos/static/src/js/receipt_screen.js',
             'ksa_zatca_integration_pos/static/src/js/order_receipt.js',
             'ksa_zatca_integration_pos/static/src/js/models.js',
             'ksa_zatca_integration_pos/static/src/js/invoice_button.js',
-            'ksa_zatca_integration_pos/static/src/js/zatca_report_service.js',
+            'ksa_zatca_integration_pos/static/src/js/jquery-qrcode.min.js',
             'ksa_zatca_integration_pos/static/src/css/style.css',
+            'ksa_zatca_integration_pos/static/src/css/arabic_font.css',
             'ksa_zatca_integration_pos/static/src/app/**/*'
 
-            # 'ksa_zatca_integration_pos/static/src/js/custom_partner_details_edit.js',
-            # 'ksa_zatca_integration_pos/static/src/xml/custom_partner_details_edit.xml',
         ],
     },
 
