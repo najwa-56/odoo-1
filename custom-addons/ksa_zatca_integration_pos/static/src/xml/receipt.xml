@@ -27,6 +27,16 @@
 							<t t-esc="props.data.config.name" style="text-align:center"/>
 						</td>
 					</tr>
+
+					<tr>
+						<td style="text-align:right;text-size:12pt; font-family:droidarabickufiregular !important;"> العنوان</td>
+						<td style="padding-left:3pt">:</td>
+						<td style="text-align:center;padding-right:5pt">
+							<br />
+							<t t-esc="props.data.company.street" style="text-align:center"/> - <t t-esc="props.data.company.street2" style="text-align:center"/> - <t t-esc="props.data.company.city" style="text-align:center"/> - <t t-esc="props.data.company.zip" style="text-align:center"/>
+							
+						</td>
+					</tr>
 				</table>
 				<br/>
 
@@ -94,36 +104,7 @@
 				</table>
 				<br/>	
 
-				<table style="border-bottom:4pt solid black;margin-top:-18pt;padding:5pt;font-size:10pt;font-weight:bold">
-					<colgroup>
-						<col width='39%'/>
-						<col width='1%'/>
-						<col width='60%'/>
-						
-					</colgroup>
-					<tr t-if='partner'>
-						<td style="text-align:right;text-size:7pt;padding-top:3pt;padding-bottom:3pt; font-family:droidarabickufiregular !important;">اسم الضيف</td>
-						<td style="padding-top:3pt;padding-bottom:3pt;padding-left:3pt">:</td>
-						<td style="text-align:center;padding-right:5pt;padding-top:3pt;padding-bottom:3pt">
-							<t t-esc="partner.name"/>
-						</td>
-					</tr>
-
-					<tr t-if='partner'>
-						<td style="text-align:right;text-size:7pt;padding-top:3pt;padding-bottom:3pt;font-family:droidarabickufiregular !important;">جوال الضيف</td>
-						<td style="padding-top:3pt;padding-bottom:3pt;padding-left:3pt">:</td>
-						<td style="text-align:center;padding-right:5pt;padding-top:3pt;padding-bottom:3pt">
-							<t t-esc="partner.phone" />
-						</td>
-					</tr>
-					<tr t-if='partner'>
-						<td style="text-align:right;text-size:7pt;padding-top:3pt;padding-bottom:3pt;font-family:droidarabickufiregular !important;">الرقم الضريبي</td>
-						<td style="padding-top:3pt;padding-bottom:3pt;padding-left:3pt">:</td>
-						<td style="text-align:center;padding-right:5pt;padding-top:3pt;padding-bottom:3pt">
-						   <t t-esc="partner.vat"/>
-						</td>
-					</tr>
-				</table>
+				
 
 				<div style="display:none; !important">
 					<OrderWidget  lines="props.data.orderlines" t-slot-scope="scope">
@@ -154,8 +135,7 @@
 						 <th style="border-bottom:1pt dashed black;text-align:center;margin-bottom:5pt;padding-bottom:3pt;    font-family: droidarabickufiregular !important;;font-weight:bold">الإجمالي<br/>Amount
 						</th>
 
-						<th style="border-bottom:1pt dashed black;text-align:center;margin-bottom:5pt;padding-bottom:3pt;    font-family: droidarabickufiregular !important;;font-weight:bold">الكود<br/>Itemcode.
-						</th>
+						
 						<th style="border-bottom:1pt dashed black;text-align:center;margin-bottom:5pt;padding-bottom:3pt;    font-family: droidarabickufiregular !important;;font-weight:bold">الكمية<br/>Qty.
 						</th>
 						 <th style="border-bottom:1pt dashed black;text-align:center;margin-bottom:5pt;padding-bottom:3pt;    font-family: droidarabickufiregular !important;;font-weight:bold">المبلغ<br/>Price
@@ -183,12 +163,7 @@
 							<td style="vertical-align:top;border-left: 1px solid black;width: 28%;text-align:center;" class="pos-center-align">
 								<t t-esc="props.formatCurrency(orderline.get_display_price())"/>
 							</td>
-							<td style="vertical-align:top;border-left: 1px solid black;width: 37%;text-align:center;" class="pos-center-align">
-								<t t-if="orderline.get_product().default_code">
-									<t t-esc="orderline.get_product().default_code"/>
-								</t>
-								
-							</td>
+							
 							<td style="vertical-align:top;border-left: 1px solid black;width: 7%;text-align:center;" class="pos-center-align">
 								<t t-esc="orderline.get_quantity()"/>
 							</td>
@@ -213,46 +188,28 @@
 						<col width='34%'/>
 					</colgroup>
 					<tr>
-						<td style="text-align:right;text-size:7pt;padding-top:3pt;padding-bottom:3pt;font-family:droidarabickufiregular !important;">الاجمالي قبل الخصم</td>
+						<td style="text-align:right;text-size:7pt;padding-top:3pt;padding-bottom:3pt;font-family:droidarabickufiregular !important;">الاجمالي غير شامل الضريبة </td>
 						<td style="padding-top:3pt;padding-bottom:3pt">:</td>
 						<td style="text-align:center;padding-bottom:3pt;padding-top:3pt;padding-right:3pt">
 						   <t t-esc="props.formatCurrency(order.get_total_without_tax() + order.get_total_discount())"/>
 						</td>
 						<td style="padding-bottom:3pt;padding-top:3pt">:</td>
-						<td style="text-align:left;text-size:7pt;padding-top:3pt;padding-bottom:3pt;font-family:droidarabickufiregular !important;">Total Before Discount</td>
-					</tr>
-					 <tr>
-						<td style="text-align:right;text-size:7pt;padding-top:3pt;padding-bottom:3pt;font-family:droidarabickufiregular !important;">اجمالي الخصم</td>
-						<td style="padding-bottom:3pt;padding-top:3pt">:</td>
-						<td style="text-align:center;padding-bottom:3pt;padding-top:3pt;padding-right:6pt">
-							<t t-esc="props.formatCurrency(order.get_total_discount())"/>
-						</td>
-						<td style="padding-bottom:3pt;padding-top:3pt">:</td>
-						<td style="text-align:left;text-size:7pt;padding-top:3pt;padding-bottom:3pt;font-family:droidarabickufiregular !important;">Total Discount Value</td>
-					</tr>
-					<tr>
-						<td style="text-align:right;text-size:7pt;padding-top:3pt;padding-bottom:3pt; font-family:droidarabickufiregular !important;">الاجمالي بعد الخصم</td>
-						<td style="padding-bottom:3pt;padding-top:3pt">:</td>
-						<td style="text-align:center;padding-bottom:3pt;padding-top:3pt;padding-right:6pt">
-							<t t-esc="props.formatCurrency(order.get_total_without_tax())"/>
-						</td>
-						<td style="padding-bottom:3pt;padding-top:3pt">:</td>
-						<td style="text-align:left;text-size:7pt;padding-top:3pt;padding-bottom:3pt; font-family:droidarabickufiregular !important;">Total After Discount</td>
+						<td style="text-align:left;text-size:7pt;padding-top:3pt;padding-bottom:3pt;font-family:droidarabickufiregular !important;">Total Before Tax</td>
 					</tr>
 
-					<t t-foreach="props.data.tax_details" t-as="taxdetail" t-key="taxdetail.id">
-						<tr>
-							<td style="text-align:right;text-size:7pt;padding-top:3pt;padding-bottom:3pt; font-family:droidarabickufiregular !important;">الضريبة 15%</td>
-							
-							<td style="padding-bottom:3pt;padding-top:3pt">:</td>
-							<td style="text-align:center;padding-bottom:3pt;padding-top:3pt;padding-right:6pt">
-								<t t-esc="props.formatCurrency(taxdetail.amount)"/>
-							</td>
-							<td style="padding-bottom:3pt;padding-top:3pt">:</td>
-							<td style="text-align:left;text-size:7pt;padding-top:3pt;padding-bottom:3pt; font-family:droidarabickufiregular !important;">%VAT 15</td>
-		
-											</tr>
-					</t>
+					<tr>
+						<td style="text-align:right;text-size:7pt;padding-top:3pt;padding-bottom:3pt;font-family:droidarabickufiregular !important;"> الضريبة </td>
+						<td style="padding-top:3pt;padding-bottom:3pt">:</td>
+						<td style="text-align:center;padding-bottom:3pt;padding-top:3pt;padding-right:3pt">
+						   <t t-esc="props.formatCurrency(order.get_total_tax())"/>
+						</td>
+						<td style="padding-bottom:3pt;padding-top:3pt">:</td>
+						<td style="text-align:left;text-size:7pt;padding-top:3pt;padding-bottom:3pt;font-family:droidarabickufiregular !important;">Total Tax</td>
+					</tr>
+
+					 
+					
+
 				   
 					<tr style="border-bottom:4pt solid black;font-weight:bold;font-size:10pt">
 						<td style="text-align:right;padding-bottom:5pt;font-family: droidarabickufiregular !important;">الصافي</td>

@@ -7,7 +7,7 @@ class PosSession(models.Model):
 
     def _loader_params_res_company(self):
         result = super()._loader_params_res_company()
-        result['search_params']['fields'].extend(['parent_zatca_send_from_pos', 'parent_is_zatca','street','street2','city','state_id','vat'])
+        result['search_params']['fields'].extend(['parent_zatca_send_from_pos', 'parent_is_zatca','street','street2','city','state_id','vat','zip'])
         return result
 
     
