@@ -48,7 +48,7 @@
 
 					<table style="border:2pt solid black;width:100%;color:black; margin-top:-30pt; font-family:ArbFONTS-GE_Dinar_One_Medium !important" class="table-condensed table-sm">
 							<tr style="border:2pt solid black">
-								<td style="font-weight: bold;text-align:center;color:white;background-color:#46c0ae;FONT-SIZE: 12pt"><span class="text-right arabic"> تفاصيل الفاتورة الضريبية  </span></td> 
+								<td style="font-weight: bold;text-align:center;color:black;background-color:#dddddd;FONT-SIZE: 12pt"><span class="text-right arabic"> تفاصيل الفاتورة الضريبية  </span></td> 
 							</tr>
 					</table>
 					
@@ -57,11 +57,11 @@
 							<table style="border:2pt solid black;width:100%;padding:10pt;color:black;" class="table table-bordered table-sm">
 								<tr style="border:2pt solid black">
 									<td class="arabic" style="width:50%; text-align:center;background-color:#white;color:black;"><span t-field="o.name"/></td>
-									<td class="arabic" style=" text-align:right;color:black;background-color:#45c1ae ; font-weight: bold;">رقم الفاتورة</td>
+									<td class="arabic" style=" text-align:right;color:black;background-color:#dddddd ; font-weight: bold;">رقم الفاتورة</td>
 								</tr>
 								<tr style="border:2pt solid black">
-									<td class="arabic" style="width:50%; text-align:center;background-color:#DDDDDD;color:black;"><span t-field="o.invoice_date"/></td>
-									<td class="arabic" style=" text-align:right;color:black;background-color:#45c1ae;font-weight: bold;">تاريخ الفاتورة</td>
+									<td class="arabic" style="width:50%; text-align:center;"><span t-field="o.invoice_date"/></td>
+									<td class="arabic" style=" text-align:right;color:black;background-color:#dddddd;font-weight: bold;">تاريخ الفاتورة</td>
 								</tr>
 								
 								
@@ -69,7 +69,7 @@
 							</table>
 						</div>
 						<div class="col-3" style="margin-top:5pt; padding-left:25pt;">
-							<img t-if="doc.get_qr_code()" style="border: 3px solid #45c1ae; padding: 3px; display:block;margin-left:20px;" t-att-src="'/report/barcode/?barcode_type=%s&amp;value=%s&amp;width=%s&amp;height=%s'%('QR', doc.get_qr_code(), 103, 103)"/>
+							<img t-if="doc.get_qr_code()" style="border: 3px solid #dddddd; padding: 3px; display:block;margin-left:20px;" t-att-src="'/report/barcode/?barcode_type=%s&amp;value=%s&amp;width=%s&amp;height=%s'%('QR', doc.get_qr_code(), 103, 103)"/>
 			            </div>
 			        </div>
 							<br/>
@@ -83,12 +83,12 @@
 								
 								<tr style="border:2pt solid black">
 									<td class="text-center arabic"><span t-field="company.name"/></td>
-									<td class="arabic" style=" text-align:right;color:white;background-color:#46c0ae;">الاسم</td>
+									<td class="arabic" style=" text-align:right;color:black;background-color:#dddddd;">الاسم</td>
 								</tr>
 								
 								<tr style="border:2pt solid black">
 									<td class="text-center arabic"><span t-field="company.arabic_street"/>- <span t-field="company.street2"/> - <span t-field="company.street"/> - <span t-field="company.country_id"/></td>
-									<td class="arabic" style=" text-align:right;">العنوان</td>
+									<td class="arabic" style=" text-align:right;color:black;background-color:#dddddd;">العنوان</td>
 								</tr>
 								
 								
@@ -96,11 +96,11 @@
 								
 								<tr style="border:2pt solid black">
 									<td class="text-center arabic"><span t-field="company.vat"/></td>
-									<td class="arabic" style=" text-align:right;color:white;background-color:#46c0ae;">الرقم الضريبي</td>
+									<td class="arabic" style=" text-align:right;color:black;background-color:#dddddd;">الرقم الضريبي</td>
 								</tr>
 								<tr style="border:2pt solid black">
 									<td class="text-center arabic"><span t-field="company.company_registry"/></td>
-									<td class="arabic" style=" text-align:right;color:white;background-color:#46c0ae;">السجل التجاري </td>
+									<td class="arabic" style=" text-align:right;color:black;background-color:#dddddd;">السجل التجاري </td>
 								</tr>
 							</table>
 		                </div>
@@ -111,12 +111,12 @@
 							</center>
 								<tr style="border:2pt solid black">
 									<td class="text-center arabic"><span t-field="o.partner_id.name"/></td>
-									<td class="arabic" style=" text-align:right;background-color:#45c1ae;color:black;">الاسم</td>
+									<td class="arabic" style=" text-align:right;background-color:#dddddd;color:black;">الاسم</td>
 								</tr>
 								
 								<tr style="border:2pt solid black">
 									<td class="text-center arabic"><span t-field="o.partner_id.street"/> - <span t-field="o.partner_id.street2"/> - <span t-field="o.partner_id.street"/> - <span t-field="o.partner_id.country_id"/></td>
-									<td class="arabic" style=" text-align:right;">العنوان</td>
+									<td class="arabic" style=" text-align:right;color:black;background-color:#dddddd;">العنوان</td>
 								</tr>
 								
 								
@@ -124,11 +124,11 @@
 								
 								<tr style="border:2pt solid black">
 									<td class="text-center arabic"><span t-field="o.partner_id.vat"/></td>
-									<td class="arabic" style=" text-align:right;background-color:#45c1ae;color:black;">الرقم الضريبي</td>
+									<td class="arabic" style=" text-align:right;background-color:#dddddd;color:black;">الرقم الضريبي</td>
 								</tr>
 								<tr style="border:2pt solid black">
 									<td class="text-center arabic"><span t-field="o.partner_id.buyer_identification_no"/></td>
-									<td class="arabic" style=" text-align:right;background-color:#45c1ae;color:black;">السجل التجاري</td>
+									<td class="arabic" style=" text-align:right;background-color:#dddddd;color:black;">السجل التجاري</td>
 								</tr>
 							</table>
 		                </div>
@@ -138,14 +138,13 @@
 						<thead>
 							
 
-							<tr style="background-color:#46c0ae;color:white; font-weight: bold;">
+							<tr style="background-color:#dddddd;color:black; font-weight: bold;">
 								<td style="border:2pt solid black;text-align:center;padding:2pt;"><span class="arabic">#</span></td>
 								<td width="25%" style="border:2pt solid black;text-align:center;padding:2pt; "><span class="arabic"> الاسم</span></td>
 								<td width="25%" style="border:2pt solid black;text-align:center;padding:2pt; "><span class="arabic"> الاسم اللاتنيني</span></td>
 
 								<td style="border:2pt solid black;text-align:center;padding:2pt;"><span class="arabic">سعر </span></td>
 								<td style="border:2pt solid black;text-align:center;padding:2pt;width:7%"><span class="arabic">الكمية</span></td>
-								<td style="border:2pt solid black;text-align:center; width:10%;padding:2pt"><span class="arabic">الخصم</span></td>
 								<td style="border:2pt solid black;text-align:center;padding:2pt;width:7%"><span class="arabic">الوحدة</span></td>
 								<!-- <td style="border:2pt solid black;text-align:center;padding:2pt;width:8%"><span class="arabic">نسبة الضريبة</span></td> -->
 								<td style="border:2pt solid black;text-align:center;padding:2pt;width:7%"><span class="arabic">معدل الضريبة</span></td>
@@ -181,9 +180,7 @@
 
 					 			
 
-						 		<td class="arabic" style="border:2pt solid black;text-align:center;padding:3pt;">
-	                                <span t-field="l.discount"/> % 
-	                             </td>
+						 		
 								 <td class="arabic" style="border:2pt solid black;text-align:center;padding:3pt;">
 	                                <span t-field="l.product_uom_id.name"/>
 	                             </td>
@@ -230,6 +227,13 @@
 			</tr>
 			
 			<tr style="border:2pt solid black">
+				<td width="35%" class="text-left arabic" style="border:2pt solid black;text-align:right;padding:3pt ;  font-weight: bold;">إجمالي ضريبة القيمة المضافة</td>
+				<td width="30%" style="border:2pt solid black;text-align:center;padding:3pt" class="text-center"><span t-esc="tax_total" t-options="{&quot;widget&quot;: &quot;monetary&quot;, &quot;display_currency&quot;: o.currency_id}"/></td>
+				<td width="35%" class="text-left arabic" style="border:2pt solid black;text-align:left;padding:3pt ;  font-weight: bold;">Total VAT 15%</td>
+				
+			</tr>
+
+			<tr style="border:2pt solid black">
 				<td width="35%" class="text-left arabic" style="border:2pt solid black;text-align:right;padding:3pt ; font-weight: bold;">إجمالي المبلغ بعد الضريبة</td>
 				<td width="30%" style="border:2pt solid black;text-align:center;padding:3pt" class="text-center"><span t-esc="discount_before_total" t-options="{&quot;widget&quot;: &quot;monetary&quot;, &quot;display_currency&quot;: o.currency_id}"/></td>
 				<td width="35%" class="text-left arabic" style="border:2pt solid black;text-align:left;padding:3pt ; font-weight: bold;"> Total Amount After Tax</td>
@@ -237,12 +241,7 @@
 				
 				
 			</tr>
-			<tr style="border:2pt solid black">
-				<td width="35%" class="text-left arabic" style="border:2pt solid black;text-align:right;padding:3pt ; background-color:#45c1ae;color:black; font-weight: bold;">إجمالي ضريبة القيمة المضافة</td>
-				<td width="30%" style="border:2pt solid black;text-align:center;padding:3pt" class="text-center"><span t-esc="tax_total" t-options="{&quot;widget&quot;: &quot;monetary&quot;, &quot;display_currency&quot;: o.currency_id}"/></td>
-				<td width="35%" class="text-left arabic" style="border:2pt solid black;text-align:left;padding:3pt ; background-color:#45c1ae;color:black; font-weight: bold;">Total VAT 15%</td>
-				
-			</tr>
+			
 			<tr style="border:2pt solid black">
 				<td width="35%" class="text-left arabic" style="border:2pt solid black;text-align:right;padding:3pt ; background-color:#dddddd;color:black; font-weight: bold;FONT-SIZE: 15pt">إجمالي المبلغ المستحق</td>
 				<td width="30%" style="border:2pt solid black;text-align:center;padding:3pt ; background-color:#dddddd;color:black; font-weight: bold;FONT-SIZE: 15pt" class="text-center"><span t-esc="doc.amount_residual" t-options="{&quot;widget&quot;: &quot;monetary&quot;, &quot;display_currency&quot;: o.currency_id}"/></td>
