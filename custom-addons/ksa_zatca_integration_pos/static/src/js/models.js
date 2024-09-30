@@ -21,7 +21,7 @@ patch(Order.prototype, {
         this.l10n_is_summary_invoice = json.l10n_is_summary_invoice;
 		this.is_invoice = json.is_invoice;
 		// Set default value for credit_debit_reason
-        this.credit_debit_reason = json.credit_debit_reason || "Default reason"; // Change this to your desired default value
+        this.credit_debit_reason = json.credit_debit_reason || "مرتجع عميل"; // Change this to your desired default value
     },
 	
 

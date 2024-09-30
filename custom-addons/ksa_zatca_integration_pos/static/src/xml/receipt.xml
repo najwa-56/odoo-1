@@ -45,7 +45,13 @@
 	    </div>
 
 
-			<div style="border-bottom:4pt solid black;;font-size:14pt; text-align:center; font-weight:bold;padding-bottom:15pt;padding-top:5pt;font-family:droidarabickufiregular !important;" > الفاتورة الإلكترونية المبسطة </div>
+		
+			<div style="border-bottom:4pt solid black;;font-size:14pt; text-align:center; font-weight:bold;padding-bottom:15pt;padding-top:5pt;font-family:droidarabickufiregular !important;" > الفاتورة الإلكترونية المبسطة 
+					
+				
+			</div>
+
+
 		</xpath>
 
 		<xpath expr="//img[@id='qrcode']" position="replace">
@@ -62,8 +68,21 @@
 	<t t-name="OrderReceipt" t-inherit="point_of_sale.OrderReceipt" t-inherit-mode="extension" owl="1">
 
 		<xpath expr="//OrderWidget" position="replace">
+			
 			<div class='receipt-orderlines' style="margin-top: -20%;">
-				<table style="border-bottom:4pt solid black;margin-top:-18pt;padding:5pt;font-size:9pt">
+				<div style="font-size:14pt; text-align:center; font-weight:bold;padding-bottom:15pt;padding-top:5pt;font-family:droidarabickufiregular !important;" >
+					
+					<t t-if="props.data.total_without_tax &lt; 0 ">
+						<t t-esc="'إشعار دائن'" />
+						
+					</t>
+					
+				
+			</div>
+			<br/>
+			
+				
+				<table style="border-bottom:4pt solid black;margin-top:58pt;padding:5pt;font-size:9pt">
 					<colgroup>
 						<col width='24%'/>
 						<col width='1%'/>
