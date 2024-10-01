@@ -26,17 +26,30 @@ patch(Order.prototype, {
 	
 
     export_for_printing() {
-        const json = super.export_for_printing(...arguments);
-        if (json) {
-        	let headerdata = json.headerData;
+        const result = super.export_for_printing(...arguments);
+        	let headerdata = result.headerData;
         	headerdata['config'] = this.pos.config || '';
         	headerdata['pos'] = this.pos || '';
-        	json.headerData = headerdata;
-        	json.ksa_qr_code =  qrCodeSrc(
-                    `${this.get_qrcode_data()}`
-                )
-        }
-        return json;
+        	result.headerData = headerdata;
+        	// json.ksa_qr_code =  qrCodeSrc(
+            //         `${this.get_qrcode_data()}`
+            //     )
+					const company = this.pos.company;
+					const codeWriter = new window.ZXing.BrowserQRCodeSvgWriter();
+					const qr_values = this.compute_sa_qr_code(
+						company.name,
+						company.vat,
+						this.date_order.toISO(),
+						this.get_total_with_tax(),
+						this.get_total_tax()
+					);
+					const qr_code_svg = new XMLSerializer().serializeToString(
+						codeWriter.write(qr_values, 150, 150)
+					);
+					result.qr_code = "data:image/svg+xml;base64," + window.btoa(qr_code_svg);
+				
+        
+        return result;
     },
 
     export_as_JSON() {
@@ -48,6 +61,39 @@ patch(Order.prototype, {
         json.credit_debit_reason = this.credit_debit_reason || 'مرتجع العميل';
         return json;
     },
+
+
+	compute_sa_qr_code(name, vat, date_isostring, amount_total, amount_tax) {
+        /* Generate the qr code for Saudi e-invoicing. Specs are available at the following link at page 23
+    https://zatca.gov.sa/ar/E-Invoicing/SystemsDevelopers/Documents/20210528_ZATCA_Electronic_Invoice_Security_Features_Implementation_Standards_vShared.pdf
+    */
+        const seller_name_enc = this._compute_qr_code_field(1, name);
+        const company_vat_enc = this._compute_qr_code_field(2, vat);
+        const timestamp_enc = this._compute_qr_code_field(3, date_isostring);
+        const invoice_total_enc = this._compute_qr_code_field(4, amount_total.toString());
+        const total_vat_enc = this._compute_qr_code_field(5, amount_tax.toString());
+
+        const str_to_encode = seller_name_enc.concat(
+            company_vat_enc,
+            timestamp_enc,
+            invoice_total_enc,
+            total_vat_enc
+        );
+
+        let binary = "";
+        for (let i = 0; i < str_to_encode.length; i++) {
+            binary += String.fromCharCode(str_to_encode[i]);
+        }
+        return btoa(binary);
+    },
+    _compute_qr_code_field(tag, field) {
+        const textEncoder = new TextEncoder();
+        const name_byte_array = Array.from(textEncoder.encode(field));
+        const name_tag_encoding = [tag];
+        const name_length_encoding = [name_byte_array.length];
+        return name_tag_encoding.concat(name_length_encoding, name_byte_array);
+    },
+
 
     decimalToHex(rgb) {
 		let hex = Number(rgb).toString(16);

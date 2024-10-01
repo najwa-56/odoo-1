@@ -295,9 +295,10 @@
 		<xpath expr="//div[hasclass('pos-receipt')]/div[hasclass('pos-receipt-order-data')]" position="replace">
 			<div class="pos-receipt-order-data">
 				
-				<div t-if="props.data.ksa_qr_code" style="margin-top: -30%;">
+				<!-- <div t-if="props.data.ksa_qr_code" style="margin-top: -30%;">
 	                <img id="KSAposqrcode" t-att-src="props.data.ksa_qr_code" class="pos-receipt-logo" style=" border: 2px solid black; padding: 5px; border-radius: 5px; margin-bottom: 5px; "/>
-	            </div>
+	            </div> -->
+				<img t-if="props.data.qr_code" id="qrcode" t-att-src="props.data.qr_code" class="pos-receipt-qrcode"/>
 				<div t-esc="props.data.date" />
 			</div>
 		</xpath>
