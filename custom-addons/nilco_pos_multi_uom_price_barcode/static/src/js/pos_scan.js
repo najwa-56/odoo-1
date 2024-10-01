@@ -71,6 +71,7 @@ patch(ProductScreen.prototype, {
         var unit_price = 0;
         var uom_data_matched = false;
         let selected_uom_id = null;
+        let selected_uom_name = null;
 
         // Get the product template ID
         let product_tmpl_id = product.product_tmpl_id;
@@ -85,6 +86,7 @@ patch(ProductScreen.prototype, {
                     unit_price = uom_data.price;
                     uom_data_matched = true;
                     selected_uom_id = uom_data.id;
+                    selected_uom_name = uom_data.name_field 
 
                     Object.assign(options, {
                         price: uom_data.price,
@@ -119,6 +121,7 @@ patch(ProductScreen.prototype, {
         line.set_unit_price(unit_price);
         line.set_product_uom(selected_uom_id);
         line.set_uom(selected_uom_id);  // Set UoM explicitly
+        line.set_uom_name(selected_uom_name);
         line.price_manually_set = true;
         line.price_type = "automatic";
 
