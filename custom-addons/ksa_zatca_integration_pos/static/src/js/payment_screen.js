@@ -16,7 +16,8 @@ patch(PaymentScreen.prototype, {
             this.toggleIsToInvoice();
     },
     async _isOrderValid(isForceValidate) {
-        const res = super._isOrderValid(...arguments);
+        const res = await super._isOrderValid(...arguments);
+        console.log("_isOrderValid============================",res)
         if (res)
             if (this.currentOrder.get_total_with_tax() == 0 && _.contains([undefined, false, NaN, ''], this.currentOrder.credit_debit_reason)) {
                 this.popup.add(ErrorPopup, {

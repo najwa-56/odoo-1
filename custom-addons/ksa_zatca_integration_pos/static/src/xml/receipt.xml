@@ -69,22 +69,24 @@
 
 		<xpath expr="//OrderWidget" position="replace">
 			
-			<div class='receipt-orderlines' style="margin-top: 0%;">
+			<div class='receipt-orderlines' style="margin-top: -20%;">
 
 
-				<div style="font-size:14pt; text-align:center; font-weight:bold;font-family:droidarabickufiregular !important;" >
+				
 					
 					<t t-if="props.data.total_without_tax &lt; 0 ">
-						<t t-esc="'إشعار دائن'" />
+						<div style="margin-bottom:15pt;font-size:12pt; text-align:center; font-weight:bold;font-family:droidarabickufiregular !important;" >
+
+							<t t-esc="'إشعار دائن'" />
+						</div>
+					
 						
 					</t>
 					
 				
-			</div>
-			<br/>
 			
 				
-				<table style="border-bottom:4pt solid black;margin-top:8pt;padding:5pt;font-size:9pt">
+				<table style="border-bottom:4pt solid black;margin-top:0pt;padding:5pt;font-size:9pt">
 					<colgroup>
 						<col width='24%'/>
 						<col width='1%'/>
@@ -189,7 +191,7 @@
 								<t t-esc="orderline.get_quantity()"/>
 							</td>
 							<td style="vertical-align:top;border-left: 1px solid black;width: 28%;text-align:center;" class="pos-center-align">
-								<t t-esc="props.formatCurrency(orderline.get_lst_price())"/>
+								<t t-esc="props.formatCurrency(orderline.get_unit_price())"/>
 							</td>
 						</tr>
 					</t>
