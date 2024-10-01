@@ -54,7 +54,8 @@ patch(PaymentScreen.prototype, {
         this.currentOrder.l10n_is_summary_invoice = this.currentOrder.l10n_is_summary_invoice ? 0 : 1;
     },
     Refund_Reason() {
-        this.currentOrder.credit_debit_reason = arguments[0].currentTarget.value;
+        // this.currentOrder.credit_debit_reason = arguments[0].currentTarget.value;
+        this.currentOrder.credit_debit_reason = 'مرتجع العميل';
     },
     toggleIsInvoice() {
         this.currentOrder.is_invoice = this.currentOrder.is_invoice ? 0 : 1;

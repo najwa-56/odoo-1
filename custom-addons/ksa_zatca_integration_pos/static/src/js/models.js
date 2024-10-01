@@ -45,7 +45,7 @@ patch(Order.prototype, {
         json.l10n_is_nominal_invoice = this.l10n_is_nominal_invoice ? 1 : 0;
         json.l10n_is_summary_invoice = this.l10n_is_summary_invoice ? 1 : 0;
 		json.is_invoice = this.is_invoice ? 1 : 0;
-        json.credit_debit_reason = this.credit_debit_reason;
+        json.credit_debit_reason = this.credit_debit_reason || 'مرتجع العميل';
         return json;
     },
 

@@ -138,6 +138,7 @@ class AccountMove(models.Model):
     @api.model
     def default_get(self, fields_list):
         res = super(AccountMove, self).default_get(fields_list)
+        res['credit_debit_reason'] = 'مرتجع العملاء'
         conf = self.journal_id.company_id.parent_root_id or self.company_id.parent_root_id or self.env.company.sudo().parent_root_id
         if 'l10n_sa_invoice_type_is_readonly' in fields_list:
             res['l10n_sa_invoice_type_is_readonly'] = 1 if conf.is_zatca and conf.zatca_invoice_type != "Standard & Simplified" else 0

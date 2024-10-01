@@ -69,8 +69,10 @@
 
 		<xpath expr="//OrderWidget" position="replace">
 			
-			<div class='receipt-orderlines' style="margin-top: -20%;">
-				<div style="font-size:14pt; text-align:center; font-weight:bold;padding-bottom:15pt;padding-top:5pt;font-family:droidarabickufiregular !important;" >
+			<div class='receipt-orderlines' style="margin-top: 0%;">
+
+
+				<div style="font-size:14pt; text-align:center; font-weight:bold;font-family:droidarabickufiregular !important;" >
 					
 					<t t-if="props.data.total_without_tax &lt; 0 ">
 						<t t-esc="'إشعار دائن'" />
@@ -82,7 +84,7 @@
 			<br/>
 			
 				
-				<table style="border-bottom:4pt solid black;margin-top:58pt;padding:5pt;font-size:9pt">
+				<table style="border-bottom:4pt solid black;margin-top:8pt;padding:5pt;font-size:9pt">
 					<colgroup>
 						<col width='24%'/>
 						<col width='1%'/>
