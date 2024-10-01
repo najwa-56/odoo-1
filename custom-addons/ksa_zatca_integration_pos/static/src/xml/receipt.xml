@@ -235,7 +235,7 @@
 
 				   
 					<tr style="border-bottom:4pt solid black;font-weight:bold;font-size:10pt">
-						<td style="text-align:right;padding-bottom:5pt;font-family: droidarabickufiregular !important;">الصافي</td>
+						<td style="text-align:right;padding-bottom:5pt;font-family: droidarabickufiregular !important;">الإجمالي شامل الضريبة</td>
 						<td style="padding-bottom:5pt">:</td>
 						<td style="font-weight:bold;text-align:center;padding-bottom:5pt;padding-right:6pt">
 							<t t-esc="props.formatCurrency(props.data.amount_total)"/>
