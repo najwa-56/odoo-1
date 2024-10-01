@@ -182,14 +182,17 @@
 
 						 		
 								 <td class="arabic" style="border:2pt solid black;text-align:center;padding:3pt;">
-	                                <span t-field="l.product_uom_id.name"/>
+	                                <span t-field="l.uom_name"/>
 	                             </td>
 			                    
 						 		
 								 
 
 								<td class="arabic" style="border:2pt solid black;text-align:center;padding:3pt;background-color:#white; font-weight: bold;">
-			                        <span class="arabic" t-esc="l.tax_ids[0].name"/>
+									<t t-if="l.tax_ids">
+										<span class="arabic" t-esc="l.tax_ids[0].name"/>
+									</t>
+			                        
 			                    </td>
 								<td class="arabic" style="padding:3pt;border:2pt solid black;text-align:center;">
 									<t t-set="line_tax_total" t-value="l.price_subtotal*line_tax_total/100"/>

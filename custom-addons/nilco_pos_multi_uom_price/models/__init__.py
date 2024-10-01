@@ -4,3 +4,4 @@ from . import pos_order
 from . import stock_picking
 from . import pos_session
 from . import purchase
+from . import account_move
