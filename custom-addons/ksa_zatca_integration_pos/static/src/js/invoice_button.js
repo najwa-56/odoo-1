@@ -16,10 +16,10 @@ patch(InvoiceButton.prototype, {
         return response;
     },
 
-    async tryReprint() {
-        let report = await this.get_report(this.props.order.name)
-        this.printer.printHtml($(report)[0], { webPrintFallback: true });
-    },
+    // async tryReprint() {
+    //     let report = await this.get_report(this.props.order.name)
+    //     this.printer.printHtml($(report)[0], { webPrintFallback: true });
+    // },
 
     async _downloadInvoice(orderId) {
         try {

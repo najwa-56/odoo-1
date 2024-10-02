@@ -1,5 +1,7 @@
 # -*- coding: utf-8 -*-
 from odoo import fields, models, api, exceptions
+import base64
+
 import logging
 _logger = logging.getLogger(__name__)
 
@@ -57,3 +59,21 @@ class PosOrder(models.Model):
 
 
    
+
+    @api.model
+    def get_qr_code(self):
+        def get_qr_encoding(tag, field):
+            company_name_byte_array = field.encode('UTF-8')
+            company_name_tag_encoding = tag.to_bytes(length=1, byteorder='big')
+            company_name_length_encoding = len(company_name_byte_array).to_bytes(length=1, byteorder='big')
+            return company_name_tag_encoding + company_name_length_encoding + company_name_byte_array
+        qr_code_str = ''
+        seller_name_enc = get_qr_encoding(1, self.company_id.display_name)
+        company_vat_enc = get_qr_encoding(2, self.company_id.vat or '')
+        date_order = fields.Datetime.context_timestamp(self.with_context(tz='Asia/Riyadh'), self.date_order)
+        timestamp_enc = get_qr_encoding(3, str(date_order.isoformat()))
+        invoice_total_enc = get_qr_encoding(4, str(round(abs(self.amount_total),2)))
+        total_vat_enc = get_qr_encoding(5, str(round(abs(self.amount_tax),2)))
+        str_to_encode = seller_name_enc + company_vat_enc + timestamp_enc + invoice_total_enc + total_vat_enc
+        qr_code_str = base64.b64encode(str_to_encode).decode('UTF-8')
+        return qr_code_str

@@ -26,6 +26,7 @@
         'views/cron.xml',
         'reports/e_invoicing_b2c_invoice.xml',
         'reports/report.xml',
+        'reports/simplifed.xml',
     ],
     'assets': {
         'point_of_sale._assets_pos': [
@@ -38,6 +39,7 @@
             'ksa_zatca_integration_pos/static/src/js/order_receipt.js',
             'ksa_zatca_integration_pos/static/src/js/models.js',
             'ksa_zatca_integration_pos/static/src/js/invoice_button.js',
+            'ksa_zatca_integration_pos/static/src/js/ticket_screen.js',
             'ksa_zatca_integration_pos/static/src/js/jquery-qrcode.min.js',
             'ksa_zatca_integration_pos/static/src/css/style.css',
             'ksa_zatca_integration_pos/static/src/css/arabic_font.css',
