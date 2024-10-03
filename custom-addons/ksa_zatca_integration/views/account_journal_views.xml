@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+     
+
+        <record id="view_account_journal_form_inherit" model="ir.ui.view">
+            <field name="name">account.journal.form.inherited</field>
+            <field name="model">account.journal</field>
+            <field name="inherit_id" ref="account.view_account_journal_form" />
+            <field name="arch" type="xml">
+                <xpath expr="//page[@name='advanced_settings']/group" position="after">
+                    <group string="Zatcka Integaration">
+                        <field name="name" />
+                        <field name="cr"/>
+                        <field name="street" />
+                        <field name="street2"/>
+                        <field name="district"/>
+                        <field name="city"/>
+                        <field name="zip"/>
+                        <field name="license"/>
+                        <field name="license_no"/>
+                        <field name="building_no"/>
+                        <field name="additional_no"/>
+                        
+                        
+                    </group>
+                </xpath>
+            </field>
+        </record>
+</odoo>

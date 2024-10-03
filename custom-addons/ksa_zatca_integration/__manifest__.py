@@ -31,6 +31,7 @@
         'views/product_template.xml',
         'views/product_product.xml',
         'views/client_action.xml',
+        'views/account_journal_views.xml',
         'reports/e_invoicing_b2b.xml',
         'reports/e_invoicing_b2c.xml',
         'reports/report.xml',
