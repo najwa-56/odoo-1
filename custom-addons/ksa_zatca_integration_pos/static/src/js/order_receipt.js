@@ -26,7 +26,10 @@ patch(OrderReceipt.prototype, {
 	},
 
 	get orderlines() {
-  		return this.pos.get_order().get_orderlines();
+        const orderlines = this.pos.get_order().get_orderlines();
+        console.log("his.pos.get_order().get_orderlines()=======================", orderlines);
+        // Return false if the orderlines array is empty
+        return orderlines.length === 0 ? false : orderlines;
 	},
 
 	get partner() {

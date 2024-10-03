@@ -164,6 +164,8 @@
 						 <th style="border-bottom:1pt dashed black;text-align:center;margin-bottom:5pt;padding-bottom:3pt;    font-family: droidarabickufiregular !important;;font-weight:bold">المبلغ<br/>Price
 						</th>
 					</tr>
+                    <t t-if="orderlines">
+                        
 					<t t-foreach="orderlines" t-as="orderline" t-key="orderline.id" style="margin-top:5pt">
 						<tr>
 							<td colspan="4" style="text-align:right;vertical-align:top;font-size:12px;font-weight:bold">
@@ -195,6 +197,36 @@
 							</td>
 						</tr>
 					</t>
+                </t>
+                
+                <t t-else="">
+                    <t t-foreach="props.data.orderlines" t-as="orderline" t-key="orderline.id" style="margin-top:5pt">
+                    <tr>
+                        <td colspan="4" style="text-align:right;vertical-align:top;font-size:12px;font-weight:bold">
+                            <t t-esc="orderline.productName"/>
+                            
+                            <t t-if="orderline.discount > 0">
+                                <div class="pos-disc-font">
+                                    With a<t t-esc="orderline.discount"/>% discount
+                                </div>
+                            </t>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td style="vertical-align:top;border-left: 1px solid black;width: 28%;text-align:center;" class="pos-center-align">
+                            <t t-esc="orderline.price"/>
+                        </td>
+                        
+                        <td style="vertical-align:top;border-left: 1px solid black;width: 7%;text-align:center;" class="pos-center-align">
+                            <t t-esc="orderline.qty"/>
+                        </td>
+                        <td style="vertical-align:top;border-left: 1px solid black;width: 28%;text-align:center;" class="pos-center-align">
+                            <t t-esc="orderline.unitPrice"/>
+                        </td>
+                    </tr>
+                </t>
+                </t>
+
 					<tr>
 						<td colspan="4" style="text-align:right;vertical-align:top;font-size: 11px;">
 							<p></p>
