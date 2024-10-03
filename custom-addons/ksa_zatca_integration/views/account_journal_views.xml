@@ -9,7 +9,7 @@
             <field name="arch" type="xml">
                 <xpath expr="//page[@name='advanced_settings']/group" position="after">
                     <group string="Zatcka Integaration">
-                        <field name="name" />
+                        <field name="branch_name" />
                         <field name="cr"/>
                         <field name="street" />
                         <field name="street2"/>
