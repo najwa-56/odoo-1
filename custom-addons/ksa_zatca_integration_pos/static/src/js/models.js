@@ -20,6 +20,8 @@ patch(Order.prototype, {
         this.l10n_is_nominal_invoice = json.l10n_is_nominal_invoice;
         this.l10n_is_summary_invoice = json.l10n_is_summary_invoice;
 		this.is_invoice = json.is_invoice;
+		this.is_invoice_b2c = json.is_invoice_b2c;
+		
 		// Set default value for credit_debit_reason
         this.credit_debit_reason = json.credit_debit_reason || "مرتجع عميل"; // Change this to your desired default value
     },
@@ -58,6 +60,8 @@ patch(Order.prototype, {
         json.l10n_is_nominal_invoice = this.l10n_is_nominal_invoice ? 1 : 0;
         json.l10n_is_summary_invoice = this.l10n_is_summary_invoice ? 1 : 0;
 		json.is_invoice = this.is_invoice ? 1 : 0;
+		json.is_invoice_b2c = this.is_invoice_b2c ? 1 : 0;
+		
         json.credit_debit_reason = this.credit_debit_reason || 'مرتجع العميل';
         return json;
     },

@@ -14,8 +14,16 @@
             <button class="button js_invoice btn btn-light py-3 text-start rounded-0 border-bottom"
                 t-att-class="{ 'highlight text-bg-primary': currentOrder.is_invoice }"
                 t-on-click="toggleIsInvoice">
-            <i class="fa fa-check-square-o me-2" />Print Invoice
+            <i class="fa fa-check-square-o me-2" />Print Standard Invoice
         </button>
+
+        <button class="button js_invoice btn btn-light py-3 text-start rounded-0 border-bottom"
+        t-att-class="{ 'highlight text-bg-primary': currentOrder.is_invoice_b2c }"
+        t-on-click="toggleIsInvoiceB2c">
+    <i class="fa fa-check-square-o me-2" />Print Simplified Invoice
+</button>
+
+        
             <div class="zatca-flags d-flex flex-column flex-wrap" t-if="pos.company.parent_is_zatca">
                 <h3><center>Zatca Flags</center></h3>
                 <button class="button js_invoice btn btn-light py-3 text-start rounded-0 border-bottom"

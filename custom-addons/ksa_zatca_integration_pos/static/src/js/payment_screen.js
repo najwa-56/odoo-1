@@ -17,7 +17,6 @@ patch(PaymentScreen.prototype, {
     },
     async _isOrderValid(isForceValidate) {
         const res = await super._isOrderValid(...arguments);
-        console.log("_isOrderValid============================",res)
         if (res)
             if (this.currentOrder.get_total_with_tax() == 0 && _.contains([undefined, false, NaN, ''], this.currentOrder.credit_debit_reason)) {
                 this.popup.add(ErrorPopup, {
@@ -40,9 +39,10 @@ patch(PaymentScreen.prototype, {
         return res
     },
     shouldDownloadInvoice() {
-        if (this.currentOrder.is_invoice) {
+        if (this.currentOrder.is_invoice || this.currentOrder.is_invoice_b2c) {
             return true
         }
+        
         return false
     },
     toggleIsThirdParty() {
@@ -59,8 +59,26 @@ patch(PaymentScreen.prototype, {
         this.currentOrder.credit_debit_reason = 'مرتجع العميل';
     },
     toggleIsInvoice() {
-        this.currentOrder.is_invoice = this.currentOrder.is_invoice ? 0 : 1;
+        // Only toggle is_invoice and make sure is_invoice_b2c is untoggled if is_invoice is turned on
+        if (!this.currentOrder.is_invoice) {
+            this.currentOrder.is_invoice = 1;
+            this.currentOrder.is_invoice_b2c = 0;  // Ensure B2C is untoggled
+        } else {
+            this.currentOrder.is_invoice = 0;  // Toggle off the is_invoice
+        }
     },
+    
+    toggleIsInvoiceB2c() {
+        // Only toggle is_invoice_b2c and make sure is_invoice is untoggled if is_invoice_b2c is turned on
+        if (!this.currentOrder.is_invoice_b2c) {
+            this.currentOrder.is_invoice_b2c = 1;
+            this.currentOrder.is_invoice = 0;  // Ensure the regular invoice is untoggled
+        } else {
+            this.currentOrder.is_invoice_b2c = 0;  // Toggle off the is_invoice_b2c
+        }
+    },
+    
+    
     async get_report(name) {
         let response = await this.orm.call('pos.order', 'get_simplified_zatca_report', [[], name]);
         if (response)
@@ -194,9 +212,17 @@ patch(PaymentScreen.prototype, {
             // 2. Invoice.
             if (this.shouldDownloadInvoice() && this.currentOrder.is_to_invoice()) {
                 if (syncOrderResult[0]?.account_move) {
-                    await this.report.doAction("ksa_zatca_integration.action_report_tax_invoice", [
-                        syncOrderResult[0].account_move,
-                    ]);
+                    if (this.currentOrder.is_invoice_b2c) {
+                        // Call B2C simplified tax invoice report
+                        await this.report.doAction("ksa_zatca_integration.action_report_simplified_tax_invoice", [
+                            syncOrderResult[0].account_move,
+                        ]);
+                    } else if (this.currentOrder.is_invoice) {
+                        // Call the standard tax invoice report
+                        await this.report.doAction("ksa_zatca_integration.action_report_tax_invoice", [
+                            syncOrderResult[0].account_move,
+                        ]);
+                    }
                 } else {
                     throw {
                         code: 401,
