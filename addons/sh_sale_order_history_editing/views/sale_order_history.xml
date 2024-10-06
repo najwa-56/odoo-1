@@ -45,7 +45,7 @@
             </group>
         </xpath>
 
-        <xpath expr="//group/group[@id='header_left_group']/field[@name='partner_id']" position="after">
+        <xpath expr="//field[@name='partner_shipping_id']" position="after">
              <group>
                  <field name="total_balance" widget="monetary" options="{'currency_field': 'currency_id'}" invisible="1"/>
                 <field name="sum_total_balance" widget="monetary" options="{'currency_field': 'currency_id'}"/>

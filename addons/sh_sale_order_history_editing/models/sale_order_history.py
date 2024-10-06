@@ -6,7 +6,7 @@ class SaleOrderHistoryy(models.Model):
     # adding customer
     partner_id = fields.Many2one(
         "res.partner",
-        related="name.order_id.partner_id", store=True
+        related="name.order_id.partner_id", 
     )
 
     # adding customer
@@ -15,30 +15,40 @@ class SaleOrderHistoryy(models.Model):
     product_uom_qtyy = fields.Float(
         "الجرد",
         related="name.aljard",
-        store=True
+        
     )
     product_uom_qty = fields.Float(
         "Quantity",
         related="name.product_uom_qty",
         readonly=True,
-        store=True,
+        
     )
-    total_multiplied_field=fields.Float("total_multiplied_field",related="order_id.total_multiplied_field",store=True)
+    total_multiplied_field=fields.Float("total_multiplied_field",related="order_id.total_multiplied_field",)
 
     #alsarf
-    alsarf = fields.Float("الصرف", compute="_compute_alsarf",store=True)
+    alsarf = fields.Float("الصرف", compute="_compute_alsarf",)
+
     @api.depends("product_uom_qty", "product_uom_qtyy", "alsarf", "order_id.partner_id")
     def _compute_alsarf(self):
         for record in self:
+            if record.company_id.company_registry == 1131021506:
+                # Check if the record has been saved (i.e., has a valid ID)
+                if not record.id:
+                    record.alsarf = 0
+                    continue
 
-            previous_record = self.search([('id', '<', record.id),
-                                           ('partner_id', '=', record.partner_id.id),
-                                           ('product_id', '=', record.product_id.id)],
-                                          limit=1, order='id desc')
-            if previous_record:
-              record.alsarf = (previous_record.product_uom_qty + previous_record.product_uom_qtyy) - record.product_uom_qtyy
+                # Proceed with the search only if the record has a valid ID
+                previous_record = self.search([('id', '<', record.id),
+                                            ('partner_id', '=', record.partner_id.id),
+                                            ('product_id', '=', record.product_id.id)],
+                                            limit=1, order='id desc')
+                if previous_record:
+                    record.alsarf = (previous_record.product_uom_qty + previous_record.product_uom_qtyy) - record.product_uom_qtyy
+                else:
+                    record.alsarf = 0
             else:
                 record.alsarf = 0
+
 
 
 
@@ -46,17 +56,17 @@ class SaleOrderHistoryy(models.Model):
 class SaleOrderLine(models.Model):
     _inherit = 'sale.order.line'
 
-    aljard = fields.Float('الجرد', store=True)
+    aljard = fields.Float('الجرد', )
 
     #NOW LIN ORDER_ID IN SALE HISTOR "NAME" TO SALE ORDER LINE
     order_history_line = fields.One2many( 'sale.order.history', 'name', string='Order History Lines')
     #----------------------------------------------
 
     #then link alserf field to alsarf in sale order history by order id "order_history_line"
-    alsarf = fields.Float('الصرف', related='order_history_line.alsarf',store=True, readonly=True)
+    alsarf = fields.Float('الصرف', related='order_history_line.alsarf', readonly=True)
     #---------------------------------------------
     #value from multiplied alsarf .
-    multiplied_field = fields.Float('Multiplied Field', compute='_compute_multiplied_field', store=True, readonly=True)
+    multiplied_field = fields.Float('Multiplied Field', compute='_compute_multiplied_field',  readonly=True)
     #-----------------------------------
     #this method to show vlue and updat the record for field alsarf in sales order line whenever user add new vallue in aljard field .
     @api.onchange('aljard')
@@ -80,15 +90,18 @@ class SaleOrderLine(models.Model):
     @api.depends('alsarf', 'order_history_line.price_unit')
     def _compute_multiplied_field(self):
         for record in self:
-            # Check if there are multiple order history lines for the current record
-            if len(record.order_history_line) > 1:
-                # Perform a specific calculation when multiple order history lines are present
-                # Modify this part based on your business logic
-                multiplied_values = [line.alsarf * line.price_unit for line in record.order_history_line]
-                record.multiplied_field = sum(multiplied_values)
+            if record.company_id.company_registry == 1131021506:
+                # Check if there are multiple order history lines for the current record
+                if len(record.order_history_line) > 1:
+                    # Perform a specific calculation when multiple order history lines are present
+                    # Modify this part based on your business logic
+                    multiplied_values = [line.alsarf * line.price_unit for line in record.order_history_line]
+                    record.multiplied_field = sum(multiplied_values)
+                else:
+                    # Perform a calculation for a single order history line
+                    record.multiplied_field = record.alsarf * record.order_history_line.price_unit
             else:
-                # Perform a calculation for a single order history line
-                record.multiplied_field = record.alsarf * record.order_history_line.price_unit
+                record.multiplied_field = 0
      #_______________________________________________________________
      #The create and write methods in the SaleOrderLine model are modified to trigger the computation of the total in the sale.order model
      # whenever a new record is created or an existing record is modified.
@@ -130,7 +143,7 @@ class AccountMove(models.Model):
 
     total_multiplied_field_sale_order = fields.Float(
         string='المجموع المستحق لهذه الفاتوره ',
-        store=True,readonly=True  )
+        readonly=True  )
 
     # ovirraide the function that is in account move and add eidt
     # it that make the value in total_multiplied_field in sale order visible in new field in account move total_multiplied_field_sale_order.
@@ -165,7 +178,7 @@ class AccountMove(models.Model):
     total_balance = fields.Float(
         string='Total Balance',
         compute='_compute_total_balance',
-        store=True,
+        
         readonly=True,
         help='Sum of total_multiplied_field_sale_order for all invoices.'
     )
@@ -173,7 +186,7 @@ class AccountMove(models.Model):
     sum_total_balance = fields.Float(
         string=' sum Total Balance',
         compute='_compute_sum_total_balance',
-        store=True,
+        
         readonly=True,
         help='Sum of total_balance for all records.'
     )
@@ -182,25 +195,32 @@ class AccountMove(models.Model):
     @api.depends('total_multiplied_field_sale_order')
     def _compute_total_balance(self):
         for move in self:
-            total_balance = sum(move.mapped('total_multiplied_field_sale_order'))
-            move.total_balance = total_balance
+            if move.company_id.company_registry == 1131021506:
+                total_balance = sum(move.mapped('total_multiplied_field_sale_order'))
+                move.total_balance = total_balance
+            else:
+                move.total_balance = 0
+
 
     @api.depends('total_balance')
     def _compute_sum_total_balance(self):
         for move in self:
-            # Find all moves with the same partner
-            moves_with_same_partner = self.env['account.move'].search([
-                ('partner_id', '=', move.partner_id.id),
-            ])
+            if move.company_id.company_registry == 1131021506:
+                # Find all moves with the same partner
+                moves_with_same_partner = self.env['account.move'].search([
+                    ('partner_id', '=', move.partner_id.id),
+                ])
 
-            # Calculate the total_balance for all moves with the same partner
-            total_balance_sum = sum(moves_with_same_partner.mapped('total_balance'))
+                # Calculate the total_balance for all moves with the same partner
+                total_balance_sum = sum(moves_with_same_partner.mapped('total_balance'))
 
-            # Adjust the total balance sum by subtracting the payment amounts
-            total_balance_sum -= sum(payment.amount_company_currency_signed for payment in move.payment_ids)
+                # Adjust the total balance sum by subtracting the payment amounts
+                total_balance_sum -= sum(payment.amount_company_currency_signed for payment in move.payment_ids)
 
-            # Update the sum_total_balance for all related invoice records
-            moves_with_same_partner.write({'sum_total_balance': total_balance_sum})
+                # Update the sum_total_balance for all related invoice records
+                moves_with_same_partner.write({'sum_total_balance': total_balance_sum})
+            else:
+                move.sum_total_balance = 0
 
 ''''
 class AccountPayment(models.Model):
@@ -248,15 +268,18 @@ class SaleOrder(models.Model):
     #We add total_multiplied_field to sale order which  comput sum for total multiple field that is defid already in sales order line.
 
     total_multiplied_field = fields.Float('Total Multiplied Field', compute='_compute_total_multiplied_field',
-                                          store=True, readonly=True)
+                                           readonly=True)
 
     @api.model
     @api.depends('order_line.multiplied_field')
     def _compute_total_multiplied_field(self):
         for order in self:
-            total_before_tax = sum(order.order_line.mapped('multiplied_field'))
-            tax_percentage = 0.15  # 15% tax
+            if order.company_id.company_registry == 1131021506:
+                total_before_tax = sum(order.order_line.mapped('multiplied_field'))
+                tax_percentage = 0.15  # 15% tax
 
-            # Calculate the total including tax
-            order.total_multiplied_field = total_before_tax * (1 + tax_percentage)
+                # Calculate the total including tax
+                order.total_multiplied_field = total_before_tax * (1 + tax_percentage)
+            else:
+                order.total_multiplied_field = 0
     #-----------------------------------------------------------------------
