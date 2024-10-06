@@ -53,7 +53,8 @@ class Home(ShHome):
 
         return redirect if redirect else '/web'
 
-    @http.route(website=True, auth="public", sitemap=False)
+    # @http.route(website=True, auth="public", sitemap=False)
+    @http.route('/web', type='http', auth="public")
     def web_client(self, s_action=None, **kw):
         res_users_obj = request.env['res.users']
         if request.uid:
