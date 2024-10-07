@@ -31,7 +31,7 @@
     'website': 'https://www.cybrosys.com',
     'live_test_url': 'https://www.youtube.com/watch?v=tdu6iBP2N6Y',
     'category': 'Tools',
-    'depends': ['base', 'mail','sale','customer_route_management'],
+    'depends': ['base', 'mail','sale','customer_route_management','google_maps_partner'],
     'license': 'OPL-1',
     'price': 19.99,
     'currency': 'EUR',
