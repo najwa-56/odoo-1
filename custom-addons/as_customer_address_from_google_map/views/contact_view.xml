@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+
+       <record id="view_partner_form_inherit_google_map" model="ir.ui.view">
+        <field name="name">base.view.partner.form.inherit.google.map</field>
+        <field name="model">res.partner</field>
+        <field name="inherit_id" ref="base.view_partner_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="/form/*" position="before">
+                <header>
+                    <button name="select_destination_loc"
+                    string="Fetch Address"
+                    type="object"
+                    class="oe_highlight"/>
+                </header>
+            </xpath>
+        </field>
+    </record>
+
+</odoo>

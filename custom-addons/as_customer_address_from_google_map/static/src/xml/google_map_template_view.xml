@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+    <t t-name="partner_select_current_point">
+        <div class="container-fluid" id="header_section">
+            <h3>
+                <p id="current_address" style="margin-top: 15px"/>
+            </h3>
+            <center style="height:65vh">
+                <div id="map-canvas" style="height: 65vh"/>
+            </center>
+        </div>
+    </t>
+</templates>
+<!-- <?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+    <t t-name="partner_select_current_point">
+         <div class="container-fluid" id="header_section">
+            <div class="row">
+                <center class="col-12 m-0 p-0" style="height:70vh">
+                    <div id="map-canvas" style="height:70vh"/>
+                </center>
+            </div>
+        </div>
+    </t>
+</templates> -->
