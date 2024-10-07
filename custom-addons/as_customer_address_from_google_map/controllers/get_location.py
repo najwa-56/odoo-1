@@ -12,8 +12,10 @@ class Google_Map(http.Controller):
 
     @http.route(['/google_cred_customer'], type='json', auth="public")
     def google_cred(self, **kwargs):
+        #TODO find a way to current company not request.env.company becasue it gets the company from user not the active one
+        company_id = request.env['res.company'].browse(2)
         return {
-            'res_partner_use_gmap': request.env.company.res_partner_use_gmap,
+            'res_partner_use_gmap': company_id.res_partner_use_gmap,
         }
 
     @http.route(['/set_current_location_name_contact/'], type='json', auth="public")
