@@ -19,7 +19,8 @@ class partner_select_current_point extends Component {
         this.actionManager = parent;
         this.options = {};
         this.dialogService = useService("dialog");
-        if (this.props.action.context.active_model === "res.partner") {
+        console.log("props.action.context.active_model=======================",this.props.action.context.active_model)
+        // if (this.props.action.context.active_model === "res.partnerr") {
             this.rpc("/google_cred_customer", {}).then(function (data){
                 if(data && data.res_partner_use_gmap){
                     navigator.geolocation.getCurrentPosition(success);
@@ -34,7 +35,7 @@ class partner_select_current_point extends Component {
                     }
                 }
             })
-        }
+        // }
     }
 
     get_address_location(latitude, longitude, res_partner_use_gmap) {
