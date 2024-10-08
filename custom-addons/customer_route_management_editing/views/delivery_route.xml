@@ -13,7 +13,7 @@
             <xpath expr="//notebook" position="inside">
                 <page string="المسارات" groups="customer_route_management.group_delivery_route_user">
                     <field name="route_line_ids"  >
-                        <tree  delete="false" create="false" string="Route Liness test" limit="1" default_order="sequence asc">
+                        <tree  delete="false" create="false" string="Route Liness test" limit="1" default_order="id desc">
 
                             <field name="sequence" string="" invisible="1"/>
                            <field name="statuss_checkbox" string="" invisible="1"/>

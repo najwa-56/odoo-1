@@ -14,7 +14,7 @@
                     <notebook>
                         <page string="Route Lines"  groups="customer_route_management.group_delivery_route_manager">
                             <!--we  add grope manager for page  -->
-                            <field name="route_line_ids" >
+                            <field name="route_line_ids"  default_order="id desc">
                                 <tree string="Route Lines" create="True">
                                     <field name="sequence" widget="handle" create="True"/>
                                     <field name="route"/>
