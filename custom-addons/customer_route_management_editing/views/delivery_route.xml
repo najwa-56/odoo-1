@@ -17,7 +17,7 @@
 
                             <field name="sequence" string="" invisible="1"/>
                            <field name="statuss_checkbox" string="" invisible="1"/>
-                            <field name="route" readonly="1"/>
+                            <field name="route" readonly="0"/>
                             <button name="move_record_to_last"
                                     string="منجز "
                                     class="btn-primary"
@@ -27,6 +27,15 @@
                         </tree>
                     </field>
                 </page>
+            </xpath>
+            <xpath expr="//field[@name='route_line_ids']/tree//field[@name='route']" position="after">
+                <button name="move_record_to_last"
+                                    string="منجز "
+                                    class="btn-primary"
+                                    style="background-color: red; border-radius: 50%; padding: 10px;"
+                                    type="object"
+                            />
+
             </xpath>
         </data>
     </field>
