@@ -141,8 +141,9 @@
 							<tr style="background-color:#dddddd;color:black; font-weight: bold;">
 								<td style="border:2pt solid black;text-align:center;padding:2pt;"><span class="arabic">#</span></td>
 								<td width="25%" style="border:2pt solid black;text-align:center;padding:2pt; "><span class="arabic"> الاسم</span></td>
-								<td width="25%" style="border:2pt solid black;text-align:center;padding:2pt; "><span class="arabic"> الاسم اللاتنيني</span></td>
-
+								<t t-if="company.id == 1">
+									<td width="25%" style="border:2pt solid black;text-align:center;padding:2pt; "><span class="arabic"> الاسم اللاتنيني</span></td>
+								</t>
 								<td style="border:2pt solid black;text-align:center;padding:2pt;"><span class="arabic">سعر </span></td>
 								<td style="border:2pt solid black;text-align:center;padding:2pt;width:7%"><span class="arabic">الكمية</span></td>
 								<td style="border:2pt solid black;text-align:center;padding:2pt;width:7%"><span class="arabic">الوحدة</span></td>
@@ -172,9 +173,11 @@
 						 		<td style="border:2pt solid black;padding:3pt;text-align:center">
 						 			<span class="arabic" t-field="l.name"/> 
 						 		</td>
+								<t t-if="company.id == 1">
 								 <td style="border:2pt solid black;padding:3pt;text-align:center">
 									<span class="arabic" t-field="l.product_arabic"/> 
 								</td>
+								</t>
 						 		<td class="arabic" style="border:2pt solid black;text-align:center;padding:3pt"><span t-field="l.price_unit" t-options="{&quot;widget&quot;: &quot;monetary&quot;, &quot;display_currency&quot;: o.currency_id}"/></td>
 						 		<td class="arabic" style="border:2pt solid black;text-align:center;padding:3pt"><span t-esc="'%.2f'%(l.quantity)"/></td>
 
