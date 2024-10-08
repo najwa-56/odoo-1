@@ -12,9 +12,9 @@
                         <field name="company_id" invisible="1"/>
                     </group>
                     <notebook>
-                        <page string="Route Lines"  groups="customer_route_management_editing.group_rout_manager">
+                        <page string="Route Lines"  groups="customer_route_management.group_delivery_route_manager">
                             <!--we  add grope manager for page  -->
-                            <field name="route_line_ids">
+                            <field name="route_line_ids" >
                                 <tree string="Route Lines" create="True">
                                     <field name="sequence" widget="handle" create="True"/>
                                     <field name="route"/>

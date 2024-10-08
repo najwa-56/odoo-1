@@ -5,6 +5,7 @@
         <field name="description">routs group</field>
         <field name="sequence">20</field>
     </record>
+    
     <record id="group_rout_user" model="res.groups">
         <field name="name"> User</field>
         <field name="category_id" ref="customer_route_management_editing.module_rout_category" />

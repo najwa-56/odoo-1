@@ -19,7 +19,8 @@
 #    THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 #
 ###############################################################################
-from odoo import fields, models
+from odoo import fields, models,api,_
+from odoo.exceptions import UserError, ValidationError, AccessError, RedirectWarning
 
 
 class DeliveryRoute(models.Model):
@@ -37,3 +38,11 @@ class DeliveryRoute(models.Model):
                                   string='Route Lines',
                                   help="Route lines containing route,"
                                        " delivery route and customer details")
+
+
+    def write(self, vals):
+        if 'name' in vals :
+            if self.user_has_groups('customer_route_management.group_delivery_route_user'):
+                message = _("You cannot add/modify Route")
+                raise UserError(message)
+        return super().write(vals)

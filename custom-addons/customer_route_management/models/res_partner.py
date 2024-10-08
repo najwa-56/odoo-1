@@ -19,7 +19,7 @@
 #    THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 #
 ###############################################################################
-from odoo import fields, models
+from odoo import fields, models,api,_
 
 
 class ResPartner(models.Model):
@@ -31,6 +31,7 @@ class ResPartner(models.Model):
     location_id = fields.Many2one('route.line', string='Location',
                                   help="Location of route.")
     sequence = fields.Integer(default=10)
+    
 
     def get_all_dues(self):
         """This function gives all the dues and invoices details
@@ -42,3 +43,15 @@ class ResPartner(models.Model):
         self.env.cr.execute(query, [self.id, self.id])
         list = self.env.cr.dictfetchall()
         return list
+
+    # @api.constrains('vat')
+    # def _constrains_vat(self):
+    #     print("self.context================",self._context)
+    #     if self._context.get('params',False):
+    #         print("first if===================")
+    #         if self._context.get('params').get('model','') == 'delivery.route':
+    #             print("second if=====================",self.vat)
+    #             if not self.vat:
+    #                 message = _("Vat is Requird add/modify Route")
+    #                 raise UserError(message)
+    #     pass

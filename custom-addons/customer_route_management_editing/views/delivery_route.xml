@@ -11,13 +11,13 @@
     <field name="arch" type="xml">
         <data>
             <xpath expr="//notebook" position="inside">
-                <page string="المسارات" groups="customer_route_management_editing.group_rout_user">
+                <page string="المسارات" groups="customer_route_management.group_delivery_route_user">
                     <field name="route_line_ids"  >
-                        <tree  delete="false" create="false" string="Route Liness test" limit="1" >
+                        <tree  delete="false" create="false" string="Route Liness test" limit="1" default_order="sequence asc">
 
                             <field name="sequence" string="" invisible="1"/>
                            <field name="statuss_checkbox" string="" invisible="1"/>
-                            <field name="route"/>
+                            <field name="route" readonly="1"/>
                             <button name="move_record_to_last"
                                     string="منجز "
                                     class="btn-primary"

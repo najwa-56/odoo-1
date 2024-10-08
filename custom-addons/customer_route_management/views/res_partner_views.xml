@@ -8,6 +8,9 @@
         <field name="model">res.partner</field>
         <field name="inherit_id" ref="base.view_partner_form"/>
         <field name="arch" type="xml">
+            <xpath expr="//field[@name='vat']" position="attributes">
+                <attribute name="required">1</attribute>
+            </xpath>
             <page name="sales_purchases" position="inside">
                 <group string="Locations">
                     <group>

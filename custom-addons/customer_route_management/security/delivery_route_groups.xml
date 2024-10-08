@@ -17,7 +17,7 @@
     <record id="group_delivery_route_manager" model="res.groups">
         <field name="name">Manager</field>
         <field name="category_id" ref="module_customer_route_management"/>
-        <field name="implied_ids"
-               eval="[(4, ref('group_delivery_route_user'))]"/>
+        <!-- <field name="implied_ids"
+               eval="[(4, ref('group_delivery_route_user'))]"/> -->
     </record>
 </odoo>
