@@ -13,7 +13,7 @@
     'website': "nilcotechnology@gmail.com",
     'currency': 'USD',
     'price': 25.6,
-    'depends': ['point_of_sale','stock','uom','base'],
+    'depends': ['point_of_sale','stock','uom','base','sale_management'],
     'data': [
         'security/ir.model.access.csv',
         'views/product_view.xml',

@@ -5,3 +5,4 @@ from . import stock_picking
 from . import pos_session
 from . import purchase
 from . import account_move
+from . import sale_order_product_template_line

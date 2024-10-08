@@ -30,15 +30,45 @@ class ProductTemplate(models.Model):
 class SaleOrderLine(models.Model):
     _inherit = 'sale.order.line'
 
+    @api.depends('product_id', 'product_uom', 'product_uom_qty')
+    def _compute_price_unit(self):
+        for line in self:
+            if line.order_id.sale_order_template_id:
+                uom_price_id = line.product_id.multi_uom_price_id.filtered(lambda m :m.uom_id.id == line.product_uom.id)
+                if uom_price_id:
+                    line.price_unit = uom_price_id[0].price
+                
+            else:
+                return super(SaleOrderLine, self)._compute_price_unit()
+    @api.depends('product_id')
+    def _compute_product_uom(self):
+        for line in self:
+            uom_price_id = line.product_id and line.product_id.multi_uom_price_id or False
+            if uom_price_id:
+                line.product_uom = uom_price_id[0].uom_id.id
+            else:     
+                if not line.product_uom or (line.product_id.uom_id.id != line.product_uom.id):
+                    line.product_uom = line.product_id.uom_id
+
+
     selected_uom_ids = fields.Many2many(string="Uom Ids", related='product_id.selected_uom_ids')
 
     sales_multi_uom_id = fields.Many2one("product.multi.uom.price", string="Cust UOM", domain="[('id', 'in', selected_uom_ids)]")
     name_field = fields.Char(string="أسم الوحدة", compute="_compute_name_field", store=True)
 
-    @api.depends('sales_multi_uom_id')
+    # @api.depends('sales_multi_uom_id')
+    # def _compute_name_field(self):
+    #     for line in self:
+    #         line.name_field = line.sales_multi_uom_id.name_field if line.sales_multi_uom_id else ''
+
+    @api.depends('product_uom')
     def _compute_name_field(self):
-        for line in self:
-            line.name_field = line.sales_multi_uom_id.name_field if line.sales_multi_uom_id else ''
+        for rec in self:
+            uom_id = rec.product_id.multi_uom_price_id.filtered(lambda m :m.uom_id.id == rec.product_uom.id)
+            if uom_id:
+                rec.name_field = uom_id[0].name_field
+            else:
+                rec.name_field = rec.product_uom.name
 
     def _prepare_invoice_line(self, **optional_values):
         # Call the original method and get the result
@@ -47,10 +77,12 @@ class SaleOrderLine(models.Model):
         # Update the result with custom fields
         invoice_line_vals.update({
             'sales_multi_uom_id': self.sales_multi_uom_id.id,
-            'name_field': self.name_field,
+            'uom_name': self.name_field,
         })
 
         return invoice_line_vals
+
+    
 
     @api.onchange('sales_multi_uom_id')
     def sales_multi_uom_id_change(self):
