@@ -52,9 +52,9 @@ class SaleOrderLine(models.Model):
                     line.product_uom = line.product_id.uom_id
 
 
-    selected_uom_ids = fields.Many2many(string="Uom Ids", related='product_id.selected_uom_ids')
+    # selected_uom_ids = fields.Many2many(string="Uom Ids", related='product_id.selected_uom_ids')
 
-    sales_multi_uom_id = fields.Many2one("product.multi.uom.price", string="Cust UOM", domain="[('id', 'in', selected_uom_ids)]")
+    # sales_multi_uom_id = fields.Many2one("product.multi.uom.price", string="Cust UOM", domain="[('id', 'in', selected_uom_ids)]")
     name_field = fields.Char(string="أسم الوحدة", compute="_compute_name_field", store=True)
 
     # @api.depends('sales_multi_uom_id')
@@ -77,7 +77,6 @@ class SaleOrderLine(models.Model):
 
         # Update the result with custom fields
         invoice_line_vals.update({
-            'sales_multi_uom_id': self.sales_multi_uom_id.id,
             'uom_name': self.name_field,
         })
 
@@ -85,12 +84,12 @@ class SaleOrderLine(models.Model):
 
     
 
-    @api.onchange('sales_multi_uom_id')
-    def sales_multi_uom_id_change(self):
-        self.ensure_one()
-        if self.sales_multi_uom_id:
-            domain = {'product_uom': [('id', '=', self.sales_multi_uom_id.uom_id.id)]}
-            return {'domain': domain}
+    # @api.onchange('sales_multi_uom_id')
+    # def sales_multi_uom_id_change(self):
+    #     self.ensure_one()
+    #     if self.sales_multi_uom_id:
+    #         domain = {'product_uom': [('id', '=', self.sales_multi_uom_id.uom_id.id)]}
+    #         return {'domain': domain}
 
     # @api.onchange('sales_multi_uom_id', 'product_uom', 'product_uom_qty')
     # def product_uom_change(self):
@@ -131,109 +130,109 @@ class SaleOrderLine(models.Model):
 
 
 
-class Pricelist(models.Model):
-    _inherit = "product.pricelist"
+# class Pricelist(models.Model):
+#     _inherit = "product.pricelist"
 
-    def _compute_price_rule12(
-            self, products, quantity, currency=None, uom=None, date=False, compute_price=True, pro_price=0.0,
-            **kwargs
-    ):
-        self and self.ensure_one()  # self is at most one record
+#     def _compute_price_rule12(
+#             self, products, quantity, currency=None, uom=None, date=False, compute_price=True, pro_price=0.0,
+#             **kwargs
+#     ):
+#         self and self.ensure_one()  # self is at most one record
 
-        currency = currency or self.currency_id or self.env.company.currency_id
-        currency.ensure_one()
+#         currency = currency or self.currency_id or self.env.company.currency_id
+#         currency.ensure_one()
 
-        if not products:
-            return {}
+#         if not products:
+#             return {}
 
-        if not date:
-            # Used to fetch pricelist rules and currency rates
-            date = fields.Datetime.now()
+#         if not date:
+#             # Used to fetch pricelist rules and currency rates
+#             date = fields.Datetime.now()
 
-        # Fetch all rules potentially matching specified products/templates/categories and date
-        rules = self._get_applicable_rules(products, date, **kwargs)
+#         # Fetch all rules potentially matching specified products/templates/categories and date
+#         rules = self._get_applicable_rules(products, date, **kwargs)
 
-        results = {}
-        price = pro_price
-        for product in products:
-            suitable_rule = self.env['product.pricelist.item']
+#         results = {}
+#         price = pro_price
+#         for product in products:
+#             suitable_rule = self.env['product.pricelist.item']
 
-            product_uom = product.uom_id
-            target_uom = uom or product_uom  # If no uom is specified, fall back on the product uom
+#             product_uom = product.uom_id
+#             target_uom = uom or product_uom  # If no uom is specified, fall back on the product uom
 
-            # Compute quantity in product uom because pricelist rules are specified
-            # w.r.t product default UoM (min_quantity, price_surchage, ...)
-            if target_uom != product_uom:
-                qty_in_product_uom = target_uom._compute_quantity(
-                    quantity, product_uom, raise_if_failure=False
-                )
-            else:
-                qty_in_product_uom = quantity
+#             # Compute quantity in product uom because pricelist rules are specified
+#             # w.r.t product default UoM (min_quantity, price_surchage, ...)
+#             if target_uom != product_uom:
+#                 qty_in_product_uom = target_uom._compute_quantity(
+#                     quantity, product_uom, raise_if_failure=False
+#                 )
+#             else:
+#                 qty_in_product_uom = quantity
 
-            for rule in rules:
-                if rule._is_applicable_for(product, qty_in_product_uom):
-                    suitable_rule = rule
-                    break
+#             for rule in rules:
+#                 if rule._is_applicable_for(product, qty_in_product_uom):
+#                     suitable_rule = rule
+#                     break
 
-            if compute_price:
-                price = suitable_rule._compute_price(
-                    product, quantity, target_uom, date=date, currency=currency)
-            else:
-                # Skip price computation when only the rule is requested.
-                price = pro_price
-            results[product.id] = (price, suitable_rule.id)
-        return results
-
-
-    def _get_product_price_rule12(self,product,*args, **kwargs):
-
-        self and self.ensure_one()  # self is at most one record
-        return self._compute_price_rule12(product,*args, **kwargs)[product.id]
-
-class AccountInvoiceLine(models.Model):
-    _inherit = "account.move.line"
-
-    selected_uom_ids = fields.Many2many(string="Uom Ids", related='product_id.selected_uom_ids')
-
-    sales_multi_uom_id = fields.Many2one("product.multi.uom.price", string="Cust UOM",
-                                         domain="[('id', 'in', selected_uom_ids)]")
-    name_field = fields.Char(string="أسم الوحدة", compute="_compute_name_field", store=True)
-    product_uom_id = fields.Many2one('uom.uom', string='الوحدة', related='')
+#             if compute_price:
+#                 price = suitable_rule._compute_price(
+#                     product, quantity, target_uom, date=date, currency=currency)
+#             else:
+#                 # Skip price computation when only the rule is requested.
+#                 price = pro_price
+#             results[product.id] = (price, suitable_rule.id)
+#         return results
 
 
-    @api.depends('sales_multi_uom_id')
-    def _compute_name_field(self):
-        for line in self:
-            line.name_field = line.sales_multi_uom_id.name_field if line.sales_multi_uom_id else ''
+#     def _get_product_price_rule12(self,product,*args, **kwargs):
+
+#         self and self.ensure_one()  # self is at most one record
+#         return self._compute_price_rule12(product,*args, **kwargs)[product.id]
+
+# class AccountInvoiceLine(models.Model):
+#     _inherit = "account.move.line"
+
+#     selected_uom_ids = fields.Many2many(string="Uom Ids", related='product_id.selected_uom_ids')
+
+#     sales_multi_uom_id = fields.Many2one("product.multi.uom.price", string="Cust UOM",
+#                                          domain="[('id', 'in', selected_uom_ids)]")
+#     name_field = fields.Char(string="أسم الوحدة", compute="_compute_name_field", store=True)
+#     product_uom_id = fields.Many2one('uom.uom', string='الوحدة', related='')
+
+
+#     @api.depends('sales_multi_uom_id')
+#     def _compute_name_field(self):
+#         for line in self:
+#             line.name_field = line.sales_multi_uom_id.name_field if line.sales_multi_uom_id else ''
 
 
 
-    @api.onchange('product_uom_id', 'quantity')
-    def _onchange_uom_id(self):
-        warning = {}
-        result = {}
-        values = {}
-        if not self.product_uom_id:
-            self.price_unit = 0.0
-        if self.sales_multi_uom_id:
-            if self.sales_multi_uom_id:
-                values = {
-                    "product_uom_id": self.sales_multi_uom_id.uom_id.id,
-                }
-            self.update(values)
-            self.price_unit = self.sales_multi_uom_id.price
+#     @api.onchange('product_uom_id', 'quantity')
+#     def _onchange_uom_id(self):
+#         warning = {}
+#         result = {}
+#         values = {}
+#         if not self.product_uom_id:
+#             self.price_unit = 0.0
+#         if self.sales_multi_uom_id:
+#             if self.sales_multi_uom_id:
+#                 values = {
+#                     "product_uom_id": self.sales_multi_uom_id.uom_id.id,
+#                 }
+#             self.update(values)
+#             self.price_unit = self.sales_multi_uom_id.price
 
-        if self.product_id and self.product_uom_id:
-            if self.product_id.uom_id.category_id.id != self.product_uom_id.category_id.id:
-                warning = {
-                    'title': _('Warning!'),
-                    'message': _(
-                        'The selected unit of measure is not compatible with the unit of measure of the product.'),
-                }
-                self.product_uom_id = self.product_id.uom_id.id
-        if warning:
-            result['warning'] = warning
-        return result
+#         if self.product_id and self.product_uom_id:
+#             if self.product_id.uom_id.category_id.id != self.product_uom_id.category_id.id:
+#                 warning = {
+#                     'title': _('Warning!'),
+#                     'message': _(
+#                         'The selected unit of measure is not compatible with the unit of measure of the product.'),
+#                 }
+#                 self.product_uom_id = self.product_id.uom_id.id
+#         if warning:
+#             result['warning'] = warning
+#         return result
 
 
     

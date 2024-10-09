@@ -3,6 +3,8 @@ from odoo import api, fields, models, exceptions
 
 class SaleOrder(models.Model):
     _inherit = "sale.order"
+    
+    payment_journal_id = fields.Many2one('account.journal', string='Payment Journal')
 
     def action_confirm(self):
         res = super(SaleOrder, self.with_context(default_immediate_transfer=True)).action_confirm()
@@ -30,5 +32,12 @@ class SaleOrder(models.Model):
             if warehouse.validate_invoice and order.invoice_ids:
                 for invoice in order.invoice_ids:
                     invoice.action_post()
+
+                    payment_register = self.env['account.payment.register'].with_context(active_model='account.move',active_ids=invoice.ids).create(
+                        {
+                        'payment_date': invoice.date,
+                        'journal_id':order.payment_journal_id.id
+                    })
+                    payment_register.action_create_payments()
 
         return res  
