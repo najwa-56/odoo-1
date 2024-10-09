@@ -6,6 +6,11 @@ class SaleOrder(models.Model):
     
     payment_journal_id = fields.Many2one('account.journal', string='Payment Journal')
 
+    def action_print_standard_invoice(self):
+        if self.invoice_ids:
+            return self.env.ref('ksa_zatca_integration.action_report_tax_invoice').report_action(self.invoice_ids.ids)
+            
+
     def action_confirm(self):
         res = super(SaleOrder, self.with_context(default_immediate_transfer=True)).action_confirm()
         for order in self:

@@ -10,6 +10,11 @@
                     
     
                     </xpath>
+                    <xpath expr="//button[@name='action_confirm']" position="after">
+                        <button name="action_print_standard_invoice" class="btn-success"  type="object" string="Print Tax Invoice" invisible="invoice_status != 'invoiced'" />
+                    
+    
+                    </xpath>
                      
                 </field>
         </record>

@@ -1,7 +1,69 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
+
+	<template id="external_layout_simple_seti">
+		<t t-if="o and 'company_id' in o">
+        <t t-set="company" t-value="o.company_id"/>
+    	</t>
+    	<t t-if="not o or not 'company_id' in o">
+        <t t-set="company" t-value="res_company"/>
+    	</t>
+		<div class="header">
+	    	<table style="border:1pt solid white;width:100%;font-size:12px; margin-top:-10px;font-family:Alexandria-Regular !important" width="100%">
+	    		<link rel="stylesheet" href="/mai_e_invoice_ksa/static/src/css/style.css"/>
+	            <tr>
+					<td colspan="2" width="30%" class="text-left">
+	                
+					
+
+				</td>
+				<br/>
+					
+	                <br/>
+					
+						<td colspan="3" width="40%" class="text-center"><img t-if="company.logo" t-att-src="image_data_uri(company.logo)" style="height: 150px;width: 150px;" alt="Logo"/></td>
+	
+					   
+
+	                <td colspan="2" width="30%" class="text-right arabic" dir="rtl">
+	                	
+	                	<t t-if="company.street">
+	                		<span style="padding-left:5px;" t-field="company.street"/><br/>
+	                	</t>
+	                	<t t-if="company.street2">
+	                		<span style="padding-left:5px;" t-field="company.street2"/><br/>
+	                	</t>
+	                	<t t-if="company.city">
+	                		<span style="padding-left:5px;" t-field="company.city"/><br/>
+	                	</t>
+	                	<t t-if="company.country_id">
+	                		<span style="padding-left:5px;" t-field="company.country_id"/><br/>
+	                	</t>
+						<t t-if="company.vat">
+	                		<span style="padding-left:5px;" t-field="company.vat"/><br/>
+	                	</t>
+						<t t-if="company.company_registry">
+	                		<span style="padding-left:5px;" t-field="company.company_registry"/><br/>
+	                	</t>
+						<t t-if="company.vat">
+							<span class="text-left arabic" style="padding-left:5px;" t-field="company.vat"/><br/>
+						</t>
+						
+	                </td>
+	            </tr>
+	        	
+	        </table>
+        </div>
+        <div class="article o_report_layout_standard">
+            <t t-raw="0"/>
+        </div>
+       
+	</template>
+
+
+
 	<template id="report_simplified_tax_invoice_document">
-		<t t-call="ksa_zatca_integration.external_layout_seti">
+		<t t-call="ksa_zatca_integration.external_layout_simple_seti">
 			<t t-foreach="doc" t-as="o">
 				<div class="page" style="padding-top:40px;margin-top:-23pt;" >
 					<link rel="stylesheet" href="/ksa_zatca_integration/static/src/css/style.css"/>
