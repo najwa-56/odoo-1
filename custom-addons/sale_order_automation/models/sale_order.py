@@ -8,7 +8,7 @@ class SaleOrder(models.Model):
 
     def action_print_standard_invoice(self):
         if self.invoice_ids:
-            return self.env.ref('ksa_zatca_integration.action_report_tax_invoice').report_action(self.invoice_ids.ids)
+            return self.env.ref('ksa_zatca_integration.action_report_standard_low_margin_tax_invoice').report_action(self.invoice_ids.ids)
             
 
     def action_confirm(self):

@@ -37,6 +37,7 @@
         'reports/report.xml',
         'reports/vat_invoice_report_print.xml',
         'reports/simpli_vat_invoice_report.xml',
+        'reports/standard_invoice_low_margin.xml',
         'wizard/account_debit_note.xml',
         'wizard/account_move_reversal.xml',
     ],
