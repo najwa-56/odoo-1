@@ -21,7 +21,7 @@ class ResPartner(models.Model):
                                              ('MOM', 'Momrah license'), ('MLS', 'MHRSD license'), ('700', '700 Number'),
                                              ('SAG', 'MISA license'), ('NAT', 'National ID'), ('GCC', 'GCC ID'),
                                              ('IQA', 'Iqama Number'), ('PAS', 'Passport ID'), ('OTH', 'Other OD')],
-                                            string="Buyer Identification",
+                                            string="Buyer Identification",default="CRN",
                                             help="|) required only if buyer is not VAT registered."
                                                  "||) In case of multiple commercial registrations, the seller should "
                                                  "fill the commercial registration of the branch in respect of which "

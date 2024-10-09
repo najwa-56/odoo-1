@@ -48,7 +48,7 @@
 
 					<table style="border:2pt solid black;width:100%;color:black; margin-top:-30pt; font-family:ArbFONTS-GE_Dinar_One_Medium !important" class="table-condensed table-sm">
 							<tr style="border:2pt solid black">
-								<td style="font-weight: bold;text-align:center;color:black;background-color:#dddddd;FONT-SIZE: 12pt"><span class="text-right arabic"> تفاصيل الفاتورة الضريبية  </span></td> 
+								<td style="font-weight: bold;text-align:center;color:black;background-color:#dddddd;FONT-SIZE: 12pt"><span class="text-right arabic">  الفاتورة الضريبية  </span></td> 
 							</tr>
 					</table>
 					
@@ -240,18 +240,18 @@
 			</tr>
 
 			<tr style="border:2pt solid black">
-				<td width="35%" class="text-left arabic" style="border:2pt solid black;text-align:right;padding:3pt ; font-weight: bold;">إجمالي المبلغ بعد الضريبة</td>
-				<td width="30%" style="border:2pt solid black;text-align:center;padding:3pt" class="text-center"><span t-esc="discount_before_total" t-options="{&quot;widget&quot;: &quot;monetary&quot;, &quot;display_currency&quot;: o.currency_id}"/></td>
-				<td width="35%" class="text-left arabic" style="border:2pt solid black;text-align:left;padding:3pt ; font-weight: bold;"> Total Amount After Tax</td>
+				<td width="35%" class="text-left arabic" style="border:2pt solid black;text-align:right;padding:3pt ; font-weight: bold;;FONT-SIZE: 15pt">إجمالي المبلغ بعد الضريبة</td>
+				<td width="30%" style="border:2pt solid black;text-align:center;padding:3pt; font-weight: bold;;FONT-SIZE: 15pt" class="text-center"><span t-esc="discount_before_total" t-options="{&quot;widget&quot;: &quot;monetary&quot;, &quot;display_currency&quot;: o.currency_id}"/></td>
+				<td width="35%" class="text-left arabic" style="border:2pt solid black;text-align:left;padding:3pt ; font-weight: bold;FONT-SIZE: 15pt"> Total Amount After Tax</td>
 
 				
 				
 			</tr>
 			
 			<tr style="border:2pt solid black">
-				<td width="35%" class="text-left arabic" style="border:2pt solid black;text-align:right;padding:3pt ; background-color:#dddddd;color:black; font-weight: bold;FONT-SIZE: 15pt">إجمالي المبلغ المستحق</td>
-				<td width="30%" style="border:2pt solid black;text-align:center;padding:3pt ; background-color:#dddddd;color:black; font-weight: bold;FONT-SIZE: 15pt" class="text-center"><span t-esc="doc.amount_residual" t-options="{&quot;widget&quot;: &quot;monetary&quot;, &quot;display_currency&quot;: o.currency_id}"/></td>
-				<td width="35%" class="text-left arabic" style="border:2pt solid black;text-align:left;padding:3pt ; background-color:#dddddd;color:black; font-weight: bold;FONT-SIZE: 15pt">TOTAL AMOUNT DUE</td>
+				<td width="35%" class="text-left arabic" style="border:2pt solid black;text-align:right;padding:3pt ; background-color:#dddddd;color:black; font-weight: bold;FONT-SIZE: 13pt">إجمالي المبلغ المستحق</td>
+				<td width="30%" style="border:2pt solid black;text-align:center;padding:3pt ; background-color:#dddddd;color:black; font-weight: bold;FONT-SIZE: 13pt" class="text-center"><span t-esc="doc.amount_residual" t-options="{&quot;widget&quot;: &quot;monetary&quot;, &quot;display_currency&quot;: o.currency_id}"/></td>
+				<td width="35%" class="text-left arabic" style="border:2pt solid black;text-align:left;padding:3pt ; background-color:#dddddd;color:black; font-weight: bold;FONT-SIZE: 13pt">TOTAL AMOUNT DUE</td>
 				
 			</tr>
 		</thead>

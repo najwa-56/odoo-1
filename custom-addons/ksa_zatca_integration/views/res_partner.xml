@@ -10,10 +10,10 @@
                     <field name="is_zatca" invisible="1"/>
                 </xpath>
                 <xpath expr="//field[@name='vat']" position="after">
-                    <field name="buyer_identification"
+                    <field name="buyer_identification" placeholder="Buyer Identity" required="1"
                            groups="ksa_zatca_integration.l10n_sa_group_zatca_user"/>
-                    <field name="buyer_identification_no"
-                           groups="ksa_zatca_integration.l10n_sa_group_zatca_user"/>
+                    <field name="buyer_identification_no"  placeholder="Identity NUM"
+                           groups="ksa_zatca_integration.l10n_sa_group_zatca_user" required="1"/>
                 </xpath>
                 <xpath expr="//field[@name='street2']" position="after">
                     <field name="building_no" placeholder="Building Number" class="o_address_city" style="width: 41%;"
