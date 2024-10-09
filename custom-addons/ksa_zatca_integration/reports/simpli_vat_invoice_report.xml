@@ -53,56 +53,139 @@
 			            </div>
 			        </div>
 			        <br/>
-     				<table style="border:1pt solid grey;width:100%;color:black; margin-top:-20pt;" class="table-condensed">
+					<table style="border:2pt solid ;width:100%;color:black; margin-top:5pt; color:black;" class="table table-striped" dir="rtl">
 						<thead>
-							<tr style="background-color:#DCDCDC">
-								<td width="40%" style="border:1pt solid grey;text-align:center;padding:2pt;">Nature of goods <br/> or services<br/><span class="arabic">تفاصيل السلع أو الخدمات</span></td>
-								<td  style="border:1pt solid grey;text-align:center;padding:2pt; width:15%">Unit Price<br/><span class="arabic">سعر الوحدة</span></td>
-								<td  style="border:1pt solid grey;text-align:center;padding:2pt;width:10%">Quantity<br/><span class="arabic"></span>الكمية</td>
-								<td  style="border:1pt solid grey;text-align:center;padding:2pt; width:35%">Item Subtotal<br/>(Including VAT) <br/><span class="arabic">المجموع (شامل ضريبة القيمة المضافة)</span></td>
+							
+
+							<tr style="background-color:#dddddd;color:black; font-weight: bold;">
+								<td style="border:2pt solid black;text-align:center;padding:2pt;"><span class="arabic">#</span></td>
+								<td width="25%" style="border:2pt solid black;text-align:center;padding:2pt; "><span class="arabic"> الاسم</span></td>
+								<t t-if="company.id == 1">
+									<td width="25%" style="border:2pt solid black;text-align:center;padding:2pt; "><span class="arabic"> الاسم اللاتنيني</span></td>
+								</t>
+								<td style="border:2pt solid black;text-align:center;padding:2pt;"><span class="arabic">سعر </span></td>
+								<td style="border:2pt solid black;text-align:center;padding:2pt;width:7%"><span class="arabic">الكمية</span></td>
+								<td style="border:2pt solid black;text-align:center;padding:2pt;width:7%"><span class="arabic">الوحدة</span></td>
+								<!-- <td style="border:2pt solid black;text-align:center;padding:2pt;width:8%"><span class="arabic">نسبة الضريبة</span></td> -->
+								<td style="border:2pt solid black;text-align:center;padding:2pt;width:7%"><span class="arabic">معدل الضريبة</span></td>
+								<td style="border:2pt solid black;text-align:center; width:10%;padding:2pt"><span class="arabic">مبلغ الضريبة</span></td>
+								<td style="border:2pt solid black;text-align:center;padding:2pt;"><span class="arabic">المجموع غير شامل الضريبة</span></td>
+								<td style="border:2pt solid black;text-align:center;padding:2pt;"><span class="arabic">المجموع شامل الضريبة</span></td>
 							</tr>
 						</thead>
 					 	<t t-set="tax_total" t-value="0"/>
+					 	<t t-set="discount_total" t-value="0"/>
 						<tbody class="invoice_tbody">
+							<t t-set="count" t-value="1"/>
 						 	<tr t-foreach="o.invoice_line_ids" t-as="l">
 						 		<t t-set="line_tax_total" t-value="0"/>
 					 			<t t-foreach="l.tax_ids" t-as="t">
 					 				<t t-set="tax_total" t-value="tax_total + l.price_subtotal* t.amount/100"/>
 					 				<t t-set="line_tax_total" t-value="line_tax_total + t.amount"/>
 					 			</t>
-						 		<td style="border-right:1pt solid grey;padding:3pt">
-						 			<span t-field="l.name"/> - 
-						 			<span t-if="l.product_id" class="text-right arabic" t-esc="l.product_id.get_product_arabic_name()"/>
-						 			<br/>
+
+								 <td style="border:2pt solid black;padding:3pt;text-align:center;background-color:#white; font-weight: bold; ">
+									<span class="arabic" t-esc="count"/> 
+								</td>
+
+					 			<t t-set="discount_total" t-value="discount_total + ((l.price_unit * l.quantity) - l.price_subtotal)"/>
+						 		<td style="border:2pt solid black;padding:3pt;text-align:center">
+						 			<span class="arabic" t-field="l.name"/> 
 						 		</td>
-						 		<td style="text-align:right;padding:3pt;border-right:1pt solid grey;"><span t-field="l.price_unit" t-options='{"widget": "monetary", "display_currency": o.currency_id}'/></td>
-						 		<td style="text-align:center;padding:3pt; border-right:1pt solid grey;"><span t-esc="'%.2f'%(l.quantity)"/></td>
-						 		<td style="text-align:right;padding:3pt" >
-			                        <span t-field="l.price_total" t-options='{"widget": "monetary", "display_currency": o.currency_id}'/>
+								<t t-if="company.id == 1">
+								 <td style="border:2pt solid black;padding:3pt;text-align:center">
+									<span class="arabic" t-field="l.product_arabic"/> 
+								</td>
+								</t>
+						 		<td class="arabic" style="border:2pt solid black;text-align:center;padding:3pt"><span t-field="l.price_unit" t-options="{&quot;widget&quot;: &quot;monetary&quot;, &quot;display_currency&quot;: o.currency_id}"/></td>
+						 		<td class="arabic" style="border:2pt solid black;text-align:center;padding:3pt"><span t-esc="'%.2f'%(l.quantity)"/></td>
+
+					 			
+
+						 		
+								 <td class="arabic" style="border:2pt solid black;text-align:center;padding:3pt;">
+	                                <span t-field="l.uom_name"/>
+	                             </td>
+			                    
+						 		
+								 
+
+								<td class="arabic" style="border:2pt solid black;text-align:center;padding:3pt;background-color:#white; font-weight: bold;">
+									<t t-if="l.tax_ids">
+										<span class="arabic" t-esc="l.tax_ids[0].name"/>
+									</t>
+			                        
 			                    </td>
+								<td class="arabic" style="padding:3pt;border:2pt solid black;text-align:center;">
+									<t t-set="line_tax_total" t-value="l.price_subtotal*line_tax_total/100"/>
+									<span class="arabic" t-esc="line_tax_total" t-options="{&quot;widget&quot;: &quot;monetary&quot;, &quot;display_currency&quot;: o.currency_id}"/>
+								</td>
+
+								<td class="arabic" style="border:2pt solid black;text-align:center;padding:3pt;background-color:#white; font-weight: bold;">
+			                        <span class="arabic" t-field="l.price_subtotal" t-options="{&quot;widget&quot;: &quot;monetary&quot;, &quot;display_currency&quot;: o.currency_id}"/>
+			                    </td>
+
+								<td class="arabic" style="border:2pt solid black;text-align:center;padding:3pt;background-color:#white; font-weight: bold;">
+			                        <span class="arabic" t-field="l.price_total" t-options="{&quot;widget&quot;: &quot;monetary&quot;, &quot;display_currency&quot;: o.currency_id}"/>
+			                    </td>
+						 		
+
+								<t t-set="count" t-value="count + 1"/>
 						 	</tr>
 		               	</tbody>
 					</table>
 					<br/>
-					<table  style="border:1pt solid grey;width:100%;color:black;" class="table table-bordered table-sm">
+
+
+	<table style="border:2pt solid black;width:100%;color:black;margin-top:10px; color:black;" class="table table-bordered table-sm" dir="rtl">
+		<thead>
+							
+			<center>
+				<span class="arabic" style="font-weight: bold;text-align:center !important;">المبالغ الإجمالية</span>
+			</center>
+			<t t-set="discount_before_total" t-value="doc.amount_untaxed + discount_total"/>
+			<tr style="border:2pt solid black">
+				<td width="35%" class="text-left arabic" style="border:2pt solid black;text-align:right;padding:3pt ; font-weight: bold;"> إجمالي المبلغ قبل  الضريبة</td>
+				<td width="30%" style="border:2pt solid black;text-align:center;padding:3pt" class="text-center"><span t-esc="doc.amount_untaxed" t-options="{&quot;widget&quot;: &quot;monetary&quot;, &quot;display_currency&quot;: o.currency_id}"/></td>
+				<td width="35%" class="text-left arabic" style="border:2pt solid black;text-align:left;padding:3pt ; font-weight: bold;"> Total Amount Before Tax</td>
+				
+			</tr>
+			
+			<tr style="border:2pt solid black">
+				<td width="35%" class="text-left arabic" style="border:2pt solid black;text-align:right;padding:3pt ;  font-weight: bold;">إجمالي ضريبة القيمة المضافة</td>
+				<td width="30%" style="border:2pt solid black;text-align:center;padding:3pt" class="text-center"><span t-esc="tax_total" t-options="{&quot;widget&quot;: &quot;monetary&quot;, &quot;display_currency&quot;: o.currency_id}"/></td>
+				<td width="35%" class="text-left arabic" style="border:2pt solid black;text-align:left;padding:3pt ;  font-weight: bold;">Total VAT 15%</td>
+				
+			</tr>
+
+			<tr style="border:2pt solid black">
+				<td width="35%" class="text-left arabic" style="border:2pt solid black;text-align:right;padding:3pt ; font-weight: bold;;FONT-SIZE: 15pt">إجمالي المبلغ بعد الضريبة</td>
+				<td width="30%" style="border:2pt solid black;text-align:center;padding:3pt; font-weight: bold;;FONT-SIZE: 15pt" class="text-center"><span t-esc="discount_before_total" t-options="{&quot;widget&quot;: &quot;monetary&quot;, &quot;display_currency&quot;: o.currency_id}"/></td>
+				<td width="35%" class="text-left arabic" style="border:2pt solid black;text-align:left;padding:3pt ; font-weight: bold;FONT-SIZE: 15pt"> Total Amount After Tax</td>
+
+				
+				
+			</tr>
+			
+			<tr style="border:2pt solid black">
+				<td width="35%" class="text-left arabic" style="border:2pt solid black;text-align:right;padding:3pt ; background-color:#dddddd;color:black; font-weight: bold;FONT-SIZE: 13pt">إجمالي المبلغ المستحق</td>
+				<td width="30%" style="border:2pt solid black;text-align:center;padding:3pt ; background-color:#dddddd;color:black; font-weight: bold;FONT-SIZE: 13pt" class="text-center"><span t-esc="doc.amount_residual" t-options="{&quot;widget&quot;: &quot;monetary&quot;, &quot;display_currency&quot;: o.currency_id}"/></td>
+				<td width="35%" class="text-left arabic" style="border:2pt solid black;text-align:left;padding:3pt ; background-color:#dddddd;color:black; font-weight: bold;FONT-SIZE: 13pt">TOTAL AMOUNT DUE</td>
+				
+			</tr>
+		</thead>
+					</table>
+					
+
+					<table style="border:1pt solid grey;width:100%;color:black;color:black; margin-top:0pt;" class="table table-bordered table-sm">
 						<thead>
 							<tr>
-								<td width="33%" style="font-weight: bold;text-align:left;padding:3pt">Total Taxable Amount (Excluding VAT)</td>
-								<td class="arabic"  width="47%" style="text-align:right;padding:3pt">إجمالي المبلغ الخاضع للضريبة (غير شامل ضريبة القيمة المضافة)</td>
-								<td  width="20%" style="text-align:right;" class="text-right"><span t-esc="doc.amount_untaxed" t-options='{"widget": "monetary", "display_currency": o.currency_id}'/></td>
-							</tr>
-							<tr>
-								<td  style="font-weight: bold;text-align:left;padding:3pt" >Total VAT</td>
-								<td class="arabic" style="text-align:right;padding:3pt">مجموع ضريبة القيمة المضافة</td>
-								<td style="text-align:right;padding:3pt" class="text-right"><span t-esc="tax_total" t-options='{"widget": "monetary", "display_currency": o.currency_id}'/></td>
-							</tr>
-							<tr>
-								<td  style="font-weight: bold;text-align:left;padding:3pt">Total Amount Due</td>
-								<td class="arabic" style="text-align:right;padding:3pt">اجمالي المبلغ المستحق</td>
-								<td style="text-align:right;padding:3pt" class="text-right"><span t-esc="doc.amount_residual" t-options='{"widget": "monetary", "display_currency": o.currency_id}'/></td>
+								<td class="text-right arabic" width="70%" style="padding-right:12px;"><span t-esc="doc.amount_word(doc.amount_total)"/></td>
+								<td class="text-right arabic" width="30%" style="font-weight: bold;background-color:#DCDCDC;">المبالغ المفوترة</td>
 							</tr>
 						</thead>
 					</table>
+				
 
 					</div>
 				</div>
