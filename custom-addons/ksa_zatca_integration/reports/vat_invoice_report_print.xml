@@ -266,6 +266,13 @@
 							</tr>
 						</thead>
 					</table>
+
+					<div class="col-3" style="margin-top:5pt; padding-left:25pt;">
+						<img t-if="o.pos_reference"  t-attf-src="/report/barcode/Code128/{{o.pos_reference.split(' ')[1]}}"
+						style="width:250px;height:50px;display:block;margin:auto;"
+						alt="Barcode" />
+					</div>
+					
 					<!-- <br/>
 
 					<table style="border:1pt solid grey;width:100%;color:black; margin-top:-20pt;">

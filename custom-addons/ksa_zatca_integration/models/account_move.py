@@ -131,6 +131,8 @@ class AccountMove(models.Model):
     sa_qr_code_str = fields.Char(string='Zatka QR Code', copy=False, readonly=1)
     # l10n_sa_is_tax_invoice = fields.Boolean(readonly=1, copy=False)
     l10n_sa_zatca_status = fields.Char("E-Invoice status", copy=False, readonly=1)
+    
+    pos_reference = fields.Char(string='Receipt Number', readonly=True, copy=False, index=True)
 
     def _get_zatca_ubl_functions(self):
         return ZatcaUBL
