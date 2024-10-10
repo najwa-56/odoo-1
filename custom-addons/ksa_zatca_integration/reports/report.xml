@@ -132,6 +132,8 @@
         <field name="report_file">ksa_zatca_integration.report_tax_low_margin_invoice</field>
         <field name="print_report_name">(object._get_report_base_filename())</field>
         <field name="paperformat_id" ref="ksa_zatca_integration.paperformat_low_simplified"/>
+        <field name="binding_model_id" ref="account.model_account_move"/>
+        <field name="binding_type">report</field>
     </record>
 
 </odoo>
