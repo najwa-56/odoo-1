@@ -161,10 +161,10 @@
                                     <td style="border: 2pt solid black; text-align: center; padding: 2pt;">
                                         <span class="arabic">مبلغ الضريبة</span>
                                     </td>
-                                    <td style="border: 2pt solid black; text-align: center; padding: 2pt;">
+                                    <td style="font-size: 15pt;font-weight: bold;border: 2pt solid black; text-align: center; padding: 2pt;">
                                         <span class="arabic">المجموع غير شامل الضريبة</span>
                                     </td>
-                                    <td style="border: 2pt solid black; text-align: center; padding: 2pt;">
+                                    <td style="font-size: 15pt;font-weight: bold;border: 2pt solid black; text-align: center; padding: 2pt;">
                                         <span class="arabic">المجموع شامل الضريبة</span>
                                     </td>
                                 </tr>
@@ -199,10 +199,10 @@
                                         <t t-set="line_tax_total" t-value="l.price_subtotal * l.tax_ids[0].amount / 100"/>
                                         <span t-esc="'%.2f'%(line_tax_total)"/> 
                                     </td>
-                                    <td style="border: 2pt solid black; padding: 3pt; text-align: center;">
+                                    <td style="font-size: 15pt;font-weight: bold;border: 2pt solid black; padding: 3pt; text-align: center;">
                                         <span t-esc="'%.2f'%(l.price_subtotal)"/>
                                     </td>
-                                    <td style="border: 2pt solid black; padding: 3pt; text-align: center;">
+                                    <td style="font-size: 15pt;font-weight: bold;border: 2pt solid black; padding: 3pt; text-align: center;">
                                         <span t-esc="'%.2f'%(l.price_total)"/>
                                     </td>
                                     <t t-set="count" t-value="count + 1"/>
