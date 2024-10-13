@@ -139,7 +139,7 @@
                         <br/>
 
                         <!-- Invoice Items -->
-                        <table style="font-weight: bold;font-size: 15pt;border: 2pt solid black; width:100%; color:black;" class="table table-striped" dir="rtl">
+                        <table style="font-weight: bold;font-size: 13pt;border: 2pt solid black; width:100%; color:black;" class="table table-striped" dir="rtl">
                             <thead style="display: table-row-group">
                                 <tr style="background-color: #dddddd; color: black; ">
                                     <td style="border: 2pt solid black; text-align: center; padding: 2pt;">
@@ -212,10 +212,10 @@
                         <br/>
 
                         <!-- Total Information -->
-                        <table style="font-size: 17pt;border: 2pt solid black; width:100%; color:black;" class="table table-bordered table-sm" dir="rtl">
+                        <table style="font-size: 15pt;border: 2pt solid black; width:100%; color:black;" class="table table-bordered table-sm" dir="rtl">
                             <thead>
                                 <center>
-                                    <span class="arabic" style="font-size: 17pt;font-weight: bold;">المبالغ
+                                    <span class="arabic" style="font-size: 15pt;font-weight: bold;">المبالغ
                                         الإجمالية</span>
                                 </center>
                                 <t t-set="discount_before_total" t-value="o.amount_untaxed + discount_total"/>
@@ -247,7 +247,7 @@
                                         إجمالي المبلغ بعد الضريبة
                                     </td>
                                     <td style="border: 2pt solid black; text-align:center;padding:3pt;font-weight: bold;" class="text-center">
-                                        <span t-esc="'%.2f'%(discount_before_total)"/> 
+                                        <span t-esc="'%.2f'%(o.amount_total)"/> 
                                     </td>
                                     <td class="text-left arabic" style="border: 2pt solid black; text-align:left;padding:3pt; font-weight: bold;">
                                         Total Amount After Tax
