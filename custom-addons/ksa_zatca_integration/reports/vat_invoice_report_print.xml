@@ -266,10 +266,11 @@
 							</tr>
 						</thead>
 					</table>
+					<br/>
+					<div class="col-12" style="margin-top:5pt; padding-left:40pt;">
 
-					<div class="col-3" style="margin-top:5pt; padding-left:25pt;">
-						<img t-if="o.pos_reference"  t-attf-src="/report/barcode/Code128/{{o.pos_reference.split(' ')[1]}}"
-						style="width:250px;height:50px;display:block;margin:auto;"
+						<img t-if="o.pos_reference"   t-attf-src="/report/barcode/?barcode_type=Code128&amp;value={{o.pos_reference.split(' ')[1]}}&amp;width=170&amp;height=90&amp;humanreadable=1&amp;quiet=0"
+						style="width:300px;height:60px;display:block;margin:auto;"
 						alt="Barcode" />
 					</div>
 					
