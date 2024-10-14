@@ -256,12 +256,37 @@ patch(Orderline.prototype, {
     
     },
 
+    // export_as_JSON(){
+    //     var unit_id = this.product.uom_id;
+    //     var json = super.export_as_JSON(...arguments);
+    //     // Export the UoM used in the orderline
+    //     json.product_uom = this.wvproduct_uom ? this.wvproduct_uom.id : unit_id[0];
+    //     json.product_uom_id =  this.wvproduct_uom ? this.wvproduct_uom.id : unit_id[0]
+    //     return json;
+    // },
     export_as_JSON(){
         var unit_id = this.product.uom_id;
         var json = super.export_as_JSON(...arguments);
-        // Export the UoM used in the orderline
-        json.product_uom = this.wvproduct_uom ? this.wvproduct_uom.id : unit_id[0];
-        json.product_uom_id =  this.wvproduct_uom ? this.wvproduct_uom.id : unit_id[0]
+        
+        function getSafeUomId(uom) {
+            // If uom is a proxy or an object-like structure
+            if (uom && typeof uom === 'object') {
+                // If uom is a Proxy with target, safely access the id or first value
+                return uom.id || uom[0];
+            }
+            return uom; // If it's a direct value, return as is
+        }
+    
+        const productUomId = getSafeUomId(this.product_uom_id);
+    
+        const productUom = 
+            productUomId || 
+            (this.wvproduct_uom && this.wvproduct_uom.id) || 
+            unit_id[0];
+    
+        json.product_uom = productUom;
+        json.product_uom_id = productUom;
+    
         return json;
     },
 
