@@ -489,27 +489,46 @@ class AccountMove(models.Model):
         return str(value)
 
     def _get_zatca_company_data(self, company_id):
-        # arabic only fields
-        lang = self.env.user.partner_id.lang
-        # lang = 'ar_001'
-        conf = company_id.with_context(lang=lang).sudo()
-        # These fields must be in res.company
-        data = {
-            "name": {'value': conf.name, 'field': 'name'},
-            "street": {'value': conf.street, 'field': 'street'},
-            "street2": {'value': conf.street2, 'field': 'street2'},
-            "district": {'value': conf.district, 'field': 'district'},
-            "city": {'value': conf.city, 'field': 'city'}
-        }
-        # These fields must be in res.country.state
-        data.update({
-            "state_id_name": {'value': conf.state_id.name, 'field': 'name'},  # state_id.name
-        })
-        # These fields must be in res.country
-        data.update({
-            "country_id_name": {'value': conf.country_id.name, 'field': 'name'},  # only for reports
-        })
-
+        data = {}
+        if self.company_id.id == 3:
+            # Fetch fields from journal
+            journal_id = self.journal_id
+            data = {
+                "name": {'value': journal_id.branch_name, 'field': 'name'},
+                "street": {'value': journal_id.street, 'field': 'street'},
+                "street2": {'value': journal_id.street2, 'field': 'street2'},
+                "district": {'value': journal_id.district, 'field': 'district'},
+                "city": {'value': journal_id.city, 'field': 'city'}
+            }
+            # These fields must be in res.country.state
+            data.update({
+                "state_id_name": {'value': journal_id.city, 'field': 'name'},  # state_id.name
+            })
+            # These fields must be in res.country
+            data.update({
+                "country_id_name": {'value': company_id.country_id.name, 'field': 'name'},  # only for reports
+            })
+        else:
+            # arabic only fields
+            lang = self.env.user.partner_id.lang
+            # lang = 'ar_001'
+            conf = company_id.with_context(lang=lang).sudo()
+            # These fields must be in res.company
+            data = {
+                "name": {'value': conf.name, 'field': 'name'},
+                "street": {'value': conf.street, 'field': 'street'},
+                "street2": {'value': conf.street2, 'field': 'street2'},
+                "district": {'value': conf.district, 'field': 'district'},
+                "city": {'value': conf.city, 'field': 'city'}
+            }
+            # These fields must be in res.country.state
+            data.update({
+                "state_id_name": {'value': conf.state_id.name, 'field': 'name'},  # state_id.name
+            })
+            # These fields must be in res.country
+            data.update({
+                "country_id_name": {'value': conf.country_id.name, 'field': 'name'},  # only for reports
+            })
         return data
 
     def _get_zatca_product_name(self, invoice_line_id):

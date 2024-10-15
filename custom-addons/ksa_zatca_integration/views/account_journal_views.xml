@@ -10,16 +10,16 @@
                 <xpath expr="//page[@name='advanced_settings']/group" position="after">
                     <group string="Zatcka Integaration">
                         <field name="branch_name" />
-                        <field name="cr"/>
+                        <!-- <field name="cr"/> -->
                         <field name="street" />
                         <field name="street2"/>
                         <field name="district"/>
                         <field name="city"/>
-                        <field name="zip"/>
-                        <field name="license"/>
-                        <field name="license_no"/>
+                        <!-- <field name="zip"/> -->
+                        <!-- <field name="license"/> -->
+                        <!-- <field name="license_no"/> -->
                         <field name="building_no"/>
-                        <field name="additional_no"/>
+                        <!-- <field name="additional_no"/> -->
                         
                         
                     </group>
