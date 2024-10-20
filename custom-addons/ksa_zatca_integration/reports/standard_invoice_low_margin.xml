@@ -188,7 +188,7 @@
                                     <td style="border: 2pt solid black; padding: 3pt; text-align: center;">
                                         <span t-field="l.price_unit" />
                                     </td>
-                                    <td style="border: 2pt solid black; padding: 3pt; text-align: center;">
+                                    <td  width="10%" style="border: 2pt solid black; padding: 3pt; text-align: center;">
                                         <span t-esc="'%.2f'%(l.quantity)"/>
                                     </td>
                                     <td style="border: 2pt solid black; padding: 3pt; text-align: center;">
