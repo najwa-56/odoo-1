@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record model="ir.ui.view" id="point_of_sale_view_pos_details_wizard_inherit_form">
+        <field name="name">pos.details.wizard.form.inherit</field>
+        <field name="model">pos.details.wizard</field>
+        <field name="inherit_id" ref="point_of_sale.view_pos_details_wizard" />
+        <field name="priority">10</field>
+        <field name="arch" type="xml">
+            <xpath expr="//footer/button[@name='generate_report']" position="after">
+                 <button name="print_excel_report" string="Print Excel" type="object" class="btn-primary"/>
+            </xpath>
+        </field>
+    </record>
+</odoo>
