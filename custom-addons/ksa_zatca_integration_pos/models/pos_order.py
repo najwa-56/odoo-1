@@ -78,6 +78,7 @@ class PosOrder(models.Model):
     def _prepare_invoice_vals(self):
         invoice_vals = super(PosOrder, self)._prepare_invoice_vals()
         invoice_vals['l10n_sa_invoice_type'] = 'Simplified'
+        invoice_vals['pos_reference'] = self.pos_reference
         return invoice_vals
 
     @api.model
@@ -97,14 +98,12 @@ class PosOrder(models.Model):
                 if len(self_id.refunded_order_ids.account_move.ids) > 1:
                     raise exceptions.ValidationError("only 1 invoice can be returned at a time.")
                 self_id.account_move.create_xml_file(pos_refunded_order_id=self_id.refunded_order_ids.account_move.id)
-                #wirte pos refeernce in account move so that we get barcode for return
-                self_id.account_move.write({'pos_reference':self_id.pos_reference})
-                self.send_to_zatca(self_id.pos_reference)
-                # try:
-                #     self.send_to_zatca(self_id.pos_reference)
-                # except Exception as e:
-                #     # Log the error or handle it as needed, but continue processing
-                #     _logger.error(f"Failed to send to ZATCA for POS reference {self_id.pos_reference}: {str(e)}")
+                
+                try:
+                    self.send_to_zatca(self_id.pos_reference)
+                except Exception as e:
+                    # Log the error or handle it as needed, but continue processing
+                    _logger.error(f"Failed to send to ZATCA for POS reference {self_id.pos_reference}: {str(e)}")
 
         return order_ids
 
