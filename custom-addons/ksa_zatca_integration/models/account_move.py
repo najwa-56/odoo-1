@@ -1724,7 +1724,7 @@ class AccountMove(models.Model):
         return self.invoices_clearance_single_api()
 
     def send_for_reporting(self, no_xml_generate=0):
-        if (sefl._context.get('xml_generate', 0) or not self.zatca_invoice) and not no_xml_generate:
+        if (self._context.get('xml_generate', 0) or not self.zatca_invoice) and not no_xml_generate:
             self.create_xml_file()
         return self.invoices_reporting_single_api(no_xml_generate)
 
