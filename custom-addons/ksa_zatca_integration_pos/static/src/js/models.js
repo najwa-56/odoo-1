@@ -32,6 +32,7 @@ patch(Order.prototype, {
         	let headerdata = result.headerData;
         	headerdata['config'] = this.pos.config || '';
         	headerdata['pos'] = this.pos || '';
+			headerdata['is_header_or_footer'] = this.pos.config.is_header_or_footer || '';
         	result.headerData = headerdata;
         	// json.ksa_qr_code =  qrCodeSrc(
             //         `${this.get_qrcode_data()}`
