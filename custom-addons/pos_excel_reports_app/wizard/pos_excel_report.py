@@ -71,6 +71,7 @@ class PosExcel(models.TransientModel):
         worksheet.write(row, 5, 'Unit of Mesaure',session_total_formate)
         worksheet.set_column('F:F', 20)
         worksheet.write(row, 6, 'Subtotal(Discounts Deducted)',session_total_formate)
+        worksheet.write(row, 7, 'Name Field',session_total_formate)
         worksheet.set_column('G:G', 20)
         configs = self.pos_config_ids
         user_tz = pytz.timezone(self.env.context.get('tz') or self.env.user.tz or 'UTC')
@@ -104,7 +105,7 @@ class PosExcel(models.TransientModel):
                 total += order.amount_total
             currency = order.session_id.currency_id
             for line in order.lines:
-                key = (line.product_id, line.price_unit, line.discount)
+                key = (line.product_id, line.price_unit, line.discount , line.name_field ,line.product_uom_id)
                 products_sold.setdefault(key, 0.0)
                 products_sold[key] += line.qty
                 if line.tax_ids_after_fiscal_position:
@@ -136,8 +137,10 @@ class PosExcel(models.TransientModel):
                 'quantity': qty,
                 'price_unit': price_unit,
                 'discount': discount,
-                'uom': product.uom_id.name
-            } for (product, price_unit, discount), qty in products_sold.items()], key=lambda l: l['product_name'])    
+                'uom': product.uom_id.name,
+                'product_uom_id': product_uom_id.name,
+                'name_field':name_field
+            } for (product, price_unit, discount , name_field , product_uom_id), qty in products_sold.items()], key=lambda l: l['product_name'])    
         row = 6
         totals = 0.0
         for product_id in products:
@@ -148,8 +151,9 @@ class PosExcel(models.TransientModel):
             worksheet.write(row,2,product_id.get('quantity'),session_total_formate1)
             worksheet.write(row,3,product_id.get('price_unit'),session_total_formate1)
             worksheet.write(row,4,product_id.get('discount'),session_total_formate1)
-            worksheet.write(row,5,product_id.get('uom'),session_total_formate1)
+            worksheet.write(row,5,product_id.get('product_uom_id'),session_total_formate1)
             worksheet.write(row,6,sub_total_disc_deducted)
+            worksheet.write(row,7,product_id.get('name_field'),session_total_formate1)
             totals += sub_total_disc_deducted
             row +=1
         worksheet.write(row+2,5,'Total without taxes',session_total_formate1)                
