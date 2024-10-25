@@ -36,6 +36,12 @@ patch(PosStore.prototype, {
 
 patch(ProductScreen.prototype, {
     async _barcodeProductAction(code) {
+
+        if (code.type !== 'product'){
+            return super._barcodeProductAction(code);
+        }
+        
+
         const product = await this._getProductByBarcode(code);
         if (!product) {
             return this.popup.add(ErrorBarcodePopup, { code: code.base_code });
@@ -46,26 +52,6 @@ patch(ProductScreen.prototype, {
         if (!options) {
             return;
         }
-
-        // update the options depending on the type of the scanned code
-        if (code.type === "price") {
-            Object.assign(options, {
-                price: code.value,
-                extras: {
-                    price_type: "manual",
-                },
-            });
-        } else if (code.type === "weight" || code.type === "quantity") {
-            Object.assign(options, {
-                quantity: code.value,
-                merge: false,
-            });
-        } else if (code.type === "discount") {
-            Object.assign(options, {
-                discount: code.value,
-                merge: false,
-            });
-        }
         // Access the UOM list and match barcodes
         var pos_multi_op = this.pos.em_uom_list;
         var unit_price = 0;
@@ -73,50 +59,34 @@ patch(ProductScreen.prototype, {
         let selected_uom_id = null;
         let selected_uom_name = null;
 
-        // Get the product template ID
+        
+
+    // Check if the product exists in pos_multi_op
         let product_tmpl_id = product.product_tmpl_id;
-
-        // Check if the product exists in pos_multi_op
         if (pos_multi_op[product_tmpl_id]) {
-            let uomPrices = pos_multi_op[product_tmpl_id].uom_id;
+            let barcodePrices = pos_multi_op[product_tmpl_id].barcodes;
 
-            // Loop through the UOM data for the product
-            Object.values(uomPrices).forEach(function(uom_data) {
-                if (uom_data.barcodes.includes(code.base_code)) {
+            // Loop through the barcode data for the product
+            Object.keys(barcodePrices).forEach(function(barcode) {
+                if (barcode === code.base_code) {
+                    let uom_data = barcodePrices[barcode];
                     unit_price = uom_data.price;
                     uom_data_matched = true;
-                    selected_uom_id = uom_data.id;
-                    selected_uom_name = uom_data.name_field 
+                    selected_uom_id = uom_data.uom_id[0];
+                    selected_uom_name = uom_data.name_field;
 
                     Object.assign(options, {
                         price: uom_data.price,
                         extras: {
-                            wvproduct_uom: this.pos.units_by_id[uom_data.id],
+                            wvproduct_uom: this.pos.units_by_id[uom_data.uom_id[0]],
                         },
                     });
                 }
             }, this);
         }
 
-        // If UOM barcode wasn't matched, fallback to original product barcode
-        if (!uom_data_matched) {
-            if (product.barcode === code.base_code) {
-                unit_price = product.lst_price;
-                selected_uom_id = product.uom_id[0];
-
-                Object.assign(options, {
-                    price: product.lst_price,
-                    extras: {
-                        wvproduct_uom: this.pos.units_by_id[product.uom_id[0]],  // The original UOM
-                    },
-                });
-            }
-        }
-
-        // Add the product to the order with the updated options
         this.currentOrder.add_product(product, options);
 
-        // Set the unit price and UoM for the orderline
         var line = this.currentOrder.selected_orderline;
         line.set_unit_price(unit_price);
         line.set_product_uom(selected_uom_id);
@@ -309,8 +279,8 @@ patch(Orderline.prototype, {
         }
 
         // Compare the product name and UOM IDs
-
-        if (this.full_product_name === orderline.full_product_name && current_uom.id === orderline_uom.id) {
+        console.log("orderline==================",orderline.price , this.price)
+        if (this.full_product_name === orderline.full_product_name && current_uom.id === orderline_uom.id && orderline.price === this.price) {
             return true;
         } else if (this.full_product_name === orderline.full_product_name && current_uom.id !== orderline_uom.id) {
             return false;
