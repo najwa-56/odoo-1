@@ -22,6 +22,7 @@
         # 'views/update.xml',
         'security/groups.xml',
         'data/data.xml',
+        'data/cron.xml',
         'reports/account_move.xml',
         'views/account_move.xml',
         'views/res_partner.xml',

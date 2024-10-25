@@ -18,6 +18,7 @@ import math
 import re
 import os
 from num2words import num2words
+from datetime import date
 
 _logger = logging.getLogger(__name__)
 _zatca = logging.getLogger('Zatca Debugger for account.move :')
@@ -1728,6 +1729,23 @@ class AccountMove(models.Model):
             if (rec._context.get('xml_generate', 0) or not rec.zatca_invoice) and not no_xml_generate:
                 rec.create_xml_file()
             return rec.invoices_reporting_single_api(no_xml_generate)
+
+    
+    def send_cron_multiple_to_zatca(self):
+        # Get today's date
+        today = date.today()
+        
+        # Filter invoices with today's date only
+        invoices = self.search([('invoice_date','=',today)])
+        
+        # Check if there are invoices to send
+        if invoices:
+            # Send filtered invoices to ZATCA
+            invoices.send_multiple_to_zatca()
+            _logger.info(f"Sent {len(invoices)} invoices to ZATCA for {today}")
+        else:
+            _logger.info(f"No invoices found for {today} to send to ZATCA.")
+
 
     def send_multiple_to_zatca(self):
         self = self.filtered(lambda x: x.zatca_icv_counter).sorted(key='zatca_icv_counter')
