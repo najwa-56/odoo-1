@@ -85,6 +85,20 @@ patch(ProductScreen.prototype, {
             }, this);
         }
 
+        // If UOM barcode wasn't matched, fallback to original product barcode
+        if (!uom_data_matched) {
+            if (product.barcode === code.base_code) {
+                unit_price = product.lst_price;
+                selected_uom_id = product.uom_id[0];
+                Object.assign(options, {
+                    price: product.lst_price,
+                    extras: {
+                        wvproduct_uom: this.pos.units_by_id[product.uom_id[0]],  // The original UOM
+                    },
+                });
+            }
+        }
+
         this.currentOrder.add_product(product, options);
 
         var line = this.currentOrder.selected_orderline;
