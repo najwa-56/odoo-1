@@ -6,7 +6,7 @@
 
                 <!-- POS-Style Container -->
                 <div dir="ltr">
-                    <div class="pos-receipt page_block font" style="text-align: center; padding-bottom: 0px; display: inline-block; overflow: hidden; width: 800px;">
+                    <div class="pos-receipt page_block font" style="text-align: center; padding-bottom: 0px; display: inline-block; overflow: hidden;">
 
                         <!-- Add Font CSS -->
                         <link rel="stylesheet" href="/ksa_zatca_integration/static/src/css/style.css"/>
