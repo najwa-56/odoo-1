@@ -62,66 +62,27 @@ patch(ProductScreen.prototype, {
         
 
     // Check if the product exists in pos_multi_op
-        // let product_tmpl_id = product.product_tmpl_id;
-        // if (pos_multi_op[product_tmpl_id]) {
-        //     let barcodePrices = pos_multi_op[product_tmpl_id].barcodes;
-
-        //     // Loop through the barcode data for the product
-        //     Object.keys(barcodePrices).forEach(function(barcode) {
-        //         if (barcode === code.base_code) {
-        //             let uom_data = barcodePrices[barcode];
-        //             unit_price = uom_data.price;
-        //             uom_data_matched = true;
-        //             selected_uom_id = uom_data.uom_id[0];
-        //             selected_uom_name = uom_data.name_field;
-
-        //             Object.assign(options, {
-        //                 price: uom_data.price,
-        //                 extras: {
-        //                     wvproduct_uom: this.pos.units_by_id[uom_data.uom_id[0]],
-        //                 },
-        //             });
-        //         }
-        //     }, this);
-        // }
-
         let product_tmpl_id = product.product_tmpl_id;
-
-        // Check if the product exists in pos_multi_op
         if (pos_multi_op[product_tmpl_id]) {
-            let uomPrices = pos_multi_op[product_tmpl_id].uom_id;
+            let barcodePrices = pos_multi_op[product_tmpl_id].barcodes;
 
-            // Loop through the UOM data for the product
-            Object.values(uomPrices).forEach(function(uom_data) {
-                if (uom_data.barcodes.includes(code.base_code)) {
+            // Loop through the barcode data for the product
+            Object.keys(barcodePrices).forEach(function(barcode) {
+                if (barcode === code.base_code) {
+                    let uom_data = barcodePrices[barcode];
                     unit_price = uom_data.price;
                     uom_data_matched = true;
-                    selected_uom_id = uom_data.id;
+                    selected_uom_id = uom_data.uom_id[0];
                     selected_uom_name = uom_data.name_field;
 
                     Object.assign(options, {
                         price: uom_data.price,
                         extras: {
-                            wvproduct_uom: this.pos.units_by_id[uom_data.id],
+                            wvproduct_uom: this.pos.units_by_id[uom_data.uom_id[0]],
                         },
                     });
                 }
             }, this);
-        }
-
-
-        // If UOM barcode wasn't matched, fallback to original product barcode
-        if (!uom_data_matched) {
-            if (product.barcode === code.base_code) {
-                unit_price = product.lst_price;
-                selected_uom_id = product.uom_id[0];
-                Object.assign(options, {
-                    price: product.lst_price,
-                    extras: {
-                        wvproduct_uom: this.pos.units_by_id[product.uom_id[0]],  // The original UOM
-                    },
-                });
-            }
         }
 
         this.currentOrder.add_product(product, options);
