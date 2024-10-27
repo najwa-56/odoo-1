@@ -134,3 +134,11 @@ class PosOrder(models.Model):
         str_to_encode = seller_name_enc + company_vat_enc + timestamp_enc + invoice_total_enc + total_vat_enc
         qr_code_str = base64.b64encode(str_to_encode).decode('UTF-8')
         return qr_code_str
+
+
+    def _generate_pos_order_invoice(self):
+        try:
+            return super(PosOrder, self.with_context(skip_account_edi_cron_trigger=True))._generate_pos_order_invoice()
+        except Exception as e:
+            _logger.error(f"Failed Transcation Aoboreted {'aborted'}: {str(e)}")
+
