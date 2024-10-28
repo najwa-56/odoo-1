@@ -37,11 +37,6 @@ patch(PosStore.prototype, {
 patch(ProductScreen.prototype, {
     async _barcodeProductAction(code) {
 
-        if (code.type !== 'product'){
-            return super._barcodeProductAction(code);
-        }
-        
-
         const product = await this._getProductByBarcode(code);
         if (!product) {
             return this.popup.add(ErrorBarcodePopup, { code: code.base_code });
@@ -52,6 +47,27 @@ patch(ProductScreen.prototype, {
         if (!options) {
             return;
         }
+
+        // update the options depending on the type of the scanned code
+        if (code.type === "price") {
+            Object.assign(options, {
+                price: code.value,
+                extras: {
+                    price_type: "manual",
+                },
+            });
+        } else if (code.type === "weight" || code.type === "quantity") {
+            Object.assign(options, {
+                quantity: code.value,
+                merge: false,
+            });
+        } else if (code.type === "discount") {
+            Object.assign(options, {
+                discount: code.value,
+                merge: false,
+            });
+        }
+
         // Access the UOM list and match barcodes
         var pos_multi_op = this.pos.em_uom_list;
         var unit_price = 0;
@@ -84,6 +100,21 @@ patch(ProductScreen.prototype, {
                 }
             }, this);
         }
+
+        // If UOM barcode wasn't matched, fallback to original product barcode
+        if (!uom_data_matched) {
+            if (product.barcode === code.base_code) {
+                unit_price = product.lst_price;
+                selected_uom_id = product.uom_id[0];
+                Object.assign(options, {
+                    price: product.lst_price,
+                    extras: {
+                        wvproduct_uom: this.pos.units_by_id[product.uom_id[0]],  // The original UOM
+                    },
+                });
+            }
+        }
+
 
         this.currentOrder.add_product(product, options);
 
