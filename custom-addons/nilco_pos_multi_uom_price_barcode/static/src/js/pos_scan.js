@@ -73,9 +73,7 @@ patch(ProductScreen.prototype, {
         var unit_price = 0;
         var uom_data_matched = false;
         let selected_uom_id = null;
-        let selected_uom_name = null;
-
-        
+        let selected_uom_name = null;        
 
     // Check if the product exists in pos_multi_op
         let product_tmpl_id = product.product_tmpl_id;
@@ -115,6 +113,8 @@ patch(ProductScreen.prototype, {
             }
         }
 
+
+        
 
         this.currentOrder.add_product(product, options);
 

@@ -12,7 +12,11 @@ class PosSession(models.Model):
 
 
     def _loader_params_product_multi_uom_price(self):
-        return {'search_params': {'domain': [], 'fields': ['product_id', 'uom_id', 'price', 'barcode', 'product_variant_id','name_field'],},}
+        domain = []
+        if self.config_id.iface_available_categ_ids:
+            domain = [('product_id.pos_categ_ids','in',self.config_id.iface_available_categ_ids.ids)]
+
+        return {'search_params': {'domain': domain, 'fields': ['product_id', 'uom_id', 'price', 'barcode', 'product_variant_id','name_field'],},}
 
     # def _get_pos_ui_product_multi_uom_price(self, params):
     #     products_uom_price = self.env['product.multi.uom.price'].search_read(**params['search_params'])
@@ -43,6 +47,7 @@ class PosSession(models.Model):
 
     #     return product_uom_price
     def _get_pos_ui_product_multi_uom_price(self, params):
+        print("params=================",params)
         products_uom_price = self.env['product.multi.uom.price'].search_read(**params['search_params'])
         product_uom_price = {}
 
@@ -67,7 +72,7 @@ class PosSession(models.Model):
                             'product_id': product_id,
                             'product_variant_id': unit['product_variant_id'],
                         }
-
+        print("len of  product_uom_price========================",len(product_uom_price))
         return product_uom_price
 
 
