@@ -61,17 +61,39 @@ export class UOMButton extends Component {
 			const uomList = [ ];
 			let uomPrices = line.pos.product_uom_price[product].barcodes;
 		  //  console.log(uomPrices);
+			// if (uomPrices) {
+			//  Object.entries(uomPrices).forEach(([barcode, uomPrice]) => {
+			// 	 let uniqueKey = `${uomPrice.uom_id[0]}_${barcode}`;
+			// 		uomList.push({
+			// 			id:	uniqueKey,
+			// 			label:	uomPrice.name_field,
+			// 			isSelected: true,
+			// 			item:	uomPrice,
+			// 			uom_id:	uomPrice.id,
+			// 		});
+			// 		});
+			// }
+
 			if (uomPrices) {
-			 Object.entries(uomPrices).forEach(([barcode, uomPrice]) => {
-				 let uniqueKey = `${uomPrice.uom_id[0]}_${barcode}`;
-					uomList.push({
-						id:	uniqueKey,
-						label:	uomPrice.name_field,
-						isSelected: true,
-						item:	uomPrice,
-						uom_id:	uomPrice.id,
-					});
-					});
+				const uniqueUoms = new Map();  // Map to store unique items based on `name_field` and `price`
+			
+				Object.entries(uomPrices).forEach(([barcode, uomPrice]) => {
+					// Generate a unique key based on `name_field` and `price`
+					const uniqueKey = `${uomPrice.name_field}_${uomPrice.price}`;
+			
+					// Only add to `uomList` if the combination of `name_field` and `price` is unique
+					if (!uniqueUoms.has(uniqueKey)) {
+						uniqueUoms.set(uniqueKey, true);  // Mark this unique combination as added
+			
+						uomList.push({
+							id: `${uomPrice.uom_id[0]}_${barcode}`,
+							label: uomPrice.name_field,
+							isSelected: true,
+							item: uomPrice,
+							uom_id: uomPrice.id,
+						});
+					}
+				});
 			}
 			const { confirmed, payload: selectedUOM } = await this.env.services.popup.add(
 					 SelectionPopup, {
