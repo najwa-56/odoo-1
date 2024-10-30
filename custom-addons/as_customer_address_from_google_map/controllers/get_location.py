@@ -52,50 +52,99 @@ class Google_Map(http.Controller):
             for i in range(addres_component_length):
                 types = address[i].get('types', [])
                 long_name = address[i].get('long_name', False)
-                if 'administrative_area_level_3' in types:
-                    partner_address.update({'city': long_name})
-                elif 'locality' in types:
-                    if 'administrative_area_level_3' not in types:
-                        partner_address.update({'city': long_name})
+                
+                if 'street_number' in types:
+                    partner_address['street'] = (partner_address['street'] or '') + ' ' + long_name
+                elif 'route' in types:
+                    partner_address['street'] = long_name
+                elif 'premise' in types:
+                    partner_address['street2'] = long_name
+                elif 'locality' in types and not partner_address['city']:
+                    partner_address['city'] = long_name
                 elif 'administrative_area_level_1' in types:
                     state_id = request.env['res.country.state'].search([('name', '=ilike', long_name)])
-                    partner_address.update({'state_id': state_id.id or False})
-                elif 'locality' in types:
-                    if 'administrative_area_level_1' not in types:
-                        state_id = request.env['res.country.state'].search([('name', '=ilike', long_name)])
-                        partner_address.update({'state_id': state_id.id or False})
+                    partner_address['state_id'] = state_id.id or False
                 elif 'country' in types:
-                    country_id = request.env['res.country'].search([('name', '=ilike',long_name)])
-                    partner_address.update({'country_id': country_id.id or False})
-                elif 'locality' in types:
-                    if 'country' not in types:
-                        country_id = request.env['res.country'].search([('name', '=ilike', long_name)])
-                        partner_address.update({'country_id': country_id.id or False})
+                    country_id = request.env['res.country'].search([('name', '=ilike', long_name)])
+                    partner_address['country_id'] = country_id.id or False
                 elif 'postal_code' in types:
-                    partner_address.update({'zip': long_name})
-                elif 'plus_code' in types:
-                    partner_address.update({'street': long_name})
+                    partner_address['zip'] = long_name
 
+            # Parse `location_name` for missing street or street2
             location_list = location_name.split(', ')
-            if partner_address['city'] and partner_address['city'] in location_list:
-                index = location_list.index(partner_address['city'])
-                if index:
-                    location_list.pop(index)
-            if partner_address['country_id']:
-                country = request.env['res.country'].browse(partner_address['country_id']).name
-                if country and country in location_list:
-                    index1 = location_list.index(country)
-                    if index1:
-                        location_list.pop(index1)
-            if location_list:
-                remove_state = location_list.pop(-1)
-            if location_list[:2]:
-                partner_address.update({'street': ', '.join(location_list[:2])})
-            if location_list[2:]:
-                partner_address.update({'street2': ', '.join(location_list[2:])})
-
+            if not partner_address['street'] and location_list:
+                partner_address['street'] = location_list[0]
+            if not partner_address['street2'] and len(location_list) > 1:
+                partner_address['street2'] = location_list[1]
+            
             if partner_address and get_partner_rec:
                 get_partner_rec.update(partner_address)
+
+
+        # if addres_component_length and address:
+        #     addres_component_length = len(address)
+        #     partner_address = {
+        #         'street': False,
+        #         'street2': False,
+        #         'city': False,
+        #         'state_id': False,
+        #         'country_id': False,
+        #         'zip': False,
+        #         'location_name': location_name,
+        #         'partner_latitude': latitude,
+        #         'partner_longitude': longitude,
+        #         'date_localization': fields.Datetime.now()
+        #     }
+        #     state_id = False
+        #     country_id = False
+
+        #     for i in range(addres_component_length):
+        #         types = address[i].get('types', [])
+        #         long_name = address[i].get('long_name', False)
+        #         if 'administrative_area_level_3' in types:
+        #             partner_address.update({'city': long_name})
+        #         elif 'locality' in types:
+        #             if 'administrative_area_level_3' not in types:
+        #                 partner_address.update({'city': long_name})
+        #         elif 'administrative_area_level_1' in types:
+        #             state_id = request.env['res.country.state'].search([('name', '=ilike', long_name)])
+        #             partner_address.update({'state_id': state_id.id or False})
+        #         elif 'locality' in types:
+        #             if 'administrative_area_level_1' not in types:
+        #                 state_id = request.env['res.country.state'].search([('name', '=ilike', long_name)])
+        #                 partner_address.update({'state_id': state_id.id or False})
+        #         elif 'country' in types:
+        #             country_id = request.env['res.country'].search([('name', '=ilike',long_name)])
+        #             partner_address.update({'country_id': country_id.id or False})
+        #         elif 'locality' in types:
+        #             if 'country' not in types:
+        #                 country_id = request.env['res.country'].search([('name', '=ilike', long_name)])
+        #                 partner_address.update({'country_id': country_id.id or False})
+        #         elif 'postal_code' in types:
+        #             partner_address.update({'zip': long_name})
+        #         elif 'plus_code' in types:
+        #             partner_address.update({'street': long_name})
+
+        #     location_list = location_name.split(', ')
+        #     if partner_address['city'] and partner_address['city'] in location_list:
+        #         index = location_list.index(partner_address['city'])
+        #         if index:
+        #             location_list.pop(index)
+        #     if partner_address['country_id']:
+        #         country = request.env['res.country'].browse(partner_address['country_id']).name
+        #         if country and country in location_list:
+        #             index1 = location_list.index(country)
+        #             if index1:
+        #                 location_list.pop(index1)
+        #     if location_list:
+        #         remove_state = location_list.pop(-1)
+        #     if location_list[:2]:
+        #         partner_address.update({'street': ', '.join(location_list[:2])})
+        #     if location_list[2:]:
+        #         partner_address.update({'street2': ', '.join(location_list[2:])})
+
+        #     if partner_address and get_partner_rec:
+        #         get_partner_rec.update(partner_address)
                 # get_partner_rec.write({
                 #                             'street': partner_address.get('street'),
                 #                             'street2': partner_address.get('street2'),

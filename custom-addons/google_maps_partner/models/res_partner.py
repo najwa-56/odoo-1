@@ -25,19 +25,25 @@ class ResPartner(models.Model):
 
     def open_map(self):
         for partner in self:
-            url = "http://maps.google.com/maps?oi=map&q="
-            if partner.street:
-                url += partner.street.replace(' ', '+')
-            if partner.city:
-                url += '+'+partner.city.replace(' ', '+')
-            if partner.state_id:
-                url += '+'+partner.state_id.name.replace(' ', '+')
-            if partner.country_id:
-                url += '+'+partner.country_id.name.replace(' ', '+')
-            if partner.zip:
-                url += '+'+partner.zip.replace(' ', '+')
-        return {
-            'type': 'ir.actions.act_url',
-            'target': 'new',
-            'url': url
-        }
+            if partner.partner_latitude and partner.partner_longitude:
+                # Use latitude and longitude for precise location
+                url = f"https://maps.google.com/?q={partner.partner_latitude},{partner.partner_longitude}"
+            else:
+                # Fallback to address fields if latitude and longitude are not available
+                url = "http://maps.google.com/maps?oi=map&q="
+                if partner.street:
+                    url += partner.street.replace(' ', '+')
+                if partner.city:
+                    url += '+' + partner.city.replace(' ', '+')
+                if partner.state_id:
+                    url += '+' + partner.state_id.name.replace(' ', '+')
+                if partner.country_id:
+                    url += '+' + partner.country_id.name.replace(' ', '+')
+                if partner.zip:
+                    url += '+' + partner.zip.replace(' ', '+')
+            
+            return {
+                'type': 'ir.actions.act_url',
+                'target': 'new',
+                'url': url
+            }
