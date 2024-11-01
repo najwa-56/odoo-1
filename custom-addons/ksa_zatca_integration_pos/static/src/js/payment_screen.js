@@ -10,34 +10,35 @@ import { OrderReceipt } from "@point_of_sale/app/screens/receipt_screen/receipt/
 
 
 patch(PaymentScreen.prototype, {
-    setup() {
-        super.setup(...arguments);
-        if (!this.currentOrder.is_to_invoice())
-            this.toggleIsToInvoice();
-    },
-    async _isOrderValid(isForceValidate) {
-        const res = await super._isOrderValid(...arguments);
-        if (res)
-            if (this.currentOrder.get_total_with_tax() == 0 && _.contains([undefined, false, NaN, ''], this.currentOrder.credit_debit_reason)) {
-                this.popup.add(ErrorPopup, {
-                    title: _t("Zatca Validation Error"),
-                    body: _t(
-                        "Reason is compulsory for returns for zatca."
-                    ),
-                });
-                return false;
-            }
-            else if (!this.currentOrder.is_to_invoice()){
-                this.popup.add(ErrorPopup, {
-                    title: _t("Zatca Validation Error"),
-                    body: _t(
-                        "Invoice is compulsory for zatca."
-                    ),
-                });
-                return false;
-            }
-        return res
-    },
+    // setup() {
+    //     super.setup(...arguments);
+    //     if (!this.currentOrder.is_to_invoice())
+    //         this.toggleIsToInvoice();
+    // },
+    
+    // async _isOrderValid(isForceValidate) {
+    //     const res = await super._isOrderValid(...arguments);
+    //     if (res)
+    //         if (this.currentOrder.get_total_with_tax() == 0 && _.contains([undefined, false, NaN, ''], this.currentOrder.credit_debit_reason)) {
+    //             this.popup.add(ErrorPopup, {
+    //                 title: _t("Zatca Validation Error"),
+    //                 body: _t(
+    //                     "Reason is compulsory for returns for zatca."
+    //                 ),
+    //             });
+    //             return false;
+    //         }
+    //         else if (!this.currentOrder.is_to_invoice()){
+    //             this.popup.add(ErrorPopup, {
+    //                 title: _t("Zatca Validation Error"),
+    //                 body: _t(
+    //                     "Invoice is compulsory for zatca."
+    //                 ),
+    //             });
+    //             return false;
+    //         }
+    //     return res
+    // },
     shouldDownloadInvoice() {
         if (this.currentOrder.is_invoice || this.currentOrder.is_invoice_b2c) {
             return true
@@ -61,6 +62,9 @@ patch(PaymentScreen.prototype, {
     toggleIsInvoice() {
         // Only toggle is_invoice and make sure is_invoice_b2c is untoggled if is_invoice is turned on
         if (!this.currentOrder.is_invoice) {
+            if (!this.currentOrder.is_to_invoice()){
+                 this.toggleIsToInvoice();
+            }
             this.currentOrder.is_invoice = 1;
             this.currentOrder.is_invoice_b2c = 0;  // Ensure B2C is untoggled
         } else {
@@ -71,6 +75,9 @@ patch(PaymentScreen.prototype, {
     toggleIsInvoiceB2c() {
         // Only toggle is_invoice_b2c and make sure is_invoice is untoggled if is_invoice_b2c is turned on
         if (!this.currentOrder.is_invoice_b2c) {
+            if (!this.currentOrder.is_to_invoice()){
+                this.toggleIsToInvoice();
+           }
             this.currentOrder.is_invoice_b2c = 1;
             this.currentOrder.is_invoice = 0;  // Ensure the regular invoice is untoggled
         } else {
