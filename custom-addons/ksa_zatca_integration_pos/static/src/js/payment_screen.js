@@ -60,28 +60,37 @@ patch(PaymentScreen.prototype, {
         this.currentOrder.credit_debit_reason = 'مرتجع العميل';
     },
     toggleIsInvoice() {
+       
         // Only toggle is_invoice and make sure is_invoice_b2c is untoggled if is_invoice is turned on
         if (!this.currentOrder.is_invoice) {
-            if (!this.currentOrder.is_to_invoice()){
-                 this.toggleIsToInvoice();
-            }
+            
             this.currentOrder.is_invoice = 1;
             this.currentOrder.is_invoice_b2c = 0;  // Ensure B2C is untoggled
         } else {
             this.currentOrder.is_invoice = 0;  // Toggle off the is_invoice
         }
+        if (this.currentOrder.is_invoice) {
+            if (!this.currentOrder.is_to_invoice()){
+                this.toggleIsToInvoice();
+        }
+        }
     },
     
     toggleIsInvoiceB2c() {
+        
+
         // Only toggle is_invoice_b2c and make sure is_invoice is untoggled if is_invoice_b2c is turned on
         if (!this.currentOrder.is_invoice_b2c) {
-            if (!this.currentOrder.is_to_invoice()){
-                this.toggleIsToInvoice();
-           }
             this.currentOrder.is_invoice_b2c = 1;
             this.currentOrder.is_invoice = 0;  // Ensure the regular invoice is untoggled
         } else {
             this.currentOrder.is_invoice_b2c = 0;  // Toggle off the is_invoice_b2c
+        }
+
+        if (this.currentOrder.is_invoice_b2c) {
+            if (!this.currentOrder.is_to_invoice()){
+                this.toggleIsToInvoice();
+        }
         }
     },
     
