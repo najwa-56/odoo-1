@@ -36,19 +36,22 @@ class AccountMove(models.Model):
     date_due = fields.Date('Date Due')
     invoice_date_supply = fields.Date('Date Of Supply') 
 
-    def amount_word(self, amount):
-        language = self.partner_id.lang or 'en'
-        language_id = self.env['res.lang'].search([('code', '=', 'ar_001')])
-        if language_id:
-            language = language_id.iso_code
-        amount_str =  str('{:2f}'.format(amount))
-        amount_str_splt = amount_str.split('.')
-        before_point_value = amount_str_splt[0]
-        after_point_value = amount_str_splt[1][:2]           
-        before_amount_words = num2words(int(before_point_value),lang=language)
-        after_amount_words = num2words(int(after_point_value),lang=language)
-        amount = before_amount_words + ' ' + after_amount_words
-        return amount
+    # def amount_word(self, amount):
+    #     language = self.partner_id.lang or 'en'
+    #     language_id = self.env['res.lang'].search([('code', '=', 'ar_001')])
+    #     if language_id:
+    #         language = language_id.iso_code
+    #     amount_str =  str('{:2f}'.format(amount))
+    #     amount_str_splt = amount_str.split('.')
+    #     before_point_value = amount_str_splt[0]
+    #     after_point_value = amount_str_splt[1][:2]           
+    #     before_amount_words = num2words(int(before_point_value),lang=language)
+    #     after_amount_words = num2words(int(after_point_value),lang=language)
+    #     amount = before_amount_words + ' ' + after_amount_words
+    #     return amount
+    def amount_word(self, amount , lang="ar_001"):
+        return self.currency_id.with_context(lang=lang).amount_to_text(amount)
+
 
     def total_amount_words(self, amount):
         words_amount = self.currency_id.amount_to_text(amount)
