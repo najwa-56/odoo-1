@@ -50,7 +50,7 @@
                                 </tr>
                                 <tr style="border: 2pt solid black;">
                                     <td class="arabic" style="width:50%; text-align:center;">
-                                        <span t-esc="نقدا"/>
+                                        نقدا
                                     </td>
                                     <td class="arabic" style="text-align:right;color:black;background-color:#dddddd;font-weight: bold;">
                                         طريقة الدفع 
