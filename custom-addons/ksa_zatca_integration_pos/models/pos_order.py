@@ -149,18 +149,24 @@ class PosOrder(models.Model):
             if rec.picking_ids:
                 if not rec.partner_id:
                     rec.write({'partner_id':23})
-                rec._generate_pos_order_invoice()
+                rec.with_user(rec.user_id)._generate_pos_order_invoice()
+                
                 if rec.account_move:
-                    if rec.partner_id != 23 :
+                    msg = _('Invoice Created by %s:', rec.user_id.name)
+                    rec.account_move.message_post(body=msg)
+                    if rec.partner_id.id != 23 :
                         rec.account_move.write({
                             'l10n_sa_invoice_type':'Standard'
                         })
             else:
                 if not rec.partner_id:
                     rec.write({'partner_id':23})
-                rec.action_pos_order_invoice()
+                rec.with_user(rec.user_id).action_pos_order_invoice()
+                
                 if rec.account_move:
-                    if rec.partner_id != 23 :
+                    msg = _('Invoice Created by %s:', rec.user_id.name)
+                    rec.account_move.message_post(body=msg)
+                    if rec.partner_id.id != 23 :
                         rec.account_move.write({
                             'l10n_sa_invoice_type':'Standard'
                         })
