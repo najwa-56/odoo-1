@@ -19,6 +19,7 @@
         'python': ['cryptography', 'lxml']
     },
     'data': [
+        'data/cron.xml',
         'views/pos_order.xml',
         'views/res_company.xml',
         'views/pos_payment_method.xml',

@@ -2,6 +2,8 @@
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 from collections import defaultdict
 from datetime import datetime
+from datetime import date
+
 from functools import partial
 from itertools import groupby
 from markupsafe import Markup
@@ -88,6 +90,11 @@ class PosOrder(models.Model):
             for order_id in order_ids:
                 self_id = self.browse(order_id['id'])
                 if self_id.account_move.id:
+                    
+                    if self_id.partner_id.id != 23 :
+                        self_id.account_move.write({
+                            'l10n_sa_invoice_type':'Standard'
+                        })
                     account_move = {}
                     for x in orders:
                         if x['data']['name'] == order_id['pos_reference']:
@@ -135,10 +142,25 @@ class PosOrder(models.Model):
         qr_code_str = base64.b64encode(str_to_encode).decode('UTF-8')
         return qr_code_str
 
-
-    def _generate_pos_order_invoice(self):
-        try:
-            return super(PosOrder, self.with_context(skip_account_edi_cron_trigger=True))._generate_pos_order_invoice()
-        except Exception as e:
-            _logger.error(f"Failed Transcation Aoboreted {'aborted'}: {str(e)}")
-
+    def create_pos_order_invoice(self):
+        today = date.today()
+        orders = self.search([('state','=','paid'),('date_order','>=',today)])
+        for rec in orders:
+            if rec.picking_ids:
+                if not rec.partner_id:
+                    rec.write({'partner_id':23})
+                rec._generate_pos_order_invoice()
+                if rec.account_move:
+                    if rec.partner_id != 23 :
+                        rec.account_move.write({
+                            'l10n_sa_invoice_type':'Standard'
+                        })
+            else:
+                if not rec.partner_id:
+                    rec.write({'partner_id':23})
+                rec.action_pos_order_invoice()
+                if rec.account_move:
+                    if rec.partner_id != 23 :
+                        rec.account_move.write({
+                            'l10n_sa_invoice_type':'Standard'
+                        })
