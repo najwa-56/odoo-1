@@ -82,7 +82,7 @@ class PosSession(models.Model):
                 ('barcode', '=', barcode),
                 ('sale_ok', '=', True),
                 ('available_in_pos', '=', True),
-                ('product_id.pos_categ_ids','in',self.config_id.iface_available_categ_ids.ids)
+                ('pos_categ_ids','in',self.config_id.iface_available_categ_ids.ids)
             ])
             if product:
                 return {'product_id': [product.id]}
