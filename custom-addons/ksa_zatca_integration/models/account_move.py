@@ -1739,7 +1739,7 @@ class AccountMove(models.Model):
         today = date.today()
         
         # Filter invoices with today's date only
-        invoices = self.search([('invoice_date','=',today)])
+        invoices = self.search([('invoice_date','>=',today)])
         
         # Check if there are invoices to send
         if invoices:
@@ -1752,7 +1752,6 @@ class AccountMove(models.Model):
 
     def send_multiple_to_zatca(self):
         self = self.filtered(lambda x: x.zatca_icv_counter).sorted(key='zatca_icv_counter')
-
         # if int(self[0].zatca_icv_counter) > 1:
         #     def get_last_zatca_invoice(self, icv):
         #         record = self.search([('zatca_icv_counter', '=', icv -1)], limit=1)

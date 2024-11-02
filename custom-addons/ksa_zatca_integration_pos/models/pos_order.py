@@ -152,6 +152,7 @@ class PosOrder(models.Model):
                 rec.with_user(rec.user_id)._generate_pos_order_invoice()
                 
                 if rec.account_move:
+                    rec.account_move.create_xml_file(pos_refunded_order_id=rec.refunded_order_ids.account_move.id)
                     msg = _('Invoice Created by %s:', rec.user_id.name)
                     rec.account_move.message_post(body=msg)
                     if rec.partner_id.id != 23 :
@@ -164,6 +165,7 @@ class PosOrder(models.Model):
                 rec.with_user(rec.user_id).action_pos_order_invoice()
                 
                 if rec.account_move:
+                    rec.account_move.create_xml_file(pos_refunded_order_id=rec.refunded_order_ids.account_move.id)
                     msg = _('Invoice Created by %s:', rec.user_id.name)
                     rec.account_move.message_post(body=msg)
                     if rec.partner_id.id != 23 :
