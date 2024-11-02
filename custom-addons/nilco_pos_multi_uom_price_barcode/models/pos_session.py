@@ -76,4 +76,24 @@ class PosSession(models.Model):
         return product_uom_price
 
 
+    def find_product_by_barcode(self, barcode):
+        if self.config_id.iface_available_categ_ids:
+            product = self.env['product.product'].search([
+                ('barcode', '=', barcode),
+                ('sale_ok', '=', True),
+                ('available_in_pos', '=', True),
+                ('product_id.pos_categ_ids','in',self.config_id.iface_available_categ_ids.ids)
+            ])
+            if product:
+                return {'product_id': [product.id]}
 
+            packaging_params = self._loader_params_product_packaging()
+            packaging_params['search_params']['domain'] = [['barcode', '=', barcode]]
+            packaging = self.env['product.packaging'].search_read(**packaging_params['search_params'])
+            if packaging:
+                product_id = packaging[0]['product_id']
+                if product_id:
+                    return {'product_id': [product_id[0]], 'packaging': packaging}
+            return {}
+        else:
+            return super().find_product_by_barcode(barcode = barcode)
