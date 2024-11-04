@@ -284,16 +284,16 @@ class AccountMoveReport(models.Model):
 
 
 
-    def change_size_page(self, items):
-        paper_format = self.env['report.paperformat'].search([('id', '=', 39)], limit=1)  # Replace 39 with your actual paper format ID
-        if not paper_format:
-            return  # Exit if the paper format doesn't exist
+  ###  def change_size_page(self, items):
+    ##    paper_format = self.env['report.paperformat'].search([('id', '=', 39)], limit=1)  # Replace 39 with your actual paper format ID
+     ##   if not paper_format:
+      ##      return  # Exit if the paper format doesn't exist
 
-        base_height = 150  # in mm
-        additional_height_per_item = 7
+      ##  base_height = 150  # in mm
+      ##  additional_height_per_item = 7
 
         # Calculate total height
-        total_height = base_height + max(0, (items - 1) * additional_height_per_item)
+      ##  total_height = base_height + max(0, (items - 1) * additional_height_per_item)
 
         # Set the calculated height in the paper format
-        paper_format.page_height = total_height
+      ##  paper_format.page_height = total_height
