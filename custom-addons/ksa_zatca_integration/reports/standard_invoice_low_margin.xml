@@ -295,7 +295,7 @@
                             <img t-if="o.get_qr_code()" style="border: 3px solid #dddddd; padding: 3px; display:block;margin-left:20px;" t-att-src="'/report/barcode/?barcode_type=%s&amp;value=%s&amp;width=%s&amp;height=%s'%('QR', o.get_qr_code(), 200, 200)"/>
                         </div>
                     </center>
-                   <t t-esc="o.change_size_page(len(o.invoice_line_ids))"/>
+                  <!-- <t t-esc="o.change_size_page(len(o.invoice_line_ids))"/>-->
                     </div>
                 </div>
             </t>
