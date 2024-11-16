@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+
+	<div t-name="ReportPreviewDialog">
+	   	<!-- <Dialog title="props.title">content</Dialog> -->
+		<div class="d-flex justify-content-center modal fixed-top">
+			<div class="o-FileViewer flex-column align-items-center d-flex w-100 h-100">
+				<div class="o-FileViewer-header position-absolute top-0 d-flex w-100 bg-black-75 text-400">
+					<div class="d-flex align-items-center mx-2 overflow-auto">
+                        <span class="text-truncate" t-out="state.title"/>
+                    </div>
+					<div class="flex-grow-1"/>
+					<div t-on-click.stop="close" class="o-FileViewer-headerButton d-flex align-items-center mb-0 px-3 h4 text-reset cursor-pointer" role="button" title="Close (Esc)" aria-label="Close">
+                        <i class="fa fa-fw fa-times" role="img"/>
+                    </div>
+				</div>
+			</div>
+			<div t-on-click.stop="close" class="o-FileViewer-main position-absolute top-0 bottom-0 start-0 end-0 align-items-center justify-content-center d-flex">
+				<iframe class="o-FileViewer-view w-75 h-100 border-0" 
+					t-att-src="state.url" t-ref="iframe">
+				</iframe>
+			</div>
+		</div>
+	</div>
+
+</templates>

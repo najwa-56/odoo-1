@@ -1,0 +1,32 @@
+.preview-body {
+    position: relative;
+    padding: 0;    
+    min-height: 450px !important; 
+}
+.preview-resize-btn {    
+    background: transparent;
+    opacity: 0.3;
+    border: 0;
+    font-size: 16px;
+    font-weight: bold;
+    color: #000;
+    text-shadow: 0 1px 0 #fff;
+}
+.preview-resize-btn:hover, 
+.preview-resize-btn:focus {
+    opacity: 0.5;
+}
+.preview-minimize {
+    display: none;
+}
+.preview_pdf_iframe_container,
+.preview_pdf_iframe_container iframe {
+    width: 100%;
+	height: 100%;
+	position: absolute;
+	display: block;	
+}
+.modal-full {
+    min-width: 100%;
+    margin: 0;
+}

@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_users_form_simple_print_report_preview" model="ir.ui.view">
+        <field name="name">res.users.report.print.preview.form</field>
+        <field name="model">res.users</field>
+        <field name="arch" type="xml">
+            <form string="Users">
+                <field name="image_1920" readonly="0" widget="image" class="oe_avatar" options="{'zoom': true, 'preview_image': 'image_128'}"/>
+                <h1>
+                    <field name="name" readonly="1" class="oe_inline"/>
+                </h1>
+            
+                <group name="report_preview">
+                    <field name="report_preview" readonly="0"/>
+                    <field name="report_automatic_printing" readonly="0"/>
+                </group>
+                
+                <footer>
+                    <button name="report_preview_reload" type="object" string="Save" class="btn-primary"/>
+                    <button string="Cancel" special="cancel" class="btn-default"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_simple_print_report_preview" model="ir.actions.act_window">
+        <field name="name">Preview Print</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">res.users</field>
+        <field name="target">new</field>
+        <field name="view_mode">form</field>
+    </record>
+
+    <record id="action_simple_print_report_preview_view" model="ir.actions.act_window.view">
+        <field eval="10" name="sequence"/>
+        <field name="view_mode">form</field>
+        <field name="view_id" ref="view_users_form_simple_print_report_preview"/>
+        <field name="act_window_id" ref="action_simple_print_report_preview"/>
+    </record>
+
+    <record id="view_users_form" model="ir.ui.view">
+        <field name="name">res.users.form.inherit</field>
+        <field name="model">res.users</field>
+        <field name="inherit_id" ref="base.view_users_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//page[@name='preferences']/group[1]" position="before">                
+                <group>
+                    <group string="Report">
+                        <label for="report_preview"/>
+                        <div class="o_row">
+                            <field name="report_preview"/>
+                            <button type="object" name="report_preview_reload" class="btn-sm btn-link mb4 fa fa-refresh" aria-label="Reload" title="Reload"/>
+                        </div>
+                        <label for="report_automatic_printing"/>
+                        <div class="o_row">
+                            <field name="report_automatic_printing"/>
+                        </div>                        
+                    </group>
+                </group>                
+            </xpath>
+        </field>
+    </record>
+
+</odoo>
