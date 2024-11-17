@@ -18,7 +18,7 @@ class AccountMoveLine(models.Model):
                 rec.uom_name = rec.product_uom_id.name
 
 
-class AccountInvoiceReport(models.Model):
+"""class AccountInvoiceReport(models.Model):
     _inherit = "account.invoice.report"
 
 
@@ -31,3 +31,4 @@ class AccountInvoiceReport(models.Model):
                 rec.uom_name = uom_id[0].name_field
             else:
                 rec.uom_name = rec.product_uom_id.name
+"""
