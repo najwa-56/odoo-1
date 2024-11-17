@@ -24,13 +24,21 @@ class AccountInvoiceReport(models.Model):
     uom_name = fields.Char(string="UOM Name", readonly=True)
 
     def _select(self):
-        # Extend the select clause to include the new field
+        # Extend the SELECT clause to include the UOM name
         select_str = super(AccountInvoiceReport, self)._select()
         select_str += ", uom.name as uom_name"
         return select_str
 
+    def _from(self):
+        # Extend the FROM clause to include the UOM table
+        from_str = super(AccountInvoiceReport, self)._from()
+        from_str += """
+              LEFT JOIN uom_uom uom ON uom.id = line.product_uom_id
+          """
+        return from_str
+
     def _group_by(self):
-        # Extend the group by clause to include the new field
+        # Extend the GROUP BY clause to include the UOM name
         group_by_str = super(AccountInvoiceReport, self)._group_by()
         group_by_str += ", uom.name"
         return group_by_str
