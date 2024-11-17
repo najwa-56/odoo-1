@@ -28,7 +28,6 @@ class AccountInvoiceReport(models.Model):
         for rec in self:
             uom_id = rec.product_id.multi_uom_price_id.filtered(lambda m: m.uom_id.id == rec.product_uom_id.id)
             if uom_id:
-                # Ensure it's a plain string
                 rec.uom_name = uom_id[0].name_field or ''
             else:
                 rec.uom_name = rec.product_uom_id.name or ''
