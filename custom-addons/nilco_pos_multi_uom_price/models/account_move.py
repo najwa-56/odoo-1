@@ -21,22 +21,16 @@ class AccountMoveLine(models.Model):
 class AccountInvoiceReport(models.Model):
     _inherit = "account.invoice.report"
 
-    uom_name = fields.Char(
-        string="UOM Name",
-        compute="_compute_get_uom_name",
-        store=True
-    )
+    uom_name = fields.Char(string="UOM Name", readonly=True)
 
-    @api.depends('product_id', 'product_uom_id')
-    def _compute_get_uom_name(self):
-        for rec in self:
-            uom_name = None
-            if rec.product_id and rec.product_uom_id:
-                # Check if multi_uom_price_id exists and filter by uom_id
-                uom_price = rec.product_id.multi_uom_price_id.filtered(
-                    lambda m: m.uom_id.id == rec.product_uom_id.id
-                )
-                uom_name = uom_price[0].name_field if uom_price else None
+    def _select(self):
+        # Extend the select clause to include the new field
+        select_str = super(AccountInvoiceReport, self)._select()
+        select_str += ", uom.name as uom_name"
+        return select_str
 
-            # Fallback to product_uom_id name if no match is found
-            rec.uom_name = uom_name or rec.product_uom_id.name
+    def _group_by(self):
+        # Extend the group by clause to include the new field
+        group_by_str = super(AccountInvoiceReport, self)._group_by()
+        group_by_str += ", uom.name"
+        return group_by_str
