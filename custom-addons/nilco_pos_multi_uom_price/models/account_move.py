@@ -20,7 +20,7 @@ class AccountMoveLine(models.Model):
 class AccountINvoiceREport(models.Model):
     _inherit = "account.invoice.report"
 
-    uom_name = fields.Char('Uom Name', compute="_compute_get_uom_name")
+    uom_name = fields.Char('Uom Name', compute="_compute_get_uom_name", store=True )
 
     @api.depends('product_uom_id')
     def _compute_get_uom_name(self):
