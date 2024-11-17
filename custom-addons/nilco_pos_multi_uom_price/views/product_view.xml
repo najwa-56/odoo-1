@@ -96,12 +96,6 @@
         </field>
     </record>
 
-     <record id="view_account_invoice_report" model="ir.actions.report">
-    <field name="model">account.invoice.report</field>
-    <field name="name">Account Invoice Report</field>
-    <field name="arch" type="xml">
-        <field name="uom_name"/>
-    </field>
-    </record>
+
 
 </odoo>
