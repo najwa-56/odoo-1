@@ -14,6 +14,8 @@ export class Ksdashboardtile extends Component{
         this._rpc = useService("rpc");
         this.actionService = useService("action");
         this.ks_tile = useRef('ks_tile');
+        this.mailChatService = useService("mail.chat_window");
+        this.threadService = useService("mail.thread");
         this.ks_container_class = 'grid-stack-item';
         this.ks_inner_container_class = 'grid-stack-item-content';
         this.state = useState({data_count:""})
@@ -26,7 +28,7 @@ export class Ksdashboardtile extends Component{
             this.ks_inner_container_class = 'grid-stack-item-content ks_ai_dashboard_item'
         }else{
             this.ks_container_class = 'grid-stack-item'
-            this.ks_inner_container_class = 'grid-stack-item-content'
+            this.ks_inner_container_class = 'encapsulated-kpi-tile grid-stack-item-content'
         }
         if (this.item.ks_ai_analysis && this.item.ks_ai_analysis){
             var ks_analysis = this.item.ks_ai_analysis.split('ks_gap')
@@ -52,7 +54,7 @@ export class Ksdashboardtile extends Component{
 
         })
         useEffect(()=>{
-            if (update_interval){
+            if (update_interval && !this.env.inDialog){
                 const interval = setInterval(() => {
                     this.ksFetchUpdateItem(this.item.id);
                 }, update_interval);
@@ -213,6 +215,9 @@ Ksdashboardtile.props = {
     pre_defined_filter :{type:Object, Optional:true},
     custom_filter :{type:Object, Optional:true},
     ks_speak:{type:Function , Optional:true},
+    hideButtons: { type: Number, optional: true },
+    on_dialog: { type: Boolean, optional: true },
+    generate_dialog: { type: Boolean, optional: true },
 };
 
 Ksdashboardtile.template = "ksdashboardtile";

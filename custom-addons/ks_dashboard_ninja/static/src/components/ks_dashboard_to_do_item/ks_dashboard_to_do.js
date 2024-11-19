@@ -13,6 +13,8 @@ export class Ksdashboardtodo extends Component{
         super.setup();
         this._rpc = useService("rpc");
         this.dialogService = useService("dialog");
+        this.mailChatService = useService("mail.chat_window");
+        this.threadService = useService("mail.thread");
         this.state = useState({to_do_view_data : ""})
         this.item = this.props.item
         this.ks_dashboard_data = this.props.dashboard_data
@@ -20,21 +22,21 @@ export class Ksdashboardtodo extends Component{
     }
 
 
-        ksFetchUpdateItem(item_id) {
-            var self = this;
-            return self._rpc("/web/dataset/call_kw/ks_dashboard_ninja.board/ks_fetch_item",{
-                model: 'ks_dashboard_ninja.board',
-                method: 'ks_fetch_item',
-                args: [
-                    [parseInt(item_id)], self.ks_dashboard_data.ks_dashboard_id,{}
-                ],
-                kwargs:{context:this.props.dashboard_data.context},
-            }).then(function(new_item_data) {
-                this.ks_dashboard_data.ks_item_data[item_id] = new_item_data[item_id];
-                this.item = this.ks_dashboard_data.ks_item_data[item_id] ;
-                this.prepare_item()
-            }.bind(this));
-        }
+    ksFetchUpdateItem(item_id) {
+        var self = this;
+        return self._rpc("/web/dataset/call_kw/ks_dashboard_ninja.board/ks_fetch_item",{
+            model: 'ks_dashboard_ninja.board',
+            method: 'ks_fetch_item',
+            args: [
+                [parseInt(item_id)], self.ks_dashboard_data.ks_dashboard_id,{}
+            ],
+            kwargs:{context:this.props.dashboard_data.context},
+        }).then(function(new_item_data) {
+            this.ks_dashboard_data.ks_item_data[item_id] = new_item_data[item_id];
+            this.item = this.ks_dashboard_data.ks_item_data[item_id] ;
+            this.prepare_item()
+        }.bind(this));
+    }
 
     get ksIsDashboardManager(){
         return this.ks_dashboard_data.ks_dashboard_manager;
@@ -158,9 +160,6 @@ export class Ksdashboardtodo extends Component{
             var ks_result = this.dialogService.add(addtododialog,{
                 confirm: (event) => {
                 var content = $(event.currentTarget.parentElement.parentElement).find('.ks_section').val();
-                    if (content.length === 0){
-                        console.log("")
-                    }
                     self._onCreateTask(content, parseInt(ks_section_id), parseInt(ks_item_id));
                 },
             });
@@ -245,6 +244,9 @@ export class Ksdashboardtodo extends Component{
 Ksdashboardtodo.props = {
     item: { type: Object, Optional:true},
     dashboard_data: { type: Object, Optional:true},
+    hideButtons: { type: Number, optional: true },
+    on_dialog: { type: Boolean, optional: true },
+    explain_ai_whole: { type: Boolean, optional: true }
 };
 Ksdashboardtodo.components = {Todoeditdialog, addtododialog}
 

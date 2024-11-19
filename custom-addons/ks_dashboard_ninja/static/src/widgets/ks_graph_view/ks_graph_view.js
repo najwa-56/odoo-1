@@ -3,6 +3,7 @@
 import { registry } from "@web/core/registry";
 import { CharField } from "@web/views/fields/char/char_field";
 const { Component,reactive, onWillUnmount, onWillUpdateProps, useEffect, useRef, useState, onMounted, willStart } = owl;
+import { renderToElement, renderToString } from "@web/core/utils/render";
 
 export class KsGraphPreview extends Component{
     setup(){
@@ -68,6 +69,26 @@ export class KsGraphPreview extends Component{
         var ks_labels = chart_data['labels'];
         var ks_data = chart_data.datasets;
 
+        if(this.props.record.data.ks_chart_cumulative_field.count){
+            for(var i=0;i<ks_data.length;i++){
+                var ks_temp_com = 0;
+                var datasets = {};
+                var cumulative_data = []
+                if(ks_data[i].ks_chart_cumulative_field){
+                    for(var j=0; j< ks_data[i].data.length; j++){
+                        ks_temp_com = ks_temp_com + ks_data[i].data[j];
+                        cumulative_data.push(ks_temp_com);
+                    }
+                    datasets.label = 'Cumulative ' + ks_data[i].label;
+                    datasets.data = cumulative_data;
+                    if(this.props.record.data.ks_chart_cumulative){
+                        datasets.type = 'line';
+                    }
+                    ks_data.push(datasets);
+                }
+            }
+        }
+
         let data=[];
         if (ks_data && ks_labels){
         if (ks_data.length && ks_labels.length){
@@ -108,8 +129,13 @@ export class KsGraphPreview extends Component{
             var chart_type = this.props.record.data.ks_dashboard_item_type
             switch (chart_type){
             case "ks_bar_chart":
+            if(this.props.record.data.zoom_enabled){
+                    var wheely_val = "zoomX";
+                }else{
+                    var wheely_val = 'none';
+                }
             var chart = this.root.container.children.push(am5xy.XYChart.new(this.root, {panX: false,panY: false,
-             wheelX: "panX",wheelY: "zoomX",layout: this.root.verticalLayout}));
+             wheelX: "panX",wheelY: wheely_val,layout: this.root.verticalLayout}));
 
             var xRenderer = am5xy.AxisRendererX.new(this.root, {
                 minGridDistance: 15,
@@ -232,8 +258,13 @@ export class KsGraphPreview extends Component{
             }
             break;
             case "ks_horizontalBar_chart":
+            if(this.props.record.data.zoom_enabled){
+                    var wheely_val = "zoomX";
+                }else{
+                    var wheely_val = 'none';
+                }
                 var chart = this.root.container.children.push(am5xy.XYChart.new(this.root, {panX: false,panY: false,
-                wheelX: "panX",wheelY: "zoomX",layout: this.root.verticalLayout}));
+                wheelX: "panX",wheelY: wheely_val,layout: this.root.verticalLayout}));
                 var yRenderer = am5xy.AxisRendererY.new(this.root, {
                         inversed: true,
                         minGridDistance: 30,
@@ -311,7 +342,6 @@ export class KsGraphPreview extends Component{
     //                            locationX: 1,
                                     sprite: am5.Label.new(self.root, {
                                       text:  "{valueX}",
-                                      fill: self.root.interfaceColors.get("alternativeText"),
                                       centerY: am5.p50,
                                       centerX: am5.p50,
                                       populateText: true
@@ -357,8 +387,13 @@ export class KsGraphPreview extends Component{
             break;
             case "ks_line_chart":
             case "ks_area_chart":
+            if(this.props.record.data.zoom_enabled){
+                    var wheely_val = "zoomX";
+                }else{
+                    var wheely_val = 'none';
+                }
                 var chart = this.root.container.children.push(am5xy.XYChart.new(this.root, {panX: false,panY: false,
-                wheelX: "panX",wheelY: "zoomX",layout: this.root.verticalLayout}));
+                wheelX: "panX",wheelY:wheely_val,layout: this.root.verticalLayout}));
                 var xRenderer = am5xy.AxisRendererX.new(this.root, {
                 minGridDistance: 15,
                 minorGridEnabled: true
@@ -566,11 +601,16 @@ export class KsGraphPreview extends Component{
                 case "ks_radar_view":
                 case "ks_flower_view":
                 case "ks_radialBar_chart":
+                if(this.props.record.data.zoom_enabled){
+                    var wheely_val = "zoomX";
+                }else{
+                    var wheely_val = 'none';
+                }
                     var chart = this.root.container.children.push(am5radar.RadarChart.new(this.root, {
                         panX: false,
                         panY: false,
                         wheelX: "panX",
-                        wheelY: "zoomX",
+                        wheelY: wheely_val,
                         radius: am5.percent(80),
                         layout: this.root.verticalLayout,
                     }));
@@ -756,8 +796,13 @@ export class KsGraphPreview extends Component{
                     break;
 
                 case "ks_scatter_chart":
+                if(this.props.record.data.zoom_enabled){
+                    var wheely_val = "zoomX";
+                }else{
+                    var wheely_val = 'none';
+                }
                 var chart = this.root.container.children.push(am5xy.XYChart.new(this.root, {panX: false,panY: false,
-                 wheelX: "panX",wheelY: "zoomX",layout: this.root.verticalLayout}));
+                 wheelX: "panX",wheelY: wheely_val,layout: this.root.verticalLayout}));
                     var xAxis = chart.xAxes.push(am5xy.ValueAxis.new(self.root, {
                         renderer: am5xy.AxisRendererX.new(self.root, { minGridDistance: 50 }),
                         tooltip: am5.Tooltip.new(self.root, {})
@@ -868,10 +913,10 @@ export class KsGraphPreview extends Component{
                 series.appear();
             }
         }else{
-            $(this.graphref.el).append($("<div class='graph_text'>").text("No Data Available."));
+            $(this.graphref.el).append(renderToString("ksNoItemChartView", {}));
         }
         }else{
-        $(this.graphref.el).append($("<div class='graph_text'>").text("No Data Available."));
+        $(this.graphref.el).append(renderToString("ksNoItemChartView", {}));
         }
 
     }

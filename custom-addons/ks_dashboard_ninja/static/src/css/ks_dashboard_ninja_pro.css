@@ -1,5 +1,5 @@
 .ks_dashboard_item {
-    height: 132px;
+    height: auto;
 }
 
 /* Form pie chart no data */
@@ -65,6 +65,7 @@
 .ks_dashboard_item_header_l6{
     top: 5px !important;
     right: 10px;
+    position:absolute;
 }
 
 .ks_chart_json_export {
@@ -104,6 +105,8 @@ table#ksListViewTable {
 
 #ks_item_info {
     cursor:pointer;
+    height: 18px;
+    width: 18px;
 }
 
 .ks_chart_heading{

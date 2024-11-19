@@ -14,12 +14,17 @@ from odoo.http import content_disposition, request
 from odoo.tools.misc import xlwt
 from odoo.exceptions import UserError
 from odoo.tools import pycompat
+
+from odoo.exceptions import ValidationError
+
 _logger = logging.getLogger(__name__)
 
 class KsChartExport(http.Controller):
 
     def base(self, data):
         params = json.loads(data)
+        if not params.get('chart_data'):
+            raise ValidationError("Chart data not present")
         header,chart_data = operator.itemgetter('header','chart_data')(params)
         chart_data = json.loads(chart_data)
 

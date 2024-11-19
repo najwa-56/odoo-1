@@ -14,7 +14,7 @@ class KsDashboardNInjaImport(models.TransientModel):
     ks_top_menu_id = fields.Many2one('ir.ui.menu', string="Show Under Menu", domain="[('parent_id','=',False)]",
                                      required=True,
                                      default=lambda self: self.env['ir.ui.menu'].search(
-                                         [('name', '=', 'My Dashboard')]))
+                                         [('name', '=', 'My Dashboards')]))
 
     def ks_do_action(self):
         for rec in self:

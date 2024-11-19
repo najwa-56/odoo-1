@@ -6,14 +6,26 @@
             <field name="model">ks_dashboard_ninja.ai_dashboard</field>
             <field name="arch" type="xml">
                 <form string="AI Dashboard" class="ks_import_dashboard_d_none">
-                    <group>
-                        <group>
-                            <field name="ks_import_model_id" string="Model"/>
-                            <field name='ks_dash_name'/>
+                    <group class="row ks_dash_row">
+                        <group class="d-flex flex-column w-95 h-95">
+                            <div class="mb-3 mb-lg-0">
+                                <label for="ks_import_model_id" class="form-label">Model</label>
+                                <field name="ks_import_model_id" placeholder="Enter Model" class="form-control form-input-box validation"/>
+                            </div>
+                            <div>
+                                <label for="ks_dash_name" class="form-label">Dashboard Name</label>
+                                <field name="ks_dash_name" placeholder="Enter Dashboard Name" class="form-control form-input-box validation"/>
+                            </div>
                         </group>
-                        <group>
-                            <field name="ks_menu_name"/>
-                            <field name="ks_top_menu_id"/>
+                        <group class="d-flex flex-column w-90 h-90">
+                            <div class="mb-3 mb-lg-0">
+                                <label for="ks_menu_name" class="form-label">Menu Name</label>
+                                <field name="ks_menu_name" placeholder="Enter Menu Name" class="form-control form-input-box validation"/>
+                            </div>
+                            <div>
+                                <label for="ks_top_menu_id" class="form-label">Show Under Menu</label>
+                                <field name="ks_top_menu_id" placeholder="Show Under Menu" class="form-control form-input-box validation"/>
+                            </div>
                             <field name="ks_template" invisible="1"/>
                         </group>
                     </group>

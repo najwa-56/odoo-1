@@ -9,7 +9,7 @@ class KSduplicateDashboardWizard(models.TransientModel):
 
     ks_top_menu_id = fields.Many2one('ir.ui.menu', string="Show Under Menu", required=True, domain="[('parent_id','=',False)]",
                                      default=lambda self: self.env['ir.ui.menu'].search(
-                                         [('name', '=', 'My Dashboard')]))
+                                         [('name', '=', 'My Dashboards')]))
 
     def DuplicateDashBoard(self):
         '''this function returns acion id of ks.dashboard.duplicate.wizard'''
@@ -49,6 +49,5 @@ class KSDeleteDashboardWizard(models.TransientModel):
         '''this function creats record of ks_dashboard_ninja.board and return dashboard action_id'''
         dashboard_id = kwargs.get('dashboard_id')
         self.env['ks_dashboard_ninja.board'].browse(dashboard_id).unlink()
-        action = self.env['ir.actions.client']._for_xml_id(
-            'ks_dashboard_ninja.board_dashboard_action_window')
-        return action
+        menu_action_id = self.env.ref('ks_dashboard_ninja.board_menu_root').id
+        return menu_action_id

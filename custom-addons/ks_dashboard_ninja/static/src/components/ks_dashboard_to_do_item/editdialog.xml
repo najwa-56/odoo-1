@@ -2,7 +2,7 @@
 <templates>
     <t t-name="Kseditdialog">
         <Dialog size="'md'" title="'Edit Task'">
-            <div>
+            <div class="form-control form-input-box">
                 <input type='text' class='ks_description' t-att-value="props.ks_description" placeholder='Task'>
                 </input>
             </div>
@@ -15,7 +15,7 @@
 
     <t t-name="Ksaddtaskdialog">
         <Dialog size="'md'" title="'New Task'">
-            <div>
+            <div class="form-control form-input-box">
                 <input type='text' class='ks_section' placeholder='Task'>
                 </input>
             </div>

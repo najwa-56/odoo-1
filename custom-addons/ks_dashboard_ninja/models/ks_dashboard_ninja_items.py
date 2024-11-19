@@ -1,29 +1,32 @@
 # -*- coding: utf-8 -*-
-import dateutil
-import datetime as dt
-from datetime import timezone
-import pytz
-import json
-import xlrd
+import ast
+import binascii
 import csv
+import datetime as dt
+import json
+import logging
 import os
 import tempfile
-import binascii
-import pandas as pd
-import babel
-import ast
-from datetime import timedelta
-from odoo.tools.safe_eval import safe_eval
-from odoo.tools.misc import DEFAULT_SERVER_DATETIME_FORMAT, DEFAULT_SERVER_DATE_FORMAT
 from collections import defaultdict
 from datetime import datetime
+from datetime import timedelta
+
+import babel
+import dateutil
+import pandas as pd
+import pytz
 from dateutil import relativedelta
 from odoo import models, fields, api, _
-from odoo.exceptions import ValidationError, UserError
 from odoo.addons.ks_dashboard_ninja.common_lib.ks_date_filter_selections import ks_get_date, ks_convert_into_utc, \
     ks_convert_into_local
+from odoo.exceptions import ValidationError, UserError
+from odoo.tools.misc import DEFAULT_SERVER_DATETIME_FORMAT
+from odoo.tools.safe_eval import safe_eval
+from odoo.addons.ks_dashboard_ninja.common_lib.filter_tools import replace_company_domain
+
+
 from .ks_country_bounds import get_country_code
-import logging
+
 _logger = logging.getLogger("DS_NINJA")
 # TODO : Check all imports if needed
 
@@ -214,17 +217,23 @@ class KsDashboardNinjaItems(models.Model):
 
     ks_model_name_2 = fields.Char(related='ks_model_id_2.model', string="Kpi Model Name")
 
-    # This field main purpose is to store %UID as current user id. Mainly used in JS file as container.
+    zoom_enabled = fields.Boolean(string="Zoom enabled?", compute="compute_zoom_enabled")
+
+    def compute_zoom_enabled(self):
+        for rec in self:
+            rec.zoom_enabled = self.env['ir.config_parameter'].sudo().get_param('ks_dashboard_ninja.enable_chart_zoom')
+
+            # This field main purpose is to store %UID as current user id. Mainly used in JS file as container.
     ks_domain_temp = fields.Char(string="Domain Substitute")
     grid_corners = fields.Char(string="grid corners")
     ks_background_color = fields.Char(string="Background Color",
-                                      default="#ffffff,0.99", help=' Select the background color with transparency. ')
+                                      default="#DAEAF6,0.99", help=' Select the background color with transparency. ')
     ks_icon = fields.Binary(string="Upload Icon", attachment=True)
     ks_default_icon = fields.Char(string="Icon", default="bar-chart", help='Select the icon to be displayed. ')
-    ks_default_icon_color = fields.Char(default="#ffffff,0.99", string="Icon Color",
+    ks_default_icon_color = fields.Char(default="#6789C6,0.99", string="Icon Color",
                                         help='Select the icon to be displayed. ')
     ks_icon_select = fields.Selection([("Default","Default"),("Custom","Custom"),],string="Icon Option", default=("Default"), help='Choose the Icon option. ')
-    ks_font_color = fields.Char(default="#ffffff,0.99", string="Font Color", help='Select the font color. ')
+    ks_font_color = fields.Char(default="#000000,0.99", string="Font Color", help='Select the font color. ')
     ks_dashboard_item_theme = fields.Char(string="Theme", default="white",
                                           help='Select the color theme for the display. ')
     ks_layout = fields.Selection([('layout1', 'Layout 1'),
@@ -233,7 +242,7 @@ class KsDashboardNinjaItems(models.Model):
                                   ('layout4', 'Layout 4'),
                                   ('layout5', 'Layout 5'),
                                   ('layout6', 'Layout 6'),
-                                  ], default=('layout1'), required=True, string="Layout",
+                                  ], default=('layout5'), required=True, string="Layout",
                                  help=' Select the layout to display records. ')
     ks_preview = fields.Integer(default=1, string="Preview")
     ks_model_name = fields.Char(related='ks_model_id.model', string="Model Name")
@@ -778,7 +787,7 @@ class KsDashboardNinjaItems(models.Model):
                         value['ks_record_count_type'] = 'average'
                     else:
                         value['ks_record_count_type'] = item["aggregations"][0]["type"]
-                    value['ks_background_color'] = "#ffffff,0.99"
+                    value['ks_background_color'] = "#DAEAF6,0.99"
                     value['ks_default_icon_color'] = "#000000,0.99"
                     value['ks_font_color'] = "#000000,0.99"
                     value['ks_button_color'] = "#000000,0.99"
@@ -935,7 +944,7 @@ class KsDashboardNinjaItems(models.Model):
                 })]
             })
 
-        # Creating table in ir model and adding column in it.
+        # Creating table in ir model and adding column (fields) in it.
     def create_table(self):
         records = self.ks_group_by_lines
         dict = []
@@ -995,7 +1004,10 @@ class KsDashboardNinjaItems(models.Model):
             'perm_unlink': False,
         })
         self.ks_model_id = model_creation.id
-        self.insert_data_into_table(tablemodel)
+        try:
+            self.insert_data_into_table(tablemodel)
+        except Exception as e:
+            raise ValidationError("Found error while table creation Error {}".format(e))
 
         # Inserting data into the ir model table.
     def insert_data_into_table(self, tablemodel):
@@ -1016,6 +1028,7 @@ class KsDashboardNinjaItems(models.Model):
             df = df.astype(str)
             values ={}
             fields = df.columns.tolist()
+            user_timezone_str = self.env.context.get('tz', 'UTC')
             for row_no in range(df.shape[0]):
                     line = list(df.iloc[row_no])
                     val = {}
@@ -1032,10 +1045,16 @@ class KsDashboardNinjaItems(models.Model):
                         if 'Date' in field or 'Deadline' in field:
                             if line[value] != 'NaT' and line[value] !=False:
                                 if self.ks_group_by_lines[value].ttype == 'datetime':
+                                    user_datetime_str = line[value]
+                                    local_datetime = datetime.strptime(user_datetime_str, '%Y-%m-%d %H:%M:%S')
+                                    user_timezone = pytz.timezone(user_timezone_str)
+                                    localized_datetime = user_timezone.localize(local_datetime)
+                                    utc_datetime = localized_datetime.astimezone(pytz.utc)
+                                    formatted_utc_datetime = utc_datetime.strftime('%Y-%m-%d %H:%M:%S')
                                     # final_date = pd.to_timedelta(float(line[value]), unit='D') + pd.to_datetime('1899-12-30')
                                     while (value < len(line)):
                                         values.update({
-                                            field: line[value],
+                                            field: formatted_utc_datetime,
                                         })
                                         value = value + 1
                                         break
@@ -1158,15 +1177,13 @@ class KsDashboardNinjaItems(models.Model):
                                     })
                                     value = value + 1
                                     break
-                    final_values = []
-                    final_heading = []
                     try:
                         if values.keys():
                             data_values = dict([('x_' + key.lower().replace(' ', '_'), values[key]) for key in values if
                                                 values[key] != 'Null'])
                             self.env[tablemodel].sudo().create(data_values)
                     except Exception as e:
-                        raise ValidationError("found error while Table creation {}".format(e))
+                        raise ValidationError("Found error while table creation {}".format(e))
 
     def csv_create_table(self):
         records = self.ks_csv_group_by_lines
@@ -1227,7 +1244,11 @@ class KsDashboardNinjaItems(models.Model):
             'perm_unlink': False,
         })
         self.ks_model_id = model_creation.id
-        self.insert_data_into_csv_table(tablemodel)
+        try:
+            self.insert_data_into_csv_table(tablemodel)
+        except Exception as e:
+            raise ValidationError("Found error while table creation Error {}".format(e))
+
 
     def insert_data_into_csv_table(self, tablemodel):
         if self.ks_csv_field:
@@ -1241,6 +1262,7 @@ class KsDashboardNinjaItems(models.Model):
                 values = {}
                 field_values = {}
                 header_row = next(csv_reader)
+                user_timezone_str = self.env.context.get('tz', 'UTC')
                 for row in header_row:
                     fields.append(row)
                     field_values[row] = None
@@ -1258,10 +1280,16 @@ class KsDashboardNinjaItems(models.Model):
                         if 'Date' in field or 'Deadline' in field:
                             if line[value]:
                                 if self.ks_csv_group_by_lines[value].ttype == 'datetime':
+                                    user_datetime_str = line[value]
+                                    local_datetime = datetime.strptime(user_datetime_str, '%Y-%m-%d %H:%M:%S')
+                                    user_timezone = pytz.timezone(user_timezone_str)
+                                    localized_datetime = user_timezone.localize(local_datetime)
+                                    utc_datetime = localized_datetime.astimezone(pytz.utc)
+                                    formatted_utc_datetime = utc_datetime.strftime('%Y-%m-%d %H:%M:%S')
                                     final_date = line[value].split(' ')[0]
                                     while (value < len(line)):
                                         values.update({
-                                            field: final_date,
+                                            field: formatted_utc_datetime,
                                         })
                                         value = value + 1
                                         break
@@ -1374,15 +1402,13 @@ class KsDashboardNinjaItems(models.Model):
                                     })
                                     value = value + 1
                                     break
-                    final_values = []
-                    final_heading = []
                     try:
                         if values.keys():
                             data_values = dict([('x_' + key.lower().replace(' ', '_'), values[key]) for key in values if
                                                 values[key] != 'Null'])
                             self.env[tablemodel].sudo().create(data_values)
                     except Exception as e:
-                        raise ValidationError("found error while Table creation error {}".format(e))
+                        raise ValidationError("Found error while table creation Error {}".format(e))
 
     def check_target(self):
         base_url = self.env['ir.config_parameter'].sudo().get_param('web.base.url')
@@ -1439,6 +1465,16 @@ class KsDashboardNinjaItems(models.Model):
             if rec.ks_item_start_date_2 and rec.ks_item_end_date_2:
                 if rec.ks_item_start_date_2 > rec.ks_item_end_date_2:
                     raise ValidationError(_('Start date must be less than end date'))
+
+    @api.onchange('ks_dashboard_item_type')
+    def change_data_source_to_odoo(self):
+        if self.ks_dashboard_item_type == 'ks_scatter_chart':
+            self.ks_data_calculation_type = 'custom'
+
+    @api.onchange('ks_dashboard_item_type')
+    def change_data_calculation_type_to_default(self):
+        if self.ks_dashboard_item_type == 'ks_map_view':
+            self.data_source = 'odoo'
 
     @api.depends('ks_dashboard_item_type')
     def _ks_compute_precision_digits(self):
@@ -1507,6 +1543,7 @@ class KsDashboardNinjaItems(models.Model):
             if rec.ks_data_calculation_type == 'query':
                 rec.ks_list_view_type = 'ungrouped'
                 rec.ks_multiplier_active = False
+                rec.ks_record_field = False
 
     @api.onchange('ks_goal_lines')
     def ks_is_goal_lines(self):
@@ -1742,32 +1779,38 @@ class KsDashboardNinjaItems(models.Model):
     def layout_four_font_change(self):
         if self.ks_dashboard_item_theme != "white":
             if self.ks_layout == 'layout4' and self.ks_dashboard_item_theme in ['red','blue','yellow','green']:
-                self.ks_font_color = self.ks_background_color
-                self.ks_default_icon_color = "#ffffff,0.99"
+                self.ks_font_color = '#E7495E,0.99'
+                self.ks_default_icon_color = "#6789C6,0.99"
             elif self.ks_layout == 'layout4' and self.ks_dashboard_item_theme not in ['red','blue','yellow','green']:
                 self.ks_font_color = '#000000,0.99'
-                if self.ks_background_color=="#000000,0.99":
-                    self.ks_default_icon_color="#ffffff,0.99"
+                if self.ks_background_color=="#DAEAF6,0.99":
+                    self.ks_default_icon_color="#000000,0.99"
                 else:
                     self.ks_default_icon_color = "#000000,0.99"
             elif self.ks_layout != 'layout4' and self.ks_dashboard_item_theme not in ['red', 'blue', 'yellow', 'green']:
                 self.ks_font_color = "#000000,0.99"
             elif self.ks_layout == 'layout6':
-                self.ks_font_color = "#ffffff,0.99"
-                self.ks_default_icon_color = self.ks_get_dark_color(self.ks_background_color.split(',')[0],
-                                                                    self.ks_background_color.split(',')[1])
+                self.ks_font_color = "#737791,0.99"
+                self.ks_default_icon_color = "#737791,0.99"
+            elif self.ks_layout == 'layout3':
+                self.ks_font_color = "#6789C6,0.99"
             else:
-                self.ks_default_icon_color = "#ffffff,0.99"
-                self.ks_font_color = "#ffffff,0.99"
+                self.ks_default_icon_color = "#6789C6,0.99"
+                self.ks_font_color = "#000000,0.99"
+        elif self.ks_dashboard_item_type == 'ks_tile' and self.ks_layout == 'layout6':
+            self.ks_font_color = "#737791,0.99"
+            self.ks_default_icon_color = "#737791,0.99"
         else:
             if self.ks_layout == 'layout4':
-                self.ks_background_color = "#000000,0.99"
-                self.ks_font_color = self.ks_background_color
-                self.ks_default_icon_color = "#ffffff,0.99"
+                self.ks_background_color = "#DAEAF6,0.99"
+                self.ks_font_color = "#E7495E,0.99"
+                self.ks_default_icon_color = "#6789C6,0.99"
+            elif self.ks_layout == 'layout3':
+                self.ks_font_color = "#6789C6,0.99"
             else:
-                self.ks_background_color = "#ffffff,0.99"
+                self.ks_background_color = "#DAEAF6,0.99"
                 self.ks_font_color = "#000000,0.99"
-                self.ks_default_icon_color = "#000000,0.99"
+                self.ks_default_icon_color = "#6789C6,0.99"
 
     # To convert color into 10% darker. Percentage amount is hardcoded. Change amt if want to change percentage.
     def ks_get_dark_color(self, color, opacity):
@@ -1828,42 +1871,70 @@ class KsDashboardNinjaItems(models.Model):
     @api.onchange('ks_dashboard_item_theme')
     def change_dashboard_item_theme(self):
         if self.ks_dashboard_item_theme == "red":
-            self.ks_background_color = "#d9534f,0.99"
-            self.ks_default_icon_color = "#ffffff,0.99"
-            self.ks_font_color = "#ffffff,0.99"
+            self.ks_background_color = "#DCFCE7,0.99"
+            if self.ks_dashboard_item_type == 'ks_tile':
+                self.ks_default_icon_color = "#6789C6,0.99"
+                self.ks_font_color = "#000000,0.99"
+            elif self.ks_layout == 'layout3':
+                self.ks_font_color = "#6789C6,0.99"
+            else:
+                self.ks_default_icon_color = "#000000,0.99"
+                self.ks_font_color = "#000000,0.99"
             self.ks_button_color = "#000000,0.99"
         elif self.ks_dashboard_item_theme == "blue":
-            self.ks_background_color = "#337ab7,0.99"
-            self.ks_default_icon_color = "#ffffff,0.99"
-            self.ks_font_color = "#ffffff,0.99"
+            self.ks_background_color = "#FFF4DE,0.99"
+            if self.ks_dashboard_item_type == 'ks_tile':
+                self.ks_default_icon_color = "#6789C6,0.99"
+                self.ks_font_color = "#000000,0.99"
+            elif self.ks_layout == 'layout3':
+                self.ks_font_color = "#6789C6,0.99"
+            else:
+                self.ks_default_icon_color = "#000000,0.99"
+                self.ks_font_color = "#000000,0.99"
             self.ks_button_color = "#000000,0.99"
         elif self.ks_dashboard_item_theme == "yellow":
-            self.ks_background_color = "#f0ad4e,0.99"
-            self.ks_default_icon_color = "#ffffff,0.99"
-            self.ks_font_color = "#ffffff,0.99"
+            self.ks_background_color = "#F3E8FF,0.99"
+            if self.ks_dashboard_item_type == 'ks_tile':
+                self.ks_default_icon_color = "#6789C6,0.99"
+                self.ks_font_color = "##E7495E,0.99"
+            elif self.ks_layout == 'layout3':
+                self.ks_font_color = "#6789C6,0.99"
+            else:
+                self.ks_default_icon_color = "#000000,0.99"
+                self.ks_font_color = "#000000,0.99"
             self.ks_button_color = "#000000,0.99"
         elif self.ks_dashboard_item_theme == "green":
-            self.ks_background_color = "#5cb85c,0.99"
-            self.ks_default_icon_color = "#ffffff,0.99"
-            self.ks_font_color = "#ffffff,0.99"
+            self.ks_background_color = "#FFE2E5,0.99"
+            if self.ks_dashboard_item_type == 'ks_tile':
+                self.ks_default_icon_color = "#6789C6,0.99"
+                self.ks_font_color = "#000000,0.99"
+            elif self.ks_layout == 'layout3':
+                self.ks_font_color = "#6789C6,0.99"
+            else:
+                self.ks_default_icon_color = "#000000,0.99"
+                self.ks_font_color = "#000000,0.99"
             self.ks_button_color = "#000000,0.99"
         elif self.ks_dashboard_item_theme == "white":
             if self.ks_layout == 'layout4':
-                self.ks_background_color = "#00000,0.99"
-                self.ks_default_icon_color = "#ffffff,0.99"
+                self.ks_background_color = "#DAEAF6,0.99"
+                self.ks_default_icon_color = "#6789C6,0.99"
+                self.ks_font_color = "#E7495E,0.99"
+                self.ks_button_color = "#6789C6,0.99"
+            elif self.ks_layout == 'layout3':
+                self.ks_font_color = "#6789C6,0.99"
                 self.ks_button_color = "#000000,0.99"
             else:
-                self.ks_background_color = "#ffffff,0.99"
-                self.ks_default_icon_color = "#000000,0.99"
+                self.ks_background_color = "#DAEAF6,0.99"
+                self.ks_default_icon_color = "#6789C6,0.99"
                 self.ks_font_color = "#000000,0.99"
                 self.ks_button_color = "#000000,0.99"
 
         if self.ks_layout == 'layout4':
-            self.ks_font_color = self.ks_background_color
+            self.ks_font_color = "#DAEAF6,0.99"
+            self.ks_button_color = "#000000,0.99"
 
-        elif self.ks_layout == 'layout6':
-            self.ks_default_icon_color = self.ks_get_dark_color(self.ks_background_color.split(',')[0],
-                                                                self.ks_background_color.split(',')[1])
+        elif self.ks_dashboard_item_type == 'ks_tile' and self.ks_layout == 'layout6':
+            self.ks_default_icon_color = "#000000,0.99"
             if self.ks_dashboard_item_theme == "white":
                 self.ks_default_icon_color = "#000000,0.99"
 
@@ -1873,6 +1944,12 @@ class KsDashboardNinjaItems(models.Model):
     def ks_get_record_count(self):
         for rec in self:
             rec.ks_record_count = rec._ksGetRecordCount(domain=[])
+
+    def unlink(self):
+        channel = self.env['discuss.channel'].search([('ks_dashboard_item_id', 'in', self.ids)])
+        if channel:
+            channel.unlink()
+        return super(KsDashboardNinjaItems, self).unlink()
 
     def _ksGetRecordCount(self, domain=[]):
         rec = self
@@ -1929,7 +2006,7 @@ class KsDashboardNinjaItems(models.Model):
             ks_domain = ks_domain.replace('"%UID"', str(self.env.user.id))
 
         if ks_domain and "%MYCOMPANY" in ks_domain:
-            ks_domain = ks_domain.replace('"%MYCOMPANY"', str(self.env.company.id))
+            ks_domain = replace_company_domain(ks_domain, self.env.company.id, self.env.companies.ids)
 
         ks_date_domain = False
         if rec.ks_date_filter_field:
@@ -2055,9 +2132,9 @@ class KsDashboardNinjaItems(models.Model):
                 print(ks_extensiom_domain)
 
         if ks_extensiom_domain and "%MYCOMPANY" in ks_extensiom_domain:
-            ks_extensiom_domain = ks_extensiom_domain.replace('"%MYCOMPANY"', str(self.env.company.id))
+            ks_extensiom_domain = replace_company_domain(ks_extensiom_domain, self.env.company.id, self.env.companies.ids)
             if "%MYCOMPANY" in ks_extensiom_domain:
-                ks_extensiom_domain = ks_extensiom_domain.replace("'%MYCOMPANY'", str(self.env.company.id))
+                ks_extensiom_domain = replace_company_domain(ks_extensiom_domain, self.env.company.id, self.env.companies.ids)
 
         ks_domain = safe_eval(ks_extensiom_domain)
         return ks_domain
@@ -2071,7 +2148,7 @@ class KsDashboardNinjaItems(models.Model):
                 if "%UID" in ks_domain_extension:
                     ks_domain_extension = ks_domain_extension.replace("%UID", str(self.env.user.id))
                 if "%MYCOMPANY" in ks_domain_extension:
-                    ks_domain_extension = ks_domain_extension.replace("%MYCOMPANY", str(self.env.company.id))
+                    ks_domain_extension = replace_company_domain(ks_domain_extension, self.env.company.id, self.env.companies.ids)
                 self.env[self.ks_model_name].search_count(safe_eval(ks_domain_extension))
             except Exception:
                 raise ValidationError(
@@ -2087,7 +2164,7 @@ class KsDashboardNinjaItems(models.Model):
                 if "%UID" in ks_domain_extension:
                     ks_domain_extension = ks_domain_extension.replace("%UID", str(self.env.user.id))
                 if "%MYCOMPANY" in ks_domain_extension:
-                    ks_domain_extension = ks_domain_extension.replace("%MYCOMPANY", str(self.env.company.id))
+                    ks_domain_extension = replace_company_domain(ks_domain_extension, self.env.company.id, self.env.companies.ids)
                 self.env[self.ks_model_name].search_count(safe_eval(ks_domain_extension))
             except Exception:
                 raise ValidationError(
@@ -2103,7 +2180,7 @@ class KsDashboardNinjaItems(models.Model):
                 if "%UID" in ks_domain_extension:
                     ks_domain_extension = ks_domain_extension.replace("%UID", str(self.env.user.id))
                 if "%MYCOMPANY" in ks_domain_extension:
-                    ks_domain_extension = ks_domain_extension.replace("%MYCOMPANY", str(self.env.company.id))
+                    ks_domain_extension = replace_company_domain(ks_domain_extension, self.env.company.id, self.env.companies.ids)
                 self.env[self.ks_model_name].search_count(safe_eval(ks_domain_extension))
             except Exception:
                 raise ValidationError(
@@ -2119,7 +2196,7 @@ class KsDashboardNinjaItems(models.Model):
                 if "%UID" in ks_domain_extension:
                     ks_domain_extension = ks_domain_extension.replace("%UID", str(self.env.user.id))
                 if "%MYCOMPANY" in ks_domain_extension:
-                    ks_domain_extension = ks_domain_extension.replace("%MYCOMPANY", str(self.env.company.id))
+                    ks_domain_extension = replace_company_domain(ks_domain_extension, self.env.company.id, self.env.companies.ids)
                 self.env[self.ks_model_name].search_count(safe_eval(ks_domain_extension))
             except Exception:
                 raise ValidationError(
@@ -2816,7 +2893,7 @@ class KsDashboardNinjaItems(models.Model):
                                 ks_chart_data['datasets'][i]['data'] = data_values
                         except Exception as e:
                             raise ValidationError('JSON file not supported.')
-            if rec.ks_dashboard_item_type == 'ks_map_view' and ks_chart_data.get('groupByIds',False):
+            if rec.ks_dashboard_item_type == 'ks_map_view' and ks_chart_data and ks_chart_data.get('groupByIds',False):
                 map_fields =  ["partner_latitude", "partner_longitude", "name"]
                 map_domain = [['id', 'in',ks_chart_data['groupByIds']]]
                 ks_chart_data['partner'] = self.env['res.partner'].search_read(map_domain,map_fields)
@@ -3515,7 +3592,7 @@ class KsDashboardNinjaItems(models.Model):
             # To show "created on" by default on date filter field on model select.
             if rec.ks_model_id:
                 datetime_field_list = rec.ks_date_filter_field_2.search(
-                    [('model_id', '=', rec.ks_model_id.id), '|', ('ttype', '=', 'date'),
+                    [('model_id', '=', rec.ks_model_id_2.id), '|', ('ttype', '=', 'date'),
                      ('ttype', '=', 'datetime')]).read(['id', 'name'])
                 for field in datetime_field_list:
                     if field['name'] == 'create_date':
@@ -3564,7 +3641,7 @@ class KsDashboardNinjaItems(models.Model):
         if ks_domain_2 and "%UID" in ks_domain_2:
             ks_domain_2 = ks_domain_2.replace('"%UID"', str(self.env.user.id))
         if ks_domain_2 and "%MYCOMPANY" in ks_domain_2:
-            ks_domain_2 = ks_domain_2.replace('"%MYCOMPANY"', str(self.env.company.id))
+            ks_domain_2 = replace_company_domain(ks_domain_2, self.env.company.id, self.env.companies.ids)
 
         ks_date_domain = False
 
@@ -4299,7 +4376,7 @@ class KsDashboardNinjaItems(models.Model):
                 if "%UID" in ks_domain_2:
                     ks_domain_2 = ks_domain_2.replace("%UID", str(self.env.user.id))
                 if "%MYCOMPANY" in ks_domain_2:
-                    ks_domain_2 = ks_domain_2.replace("%MYCOMPANY", str(self.env.company.id))
+                    ks_domain_2 = replace_company_domain(ks_domain_2, self.env.company.id, self.env.companies.ids)
                 ks_domain_2 = safe_eval(ks_domain_2)
 
                 for element in ks_domain_2:
@@ -4317,7 +4394,7 @@ class KsDashboardNinjaItems(models.Model):
                 if "%UID" in ks_domain:
                     ks_domain = ks_domain.replace("%UID", str(self.env.user.id))
                 if "%MYCOMPANY" in ks_domain:
-                    ks_domain = ks_domain.replace("%MYCOMPANY", str(self.env.company.id))
+                    ks_domain = replace_company_domain(ks_domain, self.env.company.id, self.env.companies.ids)
                 ks_domain = safe_eval(ks_domain)
                 for element in ks_domain:
                     proper_domain.append(element) if type(element) != list else proper_domain.append(tuple(element))

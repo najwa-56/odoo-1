@@ -1,17 +1,17 @@
 # -*- coding: utf-8 -*-
 
-from odoo.fields import datetime
-from odoo import _
-from odoo.exceptions import ValidationError
-from datetime import timedelta
-import pytz
+import json
 import os
-import ast
 import os.path
+from datetime import timedelta
+
+import pytz
 from dateutil import rrule
 from dateutil.relativedelta import relativedelta
+from odoo import _
+from odoo.exceptions import ValidationError
+from odoo.fields import datetime
 from odoo.tools.safe_eval import safe_eval
-
 
 
 def ks_get_date(ks_date_filter_selection, self, type):

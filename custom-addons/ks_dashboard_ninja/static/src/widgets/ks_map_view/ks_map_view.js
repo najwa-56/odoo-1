@@ -3,6 +3,7 @@
 import { registry } from "@web/core/registry";
 import { useService } from "@web/core/utils/hooks";
 const { Component, useEffect, useRef, useState, onMounted } = owl;
+import { renderToElement, renderToString } from "@web/core/utils/render";
 
 
 export class KsMapPreview extends Component {
@@ -319,7 +320,7 @@ export class KsMapPreview extends Component {
 
 }
 else{
-            $(this.mapContainerRef.el).append($("<div class='graph_text'>").text("No Data Available."));
+            $(this.mapContainerRef.el).append(renderToString("ksNoItemChartView", {}));
 }
 }
 //    }else{

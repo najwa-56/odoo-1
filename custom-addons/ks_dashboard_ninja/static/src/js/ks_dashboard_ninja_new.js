@@ -1,10 +1,10 @@
 /** @odoo-module **/
 
 import { _t } from "@web/core/l10n/translation";
-import { Component, onWillStart, useState ,onMounted, onWillRender, useRef, useEffect,onWillUnmount  } from "@odoo/owl";
+import { Component,onRendered,  onWillStart, useState, onPatched     ,onMounted, onWillRender, useRef, useEffect,onWillUnmount  } from "@odoo/owl";
 import { registry } from "@web/core/registry";
 import { jsonrpc } from "@web/core/network/rpc_service";
-import { useService } from "@web/core/utils/hooks";
+import { useService, useBus } from "@web/core/utils/hooks";
 import { loadJS,loadCSS } from "@web/core/assets";
 import { localization } from "@web/core/l10n/localization";
 import { session } from "@web/session";
@@ -15,30 +15,36 @@ import { ConfirmationDialog } from "@web/core/confirmation_dialog/confirmation_d
 import { patch } from "@web/core/utils/patch";
 import { isBrowserChrome, isMobileOS } from "@web/core/browser/feature_detection";
 import { loadBundle } from '@web/core/assets';
-import {FormViewDialog} from '@web/views/view_dialogs/form_view_dialog';
+import { FormViewDialog} from '@web/views/view_dialogs/form_view_dialog';
 import { renderToElement } from "@web/core/utils/render";
-import {globalfunction } from '@ks_dashboard_ninja/js/ks_global_functions'
+import { globalfunction } from '@ks_dashboard_ninja/js/ks_global_functions'
 import { Ksdashboardtile } from '@ks_dashboard_ninja/components/ks_dashboard_tile_view/ks_dashboard_tile';
 import { Ksdashboardlistview } from '@ks_dashboard_ninja/components/ks_dashboard_list_view/ks_dashboard_list';
 import { Ksdashboardtodo } from '@ks_dashboard_ninja/components/ks_dashboard_to_do_item/ks_dashboard_to_do';
 import { Ksdashboardkpiview } from '@ks_dashboard_ninja/components/ks_dashboard_kpi_view/ks_dashboard_kpi';
 import { Ksdashboardgraph } from '@ks_dashboard_ninja/components/ks_dashboard_graphs/ks_dashboard_graphs';
+import { KschatwithAI } from '@ks_dashboard_ninja/components/chatwithAI/ks_chat';
+import { CustomFilter } from '@ks_dashboard_ninja/js/custom_filter';
 import { DateTimePicker } from "@web/core/datetime/datetime_picker";
 import { DateTimeInput } from "@web/core/datetime/datetime_input";
 const { DateTime } = luxon;
 import {formatDate,formatDateTime} from "@web/core/l10n/dates";
 import {parseDateTime,parseDate,} from "@web/core/l10n/dates";
+import { dnNavBarAddClasses } from "@ks_dashboard_ninja/js/dnNavBarExtend";
+
 
 
 export class KsDashboardNinja extends Component {
 
     setup() {
         this.actionService = useService("action");
+        this.uiService = useService("ui");
         this.dialogService = useService("dialog");
         this.notification = useService("notification");
         this._rpc = useService("rpc");
         this.dialogService = useService("dialog");
         this.header =  useRef("ks_dashboard_header");
+        this.footer =  useRef("ks_dashboard_footer");
         this.main_body = useRef("ks_main_body");
         this.reload_menu_option = {
             reload:this.props.action.context.ks_reload_menu,
@@ -51,6 +57,7 @@ export class KsDashboardNinja extends Component {
         this.ksIsDashboardManager = false;
         this.ksDashboardEditMode = false;
         this.ksNewDashboardName = false;
+        this.recent_searches = useState({ value : []})
         this.file_type_magic_word = {
             '/': 'jpg',
             'R': 'gif',
@@ -108,11 +115,25 @@ export class KsDashboardNinja extends Component {
         ];
 
         this.ks_dashboard_id = this.props.action.params.ks_dashboard_id;
+        this.isReloadOnFirstCreate = this.props.action?.params?.isReloadOnFirstCreate ? true : false
+        this.on_dialog = false;
+        this.on_dialog = this.props.action.params.on_dialog ? true : false;
+        this.explain_ai_whole = true;
+//        this.explain_ai_whole = this.props.action.params.explain_ai_whole ? true : false;
+        this.explain_ai_whole = this.props.action.params.explain_ai_whole === undefined ? true : false;
+
+         var ks_fav_filter_remove = $('.ks_dn_fav_filters').find('.ks_fav_filters_checked');
+         if (ks_fav_filter_remove.length){
+             var ks_fav_filter = ks_fav_filter_remove.attr('fav-name');
+             ks_fav_filter_remove.removeClass('ks_fav_filters_checked');
+             this.ks_remove_favourite_filter(ks_fav_filter);
+         }
+
 
         this.gridstack_options = {
             staticGrid:true,
             float: false,
-            cellHeight: 80,
+            cellHeight: 68,
             styleInHead : true,
 //          disableOneColumnMode: true,
         };
@@ -143,7 +164,10 @@ export class KsDashboardNinja extends Component {
             ksDateFilterSelection :false,
             pre_defined_filter :{},
             ksDateFilterStartDate: DateTime.now(),
-            ksDateFilterEndDate:DateTime.now()
+            ksDateFilterEndDate:DateTime.now(),
+            stateToggle: false,
+            dialog_header: true
+
         })
         this.ksChartColorOptions = ['default', 'cool', 'warm', 'neon'];
         this.ksDateFilterSelection = false;
@@ -161,26 +185,43 @@ export class KsDashboardNinja extends Component {
         }
         this.dn_state = {}
         this.dn_state['user_context']=context
+        this.isFavFilter = false;
+        this.activeFavFilterName = "FavouriteFilter"
         this.ks_speeches = [];
+        this.isPredefined = false;
+        this.isModelVisePredefined = {};
         onWillStart(this.willStart);
         onWillRender(this.dashboard_mount);
         onWillUnmount(()=>this.ks_switch_default_dashboard());
+        this.filter_facets_count = 0
+
+
 
         onMounted(() => {
-            this.grid_initiate();
+            if (!this.ks_dashboard_data.ks_ai_explain_dash){
+                this.grid_initiate();
+            }
             var filter_date_data = this.getObjectFromCookie('FilterDateData' + this.ks_dashboard_id);
+//            var filter_date_data = null
             if (filter_date_data != null){
                 $(this.header.el).find('.ks_date_filter_selected').removeClass('ks_date_filter_selected');
                 $('#ks_date_filter_selection').text(this.ks_date_filter_selections[filter_date_data]);
 
                 var element_selected = document.getElementById(filter_date_data);
-                element_selected.classList.add('ks_date_filter_selected')
+                if(element_selected){
+                    element_selected.classList.add('ks_date_filter_selected')
+                }
+//                element_selected.classList.add('ks_date_filter_selected')
                 this.state.ksDateFilterSelection = filter_date_data;
                 if(filter_date_data==='l_custom'){
                     var custom_range = this.getObjectFromCookie('custom_range' + this.ks_dashboard_id);
                     if(custom_range){
-                        this.state.ksDateFilterStartDate = custom_range['start_date']
-                        this.state.ksDateFilterEndDate = custom_range['end_date']
+                        try {
+                            this.state.ksDateFilterStartDate = parseDateTime(custom_range['start_date'], self.datetime_format)
+                            this.state.ksDateFilterEndDate = parseDateTime(custom_range['end_date'], self.datetime_format)
+                        } catch (error) {
+                            this.eraseCookie('custom_range' + this.ks_dashboard_id);
+                        }
                     }
                     $('.ks_date_input_fields').removeClass("ks_hide");
                     $('.ks_date_filter_dropdown').addClass("ks_btn_first_child_radius");
@@ -189,11 +230,85 @@ export class KsDashboardNinja extends Component {
             }
 
             if (this.getObjectFromCookie('FilterDateData' + this.ks_dashboard_id) || this.getObjectFromCookie('FilterOrderData' + this.ks_dashboard_id)){
+                var pre_defined_filters = document.querySelectorAll('.dn_filter_click_event_selector');
+                var filters_applied = this.ks_dashboard_data.ks_dashboard_domain_data;
+                var pre_defined_filters_data = this.ks_dashboard_data.ks_dashboard_pre_domain_filter;
+                const elementsArray = document.querySelectorAll('.dn_filter_click_event_selector');
+                if(Object.keys(filters_applied).length > 0){
+                    elementsArray.forEach(element  => {
+                  for (const key in pre_defined_filters_data) {
+                    if(key === element.dataset.filterId){
+                        for(const key1 in filters_applied){
+                            for(const domain_index in filters_applied[key1].ks_domain_index_data){
+                                if(filters_applied[key1].ks_domain_index_data[domain_index].categ){
+                                    if(filters_applied[key1].ks_domain_index_data[domain_index].categ === pre_defined_filters_data[key].categ){
+                                        if (filters_applied[key1].ks_domain_index_data[domain_index].label.includes(pre_defined_filters_data[key].name)) {
+                                          if(!element.classList.contains('dn_dynamic_filter_selected')){
+                                            element.classList.add('dn_dynamic_filter_selected')
+                                            element.classList.add('global-active')
+                                          }
+                                        } else {
+                                          if(element.classList.contains('dn_dynamic_filter_selected')){
+                                            element.classList.remove('dn_dynamic_filter_selected')
+                                            element.classList.remove('global-active')
+                                          }
+                                        }
+                                    }
+                                }
+                            }
+
+                        }
+                    }
+                    }
+                    });
+                }
+                else{
+                    elementsArray.forEach(element  => {
+                      if(element.classList.contains('dn_dynamic_filter_selected')){
+                        element.classList.remove('dn_dynamic_filter_selected')
+                        element.classList.remove('global-active')
+                      }
+
+                    });
+                }
+
                 this._onKsApplyDateFilter();
             }
+            document.querySelector('.table-custom')?.addEventListener('show.bs.dropdown', this.filterTableDropdownShow);
+            document.querySelector('.table-custom')?.addEventListener('hide.bs.dropdown', this.filterTableDropdownHide);
+             $(".modal-footer").find("button").addClass('d-none')
+             let filterFacetCountTag = this.header.el.querySelector('.filters-amount')
+            if(filterFacetCountTag)
+                filterFacetCountTag.textContent = this.header.el?.querySelectorAll('.selcted-opt').length
         });
-    }
 
+        onRendered(()=>{
+
+//            if(!$('body').hasClass('ks_body_class'))
+//                    dnNavBarAddClasses();
+            if(this.env.services.menu.getCurrentApp()?.xmlid !== "ks_dashboard_ninja.board_menu_root")
+                this.env.services.menu.reload()
+
+            if(this.isReloadOnFirstCreate){
+                this.isReloadOnFirstCreate = false;
+                if(this.props.action.params && this.props.action.params.isReloadOnFirstCreate)
+                    this.props.action.params.isReloadOnFirstCreate = false
+                this.env.services.menu.reload();
+                this.notification.add(_t('New Dashboard is successfully created'),{
+                    title:_t("New Dashboard"),
+                    type: 'success',
+                });
+            }
+        })
+        onPatched(() => {
+            let filterFacetCountTag = this.header.el.querySelector('.filters-amount')
+            if(filterFacetCountTag)
+                filterFacetCountTag.textContent = this.header.el?.querySelectorAll('.selcted-opt').length
+            this.header.el?.querySelector('.predefined-filters')?.classList.remove('disabled')
+        })
+
+        useBus(this.env.bus, "GET:ParamsForItemFetch", (ev) => this.ksGetParamsForItemFetch(ev.detail));
+    }
 
     willStart(){
         var self = this;
@@ -213,6 +328,39 @@ export class KsDashboardNinja extends Component {
         });
     }
 
+    dashboardImageUpdate(){
+        let image_element = document.querySelector('.ks_dashboard_main_content');
+        if(!document.querySelector('.ks_dashboard_main_content')?.childNodes.length){
+            image_element = document.querySelector('.main-box');
+        }
+        let self = this;
+        this.uiService.block();
+        let canvas = html2canvas(image_element,  {
+                          height: image_element.clientHeight + 186,
+                          width: image_element.clientWidth,
+                          windowWidth: image_element.scrollWidth,
+                          windowHeight: image_element.scrollHeight,
+                          scrollY: 0,
+                          scrollX: 0,
+                          x: image_element.scrollLeft,
+                          y: image_element.scrollTop,
+                        }).then((canvas) => {
+                                    let image = canvas.toDataURL("image/png");
+                                    self._rpc("/web/dataset/call_kw/ks_dashboard_ninja.board/saveImage",{
+                                                        model: 'ks_dashboard_ninja.board',
+                                                        method: 'save_dashboard_image',
+                                                        args: [[self.ks_dashboard_id]],
+                                                        kwargs:{image: image},
+                                                    }).then((result) => {
+                                                            this.uiService.unblock();
+                                                    });
+        });
+        this.notification.add(_t('Dashboard image updated successfully!'),{
+                            title:_t("Dashboard Image Refreshed"),
+                            type: 'success',
+                        });
+    }
+
     grid_initiate(){
         var self=this;
         const ks_element = this.main_body.el;
@@ -229,11 +377,11 @@ export class KsDashboardNinja extends Component {
                 if ($ks_preview.length && !this.ks_dashboard_data.ks_ai_explain_dash) {
                     if (item[i].id in self.gridstackConfig) {
                         var min_width = graphs.includes(item[i].ks_dashboard_item_type)? 3:2
-                         self.grid.addWidget($ks_preview[0], {x:self.gridstackConfig[item[i].id].x, y:self.gridstackConfig[item[i].id].y, w:self.gridstackConfig[item[i].id].w, h: self.gridstackConfig[item[i].id].h, autoPosition:false, minW:min_width, maxW:null, minH:2, maxH:null, id:item[i].id});
-                    } else if ( graphs.includes (item[i].ks_dashboard_item_type)) {
-                         self.grid.addWidget($ks_preview[0], {x:0, y:0, w:5, h:5,autoPosition:true,minW:4,maxW:null,minH:3,maxH:null, id :item[i].id});
+                         self.grid.addWidget($ks_preview[0], {x:self.gridstackConfig[item[i].id].x, y:self.gridstackConfig[item[i].id].y, w:self.gridstackConfig[item[i].id].w, h: self.gridstackConfig[item[i].id].h, autoPosition:false, minW:min_width, maxW:null, minH:3, maxH:null, id:item[i].id});
+                    } else if ( graphs.includes(item[i].ks_dashboard_item_type)) {
+                         self.grid.addWidget($ks_preview[0], {x:0, y:0, w:5, h:6,autoPosition:true,minW:4,maxW:null,minH:3,maxH:null, id :item[i].id});
                     }else{
-                        self.grid.addWidget($ks_preview[0], {x:0, y:0, w:3, h:2,autoPosition:true,minW:3,maxW:null,minH:2,maxH:2,id:item[i].id});
+                        self.grid.addWidget($ks_preview[0], {x:0, y:0, w:2, h:2,autoPosition:true,minW:2,maxW:null,minH:3,maxH:2,id:item[i].id});
                     }
                 }else{
                 if (item[i].id in self.gridstackConfig) {
@@ -256,6 +404,7 @@ export class KsDashboardNinja extends Component {
             this.grid.setStatic(true);
         }
         this.ksRenderDashboard();
+//        dnNavBarAddClasses();
         // Events //
 
         Object.values(ks_element.querySelectorAll(".ks_duplicate_item")).map((item) => { item.addEventListener('click', this.onKsDuplicateItemClick.bind(this))})
@@ -272,7 +421,12 @@ export class KsDashboardNinja extends Component {
         Object.values(ks_element.querySelectorAll(".ks_item_click")).map((item) => { item.addEventListener('click', this._onKsItemClick.bind(this))})
         Object.values(ks_element.querySelectorAll(".ks_dashboard_item_action")).map((item) => { item.addEventListener('click', this.ks_dashboard_item_action.bind(this))})
         Object.values(ks_element.querySelectorAll(".ks_dashboard_item_chart_info")).map((item) => { item.addEventListener('click', this.onChartMoreInfoClick.bind(this))})
+//        document.querySelector('.table-custom')?.addEventListener('show.bs.dropdown', this.filterTableDropdownShow);
+//        document.querySelector('.table-custom')?.addEventListener('hide.bs.dropdown', this.filterTableDropdownHide);
+        document.querySelector('.predefined-filters')?.addEventListener('hide.bs.dropdown', this.predefinedSearchFocusout.bind(this));
+
 //        Object.values((self.header.el).querySelectorAll(".ks_custom_filter_field_selector")).map((item) => { item.addEventListener('change', this.ksOnCustomFilterFieldSelect.bind(this))})
+
 
     }
 
@@ -290,6 +444,31 @@ export class KsDashboardNinja extends Component {
         return Object.assign(context, ks_new_obj);
     }
 
+    renderListViewData(item) {
+        var list_view_data = JSON.parse(item.ks_list_view_data);
+        if (item.ks_list_view_type === "ungrouped" && list_view_data) {
+            if (list_view_data.date_index) {
+                var index_data = list_view_data.date_index;
+                for (var i = 0; i < index_data.length; i++) {
+                    for (var j = 0; j < list_view_data.data_rows.length; j++) {
+                        var index = index_data[i]
+                        var date = list_view_data.data_rows[j]["data"][index]
+                        if (date) {
+                            if (list_view_data.fields_type[index] === 'date'){
+                                list_view_data.data_rows[j]["data"][index] = luxon.DateTime.fromJSDate(date).format?.(this.date_format) , {}, {timezone: false};
+                            }else{
+                                list_view_data.data_rows[j]["data"][index] = luxon.DateTime.fromJSDate(new Date(date + " UTC")).toFormat?.(this.datetime_format), {}, {timezone: false};
+                            }
+                        }else{
+                            list_view_data.data_rows[j]["data"][index] = "";
+                        }
+                    }
+                }
+            }
+        }
+        return JSON.stringify(list_view_data);
+    }
+
     ks_fetch_data(){
         var self = this;
         return jsonrpc("/web/dataset/call_kw",{
@@ -301,9 +480,16 @@ export class KsDashboardNinja extends Component {
         }).then(function(result) {
         //                result = self.normalize_dn_data(result);
             self.ks_dashboard_data = result;
+            self.ks_dashboard_data.ks_ai_explain_dash = self.props.action.params.explainWithAi ? true : false
             self.ks_dashboard_data['ks_dashboard_id'] = self.props.action.params.ks_dashboard_id
             self.ks_dashboard_data['context'] = self.getContext()
             self.ks_dashboard_data['ks_ai_dashboard'] = false
+            self.ks_favourite_filters = JSON.parse(JSON.stringify(self.ks_dashboard_data.ks_dashboard_favourite_filter))
+//            Object.values(self.ks_dashboard_data.ks_dashboard_pre_domain_filter).map((x)=>{
+//                if(self.dn_state['domain_data'][x['model']] != undefined){
+//
+//                }
+//            })
             if(self.dn_state['domain_data'] != undefined){
 //                self.ks_dashboard_data.ks_dashboard_domain_data=self.dn_state['domain_data']
                 Object.values(self.ks_dashboard_data.ks_dashboard_pre_domain_filter).map((x)=>{
@@ -325,8 +511,33 @@ export class KsDashboardNinja extends Component {
 //        var items = self.ksSortItems(self.ks_dashboard_data.ks_item_data)
         var items = Object.values(self.ks_dashboard_data.ks_item_data)
         self.state.ks_dashboard_items = items
-        self.ks_dashboard_data['context'] = self.getContext()
+        self.ks_dashboard_data['context'] = self.getContext();
+//        dnNavBarAddClasses();
+    }
 
+    renderListViewData(item) {
+        var list_view_data = JSON.parse(item.ks_list_view_data);
+        if (item.ks_list_view_type === "ungrouped" && list_view_data) {
+            if (list_view_data.date_index) {
+                var index_data = list_view_data.date_index;
+                for (var i = 0; i < index_data.length; i++) {
+                    for (var j = 0; j < list_view_data.data_rows.length; j++) {
+                        var index = index_data[i]
+                        var date = list_view_data.data_rows[j]["data"][index]
+                        if (date) {
+                            if (list_view_data.fields_type[index] === 'date'){
+                                list_view_data.data_rows[j]["data"][index] = luxon.DateTime.fromJSDate(date).format(this.date_format) , {}, {timezone: false};
+                            }else{
+                                list_view_data.data_rows[j]["data"][index] = luxon.DateTime.fromJSDate(new Date(date + " UTC")).toFormat(this.datetime_format), {}, {timezone: false};
+                            }
+                        }else{
+                            list_view_data.data_rows[j]["data"][index] = "";
+                        }
+                    }
+                }
+            }
+        }
+        return JSON.stringify(list_view_data);
     }
 
     ks_fetch_items_data(){
@@ -340,7 +551,36 @@ export class KsDashboardNinja extends Component {
                 args : [[item_id], self.ks_dashboard_id, self.ksGetParamsForItemFetch(item_id)],
                 kwargs:{context:self.getContext()}
             }).then(function(result){
+                if(result[item_id].ks_list_view_data){
+                    result[item_id].ks_list_view_data = self.renderListViewData(result[item_id])
+                }
                 self.ks_dashboard_data.ks_item_data[item_id] = result[item_id];
+                const ks_default_end_time = result[item_id].ks_default_end_time;
+                var filter_date_data = self.getObjectFromCookie('FilterDateData' + self.ks_dashboard_id);
+                if(filter_date_data && filter_date_data=='none'){
+                    if (ks_default_end_time) {
+                        self.state.ksDateFilterEndDate = DateTime.now().endOf('day');
+                    } else {
+                        self.state.ksDateFilterEndDate = DateTime.now();
+                     }
+                }else{
+                    var custom_range = self.getObjectFromCookie('custom_range' + self.ks_dashboard_id);
+                    if(custom_range){
+                        try {
+                            self.state.ksDateFilterEndDate = parseDateTime(custom_range['end_date'], self.datetime_format)
+                        } catch (error) {
+                            self.eraseCookie('custom_range' + self.ks_dashboard_id);
+                            self.state.ksDateFilterEndDate = DateTime.now()
+                        }
+                    }else{
+                        if (ks_default_end_time) {
+                            self.state.ksDateFilterEndDate = DateTime.now().endOf('day');
+                        } else {
+                            self.state.ksDateFilterEndDate = DateTime.now();
+                         }
+                    }
+                }
+
                 self.state.ks_show_create_layout_option = (Object.keys(self.ks_dashboard_data.ks_item_data).length > 0) && self.ks_dashboard_data.ks_dashboard_manager
             }));
         });
@@ -362,13 +602,18 @@ export class KsDashboardNinja extends Component {
         self.state.custom_filter = {}
         var custom_range = this.getObjectFromCookie('custom_range' + this.ks_dashboard_id);
         if(custom_range){
-            this.state.ksDateFilterStartDate = parseDateTime(custom_range['start_date'], self.datetime_format)
-            this.state.ksDateFilterEndDate = parseDateTime(custom_range['end_date'], self.datetime_format)
+            try {
+                this.state.ksDateFilterStartDate = parseDateTime(custom_range['start_date'], self.datetime_format)
+                this.state.ksDateFilterEndDate = parseDateTime(custom_range['end_date'], self.datetime_format)
+            } catch (error) {
+                this.eraseCookie('custom_range' + this.ks_dashboard_id);
+                self.state.ksDateFilterStartDate = DateTime.now()
+                self.state.ksDateFilterEndDate = DateTime.now()
+            }
         }else{
             self.state.ksDateFilterStartDate = DateTime.now()
             self.state.ksDateFilterEndDate = DateTime.now()
         }
-
         self.state.ks_user_name = session.name
         return Promise.all(items_promises)
 
@@ -387,7 +632,7 @@ export class KsDashboardNinja extends Component {
         }
         if (Object.keys(self.ks_dashboard_data.ks_item_data).length===0){
             $(self.header.el).find('.ks_dashboard_link').addClass("d-none");
-            $(self.header.el).find('.ks_dashboard_edit_layout').addClass("d-none");
+            $(self.header.el).find('.ks_dashboard_edit_layout').addClass("ks_hide");
         }
         if(!self.state.ks_dashboard_manager){
             $(self.header.el).find('#ks_dashboard_title').addClass("ks_user")
@@ -414,13 +659,15 @@ export class KsDashboardNinja extends Component {
         var self = this;
         $(self.header.el).find(".ks_dashboard_link").removeClass("ks_hide");
         self._KsGetDateValues();
-        console.log("Print")
     }
 
     loadDashboardData(date = false){
         var self = this;
         $(self.header.el).find(".apply-dashboard-date-filter").removeClass("ks_hide");
         $(self.header.el).find(".clear-dashboard-date-filter").removeClass("ks_hide");
+        $(self.header.el).find(".ks_dashboard_top_settings").addClass("d-none");
+        $(self.header.el).find("#favFilterMain").addClass("ks_hide");
+        $(self.header.el).find(".filters_section").addClass("ks_hide");
     }
 
     _KsGetDateValues() {
@@ -430,7 +677,7 @@ export class KsDashboardNinja extends Component {
             if (self.ksDateFilterSelection == 'l_none'){
                     var date_filter_selected = self.ksDateFilterSelection;
             }
-            $(self.header.el).find('#' + date_filter_selected).addClass("ks_date_filter_selected");
+            $(self.header.el).find('#' + date_filter_selected).addClass("ks_date_filter_selected global-filter");
             $(self.header.el).find('#ks_date_filter_selection').text(self.ks_date_filter_selections[date_filter_selected]);
 
             if (self.ks_dashboard_data.ks_date_filter_selection === 'l_custom') {
@@ -452,27 +699,33 @@ export class KsDashboardNinja extends Component {
         if (e.target.id !== 'ks_date_selector_container') {
             var self = this;
             $.each($('.ks_date_filter_selected'), function(idx, $itm) {
-                $($itm).removeClass("ks_date_filter_selected")
+                $($itm).removeClass("ks_date_filter_selected global-active");
             });
-            $(e.target.parentElement).addClass("ks_date_filter_selected");
+            $(e.target.parentElement).addClass("ks_date_filter_selected global-active");
             $('#ks_date_filter_selection').text(self.ks_date_filter_selections[e.target.parentElement.id]);
+            $(self.header.el).find('.custom-date-range-selector').addClass("dn_hide");
 
             if (e.target.parentElement.id !== "l_custom") {
+                $(self.header.el).find(".ks_dashboard_top_settings").removeClass("d-none");
+                $(self.header.el).find("#favFilterMain").removeClass("ks_hide");
+                $(self.header.el).find(".filters_section").removeClass("ks_hide");
                 e.target.parentElement.id === "l_none" ?  self._onKsClearDateValues(true) : self._onKsApplyDateFilter();
                 $('.ks_date_input_fields').addClass("ks_hide");
                 $('.ks_date_filter_dropdown').removeClass("ks_btn_first_child_radius");
 
             } else if (e.target.parentElement.id === "l_custom") {
+                $(self.header.el).find(".ks_dashboard_top_settings").addClass("d-none");
+                $(self.header.el).find("#favFilterMain").addClass("ks_hide");
+                $(self.header.el).find(".filters_section").addClass("ks_hide");
+                $(self.header.el).find('.custom_date_filter_section').removeClass("ks_hide");
                 $("#ks_start_date_picker").val(null).removeClass("ks_hide");
                 $("#ks_end_date_picker").val(null).removeClass("ks_hide");
                 $('.ks_date_input_fields').removeClass("ks_hide");
                 $('.ks_date_filter_dropdown').addClass("ks_btn_first_child_radius");
-                $(self.header.el).find(".apply-dashboard-date-filter").removeClass("ks_hide");
-                $(self.header.el).find(".clear-dashboard-date-filter").removeClass("ks_hide");
             }
             if(self.state.ksDateFilterSelection === 'l_none'){
                 this.eraseCookie('FilterDateData' + self.ks_dashboard_id);
-            }else{
+            }else if(self.state.ksDateFilterSelection != 'none'){
                 this.setObjectInCookie('FilterDateData' + self.ks_dashboard_id, self.state.ksDateFilterSelection, 1);
             }
         }
@@ -482,11 +735,15 @@ export class KsDashboardNinja extends Component {
         var self = this;
         var start_date = $('#ks_btn_middle_child').val();
         var end_date = $('#ks_btn_last_child').val();
-        $('.ks_dashboard_item_drill_up').addClass("d-none")
+        $('.ks_dashboard_item_drill_up').addClass("d-none");
         if (start_date === "Invalid date") {
-            alert("Invalid Date is given in Start Date.")
+            this.notification.add(_t("Invalid Date is given in Start Date."), {
+                type: "warning",
+            });
         } else if (end_date === "Invalid date") {
-            alert("Invalid Date is given in End Date.")
+            this.notification.add(_t("Invalid Date is given in End Date."), {
+                type: "warning",
+            });
         } else if ($(self.header.el).find('.ks_date_filter_selected').attr('id') !== "l_custom") {
             self.ksDateFilterSelection = $(self.header.el).find('.ks_date_filter_selected').attr('id');
             var res = {};
@@ -501,25 +758,36 @@ export class KsDashboardNinja extends Component {
                 ksDateFilterEndDate: self.ksDateFilterEndDate,
             }
             self.dn_state['user_context']=context
-                $(self.header.el).find(".apply-dashboard-date-filter").addClass("ks_hide");
-                $(self.header.el).find(".clear-dashboard-date-filter").addClass("ks_hide");
-                self.state.ksDateFilterSelection = $(self.header.el).find('.ks_date_filter_selected').attr('id');
-                self.state.pre_defined_filter = {}
-                self.state.custom_filter = {}
+            $(self.header.el).find(".custom_date_filter_section").addClass("ks_hide");
+            $(self.header.el).find(".ks_date_input_fields").addClass("ks_hide");
+            $(self.header.el).find(".custom-date-range-selector").addClass("dn_hide");
+            $(self.header.el).find("#favFilterMain").removeClass("ks_hide");
+            $(self.header.el).find(".filters_section").removeClass("ks_hide");
+            $(self.header.el).find(".ks_dashboard_top_settings").removeClass("d-none");
+            self.state.ksDateFilterSelection = $(self.header.el).find('.ks_date_filter_selected').attr('id');
+            self.state.pre_defined_filter = {}
+            self.state.custom_filter = {}
         } else {
             if (start_date && end_date) {
+                let prev_start_date = start_date
+                let prev_end_date = end_date
                 if (parseDateTime(start_date,self.datetime_format) <= parseDateTime(end_date, self.datetime_format)) {
+                        $(this.header.el).find(".custom-date-range-selector").removeClass("dn_hide");
+                    this.setObjectInCookie('custom_range' + self.ks_dashboard_id, {'start_date': start_date, 'end_date':end_date}, 1);
+                    self.state.ksDateFilterStartDate = parseDateTime(start_date,self.datetime_format);
+                    self.state.ksDateFilterEndDate = parseDateTime(end_date,self.datetime_format);
 //                    var start_date = parseDateTime(start_date, self.datetime_format).format("YYYY-MM-DD H:m:s");
                     var start_date = formatDateTime(parseDateTime(start_date, self.datetime_format), { format: "yyyy-MM-dd HH:mm:ss"})
                     var end_date = formatDateTime(parseDateTime(end_date, self.datetime_format), { format: "yyyy-MM-dd HH:mm:ss" })
 //                    var end_date = formatDateTime(end_date, self.datetime_format).format("YYYY-MM-DD H:m:s");
                     if (start_date === "Invalid date" || end_date === "Invalid date"){
-                        alert(_t("Invalid Date"));
+                        this.notification.add(_t("Invalid Date"), {
+                            type: "warning",
+                        });
                     }else{
                         self.ksDateFilterSelection = $(self.header.el).find('.ks_date_filter_selected').attr('id');
                         self.ksDateFilterStartDate = start_date;
                         self.ksDateFilterEndDate = end_date;
-                        this.setObjectInCookie('custom_range' + self.ks_dashboard_id, {'start_date': start_date, 'end_date':end_date}, 1);
                         var res = {};
                         for (const [key, value] of Object.entries(self.ks_dashboard_data.ks_item_data)) {
                             if (value.ks_dashboard_item_type != "ks_to_do") {
@@ -532,20 +800,29 @@ export class KsDashboardNinja extends Component {
                             ksDateFilterEndDate: self.ksDateFilterEndDate,
                         }
                         self.dn_state['user_context']=context
-                            $(self.header.el).find(".apply-dashboard-date-filter").addClass("ks_hide");
-                            $(self.header.el).find(".clear-dashboard-date-filter").addClass("ks_hide");
-                            self.state.ksDateFilterSelection = $(self.header.el).find('.ks_date_filter_selected').attr('id');
-                            this.setObjectInCookie('FilterDateData' + self.ks_dashboard_id, self.state.ksDateFilterSelection, 1);
+
+                        $(self.header.el).find(".custom_date_filter_section").addClass("ks_hide");
+                        $(self.header.el).find(".ks_date_input_fields").addClass("ks_hide");
+                        $(self.header.el).find(".apply-dashboard-date-filter").removeClass("ks_hide");
+                        $(self.header.el).find("#favFilterMain").removeClass("ks_hide");
+                        $(self.header.el).find(".filters_section").removeClass("ks_hide");
+                        $(self.header.el).find(".ks_dashboard_top_settings").removeClass("d-none");
+                        self.state.ksDateFilterSelection = $(self.header.el).find('.ks_date_filter_selected').attr('id');
+                            if(self.state.ksDateFilterSelection != 'none'){
+                                this.setObjectInCookie('FilterDateData' + self.ks_dashboard_id, self.state.ksDateFilterSelection, 1);
+                            }
                             self.state.pre_defined_filter = {}
                             self.state.custom_filter = {}
-                            self.state.ksDateFilterStartDate = parseDateTime(self.ksDateFilterStartDate,self.datetime_format);
-                            self.state.ksDateFilterEndDate = parseDateTime(self.ksDateFilterEndDate,self.datetime_format);
                    }
                 } else {
-                    alert(_t("Start date should be less than end date"));
+                    this.notification.add(_t("Start date should be less than end date."), {
+                        type: "warning",
+                    });
                 }
             } else {
-                alert(_t("Please enter start date and end date"));
+                this.notification.add(_t("Please enter start date and end date."), {
+                    type: "warning",
+                });
             }
         }
     }
@@ -604,8 +881,10 @@ export class KsDashboardNinja extends Component {
             self.state.ksDateFilterSelection = 'l_none';
             self.state.pre_defined_filter = {};
             self.state.custom_filter = {}
-        $(self.header.el).find(".apply-dashboard-date-filter").addClass("ks_hide");
-        $(self.header.el).find(".clear-dashboard-date-filter").addClass("ks_hide");
+        $(self.header.el).find(".custom_date_filter_section").addClass("ks_hide");
+        $(self.header.el).find(".ks_dashboard_top_settings").removeClass("d-none");
+        $(self.header.el).find("#favFilterMain").removeClass("ks_hide");
+        $(self.header.el).find(".filters_section").removeClass("ks_hide");
 
     }
 
@@ -681,9 +960,9 @@ export class KsDashboardNinja extends Component {
                         target: 'current',
                     }
                 }
-                  self.actionService.doAction(action, {
-                            on_reverse_breadcrumb: self.on_reverse_breadcrumb,
-                        });
+                self.actionService.doAction(action, {
+                    on_reverse_breadcrumb: self.on_reverse_breadcrumb,
+                });
             }
         }
 
@@ -743,9 +1022,11 @@ export class KsDashboardNinja extends Component {
         //  To Handle only allow item to open when not clicking on item
         if (self.ksAllowItemClick) {
             e.preventDefault();
+            if(self.ks_mode === 'edit')   return;
             if (e.target.title != "Customize Item") {
                 var item_id = parseInt(e.currentTarget.firstElementChild.id);
                 var item_data = self.ks_dashboard_data.ks_item_data[item_id];
+//                if(["excel", "csv"].includes(item_data.item_data_source)) return;
                 if (item_data && item_data.ks_show_records && item_data.ks_data_calculation_type != 'query') {
 
                     if (item_data.action) {
@@ -814,6 +1095,8 @@ export class KsDashboardNinja extends Component {
         var self = this;
         this.dialogService.add(ConfirmationDialog, {
         body: _t("Are you sure that you want to remove this item?"),
+        confirmLabel: _t("Delete Item"),
+        title: _t("Delete Dashboard Item"),
         confirm: () => {
             self._rpc("/web/dataset/call_kw/ks_dashboard_ninja.item/unlink",{
                 model: 'ks_dashboard_ninja.item',
@@ -851,8 +1134,9 @@ export class KsDashboardNinja extends Component {
     _ksSetCurrentLayoutClick(){
         var self = this;
         this.ks_dashboard_data.ks_selected_board_id = $(self.header.el).find("#ks_dashboard_layout_dropdown_container .ks_layout_selected").data('ks_layout_id');
-        $(self.header.el).find(".ks_dashboard_top_menu .ks_dashboard_top_settings").removeClass("ks_hide");
-        $(self.header.el).find(".ks_dashboard_top_menu .ks_am_content_element").removeClass("ks_hide");
+        $(self.header.el).find(".ks_dashboard_top_menu-new .ks_dashboard_top_settings").removeClass("ks_hide");
+        $(self.header.el).find(".ks_dashboard_top_menu-new .ks_am_content_element").removeClass("ks_hide");
+        $(this.header.el).find(".ks_dashboard_top_settings").removeClass("dn_hide");
         $(self.header.el).find(".ks_dashboard_layout_edit_mode_settings").addClass("ks_hide");
 //            $('#ks_dashboard_title_input').val(this.ks_dashboard_data.ks_child_boards[this.ks_dashboard_data.ks_selected_board_id][0]);
         this.ks_dashboard_data.name = this.ks_dashboard_data.ks_child_boards[this.ks_dashboard_data.ks_selected_board_id][0];
@@ -871,10 +1155,11 @@ export class KsDashboardNinja extends Component {
 
     _ksSetDiscardCurrentLayoutClick(){
         this.ksOnLayoutSelection(this.ks_dashboard_data.ks_selected_board_id);
-        $(this.header.el).find(".ks_dashboard_top_menu .ks_dashboard_top_settings").removeClass("ks_hide");
-        $(this.header.el).find(".ks_dashboard_top_menu .ks_am_content_element").removeClass("ks_hide");
+        $(this.header.el).find(".ks_dashboard_top_menu-new .ks_dashboard_top_settings").removeClass("ks_hide");
+        $(this.header.el).find(".ks_dashboard_top_menu-new .ks_am_content_element").removeClass("ks_hide");
+        $(this.header.el).find(".ks_dashboard_top_settings").removeClass("dn_hide");
         $(this.header.el).find(".ks_dashboard_layout_edit_mode_settings").addClass("ks_hide");
-        $(this.header.el).find(".ks_dashboard_top_menu .ks_dashboard_edit_layout").removeClass("ks_hide");
+        $(this.header.el).find(".ks_dashboard_top_menu-new .ks_dashboard_edit_layout").removeClass("ks_hide");
     }
 
     _ksSaveCurrentLayout() {
@@ -930,7 +1215,7 @@ export class KsDashboardNinja extends Component {
         var params = this.ksGetParamsForItemFetch(parseInt(chart_id));
         var data = {
             "header": name,
-            "chart_data": this.ks_dashboard_data.ks_item_data[chart_id].ks_list_view_data,
+            "chart_data": typeof this.ks_dashboard_data.ks_item_data[chart_id].ks_list_view_data === 'string' ? this.ks_dashboard_data.ks_item_data[chart_id].ks_list_view_data : JSON.stringify(this.ks_dashboard_data.ks_item_data[chart_id].ks_list_view_data),
             "ks_item_id": chart_id,
             "ks_export_boolean": true,
             "context": context,
@@ -957,7 +1242,7 @@ export class KsDashboardNinja extends Component {
         var self = this;
         var chart_id = e.currentTarget.dataset.chartId;
         var name = this.ks_dashboard_data.ks_item_data[chart_id].name;
-        var base64_image
+        var base64_image;
         base64_image = $($(e.target).parentsUntil(".grid-stack-item").slice(-1)[0]).find('.ks_chart_card_body')[0]
         var $ks_el = $($($(self.main_body.el).find(".grid-stack-item[gs-id=" + chart_id + "]")).find('.ks_chart_card_body'));
         var ks_height = $ks_el.height()
@@ -967,7 +1252,7 @@ export class KsDashboardNinja extends Component {
             content: [{
                     image: ks_image,
                     width: 500,
-                    height: ks_height,
+                    height: ks_height > 750 ? 750 : ks_height,
                     }],
             images: {
                 bee: ks_image
@@ -976,6 +1261,26 @@ export class KsDashboardNinja extends Component {
         pdfMake.createPdf(ks_image_def).download(name + '.pdf');
         })
 
+    }
+    async updateBookmark(ev){
+        ev.currentTarget.classList.toggle('active');
+        let updatedBookmarks = await this._rpc("/web/dataset/call_kw/ks_dashboard_ninja.board/update_bookmarks",{
+                                model: 'ks_dashboard_ninja.board',
+                                method: 'update_bookmarks',
+                                args: [[this.ks_dashboard_id]],
+                                kwargs:{},
+                            });
+        updatedBookmarks = updatedBookmarks[1]
+        if(updatedBookmarks)
+            this.notification.add(_t('Dashboard added to your bookmarks'),{
+                            title:_t("Bookmark Added"),
+                            type: 'success',
+                        });
+        else
+            this.notification.add(_t('Dashboard removed from your bookmarks'),{
+                            title:_t("Bookmark Removed"),
+                            type: 'success',
+                        });
     }
     ksChartExportimage(e){
         var self = this;
@@ -1104,8 +1409,9 @@ export class KsDashboardNinja extends Component {
         $(self.header.el).find("#ks_dashboard_layout_dropdown_container .ks_layout_selected").removeClass("ks_layout_selected");
         $(self.header.el).find("li.ks_dashboard_layout_event[data-ks_layout_id='"+ layout_id + "']").addClass('ks_layout_selected');
         $(self.header.el).find("#ks_dn_layout_button span:first-child").text(selected_layout_name);
-        $(self.header.el).find(".ks_dashboard_top_menu .ks_dashboard_edit_layout").addClass("ks_hide");
-        $(self.header.el).find(".ks_dashboard_top_menu .ks_am_content_element").addClass("ks_hide");
+        $(self.header.el).find(".ks_dashboard_top_menu-new .ks_dashboard_edit_layout").addClass("ks_hide");
+        $(self.header.el).find(".ks_dashboard_top_menu-new .ks_am_content_element").addClass("ks_hide");
+        $(this.header.el).find(".ks_dashboard_top_settings").addClass("dn_hide");
 
         $(self.header.el).find(".ks_dashboard_layout_edit_mode_settings").removeClass("ks_hide");
     }
@@ -1114,6 +1420,11 @@ export class KsDashboardNinja extends Component {
         this.grid.setStatic(true)
         var self = this;
         //        Have  to save dashboard here
+        $(self.header.el).find(".ks_dashboard_top_settings").removeClass("d-none");
+        $(self.header.el).find("#favFilterMain").removeClass("ks_hide");
+        $(self.header.el).find(".filters_section").removeClass("ks_hide");
+         $(self.header.el).find('.hide-in-edit').removeClass('dn_hide');
+         $(self.header.el).find('.hide-in-edit.custom-date-range-selector').addClass('dn_hide');
         var dashboard_title = $('#ks_dashboard_title_input').val();
         if (dashboard_title != false && dashboard_title != 0 && dashboard_title !== self.ks_dashboard_data.name) {
             self.ks_dashboard_data.name = dashboard_title;
@@ -1153,6 +1464,7 @@ export class KsDashboardNinja extends Component {
     _onKsCreateLayoutClick() {
         var self = this;
         self.grid.setStatic(true)
+         $(self.header.el).find('.hide-in-edit').removeClass('dn_hide');
         var dashboard_title = $('#ks_dashboard_title_input').val();
         if (dashboard_title ==="") {
             self.call('notification', 'notify', {
@@ -1262,9 +1574,11 @@ export class KsDashboardNinja extends Component {
 
     onKsEditLayoutClick(e) {
         var self = this;
+//        $(self.header.el).find(".custom_date_filter_section").addClass("d-none");
         self.grid.setStatic(false);
         self.ksAllowItemClick = false;
         self._ksRenderEditMode();
+        $(self.header.el).find('.hide-in-edit').addClass('dn_hide');
     }
 
     _ksRenderEditMode(){
@@ -1306,28 +1620,46 @@ export class KsDashboardNinja extends Component {
 
 
     onAddItemTypeClick(e) {
+//        let self = this;
+//        let action = {
+//            name: _t('Create New Chart'),
+//            type: 'ir.actions.act_window',
+//            res_model: 'ks_dashboard_ninja.item',
+//            context: {
+//                'ks_dashboard_id': self.ks_dashboard_id,
+//                'ks_dashboard_item_type': 'ks_tile',
+//                'form_view_ref': 'ks_dashboard_ninja.item_form_view',
+//                'form_view_initial_mode': 'edit',
+//                'ks_set_interval': self.ks_dashboard_data.ks_set_interval,
+//                'ks_data_formatting':self.ks_dashboard_data.ks_data_formatting,
+//                'ks_form_view' : true
+//            },
+//            views: [
+//                [false, 'form']
+//            ],
+//            view_mode: 'form',
+//            target: 'current',
+//        }
+//        self.actionService.doAction(action)
         var self = this;
-             self.dialogService.add(FormViewDialog,{
-                resModel: 'ks_dashboard_ninja.item',
-                context: {
-                    'ks_dashboard_id': self.ks_dashboard_id,
-                    'ks_dashboard_item_type': 'ks_tile',
-                    'form_view_ref': 'ks_dashboard_ninja.item_form_view',
-                    'form_view_initial_mode': 'edit',
-                    'ks_set_interval': self.ks_dashboard_data.ks_set_interval,
-                    'ks_data_formatting':self.ks_dashboard_data.ks_data_formatting,
-                    'ks_form_view' : true
-                },
-                onRecordSaved:()=>{
-                            var js_id = self.actionService.currentController.jsId
-                            self.actionService.restore(js_id)
-                            $('body').removeClass('ks_dn_create_chart')
-
-                    },
-                onRecordDiscarded:()=>{
-                    $('body').removeClass('ks_dn_create_chart')
-                }
-            });
+        self.dialogService.add(FormViewDialog,{
+            resModel: 'ks_dashboard_ninja.item',
+            context: {
+                'ks_dashboard_id': self.ks_dashboard_id,
+                'ks_dashboard_item_type': 'ks_tile',
+                'form_view_ref': 'ks_dashboard_ninja.item_form_view',
+                'form_view_initial_mode': 'edit',
+                'ks_set_interval': self.ks_dashboard_data.ks_set_interval,
+                'ks_data_formatting':self.ks_dashboard_data.ks_data_formatting,
+                'ks_form_view' : true
+            },
+            onRecordSaved:()=>{
+                var js_id = self.actionService.currentController.jsId
+                self.actionService.restore(js_id)
+            },
+            size: "fs",
+            title: "Create New Chart"
+        });
 
     }
 
@@ -1365,7 +1697,7 @@ export class KsDashboardNinja extends Component {
         var self= this;
         var dashboard_id = this.ks_dashboard_id;
         var action = {
-            name: _t('ks_open_setting'),
+            name: _t('Dashboard Settings'),
             type: 'ir.actions.act_window',
             res_model: 'ks_dashboard_ninja.board',
             res_id: dashboard_id,
@@ -1377,7 +1709,9 @@ export class KsDashboardNinja extends Component {
             view_mode: 'form',
             target: 'new',
         }
-        self.actionService.doAction(action)
+        self.actionService.doAction(action).then(function(result){
+            self.eraseCookie('FilterOrderData' + self.ks_dashboard_id);
+        });
     }
 
     ksOnDashboardDeleteClick(ev){
@@ -1386,6 +1720,8 @@ export class KsDashboardNinja extends Component {
         var self= this;
         self.dialogService.add(ConfirmationDialog, {
             body: _t("Are you sure you want to delete this dashboard ?"),
+            confirmLabel: _t("Delete Dashboard"),
+            title: _t("Delete Dashboard"),
             confirm: () => {
                 this._rpc("/web/dataset/call_kw/ks.dashboard.delete.wizard/ks_delete_record", {
                     model: 'ks.dashboard.delete.wizard',
@@ -1393,16 +1729,26 @@ export class KsDashboardNinja extends Component {
                     args: [self.ks_dashboard_id],
                     kwargs: {dashboard_id: dashboard_id}
                 }).then((result)=>{
-                self.actionService.doAction(result)
+                    self.env.services.menu.reload();
+                    let currentAppId = self.env.services.menu?.getCurrentApp()?.id;
+                    self.env.services.menu.selectMenu(currentAppId).then(()=>{
+                        self.notification.add(_t('Dashboard Deleted Successfully'),{
+                            title:_t("Deleted"),
+                            type: 'success',
+                        });
+                    });
                 });
             },
+            cancel: () => {
+
+}
         });
     }
 
     ksOnDashboardCreateClick(ev){
         var self= this;
         var action = {
-            name: _t('Create Dashboard'),
+            name: _t('Add New Dashboard'),
             type: 'ir.actions.act_window',
             res_model: 'ks.dashboard.wizard',
             domain: [],
@@ -1437,35 +1783,42 @@ export class KsDashboardNinja extends Component {
         if(ev.currentTarget.dataset.itemId){
             self.dialogService.add(FormViewDialog,{
                 resModel: 'ks_dashboard_ninja.item',
-                    resId : parseInt(ev.currentTarget.dataset.itemId),
-                    context: {
-                        'form_view_ref': 'ks_dashboard_ninja.item_form_view',
-                        'form_view_initial_mode': 'edit',
-                        'ks_form_view' :true
-                    },
+                title: 'Edit Chart',
+                resId : parseInt(ev.currentTarget.dataset.itemId),
+                context: {
+                    'form_view_ref': 'ks_dashboard_ninja.item_form_view',
+                    'form_view_initial_mode': 'edit',
+                    'ks_form_view' :true
+                },
                 onRecordSaved:()=>{
 
                             var js_id = self.actionService.currentController.jsId
                             self.actionService.restore(js_id)
                             $('body').removeClass('ks_dn_create_chart')
                     },
-                    onRecordDiscarded:()=>{
-                        $('body').removeClass('ks_dn_create_chart')
-                    }
+                onRecordDiscarded:()=>{
+                    $('body').removeClass('ks_dn_create_chart')
+                },
+                size: 'fs'
             });
         }
 
     }
-        kscreateaiitem(ev){
-            var self= this;
-            self.dialogService.add(FormViewDialog,{
-                resModel: 'ks_dashboard_ninja.arti_int',
-                context: {
-                    'ks_dashboard_id': self.ks_dashboard_id,
-                    'ks_form_view' : true
-                },
-            });
-        }
+
+    kscreateaiitem(ev){
+        var self= this;
+        self.dialogService.add(FormViewDialog,{
+            resModel: 'ks_dashboard_ninja.arti_int',
+            title: 'Generate items with AI',
+            context: {
+                'ks_dashboard_id': self.ks_dashboard_id,
+                'ks_form_view' : true,
+                'generate_dialog' : true,
+                dialog_size: 'extra-large',
+            }
+        });
+    }
+
     kscreateaidashboard(ev){
         var self= this;
         var action = {
@@ -1486,6 +1839,7 @@ export class KsDashboardNinja extends Component {
         }
     ks_gen_ai_analysis(ev){
         var self = this;
+        this.state.dialog_header = false;
         var ks_items = Object.values(self.ks_dashboard_data.ks_item_data);
         var ks_items_explain = []
         var ks_rest_items = []
@@ -1496,7 +1850,7 @@ export class KsDashboardNinja extends Component {
                         name:item.name,
                         id:item.id,
                         ks_chart_data:item.ks_chart_data?{...JSON.parse(item.ks_chart_data),...{domains:[],previous_domain:[]}}:item.ks_chart_data,
-                        ks_list_view_data:item.ks_list_view_data?JSON.parse(item.ks_list_view_data):item.ks_list_view_data,
+                        ks_list_view_data: typeof item.ks_list_view_data === 'string' ? JSON.parse(item.ks_list_view_data) : item.ks_list_view_data,
                         item_type:item.ks_dashboard_item_type,
                         groupedby:item.ks_chart_relation_groupby_name,
                         subgroupedby:item.ks_chart_relation_sub_groupby_name,
@@ -1514,6 +1868,9 @@ export class KsDashboardNinja extends Component {
             });
             this.dialogService.add(ConfirmationDialog, {
                 body: _t("Do you agree that AI should be used to produce the explanation? It will take a few minutes to finish the process?"),
+                title:_t("Explain with AI"),
+                cancel: () => {},
+                confirmLabel: _t("Confirm"),
                 confirm: () => {
                     self._rpc("/web/dataset/call_kw/ks_dashboard_ninja.arti_int/ks_generate_analysis",{
                         model: 'ks_dashboard_ninja.arti_int',
@@ -1522,59 +1879,112 @@ export class KsDashboardNinja extends Component {
                         kwargs:{},
                 }).then(function(result) {
                     if (result){
-                        var js_id = self.actionService.currentController.jsId
-                        self.actionService.restore(js_id)
+                        self.actionService.doAction(
+                        {
+                            type: "ir.actions.client",
+                            name: _t("Explain with AI"),
+                            target: "new",
+                            tag: 'ks_dashboard_ninja',
+                            params:{
+                                ks_dashboard_id: self.ks_dashboard_id,
+                                on_dialog: true,
+                                explain_ai_whole: false,
+                                explainWithAi: true,
+                            },
+                             context: {
+                                dialog_size: 'extra-large'
+                             }
+                        },{
+                            onClose: ()=>{
+                               return self._rpc("/web/dataset/call_kw/ks_dashboard_ninja.arti_int/ks_switch_default_dashboard",{
+                                    model: 'ks_dashboard_ninja.arti_int',
+                                    method: 'ks_switch_default_dashboard',
+                                    args: [self.ks_dashboard_id],
+                                    kwargs:{},
+                               })
+
+                            }
+                        },
+
+                    );
+
                     }
+//                     window.addEventListener('beforeunload', function (event) {
+//                            self._rpc("/web/dataset/call_kw/ks_dashboard_ninja.arti_int/ks_switch_default_dashboard", {
+//                                model: 'ks_dashboard_ninja.arti_int',
+//                                method: 'ks_switch_default_dashboard',
+//                                args: [self.ks_dashboard_id],
+//                                kwargs: {},
+//                            });
+//                        });
+//                    window.addEventListener('visibilitychange', function() {
+//                        if (document.visibilityState === 'hidden') {
+//                            // This triggers when the user reloads or switches away from the page
+//                            self._rpc("/web/dataset/call_kw/ks_dashboard_ninja.arti_int/ks_switch_default_dashboard", {
+//                                model: 'ks_dashboard_ninja.arti_int',
+//                                method: 'ks_switch_default_dashboard',
+//                                args: [self.ks_dashboard_id],
+//                                kwargs: {},
+//                            });
+//                        }
+//                    });
+
                 });
                 }
         });
         }else{
-            self.notification.add(_t('Plese make few items to explain with AI'),{
+            self.notification.add(_t('Please make few items to explain with AI'),{
                 title:_t("Failed"),
                 type: 'warning',
             });
         }
     }
-    ks_switch_default_dashboard(ev){
+
+    ks_switch_default_dashboard(){
         var self = this;
-        if (self.ks_dashboard_data.ks_ai_explain_dash){
-            self._rpc("/web/dataset/call_kw/ks_dashboard_ninja.arti_int/ks_switch_default_dashboard",{
-                        model: 'ks_dashboard_ninja.arti_int',
-                        method: 'ks_switch_default_dashboard',
-                        args: [self.ks_dashboard_id],
-                        kwargs:{},
-                }).then(function(result) {
-                    var js_id = self.actionService.currentController.jsId
-                    self.actionService.restore(js_id)
-                });
+        if (!($(".modal-body .main-box").length)){
+//            dnNavBarRemoveClasses();
         }
+
     }
-   async speak_once(ev,item){
+
+    hideFilterTab() {
+        Collapse.getInstance('#collapseExample').hide()
+    }
+
+    async speak_once(ev,item){
         this.ksAllowItemClick = false;
         ev.preventDefault()
-        var ks_audio = ev.currentTarget
+        var ks_audio = ev.currentTarget;
+        ev.currentTarget.parentElement.querySelector('.voice-cricle').classList.toggle("d-none");
+        ev.currentTarget.parentElement.querySelector('.comp-gif').classList.toggle("d-none");
         $(document.querySelectorAll('audio')).each((index,item)=>{
-            if ($(item).attr('src') && $(ks_audio).find('audio').attr('src') != $(item).attr('src')){
+            if ($(ks_audio).attr('src') && $(ks_audio).find('audio').attr('src') != $(ks_audio).attr('src')){
                 item.pause()
-                $(item).parent().find('.fa.fa-volume-up').addClass('d-none');
-                if (!$(item).parent().find(".fa-pause").length){
-                    $(item).parent().append('<span class="fa fa-pause"></span>');
+                if (!$(ks_audio).find(".voice-cricle").length){
+                    $(ks_audio).find('.voice-cricle').removeClass('d-none');
+//                    $(item).parent().append('<span class="fa fa-pause"></span>');
                 }
-
             }
         })
         if (!this.ks_speeches.length){
             if ($(ks_audio).find('audio').attr('src') && $(ks_audio).find('audio')[0].paused){
                 $(ks_audio).find('audio')[0].play();
                 $(ks_audio).find('.fa.fa-volume-up').removeClass('d-none');
+                $(ks_audio).find('.comp-gif').removeClass('d-none');
+                $(ks_audio).find('.voice-cricle').addClass('d-none');
                 $(ks_audio).find('.fa.fa-pause').remove();
             }else if ($(ks_audio).find('audio').attr('src') && !$(ks_audio).find('audio')[0].paused){
                 $(ks_audio).find('audio')[0].pause();
+                $(ks_audio).find('.voice-cricle').removeClass('d-none');
+                $(ks_audio).find('.comp-gif').addClass('d-none');
                 $(ks_audio).find('.fa.fa-volume-up').addClass('d-none');
-                $(ks_audio).append('<span class="fa fa-pause"></span>');
+//                $(ks_audio).append('<span class="fa fa-pause"></span>');
             }else{
-                $(ks_audio).find('span').addClass('d-none')
-                $(ks_audio).append('<div class="spinner-grow" role="status"><span class="sr-only"></span></div>')
+//                $(ks_audio).find('span').addClass('d-none');
+                $(ks_audio).find('.comp-gif').removeClass('d-none');
+                $(ks_audio).find('.voice-cricle').addClass('d-none');
+//                $(ks_audio).append('<div class="spinner-grow" role="status"><span class="sr-only"></span></div>')
                 this.ks_speeches.push(this._rpc('web/dataset/call_kw/ks_dashboard_ninja.arti_int/ks_generatetext_to_speech',{
                 model : "ks_dashboard_ninja.arti_int",
                 method:"ks_generatetext_to_speech",
@@ -1592,13 +2002,25 @@ export class KsDashboardNinja extends Component {
                 }.bind(this)))
                 return Promise.resolve(this.ks_speeches)
             }
-
         }
+    }
+    ks_chat_with_ai(){
+        this.env.services.dialog.add(KschatwithAI,{})
+    }
+
+    showDateFilterRange(ev){
+        $(this.header.el).find("#favFilterMain").addClass("ks_hide");
+        $(this.header.el).find(".filters_section").addClass("ks_hide");
+        $(this.header.el).find(".custom_date_filter_section").removeClass("ks_hide");
+        $(this.header.el).find(".ks_date_input_fields").removeClass("ks_hide");
+        $(this.header.el).find(".custom-date-range-selector").addClass("dn_hide");
+        $(this.header.el).find(".ks_dashboard_top_settings").addClass("d-none");
+
     }
 
 }
 
-KsDashboardNinja.components = { Ksdashboardtile, Ksdashboardlistview, Ksdashboardgraph, Ksdashboardkpiview, Ksdashboardtodo, DateTimePicker, DateTimeInput};
+KsDashboardNinja.components = { Ksdashboardtile, Ksdashboardlistview, Ksdashboardgraph, Ksdashboardkpiview, Ksdashboardtodo, DateTimePicker, DateTimeInput,KschatwithAI, CustomFilter};
 KsDashboardNinja.template = "ks_dashboard_ninja.KsDashboardNinjaHeader"
 registry.category("actions").add("ks_dashboard_ninja", KsDashboardNinja);
 

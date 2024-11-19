@@ -25,6 +25,13 @@ export class KsColorPicker extends Component{
             this.props.record.update({ [this.props.name]: new_value });
         }
 
+        _ksOnOpacityInputNew(ev){
+            const newOpacity = ev.currentTarget.value;
+            const percentage = (newOpacity - ev.currentTarget.min) / (ev.currentTarget.max - ev.currentTarget.min) * 100;
+
+            ev.currentTarget.style.background = `linear-gradient(to right, rgba(231, 198, 201, 1) ${percentage}%, #d3d3d3 ${percentage}%)`;
+        }
+
         _ksOnOpacityInput(ev) {
             var self = this;
             var color;

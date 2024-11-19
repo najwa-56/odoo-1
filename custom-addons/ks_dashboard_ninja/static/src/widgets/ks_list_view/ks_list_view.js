@@ -22,13 +22,42 @@ class KsListViewPreview extends Component{
 
     }
 
+    renderListViewData(item) {
+        var item_list_data = item.ks_list_view_data
+        var list_view_data = JSON.parse(item_list_data);
+        var datetime_format = localization.dateTimeFormat;
+        if (list_view_data.type === "ungrouped" && list_view_data) {
+            if (list_view_data.fields_type) {
+                var index_data = list_view_data.fields_type;
+                for (var i = 0; i < index_data.length; i++) {
+                    for (var j = 0; j < list_view_data.data_rows.length; j++) {
+                        var index = index_data[i];
+                        var date = list_view_data.data_rows[j]["data"][i];
+                        if (date) {
+                            if (index === 'date'){
+                                list_view_data.data_rows[j]["data"][index] = luxon.DateTime.fromJSDate(date).format?.(datetime_format) , {}, {timezone: false};
+                            }else if (index === 'datetime'){
+                                list_view_data.data_rows[j]["data"][i] = luxon.DateTime.fromJSDate(new Date(date + " UTC")).toFormat?.(datetime_format), {}, {timezone: false};
+
+                            }else{
+                                list_view_data.data_rows[j]["data"][index] = "";
+                            }
+                        }else{
+                            list_view_data.data_rows[j]["data"][index] = "";
+                        }
+                    }
+                }
+            }
+        }
+        return list_view_data;
+    }
 
     value() {
         var self = this;
         var field = self.props.record.data;
         var ks_list_view_name;
         if (field.ks_list_view_data){
-            var list_view_data = JSON.parse(field.ks_list_view_data);
+            var list_view_data = this.renderListViewData(field);
         }else{
             var list_view_data = false
         }

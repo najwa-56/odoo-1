@@ -8,6 +8,8 @@ class ResConfig(models.TransientModel):
 
     dn_api_key = fields.Char(string="Dashboard AI API Key",store=True,
                              config_parameter='ks_dashboard_ninja.dn_api_key')
+    enable_chart_zoom = fields.Boolean(string="Enable Zooming for charts", store=True,
+                             config_parameter='ks_dashboard_ninja.enable_chart_zoom')
     url = fields.Char(string="URL", store=True,
                       config_parameter="ks_dashboard_ninja.url")
     ks_email_id = fields.Char(string="Email ID",store=True,config_parameter="ks_dashboard_ninja.ks_email_id")

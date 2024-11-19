@@ -2,24 +2,28 @@
 import { Component, onWillStart, useState ,useEffect,onMounted, onPatched, onWillUpdateProps,useRef,} from "@odoo/owl";
 import {globalfunction } from '@ks_dashboard_ninja/js/ks_global_functions';
 import { jsonrpc } from "@web/core/network/rpc_service";
-import { useService } from "@web/core/utils/hooks";
+import { useBus, useService } from "@web/core/utils/hooks";
 import { formatFloat } from "@web/core/utils/numbers";
+import { ConfirmationDialog } from "@web/core/confirmation_dialog/confirmation_dialog";
 import { _t } from "@web/core/l10n/translation";
 import { localization } from "@web/core/l10n/localization";
 import {formatDate,formatDateTime} from "@web/core/l10n/dates";
 import {parseDateTime,parseDate,} from "@web/core/l10n/dates";
-import { renderToElement } from "@web/core/utils/render";
+import { renderToElement, renderToString } from "@web/core/utils/render";
 
 export class Ksdashboardgraph extends Component{
     setup(){
         this.chart_container = {};
+        this.dialogService = useService("dialog");
         this.actionService = useService("action");
+        this.mailChatService = useService("mail.chat_window");
+        this.threadService = useService("mail.thread");
         this._rpc = useService("rpc");
-        this.state = useState({item_data:"",list_view_data:""})
+        this.state = useState({item_data:"",list_view_data:"", update_chart: 0})
         onMounted(() => this._update_view());
         onPatched(() => this.update_list_view());
         this.item = this.props.item
-
+        this.ks_dashboard_id = this.props.item.ks_dashboard_id
         this.ks_dashboard_data = this.props.dashboard_data
         if (this.item.ks_dashboard_item_type == 'ks_list_view'){
             this.prepare_list()
@@ -27,7 +31,8 @@ export class Ksdashboardgraph extends Component{
             this.prepare_item(this.item);
         }
         this.ks_gridstack_container = useRef("ks_gridstack_container");
-        this.ks_list_view = useRef("ks_list_view")
+        this.ks_list_view = useRef("ks_list_view");
+
         var update_interval = this.props.dashboard_data.ks_set_interval
         this.ks_ai_analysis = this.ks_dashboard_data.ks_ai_explain_dash
         if (this.item.ks_ai_analysis && this.item.ks_ai_analysis){
@@ -39,41 +44,76 @@ export class Ksdashboardgraph extends Component{
 
          onWillUpdateProps(async(nextprops)=>{
             if(nextprops.ksdatefilter !='none'){
-                await this.ksFetchUpdateItem(this.item.id)
+                await this.ksFetchUpdateItem(nextprops.item.id, nextprops.dashboard_data.ks_dashboard_id, nextprops.dashboard_data.context)
             }
             if (Object.keys(nextprops.pre_defined_filter).length){
                 if (nextprops.pre_defined_filter?.item_ids?.includes(this.item.id)){
-                    await this.ksFetchUpdateItem(this.item.id)
+                    await this.ksFetchUpdateItem(this.item.id, this.ks_dashboard_id,  nextprops.dashboard_data.context)
                 }
             }
              if (Object.keys(nextprops.custom_filter).length){
                 if (nextprops.custom_filter?.item_ids?.includes(this.item.id)){
-                    await this.ksFetchUpdateItem(this.item.id)
+                    await this.ksFetchUpdateItem(this.item.id, this.ks_dashboard_id,  nextprops.dashboard_data.context)
                 }
             }
 
         })
         useEffect(()=>{
-            if (update_interval){
+            if (update_interval && !this.env.inDialog){
                 const interval = setInterval(() => {
-                    this.ksFetchUpdateItem(this.item.id);
+                    this.ksFetchUpdateItem(this.item.id, this.ks_dashboard_id, this.props.dashboard_data.context);
                 }, update_interval);
                 return () => clearInterval(interval);
             }
 
         })
+        if(this.props?.item?.ks_dashboard_item_type === 'ks_list_view' && this.env.inDialog)
+            useBus(this.env.bus, `TV:List_Load_More_${this.props?.item?.id}`, (ev) => this.getDomainParams(ev));
     }
-    async ksFetchUpdateItem(item_id) {
+
+    renderListViewData(item) {
+        var item_list_data = item.ks_list_view_data;
+        var list_view_data = JSON.parse(item_list_data);
+        var datetime_format = localization.dateTimeFormat;
+        if (list_view_data.type === "ungrouped" && list_view_data) {
+            if (list_view_data.date_index) {
+                var index_data = list_view_data.date_index;
+                for (var i = 0; i < index_data.length; i++) {
+                    for (var j = 0; j < list_view_data.data_rows.length; j++) {
+                        var index = index_data[i]
+                        var date = list_view_data.data_rows[j]["data"][index]
+                        if (date) {
+                            if (list_view_data.fields_type[index] === 'date'){
+                                list_view_data.data_rows[j]["data"][index] = luxon.DateTime.fromJSDate(date)?.format?.(date_format) , {}, {timezone: false};
+                            }else{
+                                list_view_data.data_rows[j]["data"][index] = luxon.DateTime.fromJSDate(new Date(date + " UTC")).toFormat?.(datetime_format), {}, {timezone: false};
+
+                            }
+                        }else{
+                            list_view_data.data_rows[j]["data"][index] = "";
+                        }
+                    }
+                }
+            }
+        }
+        return list_view_data;
+    }
+
+    async ksFetchUpdateItem(item_id,dash_id,context,domain=this.__owl__.parent.component?.ksGetParamsForItemFetch(item_id)) {
             var self = this;
             await jsonrpc("/web/dataset/call_kw",{
                 model: 'ks_dashboard_ninja.board',
                 method: 'ks_fetch_item',
                 args: [
-                    [parseInt(item_id)], self.ks_dashboard_data.ks_dashboard_id,self.__owl__.parent.component.ksGetParamsForItemFetch(self.item.id)
+                    [parseInt(item_id)], dash_id,domain
                 ],
-                kwargs:{context:this.props.dashboard_data.context},
+                kwargs:{context},
 //                context: self.getContext(),
-            }).then(function(new_item_data) {
+            })
+            .then(function(new_item_data) {
+                if(new_item_data[item_id].ks_list_view_data){
+                    new_item_data[item_id].ks_list_view_data = self.renderListViewData(new_item_data[item_id])
+                }
                 this.ks_dashboard_data.ks_item_data[item_id] = new_item_data[item_id];
                 this.item = this.ks_dashboard_data.ks_item_data[item_id] ;
                 // done this to render updated items on play button
@@ -98,7 +138,6 @@ export class Ksdashboardgraph extends Component{
                 }
 //                 $(this.ks_gridstack_container.el).find(".ks_breadcrumb").addClass("d-none")
 //                 $(this.ks_gridstack_container.el).find(".ks_chart_heading").removeClass("d-none")
-
             }.bind(this));
         }
 
@@ -205,10 +244,10 @@ export class Ksdashboardgraph extends Component{
                         var date = list_view_data.data_rows[j]["data"][index]
                         if (date) {
                             if( list_view_data.fields_type[index] === 'date'){
-                             let parsedDate = parseDateTime(date,{format: "MM-dd-yyyy HH:mm:ss"});
+                             let parsedDate = parseDateTime(date,{format: localization.dateFormat});
                                 list_view_data.data_rows[j]["data"][index] = formatDate(parsedDate, { format: localization.dateFormat })
                             } else{
-                            let parsedDate = parseDateTime(date,{format: "MM-dd-yyyy HH:mm:ss"});
+                            let parsedDate = parseDateTime(date,{format: localization.dateTimeFormat});
                                 list_view_data.data_rows[j]["data"][index] = formatDateTime(parsedDate, { format: localization.dateTimeFormat })
                             }
                         }else{
@@ -279,6 +318,27 @@ export class Ksdashboardgraph extends Component{
         var ks_labels = chart_data['labels'];
         var ks_data = chart_data.datasets;
 
+        if(item.ks_chart_cumulative_field){
+            for(var i=0;i<ks_data.length;i++){
+                var ks_temp_com = 0;
+                var datasets = {};
+                var cumulative_data = []
+                if(ks_data[i].ks_chart_cumulative_field){
+                    for(var j=0; j< ks_data[i].data.length; j++){
+                        ks_temp_com = ks_temp_com + ks_data[i].data[j];
+                        cumulative_data.push(ks_temp_com);
+                    }
+                    datasets.label = 'Cumulative ' + ks_data[i].label;
+                    datasets.data = cumulative_data;
+                    if(item.ks_chart_cumulative){
+                        datasets.type = 'line';
+                    }
+                    ks_data.push(datasets);
+                }
+            }
+        }
+
+
         let data=[];
         if (ks_data && ks_labels){
         if (ks_data.length && ks_labels.length){
@@ -294,7 +354,6 @@ export class Ksdashboardgraph extends Component{
                 data2["category"] = ks_labels[i]
                 data.push(data2)
             }
-
 
             const root  = am5.Root.new(graph_render[0]);
             var self =this;
@@ -318,8 +377,13 @@ export class Ksdashboardgraph extends Component{
             switch (chart_type){
             case "ks_bar_chart":
             case "ks_bullet_chart":
+                if(this.props.dashboard_data.zooming_enabled){
+                    var wheely_val = "zoomX";
+                }else{
+                    var wheely_val = 'none';
+                }
             var chart = root.container.children.push(am5xy.XYChart.new(root, {panX: false,panY: false,
-             wheelX: "panX",wheelY: "zoomX",layout: root.verticalLayout}));
+             wheelX: "panX",wheelY: wheely_val,layout: root.verticalLayout}));
 
             var xRenderer = am5xy.AxisRendererX.new(root, {
                    minGridDistance: 15,
@@ -351,6 +415,10 @@ export class Ksdashboardgraph extends Component{
             var yAxis = chart.yAxes.push(am5xy.ValueAxis.new(root, {extraMin: 0,
             extraMax: 0.1,renderer: am5xy.AxisRendererY.new(root, {strokeOpacity: 0.1}) }));
 
+//            yAxis.get("renderer").labels.template.setAll({
+//                paddingRight: 30,
+//                 paddingLeft: 30
+//            });
             // Add series
 
             for (let k = 0;k<ks_data.length ; k++){
@@ -508,8 +576,13 @@ export class Ksdashboardgraph extends Component{
             }
             break;
             case "ks_horizontalBar_chart":
+                if(this.props.dashboard_data.zooming_enabled){
+                    var wheely_val = "zoomX";
+                }else{
+                    var wheely_val = 'none';
+                }
                 var chart = root.container.children.push(am5xy.XYChart.new(root, {panX: false,panY: false,
-                wheelX: "panX",wheelY: "zoomX",layout: root.verticalLayout}));
+                wheelX: "panX",wheelY: wheely_val,layout: root.verticalLayout}));
                 var yRenderer = am5xy.AxisRendererY.new(root, {
                         inversed: true,
                         minGridDistance: 30,
@@ -645,8 +718,14 @@ export class Ksdashboardgraph extends Component{
             break;
             case "ks_line_chart":
             case "ks_area_chart":
+                if(this.props.dashboard_data.zooming_enabled){
+                    var wheely_val = "zoomX";
+                }else{
+                    var wheely_val = 'none';
+                }
+
                 var chart = root.container.children.push(am5xy.XYChart.new(root, {panX: false,panY: false,
-                wheelX: "panX",wheelY: "zoomX",layout: root.verticalLayout}));
+                wheelX: "panX",wheelY: wheely_val,layout: root.verticalLayout}));
                 var xRenderer = am5xy.AxisRendererX.new(root, {
                     minGridDistance: 15,
                     minorGridEnabled: true
@@ -668,6 +747,13 @@ export class Ksdashboardgraph extends Component{
 
                 var yAxis = chart.yAxes.push(am5xy.ValueAxis.new(root, {extraMin: 0,
                 extraMax: 0.1,renderer: am5xy.AxisRendererY.new(root, {strokeOpacity: 0.1}) }));
+
+//                 if($('.o_rtl').length){
+//                    yAxis.get("renderer").labels.template.setAll({
+//                        paddingRight: 30,
+//                        paddingLeft: 30
+//                    });
+//                 }
 
                 for (let k = 0;k<ks_data.length ; k++){
 
@@ -869,11 +955,16 @@ export class Ksdashboardgraph extends Component{
                 case "ks_radar_view":
                 case "ks_flower_view":
                 case "ks_radialBar_chart":
+                    if(this.props.dashboard_data.zooming_enabled){
+                        var wheely_val = "zoomX";
+                    }else{
+                        var wheely_val = 'none';
+                    }
                     var chart = root.container.children.push(am5radar.RadarChart.new(root, {
                         panX: false,
                         panY: false,
                         wheelX: "panX",
-                        wheelY: "zoomX",
+                        wheelY: wheely_val,
                         radius: am5.percent(80),
 //                        layout: root.verticalLayout,
                     }));
@@ -1079,8 +1170,13 @@ export class Ksdashboardgraph extends Component{
                     break;
 
                 case "ks_scatter_chart":
+                if(this.props.dashboard_data.zooming_enabled){
+                        var wheely_val = "zoomX";
+                    }else{
+                        var wheely_val = 'none';
+                    }
                 var chart = root.container.children.push(am5xy.XYChart.new(root, {panX: false,panY: false,
-                 wheelX: "panX",wheelY: "zoomX",layout: root.verticalLayout}));
+                 wheelX: "panX",wheelY: wheely_val,layout: root.verticalLayout}));
                     var xAxis = chart.xAxes.push(am5xy.ValueAxis.new(root, {
                         renderer: am5xy.AxisRendererX.new(root, { minGridDistance: 50 }),
                         tooltip: am5.Tooltip.new(root, {})
@@ -1215,12 +1311,13 @@ export class Ksdashboardgraph extends Component{
 //            this.chart_container[item.id] = chart;
             $ks_gridstack_container.find('.ks_li_' + item.ks_chart_item_color).addClass('ks_date_filter_selected');
         }else{
-            $ks_gridstack_container.find('.ks_chart_card_body').append($("<div class='graph_text'>").text("No Data Available."));
+            $ks_gridstack_container.find('.ks_chart_card_body').append(renderToString("ksNoItemChartView", {}));
         }
         }else{
-         $ks_gridstack_container.find('.ks_chart_card_body').append($("<div class='graph_text'>").text("No Data Available."));
+         $ks_gridstack_container.find('.ks_chart_card_body').append(renderToString("ksNoItemChartView", {}));
         }
     }
+
      ksrenderfunnelchart($ks_gridstack_container,item){
             var self =this;
             if($ks_gridstack_container.find('.ks_chart_card_body').length){
@@ -1298,6 +1395,10 @@ export class Ksdashboardgraph extends Component{
                         legend.data.setAll(series.dataItems);
                     }
                     chart.appear(1000, 100);
+
+                    if(!this.chart_container){
+                        this.chart_container = {};
+                    }
                     this.chart_container[item.id] = chart;
                     series.slices._values.forEach((rec)=>{
                         rec.events.on("click",function(ev){
@@ -1306,17 +1407,17 @@ export class Ksdashboardgraph extends Component{
                             }
                         })
                     })
+                    $ks_gridstack_container.find('.ks_li_' + item.ks_chart_item_color).addClass('ks_date_filter_selected');
                 }else{
-                    $ks_gridstack_container.find('.ks_chart_card_body').append($("<div class='funnel_text'>").text("No Data Available."))
+                    $ks_gridstack_container.find('.ks_chart_card_body').append(renderToString("ksNoItemChartView", {}))
                 }
             }else{
-                    $ks_gridstack_container.find('.ks_chart_card_body').append($("<div class='funnel_text'>").text("No Data Available."))
+                    $ks_gridstack_container.find('.ks_chart_card_body').append(renderToString("ksNoItemChartView", {}))
             }
             return $ks_gridstack_container;
      }
 
      onChartCanvasClick(evt) {
-
         var self = this;
         this.ksUpdateDashboard = {};
         var item_id = $(evt.target).parent().data().itemId;
@@ -1420,6 +1521,7 @@ export class Ksdashboardgraph extends Component{
 
      async onChartCanvasClick_funnel(evt,item_id,item){
         var self = this;
+        if(this.env.inDialog) return ;
         this.ksUpdateDashboard = {};
         if (item_id in self.ksUpdateDashboard) {
             clearInterval(self.ksUpdateDashboard[item_id]);
@@ -1750,7 +1852,6 @@ export class Ksdashboardgraph extends Component{
 
 
     async ksrendermapview($ks_map_view_tmpl,item){
-        console.log("render")
         var self =this;
         if($ks_map_view_tmpl.find('.ks_chart_card_body').length){
             var mapRender = $ks_map_view_tmpl.find('.ks_chart_card_body');
@@ -2015,10 +2116,10 @@ export class Ksdashboardgraph extends Component{
 //               $ks_map_view_tmpl.find('.ks_li_' + item.ks_flower_item_color).addClass('ks_date_filter_selected');
 
         }else{
-            $ks_map_view_tmpl.find('.ks_chart_card_body').append($("<div class='map_text'>").text("No Data Available."))
+            $ks_map_view_tmpl.find('.ks_chart_card_body').append(renderToString("ksNoItemChartView", {}))
         }
         }else{
-            $ks_map_view_tmpl.find('.ks_chart_card_body').append($("<div class='map_text'>").text("No Data Available."))
+            $ks_map_view_tmpl.find('.ks_chart_card_body').append(renderToString("ksNoItemChartView", {}))
         }
 //       }else{
 //        $ks_map_view_tmpl.find('.ks_map_card_body').append($("<div class='map_text'>").text("Please select Groupby that has Address."))}
@@ -2060,8 +2161,13 @@ export class Ksdashboardgraph extends Component{
             var itemId = e.currentTarget.dataset.itemId;
             var offset = self.ks_dashboard_data.ks_item_data[itemId].ks_pagination_limit;
             var context = self.ks_dashboard_data['context']
-
-            var params = self.__owl__.parent.component.ksGetParamsForItemFetch(parseInt(itemId));
+            var params;
+            if(this.props?.item?.ks_dashboard_item_type === 'ks_list_view' && this.env.inDialog){
+                this.env.bus.trigger("GET:ParamsForItemFetch", {item_id: parseInt(itemId), isCarouselParentClass: true});
+                params = this.domainParams
+            }
+            else
+                params = self.__owl__.parent.component.ksGetParamsForItemFetch(parseInt(itemId));
             this._rpc("/web/dataset/call_kw/ks_dashboard_ninja.board/ks_get_list_view_data_offset",{
                 model: 'ks_dashboard_ninja.board',
                 method: 'ks_get_list_view_data_offset',
@@ -2072,6 +2178,9 @@ export class Ksdashboardgraph extends Component{
                 kwargs:{context:context}
             }).then(function(result) {
                 var item_data = self.ks_dashboard_data.ks_item_data[itemId];
+                if(result.ks_list_view_data){
+                    result.ks_list_view_data = self.renderListViewData(result)
+                }
                 var item_view = $(".ks_dashboard_main_content").find(".grid-stack-item[gs-id=" + item_data.id + "]");
                 self.item.ks_list_view_data = result.ks_list_view_data;
                 self.prepare_list();
@@ -2085,6 +2194,10 @@ export class Ksdashboardgraph extends Component{
             });
         }
 
+        getDomainParams(ev){
+            this.domainParams = ev.detail;
+        }
+
         ksLoadPreviousRecords(e) {
             var self = this;
             var itemId = e.currentTarget.dataset.itemId;
@@ -2092,7 +2205,14 @@ export class Ksdashboardgraph extends Component{
             var ks_offset =  parseInt(e.target.parentElement.dataset.prevOffset) - (offset + 1) ;
             var ks_intial_count = e.target.parentElement.dataset.next_offset;
             var context = self.ks_dashboard_data['context']
-            var params = self.__owl__.parent.component.ksGetParamsForItemFetch(parseInt(itemId));
+            var params;
+            if(this.props?.item?.ks_dashboard_item_type === 'ks_list_view' && this.env.inDialog){
+                this.env.bus.trigger("GET:ParamsForItemFetch", {item_id: parseInt(itemId), isCarouselParentClass: true});
+                params = this.domainParams
+            }
+            else
+                params = self.__owl__.parent.component.ksGetParamsForItemFetch(parseInt(itemId));
+
             this._rpc("/web/dataset/call_kw/ks_dashboard_ninja.board/ks_get_list_view_data_offset",{
                 model: 'ks_dashboard_ninja.board',
                 method: 'ks_get_list_view_data_offset',
@@ -2103,6 +2223,9 @@ export class Ksdashboardgraph extends Component{
                     }, parseInt(self.ks_dashboard_data.ks_dashboard_id), params],
                 kwargs:{context:context}
             }).then(function(result) {
+                if(result.ks_list_view_data){
+                    result.ks_list_view_data = self.renderListViewData(result)
+                }
                 var item_data = self.ks_dashboard_data.ks_item_data[itemId];
                 var item_view = $(".ks_dashboard_main_content").find(".grid-stack-item[gs-id=" + item_data.id + "]");
                 self.item.ks_list_view_data = result.ks_list_view_data;
@@ -2167,8 +2290,6 @@ export class Ksdashboardgraph extends Component{
             self.actionService.doAction(action)
         }
 
-
-
 };
 
 Ksdashboardgraph.props = {
@@ -2178,7 +2299,9 @@ Ksdashboardgraph.props = {
     pre_defined_filter :{type:Object, Optional:true},
     custom_filter :{type:Object, Optional:true},
     ks_speak:{type:Function , Optional:true},
-
+    hideButtons: { type: Number, optional: true },
+    generate_dialog: { type: Boolean, optional: true },
+    explain_ai_whole: { type: Boolean, optional: true }
 };
 
 Ksdashboardgraph.template = "Ks_chart_list_container";

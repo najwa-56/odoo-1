@@ -3,6 +3,7 @@
 import { _t } from "@web/core/l10n/translation";
 import { Component, onWillStart, useState ,onMounted, onWillRender, useRef, onWillPatch } from "@odoo/owl";
 import { registry } from "@web/core/registry";
+import { renderToString,renderToElement } from "@web/core/utils/render";
 import { useService } from "@web/core/utils/hooks";
 import { useSetupAction } from "@web/webclient/actions/action_hook";
 import { localization } from "@web/core/l10n/localization";
@@ -12,6 +13,7 @@ import { session } from "@web/session";
 import { download } from "@web/core/network/download";
 import { BlockUI } from "@web/core/ui/block_ui";
 import { WebClient } from "@web/webclient/webclient";
+import {FormViewDialog} from "@web/views/view_dialogs/form_view_dialog";
 import { ConfirmationDialog } from "@web/core/confirmation_dialog/confirmation_dialog";
 import { patch } from "@web/core/utils/patch";
 import { isBrowserChrome, isMobileOS } from "@web/core/browser/feature_detection";
@@ -22,6 +24,7 @@ import { Ksdashboardtile } from '@ks_dashboard_ninja/components/ks_dashboard_til
 import { Ksdashboardtodo } from '@ks_dashboard_ninja/components/ks_dashboard_to_do_item/ks_dashboard_to_do';
 import { Ksdashboardkpiview } from '@ks_dashboard_ninja/components/ks_dashboard_kpi_view/ks_dashboard_kpi';
 import { Ksdashboardgraph } from '@ks_dashboard_ninja/components/ks_dashboard_graphs/ks_dashboard_graphs';
+import { Dialog } from "@web/core/dialog/dialog";
 
 
 export class KsAIDashboardNinja extends Component {
@@ -33,12 +36,15 @@ export class KsAIDashboardNinja extends Component {
         this._rpc = useService("rpc");
         this.dialogService = useService("dialog");
         this.header =  useRef("ks_dashboard_header");
+        this.footer =  useRef("ks_dashboard_footer");
         this.main_body = useRef("ks_main_body");
         this.grid_stack = useRef("ks_grid_stack")
         this.reload_menu_option = {
             reload:this.props.action.context.ks_reload_menu,
             menu_id: this.props.action.context.ks_menu_id
         };
+        this.generate_dialog = false;
+        this.generate_dialog = this.props.action.context.generate_dialog ? true : false;
         this.ks_ai_dash_id = this.props.action.context['ks_dash_id'];
         this.ks_ai_dash_name = this.props.action.context['ks_dash_name'];
        this.ks_ai_del_id =this.props.action.context['ks_delete_dash_id'];
@@ -161,7 +167,9 @@ export class KsAIDashboardNinja extends Component {
         this.dn_state['user_context']=context
         onWillStart(this.willStart);
         onWillRender(this.dashboard_mount);
-        onMounted(() => this.grid_initiate());
+        onMounted(() => {
+            this.grid_initiate();
+        });
     }
 
     willStart(){
@@ -175,30 +183,34 @@ export class KsAIDashboardNinja extends Component {
                 return self.ks_fetch_items_data()
             });
         });
+
     }
 
     grid_initiate(){
-        var self=this;
-        var $gridstackContainer = $(this.grid_stack.el);
-        if($gridstackContainer.length){
-            this.grid = GridStack.init(this.gridstack_options,$gridstackContainer[0]);
-            if(this.ks_dashboard_data.ks_gridstack_config){
-                this.gridstackConfig = JSON.parse(this.ks_dashboard_data.ks_gridstack_config);
-            }
-            for (var i = 0; i < this.state.ks_dashboard_items.length; i++) {
-                var graphs = ['ks_scatter_chart','ks_bar_chart', 'ks_horizontalBar_chart', 'ks_line_chart', 'ks_area_chart', 'ks_doughnut_chart','ks_polarArea_chart','ks_pie_chart','ks_flower_view', 'ks_radar_view','ks_radialBar_chart','ks_map_view','ks_funnel_chart','ks_bullet_chart', 'ks_to_do', 'ks_list_view']
-                var $ks_preview = $('#' + self.state.ks_dashboard_items[i].id)
-                if ($ks_preview.length) {
-                    if (self.state.ks_dashboard_items[i].id in self.gridstackConfig) {
-                         self.grid.addWidget($ks_preview[0], {x:self.gridstackConfig[self.state.ks_dashboard_items[i].id].x, y:self.gridstackConfig[self.state.ks_dashboard_items[i].id].y, w:self.gridstackConfig[self.state.ks_dashboard_items[i].id].w, h: self.gridstackConfig[self.state.ks_dashboard_items[i].id].h, autoPosition:true, minW:2, maxW:null, minH:2, maxH:null, id:self.state.ks_dashboard_items[i].id});
-                    } else if ( graphs.includes (self.state.ks_dashboard_items[i].ks_dashboard_item_type)) {
-                         self.grid.addWidget($ks_preview[0], {x:0, y:0, w:5, h:5,autoPosition:true,minW:4,maxW:null,minH:3,maxH:null, id :self.state.ks_dashboard_items[i].id});
-                    }else{
-                        self.grid.addWidget($ks_preview[0], {x:0, y:0, w:3, h:2,autoPosition:true,minW:2,maxW:null,minH:2,maxH:2,id:self.state.ks_dashboard_items[i].id});
+        $(".o_dialog .o_inactive_modal").remove()
+         if (!this.generate_dialog) {
+            var self=this;
+            var $gridstackContainer = $(this.grid_stack.el);
+            if($gridstackContainer.length){
+                this.grid = GridStack.init(this.gridstack_options,$gridstackContainer[0]);
+                if(this.ks_dashboard_data.ks_gridstack_config){
+                    this.gridstackConfig = JSON.parse(this.ks_dashboard_data.ks_gridstack_config);
+                }
+                for (var i = 0; i < this.state.ks_dashboard_items.length; i++) {
+                    var graphs = ['ks_scatter_chart','ks_bar_chart', 'ks_horizontalBar_chart', 'ks_line_chart', 'ks_area_chart', 'ks_doughnut_chart','ks_polarArea_chart','ks_pie_chart','ks_flower_view', 'ks_radar_view','ks_radialBar_chart','ks_map_view','ks_funnel_chart','ks_bullet_chart', 'ks_to_do', 'ks_list_view']
+                    var $ks_preview = $('#' + self.state.ks_dashboard_items[i].id)
+                    if ($ks_preview.length) {
+                        if (self.state.ks_dashboard_items[i].id in self.gridstackConfig) {
+                             self.grid.addWidget($ks_preview[0], {x:self.gridstackConfig[self.state.ks_dashboard_items[i].id].x, y:self.gridstackConfig[self.state.ks_dashboard_items[i].id].y, w:self.gridstackConfig[self.state.ks_dashboard_items[i].id].w, h: self.gridstackConfig[self.state.ks_dashboard_items[i].id].h, autoPosition:true, minW:2, maxW:null, minH:2, maxH:null, id:self.state.ks_dashboard_items[i].id});
+                        } else if ( graphs.includes (self.state.ks_dashboard_items[i].ks_dashboard_item_type)) {
+                             self.grid.addWidget($ks_preview[0], {x:0, y:0, w:5, h:5,autoPosition:true,minW:4,maxW:null,minH:3,maxH:null, id :self.state.ks_dashboard_items[i].id});
+                        }else{
+                            self.grid.addWidget($ks_preview[0], {x:0, y:0, w:3, h:2,autoPosition:true,minW:2,maxW:null,minH:2,maxH:2,id:self.state.ks_dashboard_items[i].id});
+                        }
                     }
                 }
+                this.grid.setStatic(true);
             }
-            this.grid.setStatic(true);
         }
         // Events //
         const ks_element = this.main_body.el;
@@ -207,9 +219,14 @@ export class KsAIDashboardNinja extends Component {
         Object.values(ks_element.querySelectorAll(".ks_dashboard_kpi_dashboard")).map((item) => { item.addEventListener('click', this.onkschartcontainerclick.bind(this))})
 
        $(document.querySelectorAll(".modal-body .ks_dashboard_item_button_container")).remove();
+       $('#ks_ai_add_item').addClass("d-none");
        $(document.querySelectorAll(".modal-header .btn-close")).remove();
        $(document.querySelectorAll(".modal-footer .o-default-button")).remove();
-        $(document.querySelectorAll(".modal-header .btn-link")).addClass('d-none')
+
+       let ks_footer = $(renderToElement("ks_ai_dashboard_footer",{
+        self:this
+       }))
+        $(document.querySelectorAll(".modal-footer")).append(ks_footer)
 
        }
 
@@ -349,30 +366,29 @@ export class KsAIDashboardNinja extends Component {
 
     onkschartcontainerclick(ev){
             if($(ev.currentTarget).hasClass('ks_dashboard_kpi_dashboard')){
-                if(!($(ev.currentTarget).parent().hasClass('ks_img_selected'))){
+                if(!($(ev.currentTarget).find('.select-btn').hasClass('active'))){
                     $('#ks_ai_add_item').removeClass("d-none");
-                    $(ev.currentTarget).parent().addClass('ks_img_selected');
-                    $(ev.currentTarget).find(".ks_img_display").removeClass("d-none");
+                    $(ev.currentTarget).find('.select-btn').addClass('active');
                     this.ksSelectedgraphid.push(parseInt($(ev.currentTarget).parent()[0].id));
                 }else{
-                    $(ev.currentTarget).parent().removeClass('ks_img_selected');
-                    $(ev.currentTarget).find(".ks_img_display").addClass("d-none")
+                    $(ev.currentTarget).find('.select-btn').removeClass('active');
                     const index = this.ksSelectedgraphid.indexOf(parseInt($(ev.currentTarget).parent()[0].id));
                     this.ksSelectedgraphid.splice(index, 1);
                 }
             }else{
-                if(!($(ev.currentTarget).hasClass('ks_img_selected'))){
+                if(!($(ev.currentTarget).find('.select-btn').hasClass('active'))){
                     $('#ks_ai_add_item').removeClass("d-none");
-                    $(ev.currentTarget).addClass('ks_img_selected');
-                    $(ev.currentTarget).find(".ks_img_display").removeClass("d-none");
+                    $(ev.currentTarget).find('.select-btn').addClass('active');
                     this.ksSelectedgraphid.push(parseInt($(ev.currentTarget).parent()[0].id));
                 }else{
-                    $(ev.currentTarget).removeClass('ks_img_selected');
-                    $(ev.currentTarget).find(".ks_img_display").addClass("d-none")
+                    $(ev.currentTarget).find('.select-btn').removeClass('active');
                     const index = this.ksSelectedgraphid.indexOf(parseInt($(ev.currentTarget).parent()[0].id));
                     this.ksSelectedgraphid.splice(index, 1);
                 }
             }
+
+            const selectedCount = this.ksSelectedgraphid.length;
+            $('#selected_chart_count').text(selectedCount);
 
             if (this.ksSelectedgraphid.length == 0){
                 $('#ks_ai_add_item').addClass("d-none")
@@ -382,48 +398,56 @@ export class KsAIDashboardNinja extends Component {
     onselectallitems(){
             this.ksSelectedgraphid = []
             document.querySelectorAll(".modal-body .ks_list_view_container").forEach((item) =>{
-                $(item).addClass('ks_img_selected')
-                $(item).find('.ks_img_display').removeClass("d-none");
+//                $(item).addClass('.active')
+                $(item).find('.select-btn').addClass("active");
                 this.ksSelectedgraphid.push(parseInt($(item).parent()[0].id))
             });
             document.querySelectorAll(".modal-body .ks_dashboard_kpi_dashboard").forEach((item) =>{
-                $(item).parent().addClass('ks_img_selected')
-                $(item).find('.ks_img_display').removeClass("d-none");
+//                $(item).parent().addClass('.active')
+                $(item).find('.select-btn').addClass("active");
                 this.ksSelectedgraphid.push(parseInt($(item).parent()[0].id))
             });
 
 
             document.querySelectorAll(".modal-body .ks_dashboarditem_chart_container").forEach((item) =>{
-                $(item).addClass('ks_img_selected')
-                $(item).find('.ks_img_display').removeClass("d-none");
+//                $(item).addClass('.active')
+                $(item).find('.select-btn').addClass("active");
                 this.ksSelectedgraphid.push(parseInt($(item).parent()[0].id))
             });
 
             $('#ks_ai_add_item').removeClass("d-none")
             $('#ks_ai_remove_all_item').removeClass("d-none")
             $('#ks_ai_add_all_item').addClass("d-none")
+
+            const selectedCount = this.ksSelectedgraphid.length;
+            $('#selected_chart_count').text(selectedCount);
         }
 
     onremoveallitems(){
 
            document.querySelectorAll(".modal-body .ks_list_view_container").forEach((item) =>{
-                $(item).removeClass('ks_img_selected')
-                $(item).find('.ks_img_display').addClass("d-none");
+//                $(item).removeClass('ks_img_selected')
+//                $(item).find('.ks_img_display').addClass("d-none");
+                $(item).find('.select-btn').removeClass("active");
             })
 
             document.querySelectorAll(".modal-body .ks_dashboard_kpi_dashboard").forEach((item) =>{
-                $(item).parent().removeClass('ks_img_selected')
-                $(item).find('.ks_img_display').addClass("d-none");
+//                $(item).parent().removeClass('ks_img_selected')
+//                $(item).find('.ks_img_display').addClass("d-none");
+                $(item).find('.select-btn').removeClass("active");
             });
 
             document.querySelectorAll(".modal-body .ks_dashboarditem_chart_container").forEach((item) =>{
-                $(item).removeClass('ks_img_selected')
-                $(item).find('.ks_img_display').addClass("d-none");
+                $(item).find('.select-btn').removeClass("active");
+//                $(item).removeClass('ks_img_selected')
+//                $(item).find('.ks_img_display').addClass("d-none");
             });
             this.ksSelectedgraphid = [];
              $('#ks_ai_add_item').addClass("d-none")
              $('#ks_ai_remove_all_item').addClass("d-none")
              $('#ks_ai_add_all_item').removeClass("d-none")
+             $('#selected_chart_count').text(0);
+
         }
 
     onKsaddItemClick(e) {
@@ -461,12 +485,8 @@ export class KsAIDashboardNinja extends Component {
 
         }
     speak_once(ev,item){
-        console.log(true)
     }
-
 }
-
-
-KsAIDashboardNinja.components = { Ksdashboardtile,Ksdashboardgraph,Ksdashboardkpiview, Ksdashboardtodo};
+KsAIDashboardNinja.components = { Ksdashboardtile,Ksdashboardgraph,Ksdashboardkpiview, Ksdashboardtodo, Dialog, FormViewDialog};
 KsAIDashboardNinja.template = "ksaiDashboardNinjaHeader"
 registry.category("actions").add("ks_ai_dashboard_ninja",KsAIDashboardNinja);

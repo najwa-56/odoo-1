@@ -3,6 +3,7 @@
 import { registry } from "@web/core/registry";
 import { CharField } from "@web/views/fields/char/char_field";
 const { Component,reactive, onWillUnmount, onWillUpdateProps, useEffect, useRef, useState, onMounted, willStart } = owl;
+import { renderToElement, renderToString } from "@web/core/utils/render";
 
 export class ks_bullet_chart extends Component{
     setup(){
@@ -56,7 +57,6 @@ export class ks_bullet_chart extends Component{
     }
     get_bullet_chart(rec){
         var self = this;
-
         if($(this.bulletRef.el).find(".graph_text").length){
             $(this.bulletRef.el).find(".graph_text").remove();
         }
@@ -65,7 +65,7 @@ export class ks_bullet_chart extends Component{
         var ks_data = chart_data.datasets;
 
         let data=[];
-        if (ks_data.length){
+        if (ks_data.length && ks_data[0]?.data?.length){
             for (let i=0 ; i<ks_labels.length ; i++){
                 let data2={};
                 for (let j=0 ;j<ks_data.length ; j++){
@@ -94,12 +94,16 @@ export class ks_bullet_chart extends Component{
             };
 
             // Create chart
-
+            if(this.props.record.data.zoom_enabled){
+                    var wheely_val = "zoomX";
+                }else{
+                    var wheely_val = 'none';
+                }
             var chart = this.root.container.children.push(am5xy.XYChart.new(this.root, {
                 panX: true,
                 panY: false,
                 wheelX: "panX",
-                wheelY: "zoomX",
+                wheelY: wheely_val,
                 layout: this.root.verticalLayout
             }));
 
@@ -213,7 +217,7 @@ export class ks_bullet_chart extends Component{
             chart.appear(1000, 100);
             series.appear();
         }else{
-            $(this.bulletRef.el).append($("<div class='graph_text'>").text("No Data Available."));
+            $(this.bulletRef.el).append(renderToString("ksNoItemChartView", {}));
         }
 
     }

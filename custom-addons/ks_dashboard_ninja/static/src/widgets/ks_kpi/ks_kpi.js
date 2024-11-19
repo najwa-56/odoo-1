@@ -23,7 +23,8 @@ class KsKpiPreview extends Component {
             return parseInt(v, 16)
             }).join(",");
             return "rgba(" + rgba + "," + val.split(',')[1] + ")";
-        }
+    }
+
     setup() {
         super.setup();
         const self = this;

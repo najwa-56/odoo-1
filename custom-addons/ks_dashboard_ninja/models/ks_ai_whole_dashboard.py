@@ -18,13 +18,13 @@ class KsAIDashboardninja(models.TransientModel):
                                          "('model','!=','mail.thread'),('model','not ilike','ks_dash%'),('model','not ilike','ks_to%')]",
                                   help="Data source to fetch and read the data for the creation of dashboard items. ", required=True)
 
-    ks_dash_name = fields.Char(string="Dashboard Name", required=True)
-    ks_menu_name = fields.Char(string="Menu Name", required=True)
+    ks_dash_name = fields.Char(string="Dashboard Name", required=True, char=35)
+    ks_menu_name = fields.Char(string="Menu Name", required=True, char=35)
     ks_top_menu_id = fields.Many2one('ir.ui.menu',
                                      domain="[('parent_id','=',False)]",
                                      string="Show Under Menu", required=True,
                                      default=lambda self: self.env['ir.ui.menu'].search(
-                                         [('name', '=', 'My Dashboard')])[0])
+                                         [('name', '=', 'My Dashboards')])[0])
     ks_template = fields.Many2one('ks_dashboard_ninja.board_template',
                                   default=lambda self: self.env.ref('ks_dashboard_ninja.ks_blank',
                                                                     False),
@@ -39,7 +39,7 @@ class KsAIDashboardninja(models.TransientModel):
         if self.ks_import_model_id:
             ks_model_name = self.ks_import_model_id.model
             ks_fields = self.env[ks_model_name].fields_get()
-            ks_filtered_fields = {key: val for key, val in ks_fields.items() if val['type'] not in ['many2many', 'one2many', 'binary'] and val['name'] != 'id' and val['name'] != 'sequence' and val['store'] == True}
+            ks_filtered_fields = {key: val for key, val in ks_fields.items() if val['type'] not in ['many2many', 'one2many', 'binary'] and'name' in val and val['name'] != 'id' and val['name'] != 'sequence' and val['store'] == True}
             ks_fields_name = {val['name']:val['type'] for val in ks_filtered_fields.values()}
             question = ("columns: "+ f"{ks_fields_name}")
 

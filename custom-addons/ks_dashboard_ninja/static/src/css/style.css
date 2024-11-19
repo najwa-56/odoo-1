@@ -803,7 +803,6 @@ body:not(.o_touch_device) .o_field_selection:not(:hover):not(:focus-within) sele
 #ks_ai_item_exp_dash{
     border-radius:6px;
     margin-left:8px;
-    background: #1D4D94 !important;
 }
 
 .ks_dn_create_chart .ks_dashboard_top_settings #ks_ai_item_dash img,
@@ -828,9 +827,9 @@ body:not(.o_touch_device) .o_field_selection:not(:hover):not(:focus-within) sele
     background: var(--ks-dn-primary-700);
 }
 
-.ks_start_tv_dashboard,
+/* .ks_start_tv_dashboard,
 .ks_dashboard_print_pdf,
-.ks_dashboard_send_email,
+.ks_dashboard_send_email, */
 #ks_import_item,
 #ks_dashboard_layout_edit {
     border: solid 1px var(--ks-dn-gray-50);
@@ -881,33 +880,17 @@ body:not(.o_touch_device) .o_field_selection:not(:hover):not(:focus-within) sele
     margin-right: 0px;
 }
 
-.ks_start_tv_dashboard:hover,
+/* .ks_start_tv_dashboard:hover,
 .ks_dashboard_print_pdf:hover,
-.ks_dashboard_send_email:hover,
+.ks_dashboard_send_email:hover, */
 #ks_import_item:hover,
 #ks_dashboard_layout_edit:hover {
     background: transparent;
     border: solid 1px var(--ks-dn-gray-50);
 }
 
-.ks_dashboard_top_menu .ks_date_filter_selection_input .ks_date_selection_box .ks_date_filter_dropdown {
-    border: solid 1px var(--ks-dn-gray-50);
-    border-radius: 8px !important;
-    background: var(--ks-dn-gray-200);
-    color: var(--ks-dn-black-600);
-    padding: 12px;
-    transition: all 0.3s ease-in-out;
-}
 
 
-.ks_dashboard_top_menu .ks_date_filter_selection_input .ks_date_selection_box .ks_date_filter_dropdown:hover {
-    background: var(--ks-dn-gray-hover);
-}
-
-.ks_dashboard_top_menu .ks_date_filter_selection_input .ks_date_selection_box .ks_date_filter_dropdown.show {
-    background: var(--ks-dn-primary-600);
-    color: var(--ks-dn-white);
-}
 
 .ks_dashboard_top_menu .ks_date_filter_selection_input .ks_date_selection_box .ks_date_filter_dropdown.show #ks_date_filter_selection {
     color: var(--ks-dn-white);
@@ -1025,3 +1008,4 @@ body:not(.o_touch_device) .o_field_selection:not(:hover):not(:focus-within) sele
 .ks_chart_card_body{
     padding: 5px 5px !important;
 }
+

@@ -8,7 +8,6 @@
     position: relative;
     display: flex;
     align-items: center;
-    margin-right:14px;
 }
 .ks_date_apply_clear_print,.ks_dashboard_top_menu{
     display: flex;

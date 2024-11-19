@@ -13,12 +13,15 @@ export class Ksdashboardkpiview extends Component{
         var self = this;
         this._rpc = useService("rpc");
         this.actionService = useService("action");
+        this.mailChatService = useService("mail.chat_window");
+        this.threadService = useService("mail.thread");
         this.ks_kpi = useRef('ks_kpi')
+        this.ksAllowItemClick = false;
         this.state = useState({item_info_kpi1:{},item_info_kpi2:{},item_info_kpi3:{}})
         onMounted(() => this._update_view());
         this.item = this.props.item
         this.ks_dashboard_data = this.props.dashboard_data
-        this.classname = 'ks_dashboard_kpi ks_dashboard_kpi_dashboard ks_dashboard_custom_srollbar ks_dashboarditem_id ks_dashboard_item_hover ks_db_item_preview_color_picker grid-stack-item-content'
+        this.classname = ' encapsulated-kpi-tile ks_dashboard_kpi ks_dashboard_kpi_dashboard ks_dashboard_custom_srollbar ks_dashboarditem_id ks_dashboard_item_hover ks_db_item_preview_color_picker grid-stack-item-content'
         this.ks_ai_analysis = this.props.dashboard_data.ks_ai_explain_dash
         if (this.ks_ai_analysis){
             this.reviewclass = 'ks_ai_explain_tile'
@@ -50,7 +53,7 @@ export class Ksdashboardkpiview extends Component{
 
         })
         useEffect(()=>{
-            if (update_interval){
+            if (update_interval && !this.env.inDialog){
                 const interval = setInterval(() => {
                     this.ksFetchUpdateItem(this.item.id);
                 }, update_interval);
@@ -73,6 +76,7 @@ export class Ksdashboardkpiview extends Component{
                 this.item = this.ks_dashboard_data.ks_item_data[item_id] ;
                 this.__owl__.parent.component.ks_dashboard_data.ks_item_data[this.item.id] = new_item_data[item_id]
                 this.prepareKpiData()
+                this._update_view();
             }.bind(this));
         }
 
@@ -80,58 +84,59 @@ export class Ksdashboardkpiview extends Component{
     _update_view(){
         if(!this.kpi_data[1]){
             if (this.field.ks_target_view === "Progress Bar" && this.field.ks_goal_enable) {
-                $('#' + this.item.id).find('#ks_progressbar').val(parseInt(this.target_deviation));
+//                $('#' + this.item.id).find('#ks_progressbar').val(parseInt(this.target_deviation));
+                if(this.ks_kpi.el?.querySelector('#ks_progressbar')){
+                    this.ks_kpi.el.querySelector('#ks_progressbar').value = parseInt(this.target_deviation);
+                }
             }
             if (this.field.ks_goal_enable) {
-                    if (this.state.item_info_kpi1.target_arrow == 'up') {
-                        $('#' + this.item.id).find(".target_deviation").css({
-                            "color": "green",
-                        });
-                    } else {
-                        $('#' + this.item.id).find(".target_deviation").css({
-                            "color": "red",
-                        });
-                    }
-                }
+                const targetDeviationElement = this.ks_kpi.el?.querySelector(".target_deviation");
+                if(targetDeviationElement)
+                    targetDeviationElement.style.color = this.state.item_info_kpi1.target_arrow === 'up' ? 'green' : 'red';
+            }
             var ks_valid_date_selection = ['l_day', 't_week', 't_month', 't_quarter', 't_year'];
             if (this.field.ks_previous_period && String(this.state.item_info_kpi1.previous_period_data) && ks_valid_date_selection.indexOf(this.ks_date_filter_selection) >= 0) {
-                if (this.state.item_info_kpi1.pre_arrow == 'up') {
-                    $('#' + this.item.id).find(".pre_deviation").css({
-                        "color": "green",
-                    });
-                } else {
-                    $('#' + this.item.id).find(".pre_deviation").css({
-                        "color": "red",
-                    });
-                }
+                const preDeviationElement = this.ks_kpi.el?.querySelector(".pre_deviation");
+                if(preDeviationElement)
+                    preDeviationElement.style.color = this.state.item_info_kpi1.pre_arrow === 'up' ? 'green' : 'red';
             }
-            if ($('#' + this.item.id).find('.ks_target_previous').children().length !== 2) {
-                $('#' + this.item.id).find('.ks_target_previous').addClass('justify-content-center');
-            }
+            const ksTargetPreviousElement = this.ks_kpi.el?.querySelector('.ks_target_previous');
+            if (ksTargetPreviousElement?.children?.length !== 2)
+                ksTargetPreviousElement?.classList.add('justify-content-center');
         }else{
-            if(this.field.ks_data_comparison == 'Sum'){
-                $('#' + this.item.id).find('.target_deviation').css({
-                    "color": this.state.item_info_kpi2.ks_color
-                });
+            if (this.field.ks_data_comparison === 'Sum') {
+                if(this.ks_kpi.el?.querySelector('.target_deviation')) {
+                    const targetDeviationElement = this.ks_kpi.el.querySelector('.target_deviation');
+                    if(targetDeviationElement)
+                        targetDeviationElement.style.color = this.state.item_info_kpi2.ks_color;
+                }
                 if (this.field.ks_target_view === "Progress Bar") {
-                    $('#' + this.item.id).find('#ks_progressbar').val(parseInt(this.ks_target_deviation == Infinity || this.ks_target_deviation == -Infinity ? 0:this.ks_target_deviation))
+                    const progressBarElement = this.ks_kpi.el.querySelector('#ks_progressbar');
+                    const targetDeviation = (this.ks_target_deviation === Infinity || this.ks_target_deviation === -Infinity) ? 0 : this.ks_target_deviation;
+                    progressBarElement.value = parseInt(targetDeviation);
                 }
             }
-            if(this.field.ks_data_comparison == 'Percentage'){
-                $('#' + this.item.id).find('.target_deviation').css({
-                    "color": this.state.item_info_kpi2.ks_color
-                });
-                if (this.field.ks_target_view === "Progress Bar") {
-                    if (this.state.item_info_kpi2.count) $('#' + this.item.id).find('#ks_progressbar').val(parseInt(this.count == Infinity || this.count == -Infinity ? 0 :this.count));
-                    else $('#' + this.item.id).find('#ks_progressbar').val(0);
+            if (this.field.ks_data_comparison === 'Percentage') {
+                const targetDeviationElement = this.ks_kpi.el?.querySelector('.target_deviation');
+                if(targetDeviationElement){
+                    targetDeviationElement.style.color = this.state.item_info_kpi2.ks_color;
                 }
-            }
-        }
 
-        $(this.ks_kpi.el).find('.ks_dashboarditem_id').css({
-            "background-color": this.ks_rgba_background_color,
-            "color": this.ks_rgba_font_color,
-        });
+                if (this.field.ks_target_view === "Progress Bar") {
+                    const progressBarElement = this.ks_kpi.el.querySelector('#ks_progressbar');
+                    if (this.state.item_info_kpi2.count) {
+                        const countValue = (this.count === Infinity || this.count === -Infinity) ? 0 : this.count;
+                        progressBarElement.value = parseInt(countValue);
+                    } else {
+                        progressBarElement.value = 0;
+                    }
+                }
+            }
+
+        }
+        const dashboardItem = this.ks_kpi.el.querySelector('.ks_dashboarditem_id');
+        dashboardItem.style.backgroundColor = this.ks_rgba_background_color;
+        dashboardItem.style.color = this.ks_rgba_font_color;
     }
 
     ksSum(count_1, count_2, item_info, field, target_1, kpi_data) {
@@ -444,6 +449,9 @@ Ksdashboardkpiview.props = {
     pre_defined_filter:{type: Object, Optional:true},
     custom_filter :{type:Object, Optional:true},
     ks_speak:{type:Function , Optional:true},
+    hideButtons: { type: Number, optional: true },
+    on_dialog: { type: Boolean, optional: true },
+    generate_dialog: { type: Boolean, optional: true },
 };
 
 Ksdashboardkpiview.template = "Ksdashboardkpiview";

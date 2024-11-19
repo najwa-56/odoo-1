@@ -3,6 +3,7 @@
 import { registry } from "@web/core/registry";
 import { CharField } from "@web/views/fields/char/char_field";
 const { Component, useEffect, useRef, useState } = owl;
+import { renderToElement, renderToString } from "@web/core/utils/render";
 
 export class ks_funnel_chart extends Component{
     setup(){
@@ -136,10 +137,10 @@ export class ks_funnel_chart extends Component{
 
             chart.appear(1000, 100);
         }else{
-            $(this.funnelRef.el).append($("<div class='graph_text'>").text("No Data Available."));
+            $(this.funnelRef.el).append(renderToString("ksNoItemChartView", {}));
         }
     }else{
-        $(this.funnelRef.el).append($("<div class='graph_text'>").text("No Data Available."));
+        $(this.funnelRef.el).append(renderToString("ksNoItemChartView", {}));
     }
     }
 }

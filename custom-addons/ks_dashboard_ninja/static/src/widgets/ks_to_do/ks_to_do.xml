@@ -3,11 +3,11 @@
 
     <t t-name="ks_to_do_container">
         <div class="ks_list_view_container container-fluid p-0">
-            <div class="row">
-                <div class="shadow col-md-9 p-0 m-0">
-                    <div class="ks_card_header" t-att-style="'background-color:'+ value.ks_header_color + ';' + 'color: ' + value.ks_font_color+ ';'">
+            <div class="row p-2 justify-content-center min-h-180">
+                <div class="shadow encapsulated-card-preview col-md-9 p-0 m-0">
+                    <div class="ks_card_header encapsulated-header-card" t-att-style="'background-color:'+ value.ks_header_color + ';' + 'color: ' + value.ks_font_color+ ';'">
                         <div class="p-3 py-3 d-flex flex-row align-items-center justify-content-between ">
-                            <h6 class="m-0 font-weight-bold h3 ks_chart_heading" t-att-title="value.ks_to_do_view_name" t-att-style="'color: ' + value.ks_font_color+ ';'">
+                            <h6 class="m-0 font-weight-bold h3 ks_chart_heading text-capitalize text-start" t-att-title="value.ks_to_do_view_name" t-att-style="'color: ' + value.ks_font_color+ ';'">
                                 <t t-esc="value.ks_to_do_view_name"/>
                             </h6>
                         </div>

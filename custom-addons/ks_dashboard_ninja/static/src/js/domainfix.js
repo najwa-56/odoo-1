@@ -12,7 +12,7 @@ const SEARCH_MORE_LIMIT = 320;
         //Patching to add uid and mycompany in dropdown
 patch(RecordAutocomplete.prototype,{
    async loadOptionsSource(name) {
-        if (this.env.services.action.currentController.action?.tag === "ks_dashboard_ninja"){
+        if (this.env.services.action.currentController?.action?.tag === "ks_dashboard_ninja"){
             if (this.lastProm) {
                 this.lastProm.abort(false);
             }
@@ -47,7 +47,7 @@ RecordAutocomplete.props = {...RecordAutocomplete.props,ks_res_ids:{ type: Array
  //Patching to remove invalid domain uid and mycompany from domain-modal
 patch(DomainSelectorAutocomplete.prototype,{
      getTags(props, displayNames) {
-        if (this.env.services.action.currentController.action?.tag === "ks_dashboard_ninja"){
+        if (this.env.services.action.currentController?.action?.tag === "ks_dashboard_ninja"){
             return props.resIds.map((val, index) => {
             const { text, colorIndex } = ksgetFormat(val, displayNames);
             return {
@@ -69,7 +69,7 @@ patch(DomainSelectorAutocomplete.prototype,{
 });
 patch(DomainSelectorSingleAutocomplete.prototype,{
     getDisplayName(props = this.props, displayNames) {
-        if (this.env.services.action.currentController.action?.tag === "ks_dashboard_ninja"){
+        if (this.env.services.action.currentController?.action?.tag === "ks_dashboard_ninja"){
         const { resId } = props;
         if (resId === false) {
             return "";
