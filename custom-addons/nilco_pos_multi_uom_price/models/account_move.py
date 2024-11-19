@@ -21,10 +21,14 @@ class AccountMoveLine(models.Model):
 class AccountInvoiceReport(models.Model):
     _inherit = "account.invoice.report"
 
-    uom_name = fields.Char(string="Unit of Measure")
+    uom_name = fields.Char(string="UOM Name")
+
     def _select(self):
-        return super(AccountInvoiceReport, self)._select() + ", line.uom_name as uom_name"
+        select_str = super(AccountInvoiceReport, self)._select()
+        select_str += ", line.uom_name as uom_name"
+        return select_str
 
     def _group_by(self):
-        return super(AccountInvoiceReport, self)._group_by() + ", line.uom_name"
-
+        group_by_str = super(AccountInvoiceReport, self)._group_by()
+        group_by_str += ", line.uom_name"
+        return group_by_str
