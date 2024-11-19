@@ -29,17 +29,3 @@ class IrActionsActWindow(models.Model):
     custom_report = fields.Char(string='Custom ID', help="Custom report")
 
 
-class AccountInvoiceReport(models.Model):
-    _inherit = "account.invoice.report"
-
-    uom_name = fields.Char(string="UOM Name")
-
-    def _select(self):
-        select_str = super(AccountInvoiceReport, self)._select()
-        select_str += ", line.uom_name as uom_name"
-        return select_str
-
-    def _group_by(self):
-        group_by_str = super(AccountInvoiceReport, self)._group_by()
-        group_by_str += ", line.uom_name"
-        return group_by_str
