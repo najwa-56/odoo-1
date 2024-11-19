@@ -6,7 +6,7 @@ from odoo import models, fields, api
 class AccountMoveLine(models.Model):
     _inherit = "account.move.line"
 
-    uom_name = fields.Char('Uom Name', compute="_compute_get_uom_name")
+    uom_name = fields.Char('Uom Name', compute="_compute_get_uom_name", store=True)
 
     @api.depends('product_uom_id')
     def _compute_get_uom_name(self):
