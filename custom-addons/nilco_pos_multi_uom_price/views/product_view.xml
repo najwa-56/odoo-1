@@ -17,8 +17,7 @@
                                 <field name="name_field"/>
                                  <field name="uom_id"/>
                                 <field name="price"/>
-                                <field name="cost"/>
-                                <field name="ratio"/>
+                                  <field name="cost"/>
                             </tree>
                         </field>                                
                     </group>
