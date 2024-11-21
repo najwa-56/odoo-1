@@ -22,7 +22,6 @@ class AccountMoveLine(models.Model):
 
 
 
-
 class AccountInvoiceReport(models.Model):
     _inherit = "account.invoice.report"
 
@@ -56,7 +55,7 @@ class AccountInvoiceReport(models.Model):
         select_str = super(AccountInvoiceReport, self)._select()
         select_str += """
             , COALESCE(line.quantity / NULLIF(multi_uom_price.ratio, 0), 0) as qty
-            , line.uom_id as uom_id
+            , line.product_uom_id as uom_id
         """
         return select_str
 
@@ -72,7 +71,7 @@ class AccountInvoiceReport(models.Model):
     def _group_by(self):
         group_by_str = super(AccountInvoiceReport, self)._group_by()
         group_by_str += """
-            , line.uom_id
+            , line.product_uom_id
             , multi_uom_price.ratio
         """
         return group_by_str
