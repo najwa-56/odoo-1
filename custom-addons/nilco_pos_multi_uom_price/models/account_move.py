@@ -23,19 +23,20 @@ class AccountMoveLine(models.Model):
 
 
 
+
 class AccountInvoiceReport(models.Model):
     _inherit = "account.invoice.report"
 
-    # UOM Field
+    # UOM field
     uom_id = fields.Many2one('uom.uom', string="Unit of Measure", domain="[('category_id', '=', category_id)]", index=True)
-
-    # UOM Name (Related to UOM, now stored)
-    uom_name = fields.Char(string="UOM Name", related="uom_id.name", store=True)
 
     # Adjusted Quantity field
     qty = fields.Float(string='Adjusted Quantity', compute='_compute_qty', store=True)
 
-    # Ratio field (coming from product.multi.uom.price)
+    # UOM Name field
+    uom_name = fields.Char(string="UOM Name", related="uom_id.name", store=True)
+
+    # Ratio field (related to the product.multi.uom.price)
     ratio = fields.Float(string="Ratio", related="uom_id.ratio", store=True)
 
     @api.depends('uom_id')
@@ -58,10 +59,9 @@ class AccountInvoiceReport(models.Model):
     def _select(self):
         select_str = super(AccountInvoiceReport, self)._select()
         select_str += """
-            , COALESCE(line.quantity / NULLIF(multi_uom_price.ratio, 0), 0) as qty
             , line.product_uom_id as uom_id
-            , multi_uom_price.ratio as ratio  -- Including ratio in the SELECT
-            , line.product_uom_id as uom_name  -- Correcting the UOM name reference
+            , multi_uom_price.ratio as ratio
+            , line.product_uom_id as uom_name  -- Use as standard field, no JSON operator
         """
         return select_str
 
