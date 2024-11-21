@@ -23,7 +23,9 @@ class AccountMoveLine(models.Model):
 
 class AccountInvoiceReport(models.Model):
     _inherit = "account.invoice.report"
-
+    
+    uom_id = fields.Many2one('uom.uom', string="الوحدة", domain="[('category_id', '=', category_id)]", index=True)#,required=True
+    ratio = fields.Float(related='uom_id.ratio', string="Ratio", store=True)
     uom_name = fields.Char(string="UOM Name", store=True)
     qty = fields.Float(string='Adjusted Quantity', compute='_compute_qty', store=True)
 
