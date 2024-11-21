@@ -20,17 +20,18 @@ class AccountMoveLine(models.Model):
 
 
 
+
 class AccountInvoiceReport(models.Model):
     _inherit = "account.invoice.report"
 
-    # Fields
     uom_name = fields.Char(string="UOM Name", store=True)
     qty = fields.Float(string='Adjusted Quantity', compute='_compute_qty', store=True)
 
     @api.depends('quantity', 'product_id', 'product_uom_id')
     def _compute_qty(self):
+        """Compute Adjusted Quantity as quantity / ratio."""
         for record in self:
-            # Fetch related `product.multi.uom.price` record
+            # Fetch the ratio from the related product.multi.uom.price record
             multi_uom_price = self.env['product.multi.uom.price'].search([
                 ('product_id', '=', record.product_id.id),
                 ('uom_id', '=', record.product_uom_id.id)
@@ -39,6 +40,7 @@ class AccountInvoiceReport(models.Model):
             record.qty = record.quantity / ratio if ratio > 0 else record.quantity
 
     def _select(self):
+        """Extend the SQL SELECT statement to include qty and uom_name."""
         select_str = super(AccountInvoiceReport, self)._select()
         select_str += """
             , line.uom_name as uom_name
@@ -47,6 +49,7 @@ class AccountInvoiceReport(models.Model):
         return select_str
 
     def _from(self):
+        """Extend the SQL FROM statement to join with product_multi_uom_price."""
         from_str = super(AccountInvoiceReport, self)._from()
         from_str += """
             LEFT JOIN product_multi_uom_price AS multi_uom_price
@@ -56,6 +59,7 @@ class AccountInvoiceReport(models.Model):
         return from_str
 
     def _group_by(self):
+        """Extend the SQL GROUP BY statement to include new fields."""
         group_by_str = super(AccountInvoiceReport, self)._group_by()
         group_by_str += """
             , line.uom_name
