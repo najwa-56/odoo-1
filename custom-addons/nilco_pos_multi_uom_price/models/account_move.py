@@ -80,6 +80,8 @@ class AccountInvoiceReport(models.Model):
 
 
 
+
+
 class AccountInvoiceReport(models.Model):
     _inherit = "account.invoice.report"
 
@@ -91,30 +93,25 @@ class AccountInvoiceReport(models.Model):
         """Compute Adjusted Quantity as quantity / ratio."""
         for record in self:
             if record.product_id and record.product_uom_id:
-                # Fetch the ratio from product.multi.uom.price
+                # Fetch the ratio from the related product.multi.uom.price record
                 multi_uom_price = self.env['product.multi.uom.price'].search([
                     ('product_id', '=', record.product_id.id),
                     ('uom_id', '=', record.product_uom_id.id)
                 ], limit=1)
-                ratio = multi_uom_price.ratio if multi_uom_price else 1.0
-
-                # Debugging logs
-                _logger.info(f"Record ID: {record.id}")
-                _logger.info(f"Product: {record.product_id.name}, UOM: {record.product_uom_id.name}")
-                _logger.info(f"Quantity: {record.quantity}, Ratio: {ratio}")
-
-                # Calculate adjusted quantity
+                ratio = multi_uom_price.ratio if multi_uom_price else 1.0  # Default ratio is 1.0
+                _logger.info(f"Record {record.id}: Product={record.product_id.id}, "
+                             f"UOM={record.product_uom_id.id}, Quantity={record.quantity}, Ratio={ratio}")
                 record.qty = round(record.quantity / ratio, 2) if ratio > 0 else 0.0
             else:
-                _logger.warning(f"Missing product or UOM for record ID {record.id}")
-                record.qty = 0.0
+                _logger.warning(f"Record {record.id}: Missing product or UOM")
+                record.qty = 0.0  # Default to zero if fields are missing
 
     def _select(self):
         """Extend the SQL SELECT statement to include qty and uom_name."""
         select_str = super(AccountInvoiceReport, self)._select()
         select_str += """
             , line.uom_name as uom_name
-            , COALESCE(line.quantity / NULLIF(COALESCE(multi_uom_price.ratio, 1.0), 0), 0) as qty
+            , ROUND(COALESCE(line.quantity / NULLIF(COALESCE(multi_uom_price.ratio, 1.0), 0), 0), 2) AS qty
         """
         return select_str
 
@@ -137,3 +134,4 @@ class AccountInvoiceReport(models.Model):
             , multi_uom_price.ratio
         """
         return group_by_str
+
