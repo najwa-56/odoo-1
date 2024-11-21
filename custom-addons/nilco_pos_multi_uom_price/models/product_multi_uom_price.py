@@ -12,6 +12,7 @@ class multi_uom(models.Model):
     cost = fields.Float(string='التكلفة',required=True,digits='Product Cost')
     qty = fields.Float(string="الكمية" )
     name_field = fields.Char(store=True, string="أسم الوحدة")
+    ratio = fields.Float(related='uom_id.ratio', string="Ratio", store=True)
 
    # _sql_constraints = [
      #   ('product_multi_uom_price_uniq',
