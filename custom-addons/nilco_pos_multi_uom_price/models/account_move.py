@@ -23,7 +23,7 @@ class AccountMoveLine(models.Model):
 class AccountInvoiceReport(models.Model):
     _inherit = 'account.invoice.report'
 
-    qty = fields.Float(string='Adjusted Quantity', compute='_compute_qty', store=True)
+    qty = fields.Float(string='الكمية', compute='_compute_qty', store=True)
 
     @api.depends('quantity', 'product_id')
     def _compute_qty(self):

@@ -97,6 +97,17 @@
         </field>
     </record>
 
+    <record id="view_account_invoice_report_search_inheritt" model="ir.ui.view">
+        <field name="name">account.invoice.report.search.inheritt</field>
+        <field name="model">account.invoice.report</field>
+        <field name="inherit_id" ref="account.view_account_invoice_report_search"/>
+        <field name="arch" type="xml">
+
+            <field name="invoice_user_id" position="after">
+                <field name="qty"/>
+            </field>
+        </field>
+    </record>
 
 
 </odoo>
