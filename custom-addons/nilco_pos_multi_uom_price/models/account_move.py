@@ -22,6 +22,8 @@ class AccountMoveLine(models.Model):
 
 
 
+
+
 class AccountInvoiceReport(models.Model):
     _inherit = "account.invoice.report"
 
@@ -33,6 +35,9 @@ class AccountInvoiceReport(models.Model):
 
     # Adjusted Quantity field
     qty = fields.Float(string='Adjusted Quantity', compute='_compute_qty', store=True)
+
+    # Ratio field (coming from product.multi.uom.price)
+    ratio = fields.Float(string="Ratio", related="uom_id.ratio", store=True)
 
     @api.depends('uom_id')
     def _compute_qty(self):
@@ -56,6 +61,7 @@ class AccountInvoiceReport(models.Model):
         select_str += """
             , COALESCE(line.quantity / NULLIF(multi_uom_price.ratio, 0), 0) as qty
             , line.product_uom_id as uom_id
+            , multi_uom_price.ratio as ratio  -- Including ratio in the SELECT
         """
         return select_str
 
