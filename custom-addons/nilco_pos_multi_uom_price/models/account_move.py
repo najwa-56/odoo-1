@@ -21,51 +21,35 @@ class AccountMoveLine(models.Model):
 
 
 
-
-
-
 class AccountInvoiceReport(models.Model):
     _inherit = "account.invoice.report"
 
-    # UOM field
-    uom_id = fields.Many2one('uom.uom', string="Unit of Measure", domain="[('category_id', '=', category_id)]", index=True)
-
-    # Adjusted Quantity field
+    uom_name = fields.Char(string="UOM Name", store=True)
     qty = fields.Float(string='Adjusted Quantity', compute='_compute_qty', store=True)
 
-    # UOM Name field
-    uom_name = fields.Char(string="UOM Name", related="uom_id.name", store=True)
-
-    # Ratio field (related to the product.multi.uom.price)
-    ratio = fields.Float(string="Ratio", related="uom_id.ratio", store=True)
-
-    @api.depends('uom_id')
+    @api.depends('quantity', 'product_id', 'product_uom_id')
     def _compute_qty(self):
-        """ Compute the adjusted quantity based on the ratio from product.multi.uom.price """
+        """Compute Adjusted Quantity as quantity / ratio."""
         for record in self:
-            if record.uom_id:
-                # Search for the corresponding multi_uom_price record
-                multi_uom_price = self.env['product.multi.uom.price'].search([
-                    ('product_id', '=', record.product_id.id),
-                    ('uom_id', '=', record.uom_id.id)
-                ], limit=1)
-
-                # Calculate adjusted quantity (quantity / ratio)
-                if multi_uom_price and multi_uom_price.ratio:
-                    record.qty = record.quantity / multi_uom_price.ratio
-                else:
-                    record.qty = record.quantity  # Default to quantity if ratio is not found
+            # Fetch the ratio from the related product.multi.uom.price record
+            multi_uom_price = self.env['product.multi.uom.price'].search([
+                ('product_id', '=', record.product_id.id),
+                ('uom_id', '=', record.product_uom_id.id)
+            ], limit=1)
+            ratio = multi_uom_price.ratio if multi_uom_price else 1.0  # Default ratio is 1.0
+            record.qty = record.quantity / ratio if ratio > 0 else record.quantity
 
     def _select(self):
+        """Extend the SQL SELECT statement to include qty and uom_name."""
         select_str = super(AccountInvoiceReport, self)._select()
         select_str += """
-            , line.product_uom_id as uom_id
-            , multi_uom_price.ratio as ratio
-            , line.product_uom_id as uom_name  -- Use as standard field, no JSON operator
+            , line.uom_name as uom_name
+            , COALESCE(line.quantity / NULLIF(multi_uom_price.ratio, 0), 0) as qty
         """
         return select_str
 
     def _from(self):
+        """Extend the SQL FROM statement to join with product_multi_uom_price."""
         from_str = super(AccountInvoiceReport, self)._from()
         from_str += """
             LEFT JOIN product_multi_uom_price AS multi_uom_price
@@ -75,9 +59,15 @@ class AccountInvoiceReport(models.Model):
         return from_str
 
     def _group_by(self):
+        """Extend the SQL GROUP BY statement to include new fields."""
         group_by_str = super(AccountInvoiceReport, self)._group_by()
         group_by_str += """
-            , line.product_uom_id
+            , line.uom_name
+            , line.quantity
             , multi_uom_price.ratio
         """
         return group_by_str
+
+
+
+
