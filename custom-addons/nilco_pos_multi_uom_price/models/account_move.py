@@ -19,25 +19,24 @@ class AccountMoveLine(models.Model):
 
 
 
+
 class AccountInvoiceReport(models.Model):
     _inherit = "account.invoice.report"
 
-    # Adding new fields
+    # Fields
     uom_name = fields.Char(string="UOM Name", store=True)
     qty = fields.Float(string='Adjusted Quantity', compute='_compute_qty', store=True)
 
-    @api.depends('quantity', 'product_id')
+    @api.depends('quantity', 'product_id', 'product_uom_id')
     def _compute_qty(self):
         for record in self:
-            # Get the ratio from the related product.multi.uom.price model
+            # Fetch related `product.multi.uom.price` record
             multi_uom_price = self.env['product.multi.uom.price'].search([
                 ('product_id', '=', record.product_id.id),
                 ('uom_id', '=', record.product_uom_id.id)
             ], limit=1)
-            ratio = multi_uom_price.ratio if multi_uom_price else 1.0
-
-            # Compute the qty
-            record.qty = record.quantity / ratio if ratio else record.quantity
+            ratio = multi_uom_price.ratio if multi_uom_price else 1.0  # Default ratio is 1.0
+            record.qty = record.quantity / ratio if ratio > 0 else record.quantity
 
     def _select(self):
         select_str = super(AccountInvoiceReport, self)._select()
@@ -64,4 +63,3 @@ class AccountInvoiceReport(models.Model):
             , multi_uom_price.ratio
         """
         return group_by_str
-
