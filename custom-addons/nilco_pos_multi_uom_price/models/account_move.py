@@ -18,12 +18,23 @@ class AccountMoveLine(models.Model):
                 rec.uom_name = rec.product_uom_id.name
 
 
-
-
 class AccountInvoiceReport(models.Model):
-    _inherit = 'account.invoice.report'
+    _inherit = "account.invoice.report"
 
-    qty = fields.Float(string='الكمية', compute='_compute_qty', store=True)
+    uom_name = fields.Char(string="UOM Name", store=True)
+
+    def _select(self):
+        select_str = super(AccountInvoiceReport, self)._select()
+        select_str += ", line.uom_name as uom_name"
+        return select_str
+
+    def _group_by(self):
+        group_by_str = super(AccountInvoiceReport, self)._group_by()
+        group_by_str += ", line.uom_name"
+        return group_by_str
+
+
+    qty = fields.Float(string='Adjusted Quantity', compute='_compute_qty', store=True)
 
     @api.depends('quantity', 'product_id')
     def _compute_qty(self):
@@ -41,21 +52,20 @@ class AccountInvoiceReport(models.Model):
     def _select(self):
         select_str = super(AccountInvoiceReport, self)._select()
         select_str += """
-            , COALESCE(line.quantity / NULLIF(multi_uom_price.ratio, 0), 0) as qty
-        """
+                    , COALESCE(line.quantity / NULLIF(multi_uom_price.ratio, 0), 0) as qty
+                """
         return select_str
 
     def _from(self):
         from_str = super(AccountInvoiceReport, self)._from()
         from_str += """
-            LEFT JOIN product_multi_uom_price AS multi_uom_price
-            ON multi_uom_price.product_id = line.product_id
-            AND multi_uom_price.uom_id = line.product_uom_id
-        """
+                    LEFT JOIN product_multi_uom_price AS multi_uom_price
+                    ON multi_uom_price.product_id = line.product_id
+                    AND multi_uom_price.uom_id = line.product_uom_id
+                """
         return from_str
 
     def _group_by(self):
         group_by_str = super(AccountInvoiceReport, self)._group_by()
         group_by_str += ", line.quantity, multi_uom_price.ratio"
         return group_by_str
-
