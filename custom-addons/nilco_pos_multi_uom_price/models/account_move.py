@@ -111,7 +111,7 @@ class AccountInvoiceReport(models.Model):
         select_str = super(AccountInvoiceReport, self)._select()
         select_str += """
             , line.uom_name as uom_name
-            , ROUND(COALESCE(line.quantity / NULLIF(COALESCE(multi_uom_price.ratio, 1.0), 0), 0), 2) AS qty
+            , ROUND(COALESCE(line.quantity / NULLIF(COALESCE(multi_uom_price.ratio, 1.0), 0)::numeric, 0)::numeric, 2) AS qty
         """
         return select_str
 
