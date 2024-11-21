@@ -22,41 +22,41 @@ class AccountMoveLine(models.Model):
 
 
 
+
 class AccountInvoiceReport(models.Model):
     _inherit = "account.invoice.report"
 
     # UOM Field
     uom_id = fields.Many2one('uom.uom', string="Unit of Measure", domain="[('category_id', '=', category_id)]", index=True)
 
-    # Ratio field computed from the UOM
-    ratio = fields.Float(string="Ratio", compute="_compute_ratio", store=True)
-
-    # UOM Name field
+    # UOM Name (Related to UOM)
     uom_name = fields.Char(string="UOM Name", related="uom_id.name", store=True)
 
     # Adjusted Quantity field
     qty = fields.Float(string='Adjusted Quantity', compute='_compute_qty', store=True)
 
     @api.depends('uom_id')
-    def _compute_ratio(self):
-        """ Compute the ratio based on the UOM """
-        for record in self:
-            record.ratio = record.uom_id.ratio if record.uom_id else 1.0
-
-    @api.depends('quantity', 'ratio')
     def _compute_qty(self):
-        """ Compute the adjusted quantity based on the ratio """
+        """ Compute the adjusted quantity based on the ratio from product.multi.uom.price """
         for record in self:
-            if record.ratio > 0:
-                record.qty = record.quantity / record.ratio
-            else:
-                record.qty = record.quantity  # Avoid division by zero or invalid ratio
+            if record.uom_id:
+                # Search for the corresponding multi_uom_price record
+                multi_uom_price = self.env['product.multi.uom.price'].search([
+                    ('product_id', '=', record.product_id.id),
+                    ('uom_id', '=', record.uom_id.id)
+                ], limit=1)
+
+                # Calculate adjusted quantity (quantity / ratio)
+                if multi_uom_price and multi_uom_price.ratio:
+                    record.qty = record.quantity / multi_uom_price.ratio
+                else:
+                    record.qty = record.quantity  # Default to quantity if ratio is not found
 
     def _select(self):
         select_str = super(AccountInvoiceReport, self)._select()
         select_str += """
-            , line.uom_name as uom_name
-            , COALESCE(line.quantity / NULLIF(line.ratio, 0), 0) as qty
+            , COALESCE(line.quantity / NULLIF(multi_uom_price.ratio, 0), 0) as qty
+            , line.uom_id as uom_id
         """
         return select_str
 
@@ -72,8 +72,7 @@ class AccountInvoiceReport(models.Model):
     def _group_by(self):
         group_by_str = super(AccountInvoiceReport, self)._group_by()
         group_by_str += """
-            , line.uom_name
-            , line.quantity
-            , line.ratio
+            , line.uom_id
+            , multi_uom_price.ratio
         """
         return group_by_str
