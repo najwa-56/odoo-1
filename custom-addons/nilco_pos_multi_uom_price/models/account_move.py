@@ -23,14 +23,13 @@ class AccountMoveLine(models.Model):
 
 
 
-
 class AccountInvoiceReport(models.Model):
     _inherit = "account.invoice.report"
 
     # UOM Field
     uom_id = fields.Many2one('uom.uom', string="Unit of Measure", domain="[('category_id', '=', category_id)]", index=True)
 
-    # UOM Name (Related to UOM)
+    # UOM Name (Related to UOM, now stored)
     uom_name = fields.Char(string="UOM Name", related="uom_id.name", store=True)
 
     # Adjusted Quantity field
@@ -62,6 +61,7 @@ class AccountInvoiceReport(models.Model):
             , COALESCE(line.quantity / NULLIF(multi_uom_price.ratio, 0), 0) as qty
             , line.product_uom_id as uom_id
             , multi_uom_price.ratio as ratio  -- Including ratio in the SELECT
+            , line.product_uom_id as uom_name  -- Correcting the UOM name reference
         """
         return select_str
 
