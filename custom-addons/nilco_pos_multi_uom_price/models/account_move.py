@@ -80,40 +80,31 @@ class AccountInvoiceReport(models.Model):
 '''
 
 
+
 class AccountInvoiceReport(models.Model):
     _inherit = "account.invoice.report"
 
     uom_name = fields.Char(string="UOM Name", store=True, readonly=True)
-    qty = fields.Float(string="Adjusted Quantity", compute="_compute_qty", store=True, readonly=True)
-
-    @api.depends('quantity', 'product_id', 'product_uom_id')
-    def _compute_qty(self):
-        """Compute Adjusted Quantity as quantity / ratio."""
-        for record in self:
-            if record.product_id and record.product_uom_id:
-                # Fetch the ratio from the related product.multi.uom.price record
-                multi_uom_price = self.env['product.multi.uom.price'].search([
-                    ('product_id', '=', record.product_id.id),
-                    ('uom_id', '=', record.product_uom_id.id)
-                ], limit=1)
-                ratio = multi_uom_price.ratio if multi_uom_price else 1.0  # Default ratio
-                record.qty = round(record.quantity / ratio, 2) if ratio > 0 else 0.0
-            else:
-                record.qty = 0.0
+    qty = fields.Float(string="Adjusted Quantity", store=True, readonly=True)
 
     def _select(self):
-        """Extend the SQL SELECT statement to include uom_name."""
+        """Extend the SQL SELECT statement to include uom_name and qty."""
         select_str = super(AccountInvoiceReport, self)._select()
         select_str += """
             , product_uom.name as uom_name
+            , COALESCE(SUM(line.quantity / NULLIF(multi_uom_price.ratio, 0)), 0) as qty
         """
         return select_str
 
     def _from(self):
-        """Extend the SQL FROM statement to join with product_uom."""
+        """Extend the SQL FROM statement to join with product_multi_uom_price and uom_uom."""
         from_str = super(AccountInvoiceReport, self)._from()
         from_str += """
-            LEFT JOIN uom_uom AS product_uom ON product_uom.id = line.product_uom_id
+            LEFT JOIN product_multi_uom_price AS multi_uom_price
+                ON multi_uom_price.product_id = line.product_id
+                AND multi_uom_price.uom_id = line.product_uom_id
+            LEFT JOIN uom_uom AS product_uom
+                ON product_uom.id = line.product_uom_id
         """
         return from_str
 
@@ -124,6 +115,5 @@ class AccountInvoiceReport(models.Model):
             , product_uom.name
         """
         return group_by_str
-
 
 
