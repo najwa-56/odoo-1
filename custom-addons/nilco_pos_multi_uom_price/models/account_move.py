@@ -92,6 +92,7 @@ class AccountInvoiceReport(models.Model):
         select_str += """
             , product_uom.name as uom_name
             , SUM(line.quantity / NULLIF(multi_uom_price.ratio, 0)) as qty
+            , line.id as line_id  -- Add line.id for grouping
         """
         return select_str
 
@@ -112,8 +113,8 @@ class AccountInvoiceReport(models.Model):
         group_by_str = super(AccountInvoiceReport, self)._group_by()
         group_by_str += """
             , product_uom.name
+            , line.id  -- Ensure line.id is included for grouping
         """
         return group_by_str
-
 
 
