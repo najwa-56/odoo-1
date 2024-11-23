@@ -130,5 +130,3 @@ class AccountInvoiceReport(models.Model):
         """
         return group_by_str
 
-
-
