@@ -80,7 +80,6 @@ class AccountInvoiceReport(models.Model):
 
 
 
-
 class AccountInvoiceReport(models.Model):
     _inherit = "account.invoice.report"
 
@@ -92,41 +91,30 @@ class AccountInvoiceReport(models.Model):
         """Compute Adjusted Quantity as quantity / ratio."""
         for record in self:
             if record.product_id and record.product_uom_id:
-                # Fetch the ratio from product_multi_uom_price
+                # Fetch the ratio from the related product.multi.uom.price record
                 multi_uom_price = self.env['product.multi.uom.price'].search([
                     ('product_id', '=', record.product_id.id),
                     ('uom_id', '=', record.product_uom_id.id)
                 ], limit=1)
-
-                # Default ratio to 1.0 if no record found
-                ratio = multi_uom_price.ratio if multi_uom_price else 1.0
-
-                # Debugging logs for better insights
-                _logger.info(f"[Record {record.id}] Product: {record.product_id.id}, UOM: {record.product_uom_id.id}, "
-                             f"Quantity: {record.quantity}, Ratio: {ratio}")
-
-                # Calculate adjusted quantity (divide only once)
-                if ratio > 0:
-                    record.qty = round(record.quantity / ratio, 2)
-                    _logger.info(f"[Record {record.id}] Adjusted Qty: {record.qty}")
-                else:
-                    _logger.warning(f"[Record {record.id}] Invalid ratio: {ratio}. Setting qty to 0.")
-                    record.qty = 0.0
+                ratio = multi_uom_price.ratio if multi_uom_price else 1.0  # Default ratio is 1.0
+                _logger.info(f"Record {record.id}: Product={record.product_id.id}, "
+                             f"UOM={record.product_uom_id.id}, Quantity={record.quantity}, Ratio={ratio}")
+                record.qty = round(record.quantity / ratio, 2) if ratio > 0 else 0.0
             else:
-                _logger.warning(f"[Record {record.id}] Missing product or UOM. Setting qty to 0.")
-                record.qty = 0.0
+                _logger.warning(f"Record {record.id}: Missing product or UOM")
+                record.qty = 0.0  # Default to zero if fields are missing
 
     def _select(self):
-        """SQL SELECT statement."""
+        """Extend the SQL SELECT statement to include qty and uom_name."""
         select_str = super(AccountInvoiceReport, self)._select()
         select_str += """
-            , line.uom_name as uom_name
-            , line.quantity as qty  -- Do not divide in SQL, compute in Python
+            , multi_uom_price.uom_name as uom_name
+            , (line.quantity / COALESCE(multi_uom_price.ratio, 1)) as qty  -- Adjusted quantity calculation
         """
         return select_str
 
     def _from(self):
-        """SQL FROM statement."""
+        """Extend the SQL FROM statement to join with product_multi_uom_price."""
         from_str = super(AccountInvoiceReport, self)._from()
         from_str += """
             LEFT JOIN product_multi_uom_price AS multi_uom_price
@@ -136,11 +124,11 @@ class AccountInvoiceReport(models.Model):
         return from_str
 
     def _group_by(self):
-        """SQL GROUP BY statement."""
+        """Extend the SQL GROUP BY statement to include new fields."""
         group_by_str = super(AccountInvoiceReport, self)._group_by()
         group_by_str += """
-            , line.uom_name
-            , line.quantity
-            , multi_uom_price.ratio
+            , multi_uom_price.uom_name
+            , (line.quantity / COALESCE(multi_uom_price.ratio, 1))  -- Adjusted qty grouped properly
         """
         return group_by_str
+
