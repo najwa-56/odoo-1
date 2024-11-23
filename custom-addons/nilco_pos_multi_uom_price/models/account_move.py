@@ -80,7 +80,6 @@ class AccountInvoiceReport(models.Model):
 '''
 
 
-
 class AccountInvoiceReport(models.Model):
     _inherit = "account.invoice.report"
 
@@ -92,7 +91,7 @@ class AccountInvoiceReport(models.Model):
         select_str = super(AccountInvoiceReport, self)._select()
         select_str += """
             , product_uom.name as uom_name
-            , COALESCE(SUM(line.quantity / NULLIF(multi_uom_price.ratio, 0)), 0) as qty
+            , SUM(line.quantity / NULLIF(multi_uom_price.ratio, 0)) as qty
         """
         return select_str
 
@@ -115,5 +114,6 @@ class AccountInvoiceReport(models.Model):
             , product_uom.name
         """
         return group_by_str
+
 
 
