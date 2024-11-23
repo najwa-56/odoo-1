@@ -79,7 +79,6 @@ class AccountInvoiceReport(models.Model):
 
 
 
-
 class AccountInvoiceReport(models.Model):
     _inherit = "account.invoice.report"
 
@@ -131,4 +130,3 @@ class AccountInvoiceReport(models.Model):
             , (line.quantity / COALESCE(multi_uom_price.ratio, 1))  -- Adjusted qty grouped properly
         """
         return group_by_str
-
