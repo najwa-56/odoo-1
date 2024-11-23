@@ -96,28 +96,29 @@ class AccountInvoiceReport(models.Model):
                     ('uom_id', '=', record.product_uom_id.id)
                 ], limit=1)
                 ratio = multi_uom_price.ratio if multi_uom_price else 1.0  # Default ratio is 1.0
+                _logger.info(f"Record {record.id}: Product={record.product_id.id}, "
+                             f"UOM={record.product_uom_id.id}, Quantity={record.quantity}, Ratio={ratio}")
                 record.qty = round(record.quantity / ratio, 2) if ratio > 0 else 0.0
             else:
+                _logger.warning(f"Record {record.id}: Missing product or UOM")
                 record.qty = 0.0  # Default to zero if fields are missing
 
     def _select(self):
         """Extend the SQL SELECT statement to include qty and uom_name."""
         select_str = super(AccountInvoiceReport, self)._select()
         select_str += """
-            , uom.name as uom_name
-            , (line.quantity / COALESCE(multi_uom_price.ratio, 1)) as qty
+            , line.uom_name as uom_name
+            , line.quantity as qty  -- Just select the original quantity without division
         """
         return select_str
 
     def _from(self):
-        """Extend the SQL FROM statement to join with product_multi_uom_price and uom_uom."""
+        """Extend the SQL FROM statement to join with product_multi_uom_price."""
         from_str = super(AccountInvoiceReport, self)._from()
         from_str += """
             LEFT JOIN product_multi_uom_price AS multi_uom_price
             ON multi_uom_price.product_id = line.product_id
             AND multi_uom_price.uom_id = line.product_uom_id
-            LEFT JOIN uom_uom AS uom
-            ON uom.id = line.product_uom_id
         """
         return from_str
 
@@ -125,8 +126,11 @@ class AccountInvoiceReport(models.Model):
         """Extend the SQL GROUP BY statement to include new fields."""
         group_by_str = super(AccountInvoiceReport, self)._group_by()
         group_by_str += """
-            , uom.name
-            , (line.quantity / COALESCE(multi_uom_price.ratio, 1))
+            , line.uom_name
+            , line.quantity
+            , multi_uom_price.ratio
         """
         return group_by_str
+
+
 
