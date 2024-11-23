@@ -80,7 +80,7 @@ class AccountInvoiceReport(models.Model):
 '''
 
 
-class AccountMoveLine(models.Model):
+class AccountInvoiceReport(models.Model):
     _inherit = "account.invoice.report"
 
     uom_name = fields.Char(string="UOM Name", store=True)
