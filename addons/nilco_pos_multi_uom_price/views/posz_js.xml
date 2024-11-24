@@ -1,7 +1,0 @@
-<?xml version="1.0"?>
-<odoo>
-	<!--i add group zero to xml -->
-	<record id="group_zero_button" model="res.groups">
-		<field name="name"> zero Button</field>
-	</record>
-</odoo>
