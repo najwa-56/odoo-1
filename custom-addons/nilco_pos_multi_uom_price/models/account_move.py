@@ -168,12 +168,18 @@ class AccountInvoiceReport(models.Model):
         return select_str
 
     def _from(self):
-        """Extend the SQL FROM statement to include UOM details."""
+        """Extend the SQL FROM statement to join UOM details with unique aliases."""
         from_str = super(AccountInvoiceReport, self)._from()
         from_str += """
-            LEFT JOIN uom_uom uom_line ON uom_line.id = line.product_uom_id
-            LEFT JOIN uom_uom uom_template ON uom_template.id = template.uom_id
-        """
+             LEFT JOIN uom_uom uom_line ON uom_line.id = line.product_uom_id
+             LEFT JOIN uom_uom uom_template ON uom_template.id = template.uom_id
+         """
+        # Check for duplicates in parent methods to avoid double joining
+        if "uom_uom uom_line" not in from_str:
+            from_str += "LEFT JOIN uom_uom uom_line ON uom_line.id = line.product_uom_id\n"
+        if "uom_uom uom_template" not in from_str:
+            from_str += "LEFT JOIN uom_uom uom_template ON uom_template.id = template.uom_id\n"
+
         return from_str
 
     def _group_by(self):
