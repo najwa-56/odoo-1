@@ -449,7 +449,7 @@ class purchase_order_line(models.Model):
     discount_method = fields.Selection(
             [('fix', 'Fixed'), ('per', 'Percentage')], 'Discount Method')
     discount_type = fields.Selection(related='order_id.discount_type', string="Discount Applies to")
-    discount_amount = fields.Float('Discount Amount')
+    discount_amount = fields.Float('Discount Amount', store=True)
     discount_amt = fields.Float('Discount Final Amount')
 
 
