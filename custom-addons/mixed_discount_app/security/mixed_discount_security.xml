@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+<data>
+	<record id="mixed_discount_sale" model="res.groups">
+		<field name="name">Mixed Discount in Sale</field>
+		<field name="category_id" ref="base.module_category_hidden"/>
+   	</record>
+
+   	<record id="mixed_discount_purchase" model="res.groups">
+		<field name="name">Mixed Discount in Purchase</field>
+		<field name="category_id" ref="base.module_category_hidden"/>
+   	</record>
+
+   	<record id="mixed_discount_invoice" model="res.groups">
+		<field name="name">Mixed Discount in Invoice</field>
+		<field name="category_id" ref="base.module_category_hidden"/>
+   	</record>
+
+   	<record id="mixed_discount_bill" model="res.groups">
+		<field name="name">Mixed Discount in Bill</field>
+		<field name="category_id" ref="base.module_category_hidden"/>
+   	</record>
+
+</data>
+</odoo>
