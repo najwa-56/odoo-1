@@ -20,6 +20,7 @@ class PurchaseOrderLine(models.Model):
 		if discount_amount and not rep.match(discount_amount):
 			return False
 		return True
+
 	@api.onchange('multi_discount')
 	def get_multi_discount(self):
 		def get_discount(discount_amount):
@@ -28,15 +29,15 @@ class PurchaseOrderLine(models.Model):
 			if discount_amount and discount_amount[0] == '+':
 				discount_amount = discount_amount[1:]
 			return discount_amount
+
 		for sale_id in self:
 			if sale_id.multi_discount:
 				if self.purchase_discount(sale_id.multi_discount):
-					new_discount = get_discount(
-						sale_id.multi_discount)
+					new_discount = get_discount(sale_id.multi_discount)
 				else:
-					sale_id.discount = 0
-					raise UserError(
-						_('Please enter correct discount.'))
+					sale_id.discount_amount = 0
+					sale_id.discount = 0  # Ensure this is reset
+					raise UserError(_('Please enter correct discount.'))
 				split_reg = re.split(r'([+-])', new_discount)
 				discount_list = []
 				x = 1
@@ -52,10 +53,13 @@ class PurchaseOrderLine(models.Model):
 					rep_discount = rep_discount * (1 - (logit / 100))
 				total_dis = 1 - rep_discount
 				sale_id.discount_amount = total_dis * 100
+				sale_id.discount = total_dis * 100  # Update the discount field
 				if new_discount != sale_id.multi_discount:
 					sale_id.multi_discount = new_discount
 			else:
 				sale_id.discount_amount = 0
+				sale_id.discount = 0  # Reset the discount field when multi_discount is empty
+
 	@api.constrains('multi_discount')
 	def check_discount(self):
 		for sale_id in self:
