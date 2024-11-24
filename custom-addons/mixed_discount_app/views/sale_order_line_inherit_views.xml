@@ -22,13 +22,11 @@
             <xpath expr="//field[@name='order_line']/tree//field[@name='price_unit']" position="after">
                 <field name="multi_discount" groups="mixed_discount_app.mixed_discount_purchase"/>
                 <field name="discount" groups="mixed_discount_app.mixed_discount_purchase"/>
-                                <field name="include_tax" groups="mixed_discount_app.mixed_discount_purchase"/>
 
             </xpath>
             <xpath expr="//field[@name='order_line']/form//field[@name='price_unit']" position="after">
                 <field name="multi_discount" groups="mixed_discount_app.mixed_discount_purchase"/>
                 <field name="discount" groups="mixed_discount_app.mixed_discount_purchase"/>
-                                <field name="include_tax" groups="mixed_discount_app.mixed_discount_purchase"/>
 
             </xpath>
         </field>

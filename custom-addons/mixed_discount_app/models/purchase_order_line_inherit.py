@@ -7,8 +7,6 @@ class PurchaseOrderLine(models.Model):
 	_inherit = 'purchase.order.line'
 	multi_discount = fields.Char(string="Mixed Discount(%)")
 	discount = fields.Float(string='Discount(%)', digits=dp.get_precision('Discount'), default=0.0)
-	include_tax = fields.Boolean(string="Include Tax (15%)", default=False)
-	without_tax=fields.Boolean(string="not Include Tax (15%)",default=False)
 
 
 	@staticmethod
