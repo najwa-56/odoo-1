@@ -1,36 +1,33 @@
 # -*- coding: utf-8 -*-
-
 from odoo import api, fields, models, _
 from odoo.exceptions import UserError, ValidationError
 from odoo.addons import decimal_precision as dp
 import re
-
 class PurchaseOrderLine(models.Model):
 	_inherit = 'purchase.order.line'
-
 	multi_discount = fields.Char(string="Mixed Discount(%)")
 	discount = fields.Float(string='Discount(%)', digits=dp.get_precision('Discount'), default=0.0)
+	include_tax = fields.Boolean(string="Include Tax (15%)", default=False)
+	without_tax=fields.Boolean(string="not Include Tax (15%)",default=False)
 
 
 	@staticmethod
-	def purchase_discount(discount):
+	def purchase_discount(discount_amount):
 		rep = re.compile(
 			r'^(\s*[-+]{0,1}\s*\d+([,.]\d+)?){1}'
 			r'(\s*[-+]\s*\d+([,.]\d+)?\s*)*$'
 		)
-		if discount and not rep.match(discount):
+		if discount_amount and not rep.match(discount_amount):
 			return False
 		return True
-
 	@api.onchange('multi_discount')
 	def get_multi_discount(self):
-		def get_discount(discount):
-			discount = discount.replace(" ", "")
-			discount = discount.replace(",", ".")
-			if discount and discount[0] == '+':
-				discount = discount[1:]
-			return discount
-
+		def get_discount(discount_amount):
+			discount_amount = discount_amount.replace(" ", "")
+			discount_amount = discount_amount.replace(",", ".")
+			if discount_amount and discount_amount[0] == '+':
+				discount_amount = discount_amount[1:]
+			return discount_amount
 		for sale_id in self:
 			if sale_id.multi_discount:
 				if self.purchase_discount(sale_id.multi_discount):
@@ -40,7 +37,6 @@ class PurchaseOrderLine(models.Model):
 					sale_id.discount = 0
 					raise UserError(
 						_('Please enter correct discount.'))
-
 				split_reg = re.split(r'([+-])', new_discount)
 				discount_list = []
 				x = 1
@@ -55,14 +51,11 @@ class PurchaseOrderLine(models.Model):
 				for logit in discount_list:
 					rep_discount = rep_discount * (1 - (logit / 100))
 				total_dis = 1 - rep_discount
-				sale_id.discount = total_dis * 100
-
+				sale_id.discount_amount = total_dis * 100
 				if new_discount != sale_id.multi_discount:
 					sale_id.multi_discount = new_discount
-
 			else:
-				sale_id.discount = 0
-
+				sale_id.discount_amount = 0
 	@api.constrains('multi_discount')
 	def check_discount(self):
 		for sale_id in self:
@@ -70,15 +63,16 @@ class PurchaseOrderLine(models.Model):
 					sale_id.multi_discount):
 				raise ValidationError(
 					_('Please enter correct discount.'))
-
 	def write(self, vals):
 		res = super(PurchaseOrderLine, self).write(vals)
 		if 'multi_discount' in vals:
-			self.get_multi_discount()
+			for sale_id in self:
+				sale_id.get_multi_discount()
 		return res
 
-#	@api.depends('discount')
-#	def _compute_amount(self):
+
+	#@api.depends('discount')
+	#def _compute_amount(self):
 	#	for sale_id in self:
 		#	price_unit = False
 		#	price = sale_id.recalculate_amount()
@@ -89,12 +83,12 @@ class PurchaseOrderLine(models.Model):
 		#	if price_unit:
 			#	sale_id.price_unit = price_unit
 
-	def recalculate_amount(self):
-		self.ensure_one()
-		if self.discount:
-			return self.price_unit * (1 - self.discount / 100)
-		return self.price_unit
+#	def recalculate_amount(self):
+	#	self.ensure_one()
+	#	if self.discount:
+	#		return self.price_unit * (1 - self.discount / 100)
+	#	return self.price_unit
 
-	def _get_stock_move_price_unit(self):
-		price = self.recalculate_amount()
-		return price
+#	def _get_stock_move_price_unit(self):
+	#	price = self.recalculate_amount()
+#		return price
