@@ -1,0 +1,104 @@
+<?xml version="1.0"?>
+<odoo>
+    <data>
+
+        <record id="view_purchase_order_invoice_discount_form" model="ir.ui.view">
+            <field name="name">purchase.order.invoice.discount.form.view</field>
+            <field name="model">purchase.order</field>
+            <field name="inherit_id" ref="purchase.purchase_order_form"/>
+            <field name="arch" type="xml">
+
+                <xpath expr="//div[@name='date_approve']" position="after">
+                    <field name="discount_type" widget="radio" readonly="state == 'purchase'" />
+                </xpath>
+
+
+                <field name="notes" position="after">
+                                            
+                    <field name="discount_method" class="oe_inline"  readonly="state == 'purchase'" invisible="discount_type == 'line'"/>
+                    <label for="discount_amount" invisible="discount_type == 'line'"/>
+                    <div>
+                        <field name="discount_amount" class="oe_inline" readonly="state == 'purchase'" invisible="discount_type == 'line'"/>
+                        <label for="discount_amount" string="%%" invisible="discount_method == 'fix' or discount_type == 'line' "/>
+                    </div>
+                    <field name="config_tax" widget="monetary" invisible="1"/>
+                    <field name="report_total" invisible="1"/>
+                    <!-- <field name="untax_test_amount" invisible="1"/> -->
+                    <!-- <field name="line_total_amount" invisible="1"/> -->
+                </field>
+
+                
+                <field name="tax_totals" position="before">
+                     <field name="discount_amt" widget="monetary" options="{'currency_field': 'currency_id'}" invisible="discount_type == 'line'"/>
+                     <field name="discount_amt_line" widget="monetary" options="{'currency_field': 'currency_id'}" invisible="discount_type == 'global'"/>
+                </field>
+
+                <xpath expr="//tree/field[@name='product_qty']" position="before">
+                    <field name="discount_type" column_invisible="1"/>
+                    <field name="discount_method" column_invisible="parent.discount_type == 'global'"/>
+                    <field name="discount_amount" column_invisible="parent.discount_type == 'global'"/>
+                    <field name="discount_amt" column_invisible="1"/>
+                </xpath>
+            </field>
+        </record>
+        
+        <record id="view_purchase_account_move_discount_form" model="ir.ui.view">
+            <field name="name">account.move.discount.form.view</field>
+            <field name="model">account.move</field>
+            <field name="inherit_id" ref="account.view_move_form"/>
+            <field name="arch" type="xml">
+
+                <field name="narration" position="after">
+                    <group style="width: 65%%" invisible="move_type in ('out_invoice', 'out_refund','out_receipt')">
+                        <label for="discount_method" invisible="discount_type == 'line'"/>
+                        <div>
+                            <field name="discount_method" class="oe_inline" invisible="discount_type == 'line'" readonly="state == 'posted'"/>
+                        </div>
+                         <label for="discount_amount" invisible="discount_type == 'line'"/>
+                        <div>
+                            <field name="discount_amount" class="oe_inline" invisible="discount_type == 'line'" readonly="state == 'posted'"/>
+                            <label for="discount_amount" string="%%"
+                                 class="oe_inline" invisible="discount_method != 'per' or discount_type != 'global'"/>
+                        </div>
+                    </group>
+                    <field name="config_inv_tax" invisible="1"/>
+                    <field name="count_total" invisible="1"/>
+                    <field name="final_count_total" invisible="1"/>
+                    <!-- <field name="untax_test_amount" invisible="1"/> -->
+                </field>
+
+                <xpath expr="//field[@name='tax_totals']" position="before">
+                    <field name="discount_amt" widget="monetary" options="{'currency_field': 'currency_id'}"   invisible="move_type  in ('out_invoice', 'out_refund','out_receipt') or discount_type == 'line'"/>
+                    <field name="discount_amt_line" widget="monetary" options="{'currency_field': 'currency_id'}" invisible="move_type  in ('out_invoice', 'out_refund','out_receipt') or discount_type == 'global'"/>
+                </xpath>
+
+
+                <xpath expr="//field[@name='invoice_line_ids']/tree/field[@name='discount']" position="replace">
+                    
+                    <field name="discount" string="Disc.%" optional="hide" column_invisible="parent.move_type in ('in_invoice', 'in_refund','in_receipt')"/>
+                </xpath>
+
+
+                <xpath expr="//field[@name='line_ids']/tree/field[@name='tax_tag_ids']" position="after">
+                    <field name="discount_type" column_invisible="1"/>
+                    <field name="discount_method" column_invisible="1"/>
+                    <field name="discount_amount" column_invisible="1"/>
+                    <field name="discount_amt" column_invisible="1"/>
+                </xpath>
+
+            </field>
+        </record>
+
+        <record id="view_move_form_inherits" model="ir.ui.view">
+            <field name="name">account.move.line.form.followup</field>
+            <field name="model">account.move</field>
+            <field name="inherit_id" ref="account.view_move_form"/>
+            <field name="arch" type="xml">
+                <xpath expr="//field[@name='invoice_line_ids']//tree//field[@name='partner_id']" position="after">
+                    <field name="is_global_disc" invisible="1"/>
+                </xpath>                
+                
+            </field>
+        </record>
+    </data>
+</odoo>

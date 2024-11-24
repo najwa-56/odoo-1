@@ -1,0 +1,194 @@
+<?xml version="1.0"?>
+<odoo>
+
+        <record id="view_order_invoice_discount_form" model="ir.ui.view">
+            <field name="name">sale.order.invoice.discount.form.view</field>
+            <field name="model">sale.order</field>
+            <field name="inherit_id" ref="sale.view_order_form" />
+            <field name="arch" type="xml">
+
+                <field name="payment_term_id" position="after">
+                    <field name="discount_type" widget="radio" readonly="state == 'sale'"/>
+                    <field name="config_tax"  widget="monetary" invisible="1"/>
+                </field>
+
+                 <xpath expr="//group[@name='note_group']" position="after">
+                    <group>
+                        <label for="discount_method" invisible="discount_type == 'line'"/>
+                        <div>
+                            <field name="discount_method" class="oe_inline" readonly="state == 'sale'" invisible="discount_type == 'line'"/>
+                        </div>
+                         <label for="discount_amount" invisible="discount_type == 'line'"/>
+                        <div>
+                            <field name="discount_amount" class="oe_inline" areadonly="state == 'sale'" invisible="discount_type == 'line'"/>
+                            <label for="discount_amount" string="%%" readonly="state == 'sale'" invisible="discount_method == 'fix' or discount_type == 'line' "/>
+                         </div>
+                        <field name="config_tax" widget="monetary" invisible="1"/>
+                        <field name="report_total" invisible="1"/>
+                    </group>
+                </xpath>
+
+                <xpath expr="//group[hasclass('oe_subtotal_footer')]" position="replace">
+                    <group class="oe_subtotal_footer oe_right" colspan="2" name="sale_total">
+                        <field name="discount_amt" widget="monetary" options="{'currency_field': 'currency_id'}" invisible="discount_type == 'line'" colspan="2"/>
+                        <field name="discount_amt_line" widget="monetary" options="{'currency_field': 'currency_id'}" invisible="discount_type == 'global'" colspan="2"/>
+                        <field name="tax_totals" widget="account-tax-totals-field" nolabel="1" colspan="2"/>
+                    </group>
+                </xpath>
+
+                <xpath expr="//tree/field[@name='product_uom_qty']" position="before">
+                    <field name="discount_type" column_invisible="1"/>
+                    <field name="discount_method" column_invisible="parent.discount_type == 'global'" />
+                    <field name="discount_amount" column_invisible="parent.discount_type == 'global'" />
+                    <field name="discount_amt" column_invisible="1"/>
+                </xpath>
+
+                <xpath expr="//field[@name='order_line']/form/group/group/field[@name='price_unit']" position="before">
+                    <field name="discount_type" column_invisible="1"/>
+                    <field name="discount_amt" column_invisible="1"/>
+                    <label for="discount_method" string="Discount Method" column_invisible="parent.discount_type == 'global'"/>
+                    <div column_invisible="parent.discount_type == 'global'">
+                        <field name="discount_method" column_invisible="parent.discount_type == 'global'"/>
+                    </div>
+                    <label for="discount_amount" string="Discount Method"
+                        column_invisible="parent.discount_type == 'global'"/>
+                    <div column_invisible="parent.discount_type == 'global'">
+                        <field name="discount_amount" column_invisible="parent.discount_type == 'global'"/>
+                    </div>
+                </xpath>
+
+
+
+                <xpath expr="//tree/field[@name='discount']" position="attributes">
+                    <attribute name="column_invisible">1</attribute>
+                </xpath>
+
+                <xpath expr="//button[@name='action_open_discount_wizard']" position="attributes">
+                    <attribute name="invisible">1</attribute>
+                </xpath>
+
+                <!-- <xpath expr="//field[@name='order_line']/form/group/group/t/label[@for='discount']" position="attributes">
+                    <attribute name="invisible">1</attribute>
+                </xpath>
+
+                <xpath expr="//field[@name='order_line']/form/group/group/t/div[@name='discount']" position="attributes">
+                    <attribute name="invisible">1</attribute>
+                </xpath>
+                <xpath expr="//field[@name='order_line']/form/group/group/t/div/field[@name='discount']" position="attributes">
+                    <attribute name="invisible">1</attribute>
+                </xpath> -->
+            </field>
+        </record>
+
+        <record id="view_account_invoice_discount_form" model="ir.ui.view">
+            <field name="name">account.invoice.discount.form.view</field>
+            <field name="model">account.move</field>
+            <field name="inherit_id" ref="account.view_move_form"/>
+            <field name="arch" type="xml">
+                
+                <field name='payment_reference' position="after">
+                    <field name="discount_type" widget="radio" readonly="state == 'posted'" invisible="move_type in ('out_invoice','out_receipt','out_refund','in_invoice','in_refund','in_receipt')"/>
+                </field>
+                
+                <field name="narration" position="after">
+                    <group style="width: 65%%" invisible="move_type in ('in_invoice','in_refund','in_receipt')">
+                        <label for="discount_method" invisible="discount_type == 'line'" />
+                        <div>
+                            <field name="discount_method" class="oe_inline" readonly="state == 'posted'" invisible="discount_type == 'line'" />
+                        </div>
+                         <label for="discount_amount" invisible="discount_type == 'line'"/>
+                        <div>
+                            <field name="discount_amount" class="oe_inline" readonly="state == 'posted'" invisible="discount_type == 'line'"/>
+                            <label for="discount_amount" string="%%"
+                                class="oe_inline"  invisible="discount_method != 'per'"/>
+                            
+                        </div>
+                        
+                        <field name="config_inv_tax" invisible="1"/>
+                        <field name="count_total" invisible="1"/>
+                        <field name="final_count_total" invisible="1"/>
+                   </group>
+                   <br/>
+                   <br/>
+                </field>
+
+                <xpath expr="//field[@name='tax_totals']" position="before">
+                    <field name="discount_amt" widget="monetary" options="{'currency_field': 'currency_id'}" colspan="2"  invisible="move_type  in ('in_invoice','in_refund','in_receipt') or discount_type == 'line'"/>
+                    <field name="discount_amt_line" widget="monetary" options="{'currency_field': 'currency_id'}" invisible="move_type  in ('in_invoice','in_refund','in_receipt') or discount_type == 'global'"/> 
+                    <field name="discount_amount_line"  invisible="1"/>       
+                </xpath>
+                                
+                <xpath expr="//field[@name='invoice_line_ids']/tree/field[@name='discount']" position="attributes">
+                    <attribute name="invisible">1</attribute>
+                </xpath>
+
+                <xpath expr="//field[@name='invoice_line_ids']/tree/field[@name='quantity']" position="before">
+                    <field name="discount_type" column_invisible="1"/>
+                    <field name="discount_amt" column_invisible="1"/>
+                    <field name="discount_method" column_invisible="parent.discount_type == 'global'"/>
+                    <field name="discount_amount" column_invisible="parent.discount_type == 'global'"/>
+                </xpath>
+     
+                <xpath expr="//field[@name='line_ids']/tree/field[@name='tax_tag_ids']" position="after">
+                    <field name="discount_type" column_invisible="1"/>
+                    <field name="discount_method" column_invisible="1"/>
+                    <field name="discount_amount" column_invisible="1"/>
+                    <field name="discount_amt" column_invisible="1"/>
+                </xpath>
+                
+            </field>
+        </record>
+
+        <record id="view_account_account_discount_form" model="ir.ui.view">
+            <field name="name">account.account.discount.form.view</field>
+            <field name="model">account.account</field>
+            <field name="inherit_id" ref="account.view_account_form" />
+            <field name="arch" type="xml">
+                <field name="account_type" position="after">
+                    <field name="discount_account" />
+                </field>
+            </field>
+        </record>
+
+
+        <record id="res_config_settings_view_form_discount" model="ir.ui.view">
+            <field name="name">res.config.settings.view.form.inherit.discount</field>
+            <field name="model">res.config.settings</field>
+            <field name="priority" eval="10"/>
+            <field name="inherit_id" ref="sale.res_config_settings_view_form" />
+            <field name="arch" type="xml">
+                <xpath expr="//block[@name='quotation_order_setting_container']" position="before">  
+                    <h2>Discount Setting</h2>
+                    <div class="row mt16 o_settings_container" id="global_commission_settings">  
+                        <div class="col-12 col-lg-6 o_setting_box">
+                            <div class="o_setting_right_pane">
+                                <label for="tax_discount_policy"/>
+                                <div class="content-group">
+                                    <div class="mt16">
+                                        <field name="tax_discount_policy" class="o_light_label" widget="radio"/>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-12 col-lg-6 o_setting_box">
+                            <div class="o_setting_right_pane">
+                                <div class="content-group">
+                                    <label for="purchase_account_id"/>
+                                    <div class="mt16">
+                                        <field name="purchase_account_id" class="o_light_label"/>
+                                    </div>
+                                </div>
+                                <div class="content-group">
+                                    <label for="sale_account_id"/>
+                                    <div class="mt16">
+                                        <field name="sale_account_id" class="o_light_label" />
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </xpath>
+            </field>
+        </record>
+
+</odoo>

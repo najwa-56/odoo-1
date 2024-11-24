@@ -1,0 +1,129 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <template id="bi_sale_purchase_report_account_tax_inherit" inherit_id="account.tax_groups_totals">
+        <xpath expr="//tr" position="replace">
+            <t t-foreach="tax_totals['groups_by_subtotal'][subtotal_to_show]" t-as="amount_by_group">
+                <t t-set="display_tax_base" t-value="tax_totals['display_tax_base']"/>
+                <tr>
+                    <t t-if="tax_totals['display_tax_base']">
+                        <td>
+                            <span t-esc="amount_by_group['tax_group_name']"/>
+                           <!--  <span t-if="not amount_by_group['hide_base_amount']" class="text-nowrap"> on
+                                <t t-esc="amount_by_group['formatted_tax_group_base_amount']"/>
+                            </span> -->
+                        </td>
+                        <td class="text-end o_price_total">
+                            <span class="text-nowrap" t-out="amount_by_group['formatted_tax_group_amount']">1.05</span>
+                        </td>
+                    </t>
+                    <t t-else="">
+                        <td>
+                            <span t-out="amount_by_group['tax_group_name']">Tax 15%</span>
+                            <!-- <span t-if="not amount_by_group['hide_base_amount']" class="text-nowrap"> on
+                                <t t-esc="amount_by_group['formatted_tax_group_base_amount']"/>
+                            </span> -->
+                        </td>
+                        <td class="text-end o_price_total">
+                            <span class="text-nowrap" t-out="amount_by_group['formatted_tax_group_amount']">4.05</span>
+                        </td>
+                    </t>
+                </tr>
+            </t>
+        </xpath>
+    </template>
+
+	<template id="report_sale_discount_inherit" inherit_id="sale.report_saleorder_document">
+		<xpath expr="//div[@id='informations']" position="inside">
+            <div t-if="doc.discount_type" class="col-auto mw-100 mb-2">
+                <strong>Discount Type:</strong>
+                <p class="m-0" t-field="doc.discount_type"/>
+            </div>
+        </xpath>
+
+		<xpath expr="//div[@id='total']/div/table" position="before" >
+			<div class="clearfix">
+                <div class="row" name="total">
+                    <div t-attf-class="#{'col-12' if report_type != 'html' else 'col-sm-7 col-md-6'} ml-auto"
+                    	>
+                        <table class="table table-sm table-borderless" style="page-break-inside: avoid;">     <t t-if="doc.discount_type == 'global'">
+                                <tr class="border-black is-subtotal text-right">
+                                    <td><strong>Discount Amount</strong></td>
+                                    <td class="text-end">
+                                        <span t-field="doc.discount_amt" t-options='{"widget": "monetary", "display_currency": doc.currency_id}'/>
+                                    </td>
+                                </tr>
+                            </t>
+                            <t t-if="doc.discount_type == 'line'">
+                                <tr class="border-black is-subtotal text-right">
+                                    <td><strong>Line Discount</strong></td>
+                                    <td class="text-end">
+                                        <span t-field="doc.discount_amt_line" t-options='{"widget": "monetary", "display_currency": doc.currency_id}'/>
+                                    </td>
+                                </tr>
+                            </t>
+                        </table>
+                    </div>
+                </div>
+            </div>
+		</xpath>
+		
+		<xpath expr="//div[hasclass('clearfix')]" position="after">
+			<t t-if="doc.discount_type == 'global'">
+				<div class="row">
+					<div t-attf-class="#{'col-4' if report_type != 'html' else 'col-sm-7 col-md-5'}">
+						<table class="table table-sm">
+							<tr class="border-black">
+								<td>
+									<strong> Discount Method </strong>
+								</td>
+								<td class="text-right">
+									<span t-field="doc.discount_method" />
+								</td>
+							</tr>
+							<tr class="border-black">
+								<td>
+									<strong>Discount Amount</strong>
+								</td>
+								<td class="text-right">
+									<span t-field="doc.discount_amount" /> 
+									<t t-if="doc.discount_method == 'per'"><span class="oe_inline">&amp;nbsp;%</span></t>
+								</td>
+							</tr>
+						</table>
+					</div>
+				</div>
+			</t>
+		</xpath>
+
+		<xpath expr="//table[hasclass('o_main_table')]/thead/tr/th[4]" position="replace">
+            <t t-if="doc.discount_type == 'line'">
+                <th class="text-right"><strong>Discount Method</strong></th>
+                <th class="text-right"><strong>Discount Amount</strong></th>
+            </t>
+        </xpath>
+        
+        <xpath expr="//tbody[hasclass('sale_tbody')]/t[@t-foreach='lines_to_report']/tr/t[@t-if='not line.display_type']/td[4]" position="replace">
+            <t t-if="doc.discount_type == 'line'">
+                <t t-if="line.discount_amount">
+                    <td class="text-right">
+                        <span t-field="line.discount_method"/>
+                    </td>
+                </t>
+                <t t-else="">
+                    <td></td>
+                </t>
+                <t t-if="line.discount_amount">
+                    <td  class="text-right">
+                        <span t-field="line.discount_amount"/>
+                    </td>
+                </t>
+                <t t-else="">
+                    <td></td>
+                </t>
+            </t>
+        </xpath>
+
+
+	</template>
+</odoo>

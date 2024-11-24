@@ -1,0 +1,415 @@
+# Translation of Odoo Server.
+# This file contains the translation of the following modules:
+# 	* bi_sale_purchase_discount_with_tax
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Odoo Server 16.0+e\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2022-12-08 12:15+0000\n"
+"PO-Revision-Date: 2022-12-08 17:54+0530\n"
+"Last-Translator: \n"
+"Language-Team: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: \n"
+"Language: fr\n"
+"X-Generator: Poedit 2.3\n"
+
+#. module: bi_sale_purchase_discount_with_tax
+#: model:ir.model.fields,field_description:bi_sale_purchase_discount_with_tax.field_purchase_order__discount_amt
+msgid "- Discount"
+msgstr "- Remise"
+
+#. module: bi_sale_purchase_discount_with_tax
+#: model:ir.model.fields,field_description:bi_sale_purchase_discount_with_tax.field_purchase_order__discount_amt_line
+msgid "- Line Discount"
+msgstr "- Remise de ligne"
+
+#. module: bi_sale_purchase_discount_with_tax
+#: model_terms:ir.ui.view,arch_db:bi_sale_purchase_discount_with_tax.report_invoice_discount_inherit
+#: model_terms:ir.ui.view,arch_db:bi_sale_purchase_discount_with_tax.report_purchase_discount_inherit
+#: model_terms:ir.ui.view,arch_db:bi_sale_purchase_discount_with_tax.report_sale_discount_inherit
+msgid "<span class=\"oe_inline\">&amp;nbsp;%</span>"
+msgstr "<span class=\"oe_inline\">&amp;nbsp;%</span>"
+
+#. module: bi_sale_purchase_discount_with_tax
+#: model_terms:ir.ui.view,arch_db:bi_sale_purchase_discount_with_tax.report_purchase_discount_inherit
+msgid "<strong> Discount Amount </strong>"
+msgstr "<strong> Montant de la remise </strong>"
+
+#. module: bi_sale_purchase_discount_with_tax
+#: model_terms:ir.ui.view,arch_db:bi_sale_purchase_discount_with_tax.report_invoice_discount_inherit
+msgid "<strong> Discount Amount</strong>"
+msgstr "<strong> Montant de la remise</strong>"
+
+#. module: bi_sale_purchase_discount_with_tax
+#: model_terms:ir.ui.view,arch_db:bi_sale_purchase_discount_with_tax.report_purchase_discount_inherit
+#: model_terms:ir.ui.view,arch_db:bi_sale_purchase_discount_with_tax.report_sale_discount_inherit
+msgid "<strong> Discount Method </strong>"
+msgstr "<strong> Méthode de réduction </strong>"
+
+#. module: bi_sale_purchase_discount_with_tax
+#: model_terms:ir.ui.view,arch_db:bi_sale_purchase_discount_with_tax.report_invoice_discount_inherit
+msgid "<strong> Discount Method</strong>"
+msgstr "<strong>Méthode de réduction</strong>"
+
+#. module: bi_sale_purchase_discount_with_tax
+#: model_terms:ir.ui.view,arch_db:bi_sale_purchase_discount_with_tax.report_invoice_discount_inherit
+msgid "<strong> Line Discount </strong>"
+msgstr "<strong> Remise de ligne </strong>"
+
+#. module: bi_sale_purchase_discount_with_tax
+#: model_terms:ir.ui.view,arch_db:bi_sale_purchase_discount_with_tax.report_purchase_discount_inherit
+msgid "<strong> Taxes</strong>"
+msgstr "<strong>Taxes</strong>"
+
+#. module: bi_sale_purchase_discount_with_tax
+#: model_terms:ir.ui.view,arch_db:bi_sale_purchase_discount_with_tax.report_invoice_discount_inherit
+#: model_terms:ir.ui.view,arch_db:bi_sale_purchase_discount_with_tax.report_purchase_discount_inherit
+#: model_terms:ir.ui.view,arch_db:bi_sale_purchase_discount_with_tax.report_sale_discount_inherit
+msgid "<strong>Discount Amount</strong>"
+msgstr "<strong>Montant de la remise</strong>"
+
+#. module: bi_sale_purchase_discount_with_tax
+#: model_terms:ir.ui.view,arch_db:bi_sale_purchase_discount_with_tax.report_invoice_discount_inherit
+#: model_terms:ir.ui.view,arch_db:bi_sale_purchase_discount_with_tax.report_purchase_discount_inherit
+#: model_terms:ir.ui.view,arch_db:bi_sale_purchase_discount_with_tax.report_sale_discount_inherit
+msgid "<strong>Discount Method</strong>"
+msgstr "<strong>Méthode de remise</strong>"
+
+#. module: bi_sale_purchase_discount_with_tax
+#: model_terms:ir.ui.view,arch_db:bi_sale_purchase_discount_with_tax.report_invoice_discount_inherit
+#: model_terms:ir.ui.view,arch_db:bi_sale_purchase_discount_with_tax.report_purchase_discount_inherit
+#: model_terms:ir.ui.view,arch_db:bi_sale_purchase_discount_with_tax.report_sale_discount_inherit
+msgid "<strong>Discount Type:</strong>"
+msgstr "<strong>Type de remise :</strong>"
+
+#. module: bi_sale_purchase_discount_with_tax
+#: model_terms:ir.ui.view,arch_db:bi_sale_purchase_discount_with_tax.report_invoice_discount_inherit
+#: model_terms:ir.ui.view,arch_db:bi_sale_purchase_discount_with_tax.report_purchase_discount_inherit
+#: model_terms:ir.ui.view,arch_db:bi_sale_purchase_discount_with_tax.report_sale_discount_inherit
+msgid "<strong>Discount</strong>"
+msgstr "<strong>Réduction</strong>"
+
+#. module: bi_sale_purchase_discount_with_tax
+#: model_terms:ir.ui.view,arch_db:bi_sale_purchase_discount_with_tax.report_purchase_discount_inherit
+#: model_terms:ir.ui.view,arch_db:bi_sale_purchase_discount_with_tax.report_sale_discount_inherit
+msgid "<strong>Line Discount</strong>"
+msgstr "<strong>Remise de ligne</strong>"
+
+#. module: bi_sale_purchase_discount_with_tax
+#: model_terms:ir.ui.view,arch_db:bi_sale_purchase_discount_with_tax.report_invoice_discount_inherit
+#: model_terms:ir.ui.view,arch_db:bi_sale_purchase_discount_with_tax.report_sale_discount_inherit
+msgid "<strong>Taxes</strong>"
+msgstr "<strong>Taxes</strong>"
+
+#. module: bi_sale_purchase_discount_with_tax
+#: model_terms:ir.ui.view,arch_db:bi_sale_purchase_discount_with_tax.report_invoice_discount_inherit
+#: model_terms:ir.ui.view,arch_db:bi_sale_purchase_discount_with_tax.report_purchase_discount_inherit
+#: model_terms:ir.ui.view,arch_db:bi_sale_purchase_discount_with_tax.report_sale_discount_inherit
+msgid "<strong>Total</strong>"
+msgstr "<strong>Totale</strong>"
+
+#. module: bi_sale_purchase_discount_with_tax
+#: model_terms:ir.ui.view,arch_db:bi_sale_purchase_discount_with_tax.report_invoice_discount_inherit
+#: model_terms:ir.ui.view,arch_db:bi_sale_purchase_discount_with_tax.report_purchase_discount_inherit
+#: model_terms:ir.ui.view,arch_db:bi_sale_purchase_discount_with_tax.report_sale_discount_inherit
+msgid "<strong>Untaxed Amount</strong>"
+msgstr "<strong>Montant non taxé</strong>"
+
+#. module: bi_sale_purchase_discount_with_tax
+#: model:ir.model,name:bi_sale_purchase_discount_with_tax.model_res_company
+msgid "Companies"
+msgstr "Companies"
+
+#. module: bi_sale_purchase_discount_with_tax
+#: model:ir.model,name:bi_sale_purchase_discount_with_tax.model_res_config_settings
+msgid "Config Settings"
+msgstr "Paramètres de configuration"
+
+#. module: bi_sale_purchase_discount_with_tax
+#: model_terms:ir.ui.view,arch_db:bi_sale_purchase_discount_with_tax.view_purchase_account_move_discount_form
+msgid "Disc.%"
+msgstr "Disque.%"
+
+#. module: bi_sale_purchase_discount_with_tax
+#: model:ir.model.fields,field_description:bi_sale_purchase_discount_with_tax.field_account_bank_statement_line__discount_amt
+#: model:ir.model.fields,field_description:bi_sale_purchase_discount_with_tax.field_account_move__discount_amt
+#: model:ir.model.fields,field_description:bi_sale_purchase_discount_with_tax.field_account_payment__discount_amt
+#: model:ir.model.fields,field_description:bi_sale_purchase_discount_with_tax.field_sale_order__discount_amt
+msgid "Discount"
+msgstr "Remise"
+
+#. module: bi_sale_purchase_discount_with_tax
+#: model:ir.model.fields,field_description:bi_sale_purchase_discount_with_tax.field_account_bank_statement_line__discount_account_id
+#: model:ir.model.fields,field_description:bi_sale_purchase_discount_with_tax.field_account_move__discount_account_id
+#: model:ir.model.fields,field_description:bi_sale_purchase_discount_with_tax.field_account_payment__discount_account_id
+msgid "Discount Account"
+msgstr "Compte de réduction"
+
+#. module: bi_sale_purchase_discount_with_tax
+#: model:ir.model.fields,field_description:bi_sale_purchase_discount_with_tax.field_account_bank_statement_line__discount_amount
+#: model:ir.model.fields,field_description:bi_sale_purchase_discount_with_tax.field_account_move__discount_amount
+#: model:ir.model.fields,field_description:bi_sale_purchase_discount_with_tax.field_account_move_line__discount_amount
+#: model:ir.model.fields,field_description:bi_sale_purchase_discount_with_tax.field_account_payment__discount_amount
+#: model:ir.model.fields,field_description:bi_sale_purchase_discount_with_tax.field_purchase_order__discount_amount
+#: model:ir.model.fields,field_description:bi_sale_purchase_discount_with_tax.field_purchase_order_line__discount_amount
+#: model:ir.model.fields,field_description:bi_sale_purchase_discount_with_tax.field_sale_order__discount_amount
+#: model:ir.model.fields,field_description:bi_sale_purchase_discount_with_tax.field_sale_order_line__discount_amount
+msgid "Discount Amount"
+msgstr "Montant de la remise"
+
+#. module: bi_sale_purchase_discount_with_tax
+#: model:ir.model.fields,field_description:bi_sale_purchase_discount_with_tax.field_res_company__tax_discount_policy
+#: model:ir.model.fields,field_description:bi_sale_purchase_discount_with_tax.field_res_config_settings__tax_discount_policy
+msgid "Discount Applies On"
+msgstr "La réduction s'applique sur"
+
+#. module: bi_sale_purchase_discount_with_tax
+#: model:ir.model.fields,field_description:bi_sale_purchase_discount_with_tax.field_account_bank_statement_line__discount_type
+#: model:ir.model.fields,field_description:bi_sale_purchase_discount_with_tax.field_account_move__discount_type
+#: model:ir.model.fields,field_description:bi_sale_purchase_discount_with_tax.field_account_move_line__discount_type
+#: model:ir.model.fields,field_description:bi_sale_purchase_discount_with_tax.field_account_payment__discount_type
+#: model:ir.model.fields,field_description:bi_sale_purchase_discount_with_tax.field_purchase_order__discount_type
+#: model:ir.model.fields,field_description:bi_sale_purchase_discount_with_tax.field_purchase_order_line__discount_type
+#: model:ir.model.fields,field_description:bi_sale_purchase_discount_with_tax.field_sale_order__discount_type
+#: model:ir.model.fields,field_description:bi_sale_purchase_discount_with_tax.field_sale_order_line__discount_type
+msgid "Discount Applies to"
+msgstr "La réduction s'applique à"
+
+#. module: bi_sale_purchase_discount_with_tax
+#: model:ir.model.fields,field_description:bi_sale_purchase_discount_with_tax.field_account_move_line__discount_amt
+#: model:ir.model.fields,field_description:bi_sale_purchase_discount_with_tax.field_purchase_order_line__discount_amt
+#: model:ir.model.fields,field_description:bi_sale_purchase_discount_with_tax.field_sale_order_line__discount_amt
+msgid "Discount Final Amount"
+msgstr "Montant final de la remise"
+
+#. module: bi_sale_purchase_discount_with_tax
+#: model:ir.model.fields,field_description:bi_sale_purchase_discount_with_tax.field_account_bank_statement_line__discount_amount_line
+#: model:ir.model.fields,field_description:bi_sale_purchase_discount_with_tax.field_account_move__discount_amount_line
+#: model:ir.model.fields,field_description:bi_sale_purchase_discount_with_tax.field_account_payment__discount_amount_line
+msgid "Discount Line"
+msgstr "Ligne de remise"
+
+#. module: bi_sale_purchase_discount_with_tax
+#: model:ir.model.fields,field_description:bi_sale_purchase_discount_with_tax.field_account_bank_statement_line__discount_method
+#: model:ir.model.fields,field_description:bi_sale_purchase_discount_with_tax.field_account_move__discount_method
+#: model:ir.model.fields,field_description:bi_sale_purchase_discount_with_tax.field_account_move_line__discount_method
+#: model:ir.model.fields,field_description:bi_sale_purchase_discount_with_tax.field_account_payment__discount_method
+#: model:ir.model.fields,field_description:bi_sale_purchase_discount_with_tax.field_purchase_order__discount_method
+#: model:ir.model.fields,field_description:bi_sale_purchase_discount_with_tax.field_purchase_order_line__discount_method
+#: model:ir.model.fields,field_description:bi_sale_purchase_discount_with_tax.field_sale_order__discount_method
+#: model:ir.model.fields,field_description:bi_sale_purchase_discount_with_tax.field_sale_order_line__discount_method
+#: model_terms:ir.ui.view,arch_db:bi_sale_purchase_discount_with_tax.view_order_invoice_discount_form
+msgid "Discount Method"
+msgstr "Méthode de remise"
+
+#. module: bi_sale_purchase_discount_with_tax
+#: model_terms:ir.ui.view,arch_db:bi_sale_purchase_discount_with_tax.res_config_settings_view_form_discount
+msgid "Discount Setting"
+msgstr "Paramètre de remise"
+
+#. module: bi_sale_purchase_discount_with_tax
+#. odoo-python
+#: code:addons/bi_sale_purchase_discount_with_tax/models/purchase.py:0
+#: code:addons/bi_sale_purchase_discount_with_tax/models/sale.py:0
+#, python-format
+msgid "Down Payments"
+msgstr "Acomptes"
+
+#. module: bi_sale_purchase_discount_with_tax
+#: model:ir.model.fields,field_description:bi_sale_purchase_discount_with_tax.field_account_move_line__exclude_from_invoice_tab
+msgid "Exclude From Invoice Tab"
+msgstr "Exclure de l'onglet Facture"
+
+#. module: bi_sale_purchase_discount_with_tax
+#: model:ir.model.fields.selection,name:bi_sale_purchase_discount_with_tax.selection__account_move__discount_method__fix
+#: model:ir.model.fields.selection,name:bi_sale_purchase_discount_with_tax.selection__account_move_line__discount_method__fix
+#: model:ir.model.fields.selection,name:bi_sale_purchase_discount_with_tax.selection__purchase_order__discount_method__fix
+#: model:ir.model.fields.selection,name:bi_sale_purchase_discount_with_tax.selection__purchase_order_line__discount_method__fix
+#: model:ir.model.fields.selection,name:bi_sale_purchase_discount_with_tax.selection__sale_order__discount_method__fix
+#: model:ir.model.fields.selection,name:bi_sale_purchase_discount_with_tax.selection__sale_order_line__discount_method__fix
+msgid "Fixed"
+msgstr "Fixé"
+
+#. module: bi_sale_purchase_discount_with_tax
+#: model:ir.model.fields,field_description:bi_sale_purchase_discount_with_tax.field_account_move_line__flag
+msgid "Flag"
+msgstr "Drapeau"
+
+#. module: bi_sale_purchase_discount_with_tax
+#: model:ir.model.fields.selection,name:bi_sale_purchase_discount_with_tax.selection__account_move__discount_type__global
+#: model:ir.model.fields.selection,name:bi_sale_purchase_discount_with_tax.selection__purchase_order__discount_type__global
+#: model:ir.model.fields.selection,name:bi_sale_purchase_discount_with_tax.selection__sale_order__discount_type__global
+msgid "Global"
+msgstr "Mondial"
+
+#. module: bi_sale_purchase_discount_with_tax
+#: model:ir.model.fields,field_description:bi_sale_purchase_discount_with_tax.field_account_move_line__is_global_disc
+msgid "Global Discount"
+msgstr "Remise globale"
+
+#. module: bi_sale_purchase_discount_with_tax
+#: model:ir.model.fields,field_description:bi_sale_purchase_discount_with_tax.field_account_bank_statement_line__invoice_line_ids
+#: model:ir.model.fields,field_description:bi_sale_purchase_discount_with_tax.field_account_move__invoice_line_ids
+#: model:ir.model.fields,field_description:bi_sale_purchase_discount_with_tax.field_account_payment__invoice_line_ids
+msgid "Invoice lines"
+msgstr "Lignes de facture"
+
+#. module: bi_sale_purchase_discount_with_tax
+#: model:ir.model,name:bi_sale_purchase_discount_with_tax.model_account_move
+msgid "Journal Entry"
+msgstr "Entrée de journal"
+
+#. module: bi_sale_purchase_discount_with_tax
+#: model:ir.model,name:bi_sale_purchase_discount_with_tax.model_account_move_line
+msgid "Journal Item"
+msgstr "Élément de journal"
+
+#. module: bi_sale_purchase_discount_with_tax
+#: model:ir.model.fields,field_description:bi_sale_purchase_discount_with_tax.field_account_bank_statement_line__discount_amt_line
+#: model:ir.model.fields,field_description:bi_sale_purchase_discount_with_tax.field_account_move__discount_amt_line
+#: model:ir.model.fields,field_description:bi_sale_purchase_discount_with_tax.field_account_payment__discount_amt_line
+#: model:ir.model.fields,field_description:bi_sale_purchase_discount_with_tax.field_sale_order__discount_amt_line
+msgid "Line Discount"
+msgstr "Remise de ligne"
+
+#. module: bi_sale_purchase_discount_with_tax
+#: model:ir.model.fields.selection,name:bi_sale_purchase_discount_with_tax.selection__account_move__discount_type__line
+msgid "Move Line"
+msgstr "Déplacer la ligne"
+
+#. module: bi_sale_purchase_discount_with_tax
+#: model:ir.model.fields.selection,name:bi_sale_purchase_discount_with_tax.selection__purchase_order__discount_type__line
+#: model:ir.model.fields.selection,name:bi_sale_purchase_discount_with_tax.selection__sale_order__discount_type__line
+msgid "Order Line"
+msgstr "Ligne de commande"
+
+#. module: bi_sale_purchase_discount_with_tax
+#: model:ir.model.fields.selection,name:bi_sale_purchase_discount_with_tax.selection__account_move__discount_method__per
+#: model:ir.model.fields.selection,name:bi_sale_purchase_discount_with_tax.selection__account_move_line__discount_method__per
+#: model:ir.model.fields.selection,name:bi_sale_purchase_discount_with_tax.selection__purchase_order__discount_method__per
+#: model:ir.model.fields.selection,name:bi_sale_purchase_discount_with_tax.selection__purchase_order_line__discount_method__per
+#: model:ir.model.fields.selection,name:bi_sale_purchase_discount_with_tax.selection__sale_order__discount_method__per
+#: model:ir.model.fields.selection,name:bi_sale_purchase_discount_with_tax.selection__sale_order_line__discount_method__per
+msgid "Percentage"
+msgstr "Percentage"
+
+#. module: bi_sale_purchase_discount_with_tax
+#: model:ir.model.fields,field_description:bi_sale_purchase_discount_with_tax.field_res_company__purchase_account_id
+#: model:ir.model.fields,field_description:bi_sale_purchase_discount_with_tax.field_res_config_settings__purchase_account_id
+msgid "Purchase Discount Account"
+msgstr "Compte de réduction d'achat"
+
+#. module: bi_sale_purchase_discount_with_tax
+#: model:ir.model,name:bi_sale_purchase_discount_with_tax.model_purchase_order
+msgid "Purchase Order"
+msgstr "Bon de commande"
+
+#. module: bi_sale_purchase_discount_with_tax
+#: model:ir.model,name:bi_sale_purchase_discount_with_tax.model_purchase_order_line
+msgid "Purchase Order Line"
+msgstr "Ligne de bon de commande"
+
+#. module: bi_sale_purchase_discount_with_tax
+#: model:ir.model.fields,field_description:bi_sale_purchase_discount_with_tax.field_purchase_order__report_total
+#: model:ir.model.fields,field_description:bi_sale_purchase_discount_with_tax.field_sale_order__report_total
+msgid "Report Untaxed Amount"
+msgstr "Déclarer le montant non taxé"
+
+#. module: bi_sale_purchase_discount_with_tax
+#: model:ir.model.fields,field_description:bi_sale_purchase_discount_with_tax.field_res_company__sale_account_id
+#: model:ir.model.fields,field_description:bi_sale_purchase_discount_with_tax.field_res_config_settings__sale_account_id
+msgid "Sale Discount Account"
+msgstr "Compte d'escompte de vente"
+
+#. module: bi_sale_purchase_discount_with_tax
+#: model:ir.model,name:bi_sale_purchase_discount_with_tax.model_sale_advance_payment_inv
+msgid "Sales Advance Payment Invoice"
+msgstr "Facture de paiement anticipé des ventes"
+
+#. module: bi_sale_purchase_discount_with_tax
+#: model:ir.model,name:bi_sale_purchase_discount_with_tax.model_sale_order
+msgid "Sales Order"
+msgstr "Bon de commande"
+
+#. module: bi_sale_purchase_discount_with_tax
+#: model:ir.model,name:bi_sale_purchase_discount_with_tax.model_sale_order_line
+msgid "Sales Order Line"
+msgstr "Ligne de commande client"
+
+#. module: bi_sale_purchase_discount_with_tax
+#: model:ir.model.fields,field_description:bi_sale_purchase_discount_with_tax.field_account_bank_statement_line__amount_tax
+#: model:ir.model.fields,field_description:bi_sale_purchase_discount_with_tax.field_account_move__amount_tax
+#: model:ir.model.fields,field_description:bi_sale_purchase_discount_with_tax.field_account_payment__amount_tax
+msgid "Tax"
+msgstr "Impôt"
+
+#. module: bi_sale_purchase_discount_with_tax
+#: model:ir.model.fields,field_description:bi_sale_purchase_discount_with_tax.field_sale_order_line__is_apply_on_discount_amount
+msgid "Tax Apply After Discount"
+msgstr "La taxe s'applique après remise"
+
+#. module: bi_sale_purchase_discount_with_tax
+#: model:ir.model.fields.selection,name:bi_sale_purchase_discount_with_tax.selection__res_company__tax_discount_policy__tax
+msgid "Taxed Amount"
+msgstr "Montant de la taxe"
+
+#. module: bi_sale_purchase_discount_with_tax
+#: model:ir.model.fields,help:bi_sale_purchase_discount_with_tax.field_account_move_line__exclude_from_invoice_tab
+msgid ""
+"Technical field used to exclude some lines from the invoice_line_ids tab in "
+"the form view."
+msgstr ""
+"Champ technique utilisé pour exclure certaines lignes de l'onglet "
+"facture_ligne_ids dans la vue formulaire."
+
+#. module: bi_sale_purchase_discount_with_tax
+#: model:ir.model.fields,field_description:bi_sale_purchase_discount_with_tax.field_account_bank_statement_line__amount_total
+#: model:ir.model.fields,field_description:bi_sale_purchase_discount_with_tax.field_account_move__amount_total
+#: model:ir.model.fields,field_description:bi_sale_purchase_discount_with_tax.field_account_payment__amount_total
+msgid "Total"
+msgstr "Total"
+
+#. module: bi_sale_purchase_discount_with_tax
+#: model:ir.model.fields,field_description:bi_sale_purchase_discount_with_tax.field_account_bank_statement_line__amount_untaxed
+#: model:ir.model.fields,field_description:bi_sale_purchase_discount_with_tax.field_account_move__amount_untaxed
+#: model:ir.model.fields,field_description:bi_sale_purchase_discount_with_tax.field_account_payment__amount_untaxed
+#: model:ir.model.fields.selection,name:bi_sale_purchase_discount_with_tax.selection__res_company__tax_discount_policy__untax
+msgid "Untaxed Amount"
+msgstr "Montant non taxé"
+
+#. module: bi_sale_purchase_discount_with_tax
+#: model:ir.model.fields,field_description:bi_sale_purchase_discount_with_tax.field_account_bank_statement_line__count_total
+#: model:ir.model.fields,field_description:bi_sale_purchase_discount_with_tax.field_account_move__count_total
+#: model:ir.model.fields,field_description:bi_sale_purchase_discount_with_tax.field_account_payment__count_total
+msgid "tax total"
+msgstr "total des taxes"
+
+#. module: bi_sale_purchase_discount_with_tax
+#: model:ir.model.fields,field_description:bi_sale_purchase_discount_with_tax.field_purchase_order__line_total_amount
+msgid "total  amount for line"
+msgstr "montant total pour la ligne"
+
+#. module: bi_sale_purchase_discount_with_tax
+#: model:ir.model.fields,field_description:bi_sale_purchase_discount_with_tax.field_account_bank_statement_line__config_inv_tax
+#: model:ir.model.fields,field_description:bi_sale_purchase_discount_with_tax.field_account_move__config_inv_tax
+#: model:ir.model.fields,field_description:bi_sale_purchase_discount_with_tax.field_account_payment__config_inv_tax
+#: model:ir.model.fields,field_description:bi_sale_purchase_discount_with_tax.field_purchase_order__config_tax
+#: model:ir.model.fields,field_description:bi_sale_purchase_discount_with_tax.field_sale_order__config_tax
+msgid "total disc tax"
+msgstr "taxe totale sur le disque"
+
+#. module: bi_sale_purchase_discount_with_tax
+#: model:ir.model.fields,field_description:bi_sale_purchase_discount_with_tax.field_account_bank_statement_line__untax_test_amount
+#: model:ir.model.fields,field_description:bi_sale_purchase_discount_with_tax.field_account_move__untax_test_amount
+#: model:ir.model.fields,field_description:bi_sale_purchase_discount_with_tax.field_account_payment__untax_test_amount
+msgid "total untax amoun for line"
+msgstr "montant total non taxé pour la ligne"
+
+#. module: bi_sale_purchase_discount_with_tax
+#: model:ir.model.fields,field_description:bi_sale_purchase_discount_with_tax.field_purchase_order__untax_test_amount
+msgid "total untax amount for line"
+msgstr "montant total non taxé pour la ligne"

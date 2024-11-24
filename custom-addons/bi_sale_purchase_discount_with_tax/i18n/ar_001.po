@@ -1,0 +1,415 @@
+# Translation of Odoo Server.
+# This file contains the translation of the following modules:
+# 	* bi_sale_purchase_discount_with_tax
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Odoo Server 16.0+e\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2022-12-08 10:44+0000\n"
+"PO-Revision-Date: 2022-12-08 16:59+0530\n"
+"Last-Translator: \n"
+"Language-Team: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: \n"
+"Language: ar\n"
+"X-Generator: Poedit 2.3\n"
+
+#. module: bi_sale_purchase_discount_with_tax
+#: model:ir.model.fields,field_description:bi_sale_purchase_discount_with_tax.field_purchase_order__discount_amt
+msgid "- Discount"
+msgstr "- تخفيض"
+
+#. module: bi_sale_purchase_discount_with_tax
+#: model:ir.model.fields,field_description:bi_sale_purchase_discount_with_tax.field_purchase_order__discount_amt_line
+msgid "- Line Discount"
+msgstr "- خصم الخط"
+
+#. module: bi_sale_purchase_discount_with_tax
+#: model_terms:ir.ui.view,arch_db:bi_sale_purchase_discount_with_tax.report_invoice_discount_inherit
+#: model_terms:ir.ui.view,arch_db:bi_sale_purchase_discount_with_tax.report_purchase_discount_inherit
+#: model_terms:ir.ui.view,arch_db:bi_sale_purchase_discount_with_tax.report_sale_discount_inherit
+msgid "<span class=\"oe_inline\">&amp;nbsp;%</span>"
+msgstr "<span class=\"oe_inline\">&amp;nbsp;%</span>"
+
+#. module: bi_sale_purchase_discount_with_tax
+#: model_terms:ir.ui.view,arch_db:bi_sale_purchase_discount_with_tax.report_purchase_discount_inherit
+msgid "<strong> Discount Amount </strong>"
+msgstr "<strong> مبلغ الخصم </strong>"
+
+#. module: bi_sale_purchase_discount_with_tax
+#: model_terms:ir.ui.view,arch_db:bi_sale_purchase_discount_with_tax.report_invoice_discount_inherit
+msgid "<strong> Discount Amount</strong>"
+msgstr "<strong> مقدار الخصم</strong>"
+
+#. module: bi_sale_purchase_discount_with_tax
+#: model_terms:ir.ui.view,arch_db:bi_sale_purchase_discount_with_tax.report_purchase_discount_inherit
+#: model_terms:ir.ui.view,arch_db:bi_sale_purchase_discount_with_tax.report_sale_discount_inherit
+msgid "<strong> Discount Method </strong>"
+msgstr "<strong>  طريقة الخصم</strong>"
+
+#. module: bi_sale_purchase_discount_with_tax
+#: model_terms:ir.ui.view,arch_db:bi_sale_purchase_discount_with_tax.report_invoice_discount_inherit
+msgid "<strong> Discount Method</strong>"
+msgstr "<strong> طريقة الخصم</strong>"
+
+#. module: bi_sale_purchase_discount_with_tax
+#: model_terms:ir.ui.view,arch_db:bi_sale_purchase_discount_with_tax.report_invoice_discount_inherit
+msgid "<strong> Line Discount </strong>"
+msgstr "<strong> خصم الخط </strong>"
+
+#. module: bi_sale_purchase_discount_with_tax
+#: model_terms:ir.ui.view,arch_db:bi_sale_purchase_discount_with_tax.report_purchase_discount_inherit
+msgid "<strong> Taxes</strong>"
+msgstr "<strong> الضرائب</strong>"
+
+#. module: bi_sale_purchase_discount_with_tax
+#: model_terms:ir.ui.view,arch_db:bi_sale_purchase_discount_with_tax.report_invoice_discount_inherit
+#: model_terms:ir.ui.view,arch_db:bi_sale_purchase_discount_with_tax.report_purchase_discount_inherit
+#: model_terms:ir.ui.view,arch_db:bi_sale_purchase_discount_with_tax.report_sale_discount_inherit
+msgid "<strong>Discount Amount</strong>"
+msgstr "<strong>مقدار الخصم</strong>"
+
+#. module: bi_sale_purchase_discount_with_tax
+#: model_terms:ir.ui.view,arch_db:bi_sale_purchase_discount_with_tax.report_invoice_discount_inherit
+#: model_terms:ir.ui.view,arch_db:bi_sale_purchase_discount_with_tax.report_purchase_discount_inherit
+#: model_terms:ir.ui.view,arch_db:bi_sale_purchase_discount_with_tax.report_sale_discount_inherit
+msgid "<strong>Discount Method</strong>"
+msgstr "<strong>طريقة الخصم</strong>"
+
+#. module: bi_sale_purchase_discount_with_tax
+#: model_terms:ir.ui.view,arch_db:bi_sale_purchase_discount_with_tax.report_invoice_discount_inherit
+#: model_terms:ir.ui.view,arch_db:bi_sale_purchase_discount_with_tax.report_purchase_discount_inherit
+#: model_terms:ir.ui.view,arch_db:bi_sale_purchase_discount_with_tax.report_sale_discount_inherit
+msgid "<strong>Discount Type:</strong>"
+msgstr "<strong>نوع الخصم:</strong>"
+
+#. module: bi_sale_purchase_discount_with_tax
+#: model_terms:ir.ui.view,arch_db:bi_sale_purchase_discount_with_tax.report_invoice_discount_inherit
+#: model_terms:ir.ui.view,arch_db:bi_sale_purchase_discount_with_tax.report_purchase_discount_inherit
+#: model_terms:ir.ui.view,arch_db:bi_sale_purchase_discount_with_tax.report_sale_discount_inherit
+msgid "<strong>Discount</strong>"
+msgstr "<strong>تخفيض</strong>"
+
+#. module: bi_sale_purchase_discount_with_tax
+#: model_terms:ir.ui.view,arch_db:bi_sale_purchase_discount_with_tax.report_purchase_discount_inherit
+#: model_terms:ir.ui.view,arch_db:bi_sale_purchase_discount_with_tax.report_sale_discount_inherit
+msgid "<strong>Line Discount</strong>"
+msgstr "<strong>خصم الخط</strong>"
+
+#. module: bi_sale_purchase_discount_with_tax
+#: model_terms:ir.ui.view,arch_db:bi_sale_purchase_discount_with_tax.report_invoice_discount_inherit
+#: model_terms:ir.ui.view,arch_db:bi_sale_purchase_discount_with_tax.report_sale_discount_inherit
+msgid "<strong>Taxes</strong>"
+msgstr "<strong>الضرائب</strong>"
+
+#. module: bi_sale_purchase_discount_with_tax
+#: model_terms:ir.ui.view,arch_db:bi_sale_purchase_discount_with_tax.report_invoice_discount_inherit
+#: model_terms:ir.ui.view,arch_db:bi_sale_purchase_discount_with_tax.report_purchase_discount_inherit
+#: model_terms:ir.ui.view,arch_db:bi_sale_purchase_discount_with_tax.report_sale_discount_inherit
+msgid "<strong>Total</strong>"
+msgstr "<strong>المجموع</strong>"
+
+#. module: bi_sale_purchase_discount_with_tax
+#: model_terms:ir.ui.view,arch_db:bi_sale_purchase_discount_with_tax.report_invoice_discount_inherit
+#: model_terms:ir.ui.view,arch_db:bi_sale_purchase_discount_with_tax.report_purchase_discount_inherit
+#: model_terms:ir.ui.view,arch_db:bi_sale_purchase_discount_with_tax.report_sale_discount_inherit
+msgid "<strong>Untaxed Amount</strong>"
+msgstr "<strong>المبلغ غير الخاضع للضريبة</strong>"
+
+#. module: bi_sale_purchase_discount_with_tax
+#: model:ir.model,name:bi_sale_purchase_discount_with_tax.model_res_company
+msgid "Companies"
+msgstr "الشركات Companies"
+
+#. module: bi_sale_purchase_discount_with_tax
+#: model:ir.model,name:bi_sale_purchase_discount_with_tax.model_res_config_settings
+msgid "Config Settings"
+msgstr "تهيئة الإعدادات "
+
+#. module: bi_sale_purchase_discount_with_tax
+#: model_terms:ir.ui.view,arch_db:bi_sale_purchase_discount_with_tax.view_purchase_account_move_discount_form
+msgid "Disc.%"
+msgstr "مبلغ غير الخاضع للضريبة"
+
+#. module: bi_sale_purchase_discount_with_tax
+#: model:ir.model.fields,field_description:bi_sale_purchase_discount_with_tax.field_account_bank_statement_line__discount_amt
+#: model:ir.model.fields,field_description:bi_sale_purchase_discount_with_tax.field_account_move__discount_amt
+#: model:ir.model.fields,field_description:bi_sale_purchase_discount_with_tax.field_account_payment__discount_amt
+#: model:ir.model.fields,field_description:bi_sale_purchase_discount_with_tax.field_sale_order__discount_amt
+msgid "Discount"
+msgstr "تخفيض"
+
+#. module: bi_sale_purchase_discount_with_tax
+#: model:ir.model.fields,field_description:bi_sale_purchase_discount_with_tax.field_account_bank_statement_line__discount_account_id
+#: model:ir.model.fields,field_description:bi_sale_purchase_discount_with_tax.field_account_move__discount_account_id
+#: model:ir.model.fields,field_description:bi_sale_purchase_discount_with_tax.field_account_payment__discount_account_id
+msgid "Discount Account"
+msgstr "حساب الخصم"
+
+#. module: bi_sale_purchase_discount_with_tax
+#: model:ir.model.fields,field_description:bi_sale_purchase_discount_with_tax.field_account_bank_statement_line__discount_amount
+#: model:ir.model.fields,field_description:bi_sale_purchase_discount_with_tax.field_account_move__discount_amount
+#: model:ir.model.fields,field_description:bi_sale_purchase_discount_with_tax.field_account_move_line__discount_amount
+#: model:ir.model.fields,field_description:bi_sale_purchase_discount_with_tax.field_account_payment__discount_amount
+#: model:ir.model.fields,field_description:bi_sale_purchase_discount_with_tax.field_purchase_order__discount_amount
+#: model:ir.model.fields,field_description:bi_sale_purchase_discount_with_tax.field_purchase_order_line__discount_amount
+#: model:ir.model.fields,field_description:bi_sale_purchase_discount_with_tax.field_sale_order__discount_amount
+#: model:ir.model.fields,field_description:bi_sale_purchase_discount_with_tax.field_sale_order_line__discount_amount
+msgid "Discount Amount"
+msgstr "مقدار الخصم"
+
+#. module: bi_sale_purchase_discount_with_tax
+#: model:ir.model.fields,field_description:bi_sale_purchase_discount_with_tax.field_res_company__tax_discount_policy
+#: model:ir.model.fields,field_description:bi_sale_purchase_discount_with_tax.field_res_config_settings__tax_discount_policy
+msgid "Discount Applies On"
+msgstr "الخصم يسري على"
+
+#. module: bi_sale_purchase_discount_with_tax
+#: model:ir.model.fields,field_description:bi_sale_purchase_discount_with_tax.field_account_bank_statement_line__discount_type
+#: model:ir.model.fields,field_description:bi_sale_purchase_discount_with_tax.field_account_move__discount_type
+#: model:ir.model.fields,field_description:bi_sale_purchase_discount_with_tax.field_account_move_line__discount_type
+#: model:ir.model.fields,field_description:bi_sale_purchase_discount_with_tax.field_account_payment__discount_type
+#: model:ir.model.fields,field_description:bi_sale_purchase_discount_with_tax.field_purchase_order__discount_type
+#: model:ir.model.fields,field_description:bi_sale_purchase_discount_with_tax.field_purchase_order_line__discount_type
+#: model:ir.model.fields,field_description:bi_sale_purchase_discount_with_tax.field_sale_order__discount_type
+#: model:ir.model.fields,field_description:bi_sale_purchase_discount_with_tax.field_sale_order_line__discount_type
+msgid "Discount Applies to"
+msgstr "الخصم يسري على"
+
+#. module: bi_sale_purchase_discount_with_tax
+#: model:ir.model.fields,field_description:bi_sale_purchase_discount_with_tax.field_account_move_line__discount_amt
+#: model:ir.model.fields,field_description:bi_sale_purchase_discount_with_tax.field_purchase_order_line__discount_amt
+#: model:ir.model.fields,field_description:bi_sale_purchase_discount_with_tax.field_sale_order_line__discount_amt
+msgid "Discount Final Amount"
+msgstr "المبلغ النهائي للخصم"
+
+#. module: bi_sale_purchase_discount_with_tax
+#: model:ir.model.fields,field_description:bi_sale_purchase_discount_with_tax.field_account_bank_statement_line__discount_amount_line
+#: model:ir.model.fields,field_description:bi_sale_purchase_discount_with_tax.field_account_move__discount_amount_line
+#: model:ir.model.fields,field_description:bi_sale_purchase_discount_with_tax.field_account_payment__discount_amount_line
+msgid "Discount Line"
+msgstr "خط الخصم"
+
+#. module: bi_sale_purchase_discount_with_tax
+#: model:ir.model.fields,field_description:bi_sale_purchase_discount_with_tax.field_account_bank_statement_line__discount_method
+#: model:ir.model.fields,field_description:bi_sale_purchase_discount_with_tax.field_account_move__discount_method
+#: model:ir.model.fields,field_description:bi_sale_purchase_discount_with_tax.field_account_move_line__discount_method
+#: model:ir.model.fields,field_description:bi_sale_purchase_discount_with_tax.field_account_payment__discount_method
+#: model:ir.model.fields,field_description:bi_sale_purchase_discount_with_tax.field_purchase_order__discount_method
+#: model:ir.model.fields,field_description:bi_sale_purchase_discount_with_tax.field_purchase_order_line__discount_method
+#: model:ir.model.fields,field_description:bi_sale_purchase_discount_with_tax.field_sale_order__discount_method
+#: model:ir.model.fields,field_description:bi_sale_purchase_discount_with_tax.field_sale_order_line__discount_method
+#: model_terms:ir.ui.view,arch_db:bi_sale_purchase_discount_with_tax.view_order_invoice_discount_form
+msgid "Discount Method"
+msgstr "طريقة الخصم"
+
+#. module: bi_sale_purchase_discount_with_tax
+#: model_terms:ir.ui.view,arch_db:bi_sale_purchase_discount_with_tax.res_config_settings_view_form_discount
+msgid "Discount Setting"
+msgstr "إعداد الخصم"
+
+#. module: bi_sale_purchase_discount_with_tax
+#. odoo-python
+#: code:addons/bi_sale_purchase_discount_with_tax/models/purchase.py:0
+#: code:addons/bi_sale_purchase_discount_with_tax/models/sale.py:0
+#, python-format
+msgid "Down Payments"
+msgstr "دفعات مقدمة"
+
+#. module: bi_sale_purchase_discount_with_tax
+#: model:ir.model.fields,field_description:bi_sale_purchase_discount_with_tax.field_account_move_line__exclude_from_invoice_tab
+msgid "Exclude From Invoice Tab"
+msgstr "استبعاد من علامة تبويب الفاتورة"
+
+#. module: bi_sale_purchase_discount_with_tax
+#: model:ir.model.fields.selection,name:bi_sale_purchase_discount_with_tax.selection__account_move__discount_method__fix
+#: model:ir.model.fields.selection,name:bi_sale_purchase_discount_with_tax.selection__account_move_line__discount_method__fix
+#: model:ir.model.fields.selection,name:bi_sale_purchase_discount_with_tax.selection__purchase_order__discount_method__fix
+#: model:ir.model.fields.selection,name:bi_sale_purchase_discount_with_tax.selection__purchase_order_line__discount_method__fix
+#: model:ir.model.fields.selection,name:bi_sale_purchase_discount_with_tax.selection__sale_order__discount_method__fix
+#: model:ir.model.fields.selection,name:bi_sale_purchase_discount_with_tax.selection__sale_order_line__discount_method__fix
+msgid "Fixed"
+msgstr "مُثَبَّت"
+
+#. module: bi_sale_purchase_discount_with_tax
+#: model:ir.model.fields,field_description:bi_sale_purchase_discount_with_tax.field_account_move_line__flag
+msgid "Flag"
+msgstr "علَم"
+
+#. module: bi_sale_purchase_discount_with_tax
+#: model:ir.model.fields.selection,name:bi_sale_purchase_discount_with_tax.selection__account_move__discount_type__global
+#: model:ir.model.fields.selection,name:bi_sale_purchase_discount_with_tax.selection__purchase_order__discount_type__global
+#: model:ir.model.fields.selection,name:bi_sale_purchase_discount_with_tax.selection__sale_order__discount_type__global
+msgid "Global"
+msgstr "عالمي"
+
+#. module: bi_sale_purchase_discount_with_tax
+#: model:ir.model.fields,field_description:bi_sale_purchase_discount_with_tax.field_account_move_line__is_global_disc
+msgid "Global Discount"
+msgstr "الخصم العالمي"
+
+#. module: bi_sale_purchase_discount_with_tax
+#: model:ir.model.fields,field_description:bi_sale_purchase_discount_with_tax.field_account_bank_statement_line__invoice_line_ids
+#: model:ir.model.fields,field_description:bi_sale_purchase_discount_with_tax.field_account_move__invoice_line_ids
+#: model:ir.model.fields,field_description:bi_sale_purchase_discount_with_tax.field_account_payment__invoice_line_ids
+msgid "Invoice lines"
+msgstr "بنود الفاتورة"
+
+#. module: bi_sale_purchase_discount_with_tax
+#: model:ir.model,name:bi_sale_purchase_discount_with_tax.model_account_move
+msgid "Journal Entry"
+msgstr "قيد اليومية"
+
+#. module: bi_sale_purchase_discount_with_tax
+#: model:ir.model,name:bi_sale_purchase_discount_with_tax.model_account_move_line
+msgid "Journal Item"
+msgstr "عنصر اليومية"
+
+#. module: bi_sale_purchase_discount_with_tax
+#: model:ir.model.fields,field_description:bi_sale_purchase_discount_with_tax.field_account_bank_statement_line__discount_amt_line
+#: model:ir.model.fields,field_description:bi_sale_purchase_discount_with_tax.field_account_move__discount_amt_line
+#: model:ir.model.fields,field_description:bi_sale_purchase_discount_with_tax.field_account_payment__discount_amt_line
+#: model:ir.model.fields,field_description:bi_sale_purchase_discount_with_tax.field_sale_order__discount_amt_line
+msgid "Line Discount"
+msgstr "خصم الخط"
+
+#. module: bi_sale_purchase_discount_with_tax
+#: model:ir.model.fields.selection,name:bi_sale_purchase_discount_with_tax.selection__account_move__discount_type__line
+msgid "Move Line"
+msgstr "نقل الخط"
+
+#. module: bi_sale_purchase_discount_with_tax
+#: model:ir.model.fields.selection,name:bi_sale_purchase_discount_with_tax.selection__purchase_order__discount_type__line
+#: model:ir.model.fields.selection,name:bi_sale_purchase_discount_with_tax.selection__sale_order__discount_type__line
+msgid "Order Line"
+msgstr "خط النظام"
+
+#. module: bi_sale_purchase_discount_with_tax
+#: model:ir.model.fields.selection,name:bi_sale_purchase_discount_with_tax.selection__account_move__discount_method__per
+#: model:ir.model.fields.selection,name:bi_sale_purchase_discount_with_tax.selection__account_move_line__discount_method__per
+#: model:ir.model.fields.selection,name:bi_sale_purchase_discount_with_tax.selection__purchase_order__discount_method__per
+#: model:ir.model.fields.selection,name:bi_sale_purchase_discount_with_tax.selection__purchase_order_line__discount_method__per
+#: model:ir.model.fields.selection,name:bi_sale_purchase_discount_with_tax.selection__sale_order__discount_method__per
+#: model:ir.model.fields.selection,name:bi_sale_purchase_discount_with_tax.selection__sale_order_line__discount_method__per
+msgid "Percentage"
+msgstr "Percentage"
+
+#. module: bi_sale_purchase_discount_with_tax
+#: model:ir.model.fields,field_description:bi_sale_purchase_discount_with_tax.field_res_company__purchase_account_id
+#: model:ir.model.fields,field_description:bi_sale_purchase_discount_with_tax.field_res_config_settings__purchase_account_id
+msgid "Purchase Discount Account"
+msgstr "حساب خصم الشراء"
+
+#. module: bi_sale_purchase_discount_with_tax
+#: model:ir.model,name:bi_sale_purchase_discount_with_tax.model_purchase_order
+msgid "Purchase Order"
+msgstr "أمر شراء"
+
+#. module: bi_sale_purchase_discount_with_tax
+#: model:ir.model,name:bi_sale_purchase_discount_with_tax.model_purchase_order_line
+msgid "Purchase Order Line"
+msgstr "بند أمر الشراء"
+
+#. module: bi_sale_purchase_discount_with_tax
+#: model:ir.model.fields,field_description:bi_sale_purchase_discount_with_tax.field_purchase_order__report_total
+#: model:ir.model.fields,field_description:bi_sale_purchase_discount_with_tax.field_sale_order__report_total
+msgid "Report Untaxed Amount"
+msgstr "الإبلاغ عن المبلغ غير الخاضع للضريبة"
+
+#. module: bi_sale_purchase_discount_with_tax
+#: model:ir.model.fields,field_description:bi_sale_purchase_discount_with_tax.field_res_company__sale_account_id
+#: model:ir.model.fields,field_description:bi_sale_purchase_discount_with_tax.field_res_config_settings__sale_account_id
+msgid "Sale Discount Account"
+msgstr "حساب خصم البيع"
+
+#. module: bi_sale_purchase_discount_with_tax
+#: model:ir.model,name:bi_sale_purchase_discount_with_tax.model_sale_advance_payment_inv
+msgid "Sales Advance Payment Invoice"
+msgstr "فاتورة الدفعة المقدمة للمبيعات"
+
+#. module: bi_sale_purchase_discount_with_tax
+#: model:ir.model,name:bi_sale_purchase_discount_with_tax.model_sale_order
+msgid "Sales Order"
+msgstr "أمر البيع"
+
+#. module: bi_sale_purchase_discount_with_tax
+#: model:ir.model,name:bi_sale_purchase_discount_with_tax.model_sale_order_line
+msgid "Sales Order Line"
+msgstr "بند أمر المبيعات"
+
+#. module: bi_sale_purchase_discount_with_tax
+#: model:ir.model.fields,field_description:bi_sale_purchase_discount_with_tax.field_account_bank_statement_line__amount_tax
+#: model:ir.model.fields,field_description:bi_sale_purchase_discount_with_tax.field_account_move__amount_tax
+#: model:ir.model.fields,field_description:bi_sale_purchase_discount_with_tax.field_account_payment__amount_tax
+msgid "Tax"
+msgstr "الضريبة"
+
+#. module: bi_sale_purchase_discount_with_tax
+#: model:ir.model.fields,field_description:bi_sale_purchase_discount_with_tax.field_sale_order_line__is_apply_on_discount_amount
+msgid "Tax Apply After Discount"
+msgstr "تطبق الضريبة بعد الخصم"
+
+#. module: bi_sale_purchase_discount_with_tax
+#: model:ir.model.fields.selection,name:bi_sale_purchase_discount_with_tax.selection__res_company__tax_discount_policy__tax
+msgid "Taxed Amount"
+msgstr "قيمة الضريبة"
+
+#. module: bi_sale_purchase_discount_with_tax
+#: model:ir.model.fields,help:bi_sale_purchase_discount_with_tax.field_account_move_line__exclude_from_invoice_tab
+msgid ""
+"Technical field used to exclude some lines from the invoice_line_ids tab in "
+"the form view."
+msgstr ""
+"يُستخدم الحقل التقني لاستبعاد بعض البنود من علامة التبويب invoice_line_ids "
+"في طريقة عرض النموذج."
+
+#. module: bi_sale_purchase_discount_with_tax
+#: model:ir.model.fields,field_description:bi_sale_purchase_discount_with_tax.field_account_bank_statement_line__amount_total
+#: model:ir.model.fields,field_description:bi_sale_purchase_discount_with_tax.field_account_move__amount_total
+#: model:ir.model.fields,field_description:bi_sale_purchase_discount_with_tax.field_account_payment__amount_total
+msgid "Total"
+msgstr "الإجمالي"
+
+#. module: bi_sale_purchase_discount_with_tax
+#: model:ir.model.fields,field_description:bi_sale_purchase_discount_with_tax.field_account_bank_statement_line__amount_untaxed
+#: model:ir.model.fields,field_description:bi_sale_purchase_discount_with_tax.field_account_move__amount_untaxed
+#: model:ir.model.fields,field_description:bi_sale_purchase_discount_with_tax.field_account_payment__amount_untaxed
+#: model:ir.model.fields.selection,name:bi_sale_purchase_discount_with_tax.selection__res_company__tax_discount_policy__untax
+msgid "Untaxed Amount"
+msgstr "المبلغ غير الخاضع للضريبة"
+
+#. module: bi_sale_purchase_discount_with_tax
+#: model:ir.model.fields,field_description:bi_sale_purchase_discount_with_tax.field_account_bank_statement_line__count_total
+#: model:ir.model.fields,field_description:bi_sale_purchase_discount_with_tax.field_account_move__count_total
+#: model:ir.model.fields,field_description:bi_sale_purchase_discount_with_tax.field_account_payment__count_total
+msgid "tax total"
+msgstr "إجمالي الضرائب"
+
+#. module: bi_sale_purchase_discount_with_tax
+#: model:ir.model.fields,field_description:bi_sale_purchase_discount_with_tax.field_purchase_order__line_total_amount
+msgid "total  amount for line"
+msgstr "المبلغ الإجمالي للخط"
+
+#. module: bi_sale_purchase_discount_with_tax
+#: model:ir.model.fields,field_description:bi_sale_purchase_discount_with_tax.field_account_bank_statement_line__config_inv_tax
+#: model:ir.model.fields,field_description:bi_sale_purchase_discount_with_tax.field_account_move__config_inv_tax
+#: model:ir.model.fields,field_description:bi_sale_purchase_discount_with_tax.field_account_payment__config_inv_tax
+#: model:ir.model.fields,field_description:bi_sale_purchase_discount_with_tax.field_purchase_order__config_tax
+#: model:ir.model.fields,field_description:bi_sale_purchase_discount_with_tax.field_sale_order__config_tax
+msgid "total disc tax"
+msgstr "إجمالي ضريبة القرص"
+
+#. module: bi_sale_purchase_discount_with_tax
+#: model:ir.model.fields,field_description:bi_sale_purchase_discount_with_tax.field_account_bank_statement_line__untax_test_amount
+#: model:ir.model.fields,field_description:bi_sale_purchase_discount_with_tax.field_account_move__untax_test_amount
+#: model:ir.model.fields,field_description:bi_sale_purchase_discount_with_tax.field_account_payment__untax_test_amount
+msgid "total untax amoun for line"
+msgstr "مجموع untax آمون للخط"
+
+#. module: bi_sale_purchase_discount_with_tax
+#: model:ir.model.fields,field_description:bi_sale_purchase_discount_with_tax.field_purchase_order__untax_test_amount
+msgid "total untax amount for line"
+msgstr "إجمالي المبلغ غير الضريبي للبند"
