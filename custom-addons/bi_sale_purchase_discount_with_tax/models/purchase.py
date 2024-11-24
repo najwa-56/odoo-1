@@ -324,7 +324,7 @@ class purchase_order(models.Model):
 
         
     discount_method = fields.Selection([('fix', 'Fixed'), ('per', 'Percentage')], 'Discount Method',default='fix')
-    discount_amount = fields.Float('Discount Amount',default=0.0)
+    discount_amount = fields.Float('Discount Amount',digits=dp.get_precision('Discount'),default=0.0)
     discount_amt = fields.Monetary(compute='_amount_all',store=True,string='- Discount',readonly=True)
     discount_type = fields.Selection([('line', 'Order Line'), ('global', 'Global')],string='Discount Applies to',default='global')
     discount_amt_line = fields.Monetary(compute='_amount_all', string='- Line Discount',store=True, readonly=True)
