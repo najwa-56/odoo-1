@@ -134,15 +134,16 @@ class AccountInvoiceReport(models.Model):
         return group_by_str
 '''
 
+
 class AccountInvoiceReport(models.Model):
     _inherit = "account.invoice.report"
 
     uom_name = fields.Char(string="UOM Name", store=True)
     qty = fields.Float(string="Adjusted Quantity", compute="_compute_qty", store=True)
 
-    @api.depends('quantity', 'product_id', 'product_uom_id')
+    @api.depends('quantity', 'product_id', 'product_uom_id', 'move_type')
     def _compute_qty(self):
-        """Compute Adjusted Quantity considering refund handling."""
+        """Compute Adjusted Quantity as quantity / ratio, adjusted for refunds."""
         for record in self:
             if record.product_id and record.product_uom_id:
                 # Fetch the ratio from the related product.multi.uom.price record
@@ -151,42 +152,39 @@ class AccountInvoiceReport(models.Model):
                     ('uom_id', '=', record.product_uom_id.id)
                 ], limit=1)
                 ratio = multi_uom_price.ratio if multi_uom_price else 1.0  # Default ratio is 1.0
-                sign = -1 if record.move_type in ('in_invoice', 'out_refund', 'in_receipt') else 1
-                record.qty = round(record.quantity / ratio * sign, 2) if ratio > 0 else 0.0
+
+                # Adjust quantity based on the move type
+                adjusted_quantity = record.quantity * (-1 if record.move_type in ('out_refund', 'in_receipt') else 1)
+                record.qty = round(adjusted_quantity / ratio, 2) if ratio > 0 else 0.0
             else:
                 record.qty = 0.0  # Default to zero if fields are missing
 
     def _select(self):
-        """Extend the SQL SELECT statement to include uom_name and adjusted quantity."""
+        """Extend the SQL SELECT statement to include qty and uom_name."""
         select_str = super(AccountInvoiceReport, self)._select()
         select_str += """
-            , uom_template.name as uom_name
+            , line.uom_name as uom_name
             , line.quantity / NULLIF(COALESCE(uom_line.factor, 1) / COALESCE(uom_template.factor, 1), 0.0) 
-              * (CASE WHEN move.move_type IN ('in_invoice','out_refund','in_receipt') THEN -1 ELSE 1 END) 
-              AS qty
+              * (CASE WHEN move.move_type IN ('out_refund', 'in_receipt') THEN -1 ELSE 1 END) AS qty
         """
         return select_str
 
     def _from(self):
-        """Extend the SQL FROM statement to include UOM details without duplicate joins."""
+        """Extend the SQL FROM statement to join with product_multi_uom_price."""
         from_str = super(AccountInvoiceReport, self)._from()
-
-        # Avoid duplicate joins
-        if "LEFT JOIN uom_uom uom_line" not in from_str:
-            from_str += """
-                LEFT JOIN uom_uom uom_line ON uom_line.id = line.product_uom_id
-            """
-        if "LEFT JOIN uom_uom uom_template" not in from_str:
-            from_str += """
-                LEFT JOIN uom_uom uom_template ON uom_template.id = template.uom_id
-            """
+        from_str += """
+            LEFT JOIN product_multi_uom_price AS multi_uom_price
+            ON multi_uom_price.product_id = line.product_id
+            AND multi_uom_price.uom_id = line.product_uom_id
+        """
         return from_str
 
     def _group_by(self):
         """Extend the SQL GROUP BY statement to include new fields."""
         group_by_str = super(AccountInvoiceReport, self)._group_by()
         group_by_str += """
-            , uom_template.name
+            , line.uom_name
+            , line.quantity
         """
         return group_by_str
 
