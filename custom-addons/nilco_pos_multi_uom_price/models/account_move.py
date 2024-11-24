@@ -166,8 +166,8 @@ class AccountInvoiceReport(models.Model):
         select_str = super(AccountInvoiceReport, self)._select()
         select_str += """
             , line.uom_name as uom_name
-            , line.quantity / NULLIF(COALESCE(uom_line.factor, 1) / COALESCE(uom_template.factor, 1), 0.0) 
-              * (CASE WHEN move.move_type IN ('out_refund', 'in_receipt') THEN -1 ELSE 1 END) / COALESCE(multi_uom_price.ratio, 1.0) AS qty
+            , (line.quantity * (CASE WHEN move.move_type IN ('out_refund', 'in_receipt') THEN -1 ELSE 1 END)) / 
+              COALESCE(multi_uom_price.ratio, 1.0) AS qty
         """
         return select_str
 
