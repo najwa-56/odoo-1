@@ -190,7 +190,7 @@ class AccountInvoiceReport(models.Model):
             , multi_uom_price.ratio
         """
         return group_by_str
-'''
+
 
 
 class AccountInvoiceReport(models.Model):
@@ -255,4 +255,4 @@ class AccountInvoiceReport(models.Model):
         """
         return group_by_str
 
-
+'''
