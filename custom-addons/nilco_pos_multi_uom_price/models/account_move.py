@@ -134,8 +134,6 @@ class AccountInvoiceReport(models.Model):
         return group_by_str
 '''
 
-
-
 class AccountInvoiceReport(models.Model):
     _inherit = "account.invoice.report"
 
@@ -144,7 +142,7 @@ class AccountInvoiceReport(models.Model):
 
     @api.depends('quantity', 'product_id', 'product_uom_id')
     def _compute_qty(self):
-        """Compute Adjusted Quantity as quantity / ratio, ensuring only positive numbers."""
+        """Compute Adjusted Quantity considering refund handling."""
         for record in self:
             if record.product_id and record.product_uom_id:
                 # Fetch the ratio from the related product.multi.uom.price record
@@ -153,32 +151,28 @@ class AccountInvoiceReport(models.Model):
                     ('uom_id', '=', record.product_uom_id.id)
                 ], limit=1)
                 ratio = multi_uom_price.ratio if multi_uom_price else 1.0  # Default ratio is 1.0
-                if ratio > 0 and record.quantity > 0:  # Ensure positive ratio and quantity
-                    record.qty = round(record.quantity / ratio, 2)
-                else:
-                    record.qty = 0.0  # Default to zero if ratio or quantity is invalid
-                _logger.info(f"Record {record.id}: Product={record.product_id.id}, "
-                             f"UOM={record.product_uom_id.id}, Quantity={record.quantity}, Ratio={ratio}")
+                sign = -1 if record.move_type in ('in_invoice', 'out_refund', 'in_receipt') else 1
+                record.qty = round(record.quantity / ratio * sign, 2) if ratio > 0 else 0.0
             else:
-                _logger.warning(f"Record {record.id}: Missing product or UOM")
                 record.qty = 0.0  # Default to zero if fields are missing
 
     def _select(self):
-        """Extend the SQL SELECT statement to include qty and uom_name."""
+        """Extend the SQL SELECT statement to include uom_name and adjusted quantity."""
         select_str = super(AccountInvoiceReport, self)._select()
         select_str += """
-            , line.uom_name as uom_name
-            , line.quantity as qty  -- Selecting the original quantity for debugging
+            , uom_template.name as uom_name
+            , line.quantity / NULLIF(COALESCE(uom_line.factor, 1) / COALESCE(uom_template.factor, 1), 0.0) 
+              * (CASE WHEN move.move_type IN ('in_invoice','out_refund','in_receipt') THEN -1 ELSE 1 END) 
+              AS qty
         """
         return select_str
 
     def _from(self):
-        """Extend the SQL FROM statement to join with product_multi_uom_price."""
+        """Extend the SQL FROM statement to include UOM details."""
         from_str = super(AccountInvoiceReport, self)._from()
         from_str += """
-            LEFT JOIN product_multi_uom_price AS multi_uom_price
-            ON multi_uom_price.product_id = line.product_id
-            AND multi_uom_price.uom_id = line.product_uom_id
+            LEFT JOIN uom_uom uom_line ON uom_line.id = line.product_uom_id
+            LEFT JOIN uom_uom uom_template ON uom_template.id = template.uom_id
         """
         return from_str
 
@@ -186,8 +180,8 @@ class AccountInvoiceReport(models.Model):
         """Extend the SQL GROUP BY statement to include new fields."""
         group_by_str = super(AccountInvoiceReport, self)._group_by()
         group_by_str += """
-            , line.uom_name
-            , line.quantity
-            , multi_uom_price.ratio
+            , uom_template.name
         """
         return group_by_str
+
+
