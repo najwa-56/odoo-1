@@ -155,6 +155,8 @@ class AccountInvoiceReport(models.Model):
 
                 # Adjust quantity based on the move type
                 adjusted_quantity = record.quantity * (-1 if record.move_type in ('out_refund', 'in_receipt') else 1)
+
+                # Compute adjusted quantity divided by ratio
                 record.qty = round(adjusted_quantity / ratio, 2) if ratio > 0 else 0.0
             else:
                 record.qty = 0.0  # Default to zero if fields are missing
@@ -165,7 +167,7 @@ class AccountInvoiceReport(models.Model):
         select_str += """
             , line.uom_name as uom_name
             , line.quantity / NULLIF(COALESCE(uom_line.factor, 1) / COALESCE(uom_template.factor, 1), 0.0) 
-              * (CASE WHEN move.move_type IN ('out_refund', 'in_receipt') THEN -1 ELSE 1 END) AS qty
+              * (CASE WHEN move.move_type IN ('out_refund', 'in_receipt') THEN -1 ELSE 1 END) / COALESCE(multi_uom_price.ratio, 1.0) AS qty
         """
         return select_str
 
@@ -185,6 +187,7 @@ class AccountInvoiceReport(models.Model):
         group_by_str += """
             , line.uom_name
             , line.quantity
+            , multi_uom_price.ratio
         """
         return group_by_str
 
