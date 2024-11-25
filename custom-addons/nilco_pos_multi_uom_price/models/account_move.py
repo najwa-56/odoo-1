@@ -191,7 +191,7 @@ class AccountInvoiceReport(models.Model):
         """
         return group_by_str
 
-
+'''
 
 class AccountInvoiceReport(models.Model):
     _inherit = "account.invoice.report"
@@ -255,4 +255,4 @@ class AccountInvoiceReport(models.Model):
         """
         return group_by_str
 
-'''
+
