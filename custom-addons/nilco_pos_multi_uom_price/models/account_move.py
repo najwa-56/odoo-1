@@ -205,7 +205,7 @@ class AccountInvoiceReport(models.Model):
         """Compute Adjusted Quantity as quantity / ratio, adjusted for refunds."""
         for record in self:
             if record.product_id and record.product_uom_id:
-                # Fetch the ratio from the related product.multi.uom.price record
+                # Fetch the ratio from the product.multi.uom.price record
                 multi_uom_price = self.env['product.multi.uom.price'].search([
                     ('product_id', '=', record.product_id.id),
                     ('uom_id', '=', record.product_uom_id.id)
@@ -213,14 +213,10 @@ class AccountInvoiceReport(models.Model):
                 ratio = multi_uom_price.ratio if multi_uom_price else 1.0  # Default ratio is 1.0
 
                 # Adjust quantity based on the move type
-                base_quantity = record.quantity
-                adjusted_quantity = base_quantity * (-1 if record.move_type in ('out_refund', 'in_receipt') else 1)
+                adjusted_quantity = record.quantity * (-1 if record.move_type in ('out_refund', 'in_receipt') else 1)
 
-                # Ensure adjusted quantity is divided by the ratio only once
-                if ratio > 0:
-                    record.qty = round(adjusted_quantity / ratio, 2)
-                else:
-                    record.qty = 0.0
+                # Correct division by ratio
+                record.qty = round(adjusted_quantity / ratio, 2) if ratio > 0 else 0.0
             else:
                 record.qty = 0.0  # Default to zero if fields are missing
 
@@ -229,7 +225,7 @@ class AccountInvoiceReport(models.Model):
         select_str = super(AccountInvoiceReport, self)._select()
         select_str += """
             , line.uom_name as uom_name
-            , line.quantity * (CASE WHEN move.move_type IN ('out_refund', 'in_receipt') THEN -1 ELSE 1 END) AS base_quantity
+            , (line.quantity * (CASE WHEN move.move_type IN ('out_refund', 'in_receipt') THEN -1 ELSE 1 END)) AS adjusted_quantity
             , COALESCE(multi_uom_price.ratio, 1.0) AS ratio
             , (line.quantity * (CASE WHEN move.move_type IN ('out_refund', 'in_receipt') THEN -1 ELSE 1 END)) / 
               NULLIF(COALESCE(multi_uom_price.ratio, 1.0), 0) AS qty
