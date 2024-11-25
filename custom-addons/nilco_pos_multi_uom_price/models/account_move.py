@@ -214,26 +214,24 @@ class AccountInvoiceReport(models.Model):
                 # Adjust quantity based on the move type
                 adjusted_quantity = record.quantity * (-1 if record.move_type in ('out_refund', 'in_receipt') else 1)
 
-                # Ensure that division happens only once
+                # Ensure that adjusted quantity divided by ratio is calculated correctly
                 if ratio > 0:
-                    record.qty = round(adjusted_quantity / ratio, 2)
+                    adjusted_qty = adjusted_quantity / ratio
                 else:
-                    record.qty = 0.0  # Prevent division by zero
+                    adjusted_qty = 0.0
+
+                # Round the result to 2 decimal places, ensuring it's accurate
+                record.qty = round(adjusted_qty, 2)
             else:
-                record.qty = 0.0  # Default to zero if required fields are missing
+                record.qty = 0.0  # Default to zero if fields are missing
 
     def _select(self):
         """Extend the SQL SELECT statement to include qty and uom_name."""
         select_str = super(AccountInvoiceReport, self)._select()
         select_str += """
             , line.uom_name as uom_name
-            , CASE
-                WHEN COALESCE(multi_uom_price.ratio, 1.0) > 0 THEN 
-                    (line.quantity * 
-                    (CASE WHEN move.move_type IN ('out_refund', 'in_receipt') THEN -1 ELSE 1 END)) / 
-                    COALESCE(multi_uom_price.ratio, 1.0)
-                ELSE 0.0
-              END AS qty
+            , (line.quantity * (CASE WHEN move.move_type IN ('out_refund', 'in_receipt') THEN -1 ELSE 1 END)) / 
+              COALESCE(multi_uom_price.ratio, 1.0) AS qty
         """
         return select_str
 
