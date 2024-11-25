@@ -37,6 +37,7 @@
         'reports/e_invoicing_b2c.xml',
         'reports/report.xml',
         'reports/vat_invoice_report_print.xml',
+        'reports/vat_invoice_report_print2.xml',
         'reports/simpli_vat_invoice_report.xml',
         'reports/standard_invoice_low_margin.xml',
         'wizard/account_debit_note.xml',

@@ -745,6 +745,7 @@
                                             <br/>
                                             <span class="lable_bold">الكمية</span>
                                         </th>
+
                                         <th align="center" name="discount" class="second_table"
                                             style="background-color:#4f4d4d;text-align:center;color:white;">
                                             <span class="lable_bold">Discount</span>
