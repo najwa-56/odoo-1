@@ -208,16 +208,18 @@ class AccountInvoiceReport(models.Model):
                     ('product_id', '=', record.product_id.id),
                     ('uom_id', '=', record.product_uom_id.id)
                 ], limit=1)
-                ratio = multi_uom_price.ratio if multi_uom_price else 1.0  # Default ratio is 1.0
 
-                # Adjust quantity based on the move type
-                adjusted_quantity = record.quantity * (-1 if record.move_type in ('out_refund', 'in_receipt') else 1)
+                # Use a fallback ratio of 1 if no record is found
+                ratio = multi_uom_price.ratio if multi_uom_price else 1.0
 
-                # Calculate adjusted qty, ensuring division happens correctly
-                adjusted_qty = adjusted_quantity / ratio if ratio > 0 else 0.0
+                # Adjust quantity for refunds or receipts
+                base_quantity = record.quantity * (-1 if record.move_type in ('out_refund', 'in_receipt') else 1)
 
-                # Assign the result, rounded to 2 decimal places
-                record.qty = round(adjusted_qty, 2)
+                # Safeguard against invalid ratios
+                if ratio > 0:
+                    record.qty = round(base_quantity / ratio, 2)
+                else:
+                    record.qty = 0.0  # Default to 0 if ratio is invalid
             else:
                 record.qty = 0.0  # Default to zero if fields are missing
 
@@ -225,10 +227,10 @@ class AccountInvoiceReport(models.Model):
         """Extend the SQL SELECT statement to include qty and uom_name."""
         select_str = super(AccountInvoiceReport, self)._select()
         select_str += """
-            , line.uom_name as uom_name
+            , line.uom_name AS uom_name
             , (line.quantity * 
-               (CASE WHEN move.move_type IN ('out_refund', 'in_receipt') THEN -1 ELSE 1 END)) / 
-              NULLIF(COALESCE(multi_uom_price.ratio, 1.0), 0) AS qty
+               (CASE WHEN move.move_type IN ('out_refund', 'in_receipt') THEN -1 ELSE 1 END)) /
+               NULLIF(COALESCE(multi_uom_price.ratio, 1.0), 0) AS qty
         """
         return select_str
 
