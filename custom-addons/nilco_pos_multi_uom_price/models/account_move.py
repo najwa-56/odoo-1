@@ -226,11 +226,11 @@ class AccountInvoiceReport(models.Model):
                 record.qty = 0.0  # Default to zero if fields are missing
 
     def _select(self):
-        """Extend the SQL SELECT statement to include qty and uom_name."""
+        """Extend the SQL SELECT statement to include uom_name."""
         select_str = super(AccountInvoiceReport, self)._select()
         select_str += """
             , line.uom_name as uom_name
-            , line.quantity as quantity  -- Explicitly specify line.quantity
+            -- Do not include qty in SQL as it is computed in Python
         """
         return select_str
 
@@ -249,7 +249,6 @@ class AccountInvoiceReport(models.Model):
         group_by_str = super(AccountInvoiceReport, self)._group_by()
         group_by_str += """
             , line.uom_name
-            , line.quantity  -- Explicitly specify line.quantity
-            -- Do not include ratio here as it's handled in Python computation
+            -- Do not include qty in GROUP BY as it is computed in Python
         """
         return group_by_str
