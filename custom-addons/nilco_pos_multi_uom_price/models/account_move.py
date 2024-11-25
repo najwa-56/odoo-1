@@ -230,7 +230,7 @@ class AccountInvoiceReport(models.Model):
         select_str = super(AccountInvoiceReport, self)._select()
         select_str += """
             , line.uom_name as uom_name
-            , line.quantity as quantity  -- Remove the ratio division here
+            , line.quantity as quantity  -- Fully qualify the quantity column
         """
         return select_str
 
@@ -249,7 +249,7 @@ class AccountInvoiceReport(models.Model):
         group_by_str = super(AccountInvoiceReport, self)._group_by()
         group_by_str += """
             , line.uom_name
-            , line.quantity
+            , line.quantity  -- Fully qualify the quantity column
             -- Do not include ratio here as it's handled in Python computation
         """
         return group_by_str
