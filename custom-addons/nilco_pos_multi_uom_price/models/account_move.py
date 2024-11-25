@@ -192,6 +192,7 @@ class AccountInvoiceReport(models.Model):
         return group_by_str
 
 '''
+
 class AccountInvoiceReport(models.Model):
     _inherit = "account.invoice.report"
 
@@ -225,10 +226,11 @@ class AccountInvoiceReport(models.Model):
                 record.qty = 0.0  # Default to zero if fields are missing
 
     def _select(self):
-        """Extend the SQL SELECT statement to include uom_name."""
+        """Extend the SQL SELECT statement to include qty and uom_name."""
         select_str = super(AccountInvoiceReport, self)._select()
         select_str += """
             , line.uom_name as uom_name
+            , line.quantity as quantity  -- Remove the ratio division here
         """
         return select_str
 
@@ -247,5 +249,7 @@ class AccountInvoiceReport(models.Model):
         group_by_str = super(AccountInvoiceReport, self)._group_by()
         group_by_str += """
             , line.uom_name
+            , line.quantity
+            -- Do not include ratio here as it's handled in Python computation
         """
         return group_by_str
