@@ -208,29 +208,27 @@ class AccountInvoiceReport(models.Model):
                     ('product_id', '=', record.product_id.id),
                     ('uom_id', '=', record.product_uom_id.id)
                 ], limit=1)
+                ratio = multi_uom_price.ratio if multi_uom_price else 1.0  # Default ratio is 1.0
 
-                # Use a fallback ratio of 1 if no record is found
-                ratio = multi_uom_price.ratio if multi_uom_price else 1.0
+                # Adjust quantity based on the move type
+                adjusted_quantity = record.quantity * (-1 if record.move_type in ('out_refund', 'in_receipt') else 1)
 
-                # Adjust quantity for refunds or receipts
-                base_quantity = record.quantity * (-1 if record.move_type in ('out_refund', 'in_receipt') else 1)
-
-                # Safeguard against invalid ratios
+                # Ensure that adjusted quantity divided by ratio is calculated correctly
                 if ratio > 0:
-                    record.qty = round(base_quantity / ratio, 2)
+                    adjusted_qty = adjusted_quantity / ratio
                 else:
-                    record.qty = 0.0  # Default to 0 if ratio is invalid
+                    adjusted_qty = 0.0
+
+                # Round the result to 2 decimal places, ensuring it's accurate
+                record.qty = round(adjusted_qty, 2)
             else:
                 record.qty = 0.0  # Default to zero if fields are missing
 
     def _select(self):
-        """Extend the SQL SELECT statement to include qty and uom_name."""
+        """Extend the SQL SELECT statement to include uom_name."""
         select_str = super(AccountInvoiceReport, self)._select()
         select_str += """
-            , line.uom_name AS uom_name
-            , (line.quantity * 
-               (CASE WHEN move.move_type IN ('out_refund', 'in_receipt') THEN -1 ELSE 1 END)) /
-               NULLIF(COALESCE(multi_uom_price.ratio, 1.0), 0) AS qty
+            , line.uom_name as uom_name
         """
         return select_str
 
@@ -249,7 +247,5 @@ class AccountInvoiceReport(models.Model):
         group_by_str = super(AccountInvoiceReport, self)._group_by()
         group_by_str += """
             , line.uom_name
-            , line.quantity
-            , multi_uom_price.ratio
         """
         return group_by_str
