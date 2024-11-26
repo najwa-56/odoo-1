@@ -204,8 +204,7 @@ class AccountInvoiceReport(models.Model):
         select_str = super(AccountInvoiceReport, self)._select()
         select_str += """
             , line.uom_name as uom_name
-            , (line.quantity / COALESCE(multi_uom_price.ratio, 1.0)) * 
-              (CASE WHEN move.move_type IN ('out_refund', 'in_receipt') THEN -1 ELSE 1 END) AS qty
+            , line.quantity  AS qty
         """
         return select_str
 
@@ -224,8 +223,29 @@ class AccountInvoiceReport(models.Model):
         group_by_str = super(AccountInvoiceReport, self)._group_by()
         group_by_str += """
             , line.uom_name
-            , multi_uom_price.ratio
         """
         return group_by_str
 
+    @api.model
+    def _generate_report(self):
+        """Generate the report and log values for debugging."""
+        logger = logging.getLogger()
+
+        # Log the SELECT, FROM, and GROUP BY statements
+        select_str = self._select()
+        from_str = self._from()
+        group_by_str = self._group_by()
+
+        logger.info("SELECT statement: %s", select_str)
+        logger.info("FROM statement: %s", from_str)
+        logger.info("GROUP BY statement: %s", group_by_str)
+
+        try:
+            # Call the original method to generate the report
+            result = super(AccountInvoiceReport, self)._generate_report()
+            logger.info("Report generated successfully.")
+            return result
+        except Exception as e:
+            logger.error("Error generating report: %s", str(e))
+            raise
 
