@@ -197,16 +197,20 @@ class AccountInvoiceReport(models.Model):
     _inherit = "account.invoice.report"
 
     uom_name = fields.Char(string="UOM Name", store=True)
-    qty = fields.Float(string="Adjusted Quantity", store=True)
+    qty = fields.Float(string="Adjusted Quantity", store=True)  # Removed compute parameter
+
+    # Removed the _compute_qty method entirely
 
     def _select(self):
         """Extend the SQL SELECT statement to include qty and uom_name."""
         select_str = super(AccountInvoiceReport, self)._select()
         select_str += """
-            , line.uom_name as uom_name
-            , (line.quantity * 
-                (CASE WHEN move.move_type IN ('out_refund', 'in_receipt') THEN -1 ELSE 1 END)
-              ) / COALESCE(multi_uom_price.ratio, 1.0) AS qty
+            , line.uom_name AS uom_name
+            , (
+                SUM(line.quantity * 
+                    CASE WHEN move.move_type IN ('out_refund', 'in_receipt') THEN -1 ELSE 1 END
+                ) / NULLIF(COALESCE(multi_uom_price.ratio, 1.0), 0)
+              ) AS qty
         """
         return select_str
 
@@ -215,8 +219,8 @@ class AccountInvoiceReport(models.Model):
         from_str = super(AccountInvoiceReport, self)._from()
         from_str += """
             LEFT JOIN product_multi_uom_price AS multi_uom_price
-            ON multi_uom_price.product_id = line.product_id
-            AND multi_uom_price.uom_id = line.product_uom_id
+              ON multi_uom_price.product_id = line.product_id
+              AND multi_uom_price.uom_id = line.product_uom_id
         """
         return from_str
 
@@ -225,8 +229,6 @@ class AccountInvoiceReport(models.Model):
         group_by_str = super(AccountInvoiceReport, self)._group_by()
         group_by_str += """
             , line.uom_name
-            , line.quantity
-            , move.move_type
             , multi_uom_price.ratio
         """
         return group_by_str
