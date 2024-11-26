@@ -202,22 +202,18 @@ class AccountInvoiceReport(models.Model):
     # Removed the _compute_qty method entirely
 
     def _select(self):
-        """Extend the SQL SELECT statement to include qty and uom_name."""
         select_str = super(AccountInvoiceReport, self)._select()
         select_str += """
-            , MIN(line.id) AS id
+            , line.id AS id
             , line.uom_name AS uom_name
             , (
-                SUM(
-                    line.quantity * 
-                    CASE WHEN move.move_type IN ('out_refund', 'in_receipt') THEN -1 ELSE 1 END
-                )
-              ) / NULLIF(COALESCE(multi_uom_price.ratio, 1.0), 0) AS qty
+                line.quantity * 
+                CASE WHEN move.move_type IN ('out_refund', 'in_receipt') THEN -1 ELSE 1 END
+            ) / NULLIF(COALESCE(multi_uom_price.ratio, 1.0), 1.0) AS qty
         """
         return select_str
 
     def _from(self):
-        """Extend the SQL FROM statement to join with product_multi_uom_price."""
         from_str = super(AccountInvoiceReport, self)._from()
         from_str += """
             LEFT JOIN product_multi_uom_price AS multi_uom_price
@@ -227,11 +223,13 @@ class AccountInvoiceReport(models.Model):
         return from_str
 
     def _group_by(self):
-        """Extend the SQL GROUP BY statement to include new fields."""
         group_by_str = super(AccountInvoiceReport, self)._group_by()
         group_by_str += """
+            , line.id
             , line.uom_name
             , multi_uom_price.ratio
+            , line.quantity
+            , move.move_type
         """
         return group_by_str
 
