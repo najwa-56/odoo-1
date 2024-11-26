@@ -214,8 +214,11 @@ class AccountInvoiceReport(models.Model):
                 # Adjust quantity based on the move type
                 adjusted_quantity = record.quantity * (-1 if record.move_type in ('out_refund', 'in_receipt') else 1)
 
-                # Ensure that adjusted quantity is divided by ratio only once
-                record.qty = round(adjusted_quantity / ratio, 2) if ratio > 0 else 0.0
+                # Calculate adjusted quantity only once
+                if ratio > 0:
+                    record.qty = round(adjusted_quantity / ratio, 2)
+                else:
+                    record.qty = 0.0  # Avoid division by zero
             else:
                 record.qty = 0.0  # Default to zero if fields are missing
 
