@@ -193,6 +193,10 @@ class AccountInvoiceReport(models.Model):
 
 '''
 
+import logging
+
+_logger = logging.getLogger(__name__)
+
 class AccountInvoiceReport(models.Model):
     _inherit = "account.invoice.report"
 
@@ -203,27 +207,34 @@ class AccountInvoiceReport(models.Model):
     def _compute_qty(self):
         """Compute Adjusted Quantity as quantity / ratio, adjusted for refunds."""
         for record in self:
+            _logger.info(f"Computing qty for record ID: {record.id}, Product: {record.product_id.name if record.product_id else 'N/A'}")
+
             if record.product_id and record.product_uom_id:
                 # Fetch the ratio from the related product.multi.uom.price record
                 multi_uom_price = self.env['product.multi.uom.price'].search([
                     ('product_id', '=', record.product_id.id),
                     ('uom_id', '=', record.product_uom_id.id)
                 ], limit=1)
-                ratio = multi_uom_price.ratio if multi_uom_price else 1.0  # Default ratio is 1.0
+                ratio = multi_uom_price.ratio if multi_uom_price else 1.0
+                _logger.info(f"Retrieved ratio for product {record.product_id.name}: {ratio}")
 
                 # Adjust quantity based on the move type
                 adjusted_quantity = record.quantity * (-1 if record.move_type in ('out_refund', 'in_receipt') else 1)
+                _logger.info(f"Adjusted quantity after refund check for product {record.product_id.name}: {adjusted_quantity}")
 
                 # Ensure that adjusted quantity divided by ratio is calculated correctly (only once)
                 if ratio > 0:
                     adjusted_qty = adjusted_quantity / ratio
                 else:
                     adjusted_qty = 0.0
+                _logger.info(f"Quantity after division by ratio for product {record.product_id.name}: {adjusted_qty}")
 
                 # Set the adjusted quantity directly without further division
                 record.qty = round(adjusted_qty, 2)
+                _logger.info(f"Final computed qty for record ID {record.id}: {record.qty}")
             else:
                 record.qty = 0.0  # Default to zero if fields are missing
+                _logger.warning(f"Missing product or UOM for record ID {record.id}. Set qty to 0.")
 
     def _select(self):
         """Extend the SQL SELECT statement to include qty and uom_name."""
@@ -256,5 +267,4 @@ class AccountInvoiceReport(models.Model):
               NULLIF(COALESCE(multi_uom_price.ratio, 1.0), 0)
         """
         return group_by_str
-
 
