@@ -218,9 +218,9 @@ class AccountInvoiceReport(models.Model):
                 if ratio > 0:
                     adjusted_qty = adjusted_quantity / ratio
                 else:
-                    adjusted_qty = 0.0
+                    adjusted_qty = adjusted_quantity  # Avoid division if ratio is invalid or zero
 
-                # Round the result to 2 decimal places, ensuring it's accurate
+                # Round the result to 2 decimal places
                 record.qty = round(adjusted_qty, 2)
             else:
                 record.qty = 0.0  # Default to zero if fields are missing
@@ -231,7 +231,7 @@ class AccountInvoiceReport(models.Model):
         select_str += """
             , line.uom_name as uom_name
             , (line.quantity * (CASE WHEN move.move_type IN ('out_refund', 'in_receipt') THEN -1 ELSE 1 END)) / 
-              COALESCE(multi_uom_price.ratio, 1.0) AS qty
+              NULLIF(COALESCE(multi_uom_price.ratio, 1.0), 0) AS qty
         """
         return select_str
 
