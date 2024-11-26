@@ -220,7 +220,7 @@ class AccountInvoiceReport(models.Model):
                 else:
                     adjusted_qty = 0.0
 
-                # Round the result to 2 decimal places, ensuring it's accurate
+                # Set the adjusted quantity directly without further division
                 record.qty = round(adjusted_qty, 2)
             else:
                 record.qty = 0.0  # Default to zero if fields are missing
