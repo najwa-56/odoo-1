@@ -199,15 +199,13 @@ class AccountInvoiceReport(models.Model):
     uom_name = fields.Char(string="UOM Name", store=True)
     qty = fields.Float(string="Adjusted Quantity", store=True)  # Removed compute
 
-    # Removed the _compute_qty method
-
     def _select(self):
         """Extend the SQL SELECT statement to include qty and uom_name."""
         select_str = super(AccountInvoiceReport, self)._select()
         select_str += """
             , line.uom_name as uom_name
-            , (line.quantity * (CASE WHEN move.move_type IN ('out_refund', 'in_receipt') THEN -1 ELSE 1 END)) / 
-              NULLIF(COALESCE(multi_uom_price.ratio, 1.0), 0) AS qty
+            , (line.quantity / COALESCE(multi_uom_price.ratio, 1.0)) * 
+              (CASE WHEN move.move_type IN ('out_refund', 'in_receipt') THEN -1 ELSE 1 END) AS qty
         """
         return select_str
 
@@ -226,7 +224,6 @@ class AccountInvoiceReport(models.Model):
         group_by_str = super(AccountInvoiceReport, self)._group_by()
         group_by_str += """
             , line.uom_name
-            , line.quantity
             , multi_uom_price.ratio
         """
         return group_by_str
