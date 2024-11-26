@@ -205,12 +205,14 @@ class AccountInvoiceReport(models.Model):
         """Extend the SQL SELECT statement to include qty and uom_name."""
         select_str = super(AccountInvoiceReport, self)._select()
         select_str += """
+            , MIN(line.id) AS id
             , line.uom_name AS uom_name
             , (
-                SUM(line.quantity * 
+                SUM(
+                    line.quantity * 
                     CASE WHEN move.move_type IN ('out_refund', 'in_receipt') THEN -1 ELSE 1 END
-                ) / NULLIF(COALESCE(multi_uom_price.ratio, 1.0), 0)
-              ) AS qty
+                )
+              ) / NULLIF(COALESCE(multi_uom_price.ratio, 1.0), 0) AS qty
         """
         return select_str
 
