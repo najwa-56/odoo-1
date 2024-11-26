@@ -197,38 +197,16 @@ class AccountInvoiceReport(models.Model):
     _inherit = "account.invoice.report"
 
     uom_name = fields.Char(string="UOM Name", store=True)
-    qty = fields.Float(string="Adjusted Quantity", compute="_compute_qty", store=True)
-
-    @api.depends('quantity', 'product_id', 'product_uom_id', 'move_type')
-    def _compute_qty(self):
-        """Compute Adjusted Quantity as quantity / ratio, adjusted for refunds."""
-        for record in self:
-            if record.product_id and record.product_uom_id:
-                # Fetch the ratio from the related product.multi.uom.price record
-                multi_uom_price = self.env['product.multi.uom.price'].search([
-                    ('product_id', '=', record.product_id.id),
-                    ('uom_id', '=', record.product_uom_id.id)
-                ], limit=1)
-                ratio = multi_uom_price.ratio if multi_uom_price else 1.0  # Default ratio is 1.0
-
-                # Adjust quantity based on the move type
-                adjusted_quantity = record.quantity * (-1 if record.move_type in ('out_refund', 'in_receipt') else 1)
-
-                # Calculate adjusted quantity only once
-                if ratio > 0:
-                    record.qty = round(adjusted_quantity / ratio, 2)
-                else:
-                    record.qty = 0.0  # Avoid division by zero
-            else:
-                record.qty = 0.0  # Default to zero if fields are missing
+    qty = fields.Float(string="Adjusted Quantity", store=True)
 
     def _select(self):
         """Extend the SQL SELECT statement to include qty and uom_name."""
         select_str = super(AccountInvoiceReport, self)._select()
         select_str += """
             , line.uom_name as uom_name
-            , (line.quantity * (CASE WHEN move.move_type IN ('out_refund', 'in_receipt') THEN -1 ELSE 1 END)) / 
-              NULLIF(COALESCE(multi_uom_price.ratio, 1.0), 0) AS qty
+            , (line.quantity * 
+                (CASE WHEN move.move_type IN ('out_refund', 'in_receipt') THEN -1 ELSE 1 END)
+              ) / COALESCE(multi_uom_price.ratio, 1.0) AS qty
         """
         return select_str
 
@@ -248,6 +226,7 @@ class AccountInvoiceReport(models.Model):
         group_by_str += """
             , line.uom_name
             , line.quantity
+            , move.move_type
             , multi_uom_price.ratio
         """
         return group_by_str
