@@ -207,7 +207,7 @@ class AccountInvoiceReport(models.Model):
         select_str += """
             , line.uom_name as uom_name
             , (line.quantity * (CASE WHEN move.move_type IN ('out_refund', 'in_receipt') THEN -1 ELSE 1 END)) / 
-              COALESCE(multi_uom_price.ratio, 1.0) AS qty
+              NULLIF(COALESCE(multi_uom_price.ratio, 1.0), 0) AS qty
         """
         return select_str
 
