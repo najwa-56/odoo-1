@@ -226,26 +226,3 @@ class AccountInvoiceReport(models.Model):
         """
         return group_by_str
 
-    @api.model
-    def _generate_report(self):
-        """Generate the report and log values for debugging."""
-        logger = logging.getLogger()
-
-        # Log the SELECT, FROM, and GROUP BY statements
-        select_str = self._select()
-        from_str = self._from()
-        group_by_str = self._group_by()
-
-        logger.info("SELECT statement: %s", select_str)
-        logger.info("FROM statement: %s", from_str)
-        logger.info("GROUP BY statement: %s", group_by_str)
-
-        try:
-            # Call the original method to generate the report
-            result = super(AccountInvoiceReport, self)._generate_report()
-            logger.info("Report generated successfully.")
-            return result
-        except Exception as e:
-            logger.error("Error generating report: %s", str(e))
-            raise
-
