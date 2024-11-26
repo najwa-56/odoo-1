@@ -193,10 +193,6 @@ class AccountInvoiceReport(models.Model):
 
 '''
 
-import logging
-
-_logger = logging.getLogger(__name__)
-
 class AccountInvoiceReport(models.Model):
     _inherit = "account.invoice.report"
 
@@ -207,41 +203,58 @@ class AccountInvoiceReport(models.Model):
     def _compute_qty(self):
         """Compute Adjusted Quantity as quantity / ratio, adjusted for refunds."""
         for record in self:
-            # Start of the method
-            _logger.info(f"Computing qty for record ID: {record.id}, Product: {record.product_id.name if record.product_id else 'N/A'}")
-
             if record.product_id and record.product_uom_id:
-                # Fetch the ratio
+                # Fetch the ratio from the related product.multi.uom.price record
                 multi_uom_price = self.env['product.multi.uom.price'].search([
                     ('product_id', '=', record.product_id.id),
                     ('uom_id', '=', record.product_uom_id.id)
                 ], limit=1)
-                ratio = multi_uom_price.ratio if multi_uom_price else 1.0
-                _logger.info(f"Retrieved ratio for product {record.product_id.name}: {ratio}")
+                ratio = multi_uom_price.ratio if multi_uom_price else 1.0  # Default ratio is 1.0
 
-                # Original quantity
-                original_quantity = record.quantity
-                _logger.info(f"Original quantity for product {record.product_id.name}: {original_quantity}")
+                # Adjust quantity based on the move type
+                adjusted_quantity = record.quantity * (-1 if record.move_type in ('out_refund', 'in_receipt') else 1)
 
-                # Adjust quantity based on move type
-                adjusted_quantity = original_quantity
-                if record.move_type in ('out_refund', 'in_receipt'):
-                    adjusted_quantity *= -1
-                _logger.info(f"Adjusted quantity after refund check for product {record.product_id.name}: {adjusted_quantity}")
-
-                # Divide by ratio
+                # Ensure that adjusted quantity divided by ratio is calculated correctly (only once)
                 if ratio > 0:
                     adjusted_qty = adjusted_quantity / ratio
                 else:
                     adjusted_qty = 0.0
-                _logger.info(f"Quantity after division by ratio for product {record.product_id.name}: {adjusted_qty}")
 
-                # Set the adjusted quantity
+                # Set the adjusted quantity directly without further division
                 record.qty = round(adjusted_qty, 2)
-                _logger.info(f"Final computed qty for record ID {record.id}: {record.qty}")
             else:
-                # If fields are missing
-                record.qty = 0.0
-                _logger.warning(f"Missing product or UOM for record ID {record.id}. Set qty to 0.")
+                record.qty = 0.0  # Default to zero if fields are missing
+
+    def _select(self):
+        """Extend the SQL SELECT statement to include qty and uom_name."""
+        select_str = super(AccountInvoiceReport, self)._select()
+        select_str += """
+            , line.uom_name as uom_name
+            , (line.quantity * (CASE WHEN move.move_type IN ('out_refund', 'in_receipt') THEN -1 ELSE 1 END)) /
+              NULLIF(COALESCE(multi_uom_price.ratio, 1.0), 0) AS qty
+        """
+        return select_str
+
+    def _from(self):
+        """Extend the SQL FROM statement to join with product_multi_uom_price."""
+        from_str = super(AccountInvoiceReport, self)._from()
+        from_str += """
+            LEFT JOIN product_multi_uom_price AS multi_uom_price
+            ON multi_uom_price.product_id = line.product_id
+            AND multi_uom_price.uom_id = line.product_uom_id
+        """
+        return from_str
+
+    def _group_by(self):
+        """Extend the SQL GROUP BY statement to include new fields."""
+        group_by_str = super(AccountInvoiceReport, self)._group_by()
+        group_by_str += """
+            , line.uom_name
+            , line.quantity
+            , multi_uom_price.ratio
+            , (line.quantity * (CASE WHEN move.move_type IN ('out_refund', 'in_receipt') THEN -1 ELSE 1 END)) /
+              NULLIF(COALESCE(multi_uom_price.ratio, 1.0), 0)
+        """
+        return group_by_str
 
 
