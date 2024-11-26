@@ -203,27 +203,31 @@ class AccountInvoiceReport(models.Model):
     def _compute_qty(self):
         """Compute Adjusted Quantity as quantity / ratio, adjusted for refunds."""
         for record in self:
+            # Step 1: Check if both product and UOM are set
             if record.product_id and record.product_uom_id:
-                # Fetch the ratio from the related product.multi.uom.price record
+                # Step 2: Fetch the ratio, default to 1 if not available
                 multi_uom_price = self.env['product.multi.uom.price'].search([
                     ('product_id', '=', record.product_id.id),
                     ('uom_id', '=', record.product_uom_id.id)
                 ], limit=1)
-                ratio = multi_uom_price.ratio if multi_uom_price else 1.0  # Default ratio is 1.0
+                ratio = multi_uom_price.ratio if multi_uom_price else 1.0
 
-                # Adjust quantity based on the move type
-                adjusted_quantity = record.quantity * (-1 if record.move_type in ('out_refund', 'in_receipt') else 1)
+                # Step 3: Adjust the quantity based on the move type (refunds)
+                adjusted_quantity = record.quantity
+                if record.move_type in ('out_refund', 'in_receipt'):
+                    adjusted_quantity *= -1
 
-                # Ensure that adjusted quantity divided by ratio is calculated correctly (only once)
+                # Step 4: Divide by the ratio, only once
                 if ratio > 0:
                     adjusted_qty = adjusted_quantity / ratio
                 else:
                     adjusted_qty = 0.0
 
-                # Set the adjusted quantity directly without further division
+                # Step 5: Round the result and assign it to the field
                 record.qty = round(adjusted_qty, 2)
             else:
-                record.qty = 0.0  # Default to zero if fields are missing
+                # Step 6: Set to zero if required fields are missing
+                record.qty = 0.0
 
     def _select(self):
         """Extend the SQL SELECT statement to include qty and uom_name."""
