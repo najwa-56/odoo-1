@@ -36,10 +36,11 @@ class AccountInvoiceReport(models.Model):
 
     @api.model
     def _query(self, with_clause='', fields={}, groupby='', from_clause=''):
-        fields['location_id'] = ", partner.location_id as location_id"
+        # Get the parent fields from the base model
+        fields = fields.copy()  # Ensure we're not modifying the original fields dictionary
+        fields['location_id'] = ", partner.location_id AS location_id"
         groupby += ', partner.location_id'
         return super(AccountInvoiceReport, self)._query(with_clause, fields, groupby, from_clause)
-    
     def _select(self):
         """Extend the SQL SELECT statement to include qty and uom_name."""
         select_str = super(AccountInvoiceReport, self)._select()
