@@ -28,3 +28,9 @@ class chatter(models.Model):
 
     # changing name of field Name
     name = fields.Char(string='المنطقة', help="Name of the delivery route")
+
+
+class AccountMove(models.Model):
+    _inherit = 'account.move'
+
+    location_id = fields.Many2one('route.line', string='Location', help="Location of route.", related='partner_id.location_id', store=True)
