@@ -39,7 +39,7 @@
     </field>
 </record>
 
-        <!--
+        
         <record id="view_account_move_line_form_inheritt" model="ir.ui.view">
              <field name="name">account.move.line.form.inherit</field>
              <field name="model">account.move</field>
@@ -54,7 +54,7 @@
 
              </field>
         </record>
-        -->
+
 
 
 
