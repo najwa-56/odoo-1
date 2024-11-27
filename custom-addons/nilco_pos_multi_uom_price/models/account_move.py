@@ -24,7 +24,8 @@ class AccountInvoiceReport(models.Model):
     _inherit = "account.invoice.report"
 
     uom_name = fields.Char(string="UOM Name", store=True)
-    qty = fields.Float(string="Adjusted Quantity", store=True)  # Removed compute
+    qty = fields.Float(string="Adjusted Quantity", store=True)
+    location_id = fields.Many2one('route.line', string='المسار', help="Location of route.", related='partner_id.location_id', store=True)
 
     def _select(self):
         """Extend the SQL SELECT statement to include qty and uom_name."""
