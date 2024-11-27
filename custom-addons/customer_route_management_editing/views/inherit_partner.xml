@@ -41,19 +41,16 @@
 
 
         <record id="view_account_move_line_form_inheritt" model="ir.ui.view">
-             <field name="name">account.move.line.form.inherit</field>
-             <field name="model">account.move</field>
-             <field name="inherit_id" ref="account.view_move_form"/>
-             <field name="arch" type="xml">
+    <field name="name">account.move.line.form.inherit</field>
+    <field name="model">account.move</field>
+    <field name="inherit_id" ref="account.view_move_form"/>
+    <field name="arch" type="xml">
+        <xpath expr="//field[@name='partner_id']" position="after">
+            <field name="location_id"/>
+        </xpath>
+    </field>
+       </record>
 
-                   <xpath expr="//group/group[@id='header_left_group']/field[@name='partner_id']" position="after">
-                 
-                          <field name="location_id"/>
-
-                    </xpath>
-
-             </field>
-        </record>
 
 
 
