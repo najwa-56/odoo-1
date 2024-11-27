@@ -73,15 +73,20 @@ class AccountInvoiceReport(models.Model):
         return select_str
 
     def _from(self):
-        """Extend the SQL FROM statement to join with product_multi_uom_price and res_partner."""
+        """Extend the SQL FROM statement to join with product_multi_uom_price and add location."""
         from_str = super(AccountInvoiceReport, self)._from()
+
+        # Assuming that 'res_partner' might have already been joined, we avoid duplicating it
+        if 'res_partner' not in from_str:
+            from_str += """
+                LEFT JOIN res_partner AS partner
+                ON partner.id = move.partner_id
+            """
+
         from_str += """
             LEFT JOIN product_multi_uom_price AS multi_uom_price
             ON multi_uom_price.product_id = line.product_id
             AND multi_uom_price.uom_id = line.product_uom_id
-
-            LEFT JOIN res_partner AS partner
-            ON partner.id = move.partner_id
         """
         return from_str
 
