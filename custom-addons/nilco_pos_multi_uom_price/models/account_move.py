@@ -19,28 +19,13 @@ class AccountMoveLine(models.Model):
             else:
                 rec.uom_name = rec.product_uom_id.name
 
-
+''' 
 class AccountInvoiceReport(models.Model):
     _inherit = "account.invoice.report"
 
     uom_name = fields.Char(string="UOM Name", store=True)
     qty = fields.Float(string="Adjusted Quantity", store=True)
 
-    location_id = fields.Many2one(
-        'route.line',
-        string='المسار',
-        help="Location of route.",
-        related='partner_id.location_id',
-        store=True
-    )
-
-    @api.model
-    def _query(self, with_clause='', fields={}, groupby='', from_clause=''):
-        # Get the parent fields from the base model
-        fields = fields.copy()  # Ensure we're not modifying the original fields dictionary
-        fields['location_id'] = ", partner.location_id AS location_id"
-        groupby += ', partner.location_id'
-        return super(AccountInvoiceReport, self)._query(with_clause, fields, groupby, from_clause)
     def _select(self):
         """Extend the SQL SELECT statement to include qty and uom_name."""
         select_str = super(AccountInvoiceReport, self)._select()
@@ -65,6 +50,56 @@ class AccountInvoiceReport(models.Model):
         group_by_str = super(AccountInvoiceReport, self)._group_by()
         group_by_str += """
             , line.uom_name
+        """
+        return group_by_str
+'''
+
+class AccountInvoiceReport(models.Model):
+    _inherit = "account.invoice.report"
+
+    # Existing Fields
+    uom_name = fields.Char(string="UOM Name", store=True)
+    qty = fields.Float(string="Adjusted Quantity", store=True)
+
+    # Adding Customer and Location fields
+    partner_id = fields.Many2one(comodel_name='res.partner', string="Customer", readonly=True)
+    location_id = fields.Many2one(
+        'route.line',
+        string='المسار',  # Arabic for "route"
+        help="Location of route.",
+        related='partner_id.location_id',  # Assuming partner has a field called location_id
+        store=True
+    )
+
+    def _select(self):
+        """Extend the SQL SELECT statement to include qty, uom_name, partner_id, and location_id."""
+        select_str = super(AccountInvoiceReport, self)._select()
+        select_str += """
+            , line.uom_name as uom_name
+            , (line.quantity) * (CASE WHEN move.move_type IN ('out_refund', 'in_receipt') THEN -1 ELSE 1 END) AS qty
+            , move.partner_id as partner_id
+            , partner.location_id as location_id
+        """
+        return select_str
+
+    def _from(self):
+        """Extend the SQL FROM statement to join with product_multi_uom_price."""
+        from_str = super(AccountInvoiceReport, self)._from()
+        from_str += """
+            LEFT JOIN product_multi_uom_price AS multi_uom_price
+            ON multi_uom_price.product_id = line.product_id
+            AND multi_uom_price.uom_id = line.product_uom_id
+            LEFT JOIN res_partner AS partner ON move.partner_id = partner.id
+        """
+        return from_str
+
+    def _group_by(self):
+        """Extend the SQL GROUP BY statement to include new fields."""
+        group_by_str = super(AccountInvoiceReport, self)._group_by()
+        group_by_str += """
+            , line.uom_name
+            , move.partner_id
+            , partner.location_id
         """
         return group_by_str
 
