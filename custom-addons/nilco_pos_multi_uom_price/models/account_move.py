@@ -25,8 +25,21 @@ class AccountInvoiceReport(models.Model):
 
     uom_name = fields.Char(string="UOM Name", store=True)
     qty = fields.Float(string="Adjusted Quantity", store=True)
-    location_id = fields.Many2one('route.line', string='المسار', help="Location of route.", related='partner_id.location_id', store=True)
 
+    location_id = fields.Many2one(
+        'route.line',
+        string='المسار',
+        help="Location of route.",
+        related='partner_id.location_id',
+        store=True
+    )
+
+    @api.model
+    def _query(self, with_clause='', fields={}, groupby='', from_clause=''):
+        fields['location_id'] = ", partner.location_id as location_id"
+        groupby += ', partner.location_id'
+        return super(AccountInvoiceReport, self)._query(with_clause, fields, groupby, from_clause)
+    
     def _select(self):
         """Extend the SQL SELECT statement to include qty and uom_name."""
         select_str = super(AccountInvoiceReport, self)._select()
