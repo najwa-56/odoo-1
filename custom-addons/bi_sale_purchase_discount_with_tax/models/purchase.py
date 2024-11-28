@@ -600,7 +600,7 @@ class purchase_order_line(models.Model):
     discount = fields.Float(string='% Disc.', digits='Discount', default=0.000)
 
 
-    @api.onchange("discount_amount")
+    @api.depends("discount_amount")
     def _onchange_discount(self):
         res_config= self.env.company
 
@@ -628,7 +628,7 @@ class purchase_order_line(models.Model):
                  line.update({"discount1": discount1})
 
 
-    @api.onchange("discount_amount")
+    @api.depends("discount_amount")
     def _onchange_fixed_discount(self):
         res_config = self.env.company
         for line in self:
