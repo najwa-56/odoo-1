@@ -12,6 +12,13 @@
                     <field name="discount_type" widget="radio" readonly="state == 'purchase'" />
                 </xpath>
 
+                <xpath expr="//field[@name='order_line']/tree/field[@name='price_unit']" position="after">
+                <field name="discount1" optional="show" />
+                <field name="fixed_discount" optional="show"/>
+                     <field name="total_with_discount" />
+
+            </xpath>
+
 
                 <field name="notes" position="after">
                                             
