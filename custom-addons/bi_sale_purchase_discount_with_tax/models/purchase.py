@@ -600,7 +600,7 @@ class purchase_order_line(models.Model):
     discount = fields.Float(string='% Disc.', digits='Discount', default=0.000)
 
 
-    @api.depends("discount_amount")
+    @api.onchange("discount_amount")
     def _onchange_discount(self):
         res_config= self.env.company
 
@@ -609,7 +609,7 @@ class purchase_order_line(models.Model):
                 self.fixed_discount = 0.0
                 self.discount = 0.0
                 discount1 = line.discount_amount
-                discount = discount1
+                discount = line.discount1
                 line.update({"discount1": discount1 , "discount": discount})
                 if res_config.tax_discount_policy == 'tax':
                  fixed_discount = (line.price_total) - (
@@ -628,26 +628,29 @@ class purchase_order_line(models.Model):
                  line.update({"discount1": discount1})
 
 
-    @api.depends("discount_amount")
+    @api.onchange("discount_amount")
     def _onchange_fixed_discount(self):
         res_config = self.env.company
         for line in self:
             if line.discount_method == 'fix' and line.discount_amount != 0:
                 self.discount1 = 0.0
+                self.discount = 0.0
                 fixed_discount = line.discount_amount
                 line.update({"fixed_discount": fixed_discount})
                 if res_config.tax_discount_policy == 'tax':
                  discount1 = ((self.product_qty * self.price_unit) - (
                             (self.product_qty * self.price_unit) - self.fixed_discount)) / (
                                        self.product_qty * self.price_unit) * 100 or 0.0
+                 discount = discount1
                  total_with_discount = line.price_subtotal - fixed_discount
-                 line.update({"discount1": discount1,"total_with_discount":total_with_discount})
+                 line.update({"discount1": discount1,"total_with_discount":total_with_discount, "discount": discount})
                 elif res_config.tax_discount_policy == 'untax':
                     discount1 = ((self.product_qty * self.price_unit) - (
                             (self.product_qty * self.price_unit) - self.fixed_discount)) / (
                                         self.product_qty * self.price_unit) * 100 or 0.0
+                    discount = discount1
                     total_with_discount = line.price_subtotal
-                    line.update({"discount1": discount1, "total_with_discount": total_with_discount})
+                    line.update({"discount1": discount1, "total_with_discount": total_with_discount, "discount": discount})
 
             if line.discount_amount == 0:
                 fixed_discount = 0.0
