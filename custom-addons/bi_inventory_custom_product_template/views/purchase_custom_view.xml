@@ -76,9 +76,7 @@
 		<record id="open_inventory_custom_my_list" model="ir.actions.act_window">
 				<field name="name">Product Template</field>
 				<field name="res_model">inventory.custom.product</field>
-				<field name="binding_view_types">form</field>
 				<field name="view_mode">tree,form</field>
-				<field name="view_id" eval="False"/>
 				<field name="help" type="html">
 					<p class="oe_view_nocontent_create">
 							Click to create Product Template.
