@@ -149,7 +149,9 @@
 								<td style="border:2pt solid black;text-align:center;padding:2pt;width:7%"><span class="arabic">معدل الضريبة</span></td>
 								<td style="border:2pt solid black;text-align:center; width:10%;padding:2pt"><span class="arabic">مبلغ الضريبة</span></td>
 								<td style="border:2pt solid black;text-align:center; width:10%;padding:2pt"><span class="arabic">نسبة الخخصم</span></td>
+								<td style="border:2pt solid black;text-align:center; width:10%;padding:2pt"><span class="arabic">خصم متعدد </span></td>
 								<td style="border:2pt solid black;text-align:center; width:10%;padding:2pt"><span class="arabic">مبلغ الخخصم</span></td>
+								<td style="border:2pt solid black;text-align:center; width:10%;padding:2pt"><span class="arabic">المجموع بعد الخصم</span></td>
 								<td style="border:2pt solid black;text-align:center;padding:2pt;"><span class="arabic">المجموع غير شامل الضريبة</span></td>
 								<td style="border:2pt solid black;text-align:center;padding:2pt;"><span class="arabic">المجموع شامل الضريبة</span></td>
 							</tr>
@@ -198,10 +200,17 @@
 									<span class="arabic" t-esc="line_tax_total" t-options="{&quot;widget&quot;: &quot;monetary&quot;, &quot;display_currency&quot;: o.currency_id}"/>
 								</td>
 								<td class="arabic" style="border:2pt solid black;text-align:center;padding:3pt;background-color:#white; font-weight: bold;">
-			                        <span class="arabic" t-field="l.discount" />
+			                        <span class="arabic" t-field="l.discount1" />
 			                    </td>
 								<td class="arabic" style="border:2pt solid black;text-align:center;padding:3pt;background-color:#white; font-weight: bold;">
+			                        <span class="arabic" t-field="l.multi_discount" />
+			                    </td>
+
+								<td class="arabic" style="border:2pt solid black;text-align:center;padding:3pt;background-color:#white; font-weight: bold;">
 			                        <span class="arabic" t-field="l.fixed_discount" />
+			                    </td>
+								<td class="arabic" style="border:2pt solid black;text-align:center;padding:3pt;background-color:#white; font-weight: bold;">
+			                        <span class="arabic" t-field="l.total_with_discount" />
 			                    </td>
 								<td class="arabic" style="border:2pt solid black;text-align:center;padding:3pt;background-color:#white; font-weight: bold;">
 			                        <span class="arabic" t-field="l.price_subtotal" t-options="{&quot;widget&quot;: &quot;monetary&quot;, &quot;display_currency&quot;: o.currency_id}"/>
