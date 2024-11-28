@@ -111,16 +111,17 @@ class AccountInvoiceReport(models.Model):
     uom_name = fields.Char(string="UOM Name", store=True)
     qty = fields.Float(string="Adjusted Quantity", store=True)
     location_id = fields.Many2one('route.line', string='المسار', store=True, help="Location of route")
-    partner_id = fields.Many2one('res.partner', string="Customer", readonly=True, store=True)  # Added store=True
+    # Removed redefinition of 'partner_id' because it's already defined in the base model
+    # partner_id = fields.Many2one('res.partner', string="Customer", readonly=True, store=True)
 
     def _select(self):
-        """Extend the SQL SELECT statement to include qty, uom_name, location_id, and partner_id."""
+        """Extend the SQL SELECT statement to include qty, uom_name, and location_id."""
         select_str = super(AccountInvoiceReport, self)._select()
         select_str += """
             , line.uom_name AS uom_name
             , (line.quantity) * (CASE WHEN move.move_type IN ('out_refund', 'in_receipt') THEN -1 ELSE 1 END) AS qty
             , partner.location_id AS location_id
-            , partner.id AS partner_id  -- Added partner_id
+            -- Do not select 'partner.id AS partner_id' to avoid ambiguity
         """
         return select_str
 
@@ -128,14 +129,14 @@ class AccountInvoiceReport(models.Model):
         """Extend the SQL FROM statement to join with product_multi_uom_price and add location."""
         from_str = super(AccountInvoiceReport, self)._from()
 
-        # Ensure that 'res_partner' is joined only once
-        if 'JOIN res_partner partner' not in from_str:
+        # Ensure 'res_partner' is not joined multiple times
+        if 'LEFT JOIN res_partner partner' not in from_str:
             from_str += """
                 LEFT JOIN res_partner partner ON partner.id = move.partner_id
             """
 
         # Ensure 'product_multi_uom_price' is joined only once
-        if 'JOIN product_multi_uom_price multi_uom_price' not in from_str:
+        if 'LEFT JOIN product_multi_uom_price multi_uom_price' not in from_str:
             from_str += """
                 LEFT JOIN product_multi_uom_price multi_uom_price ON
                     multi_uom_price.product_id = line.product_id AND
@@ -149,8 +150,6 @@ class AccountInvoiceReport(models.Model):
         group_by_str += """
             , line.uom_name
             , partner.location_id
-            , partner.id  -- Added partner.id to GROUP BY
+            -- No need to group by 'partner_id' since it's already handled
         """
         return group_by_str
-
-
