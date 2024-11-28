@@ -21,7 +21,6 @@
     "depends" : ["base", "purchase"],
     "data": [
         'views/purchase_custom_view.xml',
-        'security/ir.model.access.csv',
 	     ],
     "author": "BrowseInfo",
     "website":'https://www.browseinfo.com/demo-request?app=bi_purchase_custom_product_template&version=17&edition=Community',
