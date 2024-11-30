@@ -143,19 +143,7 @@
     </field>
 </record>
 
-<!-- Define the action binding to the views -->
-<record id="action_inventory_custom_product" model="ir.actions.act_window">
-    <field name="name">Custom Inventory Products</field>
-    <field name="res_model">inventory.custom.product</field>
-    <field name="view_mode">tree,form</field>
-    <field name="view_id" ref="view_inventory_custom_product_tree"/>
-</record>
 
-<!-- Include in inventory module -->
-<menuitem id="menu_inventory_custom_product"
-          parent="stock.menu_stock_config"
-          name="Custom Inventory Products"
-          action="action_inventory_custom_product"/>
 
 
 	</data>
