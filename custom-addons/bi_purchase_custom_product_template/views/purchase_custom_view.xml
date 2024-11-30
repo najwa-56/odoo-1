@@ -143,7 +143,6 @@
 
 		<menuitem id="menu_inventory_custom_product"
           name="Custom Inventory Products"
-          parent="stock.menu_root"
           sequence="10"
           action="action_inventory_custom_product"/>
 
