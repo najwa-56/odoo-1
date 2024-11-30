@@ -18,7 +18,7 @@
     """ ,
     "price": 9,
     "currency": 'EUR',
-    "depends" : ["base", "purchase","inventory"],
+    "depends" : ["base", "purchase","stock"],
     "data": [
         'views/purchase_custom_view.xml',
 	     ],
