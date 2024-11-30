@@ -116,8 +116,6 @@
 			<field name="res_model">inventory.custom.product</field>
             <field name="view_mode">tree</field>
             <field name="view_id" ref="inventory_custom_product_tree"/>
-
-
         </record>
 
 
@@ -135,9 +133,14 @@
 		<menuitem
 				id="inventory_product_template"
 				name="inventory Custom Product Template"
-				parent="stock.menu_stock_transfers"
 				action="open_inventory_custom_my_list"
-				sequence="10"
+				sequence="1"
+				/>
+		 <menuitem
+				id="inventory_product_template2"
+				name="inventory Custom Product Template"
+				action="inventory_custom_action_view_tree"
+				sequence="2"
 				/>
 
 	</data>
