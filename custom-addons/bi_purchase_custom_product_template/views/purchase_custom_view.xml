@@ -123,12 +123,7 @@
             <group>
                 <field name="name"/>
                 <field name="check_active"/>
-                <field name="inventory_custom_line_ids">
-                    <tree>
-
-                        <field name="quantity"/>
-                    </tree>
-                </field>
+             
             </group>
         </form>
     </field>
