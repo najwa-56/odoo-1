@@ -106,7 +106,9 @@
 		<menuitem
 				id="custom_product_templatee"
 				name="Inventory Product Template"
+				parent="stock.menu_stock_root"
 				action="inventory_custom_action_view_tree"
+				sequence="10"
 			/>
 
 	</data>
