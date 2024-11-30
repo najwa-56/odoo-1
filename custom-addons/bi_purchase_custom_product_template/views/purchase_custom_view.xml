@@ -113,22 +113,6 @@
         </tree>
     </field>
 </record>
-
-<!-- Define the form view for inventory.custom.product-->
-<record id="view_inventory_custom_product_form" model="ir.ui.view">
-    <field name="name">inventory.custom.product.form</field>
-    <field name="model">inventory.custom.product</field>
-    <field name="arch" type="xml">
-        <form>
-            <group>
-                <field name="name"/>
-                <field name="check_active"/>
-             
-            </group>
-        </form>
-    </field>
-</record>
-
    <!-- Define the action for tree and form views -->
 <record id="action_inventory_custom_product" model="ir.actions.act_window">
     <field name="name">Custom Inventory Products</field>
@@ -140,7 +124,5 @@
           name="Custom Inventory Products"
           sequence="10"
           action="action_inventory_custom_product"/>
-
      </data>
-
 </odoo>
