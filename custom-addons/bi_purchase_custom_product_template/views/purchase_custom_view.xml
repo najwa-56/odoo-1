@@ -133,8 +133,8 @@
 		 </record>
 
 		<menuitem
-				id="custom_product_template"
-				name="Custom Product Template"
+				id="inventory_product_template"
+				name="inventory Custom Product Template"
 				parent="stock.menu_stock_transfers"
 				action="open_inventory_custom_my_list"
 				sequence="10"
