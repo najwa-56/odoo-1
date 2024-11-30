@@ -100,47 +100,43 @@
 
 
 		<!-- inventory -->
-		              <!-- Form view -->
-<record id="inventory_custom_product_form" model="ir.ui.view">
-    <field name="name">inventory.custom.product.form</field>
-    <field name="model">inventory.custom.product</field>
-    <field name="arch" type="xml">
-        <form string="Inventory Custom Product">
-            <sheet>
-                <group>
+		<record id="inventory_custom_product_tree" model="ir.ui.view">
+            <field name="name">inventory.custom.producttree</field>
+            <field name="model">inventory.custom.product</field>
+            <field name="arch" type="xml">
+                <tree>
                     <field name="name"/>
                     <field name="check_active"/>
-                </group>
-            </sheet>
-        </form>
-    </field>
-</record>
+                </tree>
+            </field>
+        </record>
 
-<!-- Tree view -->
-<record id="inventory_custom_product_tree" model="ir.ui.view">
-    <field name="name">inventory.custom.product.tree</field>
-    <field name="model">inventory.custom.product</field>
-    <field name="arch" type="xml">
-        <tree>
-            <field name="name"/>
-            <field name="check_active"/>
-        </tree>
-    </field>
-</record>
+	 	<record id="inventory_custom_action_view_tree" model="ir.actions.act_window">
+	 		<field name="name">inventory.custom.view</field>
+			<field name="res_model">inventory.custom.product</field>
+            <field name="view_mode">tree</field>
+            <field name="view_id" eval="inventory_custom_product_tree"/>
 
-<!-- Action Window -->
-<record id="inventory_custom_action_view_tree" model="ir.actions.act_window">
-    <field name="name">Product Template</field>
-    <field name="res_model">inventory.custom.product</field>
-    <field name="view_mode">tree,form</field>
-</record>
+        </record>
 
-<!-- Menu Item -->
-<menuitem id="custom_product_template"
-          name="Custom Product Template"
-          action="inventory_custom_action_view_tree"
-          sequence="10"/>
+				<record id="open_inventory_custom_my_list" model="ir.actions.act_window">
+				<field name="name">Product Template</field>
+				<field name="res_model">inventory.custom.product</field>
+				<field name="binding_view_types">form</field>
+				<field name="view_mode">tree,form</field>
+				<field name="view_id" eval="False"/>
+				<field name="help" type="html">
+					<p class="oe_view_nocontent_create">
+							Click to create Product Template.
+						</p>
+				</field>
+		 </record>
 
+		<menuitem
+				id="custom_product_templatee"
+				name="inventory Product Template"
+				action="open_inventory_custom_my_list"
+				/>
 
 	</data>
 </odoo>

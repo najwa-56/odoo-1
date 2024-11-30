@@ -135,3 +135,57 @@ class inventory_custom(models.Model):
 
     name = fields.Char("Template", required=True)
     check_active = fields.Boolean("Active")
+    inventory_custom_line_ids = fields.One2many("inventory.custom.lines", "inventory_custom_id")
+
+
+class inventory_custom_lines(models.Model):
+    _name = 'inventory.custom.lines'
+
+    _description = 'inventory Custom lines'
+
+    inventory_custom_id = fields.Many2one("inventory.custom.product")
+
+    product_id = fields.Many2one("product.product", string="Product", required=True)
+    uom = fields.Many2one("uom.uom", string="UOM", required=True)
+
+    @api.onchange("product_id")
+    def onchnange_product(self):
+        for i in self:
+            if i.product_id:
+                i.desc_name = i.product_id.display_name
+
+
+class inherit_inventory(models.Model):
+    _inherit = "stock.picking"
+
+    product_template_id = fields.Many2one("inventory.custom.product", string="Product Template",
+                                          domain=[('check_active', '=', True)])
+
+    @api.onchange('product_template_id')
+    def onchange_product_template(self):
+        template_list = []
+
+        for t in self.order_line:
+            if not t.custom:
+                template_list.append((0, 0, {
+                    "custom": False,
+                    "product_id": t.product_id,
+                    "name": t.name,
+                    "product_uom": t.product_uom,
+                }))
+        if self.product_template_id:
+            product_list = []
+            for i in self.product_template_id:
+                for j in i.inventory_custom_line_ids:
+                    product_list.append((0, 0, {
+                        "date_planned": datetime.now(),
+                        "product_id": j.product_id.id,
+                        "name": j.desc_name,
+                        "product_uom": j.uom.id,
+                        "custom": True,
+                    }))
+
+                self.write({'order_line': False})
+                self.update({"order_line": template_list})
+                self.update({"order_line": product_list})
+
