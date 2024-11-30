@@ -16,6 +16,7 @@ class purchase_custom(models.Model):
 
 class purchase_custom_lines(models.Model):
     _name = 'purchase.custom.lines'
+
     _description = 'Purchase Custom lines'
 
     purchase_custom_id = fields.Many2one("purchase.custom.product")
@@ -33,10 +34,6 @@ class purchase_custom_lines(models.Model):
                 i.desc_name = i.product_id.display_name	
 
 
-class inherit_purchase(models.Model):
-    _inherit = "stock.picking"
-
-    product_template_id = fields.Many2one("purchase.custom.product",string="Product Template",domain=[('check_active', '=', True)])
 
 class inherit_purchase(models.Model):
     _inherit = "purchase.order"
@@ -78,7 +75,7 @@ class inherit_purchase(models.Model):
                 self.update({"order_line":template_list})
                 self.update({"order_line":product_list})	
 
-    """
+
     @api.depends('order_line.taxes_id', 'order_line.price_subtotal', 'amount_total', 'amount_untaxed')
     def _compute_tax_totals(self):
         for order in self:
@@ -127,9 +124,3 @@ class inherit_purchase_order_line(models.Model):
                     'price_tax': amount_tax,
                     'price_total': amount_untaxed + amount_tax,
                 })			
-
-
-  """
-
-
-

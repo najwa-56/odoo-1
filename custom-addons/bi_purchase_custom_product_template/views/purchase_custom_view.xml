@@ -2,7 +2,6 @@
 
 <odoo>
 	<data>
-		<!--
 		<record id="view_inherit_purchase_order" model="ir.ui.view">
             <field name="name">view.inherit.purchase.order</field>
             <field name="model">purchase.order</field>
@@ -10,18 +9,6 @@
             <field name="arch" type="xml">
         	<xpath expr="//form/sheet/group/group/field[@name='date_order']" position="after">
            			<field name="product_template_id"/>
-			   </xpath>
-        	</field>
-		</record>
-        -->
-
-		<record id="view_inherit_inventory_order" model="ir.ui.view">
-            <field name="name">view.inherit.inventory.order</field>
-            <field name="model">stock.picking</field>
-            <field name="inherit_id" ref="stock.view_picking_form"/>
-            <field name="arch" type="xml">
-				<xpath expr="//field[@name='origin']" position="after">
-            			<field name="product_template_id"/>
 			   </xpath>
         	</field>
 		</record>
