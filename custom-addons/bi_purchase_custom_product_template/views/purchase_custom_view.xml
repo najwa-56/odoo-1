@@ -153,8 +153,9 @@
 
 <!-- Include in inventory module -->
 <menuitem id="menu_inventory_custom_product"
-          parent="inventory.menu_stock" name="inventory_custom_product">
-
+          parent="stock.menu_stock_config"
+          name="Custom Inventory Products"
+          action="action_inventory_custom_product"/>
 
 
 	</data>
