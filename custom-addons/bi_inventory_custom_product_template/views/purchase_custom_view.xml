@@ -80,7 +80,7 @@
 				<field name="help" type="html">
 					<p class="oe_view_nocontent_create">
 							Click to create Product Template.
-						</p>
+					</p>
 				</field>
 		 </record>
 
@@ -89,6 +89,7 @@
 				name="Custom Product Template"
 				parent="stock.menu_stock_transfers"
 				action="open_inventory_custom_my_list"
+				sequence="10"
 				/>
 
 	</data>
