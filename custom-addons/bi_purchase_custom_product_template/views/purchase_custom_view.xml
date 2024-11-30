@@ -100,7 +100,6 @@
 		<!-- Define the menu item for the custom model -->
 <menuitem id="menu_inventory_custom_product"
           name="Custom Inventory Products"
-          parent="stock.menu_stock_config"
           sequence="10"
           action="action_inventory_custom_product"/>
 
