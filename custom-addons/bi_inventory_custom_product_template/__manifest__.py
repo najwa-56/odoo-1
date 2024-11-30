@@ -6,7 +6,7 @@
     "name" : "Product Template for Purchase Order",
     "version" : "17.0.0.0",
     "summary": "Create Product Template with multiple products purchase order product template purchase order PO template  Apply Product Template for Purchase purchase template for product create template for purchase order po product template for PO template for product",
-    "category": "Purchase",
+    "category": "inventory",
     
     "description": """
     This module helps user to create Product Template with multiple products and on selection Product Template from Purchase Order related products will get displayed in Purchase Order.
@@ -18,7 +18,7 @@
     """ ,
     "price": 9,
     "currency": 'EUR',
-    "depends" : ["base", "purchase"],
+    "depends" : ["base", "purchase","inventory"],
     "data": [
         'views/purchase_custom_view.xml',
 	     ],
