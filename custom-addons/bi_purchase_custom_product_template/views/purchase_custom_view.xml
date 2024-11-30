@@ -97,12 +97,7 @@
 
 
 		<!-- test -->
-      <!-- Define the menu item for the custom model -->
-
-
-
-
-<!-- Define the tree view for inventory.custom.product -->
+     <!-- Define the tree view for inventory.custom.product -->
 <record id="view_inventory_custom_product_tree" model="ir.ui.view">
     <field name="name">inventory.custom.product.tree</field>
     <field name="model">inventory.custom.product</field>
@@ -113,16 +108,24 @@
         </tree>
     </field>
 </record>
-   <!-- Define the action for tree and form views -->
+
+<!-- Define the action for tree and form views -->
 <record id="action_inventory_custom_product" model="ir.actions.act_window">
     <field name="name">Custom Inventory Products</field>
     <field name="res_model">inventory.custom.product</field>
     <field name="view_mode">tree,form</field>
 </record>
 
-		<menuitem id="menu_inventory_custom_product"
+<!-- Define a parent menu if needed -->
+<menuitem id="menu_inventory_parent" name="Inventory"/>
+
+<!-- Define the menu item for Custom Inventory Products -->
+<menuitem id="menu_inventory_custom_product"
           name="Custom Inventory Products"
+          parent="menu_inventory_parent"
           sequence="10"
           action="action_inventory_custom_product"/>
+
+
      </data>
 </odoo>
