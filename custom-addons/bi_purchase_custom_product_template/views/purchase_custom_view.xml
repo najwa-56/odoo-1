@@ -14,7 +14,7 @@
         	</field>
 		</record>
         -->
-		
+
 		<record id="view_inherit_inventory_order" model="ir.ui.view">
             <field name="name">view.inherit.inventory.order</field>
             <field name="model">stock.picking</field>

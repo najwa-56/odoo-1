@@ -33,6 +33,10 @@ class purchase_custom_lines(models.Model):
                 i.desc_name = i.product_id.display_name	
 
 
+class inherit_purchase(models.Model):
+    _inherit = "stock.picking"
+
+    product_template_id = fields.Many2one("purchase.custom.product",string="Product Template",domain=[('check_active', '=', True)])
 
 class inherit_purchase(models.Model):
     _inherit = "purchase.order"
