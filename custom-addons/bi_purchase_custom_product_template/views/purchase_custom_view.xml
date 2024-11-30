@@ -95,5 +95,38 @@
 				action="open_purchase_custom_my_list"
 				/>
 
+
+
+
+		
+		<!-- inventory -->
+		<record id="inventory_custom_action_view_tree" model="ir.actions.act_window">
+	 		<field name="name">inventory.custom.view</field>
+			<field name="res_model">inventory.custom.product</field>
+            <field name="view_mode">tree</field>
+            <field name="view_id" eval="inventory_custom_product_tree"/>
+
+        </record>
+
+
+		<record id="open_inventory_custom_my_list" model="ir.actions.act_window">
+				<field name="name">Product Template</field>
+				<field name="res_model">inventory.custom.product</field>
+				<field name="view_mode">tree,form</field>
+				<field name="help" type="html">
+					<p class="oe_view_nocontent_create">
+							Click to create Product Template.
+					</p>
+				</field>
+		 </record>
+
+		<menuitem
+				id="custom_product_template"
+				name="Custom Product Template"
+				parent="stock.menu_stock_transfers"
+				action="open_inventory_custom_my_list"
+				sequence="10"
+				/>
+
 	</data>
 </odoo>

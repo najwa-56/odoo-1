@@ -124,3 +124,14 @@ class inherit_purchase_order_line(models.Model):
                     'price_tax': amount_tax,
                     'price_total': amount_untaxed + amount_tax,
                 })			
+
+
+""" INVENTORY """
+
+
+class inventory_custom(models.Model):
+    _name = 'inventory.custom.product'
+    _description = 'inventory Custom Product'
+
+    name = fields.Char("Template", required=True)
+    check_active = fields.Boolean("Active")
