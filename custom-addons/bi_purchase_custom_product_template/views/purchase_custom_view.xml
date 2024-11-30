@@ -25,17 +25,7 @@
         	</field>
 		</record>
 
-
-		<record id="view_inherit_purchase_order" model="ir.ui.view">
-            <field name="name">view.inherit.purchase.order</field>
-            <field name="model">purchase.order</field>
-            <field name="inherit_id" ref="purchase.purchase_order_form"/>
-            <field name="arch" type="xml">
-        	<xpath expr="//form/sheet/group/group/field[@name='date_order']" position="after">
-           			<field name="product_template_id"/>
-			   </xpath>
-        	</field>
-		</record>
+		
 
 		<record id="purchase_order_form_inherit" model="ir.ui.view">
             <field name="name">purchase.order.form.inherit</field>
