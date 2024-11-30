@@ -2,30 +2,32 @@
 
 <odoo>
 	<data>
+		<!-- Inherit Purchase Order View to add a new field -->
 		<record id="view_inherit_purchase_order" model="ir.ui.view">
             <field name="name">view.inherit.purchase.order</field>
             <field name="model">purchase.order</field>
             <field name="inherit_id" ref="purchase.purchase_order_form"/>
             <field name="arch" type="xml">
-        	<xpath expr="//form/sheet/group/group/field[@name='date_order']" position="after">
-           			<field name="product_template_id"/>
+            	<xpath expr="//form/sheet/group/group/field[@name='date_order']" position="after">
+            		<field name="product_template_id"/>
 			   </xpath>
         	</field>
 		</record>
 
+		<!-- Inherit Purchase Order Line Tree View to add a custom field -->
 		<record id="purchase_order_form_inherit" model="ir.ui.view">
             <field name="name">purchase.order.form.inherit</field>
             <field name="model">purchase.order</field>
             <field name="inherit_id" ref="purchase.purchase_order_form"/>
             <field name="arch" type="xml">
 			<xpath expr="//field[@name='order_line']/tree/field[@name='product_id']" position="before">
-           			<field name="custom"/>
+            		<field name="custom"/>
 			   </xpath>
         	</field>
 		</record>
-		 
 
-		 <record id="purchase_custom_product_form" model="ir.ui.view">
+		<!-- Form view for purchase.custom.product -->
+		<record id="purchase_custom_product_form" model="ir.ui.view">
 				<field name="name">purchase.custom.product.form</field>
 				<field name="model">purchase.custom.product</field>
 				<field name="arch" type="xml">
@@ -39,69 +41,51 @@
 								<page string="Template">
 									<field name="purchase_custom_line_ids">
 										<tree editable="bottom">
-											<field name ="product_id"/>
-											<field name ="desc_name"/>
-											<field name ="order_qty"/>
-											<field name ="unit_price"/>
-											<field name ="uom"/>
-											
+											<field name="product_id"/>
+											<field name="desc_name"/>
+											<field name="order_qty"/>
+											<field name="unit_price"/>
+											<field name="uom"/>
 										</tree>
 									</field>
 								</page>
 							</notebook>
-							
 						</sheet>
 					</form>
-					</field>
-				</record>
+				</field>
+		</record>
 
+		<!-- Tree view for purchase.custom.product -->
 		<record id="purchase_custom_product_tree" model="ir.ui.view">
             <field name="name">purchase.custom.product.tree</field>
             <field name="model">purchase.custom.product</field>
             <field name="arch" type="xml">
                 <tree>
-                    <field name="name"/>        
-                    <field name="check_active"/>            
+                    <field name="name"/>
+                    <field name="check_active"/>
                 </tree>
             </field>
         </record>
 
+		<!-- Action Window for purchase.custom.product -->
 	 	<record id="purchase_custom_action_view_tree" model="ir.actions.act_window">
-	 		<field name="name">purchase.custom.view</field>
+	 		<field name="name">Purchase Custom View</field>
 			<field name="res_model">purchase.custom.product</field>
-            <field name="view_mode">tree</field>
-            <field name="view_id" eval="purchase_custom_product_tree"/>
-
+            <field name="view_mode">tree,form</field>
         </record>
 
-
-		<record id="open_purchase_custom_my_list" model="ir.actions.act_window">
-				<field name="name">Product Template</field>
-				<field name="res_model">purchase.custom.product</field>
-				<field name="binding_view_types">form</field>
-				<field name="view_mode">tree,form</field>
-				<field name="view_id" eval="False"/>
-				<field name="help" type="html">
-					<p class="oe_view_nocontent_create">
-							Click to create Product Template.
-						</p>
-				</field>
-		 </record>
-
+		<!-- Menu Item for purchase.custom.product -->
 		<menuitem
 				id="custom_product_template"
 				name="Custom Product Template"
 				parent="purchase.menu_procurement_management"
-				action="open_purchase_custom_my_list"
-				/>
+				action="purchase_custom_action_view_tree"
+				sequence="10"
+			/>
 
-
-
-
-
-		<!-- inventory -->
+		<!-- Tree view for inventory.custom.product -->
 		<record id="inventory_custom_product_tree" model="ir.ui.view">
-            <field name="name">inventory.custom.producttree</field>
+            <field name="name">inventory.custom.product.tree</field>
             <field name="model">inventory.custom.product</field>
             <field name="arch" type="xml">
                 <tree>
@@ -111,32 +95,19 @@
             </field>
         </record>
 
+		<!-- Action Window for inventory.custom.product -->
 	 	<record id="inventory_custom_action_view_tree" model="ir.actions.act_window">
-	 		<field name="name">inventory.custom.view</field>
+	 		<field name="name">Inventory Custom View</field>
 			<field name="res_model">inventory.custom.product</field>
-            <field name="view_mode">tree</field>
-            <field name="view_id" eval="inventory_custom_product_tree"/>
-
+            <field name="view_mode">tree,form</field>
         </record>
 
-				<record id="open_inventory_custom_my_list" model="ir.actions.act_window">
-				<field name="name">Product Template</field>
-				<field name="res_model">inventory.custom.product</field>
-				<field name="binding_view_types">form</field>
-				<field name="view_mode">tree,form</field>
-				<field name="view_id" eval="False"/>
-				<field name="help" type="html">
-					<p class="oe_view_nocontent_create">
-							Click to create Product Template.
-						</p>
-				</field>
-		 </record>
-
+		<!-- Menu Item for inventory.custom.product -->
 		<menuitem
 				id="custom_product_templatee"
-				name="inventory Product Template"
-				action="open_inventory_custom_my_list"
-				/>
+				name="Inventory Product Template"
+				action="inventory_custom_action_view_tree"
+			/>
 
 	</data>
 </odoo>
