@@ -28,7 +28,7 @@
                 </field>
 
                 <xpath expr="//tree/field[@name='discount']" position="attributes">
-                    <attribute name="column_invisible">0</attribute>
+                    <attribute name="column_invisible">1</attribute>
                 </xpath>
 
                 
