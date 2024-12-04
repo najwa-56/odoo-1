@@ -501,7 +501,7 @@ class sale_order_line(models.Model):
 							taxes = line.tax_id.compute_all(price, line.order_id.currency_id, 1, product=line.product_id, partner=line.order_id.partner_shipping_id)
 							line.update({
 								'price_tax': sum(t.get('amount', 0.0) for t in taxes.get('taxes', [])),
-								'price_total': taxes['total_included'] + line.discount_amount,
+								'price_total': taxes['total_included'],
 								'price_subtotal': taxes['total_excluded'],
 								'discount_amt' : line.discount_amount,
 							})
@@ -512,11 +512,11 @@ class sale_order_line(models.Model):
 							taxes = line.tax_id.compute_all(price, line.order_id.currency_id, 1, product=line.product_id, partner=line.order_id.partner_shipping_id)
 							line.update({
 								'price_tax': sum(t.get('amount', 0.0) for t in taxes.get('taxes', [])),
-								'price_total': taxes['total_included'] + price_x,
+								'price_total': taxes['total_included'],
 								'price_subtotal': taxes['total_excluded'],
 								'discount_amt' : price_x,
-							})
-						
+							})		
+				
 						else:
 							price = line.price_unit * (1 - (line.discount or 0.0) / 100.0)
 							taxes = line.tax_id.compute_all(price, line.order_id.currency_id, line.product_uom_qty, product=line.product_id, partner=line.order_id.partner_shipping_id)
@@ -585,6 +585,7 @@ class sale_order_line(models.Model):
 	discount_type = fields.Selection(related='order_id.discount_type', string="Discount Applies to")
 	discount_amount = fields.Float('Discount Amount')
 	discount_amt = fields.Float('Discount Final Amount')
+
 
 	def _convert_to_tax_base_line_dict(self):
 		""" Convert the current record to a dictionary in order to use the generic taxes computation method

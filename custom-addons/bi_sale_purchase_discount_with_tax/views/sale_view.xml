@@ -67,16 +67,6 @@
                     <attribute name="invisible">1</attribute>
                 </xpath>
 
-                <!-- <xpath expr="//field[@name='order_line']/form/group/group/t/label[@for='discount']" position="attributes">
-                    <attribute name="invisible">1</attribute>
-                </xpath>
-
-                <xpath expr="//field[@name='order_line']/form/group/group/t/div[@name='discount']" position="attributes">
-                    <attribute name="invisible">1</attribute>
-                </xpath>
-                <xpath expr="//field[@name='order_line']/form/group/group/t/div/field[@name='discount']" position="attributes">
-                    <attribute name="invisible">1</attribute>
-                </xpath> -->
             </field>
         </record>
 
@@ -87,7 +77,7 @@
             <field name="arch" type="xml">
                 
                 <field name='payment_reference' position="after">
-                    <field name="discount_type" widget="radio" readonly="state == 'posted'" invisible="move_type in ('out_invoice','out_receipt','out_refund','in_invoice','in_refund','in_receipt')"/>
+                    <field name="discount_type" widget="radio" readonly="state == 'posted'" invisible="move_type not in ('out_invoice','out_receipt','out_refund','in_invoice','in_refund','in_receipt')"/>
                 </field>
                 
                 <field name="narration" position="after">

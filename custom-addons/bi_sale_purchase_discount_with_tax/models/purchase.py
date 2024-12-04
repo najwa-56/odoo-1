@@ -6,8 +6,7 @@ from odoo import api, fields, models, _
 from odoo.tools.float_utils import float_compare, float_is_zero
 from itertools import groupby
 from odoo.exceptions import RedirectWarning, UserError, ValidationError, AccessError
-from odoo.tools.misc import formatLang, _logger
-import logging
+from odoo.tools.misc import formatLang
 
 class purchase_order(models.Model):
     _inherit = 'purchase.order'
@@ -16,8 +15,6 @@ class purchase_order(models.Model):
 
     @api.depends('discount_amount','discount_method','discount_type')
     def _calculate_discount(self):
-
-
         res_config= self.env.company
         cur_obj = self.env['res.currency']
         res=0.0
@@ -41,21 +38,21 @@ class purchase_order(models.Model):
                         amount_untaxed += line.price_subtotal
                         amount_tax += line.price_tax
                         applied_discount += line.discount_amt
-
+            
                         if line.discount_method == 'fix':
                             line_discount += line.discount_amount
                             res = line_discount
                         elif line.discount_method == 'per':
                             tax = line.com_tax()
                             line_discount +=(line.price_subtotal+tax) * (line.discount_amount/ 100)
-                            res = line_discount
+                            res = line_discount  
                 else:
                     for line in order.order_line:
                         amount_untaxed += line.price_subtotal
                         amount_tax += line.price_tax
                         applied_discount += line.discount_amt
                         res = applied_discount
-
+            
                         if line.discount_method == 'fix':
                             line_discount += line.discount_amount
                             res = line_discount
@@ -81,7 +78,7 @@ class purchase_order(models.Model):
                                         taxes = line.taxes_id.compute_all(discount, \
                                                             line.order_id.currency_id,1.0, product=line.product_id, \
                                                             partner=order.partner_id)
-
+                             
                                         sums += sum(t.get('amount', 0.0) for t in taxes.get('taxes', []))
                         else:
                             order.discount_amt_line = 0.00
@@ -123,11 +120,10 @@ class purchase_order(models.Model):
 
 
     @api.depends('order_line','order_line.price_total','order_line.price_subtotal',\
-    'order_line.product_qty','discount_amount',\
+    'order_line.product_uom_qty','discount_amount',\
     'discount_method','discount_type' ,'order_line.discount_amount',\
     'order_line.discount_method','order_line.discount_amt')
     def _amount_all(self):
-
         """
         Compute the total amounts of the SO.
         """
@@ -324,7 +320,7 @@ class purchase_order(models.Model):
 
         
     discount_method = fields.Selection([('fix', 'Fixed'), ('per', 'Percentage')], 'Discount Method',default='fix')
-    discount_amount = fields.Float('Discount Amount',digits=dp.get_precision('Discount'),default=0.0)
+    discount_amount = fields.Float('Discount Amount',default=0.0)
     discount_amt = fields.Monetary(compute='_amount_all',store=True,string='- Discount',readonly=True)
     discount_type = fields.Selection([('line', 'Order Line'), ('global', 'Global')],string='Discount Applies to',default='global')
     discount_amt_line = fields.Monetary(compute='_amount_all', string='- Line Discount',store=True, readonly=True)
@@ -449,7 +445,7 @@ class purchase_order_line(models.Model):
     discount_method = fields.Selection(
             [('fix', 'Fixed'), ('per', 'Percentage')], 'Discount Method')
     discount_type = fields.Selection(related='order_id.discount_type', string="Discount Applies to")
-    discount_amount = fields.Float('Discount Amount', store=True)
+    discount_amount = fields.Float('Discount Amount')
     discount_amt = fields.Float('Discount Final Amount')
 
 
@@ -466,10 +462,10 @@ class purchase_order_line(models.Model):
     def _prepare_account_move_line(self, move=False):
 
         res =super(purchase_order_line,self)._prepare_account_move_line(move)
-        res.update({'discount_method':self.discount_method,'discount_amount':self.discount_amount,'quantity':self.qty_to_invoice,'discount_amt':self.discount_amt,"fixed_discount": self.fixed_discount,"discount1":self.discount1,"total_with_discount":self.total_with_discount,})
+        res.update({'discount_method':self.discount_method,'discount_amount':self.discount_amount,'quantity':self.qty_to_invoice,'discount_amt':self.discount_amt})
         return res 
 
-    @api.depends('product_qty', 'discount', 'price_unit', 'taxes_id','discount_method','discount_amount')
+    @api.depends('product_uom_qty', 'discount', 'price_unit', 'taxes_id','discount_method','discount_amount')
     def _compute_amount(self):
         """
         Compute the amounts of the PO line.
@@ -480,29 +476,29 @@ class purchase_order_line(models.Model):
                 if res_config.tax_discount_policy == 'untax':
                     if line.discount_type == 'line':
                         if line.discount_method == 'fix':
-                            price = (line.price_unit * line.product_qty) - line.discount_amount
+                            price = (line.price_unit * line.product_uom_qty) - line.discount_amount
                             taxes = line.taxes_id.compute_all(price, line.order_id.currency_id, 1, product=line.product_id)
                             line.update({
                                 'price_tax': sum(t.get('amount', 0.0) for t in taxes.get('taxes', [])),
-                                'price_total': taxes['total_included'] + line.discount_amount,
+                                'price_total': taxes['total_included'],
                                 'price_subtotal': taxes['total_excluded'],
                                 'discount_amt' : line.discount_amount,
                             })
 
                         elif line.discount_method == 'per':
-                            price = (line.price_unit * line.product_qty) * (1 - (line.discount_amount or 0.0) / 100.0)
-                            price_x = ((line.price_unit * line.product_qty) - (line.price_unit * line.product_qty) * (1 - (line.discount_amount or 0.0) / 100.0))
+                            price = (line.price_unit * line.product_uom_qty) * (1 - (line.discount_amount or 0.0) / 100.0)
+                            price_x = ((line.price_unit * line.product_uom_qty) - (line.price_unit * line.product_uom_qty) * (1 - (line.discount_amount or 0.0) / 100.0))
                             taxes = line.taxes_id.compute_all(price, line.order_id.currency_id, 1, product=line.product_id)
                             line.update({
                                 'price_tax': sum(t.get('amount', 0.0) for t in taxes.get('taxes', [])),
-                                'price_total': taxes['total_included'] + price_x,
+                                'price_total': taxes['total_included'],
                                 'price_subtotal': taxes['total_excluded'],
                                 'discount_amt' : price_x,
                             })
-                        
+                    
                         else:
                             price = line.price_unit * (1 - (line.discount or 0.0) / 100.0)
-                            taxes = line.taxes_id.compute_all(price, line.order_id.currency_id, line.product_qty, product=line.product_id)
+                            taxes = line.taxes_id.compute_all(price, line.order_id.currency_id, line.product_uom_qty, product=line.product_id)
                             line.update({
                                 'price_tax': sum(t.get('amount', 0.0) for t in taxes.get('taxes', [])),
                                 'price_total': taxes['total_included'],
@@ -510,7 +506,7 @@ class purchase_order_line(models.Model):
                             })
                     else:
                         price = line.price_unit * (1 - (line.discount or 0.0) / 100.0)
-                        taxes = line.taxes_id.compute_all(price, line.order_id.currency_id, line.product_qty, product=line.product_id)
+                        taxes = line.taxes_id.compute_all(price, line.order_id.currency_id, line.product_uom_qty, product=line.product_id)
                         line.update({
                             'price_tax': sum(t.get('amount', 0.0) for t in taxes.get('taxes', [])),
                             'price_total': taxes['total_included'],
@@ -520,7 +516,7 @@ class purchase_order_line(models.Model):
                     if line.discount_type == 'line':
                         price_x = 0.0
                         price = line.price_unit * (1 - (line.discount or 0.0) / 100.0)
-                        taxes = line.taxes_id.compute_all(price, line.order_id.currency_id, line.product_qty, product=line.product_id)
+                        taxes = line.taxes_id.compute_all(price, line.order_id.currency_id, line.product_uom_qty, product=line.product_id)
 
                         if line.discount_method == 'fix':
                             price_x = (taxes['total_included']) - ( taxes['total_included'] - line.discount_amount)
@@ -537,7 +533,7 @@ class purchase_order_line(models.Model):
                         })
                     else:
                         price = line.price_unit * (1 - (line.discount or 0.0) / 100.0)
-                        taxes = line.taxes_id.compute_all(price, line.order_id.currency_id, line.product_qty, product=line.product_id)
+                        taxes = line.taxes_id.compute_all(price, line.order_id.currency_id, line.product_uom_qty, product=line.product_id)
                         line.update({
                             'price_tax': sum(t.get('amount', 0.0) for t in taxes.get('taxes', [])),
                             'price_total': taxes['total_included'],
@@ -545,7 +541,7 @@ class purchase_order_line(models.Model):
                         })
                 else:
                     price = line.price_unit * (1 - (line.discount or 0.0) / 100.0)
-                    taxes = line.taxes_id.compute_all(price, line.order_id.currency_id, line.product_qty, product=line.product_id)
+                    taxes = line.taxes_id.compute_all(price, line.order_id.currency_id, line.product_uom_qty, product=line.product_id)
                     
                     line.update({
                         'price_tax': sum(t.get('amount', 0.0) for t in taxes.get('taxes', [])),
@@ -554,13 +550,27 @@ class purchase_order_line(models.Model):
                     })
             else:
                 price = line.price_unit * (1 - (line.discount or 0.0) / 100.0)
-                taxes = line.taxes_id.compute_all(price, line.order_id.currency_id, line.product_qty, product=line.product_id)
+                taxes = line.taxes_id.compute_all(price, line.order_id.currency_id, line.product_uom_qty, product=line.product_id)
                 
                 line.update({
                     'price_tax': sum(t.get('amount', 0.0) for t in taxes.get('taxes', [])),
                     'price_total': taxes['total_included'],
                     'price_subtotal': taxes['total_excluded'],
-                }) 
+                })
+    
+    # @api.depends('product_qty', 'price_unit', 'taxes_id', 'discount','discount_amount','discount_method')
+    # def _compute_amount(self):
+    #     for line in self:
+    #         tax_results = self.env['account.tax']._compute_taxes([line._convert_to_tax_base_line_dict()])
+    #         totals = next(iter(tax_results['totals'].values()))
+    #         amount_untaxed = totals['amount_untaxed']
+    #         amount_tax = totals['amount_tax']
+
+    #         line.update({
+    #             'price_subtotal': amount_untaxed,
+    #             'price_tax': amount_tax,
+    #             'price_total': amount_untaxed + amount_tax,
+    #         })
     
     def _convert_to_tax_base_line_dict(self):
         """ Convert the current record to a dictionary in order to use the generic taxes computation method
@@ -591,73 +601,7 @@ class purchase_order_line(models.Model):
             discount=discount,
             price_subtotal=self.price_subtotal,
         )
-
-
-    fixed_discount = fields.Float(string="Fixed Disc.", digits="Product Price", default=0.000)
-
-    discount1 = fields.Float(string=' % Disc %.', digits='Discount', default=0.000)
-    total_with_discount=fields.Float(string="Total_with_Disc")
-    discount = fields.Float(string='% Disc.', digits='Discount', default=0.000)
-
-
-    @api.onchange("discount_amount")
-    def _onchange_discount(self):
-        res_config= self.env.company
-
-        for line in self:
-            if line.discount_method == 'per' and line.discount_amount != 0:
-                self.fixed_discount = 0.0
-                self.discount = 0.0
-                discount1 = line.discount_amount
-                discount = line.discount1
-                line.update({"discount1": discount1 , "discount": discount})
-                if res_config.tax_discount_policy == 'tax':
-                 fixed_discount = (line.price_total) - (
-                            line.price_total * (1 - (line.discount_amount or 0.0) / 100.0))
-                 total_with_discount=line.price_subtotal-fixed_discount
-                 line.update({"fixed_discount": fixed_discount,"total_with_discount":total_with_discount})
-
-                elif res_config.tax_discount_policy == 'untax':
-
-                 fixed_discount = (line.price_unit * line.product_qty) * (line.discount1 / 100.0)
-                 total_with_discount = line.price_subtotal
-                 line.update({"fixed_discount": fixed_discount,"total_with_discount":total_with_discount})
-
-            if line.discount_amount == 0:
-                 discount1 = 0.000
-                 line.update({"discount1": discount1})
-
-
-    @api.onchange("discount_amount")
-    def _onchange_fixed_discount(self):
-        res_config = self.env.company
-        for line in self:
-            if line.discount_method == 'fix' and line.discount_amount != 0:
-                self.discount1 = 0.0
-                self.discount = 0.0
-                fixed_discount = line.discount_amount
-                line.update({"fixed_discount": fixed_discount})
-                if res_config.tax_discount_policy == 'tax':
-                 discount1 = ((self.product_qty * self.price_unit) - (
-                            (self.product_qty * self.price_unit) - self.fixed_discount)) / (
-                                       self.product_qty * self.price_unit) * 100 or 0.0
-                 discount = discount1
-                 total_with_discount = line.price_subtotal - fixed_discount
-                 line.update({"discount1": discount1,"total_with_discount":total_with_discount, "discount": discount})
-                elif res_config.tax_discount_policy == 'untax':
-                    discount1 = ((self.product_qty * self.price_unit) - (
-                            (self.product_qty * self.price_unit) - self.fixed_discount)) / (
-                                        self.product_qty * self.price_unit) * 100 or 0.0
-                    discount = discount1
-                    total_with_discount = line.price_subtotal
-                    line.update({"discount1": discount1, "total_with_discount": total_with_discount, "discount": discount})
-
-            if line.discount_amount == 0:
-                fixed_discount = 0.0
-                line.update({"fixed_discount": fixed_discount})
-
-
-
+     
 
 class ResConfigSettings(models.TransientModel):
     _inherit = 'res.config.settings'
@@ -670,8 +614,7 @@ class Company(models.Model):
     _inherit = 'res.company'
 
     tax_discount_policy = fields.Selection([('tax', 'Taxed Amount'), ('untax', 'Untaxed Amount')],string='Discount Applies On',
-                                           default='tax'
-                                           )
+        default_model='sale.order')
     sale_account_id = fields.Many2one('account.account',domain=[('account_type', '=', 'income'), ('discount_account','=',True)])
     purchase_account_id = fields.Many2one('account.account',domain=[('account_type','=','expense'), ('discount_account','=',True)])
  

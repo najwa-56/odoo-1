@@ -16,9 +16,6 @@ class account_move_line(models.Model):
 	is_global_disc = fields.Boolean(string = "Global Discount")
 	exclude_from_invoice_tab = fields.Boolean(help="Technical field used to exclude some lines from the invoice_line_ids tab in the form view.")
 	check_tax = fields.Boolean("Check Tax")
-	fixed_discount = fields.Float(string="Fixed Discount", digits="Product Price", default=0.000)
-	discount1 = fields.Float(string='% Disc.', digits='Discount', default=0.000)
-	total_with_discount = fields.Float(string="Total_with_Disc")
 
 	@api.depends('quantity', 'discount','discount_amount', 'price_unit', 'tax_ids', 'currency_id')
 	def _compute_totals(self):

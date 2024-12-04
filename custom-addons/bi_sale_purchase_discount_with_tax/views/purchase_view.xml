@@ -12,13 +12,6 @@
                     <field name="discount_type" widget="radio" readonly="state == 'purchase'" />
                 </xpath>
 
-                <xpath expr="//field[@name='order_line']/tree/field[@name='price_unit']" position="after">
-                <field name="discount1" optional="show" />
-                <field name="fixed_discount" optional="show"/>
-                     <field name="total_with_discount" />
-
-            </xpath>
-
 
                 <field name="notes" position="after">
                                             
@@ -33,6 +26,10 @@
                     <!-- <field name="untax_test_amount" invisible="1"/> -->
                     <!-- <field name="line_total_amount" invisible="1"/> -->
                 </field>
+
+                <xpath expr="//tree/field[@name='discount']" position="attributes">
+                    <attribute name="column_invisible">0</attribute>
+                </xpath>
 
                 
                 <field name="tax_totals" position="before">
@@ -79,10 +76,8 @@
                     <field name="discount_amt_line" widget="monetary" options="{'currency_field': 'currency_id'}" invisible="move_type  in ('out_invoice', 'out_refund','out_receipt') or discount_type == 'global'"/>
                 </xpath>
 
-
-                <xpath expr="//field[@name='invoice_line_ids']/tree/field[@name='discount']" position="replace">
-                    
-                    <field name="discount" string="Disc.%" optional="hide" column_invisible="parent.move_type in ('in_invoice', 'in_refund','in_receipt')"/>
+                <xpath expr="//tree/field[@name='discount']" position="attributes">
+                    <attribute name="column_invisible">1</attribute>
                 </xpath>
 
 
@@ -102,7 +97,7 @@
             <field name="inherit_id" ref="account.view_move_form"/>
             <field name="arch" type="xml">
                 <xpath expr="//field[@name='invoice_line_ids']//tree//field[@name='partner_id']" position="after">
-                    <field name="is_global_disc" invisible="1"/>
+                    <field name="is_global_disc" column_invisible="1"/>
                 </xpath>                
                 
             </field>
