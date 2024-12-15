@@ -42,6 +42,14 @@
                     <field name="discount_method" column_invisible="parent.discount_type == 'global'"/>
                     <field name="discount_amount" column_invisible="parent.discount_type == 'global'"/>
                     <field name="discount_amt" column_invisible="1"/>
+                    <field name="amount_before_discount"/>
+                    
+                </xpath>
+
+                <xpath expr="//tree/field[@name='discount']" position="after">
+                <field name="fixed_discount" optional="hide"/> 
+                    <field name="amount_before_discount" optional="hide"/>
+                    
                 </xpath>
             </field>
         </record>
@@ -66,7 +74,6 @@
                         </div>
                     </group>
                     <field name="config_inv_tax" invisible="1"/>
-                    <field name="count_total" invisible="1"/>
                     <field name="final_count_total" invisible="1"/>
                     <!-- <field name="untax_test_amount" invisible="1"/> -->
                 </field>

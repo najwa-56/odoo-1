@@ -217,75 +217,11 @@ class account_move(models.Model):
 						else:
 							move.discount_account_id = account_id.id
 		   
-
 	def _compute_amount_account(self):
 		for record in self:
 			for line in record.invoice_line_ids:
 				if line.product_id:
 					record.discount_account_id = line.account_id.id 
-	
-
-	@api.depends('discount_type')
-	def _calculate_count_total(self):
-		res_config= self.env.company
-		final_count_total = 00
-		for move in self :
-			if self._context.get('default_move_type') in ['out_invoice', 'out_receipt', 'out_refund']:
-				if move.discount_type == 'global':
-					res = self._calculate_discount()
-					if  move.config_inv_tax:
-						move.update({
-						   'count_total' : move.amount_untaxed + move.config_inv_tax,
-						   'untax_test_amount' :  move.amount_untaxed,
-						   'final_count_total' : move.amount_untaxed + move.config_inv_tax
-						})
-					else:
-						test_amount =(move.amount_untaxed)
-						move.update({
-						   'count_total' : test_amount+ move.amount_tax,
-						   'untax_test_amount' :  test_amount,
-						   'final_count_total' : test_amount+ move.amount_tax,
-						})
-						
-				else:
-					res = self._calculate_discount()
-					if  move.config_inv_tax:
-						move.update({
-						   'count_total' : move.amount_untaxed + move.config_inv_tax
-						})
-					else:
-						test_amount =(move.amount_untaxed - res)
-						move.update({
-						   'count_total' : test_amount+ move.amount_tax,
-						   'final_count_total': test_amount+ move.amount_tax,
-						   'untax_test_amount' :  test_amount
-						})
-			else:
-				res = self._calculate_discount()
-				if move.discount_type == 'global':
-					if  move.config_inv_tax:
-						move.update({
-						   'count_total' : move.amount_untaxed + move.config_inv_tax,
-						   'untax_test_amount' :  move.amount_untaxed
-						})
-					else:
-						# test_amount =(move.amount_untaxed - res)
-						move.update({
-						   'count_total' : move.amount_untaxed + move.amount_tax,
-						   'untax_test_amount' :  move.amount_untaxed
-						})
-				else:
-					if  move.config_inv_tax:
-						move.update({
-						   'count_total' : move.amount_untaxed + move.config_inv_tax
-						})
-					else:
-						test_amount =(move.amount_untaxed - res)
-						move.update({
-						   'count_total' : test_amount+ move.amount_tax,
-						   'untax_test_amount' :  test_amount
-						})
-
 
 	discount_method = fields.Selection([('fix', 'Fixed'), ('per', 'Percentage')],'Discount Method')
 	discount_amount = fields.Float('Discount Amount')
@@ -302,7 +238,6 @@ class account_move(models.Model):
 	discount_amt_line = fields.Monetary(string='Line Discount', store=True, readonly=True,compute_sudo='_compute_amount', )
 	discount_amount_line = fields.Monetary(string="Discount Line")
 	config_inv_tax = fields.Monetary(string="total disc tax",compute="_calculate_discount",store=True)
-	count_total = fields.Monetary(string="tax total",compute="_calculate_count_total",readonly=True)
 	untax_test_amount = fields.Monetary(string="total untax amount for line",compute="_calculate_discount",store=True)
 	final_count_total = fields.Monetary(string="total amount",compute="_calculate_discount",store=True)
 	config_inv_untax = fields.Float(string="total Untax",compute_sudo="_calculate_discount")
@@ -472,86 +407,85 @@ class account_move(models.Model):
 	
 	
 
-	@api.model_create_multi
-	def create(self, vals_list):
-		result = super(account_move,self).create(vals_list)
-		res_config = self.env.company
-		account = False
-		for res in result:
-			if res.move_type in ['in_invoice', 'in_receipt', 'in_refund']:
-				account = res_config.purchase_account_id.id
-				if not account:
-					raise ValidationError("Please define sale discount acount in company.")
-				if res_config.purchase_account_id and res_config.purchase_account_id.discount_account != True:
-					raise ValidationError("Please define sale discount acount in company.")
+	# @api.model_create_multi
+	# def create(self, vals_list):
+	# 	result = super(account_move,self).create(vals_list)
+	# 	res_config = self.env.company
+	# 	account = False
+	# 	for res in result:
+	# 		if res.move_type in ['in_invoice', 'in_receipt', 'in_refund']:
+	# 			account = res_config.purchase_account_id.id
+	# 			if not account:
+	# 				raise ValidationError("Please define sale discount acount in company.")
+	# 			if res_config.purchase_account_id and res_config.purchase_account_id.discount_account != True:
+	# 				raise ValidationError("Please define sale discount acount in company.")
 
-			if res.move_type in ['out_invoice', 'out_receipt', 'out_refund']:
-				account = res_config.sale_account_id.id
-				if not account:
-					raise ValidationError("Please define purchase discount acount in company.")
-				if res_config.purchase_account_id and res_config.sale_account_id.discount_account != True:
-					raise ValidationError("Please define purchase discount acount in company.")
+	# 		if res.move_type in ['out_invoice', 'out_receipt', 'out_refund']:
+	# 			account = res_config.sale_account_id.id
+	# 			if not account:
+	# 				raise ValidationError("Please define purchase discount acount in company.")
+	# 			if res_config.purchase_account_id and res_config.sale_account_id.discount_account != True:
+	# 				raise ValidationError("Please define purchase discount acount in company.")
 
-			if res.discount_method and res.discount_amount:
-				if res.state in 'draft':
+	# 		if res.discount_method and res.discount_amount:
+	# 			if res.state in 'draft':
 					
 					
-					l = res.line_ids.filtered(lambda s: s.name == "Discount")
+	# 				l = res.line_ids.filtered(lambda s: s.name == "Discount")
 					
-					if len(l or []) == 0 and account:
-						discount_vals = {
-							'account_id': account, 
-							'quantity': 1,
-							'price_unit': -res.discount_amt,
-							'name': "Discount",
-							'tax_ids' :None, 
-							'exclude_from_invoice_tab': True,
-							'display_type':'product',
+	# 				if len(l or []) == 0 and account:
+	# 					discount_vals = {
+	# 						'account_id': account, 
+	# 						'quantity': 1,
+	# 						'price_unit': -res.discount_amt,
+	# 						'name': "Discount",
+	# 						'tax_ids' :None, 
+	# 						'exclude_from_invoice_tab': True,
+	# 						'display_type':'product',
 							
 							
-						}
-						res.with_context(check_move_validity=False).write({
-								'invoice_line_ids' : [(0,0,discount_vals)]
-							})
-			else:
-				if res.state in 'draft': 
+	# 					}
+	# 					res.with_context(check_move_validity=False).write({
+	# 							'invoice_line_ids' : [(0,0,discount_vals)]
+	# 						})
+	# 		else:
+	# 			if res.state in 'draft': 
 					
-					l = res.line_ids.filtered(lambda s: s.name == "Discount")
+	# 				l = res.line_ids.filtered(lambda s: s.name == "Discount")
 					
-					if res_config.tax_discount_policy == 'untax' and  res.discount_type == 'line':
-						pass
-					else:
-						if len(l or []) == 0 and account:
-							discount_vals = {
-								'account_id': account, 
-								'quantity': 1,
-								'price_unit': -res.discount_amt_line,
-								'name': "Discount",
-								'tax_ids' :None, 
-								'exclude_from_invoice_tab': True,
-								'display_type':'product',   
-							}
-							res.with_context(check_move_validity=False).write({
-									'invoice_line_ids' : [(0,0,discount_vals)]
-								})
+	# 				if res_config.tax_discount_policy == 'untax' and  res.discount_type == 'line':
+	# 					pass
+	# 				else:
+	# 					if len(l or []) == 0 and account:
+	# 						discount_vals = {
+	# 							'account_id': account, 
+	# 							'quantity': 1,
+	# 							'price_unit': -res.discount_amt_line,
+	# 							'name': "Discount",
+	# 							'tax_ids' :None, 
+	# 							'exclude_from_invoice_tab': True,
+	# 							'display_type':'product',   
+	# 						}
+	# 						res.with_context(check_move_validity=False).write({
+	# 								'invoice_line_ids' : [(0,0,discount_vals)]
+	# 							})
 			
-			def find_tax_line(result):
-				return result['line_ids'].filtered(lambda line: line.tax_line_id)
+	# 		def find_tax_line(result):
+	# 			return result['line_ids'].filtered(lambda line: line.tax_line_id)
 
-			tax_line = find_tax_line(result)
+	# 		tax_line = find_tax_line(result)
 
-			if tax_line:
-				if res.discount_type == "global" and self.env.company.tax_discount_policy == 'untax':
-					if res.move_type in ['out_invoice','out_refund','out _receipt'] :
-					   tax_line.write({'credit': res.config_inv_untax,'check_tax':True})
-					elif res.move_type in ['in_invoice','in_refund','in _receipt'] :
-						tax_line.write({'debit': res.config_inv_untax,'check_tax':True})
+	# 		if tax_line:
+	# 			if res.discount_type == "global" and self.env.company.tax_discount_policy == 'untax':
+	# 				if res.move_type in ['out_invoice','out_refund','out _receipt'] :
+	# 				   tax_line.write({'credit': res.config_inv_untax,'check_tax':True})
+	# 				elif res.move_type in ['in_invoice','in_refund','in _receipt'] :
+	# 					tax_line.write({'debit': res.config_inv_untax,'check_tax':True})
 
-		return result  
+	# 	return result  
 
 	@contextmanager
 	def _sync_dynamic_lines(self, container):
-
 		with self._disable_recursion(container, 'skip_invoice_sync') as disabled:
 			if disabled:
 				yield
@@ -560,7 +494,7 @@ class account_move(models.Model):
 				# Only invoice-like and journal entries in "auto tax mode" are synced
 				tax_container['records'] = container['records'].filtered(lambda m: (m.is_invoice(True) or m.line_ids.tax_ids and not m.tax_cash_basis_origin_move_id))
 				invoice_container['records'] = container['records'].filtered(lambda m: m.is_invoice(True))
-				misc_container['records'] = container['records'].filtered(lambda m: m.move_type == 'entry' and not m.tax_cash_basis_origin_move_id)
+				misc_container['records'] = container['records'].filtered(lambda m: m.is_entry() and not m.tax_cash_basis_origin_move_id)
 
 			tax_container, invoice_container, misc_container = ({} for __ in range(3))
 			update_containers()
@@ -574,6 +508,13 @@ class account_move(models.Model):
 				))
 				stack.enter_context(self._sync_unbalanced_lines(misc_container))
 				stack.enter_context(self._sync_rounding_lines(invoice_container))
+				stack.enter_context(self._sync_dynamic_line(
+					existing_key_fname='discount_allocation_key',
+					needed_vals_fname='line_ids.discount_allocation_needed',
+					needed_dirty_fname='line_ids.discount_allocation_dirty',
+					line_type='discount',
+					container=invoice_container,
+				))
 				stack.enter_context(self._sync_dynamic_line(
 					existing_key_fname='tax_key',
 					needed_vals_fname='line_ids.compute_all_tax',
@@ -590,8 +531,6 @@ class account_move(models.Model):
 				))
 				stack.enter_context(self._sync_invoice(invoice_container))
 				line_container = {'records': self.line_ids}
-				
-
 				with self.line_ids._sync_invoice(line_container):
 					yield
 					line_container['records'] = self.line_ids
@@ -599,15 +538,13 @@ class account_move(models.Model):
 					def find_tax_line(line_container):
 						return line_container['records'].filtered(lambda line: line.tax_line_id and line.check_tax == True)
 				
-				
 					def find_discont_line(line_container):
 						return line_container['records'].filtered(lambda line: line.name == 'Discount')
 					
 					discont_line = find_discont_line(line_container)
 					tax_line = find_tax_line(line_container)
 					for move in self :
-						res = self._calculate_discount()
-
+						res = move._calculate_discount()
 						if tax_line:
 							if move.discount_type == "global" and self.env.company.tax_discount_policy == 'untax':
 								if move.move_type in ['out_invoice','out_refund','out _receipt'] :
@@ -617,39 +554,14 @@ class account_move(models.Model):
 								   
 						if discont_line:
 							if move.discount_type == 'global': 
-								new_debit_value = move.discount_amt 
+								new_debit_value = res 
 							elif move.discount_type == 'line':
 								new_debit_value = res
 							if move.move_type in ['out_invoice','out_refund','out _receipt'] :
-							   discont_line.write({'debit': new_debit_value})
+							   discont_line.sudo().write({'debit': new_debit_value})
 							elif move.move_type in ['in_invoice','in_refund','in _receipt'] :
-							   discont_line.write({'credit': new_debit_value})
-						else:
-							if self.env.company.tax_discount_policy != 'untax' and move.discount_type != "global":
-								if move.move_type in ['in_invoice', 'in_receipt', 'in_refund']:
-									account = self.env.company.purchase_account_id.id
-								if move.move_type in ['out_invoice', 'out_receipt', 'out_refund']:
-									account = self.env.company.sale_account_id.id
-								if move.discount_type == 'global': 
-									new_debit_value = move.discount_amt 
-								elif move.discount_type == 'line':
-									new_debit_value = res
-								
-								if move.move_type in ['in_invoice', 'in_receipt', 'in_refund','out_invoice', 'out_receipt', 'out_refund'] :
-									discount_vals = {
-										'account_id': account, 
-										'quantity': 1,
-										'price_unit': -new_debit_value,
-										'name': "Discount",
-										'tax_ids' :None, 
-										'exclude_from_invoice_tab': True,
-										'display_type':'product',
-										
-										
-									}
-									self.with_context(check_move_validity=False).write({
-											'invoice_line_ids' : [(0,0,discount_vals)]
-										})
+							   discont_line.sudo().write({'credit': new_debit_value})
+						
 
 				update_containers()
 

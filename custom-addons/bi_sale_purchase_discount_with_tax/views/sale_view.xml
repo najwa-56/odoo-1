@@ -95,7 +95,6 @@
                         </div>
                         
                         <field name="config_inv_tax" invisible="1"/>
-                        <field name="count_total" invisible="1"/>
                         <field name="final_count_total" invisible="1"/>
                    </group>
                    <br/>

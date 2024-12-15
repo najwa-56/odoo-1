@@ -17,32 +17,41 @@ class account_move_line(models.Model):
 	exclude_from_invoice_tab = fields.Boolean(help="Technical field used to exclude some lines from the invoice_line_ids tab in the form view.")
 	check_tax = fields.Boolean("Check Tax")
 
-	@api.depends('quantity', 'discount','discount_amount', 'price_unit', 'tax_ids', 'currency_id')
+	@api.depends('quantity', 'discount','discount_amount', 'price_unit', 'tax_ids', 'currency_id','discount_method')
 	def _compute_totals(self):
 		for line in self:
 			if line.display_type != 'product':
 				line.price_total = line.price_subtotal = False
 			# Compute 'price_subtotal'.
-			discount_warning = self.env['ir.config_parameter'].sudo().get_param('bi_product_discount.discount_warning')
-			warning_message = self.env['ir.config_parameter'].sudo().get_param('bi_product_discount.warning_message')
-
 			if line.discount_amount > 0:
-				if line.discount_amount > 0:
-					if self.env.company.tax_discount_policy == 'untax': 
-						if line.discount_method == 'fix':
-							line_discount_price_unit = line.price_unit - line.discount_amount
-						elif line.discount_method == 'per':
-							line_discount_price_unit = line.price_unit * (1 - (line.discount_amount / 100.0))
-						else:
-							line_discount_price_unit = line.price_unit * (1 - (line.discount / 100.0))
+				if self.env.company.tax_discount_policy == 'untax': 
+					if line.discount_method == 'fix':
+						line_discount_price_unit = line.price_unit - line.discount_amount
+					elif line.discount_method == 'per':
+						line_discount_price_unit = line.price_unit * (1 - (line.discount_amount / 100.0))
 					else:
-						line_discount_price_unit = line.price_unit
-				else:
-					line_discount_price_unit = line.price_unit * (1 - (line.discount / 100.0))
+						line_discount_price_unit = line.price_unit * (1 - (line.discount / 100.0))
 
-				subtotal = line.quantity * line_discount_price_unit
-				# Compute 'price_total'.
-				if line.tax_ids:
+					subtotal = line.quantity * line_discount_price_unit
+
+					# Compute 'price_total'.
+					if line.tax_ids:
+						taxes_res = line.tax_ids.compute_all(
+							line_discount_price_unit,
+							quantity=line.quantity,
+							currency=line.currency_id,
+							product=line.product_id,
+							partner=line.partner_id,
+							is_refund=line.is_refund,
+						)
+						line.price_subtotal = taxes_res['total_excluded']
+						line.price_total = taxes_res['total_included']
+					else:
+						line.price_total = line.price_subtotal = subtotal
+				else:
+					price_x = 0.0
+
+					line_discount_price_unit = line.price_unit
 					taxes_res = line.tax_ids.compute_all(
 						line_discount_price_unit,
 						quantity=line.quantity,
@@ -51,10 +60,22 @@ class account_move_line(models.Model):
 						partner=line.partner_id,
 						is_refund=line.is_refund,
 					)
-					line.price_subtotal = taxes_res['total_excluded']
-					line.price_total = taxes_res['total_included']
-				else:
-					line.price_total = line.price_subtotal = subtotal
+
+					if line.discount_method == 'fix':
+						price_x = (taxes_res['total_included']) - ( taxes_res['total_included'] - line.discount_amount)
+					elif line.discount_method == 'per':
+						price_x = (taxes_res['total_included']) - (taxes_res['total_included'] * (1 - (line.discount_amount or 0.0) / 100.0))
+					else:
+						price_x = line.price_unit * (1 - (line.discount or 0.0) / 100.0)
+				
+					subtotal = line.quantity * line_discount_price_unit
+
+					# Compute 'price_total'.
+					if line.tax_ids:
+						line.price_subtotal = taxes_res['total_excluded']
+						line.price_total = taxes_res['total_included'] - price_x
+					else:
+						line.price_total = line.price_subtotal = subtotal 
 			else:
 				line_discount_price_unit = line.price_unit * (1 - (line.discount / 100.0))
 				subtotal = line.quantity * line_discount_price_unit

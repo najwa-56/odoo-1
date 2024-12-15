@@ -548,7 +548,7 @@ class sale_order_line(models.Model):
 				
 						line.update({
 							'price_tax': sum(t.get('amount', 0.0) for t in taxes.get('taxes', [])),
-							'price_total': taxes['total_included'],
+							'price_total': taxes['total_included'] - price_x,
 							'price_subtotal': taxes['total_excluded'],
 							'discount_amt' : price_x,
 						})
