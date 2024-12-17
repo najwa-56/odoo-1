@@ -27,7 +27,7 @@ Deals and discount
 
     """,
     "license" : "OPL-1",  
-    "depends" : ['base','sale_management','purchase','account','stock'],
+    "depends" : ['base','sale_management','purchase','account','stock','bi_sale_purchase_discount_with_tax'],
     "data": [
         'views/sale_order_line_inherit_views.xml',
         'security/mixed_discount_security.xml',
