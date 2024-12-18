@@ -17,7 +17,7 @@
   "name"                 :  "Pos Geidea Payment Terminal Integration",
   "summary"              :  """Pos GPR Integration is used to connect/receive payment from Geidea terminal""",
   "category"             :  "Point of Sale",
-  "version"              :  "1.0.0",
+  "version"              :  "1.0.1",
   "sequence"             :  1,
   "author"               :  "Webkul Software Pvt. Ltd.",
   "license"              :  "Other proprietary",

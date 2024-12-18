@@ -11,7 +11,7 @@ import { PaymentScreen } from "@point_of_sale/app/screens/payment_screen/payment
 import { patch } from "@web/core/utils/patch";
 
 var is_open_socket = false;
-
+import { ErrorPopup } from "@point_of_sale/app/errors/popups/error_popup";
 class WkErrorNotifyPopopWidget extends AbstractAwaitablePopup {}
 WkErrorNotifyPopopWidget.template = 'pos_gpr_integration.WkErrorNotifyPopopWidget';
 WkErrorNotifyPopopWidget.defaultProps = { title: 'Error !!!', value: '' };
@@ -134,7 +134,7 @@ patch(PaymentScreen.prototype, {
                     error_event = temp_data && temp_data.Event && temp_data.Event == 'OnError' ? 'error' : '';
                 }
                 if (error_event == 'error' && temp_data && temp_data.Message && temp_data.Message.indexOf('port is closed') >= 0) {
-                    Gui.showPopup('ErrorPopup', {
+                    this.env.services.popup.add(ErrorPopup, {
                         'title': 'Connection Error',
                         'body': 'Terminal is not connected'
                     });
@@ -153,7 +153,7 @@ patch(PaymentScreen.prototype, {
                                     var wk_line = env.services.pos.get_order().selected_paymentline;
                                     if (wk_line && wk_line.time_interval)
                                         clearInterval(wk_line.time_interval);
-                                    Gui.showPopup('ErrorPopup', {
+                                    this.env.services.popup.add(ErrorPopup, {
                                         'title': 'Terminal Return Wrong Amount',
                                         'body': 'Return Amount is not matched with the amount entered. Please proceed again'
                                     });
@@ -170,7 +170,7 @@ patch(PaymentScreen.prototype, {
                                     $.unblockUI();
                                 }
                             } else {
-                                Gui.showPopup('ErrorPopup', {
+                                this.env.services.popup.add(ErrorPopup, {
                                     'title': 'Transaction Error',
                                     'body': termi_resp.TransactionResponseEnglish
                                 });
@@ -182,7 +182,7 @@ patch(PaymentScreen.prototype, {
                     } else if (temp_data.EventName == 'TERMINAL_ACTION') {
                         if (temp_data.TerminalAction == 'USER_CANCELLED_AND_TIMEOUT') {
                             $.unblockUI();
-                            Gui.showPopup('ErrorPopup', {
+                            this.env.services.popup.add(ErrorPopup, {
                                 'title': temp_data.OptionalMessage,
                                 'body': ''
                             });
@@ -293,7 +293,7 @@ export class Paymentgpr extends PaymentInterface {
             console.log("error_event----------------",error_event)
             if(error_event == 'error' && temp_data && temp_data.Message && temp_data.Message.indexOf('port is closed') >=0){
               console.log("popup need to show of errpr")
-                Gui.showPopup('ErrorPopup',{
+                this.env.services.popup.add(ErrorPopup,{
                     'title': 'Connection Error',
                     'body': 'Terminal is not conneted'
                 });
@@ -319,7 +319,7 @@ export class Paymentgpr extends PaymentInterface {
                                 var wk_line = self.pos.get_order().selected_paymentline
                                 if(wk_line && wk_line.time_interval)
                                     clearInterval(wk_line.time_interval)
-                                    Gui.showPopup('ErrorPopup',{
+                                    this.env.services.popup.add(ErrorPopup,{
                                         'title': 'Terminal Return Wrong Amount',
                                         'body': 'Return Amount is not matched with the amount entered. Please proceed again'
                                     });
@@ -342,7 +342,7 @@ export class Paymentgpr extends PaymentInterface {
                         }
                         else{
 
-                            Gui.showPopup('ErrorPopup',{
+                            this.env.services.popup.add(ErrorPopup,{
                                 'title': 'Transaction Error',
                                 'body': termi_resp.TransactionResponseEnglish
                             });
@@ -360,7 +360,7 @@ export class Paymentgpr extends PaymentInterface {
                     if(temp_data.TerminalAction == 'USER_CANCELLED_AND_TIMEOUT'){
                         $.unblockUI();
 
-                        Gui.showPopup('ErrorPopup',{
+                        this.env.services.popup.add(ErrorPopup,{
                             'title': temp_data.OptionalMessage,
                             'body': ''
                         });
@@ -416,7 +416,7 @@ export class Paymentgpr extends PaymentInterface {
         this.handleCOMDisConnect();
         return true;
     }
-    
+
     close() {
         super.close(...arguments);
     }
