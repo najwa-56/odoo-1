@@ -7,6 +7,25 @@ from odoo.tools import DEFAULT_SERVER_DATETIME_FORMAT, get_lang
 class PurchaseOrderLine(models.Model):
     _inherit = 'purchase.order.line'
 
+    product_uom = fields.Many2one('uom.uom', string='Unit of Measure',domain="[]")
+
+    @api.onchange('product_id')
+    def unit_id_change(self):
+        domain = {'product_uom': [('id', '=', self.product_id.selected_uom_ids.ids)]}        
+        return {'domain': domain}
+
+
+    product_uom_domain = fields.Binary(compute="_compute_request_domain")
+    
+    @api.depends('product_id')
+    def _compute_request_domain(self):
+        for rec in self:
+            domain = []
+            if rec.product_id:
+                domain = [('id', 'in', rec.product_id.selected_uom_ids.ids)]
+            rec.product_uom_domain = domain
+
+
     selected_uom_ids = fields.Many2many(string="UOM Ids", related='product_id.selected_uom_ids')
     purchase_multi_uom_id = fields.Many2one("product.multi.uom.price", string="الوحدة",
                                             domain="[('id', 'in', selected_uom_ids)]")
