@@ -8,6 +8,7 @@ class PurchaseOrderLine(models.Model):
     _inherit = 'purchase.order.line'
 
     product_uom = fields.Many2one('uom.uom', string='Unit of Measure',domain="[]")
+    unit_name = fields.Char('Name')
 
     @api.onchange('product_id')
     def unit_id_change(self):
@@ -122,6 +123,7 @@ class PurchaseOrderLine(models.Model):
         if self.purchase_multi_uom_id:
             values = {
                 "product_uom": self.purchase_multi_uom_id.uom_id.id,
+                'unit_name':self.purchase_multi_uom_id.uom_id.name_field
             }
             self.update(values)
 
