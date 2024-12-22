@@ -15,6 +15,12 @@ import json
 class StockPicking(models.Model):
     _inherit='stock.picking'
 
+    @api.model
+    def default_get(self, fields_list):
+        res = super().default_get(fields_list)
+        self._onchange_sale_order_template_id()
+        return res
+
     sale_order_template_id = fields.Many2one(
         comodel_name='sale.order.template',
         string="Quotation Template",
@@ -33,7 +39,7 @@ class StockPicking(models.Model):
                 order.sale_order_template_id = order.company_id.sale_order_template_id.id
 
 
-    @api.onchange('sale_order_template_id')
+    @api.onchange('sale_order_template_id','location_id','location_dest_id')
     def _onchange_sale_order_template_id(self):
         if not self.sale_order_template_id:
             return
