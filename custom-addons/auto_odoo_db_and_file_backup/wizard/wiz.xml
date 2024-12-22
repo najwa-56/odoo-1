@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+	<record id="auto_dbbackup_dropbox_wiz_form" model="ir.ui.view">
+		<field name="name">dropbox.auth.refresh.token.wiz.form</field>
+		<field name="model">dropbox.auth.refresh.token.wiz</field>
+		<field name="arch" type="xml">
+			<form string="Get Dropbox Authorization Code">
+				<p>
+					Get Authorization Code --> 
+					<b><field name="dropbox_uri" class="fa fa-arrow-right mt-1" widget="url" text="Get Authorization Code"
+							nolabel="1" readonly="1"/></b>
+					
+				</p>
+				<group>
+					<field name="dropbox_authorization_code" required="1"/>
+				</group>
+				
+				<footer>
+					<button string="Confirm" name="action_confirm"
+						type="object" class="btn-primary" />
+					<button string="Cancel" class="btn-secondary" special="cancel" />
+				</footer>
+			</form>
+		</field>
+	</record>
+
+	<record id="action_auto_dbbackup_dropbox_wiz" model="ir.actions.act_window">
+		<field name="name">Dropbox Authorization Code</field>
+		<field name="res_model">dropbox.auth.refresh.token.wiz</field>
+		<field name="view_mode">form</field>
+		<field name="target">new</field>
+	</record>
+</odoo>

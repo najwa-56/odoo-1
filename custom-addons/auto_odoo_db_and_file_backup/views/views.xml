@@ -1,0 +1,275 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo>
+    <record id="view_autobackup_config_form" model="ir.ui.view">
+        <field name="name">database.backup.form</field>
+        <field name="model">database.backup</field>
+        <field name="arch" type="xml">
+            <form create="0" string="Back-up Rules view">
+                <header>
+                    <button name="trigger_direct" string="Backup" type="object"
+                            class="oe_highlight" context="{'backup_destination' : backup_destination}"/>
+                </header>
+                <sheet>
+                    <!-- local backup fields -->
+                    <group>
+                        <field name="backup_type"/>
+                        <field name="backup_destination"/>
+                        <field name="backup"/>
+                        <field name="files_path"
+                               invisible="backup == 'db_only'"
+                               required="backup != 'db_only'"
+                        />
+                        <label for="folder" invisible="backup_destination != 'folder'"></label>
+                        <div class="address_format">
+                            <field name="folder" style="width: 65%;"
+                                   invisible="backup_destination != 'folder'"
+                                   required="backup_destination == 'folder'"
+                            />
+
+                            <field name="foldername" style="width:30%"
+                                   invisible="backup_destination != 'folder'"
+                                   required="backup_destination == 'folder'"></field>
+                        </div>
+                    </group>
+                    <!-- google drive backup fields -->
+<!--                    <group>-->
+                        <span invisible="backup_destination != 'g_drive'"
+                              class="o_form_label o_td_label" name="address_name">
+                            Get credentials file for Google Drive Upload
+                            <br/>
+                            <p style="color: firebrick;">(Note: After getting credentials file save it in
+                                path:
+                                auto_odoo_db_and_file_backup/models)
+                            </p>
+                        </span>
+                        <div class="o_address_format"
+                             invisible="backup_destination != 'g_drive'">
+                            <!-- <field name="google_drive_uri" -->
+                            <!-- attrs="{'invisible':[('backup_destination', '!=', 'g_drive')]}" -->
+                            <!-- class="fa fa-arrow-right mt-1" widget="url" text="Get Credentials" -->
+                            <!-- nolabel="1" /> -->
+                            <button name="get_gdrive_credentials"
+                                    invisible="is_cred_avail != False" type="object"
+                                    class="oe_link fa fa-arrow-right mt-1">Get Credentials
+                            </button>
+                            <button name="get_gdrive_credentials"
+                                    invisible="is_cred_avail == False"
+                                    confirm="Credentials already exist! Do you want to update it??"
+                                    type="object" class="oe_link fa fa-arrow-right mt-1">Get Credentials
+                            </button>
+                            <button name="authenticate_gdrive" type="object" class="oe_highlight">Authenticate
+                            </button>
+                        </div>
+
+<!--                    </group>-->
+                    <!-- dropbox backup fields -->
+                    <group>
+                        <field name="d_app_key"
+                               required="backup_destination == 'dropbox'"
+                               invisible="backup_destination != 'dropbox'"/>
+                        <field name="d_app_secret" password="True"
+                               required="backup_destination == 'dropbox'"
+                               invisible="backup_destination != 'dropbox'"
+                        />
+                    </group>
+
+                    <span class="o_form_label" for="" invisible="backup_destination != 'dropbox'">Get an
+                        authorization code
+                    </span>
+                    <button name="get_auth_code" type="object" string="Get Authorization Code"
+                            invisible="backup_destination != 'dropbox'"
+                    />
+                    <group>
+                        <field name="dropbox_uri" readonly="1"
+                               invisible="1"
+                               class="fa fa-arrow-right mt-1" widget="url" text="Get Authorization Code"
+                               nolabel="1"/>
+
+                        <field name="dropbox_authorization_code" string="Authorization Code"
+                               invisible="backup_destination != 'dropbox'"></field>
+                        <field name="dropbox_code_verifier" invisible="1"></field>
+                    </group>
+                    <span class="o_form_label" for="" invisible="backup_destination != 'dropbox'">Get
+                        Refresh token after generating an
+                        authorization code
+                    </span>
+                    <button name="get_auth_refresh_token" type="object"
+                            string="Generate Refresh Token" invisible="backup_destination != 'dropbox'"
+                    />
+                    <group>
+                        <field name="dropbox_refresh_token" invisible="backup_destination != 'dropbox'"></field>
+                        <field name="dropbox_token" invisible="1"></field>
+                    </group>
+                    <!-- ftp backup fields -->
+                    <group>
+                        <field name="ftp_address" required="backup_destination == 'ftp'"
+                               invisible="backup_destination != 'ftp'"/>
+                        <field name="ftp_port" required="backup_destination == 'ftp'"
+                               invisible="backup_destination != 'ftp'"
+                        />
+                        <field name="ftp_usrnm"
+                               required="backup_destination == 'ftp'" invisible="backup_destination != 'ftp'"/>
+                        <field name="ftp_pwd" password="True"
+                               required="backup_destination == 'ftp'"
+                               invisible="backup_destination != 'ftp'"/>
+                        <field name="ftp_path"
+                               required="backup_destination == 'ftp'"
+                               invisible="backup_destination != 'ftp'"/>
+                        <button name="test_ftp_connection" type="object" invisible="backup_destination != 'ftp'"
+                                string="Test FTP Connection"/>
+                    </group>
+
+                    <group>
+                        <!-- SFTP Fields -->
+                        <field name="sftp_host" required="backup_destination == 'sftp'"
+                               invisible="backup_destination != 'sftp'"></field>
+                        <field name="sftp_user"
+                               required="backup_destination == 'sftp'"
+                               invisible="backup_destination != 'sftp'"></field>
+                        <field name="sftp_port" required="backup_destination == 'sftp'"
+                               invisible="backup_destination != 'sftp' or is_pem_file_avail == True"></field>
+                        <field name="is_pem_file_avail" invisible="backup_destination != 'sftp'"
+                        ></field>
+                        <label for="sftp_keyfilepath" string="SFTP Key File Path/Password"
+                               invisible="backup_destination != 'sftp'">
+                            <span invisible="backup_destination != 'sftp' or is_pem_file_avail == False"
+                            >
+                                SFTP Password
+                            </span>
+                        </label>
+                        <div class="address_format">
+                            <field name="sftp_keyfilepath" style="width: 70%;"
+                                   required="backup_destination == 'sftp'"
+                                   invisible="backup_destination != 'sftp'"
+                            ></field>
+
+                            <field name="upload_file" style="width: 25%;" filename="file_name"
+                                   invisible="is_pem_file_avail == False or backup_destination != 'sftp'"
+                            />
+                            <field name="file_name" invisible="1"/>
+                        </div>
+                        <field name="sftp_file_path" required="backup_destination == 'sftp'"
+                               invisible="backup_destination != 'sftp'"
+                        ></field>
+                        <button name="test_sftp_connection" type="object"
+                                string="Test SFTP Connection"
+                                invisible="backup_destination != 'sftp'"/>
+                    </group>
+
+                    <group>
+                        <!-- AWS S3 -->
+                        <field name="s3_app_key_id" string="App Key"
+                               required="backup_destination == 'AWSs3'"
+                               invisible="backup_destination != 'AWSs3'"
+                        ></field>
+                        <field name="s3_secret_key_id" password="True" string="Secret Key"
+                               required="backup_destination == 'AWSs3'"
+                               invisible="backup_destination != 'AWSs3'"></field>
+                        <field name="s3_bucket_name"
+                               required="backup_destination == 'AWSs3'"
+                               invisible="backup_destination != 'AWSs3'"></field>
+                    </group>
+                    <group>
+                        <field name="is_active"></field>
+                        <field name="interval_number"></field>
+                        <field name="interval_type"></field>
+                        <field name="next_exec_dt"/>
+                        <field name="google_drive_authorization_code" string="Authorization Code"
+                               invisible="1"/>
+                        <field name="google_drive_refresh_token" invisible="1"/>
+                        <field name="is_cred_avail" invisible="1"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_auto_backup_config_form" model="ir.ui.view">
+        <field name="name">auto.database.backup.form</field>
+        <field name="model">auto.database.backup</field>
+        <field name="arch" type="xml">
+            <form create="0" delete="0" string="Back-up view">
+                <sheet>
+                    <div class="oe_title">
+                        <label for="name" class="oe_edit_only"/>
+                        <h1>
+                            <field name="name" class="oe_inline"/>
+                        </h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="bkup_email"></field>
+                            <field name="autoremove"></field>
+                        </group>
+                        <group>
+                            <field name="bkup_fail_email"></field>
+                            <field name="days_to_keep" required="autoremove == True"
+                                   invisible="autoremove == False"
+                            ></field>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Automatic Backup Rules">
+                            <field name="bkpu_rules"
+                                   context="{'form_view_ref': 'auto_odoo_db_and_file_backup.view_autobackup_config_form'}">
+                                <tree create="0" delete="0">
+                                    <field name="is_active"></field>
+                                    <field name="backup_type"/>
+                                    <field name="backup_destination"/>
+                                    <field name="next_exec_dt"/>
+                                    <field name="backup_id" column_invisible="True"></field>
+                                    <button name="trigger_direct" string="Backup" type="object"
+                                            class="oe_link"
+                                            context="{'backup_destination' : backup_destination, 'id' : id}"/>
+                                </tree>
+                            </field>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_auto_backup_config_tree" model="ir.ui.view">
+        <field name="name">auto.database.backup.tree</field>
+        <field name="model">auto.database.backup</field>
+        <field name="arch" type="xml">
+            <tree create="0" delete="0" string="Backups">
+                <field name='name'/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="action_autobackup" model="ir.actions.act_window">
+        <field name="name">Configure Auto DB Backups</field>
+        <field name="res_model">auto.database.backup</field>
+        <field name="view_mode">tree,form</field>
+        <field name="view_id" ref="view_auto_backup_config_tree"/>
+    </record>
+
+    <menuitem id="auto_backup_menu" name="Auto DB Backups" parent="base.menu_custom"/>
+    <menuitem parent="auto_backup_menu" action="action_autobackup"
+              id="backup_conf_menu"/>
+
+    <record id="view_auto_backup_status_tree" model="ir.ui.view">
+        <field name="name">auto.database.backup.status.tree</field>
+        <field name="model">auto.database.backup.status</field>
+        <field name="type">tree</field>
+        <field name="arch" type="xml">
+            <tree create="0" string="Backups Status">
+                <field name='date'/>
+                <field name='name' string="status"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="action_autobackup_status" model="ir.actions.act_window">
+        <field name="name">Auto DB Backups Status</field>
+        <field name="res_model">auto.database.backup.status</field>
+        <field name="view_mode">tree</field>
+        <field name="view_id" ref="view_auto_backup_status_tree"/>
+    </record>
+
+    <menuitem parent="auto_backup_menu" action="action_autobackup_status"
+              id="backup_status_menu"/>
+</odoo>
