@@ -50,6 +50,9 @@
 							<tr style="border:2pt solid black">
 								<td style="font-weight: bold;text-align:center;color:black;background-color:#dddddd;FONT-SIZE: 12pt"><span class="text-right arabic">  الفاتورة الضريبية  </span></td> 
 							</tr>
+								<tr t-if="doc.move_type == 'out_refund'" style="border:2pt solid black">
+								<td style="font-weight: bold;text-align:center;color:black;background-color:#dddddd;FONT-SIZE: 12pt"><span class="text-right arabic">   إشعار دائن  </span></td> 
+							</tr>
 					</table>
 					
 					<div class="row mt32 mb32">
