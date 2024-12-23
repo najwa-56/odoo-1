@@ -76,11 +76,38 @@
 			            </div>
 			        </div>
 							<br/>
+							 <t t-if="o.move_type ==  'in_invoice'">
+						<div class="row mt32 mb32">
+		                <div class="col-9" style="margin-top:5pt; color:black;">
+							<table style="border:2pt solid black;width:100%;padding:10pt;color:black;" class="table table-bordered table-sm">
+								<tr style="border:2pt solid black">
+									<td class="arabic" style="width:50%; text-align:center;background-color:#white;color:black;">
+									<t t-if="o.invoice_line_ids[0] and o.invoice_line_ids[0].purchase_order_id">
+									
+										<span t-field="o.invoice_line_ids[0].purchase_order_id.name"/>
+									</t>
+									
+									</td>
+									<td class="arabic" style=" text-align:right;color:black;background-color:#dddddd ; font-weight: bold;">رقم أمر الشراء</td>
+								</tr>
+								<tr style="border:2pt solid black">
+									<td class="arabic" style="width:50%; text-align:center;"><span t-field="o.ref"/></td>
+									<td class="arabic" style=" text-align:right;color:black;background-color:#dddddd;font-weight: bold;">رقم فاتوره المورد</td>
+								</tr>
+								
+								
+								
+							</table>
+						</div>
+						
+			        </div>
+					</t>
+
 
 			          <div class="row mt32 mb32" style="margin-top:-15pt; margin-right:0pt;">
 		                <div class="col-6">
 							<center>
-							<span class="text-center !important arabic" style="font-weight: bold;text-align:center !important">معلومات البائع</span>
+							<span class="arabic" style="font-weight: bold;text-align:center !important;">معلومات المستفيد</span>
 						</center>
 							<table style="border:2pt solid black;width:100%;" class="table table-bordered table-sm">
 								
@@ -110,7 +137,9 @@
 		                <div class="col-6">
 							<table style="border:2pt solid black;width:100%;" class="table table-bordered table-sm">
 								<center>
-								<span class="arabic" style="font-weight: bold;text-align:center !important;">معلومات المستفيد</span>
+								<span class="text-center !important arabic" style="font-weight: bold;text-align:center !important">معلومات البائع</span>
+
+								
 							</center>
 								<tr style="border:2pt solid black">
 									<td class="text-center arabic"><span t-field="o.partner_id.name"/></td>
@@ -173,7 +202,7 @@
 
 					 			<t t-set="discount_total" t-value="discount_total + ((l.price_unit * l.quantity) - l.price_subtotal)"/>
 						 		<td style="border:2pt solid black;padding:3pt;text-align:center">
-						 			<span class="arabic" t-field="l.name"/> 
+						 			<span class="arabic" t-field="l.product_id.name"/> 
 						 		</td>
 
 						 		<td class="arabic" style="border:2pt solid black;text-align:center;padding:3pt"><span t-field="l.price_unit" t-options="{&quot;widget&quot;: &quot;monetary&quot;, &quot;display_currency&quot;: o.currency_id}"/></td>

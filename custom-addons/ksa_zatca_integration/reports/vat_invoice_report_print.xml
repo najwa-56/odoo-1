@@ -76,7 +76,7 @@
 			            </div>
 			        </div>
 
-					<t t-if="o.move_type ==  'in_invoice'">
+					<!-- <t t-if="o.move_type ==  'in_invoice'">
 						<div class="row mt32 mb32">
 		                <div class="col-9" style="margin-top:5pt; color:black;">
 							<table style="border:2pt solid black;width:100%;padding:10pt;color:black;" class="table table-bordered table-sm">
@@ -101,7 +101,7 @@
 						</div>
 						
 			        </div>
-					</t>
+					</t> -->
 							<br/>
 
 			          <div class="row mt32 mb32" style="margin-top:-15pt; margin-right:0pt;">
