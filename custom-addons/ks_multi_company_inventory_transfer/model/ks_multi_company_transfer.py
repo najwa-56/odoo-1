@@ -14,18 +14,17 @@ class KsStockTransferMultiCompany(models.Model):
         comodel_name='sale.order.template',
         string="Quotation Template",
         compute='_compute_sale_order_template_id',
-        store=True, readonly=False, check_company=True, precompute=True,
-        domain="['|', ('company_id', '=', False), ('company_id', '=', company_id)]")
+        store=True, readonly=False,required=True)
     
 
     def _compute_sale_order_template_id(self):
         for order in self:
-            company_template = order.company_id.sale_order_template_id
+            company_template = order.sale_order_template_id
             if company_template and order.sale_order_template_id != company_template:
                 if 'website_id' in self._fields and order.website_id:
                     # don't apply quotation template for order created via eCommerce
                     continue
-                order.sale_order_template_id = order.company_id.sale_order_template_id.id
+                order.sale_order_template_id = order.sale_order_template_id.id
 
 
     @api.onchange('sale_order_template_id')
@@ -33,7 +32,7 @@ class KsStockTransferMultiCompany(models.Model):
         if not self.sale_order_template_id:
             return
 
-        sale_order_template = self.sale_order_template_id.with_context(lang=self.partner_id.lang)
+        sale_order_template = self.sale_order_template_id
 
         order_lines_data = [fields.Command.clear()]
         order_lines_data += [
@@ -432,6 +431,10 @@ class SaleOrderTemplateLine(models.Model):
     def _prepare_order_line_values(self, is_inter_company= False):
         res = super()._prepare_order_line_values()
         if is_inter_company:
+            print("in here====================")
+            res.pop('sequence', None)
+            res['ks_product_id'] = res['product_id']
+            res.pop('product_id', None)
             res.pop('display_type', None)  # Safely remove 'display_type' if it exists
             res.pop('name', None)
             res.pop('product_uom_qty', None)
@@ -439,5 +442,5 @@ class SaleOrderTemplateLine(models.Model):
             res.pop('sequence', None)
             
 
-
+        print("res===================",res)
         return res

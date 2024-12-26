@@ -26,6 +26,7 @@ class KsStockTransferMultiCompanyLines(models.Model):
     ks_move_line_ids = fields.One2many('multicompany.transfer.move.line', 'ks_move_id')
 
     ks_company_id = fields.Many2one('res.company', related='ks_multicompany_transfer_id.ks_transfer_from')
+    sequence = fields.Integer(help='Used to order Journals in the dashboard view', default=10)
 
     @api.depends('ks_product_id', 'ks_multicompany_transfer_id.ks_transfer_from_location')
     def ks_get_location_quantity(self):

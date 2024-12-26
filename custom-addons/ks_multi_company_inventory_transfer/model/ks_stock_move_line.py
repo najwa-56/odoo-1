@@ -25,6 +25,7 @@ class KsStockMoveLine(models.Model):
     ks_lot_id = fields.Many2one('stock.lot', 'Lot/Serial Number', domain="[('product_id', '=', ks_product_id),('company_id', '=', ks_company_id)]")
     ks_location_id = fields.Many2one('stock.location', 'Source Location')
     ks_location_dest_id = fields.Many2one('stock.location', 'Destination Location')
+   
 
     @api.depends('ks_product_id', 'ks_product_uom_id', 'ks_product_uom_qty')
     def ks_compute_product_qty(self):
