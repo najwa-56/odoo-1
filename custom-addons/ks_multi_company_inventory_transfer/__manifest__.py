@@ -56,7 +56,7 @@ Internal Inventory Transfer Apps,
     'version': '17.0.1.0.1',
     'category': 'Warehouse',
     'support': 'sales@ksolves.com',
-    'depends': ['base', 'stock'],
+    'depends': ['base', 'stock','sale'],
     'live_test_url': 'https://multicompany17.kappso.com/web/demo_login',
     'data': [
         'data/ks_sequence.xml',
