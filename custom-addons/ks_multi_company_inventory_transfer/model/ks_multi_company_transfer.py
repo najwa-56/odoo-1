@@ -9,6 +9,47 @@ class KsStockTransferMultiCompany(models.Model):
     _inherit = ['mail.thread', 'mail.activity.mixin']
     _order = 'create_date desc'
 
+
+    sale_order_template_id = fields.Many2one(
+        comodel_name='sale.order.template',
+        string="Quotation Template",
+        compute='_compute_sale_order_template_id',
+        store=True, readonly=False, check_company=True, precompute=True,
+        domain="['|', ('company_id', '=', False), ('company_id', '=', company_id)]")
+    
+
+    def _compute_sale_order_template_id(self):
+        for order in self:
+            company_template = order.company_id.sale_order_template_id
+            if company_template and order.sale_order_template_id != company_template:
+                if 'website_id' in self._fields and order.website_id:
+                    # don't apply quotation template for order created via eCommerce
+                    continue
+                order.sale_order_template_id = order.company_id.sale_order_template_id.id
+
+
+    @api.onchange('sale_order_template_id')
+    def _onchange_sale_order_template_id(self):
+        if not self.sale_order_template_id:
+            return
+
+        sale_order_template = self.sale_order_template_id.with_context(lang=self.partner_id.lang)
+
+        order_lines_data = [fields.Command.clear()]
+        order_lines_data += [
+            fields.Command.create(line._prepare_order_line_values(is_inter_company=True))
+            for line in sale_order_template.sale_order_template_line_ids
+        ]
+
+        # set first line to sequence -99, so a resequence on first page doesn't cause following page
+        # lines (that all have sequence 10 by default) to get mixed in the first page
+        if len(order_lines_data) >= 2:
+            order_lines_data[1][2]['sequence'] = -99
+
+        self.ks_multicompany_transfer_stock_ids = order_lines_data
+
+
+
     name = fields.Char(readonly=True, copy=False)
     ks_transfer_to = fields.Many2one('res.company', string='Company To', required=True, track_visibility="always")
     ks_transfer_to_location = fields.Many2one('stock.location', string='Destination Location', required=True)
@@ -382,3 +423,21 @@ class KsStockTransferMultiCompany(models.Model):
                             self.env['stock.quant']._update_reserved_quantity(ks_move_line.ks_product_id, ks_move_line.ks_location_id, -ks_move_line.ks_product_qty, lot_id=False, strict=True)
                         else:
                             raise
+
+
+
+class SaleOrderTemplateLine(models.Model):
+    _inherit = 'sale.order.template.line'
+
+    def _prepare_order_line_values(self, is_inter_company= False):
+        res = super()._prepare_order_line_values()
+        if is_inter_company:
+            res.pop('display_type', None)  # Safely remove 'display_type' if it exists
+            res.pop('name', None)
+            res.pop('product_uom_qty', None)
+            res.pop('product_uom', None)
+            res.pop('sequence', None)
+            
+
+
+        return res

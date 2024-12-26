@@ -49,6 +49,8 @@
                                    readonly="state in ('in_progress', 'posted')" options="{'no_create_edit':True}"/>
                             <field name="ks_schedule_date" readonly="state in 'posted'"
                             />
+                             <field name="sale_order_template_id"  options="{'no_create': True}" readonly="state == 'posted'"/>
+
                             <field name="ks_memo_for_transfer" readonly="state in 'posted'"
                             />
                         </group>
