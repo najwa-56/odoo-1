@@ -49,12 +49,16 @@
                                    readonly="state in ('in_progress', 'posted')" options="{'no_create_edit':True}"/>
                             <field name="ks_schedule_date" readonly="state in 'posted'"
                             />
-                             <field name="sale_order_template_id"  options="{'no_create': True}" readonly="state == 'posted'"/>
+                             <field name="sale_order_template_id"  options="{'no_create': True}" readonly="state == 'posted'" required="(is_transfer_to_visible)"/>
 
                             <field name="ks_memo_for_transfer" readonly="state in 'posted'"
                             />
                         </group>
                         <group>
+                             <field name="is_transfer_to_visible" invisible="1"/> 
+                       
+
+                        
                             <field name="ks_transfer_to"
                                    readonly="state in 'posted'"
                                    options="{'no_create_edit':True}"
@@ -62,6 +66,10 @@
                             <field name="ks_transfer_to_location" domain="[('company_id','=',ks_transfer_to)]"
                                    readonly="state in 'posted'"
                                    options="{'no_create_edit':True}"/>
+
+                                    <field name="transfer_to" 
+                                invisible="(not is_transfer_to_visible)" 
+                                required="(is_transfer_to_visible)" />
                         </group>
                     </group>
                     <field name="ks_multicompany_transfer_stock_ids" readonly="state in ('in_progress', 'posted')">

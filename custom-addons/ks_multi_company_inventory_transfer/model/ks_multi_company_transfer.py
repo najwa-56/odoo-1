@@ -9,12 +9,35 @@ class KsStockTransferMultiCompany(models.Model):
     _inherit = ['mail.thread', 'mail.activity.mixin']
     _order = 'create_date desc'
 
+    @api.model
+    def default_get(self, fields_list):
+        res = super().default_get(fields_list)
+
+        # Set ks_transfer_from to the company with company_registry 1131056851
+        company = self.env['res.company'].sudo().search([('company_registry', '=', '1131056851')], limit=1)
+        if company:
+            res['ks_transfer_from'] = company.id
+
+            # Set ks_transfer_from_location based on the company and is_from_inter = True
+            location = self.env['stock.location'].sudo().search([
+                ('is_from_inter', '=', True),
+                ('company_id', '=', company.id)
+            ], limit=1)
+            if location:
+                res['ks_transfer_from_location'] = location.id
+
+        return res
+
+    
+    
+
+
 
     sale_order_template_id = fields.Many2one(
         comodel_name='sale.order.template',
         string="Quotation Template",
         compute='_compute_sale_order_template_id',
-        store=True, readonly=False,required=True)
+        store=True, readonly=False,)
     
 
     def _compute_sale_order_template_id(self):
@@ -63,6 +86,41 @@ class KsStockTransferMultiCompany(models.Model):
                                                          'ks_multicompany_transfer_id')
     ks_stock_picking_ids = fields.Many2many('stock.picking')
 
+    transfer_to = fields.Selection([
+        ('brek', 'Al Brek'),
+        ('abobaker', 'Abo Baker'),
+        ('zolfie', 'Al Zolfie'),
+    ], string='Transfer To' )
+
+    is_transfer_to_visible = fields.Boolean(string="Is Transfer To Visible", compute="_compute_is_transfer_to_visible")
+
+    @api.depends('ks_transfer_to')
+    def _compute_is_transfer_to_visible(self):
+        for record in self:
+            record.is_transfer_to_visible = record.ks_transfer_to.company_registry == '1131021506'
+
+
+    @api.onchange('ks_transfer_to', 'transfer_to')
+    def _onchange_transfer_to(self):
+        """
+        Set ks_transfer_to_location based on the selected transfer_to value
+        and the company registry of ks_transfer_to.
+        """
+        if self.ks_transfer_to:
+            if self.ks_transfer_to.company_registry == '1131021506':
+                if self.transfer_to:
+                    self.ks_transfer_to_location = self.env['stock.location'].sudo().search([
+                        ('transfer_to', '=', self.transfer_to),
+                        ('company_id', '=', self.ks_transfer_to.id)
+                    ], limit=1)
+            else:
+                self.ks_transfer_to_location = self.env['stock.location'].sudo().search([
+                    ('is_inter', '=', True),
+                    ('company_id', '=', self.ks_transfer_to.id)
+                ], limit=1)
+
+
+
     @api.onchange('ks_transfer_to', 'ks_transfer_from')
     def ks_company_onchange(self):
         if self.ks_transfer_to_location.company_id.id != self.ks_transfer_to.id:
@@ -83,14 +141,14 @@ class KsStockTransferMultiCompany(models.Model):
 
         #  For Internal picking
         if self.ks_transfer_to.id == self.ks_transfer_from.id:
-            ks_internal_picking_type = self.env['stock.picking.type'].with_context(active_test=False).search([
+            ks_internal_picking_type = self.env['stock.picking.type'].with_context(active_test=False).sudo().search([
                ('code', '=', 'internal'),
                ('warehouse_id.company_id', '=', self.ks_transfer_from.id),
            ], limit=1)
 
             if not ks_internal_picking_type:
                 raise ValidationError("Internal Picking is not defined for %s" % (self.ks_transfer_to.name))
-            ks_internal_picking_id = self.env['stock.picking'].create({
+            ks_internal_picking_id = self.env['stock.picking'].sudo().create({
                 'picking_type_id': ks_internal_picking_type.id,
                 'location_id': self.ks_transfer_from_location.id,
                 'partner_id': self.ks_transfer_from.partner_id.id,
@@ -107,29 +165,29 @@ class KsStockTransferMultiCompany(models.Model):
             self.ks_stock_picking_ids = [(6, 0, [ks_internal_picking_id.id])]
         else:
             # for another company picking
-            picking_type = self.env['stock.picking.type'].search([
+            picking_type = self.env['stock.picking.type'].sudo().search([
                 ('code', '=', 'outgoing'),
                 ('warehouse_id.company_id', '=', self.ks_transfer_from.id),
             ], limit=1)
             if not picking_type:
                 raise ValidationError("Outgoing Picking is not defined for %s" % (self.ks_transfer_from.name))
 
-            ks_location = self.env['stock.location'].search([('usage', '=', 'transit')], order='company_id desc')
+            ks_location = self.env['stock.location'].sudo().search([('usage', '=', 'transit')], order='company_id desc')
             if not ks_location:
-                self.env['stock.location'].create({'name': _('Inter-warehouse transit'),
+                self.env['stock.location'].sudo().create({'name': _('Inter-warehouse transit'),
                                                    'usage': 'transit',
                                                    'company_id': False,
                                                    'location_id': False})
             outgoing_move_lines = self.ks_outgoing_move_line(self.ks_multicompany_transfer_stock_ids)
 
-            ks_picking_from_id = self.env['stock.picking'].create({
+            ks_picking_from_id = self.env['stock.picking'].sudo().create({
                 'picking_type_id': picking_type.id,
                 'location_id': self.ks_transfer_from_location.id,
                 'partner_id': self.ks_transfer_to.partner_id.id,
                 'scheduled_date': self.ks_schedule_date,
                 'move_ids': outgoing_move_lines,
                 'origin': self.name,
-                'location_dest_id': self.env['stock.location'].search([('usage', '=', 'transit'), '|',
+                'location_dest_id': self.env['stock.location'].sudo().search([('usage', '=', 'transit'), '|',
                                                                        (
                                                                        'company_id', '=', self.ks_transfer_from.id),
                                                                        ('company_id', '=', False),
@@ -146,7 +204,7 @@ class KsStockTransferMultiCompany(models.Model):
                     if wizard.dont_send_sms():
                         ks_picking_from_id.button_validate()
 
-            picking_incoming_id = self.env['stock.picking.type'].sudo().search([
+            picking_incoming_id = self.env['stock.picking.type'].sudo().sudo().search([
                 ('code', '=', 'incoming'),
                 ('warehouse_id.company_id', '=', self.ks_transfer_to.id),
             ], limit=1)
@@ -154,9 +212,9 @@ class KsStockTransferMultiCompany(models.Model):
                 raise ValidationError("Incoming Picking is not defined for %s" % (self.ks_transfer_to.name))
             incoming_move_lines = self.ks_incoming_move_line(self.ks_multicompany_transfer_stock_ids)
 
-            ks_picking_to_id = self.env['stock.picking'].create({
+            ks_picking_to_id = self.env['stock.picking'].sudo().create({
                 'picking_type_id': picking_incoming_id.id,
-                'location_id': self.env['stock.location'].search([('usage', '=', 'transit'), '|',
+                'location_id': self.env['stock.location'].sudo().search([('usage', '=', 'transit'), '|',
                                                                   ('company_id', '=', self.ks_transfer_to.id),
                                                                   ('company_id', '=', False),
 
@@ -177,13 +235,13 @@ class KsStockTransferMultiCompany(models.Model):
             self.ks_stock_picking_ids = [(6, 0, [ks_picking_from_id.id, ks_picking_to_id.id])]
     def ks_incoming_move_line(self, ks_multicompany_transfer_stock_ids):
         move_lines = []
-        ks_location = self.env['stock.location'].search([('usage', '=', 'transit')], order='company_id desc')
+        ks_location = self.env['stock.location'].sudo().search([('usage', '=', 'transit')], order='company_id desc')
         if not ks_location:
-            self.env['stock.location'].create({'name': _('Inter-warehouse transit'),
+            self.env['stock.location'].sudo().create({'name': _('Inter-warehouse transit'),
                                                'usage': 'transit',
                                                'company_id': False,
                                                'location_id': False})
-        picking_incoming_id = self.env['stock.picking.type'].sudo().search([
+        picking_incoming_id = self.env['stock.picking.type'].sudo().sudo().search([
                 ('code', '=', 'incoming'),
                 ('warehouse_id.company_id', '=', self.ks_transfer_to.id),
             ], limit=1)
@@ -194,7 +252,7 @@ class KsStockTransferMultiCompany(models.Model):
                     'product_id': rec.ks_product_id.id,
                     'product_uom_qty': 1,
                     'product_uom': rec.ks_product_uom_type.id,
-                    'location_id': self.env['stock.location'].search([('usage', '=', 'transit'), '|',
+                    'location_id': self.env['stock.location'].sudo().search([('usage', '=', 'transit'), '|',
                                                                   ('company_id', '=', self.ks_transfer_to.id),
                                                                   ('company_id', '=', False),
 
@@ -210,7 +268,7 @@ class KsStockTransferMultiCompany(models.Model):
                     'product_id': rec.ks_product_id.id,
                     'product_uom_qty': rec.ks_qty_transfer,
                     'product_uom': rec.ks_product_uom_type.id,
-                    'location_id': self.env['stock.location'].search([('usage', '=', 'transit'), '|',
+                    'location_id': self.env['stock.location'].sudo().search([('usage', '=', 'transit'), '|',
                                                                   ('company_id', '=', self.ks_transfer_to.id),
                                                                   ('company_id', '=', False),
 
@@ -225,13 +283,13 @@ class KsStockTransferMultiCompany(models.Model):
 
     def ks_outgoing_move_line(self, ks_multicompany_transfer_stock_ids):
         move_lines = []
-        ks_location = self.env['stock.location'].search([('usage', '=', 'transit')], order='company_id desc')
+        ks_location = self.env['stock.location'].sudo().search([('usage', '=', 'transit')], order='company_id desc')
         if not ks_location:
-            self.env['stock.location'].create({'name': _('Inter-warehouse transit'),
+            self.env['stock.location'].sudo().create({'name': _('Inter-warehouse transit'),
                                                'usage': 'transit',
                                                'company_id': False,
                                                'location_id': False})
-        picking_type = self.env['stock.picking.type'].search([
+        picking_type = self.env['stock.picking.type'].sudo().search([
             ('code', '=', 'outgoing'),
             ('warehouse_id.company_id', '=', self.ks_transfer_from.id),
         ], limit=1)
@@ -243,7 +301,7 @@ class KsStockTransferMultiCompany(models.Model):
                     'product_uom_qty': 1,
                     'product_uom': rec.ks_product_uom_type.id,
                     'location_id': self.ks_transfer_from_location.id,
-                    'location_dest_id': self.env['stock.location'].search([('usage', '=', 'transit'), '|',
+                    'location_dest_id': self.env['stock.location'].sudo().search([('usage', '=', 'transit'), '|',
                                                                            (
                                                                            'company_id', '=', self.ks_transfer_from.id),
                                                                            ('company_id', '=', False),
@@ -261,7 +319,7 @@ class KsStockTransferMultiCompany(models.Model):
                     'product_uom_qty': rec.ks_qty_transfer,
                     'product_uom': rec.ks_product_uom_type.id,
                     'location_id': self.ks_transfer_from_location.id,
-                    'location_dest_id': self.env['stock.location'].search([('usage', '=', 'transit'), '|',
+                    'location_dest_id': self.env['stock.location'].sudo().search([('usage', '=', 'transit'), '|',
                                                                            (
                                                                            'company_id', '=', self.ks_transfer_from.id),
                                                                            ('company_id', '=', False),
@@ -299,9 +357,9 @@ class KsStockTransferMultiCompany(models.Model):
                         'location_dest_id': self.ks_transfer_to_location.id,
                     }))
         else:
-            ks_location = self.env['stock.location'].search([('usage', '=', 'transit')], order='company_id desc')
+            ks_location = self.env['stock.location'].sudo().search([('usage', '=', 'transit')], order='company_id desc')
             if not ks_location:
-                self.env['stock.location'].create({'name': _('Inter-warehouse transit'),
+                self.env['stock.location'].sudo().create({'name': _('Inter-warehouse transit'),
                                                    'usage': 'transit',
                                                    'company_id': False,
                                                    'location_id': False})
@@ -313,7 +371,7 @@ class KsStockTransferMultiCompany(models.Model):
                         'product_uom_qty': 1,
                         'product_uom': rec.ks_product_uom_type.id,
                         'location_id': self.ks_transfer_from_location.id,
-                        'location_dest_id': self.env['stock.location'].search([('usage', '=', 'transit'),
+                        'location_dest_id': self.env['stock.location'].sudo().search([('usage', '=', 'transit'),
                                                                        (
                                                                        'company_id', '=', self.ks_transfer_from.id),
 
@@ -327,7 +385,7 @@ class KsStockTransferMultiCompany(models.Model):
                         'product_uom_qty': rec.ks_qty_transfer,
                         'product_uom': rec.ks_product_uom_type.id,
                         'location_id': self.ks_transfer_from_location.id,
-                        'location_dest_id': self.env['stock.location'].search([('usage', '=', 'transit'), '|',
+                        'location_dest_id': self.env['stock.location'].sudo().search([('usage', '=', 'transit'), '|',
                                                                        (
                                                                        'company_id', '=', self.ks_transfer_from.id),
                                                                        ('company_id', '=', False),
