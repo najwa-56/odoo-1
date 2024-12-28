@@ -25,5 +25,9 @@
                 </main>
             </t>
         </xpath>
+
+                 <xpath expr="//footer/div[2]" position="replace">
+    </xpath>
+    
     </t>
 </templates>
