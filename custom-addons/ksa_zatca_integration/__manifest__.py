@@ -14,7 +14,7 @@
     'category': 'Invoicing',
     'version': '17.11.0',
     'price': 700, 'currency': 'USD',
-    'depends': ['account', 'sale', 'l10n_sa', 'purchase', 'account_debit_note', 'account_edi_ubl_cii'],
+    'depends': ['account', 'sale', 'l10n_sa', 'purchase', 'account_debit_note', 'account_edi_ubl_cii','bi_sale_purchase_discount_with_tax'],
     'external_dependencies': {
         'python': ['cryptography', 'lxml', 'qrcode', 'fonttools']
     },
