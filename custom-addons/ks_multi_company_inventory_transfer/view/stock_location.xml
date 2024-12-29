@@ -8,6 +8,8 @@
             <xpath expr="//field[@name='return_location']" position='after'>
                 <field name="is_inter"  invisible="usage != 'internal'"/>
                 <field name="is_from_inter"  invisible="usage != 'internal'"/>
+                 <field name="is_inter_dolfin"  invisible="usage != 'internal'"/>
+                
                 <field name="transfer_to"  invisible="usage != 'internal'"/>
               
             </xpath>
