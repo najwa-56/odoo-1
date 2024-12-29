@@ -249,11 +249,11 @@ class KsStockTransferMultiCompany(models.Model):
                 for move_line, stock_line in zip(ks_picking_to_id.move_ids, self.ks_multicompany_transfer_stock_ids):
                     move_line.write({'quantity_done': stock_line.ks_reserved_availability})
             self.ks_update_lot_serial(ks_picking_to_id, self.ks_multicompany_transfer_stock_ids)
-            # ks_picking_to_id.button_validate()
+            ks_picking_to_id.button_validate()
             self.state = 'posted'
             self.ks_stock_picking_ids = [(6, 0, [ks_picking_from_id.id, ks_picking_to_id.id])]
 
-
+            
     def ks_incoming_move_line(self, ks_multicompany_transfer_stock_ids):
         move_lines = []
         ks_location = self.env['stock.location'].sudo().search([('usage', '=', 'transit')], order='company_id desc')
