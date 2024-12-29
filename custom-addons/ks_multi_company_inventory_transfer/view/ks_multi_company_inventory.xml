@@ -70,6 +70,10 @@
                                     <field name="transfer_to" 
                                 invisible="(not is_transfer_to_visible)" 
                                 required="(is_transfer_to_visible)" />
+                                
+                                  <field name="transfer_type" 
+                                     invisible="(not is_transfer_to_visible)" 
+                                required="(is_transfer_to_visible)" />
                         </group>
                     </group>
                     <field name="ks_multicompany_transfer_stock_ids" readonly="state in ('in_progress', 'posted')">

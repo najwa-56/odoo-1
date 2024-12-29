@@ -18,13 +18,13 @@ class KsStockTransferMultiCompany(models.Model):
         if company:
             res['ks_transfer_from'] = company.id
 
-            # Set ks_transfer_from_location based on the company and is_from_inter = True
-            location = self.env['stock.location'].sudo().search([
-                ('is_from_inter', '=', True),
-                ('company_id', '=', company.id)
-            ], limit=1)
-            if location:
-                res['ks_transfer_from_location'] = location.id
+            # # Set ks_transfer_from_location based on the company and is_from_inter = True
+            # location = self.env['stock.location'].sudo().search([
+            #     ('is_inter', '=', True),
+            #     ('company_id', '=', company.id)
+            # ], limit=1)
+            # if location:
+            #     res['ks_transfer_from_location'] = location.id
 
         return res
 
@@ -93,6 +93,25 @@ class KsStockTransferMultiCompany(models.Model):
     ], string='Transfer To' )
 
     is_transfer_to_visible = fields.Boolean(string="Is Transfer To Visible", compute="_compute_is_transfer_to_visible")
+
+    transfer_type = fields.Selection([
+        ('raw', 'Raw'),
+        ('product', 'Product'),
+    ], string='Transfer Type' )
+
+    @api.onchange('ks_transfer_to', 'transfer_type')
+    def _onchange_transfer_type(self):
+        """
+        Set ks_transfer_to_location based on the selected transfer_to value
+        and the company registry of ks_transfer_to.
+        """
+        if self.transfer_type:
+            if self.ks_transfer_from.company_registry == '1131056851':
+                self.ks_transfer_from_location = self.env['stock.location'].sudo().search([
+                    ('transfer_type', '=', self.transfer_type),
+                    ('company_id', '=', self.ks_transfer_from.id)
+                ], limit=1)
+
 
     @api.depends('ks_transfer_to')
     def _compute_is_transfer_to_visible(self):
@@ -230,9 +249,11 @@ class KsStockTransferMultiCompany(models.Model):
                 for move_line, stock_line in zip(ks_picking_to_id.move_ids, self.ks_multicompany_transfer_stock_ids):
                     move_line.write({'quantity_done': stock_line.ks_reserved_availability})
             self.ks_update_lot_serial(ks_picking_to_id, self.ks_multicompany_transfer_stock_ids)
-            ks_picking_to_id.button_validate()
+            # ks_picking_to_id.button_validate()
             self.state = 'posted'
             self.ks_stock_picking_ids = [(6, 0, [ks_picking_from_id.id, ks_picking_to_id.id])]
+
+
     def ks_incoming_move_line(self, ks_multicompany_transfer_stock_ids):
         move_lines = []
         ks_location = self.env['stock.location'].sudo().search([('usage', '=', 'transit')], order='company_id desc')
