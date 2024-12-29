@@ -64,7 +64,7 @@ class StockLocation(models.Model):
 
     is_inter = fields.Boolean('Factory Source Location?')
     is_inter_dolfin = fields.Boolean('Dolfin Location?')
-    is_from_inter = fields.Boolean('Factory Destination Location?')
+    is_from_inter = fields.Boolean('Factory Dolfin Location?')
     
 
     transfer_to = fields.Selection([
