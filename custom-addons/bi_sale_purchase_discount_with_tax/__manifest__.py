@@ -119,6 +119,7 @@ and Percentage wise as well as for the Invoice.
     'data': [
         'views/sale_view.xml',
         'views/purchase_view.xml',
+        'views/purchase_line.xml',
         'report/inherit_sale_report.xml',
         'report/inherit_account_report.xml',
         'report/inherit_purchase_report.xml',
