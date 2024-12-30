@@ -405,6 +405,8 @@ class account_move(models.Model):
         res_config = self.env.company
         account = False
         for res in result:
+            if res.discount_amt < 1 :
+                return result
             if res.move_type in ['in_invoice', 'in_receipt', 'in_refund']:
                 account = res_config.purchase_account_id.id
                 if not account:
