@@ -53,7 +53,7 @@ class StockPicking(models.Model):
                 })
 
                 transfer_id.ks_check_availability()
-                transfer_id.ks_confirm_inventory_transfer()
+                # transfer_id.ks_confirm_inventory_transfer()
 
         return res
 
