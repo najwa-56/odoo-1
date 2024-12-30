@@ -36,6 +36,13 @@ class SaleOrder(models.Model):
                 order._create_invoices()
             if warehouse.validate_invoice and order.invoice_ids:
                 for invoice in order.invoice_ids:
+                    journal_id = self.env['account.journal'].search([('is_dolfin','=',True)])
+                    if not journal_id:
+                        raise UserError("No Jouranl with is_dolfin is set")
+                    if journal_id:
+                        invoice.write({
+                            'journal_id':journal_id.id
+                        })
                     invoice.action_post()
 
                     payment_register = self.env['account.payment.register'].with_context(active_model='account.move',active_ids=invoice.ids).create(
