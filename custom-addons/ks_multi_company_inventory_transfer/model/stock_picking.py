@@ -28,8 +28,17 @@ class StockPicking(models.Model):
                     ('company_id', '=', destination_company.id)
                 ], limit=1)
 
+                source_location = self.env['stock.location'].sudo().search([
+                    ('is_from_inter', '=', True),
+                    ('company_id', '=', picking.company_id.id)
+                ], limit=1)
+
                 if not destination_location:
                     raise UserError("No destination location found with for Dolfin")
+
+                
+                if not source_location:
+                    raise UserError("No Source location found with for Dolfin")
 
                 # Prepare lines for the transfer
                 transfer_lines = []
@@ -45,14 +54,14 @@ class StockPicking(models.Model):
                     'ks_transfer_to': destination_company.id,
                     'ks_transfer_to_location': destination_location.id,
                     'ks_transfer_from': picking.company_id.id,
-                    'ks_transfer_from_location': picking.location_id.id,
+                    'ks_transfer_from_location': source_location.id,
                     'ks_memo_for_transfer': f"Transfer from Picking {picking.name}",
                     'ks_schedule_date': fields.Date.today(),
                     'ks_multicompany_transfer_stock_ids': transfer_lines,
                     'state': 'draft',
                 })
 
-                transfer_id.ks_check_availability()
+                # transfer_id.ks_check_availability()
                 # transfer_id.ks_confirm_inventory_transfer()
 
         return res
