@@ -447,8 +447,6 @@ class purchase_order_line(models.Model):
     discount_type = fields.Selection(related='order_id.discount_type', string="Discount Applies to")
     discount_amount = fields.Float('Discount Amount')
     discount_amt = fields.Float('Discount Final Amount')
-    amount_before_discount = fields.Monetary("Amount Before Discount",compute="_calculate_amount_before_discount",readonly=True)
-    fixed_discount = fields.Monetary("Fixed Discount",compute="_calculate_fixed_discount",readonly=True)
 
     @api.depends('product_qty','price_unit')
     def _calculate_amount_before_discount(self):
@@ -456,26 +454,7 @@ class purchase_order_line(models.Model):
            line.amount_before_discount = line.product_qty * line.price_unit
 
     
-    @api.depends('discount_method','price_subtotal','discount_type','discount_amount','price_total')
-    def _calculate_fixed_discount(self):
-        res_config= self.env.company
-        self.fixed_discount = 0
-        for line in self:
-            if line.discount_amount > 0 :
-                if line.discount_method == 'per':
-                    if res_config.tax_discount_policy == 'untax':
-                        line.fixed_discount = (line.price_subtotal * line.discount_amount) / (100 - line.discount_amount)
-                    else:
-                        line.fixed_discount = (line.price_total * line.discount_amount) / (100 - line.discount_amount)
-
-                elif line.discount_method == 'fix':
-                    if res_config.tax_discount_policy == 'untax':
-                        line.fixed_discount = (line.discount_amount * 100) / (line.price_subtotal + line.discount_amount)
-                    else:
-                        line.fixed_discount = (line.discount_amount * 100) / (line.price_total + line.discount_amount)
-                else:
-                    line.fixed_discount = 0
-                
+  
     
 
     @api.depends('product_qty','price_unit','taxes_id','discount_method')

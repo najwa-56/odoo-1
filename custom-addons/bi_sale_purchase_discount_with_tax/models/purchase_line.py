@@ -24,25 +24,30 @@ class purchase_order_line(models.Model):
            line.amount_before_discount = line.product_qty * line.price_unit
 
     
-    @api.depends('discount_method','price_subtotal','discount_type','discount_amount','price_total')
+    @api.depends('discount_method', 'price_subtotal', 'discount_type', 'discount_amount', 'price_total')
     def _calculate_fixed_discount(self):
-        res_config= self.env.company
+        res_config = self.env.company
         self.fixed_discount = 0
         for line in self:
-            if line.discount_amount > 0 :
+            if line.discount_amount > 0:
                 if line.discount_method == 'per':
                     if res_config.tax_discount_policy == 'untax':
-                        line.fixed_discount = (line.price_subtotal * line.discount_amount) / (100 - line.discount_amount)
+                        divisor = 100 - line.discount_amount
+                        line.fixed_discount = (line.price_subtotal * line.discount_amount) / divisor if divisor != 0 else 0
                     else:
-                        line.fixed_discount = (line.price_total * line.discount_amount) / (100 - line.discount_amount)
+                        divisor = 100 - line.discount_amount
+                        line.fixed_discount = (line.price_total * line.discount_amount) / divisor if divisor != 0 else 0
 
                 elif line.discount_method == 'fix':
                     if res_config.tax_discount_policy == 'untax':
-                        line.fixed_discount = (line.discount_amount * 100) / (line.price_subtotal + line.discount_amount)
+                        divisor = line.price_subtotal + line.discount_amount
+                        line.fixed_discount = (line.discount_amount * 100) / divisor if divisor != 0 else 0
                     else:
-                        line.fixed_discount = (line.discount_amount * 100) / (line.price_total + line.discount_amount)
+                        divisor = line.price_total + line.discount_amount
+                        line.fixed_discount = (line.discount_amount * 100) / divisor if divisor != 0 else 0
                 else:
                     line.fixed_discount = 0
+
                 
 
 
@@ -58,22 +63,26 @@ class AccountMoveLine(models.Model):
            line.amount_before_discount = line.quantity * line.price_unit
 
     
-    @api.depends('discount_method','price_subtotal','discount_type','discount_amount','price_total')
+    @api.depends('discount_method', 'price_subtotal', 'discount_type', 'discount_amount', 'price_total')
     def _calculate_fixed_discount(self):
-        res_config= self.env.company
+        res_config = self.env.company
         self.fixed_discount = 0
         for line in self:
-            if line.discount_amount > 0 :
+            if line.discount_amount > 0:
                 if line.discount_method == 'per':
                     if res_config.tax_discount_policy == 'untax':
-                        line.fixed_discount = (line.price_subtotal * line.discount_amount) / (100 - line.discount_amount)
+                        divisor = 100 - line.discount_amount
+                        line.fixed_discount = (line.price_subtotal * line.discount_amount) / divisor if divisor != 0 else 0
                     else:
-                        line.fixed_discount = (line.price_total * line.discount_amount) / (100 - line.discount_amount)
+                        divisor = 100 - line.discount_amount
+                        line.fixed_discount = (line.price_total * line.discount_amount) / divisor if divisor != 0 else 0
 
                 elif line.discount_method == 'fix':
                     if res_config.tax_discount_policy == 'untax':
-                        line.fixed_discount = (line.discount_amount * 100) / (line.price_subtotal + line.discount_amount)
+                        divisor = line.price_subtotal + line.discount_amount
+                        line.fixed_discount = (line.discount_amount * 100) / divisor if divisor != 0 else 0
                     else:
-                        line.fixed_discount = (line.discount_amount * 100) / (line.price_total + line.discount_amount)
+                        divisor = line.price_total + line.discount_amount
+                        line.fixed_discount = (line.discount_amount * 100) / divisor if divisor != 0 else 0
                 else:
                     line.fixed_discount = 0
