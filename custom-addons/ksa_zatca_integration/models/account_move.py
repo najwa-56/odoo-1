@@ -1785,7 +1785,8 @@ class AccountMove(models.Model):
                     and record.l10n_sa_invoice_type and record.l10n_sa_phase1_end_date and record.invoice_date > record.l10n_sa_phase1_end_date):
                 if (record.move_type in ['in_invoice', 'in_refund'] and record.l10n_is_self_billed_invoice) or record.move_type in ['out_invoice', 'out_refund']:
                     record.create_xml_file()
-                    if record.company_id.parent_root_id.zatca_send_from_pos:
+                    
+                    if record.company_id.parent_root_id.zatca_send_from_pos and not record.partner_id.is_dolfin:
                         if record.l10n_sa_invoice_type == 'Standard':
                             record.send_for_clearance()
                         elif record.l10n_sa_invoice_type == 'Simplified':

@@ -110,6 +110,7 @@
                 <field name="ks_transfer_to" string="Branch To"/>
                 <field name="ks_schedule_date"/>
                 <field name="ks_memo_for_transfer"/>
+                <field name="state"/>
             </tree>
         </field>
     </record>
