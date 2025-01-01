@@ -8,6 +8,9 @@ from itertools import groupby
 from odoo.exceptions import RedirectWarning, UserError, ValidationError, AccessError
 from odoo.tools.misc import formatLang
 from odoo.tools import DEFAULT_SERVER_DATETIME_FORMAT, get_lang
+from odoo import api, fields, tools, models, _
+
+
 
 class purchase_order(models.Model):
     _inherit = 'purchase.order'
@@ -24,28 +27,29 @@ class purchase_order(models.Model):
             applied_discount = line_discount = sums = order_discount =  amount_untaxed = amount_tax = amount_after_discount =  0.0
             if res_config.tax_discount_policy:
                 if res_config.tax_discount_policy == 'tax':
-                    if order.discount_method == 'fix':
-                        discount = order.discount_amount
-                        res = discount
-                    elif order.discount_method == 'per':
-                        total_amount_untax = sum(order.order_line.mapped('price_subtotal'))
-                        discount = (total_amount_untax + order.amount_tax) * (order.discount_amount/ 100)
-                        res = discount
-                    else:
-                        res = discount
+                    if order.discount_type == 'line':
+                        for line in order.order_line:
+                            amount_untaxed += line.price_subtotal
+                            amount_tax += line.price_tax
+                            applied_discount += line.discount_amt
+                
+                            if line.discount_method == 'fix':
+                                line_discount += line.discount_amount
+                                res = line_discount
+                            elif line.discount_method == 'per':
+                                tax = line.com_tax()
+                                line_discount +=(line.price_subtotal+tax) * (line.discount_amount/ 100)
+                                
+                                res = line_discount
 
-                    for line in order.order_line:
-                        amount_untaxed += line.price_subtotal
-                        amount_tax += line.price_tax
-                        applied_discount += line.discount_amt
-            
-                        if line.discount_method == 'fix':
-                            line_discount += line.discount_amount
-                            res = line_discount
-                        elif line.discount_method == 'per':
-                            tax = line.com_tax()
-                            line_discount +=(line.price_subtotal+tax) * (line.discount_amount/ 100)
-                            res = line_discount  
+                    if order.discount_type == 'global':
+                        if order.discount_method == 'fix':
+                            discount = order.discount_amount
+                            res = discount
+                        elif order.discount_method == 'per':
+                            total_amount_untax = sum(order.order_line.mapped('price_subtotal'))
+                            discount = (total_amount_untax + order.amount_tax) * (order.discount_amount/ 100)
+                            res = discount
                 else:
                     for line in order.order_line:
                         amount_untaxed += line.price_subtotal
@@ -118,11 +122,10 @@ class purchase_order(models.Model):
 
         return res
 
-
     @api.depends('order_line','order_line.price_total','order_line.price_subtotal',\
     'order_line.product_qty','discount_amount',\
     'discount_method','discount_type' ,'order_line.discount_amount',\
-    'order_line.discount_method','order_line.discount_amt','order_line.price_unit')
+    'order_line.discount_method','order_line.discount_amt')
     def _amount_all(self):
         """
         Compute the total amounts of the SO.
@@ -130,18 +133,17 @@ class purchase_order(models.Model):
         res_config= self.env.company
         cur_obj = self.env['res.currency']
         for order in self:  
-            applied_discount = 0.0                    
             applied_discount = line_discount = sums = order_discount =  amount_untaxed = amount_tax = amount_after_discount =  0.0
             for line in order.order_line:
                 amount_untaxed += line.price_subtotal
                 amount_tax += line.price_tax
                 applied_discount += line.discount_amt
-            
+
                 if line.discount_method == 'fix':
                     line_discount += line.discount_amount
                 elif line.discount_method == 'per':
                     tax = line.com_tax()
-                    line_discount += (line.price_subtotal + tax) * (line.discount_amount/ 100)            
+                    line_discount += (line.price_subtotal+tax) * (line.discount_amount/ 100)           
 
             if res_config.tax_discount_policy:
                 if res_config.tax_discount_policy == 'tax':
@@ -153,13 +155,14 @@ class purchase_order(models.Model):
                             'amount_total': amount_untaxed + amount_tax - line_discount,
                             'discount_amt_line' : line_discount,
                         })
+
                     elif order.discount_type == 'global':
                         order.discount_amt_line = 0.00
                         
                         if order.discount_method == 'per':
-                            order_discount = (amount_untaxed + amount_tax) * (order.discount_amount / 100)  
+                            order_discount = (amount_untaxed + amount_tax)* (order.discount_amount / 100)
                             order.update({
-                                'amount_untaxed': amount_untaxed - order_discount,
+                                'amount_untaxed': order.amount_untaxed -order_discount,
                                 'amount_tax': amount_tax,
                                 'amount_total': amount_untaxed + amount_tax - order_discount,
                                 'discount_amt' : order_discount,
@@ -245,7 +248,7 @@ class purchase_order(models.Model):
                                 'discount_amt' : order_discount,
                                 'config_tax': sums,
                             })
-                          
+
                     else:
                         order.update({
                             'amount_untaxed': amount_untaxed,
@@ -265,8 +268,6 @@ class purchase_order(models.Model):
                     'amount_total': amount_untaxed + amount_tax ,
                     })
 
-    
-
     def _prepare_invoice(self):
         invoice_vals = super(purchase_order, self)._prepare_invoice()
         invoice_vals.update({
@@ -279,8 +280,6 @@ class purchase_order(models.Model):
             'amount_total': self.amount_total,
             })
         return invoice_vals
-
-     
 
     def action_create_invoices(self, grouped=False, final=False):
         res = super(purchase_order,self).action_create_invoices(grouped=grouped, final=final)
@@ -300,9 +299,7 @@ class purchase_order(models.Model):
                     'discount_amount':0.0,
                     'discount_amt' : 0.0,})
 
-
         return res
-
 
     @api.depends('discount_type','discount_amt','discount_amt_line')
     def _calculate_report_total(self):
@@ -318,20 +315,15 @@ class purchase_order(models.Model):
                     'report_total' : order.amount_untaxed - order.discount_amt_line
                 })
 
-        
     discount_method = fields.Selection([('fix', 'Fixed'), ('per', 'Percentage')], 'Discount Method',default='fix')
     discount_amount = fields.Float('Discount Amount',default=0.0)
     discount_amt = fields.Monetary(compute='_amount_all',store=True,string='- Discount',readonly=True)
     discount_type = fields.Selection([('line', 'Order Line'), ('global', 'Global')],string='Discount Applies to',default='global')
     discount_amt_line = fields.Monetary(compute='_amount_all', string='- Line Discount',store=True, readonly=True)
-
-
     config_tax = fields.Monetary(string="total disc tax",compute="_amount_all",store=True)
     report_total = fields.Monetary("Report Untaxed Amount",compute="_calculate_report_total",readonly=True)
 
-
-
-    @api.depends('order_line.taxes_id','order_line.price_unit', 'amount_total', 'amount_untaxed','discount_amount')
+    @api.depends('order_line.taxes_id', 'order_line.price_unit', 'amount_total', 'amount_untaxed', 'discount_amount', 'config_tax')
     def _compute_tax_totals(self):
         res_config= self.env.company
         for order in self:
@@ -347,11 +339,9 @@ class purchase_order(models.Model):
                 
                 if tax_totals.get('amount_untaxed'):
                     tax_totals['amount_untaxed'] = tax_totals['amount_untaxed'] - res
-            
                 if tax_totals.get('formatted_amount_total'):
-                    format_tax_total = tax_totals['amount_untaxed']  + order.amount_tax
+                    format_tax_total = tax_totals['amount_untaxed'] + order.amount_tax
                     tax_totals['formatted_amount_total'] = formatLang(self.env, format_tax_total, currency_obj=self.currency_id)
-            
             if res_config.tax_discount_policy == 'untax' and order.discount_type =="global":
                 if res_config.tax_discount_policy == 'untax':
                     if tax_totals.get('amount_untaxed'):
@@ -373,7 +363,6 @@ class purchase_order(models.Model):
                         format_total = tax_totals['amount_untaxed']
                         tax_totals['formatted_amount_untaxed'] = formatLang(self.env, format_total, currency_obj=self.currency_id)
 
-    
             groups_by_subtotal = tax_totals.get('groups_by_subtotal', {})
             if bool(groups_by_subtotal):
                 _untax_amount = groups_by_subtotal.get('Untaxed Amount', [])
@@ -436,8 +425,8 @@ class purchase_order(models.Model):
                         tax_totals.get('subtotals', {})[_tax].update({
                             'formatted_amount' : formatLang(self.env, format_total, currency_obj=self.currency_id)
                         })
-                
             order.tax_totals = tax_totals
+
 
 class purchase_order_line(models.Model):
     _inherit = 'purchase.order.line'
@@ -448,16 +437,37 @@ class purchase_order_line(models.Model):
     discount_amount = fields.Float('Discount Amount')
     discount_amt = fields.Float('Discount Final Amount')
 
+    amount_before_discount = fields.Float("Amount Before Discount",compute="_calculate_amount_before_discount",readonly=True)
+    fixed_discount = fields.Float("Fixed Discount",compute="_calculate_fixed_discount",readonly=True)
+
     @api.depends('product_qty','price_unit')
     def _calculate_amount_before_discount(self):
         for line in self:
            line.amount_before_discount = line.product_qty * line.price_unit
 
     
-  
-    
+    @api.depends('discount_method','price_subtotal','discount_type','discount_amount','price_total')
+    def _calculate_fixed_discount(self):
+        res_config= self.env.company
+        self.fixed_discount = 0
+        for line in self:
+            if line.discount_amount > 0 :
+                if line.discount_method == 'per':
+                    if res_config.tax_discount_policy == 'untax':
+                        line.fixed_discount = (line.price_subtotal * line.discount_amount) / (100 - line.discount_amount)
+                    else:
+                        line.fixed_discount = (line.price_total * line.discount_amount) / (100 - line.discount_amount)
 
-    @api.depends('product_qty','price_unit','taxes_id','discount_method')
+                elif line.discount_method == 'fix':
+                    if res_config.tax_discount_policy == 'untax':
+                        line.fixed_discount = (line.discount_amount * 100) / (line.price_subtotal + line.discount_amount)
+                    else:
+                        line.fixed_discount = (line.discount_amount * 100) / (line.price_total + line.discount_amount)
+                else:
+                    line.fixed_discount = 0
+
+
+    @api.depends('product_qty','price_unit','taxes_id','discount_amount')
     def com_tax(self):
         tax_total = 0.0
         tax = 0.0
@@ -505,7 +515,6 @@ class purchase_order_line(models.Model):
                             })
                     
                         else:
-                            
                             price = line.price_unit * (1 - (line.discount or 0.0) / 100.0)
                             taxes = line.taxes_id.compute_all(price, line.order_id.currency_id, line.product_qty, product=line.product_id)
                             line.update({
@@ -514,9 +523,7 @@ class purchase_order_line(models.Model):
                                 'price_subtotal': taxes['total_excluded'],
                             })
                     else:
-                        
                         price = line.price_unit * (1 - (line.discount or 0.0) / 100.0)
-                        
                         taxes = line.taxes_id.compute_all(price, line.order_id.currency_id, line.product_qty, product=line.product_id)
                         line.update({
                             'price_tax': sum(t.get('amount', 0.0) for t in taxes.get('taxes', [])),
@@ -527,7 +534,7 @@ class purchase_order_line(models.Model):
                     if line.discount_type == 'line':
                         price_x = 0.0
                         price = line.price_unit * (1 - (line.discount or 0.0) / 100.0)
-                        taxes = line.taxes_id.compute_all(price, line.order_id.currency_id, line.product_qty, product=line.product_id)
+                        taxes = line.taxes_id.compute_all(price, line.order_id.currency_id, line.product_qty, product=line.product_id, partner=line.order_id.partner_id)
 
                         if line.discount_method == 'fix':
                             price_x = (taxes['total_included']) - ( taxes['total_included'] - line.discount_amount)
@@ -535,6 +542,7 @@ class purchase_order_line(models.Model):
                             price_x = (taxes['total_included']) - (taxes['total_included'] * (1 - (line.discount_amount or 0.0) / 100.0))
                         else:
                             price_x = line.price_unit * (1 - (line.discount or 0.0) / 100.0)
+                
                         line.update({
                             'price_tax': sum(t.get('amount', 0.0) for t in taxes.get('taxes', [])),
                             'price_total': taxes['total_included'] - price_x,
@@ -543,7 +551,7 @@ class purchase_order_line(models.Model):
                         })
                     else:
                         price = line.price_unit * (1 - (line.discount or 0.0) / 100.0)
-                        taxes = line.taxes_id.compute_all(price, line.order_id.currency_id, line.product_qty, product=line.product_id)
+                        taxes = line.taxes_id.compute_all(price, line.order_id.currency_id, line.product_qty, product=line.product_id, partner=line.order_id.partner_id)
                         line.update({
                             'price_tax': sum(t.get('amount', 0.0) for t in taxes.get('taxes', [])),
                             'price_total': taxes['total_included'],
@@ -567,8 +575,7 @@ class purchase_order_line(models.Model):
                     'price_total': taxes['total_included'],
                     'price_subtotal': taxes['total_excluded'],
                 })
-    
-    
+
     def _convert_to_tax_base_line_dict(self):
         """ Convert the current record to a dictionary in order to use the generic taxes computation method
         defined on account.tax.
@@ -661,32 +668,7 @@ class purchase_order_line(models.Model):
             if not line.name or line.name in default_names:
                 product_ctx = {'seller_id': seller.id, 'lang': get_lang(line.env, line.partner_id.lang).code}
                 line.name = line._get_product_purchase_description(line.product_id.with_context(product_ctx))
-     
 
-   
-
-    # def _get_gross_price_unit(self):
-    #     self.ensure_one()
-    #     if self.discount_amount > 0 :
-    #         price_unit = self.price_unit
-
-    #         discount = self.fixed_discount
-    #         if self.discount_method == 'per':
-    #             discount = self.discount_amount
-
-    #         if discount > 0 :
-    #             price_unit = price_unit * (1 - discount / 100)
-    #         if self.taxes_id:
-    #             qty = self.product_qty or 1
-    #             price_unit_prec = self.env['decimal.precision'].precision_get('Product Price')
-    #             price_unit = self.taxes_id.with_context(round=False).compute_all(price_unit, currency=self.order_id.currency_id, quantity=qty, product=self.product_id)['total_void']
-    #             price_unit = float_round(price_unit / qty, precision_digits=price_unit_prec)
-    #         if self.product_uom.id != self.product_id.uom_id.id:
-    #             price_unit *= self.product_uom.factor / self.product_id.uom_id.factor
-    #         return price_unit
-
-    #     else:
-    #         return super(purchase_order_line,self)._get_gross_price_unit()
 
 class ResConfigSettings(models.TransientModel):
     _inherit = 'res.config.settings'
@@ -695,6 +677,7 @@ class ResConfigSettings(models.TransientModel):
     sale_account_id = fields.Many2one('account.account',string='Sale Discount Account',check_company=True,domain=[('account_type','=','income'), ('discount_account','=',True)],readonly=False,related='company_id.sale_account_id')
     purchase_account_id = fields.Many2one('account.account',string='Purchase Discount Account',check_company=True,domain=[('account_type','=','expense'), ('discount_account','=',True)],readonly=False,related='company_id.purchase_account_id')
 
+
 class Company(models.Model):
     _inherit = 'res.company'
 
@@ -702,4 +685,47 @@ class Company(models.Model):
         default_model='sale.order')
     sale_account_id = fields.Many2one('account.account',domain=[('account_type', '=', 'income'), ('discount_account','=',True)])
     purchase_account_id = fields.Many2one('account.account',domain=[('account_type','=','expense'), ('discount_account','=',True)])
- 
+
+
+
+
+
+class UoM(models.Model):
+    _inherit = 'uom.uom'
+
+    def _compute_quantity(self, qty, to_unit, round=True, rounding_method='UP', raise_if_failure=True):
+        
+        if self.env.context.get('params'):
+            params = self.env.context.get('params')
+            model = params.get('model')  # Get the model from the context
+            quotation_only = self.env.context.get('quotation_only')  # Check if 'quotation_only' is in the context
+
+            if model in ['purchase.order'] or quotation_only:
+                if not self or not qty:
+                    return qty
+                self.ensure_one()
+
+                if self != to_unit and self.category_id.id != to_unit.category_id.id:
+                    if raise_if_failure:
+                        raise UserError(_(
+                            'The unit of measure %s defined on the order line doesn\'t belong to the same category as the unit of measure %s defined on the product. Please correct the unit of measure defined on the order line or on the product, they should belong to the same category.',
+                            self.name, to_unit.name))
+                    else:
+                        return qty
+
+                if self == to_unit:
+                    amount = qty
+                else:
+                    amount = qty / self.factor
+                    if to_unit:
+                        amount = amount
+
+                if to_unit and round:
+                    amount = tools.float_round(amount, precision_rounding=to_unit.rounding, rounding_method=rounding_method)
+
+                return amount
+            
+        else:
+            return super()._compute_quantity(qty = qty, to_unit= to_unit, round=round, rounding_method=rounding_method, raise_if_failure=raise_if_failure)
+
+     

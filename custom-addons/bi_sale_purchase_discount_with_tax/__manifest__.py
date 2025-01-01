@@ -2,7 +2,7 @@
 # Part of BrowseInfo. See LICENSE file for full copyright and licensing details.
 {
     'name': 'Odoo Global Discount on Sale,Purchase & Invoice with Tax calculation',
-    'version': '17.0.0.5',
+    'version': '17.0.0.3',
     'category': 'Sales',
     'sequence': 14,
     'price': 55,
@@ -115,11 +115,10 @@ and Percentage wise as well as for the Invoice.
 
     'author': 'BROWSEINFO',
     'website': 'https://www.browseinfo.com/demo-request?app=bi_sale_purchase_discount_with_tax&version=17&edition=Community',
-    'depends': ['base','sale','sale_management','account','purchase','stock','purchase_stock'],
+    'depends': ['base','sale','sale_management','account','purchase','stock'],
     'data': [
-        'views/sale_view.xml',
+        # 'views/sale_view.xml',
         'views/purchase_view.xml',
-        'views/purchase_line.xml',
         'report/inherit_sale_report.xml',
         'report/inherit_account_report.xml',
         'report/inherit_purchase_report.xml',

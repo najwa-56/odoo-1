@@ -1,11 +1,9 @@
 # -*- coding: utf-8 -*-
 # Part of BrowseInfo. See LICENSE file for full copyright and licensing details.
-
-from . import sale
+#from . import sale
 from . import account_move
 from . import purchase
 from . import account_move_line
-from . import purchase_line
-# from . import stock
+from . import stock
 
 # vim:expandtab:smartindent:tabstop=4:softtabstop=4:shiftwidth=4:

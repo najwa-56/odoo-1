@@ -641,4 +641,3 @@ class ResConfigSettings(models.TransientModel):
     tax_discount_policy = fields.Selection(related='company_id.tax_discount_policy',readonly=False,string='Discount Applies On',default_model='sale.order')
     sale_account_id = fields.Many2one('account.account', 'Sale Discount Account',domain=[('user_type_id.name','=','Expenses'), ('discount_account','=',True)],related="company_id.sale_account_id")
     purchase_account_id = fields.Many2one('account.account', 'Purchase Discount Account',domain=[('user_type_id.name','=','Income'), ('discount_account','=',True)],related="company_id.purchase_account_id")
-
