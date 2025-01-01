@@ -27,7 +27,10 @@ class PurchaseOrderLine(models.Model):
         res = super()._compute_price_unit_and_date_planned_and_name()
         for line in self:
             price = line.product_id.multi_uom_price_id.filtered(lambda m :m.uom_id.id == line.product_uom.id)
-            line.price_unit = price.cost
+            if line.barcode:
+                price = price.filtered(lambda m :m.barcode == line.barcode)
+            if price:
+                line.price_unit = price[0].cost
         return res
     
     # @api.depends('product_uom', 'product_qty', 'product_id.uom_id','price_unit')
