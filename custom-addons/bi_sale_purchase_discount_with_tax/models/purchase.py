@@ -488,8 +488,8 @@ class purchase_order_line(models.Model):
 
     def _prepare_account_move_line(self, move=False):
 
-        res =super(purchase_order_line,self)._prepare_account_move_line(move)
-        res.update({'discount_method':self.discount_method,'discount_amount':self.discount_amount,'quantity':self.qty_to_invoice,'discount_amt':self.discount_amt})
+        res =super(purchase_order_line,self)._prepare_account_move_line(move) 
+        res.update({'discount_method':self.discount_method,'discount_amount':self.discount_amount,'quantity':self.qty_to_invoice,'discount_amt':self.discount_amt ,'quantity':self.product_qty,})
         return res 
 
     @api.depends('product_qty', 'discount', 'price_unit', 'taxes_id','discount_method','discount_amount')
@@ -687,7 +687,8 @@ class purchase_order_line(models.Model):
             discount = self.fixed_discount
             if self.discount_method == 'per':
                 discount = self.discount_amount
-
+            if  self.company_id.tax_discount_policy == 'tax':
+                discount = 0
             if discount > 0 :
                 price_unit = price_unit * (1 - discount / 100)
             if self.taxes_id:
@@ -728,7 +729,6 @@ class UoM(models.Model):
     _inherit = 'uom.uom'
 
     def _compute_quantity(self, qty, to_unit, round=True, rounding_method='UP', raise_if_failure=True):
-        
         if self.env.context.get('params'):
             params = self.env.context.get('params')
             model = params.get('model')  # Get the model from the context
