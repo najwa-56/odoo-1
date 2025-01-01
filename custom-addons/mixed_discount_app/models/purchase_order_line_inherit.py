@@ -21,7 +21,7 @@ class PurchaseOrderLine(models.Model):
 			return False
 		return True
 
-	@api.onchange('multi_discount','discount_method','price_subtotal')
+	@api.onchange('multi_discount','discount_method')
 	def get_multi_discount(self):
 		def get_discount(discount):
 			discount = discount.replace(" ", "")
@@ -59,8 +59,8 @@ class PurchaseOrderLine(models.Model):
 				if new_discount != purchase_id.multi_discount:
 					purchase_id.multi_discount = new_discount
 
-			else:
-				purchase_id.discount_amount = 0
+			# else:
+			# 	purchase_id.discount_amount = 0
 
 	@api.constrains('multi_discount')
 	def check_discount(self):
