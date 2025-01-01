@@ -52,15 +52,11 @@
             <field name="inherit_id" ref="sale.view_order_form"/>
             <field name="arch" type="xml">
                 <xpath expr="//field[@name='order_line']/tree/field[@name='product_uom_qty']" position="after">
-                    <!-- <field name="selected_uom_ids" invisible="1"/>
-                    <field name="sales_multi_uom_id" readonly="state in ('sale','done', 'cancel')"/>
-                                                          <field name="name_field" /> -->
+                   
 
                 </xpath>
                  <xpath expr="//field[@name='order_line']/form/group/group/field[@name='product_id']" position="after">
-                    <!-- <field name="selected_uom_ids" invisible="1"/>
-
-                    <field name="sales_multi_uom_id" readonly="state in ('sale','done', 'cancel')"/> -->
+                 
                                       <field name="name_field" />
 
                 </xpath>
@@ -76,11 +72,24 @@
             <field name="inherit_id" ref="purchase.purchase_order_form"/>
             <field name="arch" type="xml">
                 <xpath expr="//field[@name='order_line']/tree//field[@name='product_qty']" position="after">
-                <field name="selected_uom_ids" invisible="1"/>
                   <field name="unit_name"/>
+                  <field name="product_uom_id_domain" column_invisible="1"/>
                 
-                    <field name="purchase_multi_uom_id" widget="many2one"/>
             </xpath>
+
+
+            <xpath expr="//field[@name='order_line']/tree//field[@name='product_uom'][2]" position="attributes">
+            <attribute name="domain">product_uom_id_domain</attribute>
+            </xpath>
+
+              <xpath expr="//field[@name='order_line']/tree//field[@name='product_packaging_id']" position="attributes">
+            <attribute name="column_invisible">1</attribute>
+            </xpath>
+
+              <xpath expr="//field[@name='order_line']/tree//field[@name='product_packaging_qty']" position="attributes">
+            <attribute name="column_invisible">1</attribute>
+            </xpath>
+            
             </field>
      </record>
     <record id="view_move_form_inherit" model="ir.ui.view">
@@ -90,8 +99,7 @@
             <xpath expr="//field[@name='invoice_line_ids']/tree//field[@name='discount']" position="after">
                 <field name="uom_name" />
 
-                  <!-- <field name="name_field" />
-                                    <field name="product_uom_id"/> -->
+                  
 
             </xpath>
 
@@ -99,17 +107,7 @@
         </field>
     </record>
 
-   <!-- <record id="view_account_invoice_report_search_inheritt" model="ir.ui.view">
-        <field name="name">account.invoice.report.search.inheritt</field>
-        <field name="model">account.invoice.report</field>
-        <field name="inherit_id" ref="account.view_account_invoice_report_search"/>
-        <field name="arch" type="xml">
-
-            <field name="invoice_user_id" position="after">
-
-            </field>
-        </field>
-    </record>-->
+  
 
 
 </odoo>
