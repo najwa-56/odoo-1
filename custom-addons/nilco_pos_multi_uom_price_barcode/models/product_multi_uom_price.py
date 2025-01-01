@@ -70,30 +70,25 @@ class PurchaseOrderLine(models.Model):
 
     barcode = fields.Char('Barcode')
 
+
+    @api.onchange('product_id')
+    def onchange_product_id(self):
+        if not self.barcode:
+            return super().onchange_product_id()
+
     @api.onchange('barcode')
     def _onchange_barcode(self):
         if self.barcode:
-            # Search for the product by barcode
-            product = self.env['product.product'].search([('multi_uom_price_id.barcode', '=', self.barcode)], limit=1)
-            if product:
-                self.product_id = product
-                self.name = product.name
-                self.price_unit = product.list_price
-                # Set quantity to 1 as default
+            multi_uom_id = self.env['product.multi.uom.price'].search([('barcode', '=', self.barcode)], limit=1)
+            if multi_uom_id:
+                self.product_id = multi_uom_id.product_variant_id.id
+                self.name = multi_uom_id.product_variant_id.name
+                self.product_uom = multi_uom_id.uom_id.id
+                self.price_unit = multi_uom_id.cost
                 self.product_qty = 1
+                self.taxes_id = multi_uom_id.product_variant_id.supplier_taxes_id.ids
 
-                # Set purchase_multi_uom_id based on barcode
-                multi_uom = self.env['product.multi.uom.price'].search([('barcode', '=', self.barcode)], limit=1)
-                if multi_uom:
-                    self.purchase_multi_uom_id = multi_uom.id
-                    self.product_uom = multi_uom.uom_id.id
-            else:
-                # Clear product_id and related fields if barcode is not found
-                self.product_id = False
-                self.name = ''
-                self.price_unit = 0.0
-                self.product_qty = 0.0
-                self.product_uom = False
+           
 
 
 
