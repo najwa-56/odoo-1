@@ -451,7 +451,7 @@ class purchase_order_line(models.Model):
         res_config= self.env.company
         self.fixed_discount = 0
         for line in self:
-            if line.discount_amount > 0 :
+            if line.discount_amount > 0 and line.price_total > 0:
                 if line.discount_method == 'per':
                     if res_config.tax_discount_policy == 'untax':
                         line.fixed_discount = (line.price_subtotal * line.discount_amount) / (100 - line.discount_amount)
