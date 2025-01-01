@@ -125,7 +125,7 @@ class purchase_order(models.Model):
     @api.depends('order_line','order_line.price_total','order_line.price_subtotal',\
     'order_line.product_qty','discount_amount',\
     'discount_method','discount_type' ,'order_line.discount_amount',\
-    'order_line.discount_method','order_line.discount_amt')
+    'order_line.discount_method','order_line.discount_amt','order_line.product_id')
     def _amount_all(self):
         """
         Compute the total amounts of the SO.
@@ -428,6 +428,15 @@ class purchase_order(models.Model):
             order.tax_totals = tax_totals
 
 
+    @api.model_create_multi
+    def create(self, vals_list):
+        lines = super().create(vals_list)
+        for line in lines:
+            line._amount_all()
+            line._calculate_discount()
+           
+        return lines
+
 class purchase_order_line(models.Model):
     _inherit = 'purchase.order.line'
     
@@ -669,6 +678,31 @@ class purchase_order_line(models.Model):
                 product_ctx = {'seller_id': seller.id, 'lang': get_lang(line.env, line.partner_id.lang).code}
                 line.name = line._get_product_purchase_description(line.product_id.with_context(product_ctx))
 
+
+    def _get_gross_price_unit(self):
+        self.ensure_one()
+        if self.discount_amount > 0 :
+            price_unit = self.price_unit
+
+            discount = self.fixed_discount
+            if self.discount_method == 'per':
+                discount = self.discount_amount
+
+            if discount > 0 :
+                price_unit = price_unit * (1 - discount / 100)
+            if self.taxes_id:
+                qty = self.product_qty or 1
+                price_unit_prec = self.env['decimal.precision'].precision_get('Product Price')
+                price_unit = self.taxes_id.with_context(round=False).compute_all(price_unit, currency=self.order_id.currency_id, quantity=qty, product=self.product_id)['total_void']
+                price_unit = float_round(price_unit / qty, precision_digits=price_unit_prec)
+            if self.product_uom.id != self.product_id.uom_id.id:
+                price_unit *= self.product_uom.factor / self.product_id.uom_id.factor
+            return price_unit
+
+        else:
+            return super(purchase_order_line,self)._get_gross_price_unit()
+
+  
 
 class ResConfigSettings(models.TransientModel):
     _inherit = 'res.config.settings'
