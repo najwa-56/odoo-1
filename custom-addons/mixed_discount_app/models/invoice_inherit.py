@@ -84,5 +84,5 @@ class PurchaseOrderLine(models.Model):
 		if 'purchase_line_id' in  move_line_vals:
 			po_line = move_line_vals.get('purchase_line_id')
 			po_line_id = self.env['purchase.order.line'].browse(po_line)
-			move_line_vals.update({'discount':po_line_id.discount, 'multi_discount':po_line_id.multi_discount})
+			move_line_vals.update({'multi_discount':po_line_id.multi_discount})
 		return move_line_vals

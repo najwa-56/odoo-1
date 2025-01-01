@@ -2,7 +2,7 @@
 <odoo>
     <data>
 
-    <record id="sale_multi_inherit_form_view" model="ir.ui.view">
+    <!-- <record id="sale_multi_inherit_form_view" model="ir.ui.view">
         <field name="model">sale.order</field>
         <field name="inherit_id" ref="sale.view_order_form"/>
         <field name="arch" type="xml">
@@ -13,7 +13,7 @@
                 <field name="multi_discount" groups="mixed_discount_app.mixed_discount_sale"/>
             </xpath>
         </field>
-    </record>
+    </record> -->
 
     <record id="purchase_multi_inherit_form_view" model="ir.ui.view">
         <field name="model">purchase.order</field>
@@ -21,11 +21,9 @@
         <field name="arch" type="xml">
             <xpath expr="//field[@name='order_line']/tree//field[@name='price_unit']" position="after">
                 <field name="multi_discount" groups="mixed_discount_app.mixed_discount_purchase"/>
-                <field name="discount" groups="mixed_discount_app.mixed_discount_purchase"/>
             </xpath>
             <xpath expr="//field[@name='order_line']/form//field[@name='price_unit']" position="after">
                 <field name="multi_discount" groups="mixed_discount_app.mixed_discount_purchase"/>
-                <field name="discount" groups="mixed_discount_app.mixed_discount_purchase"/>
             </xpath>
         </field>
     </record>
