@@ -72,7 +72,6 @@
             <field name="inherit_id" ref="purchase.purchase_order_form"/>
             <field name="arch" type="xml">
                 <xpath expr="//field[@name='order_line']/tree//field[@name='product_qty']" position="after">
-                  <field name="unit_name"/>
                   <field name="product_uom_id_domain" column_invisible="1"/>
                 
             </xpath>
@@ -80,6 +79,9 @@
 
             <xpath expr="//field[@name='order_line']/tree//field[@name='product_uom'][2]" position="attributes">
             <attribute name="domain">product_uom_id_domain</attribute>
+            </xpath>
+            <xpath expr="//field[@name='order_line']/tree//field[@name='product_uom'][2]" position="before">
+            <field name="unit_name"/>
             </xpath>
 
               <xpath expr="//field[@name='order_line']/tree//field[@name='product_packaging_id']" position="attributes">

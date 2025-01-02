@@ -9,7 +9,7 @@ class PurchaseOrderLine(models.Model):
     _inherit = 'purchase.order.line'
 
     product_uom = fields.Many2one('uom.uom', string='Unit of Measure',domain="[]")
-    unit_name = fields.Char('Name')
+    unit_name = fields.Char('Name' ,compute="_compute_price_unit_and_date_planned_and_name")
 
 
 
@@ -26,18 +26,16 @@ class PurchaseOrderLine(models.Model):
     def _compute_price_unit_and_date_planned_and_name(self):
         res = super()._compute_price_unit_and_date_planned_and_name()
         for line in self:
-            price = line.product_id.multi_uom_price_id.filtered(lambda m :m.uom_id.id == line.product_uom.id)
+            uom_id = line.product_id.multi_uom_price_id.filtered(lambda m :m.uom_id.id == line.product_uom.id)
+            line.unit_name = uom_id.name_field
             if line.barcode:
-                price = price.filtered(lambda m :m.barcode == line.barcode)
-            if price:
-                line.price_unit = price[0].cost
+                uom_id = uom_id.filtered(lambda m :m.barcode == line.barcode)
+            if uom_id:
+                line.price_unit = uom_id[0].cost
+                
         return res
     
-    # @api.depends('product_uom', 'product_qty', 'product_id.uom_id','price_unit')
-    # def _compute_product_uom_qty(self):
-    #     for line in self:
-    #         print("in here===================",line.product_qty)
-    #         line.product_uom_qty = line.product_qty
+   
 
 
 
