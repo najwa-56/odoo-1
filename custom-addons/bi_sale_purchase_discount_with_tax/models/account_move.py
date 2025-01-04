@@ -144,6 +144,8 @@ class account_move(models.Model):
     def _compute_amount(self):
         res_config= self.env.company
         for move in self:
+            if move.move_type in ['out_invoice', 'out_receipt', 'out_refund']:
+                return super()._compute_amount()
             total_untaxed, total_untaxed_currency = 0.0, 0.0
             total_tax, total_tax_currency = 0.0, 0.0
             total_residual, total_residual_currency = 0.0, 0.0
@@ -244,6 +246,8 @@ class account_move(models.Model):
         res_config= self.env.company
 
         for move in self:
+            if move.move_type in ['out_invoice', 'out_receipt', 'out_refund']:
+                return super()._compute_tax_totals()
             if move.is_invoice(include_receipts=True):
                 base_lines = move.invoice_line_ids.filtered(lambda line: line.display_type == 'product')
                 base_line_values_list = [line._convert_to_tax_base_line_dict() for line in base_lines]
@@ -402,9 +406,12 @@ class account_move(models.Model):
     @api.model_create_multi
     def create(self, vals_list):
         result = super(account_move,self).create(vals_list)
+        
         res_config = self.env.company
         account = False
         for res in result:
+            if res.move_type in ['out_invoice', 'out_receipt', 'out_refund']:
+                return res
             if res.move_type in ['in_invoice', 'in_receipt', 'in_refund']:
                 account = res_config.purchase_account_id.id
                 if not account:
@@ -478,6 +485,7 @@ class account_move(models.Model):
 
     @contextmanager
     def _sync_dynamic_lines(self, container):
+       
         with self._disable_recursion(container, 'skip_invoice_sync') as disabled:
             if disabled:
                 yield
@@ -536,6 +544,9 @@ class account_move(models.Model):
                     discont_line = find_discont_line(line_container)
                     tax_line = find_tax_line(line_container)
                     for move in self :
+                        if move.move_type in ['out_invoice', 'out_receipt', 'out_refund']:
+                            return super()._sync_dynamic_lines(container)
+
                         res = move._calculate_discount()
                         if tax_line:
                             if move.discount_type == "global" and self.env.company.tax_discount_policy == 'untax':

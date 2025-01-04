@@ -50,6 +50,8 @@ class account_move_line(models.Model):
     @api.depends('quantity', 'discount','discount_amount', 'price_unit', 'tax_ids', 'currency_id','discount_method')
     def _compute_totals(self):
         for line in self:
+            if line.move_id.move_type in ['out_invoice', 'out_receipt', 'out_refund']:
+                return super()._compute_totals()
             if line.display_type != 'product':
                 line.price_total = line.price_subtotal = False
             # Compute 'price_subtotal'.
@@ -128,6 +130,8 @@ class account_move_line(models.Model):
     @api.depends('tax_ids', 'currency_id', 'partner_id', 'analytic_distribution', 'balance', 'partner_id', 'move_id.partner_id', 'price_unit')
     def _compute_all_tax(self):
         for line in self:
+            if line.move_id.move_type in ['out_invoice', 'out_receipt', 'out_refund']:
+                return super()._compute_all_tax()
             sign = line.move_id.direction_sign
             if line.display_type == 'tax':
                 line.compute_all_tax = {}
@@ -195,6 +199,8 @@ class account_move_line(models.Model):
         :return: A python dictionary.
         """
         self.ensure_one()
+        if self.move_id.move_type in ['out_invoice', 'out_receipt', 'out_refund']:
+            return super()._convert_to_tax_base_line_dict()
         is_invoice = self.move_id.is_invoice(include_receipts=True)
         sign = -1 if self.move_id.is_inbound(include_receipts=True) else 1
         discount = 0

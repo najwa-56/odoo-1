@@ -618,6 +618,9 @@ class purchase_order_line(models.Model):
     @api.depends('product_qty', 'product_uom', 'company_id')
     def _compute_price_unit_and_date_planned_and_name(self):
         for line in self:
+            if line.price_unit:
+                continue
+
             if not line.product_id or line.invoice_lines or not line.company_id:
                 continue
             params = {'order_id': line.order_id}
