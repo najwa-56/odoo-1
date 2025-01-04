@@ -59,7 +59,7 @@ class KsStockTransferMultiCompany(models.Model):
 
         order_lines_data = [fields.Command.clear()]
         order_lines_data += [
-            fields.Command.create(line._prepare_order_line_values(is_inter_company=True))
+            fields.Command.create(line.with_context(is_inter_company= False)._prepare_order_line_values(is_inter_company=True))
             for line in sale_order_template.sale_order_template_line_ids
         ]
 
@@ -507,8 +507,9 @@ class KsStockTransferMultiCompany(models.Model):
 class SaleOrderTemplateLine(models.Model):
     _inherit = 'sale.order.template.line'
 
-    def _prepare_order_line_values(self, is_inter_company= False):
+    def _prepare_order_line_values(self):
         res = super()._prepare_order_line_values()
+        is_inter_company = self._context.get('is_inter_company',False)
         if is_inter_company:
             print("in here====================")
             res.pop('sequence', None)

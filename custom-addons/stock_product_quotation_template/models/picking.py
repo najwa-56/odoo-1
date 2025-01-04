@@ -48,7 +48,7 @@ class StockPicking(models.Model):
 
         order_lines_data = [fields.Command.clear()]
         order_lines_data += [
-            fields.Command.create(line._prepare_order_line_values(self.location_id , self.location_dest_id,True))
+            fields.Command.create(line.with_context(location_id=self.location_id , location_dest_id=self.location_dest_id,is_picking=True)._prepare_order_line_values())
             for line in sale_order_template.sale_order_template_line_ids
         ]
 
@@ -64,8 +64,11 @@ class StockPicking(models.Model):
 class SaleOrderTemplateLine(models.Model):
     _inherit = 'sale.order.template.line'
 
-    def _prepare_order_line_values(self,location_id =False,location_dest_id =False , is_picking = False):
+    def _prepare_order_line_values(self):
         res = super()._prepare_order_line_values()
+        is_picking = self._context.get('is_picking',False)
+        location_id = self._context.get('location_id',False)
+        location_dest_id = self._context.get('location_dest_id',False)
         if is_picking:
             res.pop('display_type', None)  # Safely remove 'display_type' if it exists
             res['location_id'] = location_id and location_id.id or False
