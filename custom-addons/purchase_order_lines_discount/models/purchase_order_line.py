@@ -26,10 +26,10 @@ class PurchaseOrderLine(models.Model):
 
     amount_before_discount = fields.Float("Amount Before Discount",compute="_calculate_amount_before_discount",readonly=True)
 
-    @api.depends('product_uom_qty','price_unit')
+    @api.depends('product_qty','price_unit')
     def _calculate_amount_before_discount(self):
         for line in self:
-           line.amount_before_discount = line.product_uom_qty * line.price_unit
+           line.amount_before_discount = line.product_qty * line.price_unit
 
     @api.onchange("discount")
     def _onchange_discount(self):

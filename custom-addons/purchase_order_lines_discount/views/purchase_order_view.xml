@@ -7,12 +7,13 @@
         <field name="arch" type="xml">
             <xpath expr="//field[@name='order_line']/tree/field[@name='price_unit']" position="after">
                 <field name="fixed_discount" optional="show"/>
+                <field name="amount_before_discount" optional="show"/>
             </xpath>
 
-             <xpath expr="//tree/field[@name='discount']" position="attributes">
+             
+                <xpath expr="//tree/field[@name='discount']" position="attributes">
                     <attribute name="optional">show</attribute>
                 </xpath>
-
                   <xpath expr="//tree/field[@name='name']" position="attributes">
                     <attribute name="column_invisible">1</attribute>
                 </xpath>
