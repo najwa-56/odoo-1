@@ -9,7 +9,7 @@ class PurchaseOrderLine(models.Model):
     _inherit = 'purchase.order.line'
 
     product_uom = fields.Many2one('uom.uom', string='Unit of Measure',domain="[]")
-    unit_name = fields.Char('Name' ,compute="_compute_price_unit_and_date_planned_and_name")
+    unit_name = fields.Char('Name')
 
 
 
@@ -22,19 +22,15 @@ class PurchaseOrderLine(models.Model):
             rec.product_uom_id_domain = json.dumps([('id','in',uom_ids)])
 
 
-    @api.depends('product_qty', 'product_uom', 'company_id')
-    def _compute_price_unit_and_date_planned_and_name(self):
-        res = super()._compute_price_unit_and_date_planned_and_name()
+    @api.onchange('product_id')
+    def _onchange_product_id_set_name(self):
         for line in self:
-            uom_id = line.product_id.multi_uom_price_id.filtered(lambda m :m.uom_id.id == line.product_uom.id)
-            line.unit_name = uom_id.name_field
-            if line.barcode:
-                uom_id = uom_id.filtered(lambda m :m.barcode == line.barcode)
+            if line.product_id:
+                uom_id = line.product_id.multi_uom_price_id.filtered(lambda m :m.uom_id.id == line.product_uom.id and m.barcode == line.barcode)
                 if uom_id:
-                    line.price_unit = uom_id[0].cost
-                
-        return res
-    
+                    line.unit_name = uom_id[0].name_field
+
+   
    
 
 
