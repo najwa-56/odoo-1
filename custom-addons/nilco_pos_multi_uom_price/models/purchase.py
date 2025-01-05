@@ -30,8 +30,8 @@ class PurchaseOrderLine(models.Model):
             line.unit_name = uom_id.name_field
             if line.barcode:
                 uom_id = uom_id.filtered(lambda m :m.barcode == line.barcode)
-            if uom_id:
-                line.price_unit = uom_id[0].cost
+                if uom_id:
+                    line.price_unit = uom_id[0].cost
                 
         return res
     

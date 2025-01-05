@@ -31,6 +31,10 @@
                     <attribute name="column_invisible">1</attribute>
                 </xpath>
 
+                <xpath expr="//tree/field[@name='name']" position="attributes">
+                    <attribute name="column_invisible">1</attribute>
+                </xpath>
+
                 <xpath expr="//tree/field[@name='price_subtotal']" position="before">
                  <field name="fixed_discount" optional="hide"/> 
                     <field name="amount_before_discount" optional="hide"/>
