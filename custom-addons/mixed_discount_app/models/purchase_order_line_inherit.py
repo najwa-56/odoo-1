@@ -78,31 +78,31 @@ class PurchaseOrderLine(models.Model):
 				sale_id.get_multi_discount()
 		return res
 
-	@api.depends('discount')
-	def _compute_amount(self):
-		for sale_id in self:
-			price_unit = False
-			price = sale_id.recalculate_amount()
-			if price != sale_id.price_unit:
-				price_unit = sale_id.price_unit
-				sale_id.price_unit = price
-			super(PurchaseOrderLine, sale_id)._compute_amount()
-			if price_unit:
-				sale_id.price_unit = price_unit
+	# @api.depends('discount')
+	# def _compute_amount(self):
+	# 	for sale_id in self:
+	# 		price_unit = False
+	# 		price = sale_id.recalculate_amount()
+	# 		if price != sale_id.price_unit:
+	# 			price_unit = sale_id.price_unit
+	# 			sale_id.price_unit = price
+	# 		super(PurchaseOrderLine, sale_id)._compute_amount()
+	# 		if price_unit:
+	# 			sale_id.price_unit = price_unit
 
-	def recalculate_amount(self):
-		self.ensure_one()
-		if self.discount:
-			return self.price_unit * (1 - self.discount / 100)
-		return self.price_unit	
+	# def recalculate_amount(self):
+	# 	self.ensure_one()
+	# 	if self.discount:
+	# 		return self.price_unit * (1 - self.discount / 100)
+	# 	return self.price_unit	
 
-	def _get_stock_move_price_unit(self):
-		price_unit = False
-		price = self.recalculate_amount()
-		if price != self.price_unit:
-			price_unit = self.price_unit
-			self.price_unit = price
-		price = super(PurchaseOrderLine, self)._get_stock_move_price_unit()
-		if price_unit:
-			self.price_unit = price_unit
-		return price
+	# def _get_stock_move_price_unit(self):
+	# 	price_unit = False
+	# 	price = self.recalculate_amount()
+	# 	if price != self.price_unit:
+	# 		price_unit = self.price_unit
+	# 		self.price_unit = price
+	# 	price = super(PurchaseOrderLine, self)._get_stock_move_price_unit()
+	# 	if price_unit:
+	# 		self.price_unit = price_unit
+	# 	return price
