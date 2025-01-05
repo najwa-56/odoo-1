@@ -9,6 +9,7 @@ class PurchaseOrderLine(models.Model):
 	_inherit = 'purchase.order.line'
 
 	multi_discount = fields.Char(string="Mixed Discount(%)")
+	discount = fields.Float(string='Discount(%)', digits=dp.get_precision('Discount'), default=0.0)
 
 
 	@staticmethod
@@ -21,7 +22,7 @@ class PurchaseOrderLine(models.Model):
 			return False
 		return True
 
-	@api.onchange('multi_discount','discount_method')
+	@api.onchange('multi_discount')
 	def get_multi_discount(self):
 		def get_discount(discount):
 			discount = discount.replace(" ", "")
@@ -30,13 +31,13 @@ class PurchaseOrderLine(models.Model):
 				discount = discount[1:]
 			return discount
 
-		for purchase_id in self:
-			if purchase_id.multi_discount and purchase_id.discount_method == 'per' :
-				if self.purchase_discount(purchase_id.multi_discount):
+		for sale_id in self:
+			if sale_id.multi_discount:
+				if self.purchase_discount(sale_id.multi_discount):
 					new_discount = get_discount(
-						purchase_id.multi_discount)
+						sale_id.multi_discount)
 				else:
-					purchase_id.discount_amount = 0
+					sale_id.discount = 0
 					raise UserError(
 						_('Please enter correct discount.'))
 
@@ -54,54 +55,54 @@ class PurchaseOrderLine(models.Model):
 				for logit in discount_list:
 					rep_discount = rep_discount * (1 - (logit / 100))
 				total_dis = 1 - rep_discount
-				purchase_id.discount_amount = total_dis * 100
+				sale_id.discount = total_dis * 100
 
-				if new_discount != purchase_id.multi_discount:
-					purchase_id.multi_discount = new_discount
+				if new_discount != sale_id.multi_discount:
+					sale_id.multi_discount = new_discount
 
-			# else:
-			# 	purchase_id.discount_amount = 0
+			else:
+				sale_id.discount = 0
 
 	@api.constrains('multi_discount')
 	def check_discount(self):
-		for purchase_id in self:
-			if purchase_id.multi_discount and not self.purchase_discount(
-					purchase_id.multi_discount):
+		for sale_id in self:
+			if sale_id.multi_discount and not self.purchase_discount(
+					sale_id.multi_discount):
 				raise ValidationError(
 					_('Please enter correct discount.'))
 
-	# def write(self, vals):
-	# 	res = super(PurchaseOrderLine, self).write(vals)
-	# 	if 'multi_discount' in vals:
-	# 		for purchase_id in self:
-	# 			purchase_id.get_multi_discount()
-	# 	return res
+	def write(self, vals):
+		res = super(PurchaseOrderLine, self).write(vals)
+		if 'multi_discount' in vals:
+			for sale_id in self:
+				sale_id.get_multi_discount()
+		return res
 
-	# @api.depends('discount')
-	# def _compute_amount(self):
-	# 	for purchase_id in self:
-	# 		price_unit = False
-	# 		price = purchase_id.recalculate_amount()
-	# 		if price != purchase_id.price_unit:
-	# 			price_unit = purchase_id.price_unit
-	# 			purchase_id.price_unit = price
-	# 		super(PurchaseOrderLine, purchase_id)._compute_amount()
-	# 		if price_unit:
-	# 			purchase_id.price_unit = price_unit
+	@api.depends('discount')
+	def _compute_amount(self):
+		for sale_id in self:
+			price_unit = False
+			price = sale_id.recalculate_amount()
+			if price != sale_id.price_unit:
+				price_unit = sale_id.price_unit
+				sale_id.price_unit = price
+			super(PurchaseOrderLine, sale_id)._compute_amount()
+			if price_unit:
+				sale_id.price_unit = price_unit
 
-	# def recalculate_amount(self):
-	# 	self.ensure_one()
-	# 	if self.discount_amount:
-	# 		return self.price_unit * (1 - self.discount_amount / 100)
-	# 	return self.price_unit	
+	def recalculate_amount(self):
+		self.ensure_one()
+		if self.discount:
+			return self.price_unit * (1 - self.discount / 100)
+		return self.price_unit	
 
-	# def _get_stock_move_price_unit(self):
-	# 	price_unit = False
-	# 	price = self.recalculate_amount()
-	# 	if price != self.price_unit:
-	# 		price_unit = self.price_unit
-	# 		self.price_unit = price
-	# 	price = super(PurchaseOrderLine, self)._get_stock_move_price_unit()
-	# 	if price_unit:
-	# 		self.price_unit = price_unit
-	# 	return price
+	def _get_stock_move_price_unit(self):
+		price_unit = False
+		price = self.recalculate_amount()
+		if price != self.price_unit:
+			price_unit = self.price_unit
+			self.price_unit = price
+		price = super(PurchaseOrderLine, self)._get_stock_move_price_unit()
+		if price_unit:
+			self.price_unit = price_unit
+		return price
