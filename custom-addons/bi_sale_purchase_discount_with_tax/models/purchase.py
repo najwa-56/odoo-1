@@ -733,6 +733,7 @@ class UoM(models.Model):
     _inherit = 'uom.uom'
 
     def _compute_quantity(self, qty, to_unit, round=True, rounding_method='UP', raise_if_failure=True):
+        res = super()._compute_quantity(qty = qty, to_unit= to_unit, round=round, rounding_method=rounding_method, raise_if_failure=raise_if_failure)
         if self.env.context.get('params'):
             params = self.env.context.get('params')
             model = params.get('model')  # Get the model from the context
@@ -762,7 +763,9 @@ class UoM(models.Model):
                     amount = tools.float_round(amount, precision_rounding=to_unit.rounding, rounding_method=rounding_method)
 
                 return amount
-            
+            else:
+                return super()._compute_quantity(qty = qty, to_unit= to_unit, round=round, rounding_method=rounding_method, raise_if_failure=raise_if_failure)
+
         else:
             return super()._compute_quantity(qty = qty, to_unit= to_unit, round=round, rounding_method=rounding_method, raise_if_failure=raise_if_failure)
 
