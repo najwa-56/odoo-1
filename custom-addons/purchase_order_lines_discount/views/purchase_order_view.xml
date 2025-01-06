@@ -56,15 +56,7 @@
 
                 <xpath expr="//field[@name='tax_totals']" position="before">
                    <field name="total_lines_discount" widget="monetary" options="{'currency_field': 'currency_id'}"/>
-                    <field name="discount_method" class="oe_inline" />
-                    <label for="discount"/>
-                    <div>
-                        <field name="discount" class="oe_inline" />
-                    </div>
-                    <label for="discount_amount" />
-                    <div>
-                        <field name="discount_amount" class="oe_inline"/>
-                    </div>
+                   
                 </xpath>
 
 
