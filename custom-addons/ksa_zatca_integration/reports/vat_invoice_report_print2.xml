@@ -232,7 +232,7 @@
 								</td>
 								
 								<td class="arabic" style="border:2pt solid black;text-align:center;padding:3pt;background-color:#white; font-weight: bold;">
-			                        <span class="arabic" t-field="l.discount_amount" t-options="{&quot;widget&quot;: &quot;monetary&quot;, &quot;display_currency&quot;: o.currency_id}"/>
+			                        <span class="arabic" t-field="l.fixed_discount" t-options="{&quot;widget&quot;: &quot;monetary&quot;, &quot;display_currency&quot;: o.currency_id}"/>
 			                    </td>
 
 								<td class="arabic" style="border:2pt solid black;text-align:center;padding:3pt;background-color:#white; font-weight: bold;">
