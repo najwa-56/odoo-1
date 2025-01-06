@@ -9,7 +9,24 @@ class SaleOrder(models.Model):
     def action_print_standard_invoice(self):
         if self.invoice_ids:
             return self.env.ref('ksa_zatca_integration.action_report_standard_low_margin_tax_invoice').report_action(self.invoice_ids.ids)
-            
+
+    @api.onchange('partner_id', 'sale_order_template_id')
+    def onchange_partner_id_dolfin(self):
+        for order in self:
+            if order.partner_id and order.partner_id.is_dolfin:
+                for line in order.order_line:
+                    # Remove taxes
+                    line.tax_id = False
+                    # Adjust price_unit by subtracting 15%
+                    if line.price_unit:
+                        line.price_unit = line.price_unit / 1.15
+
+
+
+   
+  
+
+  
 
     def action_confirm(self):
         res = super(SaleOrder, self.with_context(default_immediate_transfer=True)).action_confirm()
