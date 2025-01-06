@@ -12,6 +12,9 @@
             </xpath>
 
              
+                <xpath expr="//div[@name='date_approve']" position="after">
+                    <field name="discount_type" invisible="1"/>
+                </xpath>
                
                   <xpath expr="//tree/field[@name='name']" position="attributes">
                     <attribute name="column_invisible">1</attribute>
@@ -21,6 +24,57 @@
                      <field name="total_lines_discount" widget="monetary" options="{'currency_field': 'currency_id'}"/>
                 </field>
 
+
+                <field name="notes" position="after">
+                                            
+                    <field name="discount_method" class="oe_inline"  readonly="state in ['purchase','done']" invisible="discount_type == 'line'"/>
+                    <label for="discount" invisible="discount_type == 'line'"/>
+                    <div>
+                        <field name="discount" class="oe_inline" readonly="state in ['purchase','done']" invisible="discount_type == 'line'"/>
+                    </div>
+                    <label for="discount_amount" invisible="discount_type == 'line'"/>
+                    <div>
+                        <field name="discount_amount" class="oe_inline" invisible="discount_type == 'line'"/>
+                    </div>
+                   
+                </field>
+
+
         </field>
     </record>
+
+
+
+      
+        <record id="purchase_account_move_discount_form" model="ir.ui.view">
+            <field name="name">account.move.discount.form.view</field>
+            <field name="model">account.move</field>
+            <field name="inherit_id" ref="account.view_move_form"/>
+            <field name="arch" type="xml">
+
+                
+
+                <xpath expr="//field[@name='tax_totals']" position="before">
+                   <field name="total_lines_discount" widget="monetary" options="{'currency_field': 'currency_id'}"/>
+                    <field name="discount_method" class="oe_inline" />
+                    <label for="discount"/>
+                    <div>
+                        <field name="discount" class="oe_inline" />
+                    </div>
+                    <label for="discount_amount" />
+                    <div>
+                        <field name="discount_amount" class="oe_inline"/>
+                    </div>
+                </xpath>
+
+
+
+              
+
+                
+
+            </field>
+        </record>
+
+
 </odoo>
