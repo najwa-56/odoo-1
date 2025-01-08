@@ -11,6 +11,8 @@ class PurchaseOrderLine(models.Model):
 	multi_discount = fields.Char(string="Mixed Discount(%)")
 	discount = fields.Float(string='Discount(%)', digits=dp.get_precision('Discount'), default=0.0)
 
+	fix_discount = fields.Float(string='Static Discount', digits=dp.get_precision('Discount'), default=0.0)
+
 
 	@staticmethod
 	def purchase_discount(discount):
@@ -21,6 +23,24 @@ class PurchaseOrderLine(models.Model):
 		if discount and not rep.match(discount):
 			return False
 		return True
+	
+	@api.onchange("fix_discount")
+	def get_fix_discount(self):
+		for line in self:
+			self.get_multi_discount()
+			if line.fix_discount > 0:
+				# Calculate the line's total price before discount
+				total_price = line.price_unit * line.product_qty
+				# Avoid division by zero
+				if total_price > 0:
+					# Calculate the fixed discount as a percentage of the total price
+					fix_discount_percentage = (line.fix_discount / total_price) * 100.0
+
+					# Update the discount percentage
+					line.discount += fix_discount_percentage
+				
+
+			line._compute_amount()
 
 	@api.onchange('multi_discount')
 	def get_multi_discount(self):
