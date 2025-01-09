@@ -1851,11 +1851,19 @@ class AccountMove(models.Model):
         if tax_totals:
             groups_by_subtotal = tax_totals.get('groups_by_subtotal', {})
             tax_group_amount = amount_tax
-            if bool(groups_by_subtotal):
-                    _untax_amount = groups_by_subtotal.get('Untaxed Amount', [])
-                    if bool(_untax_amount):   
-                        for _tax in range(len(_untax_amount)):
-                            if _untax_amount[_tax].get('tax_group_amount'):
-                                tax_group_amount = tax_totals.get('groups_by_subtotal', {}).get('Untaxed Amount', [])[_tax].get("tax_group_amount",0)
-                                
+
+            untaxed_keys = ['Untaxed Amount', 'المبلغ دون الضريبة ']
+
+            for key in untaxed_keys:
+                _untax_amount = groups_by_subtotal.get(key, [])
+                if _untax_amount:  
+                    for tax_group in _untax_amount:
+                        if tax_group.get('tax_group_amount'):
+                            tax_group_amount = tax_group.get('tax_group_amount', 0)
+                            break  
+                    if tax_group_amount != amount_tax: 
+                        break
+
             return tax_group_amount
+
+        return amount_tax
