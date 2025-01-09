@@ -277,7 +277,10 @@
 			
 			<tr style="border:2pt solid black">
 				<td width="35%" class="text-left arabic" style="border:2pt solid black;text-align:right;padding:3pt ;  font-weight: bold;">إجمالي ضريبة القيمة المضافة</td>
-				<td width="30%" style="border:2pt solid black;text-align:center;padding:3pt" class="text-center"><span t-esc="tax_total" t-options="{&quot;widget&quot;: &quot;monetary&quot;, &quot;display_currency&quot;: o.currency_id}"/></td>
+				<td width="30%" style="border:2pt solid black;text-align:center;padding:3pt" class="text-center">
+    				<span t-esc="o.get_tax_total(o.tax_totals, tax_total)"/>
+					</td>
+
 				<td width="35%" class="text-left arabic" style="border:2pt solid black;text-align:left;padding:3pt ;  font-weight: bold;">Total VAT 15%</td>
 				
 			</tr>
