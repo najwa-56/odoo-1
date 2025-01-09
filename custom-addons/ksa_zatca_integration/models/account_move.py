@@ -1844,3 +1844,18 @@ class AccountMove(models.Model):
                 and self.l10n_sa_phase1_end_date and self.invoice_date > self.l10n_sa_phase1_end_date):
             return True
         return False
+
+
+
+    def get_tax_total(self, tax_totals, amount_tax):
+        if tax_totals:
+            groups_by_subtotal = tax_totals.get('groups_by_subtotal', {})
+            tax_group_amount = amount_tax
+            if bool(groups_by_subtotal):
+                    _untax_amount = groups_by_subtotal.get('Untaxed Amount', [])
+                    if bool(_untax_amount):   
+                        for _tax in range(len(_untax_amount)):
+                            if _untax_amount[_tax].get('tax_group_amount'):
+                                tax_group_amount = tax_totals.get('groups_by_subtotal', {}).get('Untaxed Amount', [])[_tax].get("tax_group_amount",0)
+                                
+            return tax_group_amount
