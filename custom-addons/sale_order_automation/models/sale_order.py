@@ -130,10 +130,18 @@ class SaleOrderLine(models.Model):
    
     @api.onchange('product_uom_qty')
     def onchange_partner_id_dolfin(self):
+        sale_zero_taxes = self.env['account.tax'].search([
+                    ('type_tax_use', '=', 'sale'),
+                    ('amount', '=', 0)])
+
+        
+
         for line in self:
             if line.order_id.partner_id and line.order_id.partner_id.is_dolfin:
                 # Remove taxes
-                line.tax_id = False
+                line.tax_id = [(5, 0, 0)]
+                line.tax_id = [(4, tax.id, 0) for tax in sale_zero_taxes]
                 # Adjust price_unit by subtracting 15%
                 if line.price_unit:
                     line.price_unit = line.price_unit / 1.15
+                
