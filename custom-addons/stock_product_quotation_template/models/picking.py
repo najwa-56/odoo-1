@@ -15,11 +15,11 @@ import json
 class StockPicking(models.Model):
     _inherit='stock.picking'
 
-    @api.model
-    def default_get(self, fields_list):
-        res = super().default_get(fields_list)
-        self._onchange_sale_order_template_id()
-        return res
+    # @api.model
+    # def default_get(self, fields_list):
+    #     res = super().default_get(fields_list)
+    #     self._onchange_sale_order_template_id()
+    #     return res
 
     sale_order_template_id = fields.Many2one(
         comodel_name='sale.order.template',
