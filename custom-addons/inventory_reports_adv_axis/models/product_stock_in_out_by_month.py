@@ -41,7 +41,7 @@ class ProductInOutStock(models.TransientModel):
             end_date_m = (beg + MonthEnd(1)).strftime(DEFAULT_SERVER_DATE_FORMAT)
             res_out = stockmoveline.read_group(
                 [('date', '>=', start_date_m), ('date', '<=', end_date_m), ('state', '=', 'done'),
-                 ('picking_type_id.code', '=', 'outgoing')], ['product_id', 'qty_done', 'date'],
+                 ('picking_type_id.code', '=', 'outgoing')], ['product_id', 'quantity', 'date'],
                 groupby=['product_id', 'date:month'], orderby='id DESC')
 
             for res1 in res_out:
@@ -50,21 +50,21 @@ class ProductInOutStock(models.TransientModel):
                 res_in = stockmoveline.read_group(
                     [('date', '>=', start_date_m), ('date', '<=', end_date_m), ('state', '=', 'done'),
                      ('picking_type_id.code', '=', 'incoming'), ('product_id', '=', molprod)],
-                    ['product_id', 'qty_done'],
+                    ['product_id', 'quantity'],
                     groupby=['product_id', 'date:month'], orderby='id DESC')
                 prev_res_in = stockmoveline.read_group(
                     [('date', '>=', prev_first), ('date', '<=', prev_last), ('state', '=', 'done'),
                      ('picking_type_id.code', '=', 'incoming'), ('product_id', '=', molprod)],
-                    ['product_id', 'qty_done'],
+                    ['product_id', 'quantity'],
                     groupby=['product_id', 'date:month'], orderby='id DESC')
                 prev_res_out = stockmoveline.read_group(
                     [('date', '>=', prev_first), ('date', '<=', prev_last), ('state', '=', 'done'),
                      ('picking_type_id.code', '=', 'outgoing'), ('product_id', '=', molprod)],
-                    ['product_id', 'qty_done'],
+                    ['product_id', 'quantity'],
                     groupby=['product_id', 'date:month'], orderby='id DESC')
-                prev_stock = prev_res_in[0].get('qty_done') if prev_res_in else 0 - prev_res_out[0].get(
-                    'qty_done') if prev_res_out else 0
-                avail_stock = res_in[0].get('qty_done') if res_in else 0 - res1.get('qty_done') if res1 else 0
+                prev_stock = prev_res_in[0].get('quantity') if prev_res_in else 0 - prev_res_out[0].get(
+                    'quantity') if prev_res_out else 0
+                avail_stock = res_in[0].get('quantity') if res_in else 0 - res1.get('quantity') if res1 else 0
                 if fields.Date.to_date(start_date_m) - timedelta(days=1) == prev_last:
                     intial_stock = prev_stock
                 else:
@@ -73,14 +73,14 @@ class ProductInOutStock(models.TransientModel):
                     'start_date': fields.Date.to_date(start_date_m).strftime('%B') + ' - ' + fields.Date.to_date(
                         start_date_m).strftime('%Y'), 'product_id': product_object.display_name,
                     'category': product_object.categ_id.display_name, 'intial_stock': intial_stock,
-                    'in_qty': res_in[0].get('qty_done') if res_in else 0,
-                    'out_qty': res1.get('qty_done') if res1 else 0, 'total_stock': intial_stock,
-                    'in_qty': intial_stock + res_in[0].get('qty_done') if res_in else 0 - res1.get(
-                        'qty_done') if res1 else 0}
+                    'in_qty': res_in[0].get('quantity') if res_in else 0,
+                    'out_qty': res1.get('quantity') if res1 else 0, 'total_stock': intial_stock,
+                    'in_qty': intial_stock + res_in[0].get('quantity') if res_in else 0 - res1.get(
+                        'quantity') if res1 else 0}
                 if product_object not in product_avg_dict:
-                    product_avg_dict[product_object] = res1.get('qty_done') if res1 else 0
+                    product_avg_dict[product_object] = res1.get('quantity') if res1 else 0
                 else:
-                    product_avg_dict[product_object] += res1.get('qty_done') if res1 else 0
+                    product_avg_dict[product_object] += res1.get('quantity') if res1 else 0
                     if count > 1:
                         product_avg_dict[product_object] = product_avg_dict[product_object] / count
 
@@ -109,7 +109,7 @@ class ProductInOutStock(models.TransientModel):
             end_date_m = (beg + MonthEnd(1)).strftime(DEFAULT_SERVER_DATE_FORMAT)
             res_out = stockmoveline.read_group(
                 [('date', '>=', start_date_m), ('date', '<=', end_date_m), ('state', '=', 'done'),
-                 ('picking_type_id.code', '=', 'outgoing')], ['product_id', 'qty_done', 'date'],
+                 ('picking_type_id.code', '=', 'outgoing')], ['product_id', 'quantity', 'date'],
                 groupby=['product_id', 'date:month'], orderby='id DESC')
 
             for res1 in res_out:
@@ -118,21 +118,21 @@ class ProductInOutStock(models.TransientModel):
                 res_in = stockmoveline.read_group(
                     [('date', '>=', start_date_m), ('date', '<=', end_date_m), ('state', '=', 'done'),
                      ('picking_type_id.code', '=', 'incoming'), ('product_id', '=', molprod)],
-                    ['product_id', 'qty_done'],
+                    ['product_id', 'quantity'],
                     groupby=['product_id', 'date:month'], orderby='id DESC')
                 prev_res_in = stockmoveline.read_group(
                     [('date', '>=', prev_first), ('date', '<=', prev_last), ('state', '=', 'done'),
                      ('picking_type_id.code', '=', 'incoming'), ('product_id', '=', molprod)],
-                    ['product_id', 'qty_done'],
+                    ['product_id', 'quantity'],
                     groupby=['product_id', 'date:month'], orderby='id DESC')
                 prev_res_out = stockmoveline.read_group(
                     [('date', '>=', prev_first), ('date', '<=', prev_last), ('state', '=', 'done'),
                      ('picking_type_id.code', '=', 'outgoing'), ('product_id', '=', molprod)],
-                    ['product_id', 'qty_done'],
+                    ['product_id', 'quantity'],
                     groupby=['product_id', 'date:month'], orderby='id DESC')
-                prev_stock = prev_res_in[0].get('qty_done') if prev_res_in else 0 - prev_res_out[0].get(
-                    'qty_done') if prev_res_out else 0
-                avail_stock = res_in[0].get('qty_done') if res_in else 0 - res1.get('qty_done') if res1 else 0
+                prev_stock = prev_res_in[0].get('quantity') if prev_res_in else 0 - prev_res_out[0].get(
+                    'quantity') if prev_res_out else 0
+                avail_stock = res_in[0].get('quantity') if res_in else 0 - res1.get('quantity') if res1 else 0
                 if fields.Date.to_date(start_date_m) - timedelta(days=1) == prev_last:
                     intial_stock = prev_stock
                 else:
@@ -141,14 +141,14 @@ class ProductInOutStock(models.TransientModel):
                     'start_date': fields.Date.to_date(start_date_m).strftime('%B') + ' - ' + fields.Date.to_date(
                         start_date_m).strftime('%Y'), 'product_id': product_object.display_name,
                     'category': product_object.categ_id.display_name, 'intial_stock': intial_stock,
-                    'in_qty': res_in[0].get('qty_done') if res_in else 0,
-                    'out_qty': res1.get('qty_done') if res1 else 0, 'total_stock': intial_stock,
-                    'in_qty': intial_stock + res_in[0].get('qty_done') if res_in else 0 - res1.get(
-                        'qty_done') if res1 else 0}
+                    'in_qty': res_in[0].get('quantity') if res_in else 0,
+                    'out_qty': res1.get('quantity') if res1 else 0, 'total_stock': intial_stock,
+                    'in_qty': intial_stock + res_in[0].get('quantity') if res_in else 0 - res1.get(
+                        'quantity') if res1 else 0}
                 if product_object not in product_avg_dict:
-                    product_avg_dict[product_object] = res1.get('qty_done') if res1 else 0
+                    product_avg_dict[product_object] = res1.get('quantity') if res1 else 0
                 else:
-                    product_avg_dict[product_object] += res1.get('qty_done') if res1 else 0
+                    product_avg_dict[product_object] += res1.get('quantity') if res1 else 0
                     if count > 1:
                         product_avg_dict[product_object] = product_avg_dict[product_object] / count
 
@@ -237,7 +237,7 @@ class ProductInOutStock(models.TransientModel):
             end_date_m = (beg + MonthEnd(1)).strftime(DEFAULT_SERVER_DATE_FORMAT)
             res_out = stockmoveline.read_group(
                 [('date', '>=', start_date_m), ('date', '<=', end_date_m), ('state', '=', 'done'),
-                 ('picking_type_id.code', '=', 'outgoing')], ['product_id', 'qty_done', 'date'],
+                 ('picking_type_id.code', '=', 'outgoing')], ['product_id', 'quantity', 'date'],
                 groupby=['product_id', 'date:month'], orderby='id DESC')
 
             for res1 in res_out:
@@ -246,21 +246,21 @@ class ProductInOutStock(models.TransientModel):
                 res_in = stockmoveline.read_group(
                     [('date', '>=', start_date_m), ('date', '<=', end_date_m), ('state', '=', 'done'),
                      ('picking_type_id.code', '=', 'incoming'), ('product_id', '=', molprod)],
-                    ['product_id', 'qty_done'],
+                    ['product_id', 'quantity'],
                     groupby=['product_id', 'date:month'], orderby='id DESC')
                 prev_res_in = stockmoveline.read_group(
                     [('date', '>=', prev_first), ('date', '<=', prev_last), ('state', '=', 'done'),
                      ('picking_type_id.code', '=', 'incoming'), ('product_id', '=', molprod)],
-                    ['product_id', 'qty_done'],
+                    ['product_id', 'quantity'],
                     groupby=['product_id', 'date:month'], orderby='id DESC')
                 prev_res_out = stockmoveline.read_group(
                     [('date', '>=', prev_first), ('date', '<=', prev_last), ('state', '=', 'done'),
                      ('picking_type_id.code', '=', 'outgoing'), ('product_id', '=', molprod)],
-                    ['product_id', 'qty_done'],
+                    ['product_id', 'quantity'],
                     groupby=['product_id', 'date:month'], orderby='id DESC')
-                prev_stock = prev_res_in[0].get('qty_done') if prev_res_in else 0 - prev_res_out[0].get(
-                    'qty_done') if prev_res_out else 0
-                avail_stock = res_in[0].get('qty_done') if res_in else 0 - res1.get('qty_done') if res1 else 0
+                prev_stock = prev_res_in[0].get('quantity') if prev_res_in else 0 - prev_res_out[0].get(
+                    'quantity') if prev_res_out else 0
+                avail_stock = res_in[0].get('quantity') if res_in else 0 - res1.get('quantity') if res1 else 0
                 if fields.Date.to_date(start_date_m) - timedelta(days=1) == prev_last:
                     intial_stock = prev_stock
                 else:
@@ -269,14 +269,14 @@ class ProductInOutStock(models.TransientModel):
                     'start_date': fields.Date.to_date(start_date_m).strftime('%B') + ' - ' + fields.Date.to_date(
                         start_date_m).strftime('%Y'), 'product_id': product_object.display_name,
                     'category': product_object.categ_id.display_name, 'intial_stock': intial_stock,
-                    'in_qty': res_in[0].get('qty_done') if res_in else 0,
-                    'out_qty': res1.get('qty_done') if res1 else 0, 'total_stock': intial_stock,
-                    'in_qty': intial_stock + res_in[0].get('qty_done') if res_in else 0 - res1.get(
-                        'qty_done') if res1 else 0}
+                    'in_qty': res_in[0].get('quantity') if res_in else 0,
+                    'out_qty': res1.get('quantity') if res1 else 0, 'total_stock': intial_stock,
+                    'in_qty': intial_stock + res_in[0].get('quantity') if res_in else 0 - res1.get(
+                        'quantity') if res1 else 0}
                 if product_object not in product_avg_dict:
-                    product_avg_dict[product_object] = res1.get('qty_done') if res1 else 0
+                    product_avg_dict[product_object] = res1.get('quantity') if res1 else 0
                 else:
-                    product_avg_dict[product_object] += res1.get('qty_done') if res1 else 0
+                    product_avg_dict[product_object] += res1.get('quantity') if res1 else 0
                     if count > 1:
                         product_avg_dict[product_object] = product_avg_dict[product_object] / count
 
@@ -357,7 +357,7 @@ class ProductInOutStock(models.TransientModel):
             end_date_m = (beg + MonthEnd(1)).strftime(DEFAULT_SERVER_DATE_FORMAT)
             res_out = stockmoveline.read_group(
                 [('date', '>=', start_date_m), ('date', '<=', end_date_m), ('state', '=', 'done'),
-                 ('picking_type_id.code', '=', 'outgoing')], ['product_id', 'qty_done', 'date'],
+                 ('picking_type_id.code', '=', 'outgoing')], ['product_id', 'quantity', 'date'],
                 groupby=['product_id', 'date:month'], orderby='id DESC')
 
             for res1 in res_out:
@@ -366,27 +366,27 @@ class ProductInOutStock(models.TransientModel):
                 res_in = stockmoveline.read_group(
                     [('date', '>=', start_date_m), ('date', '<=', end_date_m), ('state', '=', 'done'),
                      ('picking_type_id.code', '=', 'incoming'), ('product_id', '=', molprod)],
-                    ['product_id', 'qty_done'],
+                    ['product_id', 'quantity'],
                     groupby=['product_id', 'date:month'], orderby='id DESC')
                 prev_res_in = stockmoveline.read_group(
                     [('date', '>=', prev_first), ('date', '<=', prev_last), ('state', '=', 'done'),
                      ('picking_type_id.code', '=', 'incoming'), ('product_id', '=', molprod)],
-                    ['product_id', 'qty_done'],
+                    ['product_id', 'quantity'],
                     groupby=['product_id', 'date:month'], orderby='id DESC')
                 prev_res_out = stockmoveline.read_group(
                     [('date', '>=', prev_first), ('date', '<=', prev_last), ('state', '=', 'done'),
                      ('picking_type_id.code', '=', 'outgoing'), ('product_id', '=', molprod)],
-                    ['product_id', 'qty_done'],
+                    ['product_id', 'quantity'],
                     groupby=['product_id', 'date:month'], orderby='id DESC')
-                prev_stock = prev_res_in[0].get('qty_done') if prev_res_in else 0 - prev_res_out[0].get(
-                    'qty_done') if prev_res_out else 0
-                avail_stock = res_in[0].get('qty_done') if res_in else 0 - res1.get('qty_done') if res1 else 0
+                prev_stock = prev_res_in[0].get('quantity') if prev_res_in else 0 - prev_res_out[0].get(
+                    'quantity') if prev_res_out else 0
+                avail_stock = res_in[0].get('quantity') if res_in else 0 - res1.get('quantity') if res1 else 0
                 if fields.Date.to_date(start_date_m) - timedelta(days=1) == prev_last:
                     intial_stock = prev_stock
                 else:
                     intial_stock = avail_stock
                 payroll_label.append(product_object.display_name)
-                payroll_dataset.append(res_in[0].get('qty_done') if res_in else 0)
+                payroll_dataset.append(res_in[0].get('quantity') if res_in else 0)
         data_set.update({"payroll_dataset": payroll_dataset})
         data_set.update({"payroll_label": payroll_label})
         return data_set
@@ -416,7 +416,7 @@ class ProductInOutStock(models.TransientModel):
             end_date_m = (beg + MonthEnd(1)).strftime(DEFAULT_SERVER_DATE_FORMAT)
             res_out = stockmoveline.read_group(
                 [('date', '>=', start_date_m), ('date', '<=', end_date_m), ('state', '=', 'done'),
-                 ('picking_type_id.code', '=', 'outgoing')], ['product_id', 'qty_done', 'date'],
+                 ('picking_type_id.code', '=', 'outgoing')], ['product_id', 'quantity', 'date'],
                 groupby=['product_id', 'date:month'], orderby='id DESC')
 
             for res1 in res_out:
@@ -425,28 +425,28 @@ class ProductInOutStock(models.TransientModel):
                 res_in = stockmoveline.read_group(
                     [('date', '>=', start_date_m), ('date', '<=', end_date_m), ('state', '=', 'done'),
                      ('picking_type_id.code', '=', 'incoming'), ('product_id', '=', molprod)],
-                    ['product_id', 'qty_done'],
+                    ['product_id', 'quantity'],
                     groupby=['product_id', 'date:month'], orderby='id DESC')
                 prev_res_in = stockmoveline.read_group(
                     [('date', '>=', prev_first), ('date', '<=', prev_last), ('state', '=', 'done'),
                      ('picking_type_id.code', '=', 'incoming'), ('product_id', '=', molprod)],
-                    ['product_id', 'qty_done'],
+                    ['product_id', 'quantity'],
                     groupby=['product_id', 'date:month'], orderby='id DESC')
                 prev_res_out = stockmoveline.read_group(
                     [('date', '>=', prev_first), ('date', '<=', prev_last), ('state', '=', 'done'),
                      ('picking_type_id.code', '=', 'outgoing'), ('product_id', '=', molprod)],
-                    ['product_id', 'qty_done'],
+                    ['product_id', 'quantity'],
                     groupby=['product_id', 'date:month'], orderby='id DESC')
-                prev_stock = prev_res_in[0].get('qty_done') if prev_res_in else 0 - prev_res_out[0].get(
-                    'qty_done') if prev_res_out else 0
-                avail_stock = res_in[0].get('qty_done') if res_in else 0 - res1.get('qty_done') if res1 else 0
+                prev_stock = prev_res_in[0].get('quantity') if prev_res_in else 0 - prev_res_out[0].get(
+                    'quantity') if prev_res_out else 0
+                avail_stock = res_in[0].get('quantity') if res_in else 0 - res1.get('quantity') if res1 else 0
                 if fields.Date.to_date(start_date_m) - timedelta(days=1) == prev_last:
                     intial_stock = prev_stock
                 else:
                     intial_stock = avail_stock
 
                 payroll_label.append(product_object.display_name)
-                payroll_dataset.append(res1.get('qty_done') if res1 else 0)
+                payroll_dataset.append(res1.get('quantity') if res1 else 0)
         data_set.update({"payroll_dataset": payroll_dataset})
         data_set.update({"payroll_label": payroll_label})
         return data_set
