@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+
+        <record id="view_stock_aging_form" model="ir.ui.view">
+            <field name="name">stock.aging.report.form</field>
+            <field name="model">stock.aging</field>
+            <field name="arch" type="xml">
+                <form string="Stock Aging Report">
+                    <header>
+                        <button name="generate_report_preview" string="Preview Report" type="object" class="btn-primary"/>
+                        <button name="generate_xls_report" string="Download XLS Report" type="object" class="btn-primary"/>
+                        <button name="generate_pdf_report" string="Download PDF Report" type="object" class="btn-primary"/>
+                        <button name="%(inventory_reports_adv_axis.action_stock_aging1)d" type="action"  string="Graph Report" class="btn-primary"/>
+
+                    </header>
+                    <sheet>
+                        <group>
+                            <group>
+                                <field name="start_date"/>
+                            </group>
+                            <group>
+                                <field name="end_date"/>
+                            </group>
+                            <field name="body_html" force_save="1"/>
+                        </group>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+
+        <record id="action_stock_aging" model="ir.actions.act_window">
+            <field name="name">Stock Aging Report</field>
+            <field name="res_model">stock.aging</field>
+            <field name="view_mode">form</field>
+        </record>
+
+        <menuitem action="action_stock_aging" id="menu_stock_aging" name="Stock Aging Report" parent="stock.menu_warehouse_report" sequence="360"/>
+
+    </data>
+</odoo>

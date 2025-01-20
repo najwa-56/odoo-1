@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+
+        <record id="view_stock_availability_report_form" model="ir.ui.view">
+            <field name="name">stock.availability.report.form</field>
+            <field name="model">stock.availability</field>
+            <field name="arch" type="xml">
+                <form string="Stock Availability Report">
+                    <header>
+                        <button name="generate_report_preview" string="Preview Report" type="object" class="btn-primary"/>
+                        <button name="generate_xls_report" string="Download XLS Report" type="object" class="btn-primary"/>
+                        <button name="generate_pdf_report" string="Download PDF Report" type="object" class="btn-primary"/>
+                        <button name="%(inventory_reports_adv_axis.action_product_availibility)d" type="action"  string="Graph Report" class="btn-primary"/>
+
+                    </header>
+                    <sheet>
+                        <group>
+
+                            <group>
+                                <field name="stock_at_date"/>
+                                <field name="filtered_report"/>
+                            </group>
+                            <group>
+                                <field name="category_ids" widget="many2many_tags" invisible="filtered_report == False"/>
+                                <!--                                <field name="location_ids" widget="many2many_tags" attrs="{'invisible': [('filtered_report', '=', False)]}"/>-->
+                            </group>
+                            <field name="body_html" force_save="1"/>
+                        </group>
+
+                    </sheet>
+                </form>
+            </field>
+        </record>
+
+        <record id="action_stock_availability_report" model="ir.actions.act_window">
+            <field name="name">Stock Availability Report</field>
+            <field name="res_model">stock.availability</field>
+            <field name="view_mode">form</field>
+        </record>
+
+        <menuitem action="action_stock_availability_report" id="menu_stock_availability_report" name="Stock Availability Report" parent="stock.menu_warehouse_report" sequence="320"/>
+
+    </data>
+</odoo>

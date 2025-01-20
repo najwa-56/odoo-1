@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+
+        <record id="view_product_in_out_stock_report_form" model="ir.ui.view">
+            <field name="name">product.in.out.stock.form</field>
+            <field name="model">product.in.out.stock</field>
+            <field name="arch" type="xml">
+                <form string="Product In Out Stock">
+                    <header>
+                        <button name="generate_report_preview" string="Preview Report" type="object" class="btn-primary"/>
+                        <button name="generate_xls_report" string="Download XLS Report" type="object" class="btn-primary"/>
+                        <button name="generate_pdf_report" string="Download PDF Report" type="object" class="btn-primary"/>
+                        <button name="%(inventory_reports_adv_axis.action_product_inout_1)d" type="action"  string="Graph Report" class="btn-primary"/>
+
+                    </header>
+                    <sheet>
+                        <group>
+<!--                            <field name="date"/>-->
+                            <label for="start_date" string="Dates"/>
+                            <div class="o_row">
+                                <field name="start_date" nolabel="1" class="oe_inline" widget="daterange" options="{'related_end_date': 'end_date'}"/>
+                                <i class="fa fa-long-arrow-right mx-2" aria-label="Arrow icon" title="To"/>
+                                <field name="end_date" nolabel="1" class="oe_inline" widget="daterange" options="{'related_start_date': 'start_date'}"/>
+                            </div>
+                        </group>
+                        <field name="body_html" force_save="1"/>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+
+        <record id="action_product_in_out_stock" model="ir.actions.act_window">
+            <field name="name">Product In Out Stock Report</field>
+            <field name="res_model">product.in.out.stock</field>
+            <field name="view_mode">form</field>
+        </record>
+
+        <menuitem action="action_product_in_out_stock" id="menu_product_in_out_stock" name="Product In Out stock Report" parent="stock.menu_warehouse_report" sequence="452"/>
+
+    </data>
+</odoo>

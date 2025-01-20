@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <data>
+
+        <record id="view_stock_reorder_analysis_form" model="ir.ui.view">
+            <field name="name">stock.reorder.analysis.report.form</field>
+            <field name="model">stock.reorder.analysis</field>
+            <field name="arch" type="xml">
+                <form string="Stock Reorder Analysis Report">
+                    <header>
+                        <button name="generate_report_preview" string="Preview Report" type="object" class="btn-primary"/>
+                        <button name="generate_xls_report" string="Download XLS Report" type="object" class="btn-primary"/>
+                        <button name="generate_pdf_report" string="Download PDF Report" type="object" class="btn-primary"/>
+                        <button name="%(inventory_reports_adv_axis.action_stock_reorder_analysis1)d" type="action"  string="Graph Report" class="btn-primary"/>
+
+                    </header>
+                    <sheet>
+                        <group>
+                            <group>
+                                <field name="start_date"/>
+<!--                                <field name="product_ids" widget="many2many_tags"/>-->
+                            </group>
+                            <group>
+                                <field name="end_date"/>
+                            </group>
+                            <field name="body_html" force_save="1"/>
+                        </group>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+
+        <record id="action_stock_reorder_analysis" model="ir.actions.act_window">
+            <field name="name">Stock Reorder Analysis Report</field>
+            <field name="res_model">stock.reorder.analysis</field>
+            <field name="view_mode">form</field>
+        </record>
+
+        <menuitem action="action_stock_reorder_analysis" id="menu_stock_reorder_analysis" name="Stock Reorder Analysis Report" parent="stock.menu_warehouse_report" sequence="370"/>
+
+    </data>
+</odoo>

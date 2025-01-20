@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+
+        <record id="view_stock_expiry_report_form" model="ir.ui.view">
+            <field name="name">stock.expiry.report.form</field>
+            <field name="model">stock.expiry</field>
+            <field name="arch" type="xml">
+                <form string="Stock Expiry Report">
+                    <header>
+                        <button name="generate_report_preview" string="Preview Report" type="object"
+                                class="btn-primary"/>
+                        <button name="generate_xls_report" string="Download XLS Report" type="object" class="btn-primary"/>
+                        <button name="generate_pdf_report" string="Download PDF Report" type="object" class="btn-primary"/>
+                        <button name="%(inventory_reports_adv_axis.action_stock_expiry1)d" type="action"  string="Graph Report" class="btn-primary"/>
+
+                    </header>
+                    <sheet>
+                        <group>
+                            <group>
+                                <field name="start_date"/>
+                                <field name="report_type"/>
+                            </group>
+                            <group>
+                                <field name="end_date"/>
+                            </group>
+                        </group>
+                        <field name="body_html" force_save="1"/>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+
+        <record id="action_stock_expiry_report" model="ir.actions.act_window">
+            <field name="name">Stock Expiry Report</field>
+            <field name="res_model">stock.expiry</field>
+            <field name="view_mode">form</field>
+        </record>
+
+        <menuitem action="action_stock_expiry_report" id="menu_stock_expiry_report" name="Stock Expiry Report"
+                  parent="stock.menu_warehouse_report" sequence="380"/>
+
+    </data>
+</odoo>

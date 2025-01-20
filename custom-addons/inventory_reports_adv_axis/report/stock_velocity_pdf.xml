@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+
+        <record id="stock_velocity_pdf_report" model="ir.actions.report">
+            <field name="name">Stock Velocity</field>
+            <field name="model">stock.velocity.analysis</field>
+            <field name="report_type">qweb-html</field>
+            <field name="report_name">inventory_reports_adv_axis.report_stock_velocity_id</field>
+            <field name="report_file">inventory_reports_adv_axis.report_stock_velocity_id</field>
+            <field name="print_report_name">'Stock Velocity Report'</field>
+            <field name="binding_type">report</field>
+        </record>
+
+        <template id="report_stock_velocity_id">
+            <t t-call="web.html_container">
+                <t t-foreach="docs" t-as="doc">
+                    <t t-call="inventory_reports_adv_axis.report_stock_velocity_data"/>
+                </t>
+            </t>
+        </template>
+
+        <template id="report_stock_velocity_data">
+            <t t-call="web.external_layout">
+                <t t-call="web.html_container">
+                    <table class="table table-sm">
+                        <thead>
+                            <tr>
+                                <th>Product</th>
+                                <th>Quantity Moved</th>
+                                <th>Date Moved</th>
+                                <th>Velocity</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <t t-foreach="doc._get_stock_moves()" t-as="move">
+                                <tr>
+                                    <td><t t-out="move.product_id.name"/></td>
+                                    <td><t t-out="move.product_uom_qty"/></td>
+                                    <td><t t-out="move.date"/></td>
+                                    <td><t t-out="doc._calculate_velocity(move.product_id, move.product_uom_qty, move.date)"/></td>
+                                </tr>
+                            </t>
+                        </tbody>
+                    </table>
+                </t>
+            </t>
+        </template>
+
+    </data>
+</odoo>

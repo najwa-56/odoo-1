@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="inventory_reports_adv_axis.stock_expiry_pdf_report" model="ir.actions.report">
+        <field name="name">Stock Expiry Report</field>
+        <field name="model">stock.expiry</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">inventory_reports_adv_axis.stock_expiry_report_template</field>
+    </record>
+
+    <record id="inventory_reports_adv_axis.stock_expired_pdf_report" model="ir.actions.report">
+        <field name="name">Stock Expired Report</field>
+        <field name="model">stock.expiry</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">inventory_reports_adv_axis.stock_expired_report_template</field>
+    </record>
+
+    <template id="inventory_reports_adv_axis.stock_expiry_report_template">
+        <t t-call="web.html_container">
+            <t t-foreach="docs" t-as="doc">
+                <t t-call="inventory_reports_adv_axis.stock_expiry_data"/>
+            </t>
+        </t>
+    </template>
+
+    <template id="inventory_reports_adv_axis.stock_expired_report_template">
+        <t t-call="web.html_container">
+            <t t-foreach="docs" t-as="doc">
+                <t t-call="inventory_reports_adv_axis.stock_expiry_data"/>
+            </t>
+        </t>
+    </template>
+
+    <template id="inventory_reports_adv_axis.stock_expiry_data">
+        <t t-call="web.external_layout">
+            <t t-call="web.html_container"/>
+
+            <table class="table table-sm">
+                <thead>
+                    <tr>
+                        <th>Product</th>
+                        <th>Expiry Date</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <t t-foreach="doc._get_filtered_products()" t-as="product">
+                        <tr>
+                            <td>
+                                <t t-esc="product.name"/>
+                            </td>
+                            <td>
+                                <t t-esc="datetime.fromtimestamp(product.expiration_time).strftime('%Y-%m-%d')"/>
+                            </td>
+                        </tr>
+                    </t>
+                </tbody>
+            </table>
+        </t>
+    </template>
+</odoo>

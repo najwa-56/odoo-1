@@ -1,0 +1,43 @@
+<odoo>
+    <data>
+
+        <record id="view_product_movement_form_axis" model="ir.ui.view">
+            <field name="name">product.movement.report.form</field>
+            <field name="model">product.movement</field>
+            <field name="arch" type="xml">
+                <form string="Product Movement Report">
+                    <header>
+                        <button name="generate_report_preview" string="Preview Report" type="object" class="btn-primary"/>
+                        <button name="generate_xls_report" string="Download XLS Report" type="object" class="btn-primary"/>
+                        <button name="generate_pdf_report" string="Download PDF Report" type="object" class="btn-primary"/>
+                        <button name="%(inventory_reports_adv_axis.action_inventory_valuation)d" type="action"  string="Graph Report" class="btn-primary" context="{'categ':warehouse_ids}"/>
+
+                    </header>
+                    <sheet>
+                        <group>
+                            <group>
+                                <field name="start_date"/>
+                                <field name="slow_moving_qty"/>
+                                <field name="warehouse_ids" widget="many2many_tags"/>
+                            </group>
+                            <group>
+                                <field name="end_date"/>
+                                <field name="fast_moving_qty"/>
+                            </group>
+                        </group>
+                        <field name="body_html" force_save="1"/>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+
+        <record id="action_product_movement_report_axis" model="ir.actions.act_window">
+            <field name="name">Product Movement Report</field>
+            <field name="res_model">product.movement</field>
+            <field name="view_mode">form</field>
+        </record>
+
+        <menuitem action="action_product_movement_report_axis" id="menu_product_movement_report_axis" name="Product Movement Report" parent="stock.menu_warehouse_report" sequence="311"/>
+
+    </data>
+</odoo>

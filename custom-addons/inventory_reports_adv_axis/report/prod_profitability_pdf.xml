@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="product_profitability_pdf_report" model="ir.actions.report">
+        <field name="name">Product Profitability</field>
+        <field name="model">product.profitability</field>
+        <field name="report_type">qweb-html</field>
+        <field name="report_name">inventory_reports_adv_axis.report_product_profitability_id</field>
+        <field name="report_file">inventory_reports_adv_axis.report_product_profitability_id</field>
+        <field name="binding_type">report</field>
+    </record>
+
+    <template id="report_product_profitability_id">
+        <t t-call="web.html_container">
+            <t t-foreach="docs" t-as="doc">
+                <t t-call="inventory_reports_adv_axis.report_product_profitability_data"/>
+            </t>
+        </t>
+    </template>
+
+    <template id="report_product_profitability_data">
+        <t t-call="web.external_layout">
+            <t t-call="web.html_container">
+                <div class="page">
+                    <h2>Product Profitability Report</h2>
+                    <p>Start Date: <t t-esc="doc.start_date"/></p>
+                    <p>End Date: <t t-esc="doc.end_date"/></p>
+
+                    <table class="table table-sm">
+                        <thead>
+                            <tr>
+                                <th>Product</th>
+                                <th>Total Revenue</th>
+                                <th>Total Cost</th>
+                                <th>Gross Profit</th>
+                                <th>Profit Percentage</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+<!--                            <t t-foreach="doc.env['product.product'].search([])" t-as="product">-->
+<!--                                <tr>-->
+<!--                                    <td><t t-esc="product.name"/></td>-->
+<!--                                    <td><t t-esc="get_total_revenue(product)"/></td>-->
+<!--                                    <td><t t-esc="get_total_cost(product)"/></td>-->
+<!--                                    <td><t t-esc="get_gross_profit(product)"/></td>-->
+<!--                                    <td><t t-esc="get_profit_percentage(product)"/></td>-->
+<!--                                </tr>-->
+<!--                            </t>-->
+
+                            <t t-foreach="doc.env['product.product'].search([])" t-as="product">
+                                <tr>
+                                    <td><t t-esc="product.name"/></td>
+                                    <td><t t-esc="doc.get_total_revenue(product)"/></td>
+                                    <td><t t-esc="doc.get_total_cost(product)"/></td>
+                                    <td><t t-esc="doc.get_gross_profit(product)"/></td>
+                                    <td><t t-esc="doc.get_profit_percentage(product)"/></td>
+                                </tr>
+                            </t>
+                        </tbody>
+                    </table>
+                </div>
+            </t>
+        </t>
+    </template>
+</odoo>

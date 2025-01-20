@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+
+        <record id="view_inventory_coverage_report_form" model="ir.ui.view">
+            <field name="name">inventory.coverage.form</field>
+            <field name="model">inventory.coverage</field>
+            <field name="arch" type="xml">
+                <form string="Inventory Coverage Report">
+                    <header>
+                        <button name="generate_report_preview" string="Preview Report" type="object" class="btn-primary"/>
+                        <button name="generate_xls_report" string="Download XLS Report" type="object" class="btn-primary"/>
+                        <button name="generate_pdf_report" string="Download PDF Report" type="object" class="btn-primary"/>
+                        <button name="%(inventory_reports_adv_axis.action_inventory_inventory_coverage_1)d" type="action"  string="Graph Report" class="btn-primary"/>
+
+                    </header>
+                    <sheet>
+                        <group>
+
+                            <group>
+                                <field name="date_start"/>
+                            </group>
+                            <group>
+                                <field name="date_end"/>
+                            </group>
+
+                        </group>
+                        <field name="body_html" force_save="1"/>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+
+        <record id="action_inventory_coverage_report" model="ir.actions.act_window">
+            <field name="name">Inventory Coverage Report</field>
+            <field name="res_model">inventory.coverage</field>
+            <field name="view_mode">form</field>
+        </record>
+
+        <menuitem action="action_inventory_coverage_report" id="menu_inventory_coverage_report" name="Inventory Coverage Report" parent="stock.menu_warehouse_report" sequence="420"/>
+
+    </data>
+</odoo>
