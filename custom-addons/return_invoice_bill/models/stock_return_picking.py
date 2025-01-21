@@ -71,3 +71,53 @@ class StockReturnPicking(models.TransientModel):
         """
         self._update_stock_picking()
         return self._get_return_action()
+
+
+    def action_create_exchanges(self):
+        """ Create a return for the active picking, then create a return of
+        the return for the exchange picking and open it."""
+        action = self.create_returns()
+        if action.get('res_id'):
+            new_picking = self.env['stock.picking'].browse(int(action.get('res_id')))
+            new_picking.button_validate()
+
+        proc_list = []
+        for line in self.product_return_moves:
+            if not line.move_id:
+                continue
+            proc_values = self._get_proc_values(line)
+            proc_list.append(self.env["procurement.group"].with_context(exchange=True).Procurement(
+                line.product_id, line.quantity, line.uom_id,
+                line.move_id.location_dest_id or self.picking_id.location_dest_id,
+                line.product_id.display_name, self.picking_id.origin, self.picking_id.company_id,
+                proc_values,
+            ))
+        if proc_list:
+            self.env['procurement.group'].with_context(exchange=True).run(proc_list)
+        exchange_picking_id = self.env['stock.picking'].search([('state','=','assigned'),('group_id','=',new_picking.group_id.id)])
+        exchange_picking_id.button_validate()
+        return action
+
+    def _get_proc_values(self, line):
+        self.ensure_one()
+        return {
+            'group_id': self.picking_id.group_id,
+            'date_planned': line.move_id.date or fields.Datetime.now(),
+            'warehouse_id': self.picking_id.picking_type_id.warehouse_id,
+            'partner_id': self.picking_id.partner_id.id,
+            'location_dest_id': line.move_id.location_dest_id or self.picking_id.location_dest_id,
+            'location_id': line.move_id.location_id or self.picking_id.location_id,
+            'company_id': self.picking_id.company_id,
+        }
+
+
+
+
+    # def _prepare_move_default_values(self, return_line, new_picking):
+    #     vals = super(StockReturnPicking, self)._prepare_move_default_values(return_line, new_picking)
+    #     print("self._prepare_move_default_values context ===================",self._context)
+    #     is_exchange = self._context.get('is_exchange',False)
+    #     if return_line.to_refund and not is_exchange:
+    #         vals['to_refund'] = True
+    #     return vals
+

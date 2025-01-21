@@ -21,15 +21,26 @@ class StockPicking(models.Model):
     is_paid = fields.Boolean(string='Is Paid',
                              help='Value will be True when order has paid '
                                   'otherwise False.')
+    second_deilvery = fields.Boolean('second_deilvery')
+   
 
-    @api.model
+    @api.model_create_multi
     def create(self, vals):
-        """This method overrides the default create method to set the
-        'picking_type_name' field based on the 'picking_type_id' field
-        before creating the record."""
-
-        self.picking_type_name = self.picking_type_id.name
-        return super(StockPicking, self).create(vals)
+        if self._context.get('exchange',False):
+            for val in vals:
+                if val.get('origin',False):
+                    sale_order_id = self.env['sale.order'].search([('name','=',val.get('origin'))])
+                    if sale_order_id:
+                        if  sale_order_id.order_line[0] and  sale_order_id.order_line[0].route_id:
+                            rule_id = self.env['stock.rule'].search([('route_id', '=', sale_order_id.order_line[0].route_id.id)])
+                            picking_type_id = rule_id.picking_type_id
+                            location_id = rule_id.location_src_id
+                            if picking_type_id and location_id :
+                                val['picking_type_id'] = picking_type_id.id
+                                val['location_id'] = location_id.id
+                                val['second_deilvery'] = True
+        res =  super().create(vals)
+        return res
 
     def action_get_credit_note(self):
         """Generates an action to view reversal credit notes
@@ -66,3 +77,31 @@ class StockPicking(models.Model):
     @api.depends('return_invoice_count')
     def _compute_return_invoice_count(self):
         self.return_invoice_count = self.return_count
+
+
+
+
+class StockMove(models.Model):
+    """This class extends the 'stock.picking' model to add a method for
+    retrieving credit notes and debit notes related
+    to the picking, and generating actions for viewing them."""
+    _inherit = 'stock.move'
+
+
+    @api.model_create_multi
+    def create(self, vals):
+        if self._context.get('exchange',False):
+            for val in vals:
+                if val.get('origin',False):
+                    sale_order_id = self.env['sale.order'].search([('name','=',val.get('origin'))])
+                    if sale_order_id:
+                        if  sale_order_id.order_line[0] and  sale_order_id.order_line[0].route_id:
+                            rule_id = self.env['stock.rule'].search([('route_id', '=', sale_order_id.order_line[0].route_id.id)])
+                            picking_type_id = rule_id.picking_type_id
+                            location_id = rule_id.location_src_id
+                            if picking_type_id and location_id :
+                                val['picking_type_id'] = picking_type_id.id
+                                val['location_id'] = location_id.id
+        res =  super().create(vals)
+
+        return res
