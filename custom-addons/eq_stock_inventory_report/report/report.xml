@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+
+        <record id="action_stock_inventory_template" model="ir.actions.report">
+            <field name="name">Stock Report</field>
+            <field name="model">wizard.stock.inventory</field>
+            <field name="report_type">qweb-pdf</field>
+            <field name="report_name">eq_stock_inventory_report.stock_inventory_report</field>
+            <field name="report_file">eq_stock_inventory_report.stock_inventory_report</field>
+        </record>
+
+    </data>
+</odoo>
