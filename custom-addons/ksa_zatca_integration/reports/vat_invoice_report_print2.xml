@@ -48,7 +48,7 @@
 
 					<table style="border:2pt solid black;width:100%;color:black; margin-top:-30pt; font-family:ArbFONTS-GE_Dinar_One_Medium !important" class="table-condensed table-sm">
 							<tr style="border:2pt solid black">
-								<td style="font-weight: bold;text-align:center;color:black;background-color:#dddddd;FONT-SIZE: 12pt"><span class="text-right arabic">  الفاتورة الضريبية  </span></td> 
+								<td style="font-weight: bold;text-align:center;color:black;background-color:#dddddd;FONT-SIZE: 12pt"><span class="text-right arabic"> (مشتريات) الفاتورة الضريبية  </span></td> 
 							</tr>
 								<tr t-if="doc.move_type == 'out_refund'" style="border:2pt solid black">
 								<td style="font-weight: bold;text-align:center;color:black;background-color:#dddddd;FONT-SIZE: 12pt"><span class="text-right arabic">   إشعار دائن  </span></td> 
