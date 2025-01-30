@@ -76,6 +76,12 @@ class wizard_stock_inventory(models.TransientModel):
             'target': 'new'
         }
 
+    def _get_mulit_uom(self,product):
+        if self.company_id.company_registry == '1131056851':
+            if product.multi_uom_price_id:
+                return product.multi_uom_price_id[0].uom_id.factor_inv
+            return 1
+        return 1
     def print_xls_report(self):
         self.check_date_range()
         xls_filename = 'stock_report.xlsx'
@@ -120,12 +126,13 @@ class wizard_stock_inventory(models.TransientModel):
                 if not self.group_by_categ:
                     products_data = report_stock_inv_obj.get_product_valuation_data(self,warehouse)
                     for key,product_val in products_data.items():
-                        beginning_qty = product_val.get('beg_qty')
-                        product_qty_in = product_val.get('product_qty_in')
-                        product_qty_out = product_val.get('product_qty_out')
-                        product_qty_internal = product_val.get('product_qty_internal')
-                        product_qty_adjustment = product_val.get('product_qty_adjustment')
-                        ending_qty = product_val.get('product_ending_qty')
+                        factor_inv = self._get_mulit_uom(key) 
+                        beginning_qty = product_val.get('beg_qty') * factor_inv
+                        product_qty_in = product_val.get('product_qty_in') * factor_inv
+                        product_qty_out = product_val.get('product_qty_out') * factor_inv
+                        product_qty_internal = product_val.get('product_qty_internal') * factor_inv
+                        product_qty_adjustment = product_val.get('product_qty_adjustment') * factor_inv
+                        ending_qty = product_val.get('product_ending_qty') * factor_inv
 
                         worksheet.merge_range(rows, 0, rows, 1, key.display_name, product_header_format)
                         worksheet.write(rows, 2, beginning_qty, header_data_format)
@@ -159,12 +166,13 @@ class wizard_stock_inventory(models.TransientModel):
                         worksheet.merge_range(rows, 0, rows, 7, categ.name, header_merge_format)
                         rows += 1
                         for key,product_val in product_value.items():
-                            beginning_qty = product_val.get('beg_qty')
-                            product_qty_in = product_val.get('product_qty_in')
-                            product_qty_out = product_val.get('product_qty_out')
-                            product_qty_internal = product_val.get('product_qty_internal')
-                            product_qty_adjustment = product_val.get('product_qty_adjustment')
-                            ending_qty = product_val.get('product_ending_qty')
+                            factor_inv = self._get_mulit_uom(key)
+                            beginning_qty = product_val.get('beg_qty') * factor_inv
+                            product_qty_in = product_val.get('product_qty_in') * factor_inv
+                            product_qty_out = product_val.get('product_qty_out') * factor_inv
+                            product_qty_internal = product_val.get('product_qty_internal') * factor_inv
+                            product_qty_adjustment = product_val.get('product_qty_adjustment') * factor_inv
+                            ending_qty = product_val.get('product_ending_qty') * factor_inv
 
                             worksheet.merge_range(rows, 0 , rows, 1, key.name, product_header_format)
                             worksheet.write(rows, 2, beginning_qty, header_data_format)
@@ -213,12 +221,13 @@ class wizard_stock_inventory(models.TransientModel):
                 if not self.group_by_categ:
                     products_data = report_stock_inv_obj.get_location_wise_product(self,warehouse,self.location_ids)
                     for key,value in products_data.items():
+                        factor_inv = self._get_mulit_uom(key)
                         for header_data in value.get('location_header_data'):
-                            beginning_qty = header_data['beg_qty']
-                            product_qty_in = header_data['product_qty_in']
-                            product_qty_out = header_data['product_qty_out']
-                            product_qty_internal = header_data['product_qty_internal']
-                            product_qty_adjustment = header_data['product_qty_adjustment']
+                            beginning_qty = header_data['beg_qty'] * factor_inv
+                            product_qty_in = header_data['product_qty_in'] * factor_inv
+                            product_qty_out = header_data['product_qty_out'] * factor_inv
+                            product_qty_internal = header_data['product_qty_internal'] * factor_inv
+                            product_qty_adjustment = header_data['product_qty_adjustment'] * factor_inv
                             ending_qty = header_data['product_ending_qty']
 
                             prod_beginning_qty += beginning_qty
@@ -266,13 +275,16 @@ class wizard_stock_inventory(models.TransientModel):
                         worksheet.merge_range(rows, 0, rows, 8, categ.name, header_merge_format)
                         rows += 1
                         for data in list(product_value.values()):
+                            # factor_inv = self._get_mulit_uom(key)
+                            
                             for header_data in data['location_header_data']:
-                                beginning_qty = header_data['beg_qty']
-                                product_qty_in = header_data['product_qty_in']
-                                product_qty_out = header_data['product_qty_out']
-                                product_qty_internal = header_data['product_qty_internal']
-                                product_qty_adjustment = header_data['product_qty_adjustment']
-                                ending_qty = header_data['product_ending_qty']
+                                factor_inv = self._get_mulit_uom(header_data['product_id'])
+                                beginning_qty = header_data['beg_qty'] * factor_inv
+                                product_qty_in = header_data['product_qty_in']  * factor_inv
+                                product_qty_out = header_data['product_qty_out']  * factor_inv
+                                product_qty_internal = header_data['product_qty_internal']  * factor_inv
+                                product_qty_adjustment = header_data['product_qty_adjustment']  * factor_inv
+                                ending_qty = header_data['product_ending_qty']  * factor_inv
 
                                 categ_prod_beginning_qty += beginning_qty
                                 categ_prod_qty_in += product_qty_in
