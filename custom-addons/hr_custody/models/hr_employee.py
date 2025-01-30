@@ -71,7 +71,7 @@ class HrEmployee(models.Model):
             custody_ids = []
             for each in custody_obj:
                 custody_ids.append(each.id)
-            view_id = self.env.ref('hr_custody.hr_custody_form_view').id
+            view_id = self.env.ref('hr_custody.custody_property_view_form').id
             if custody_ids:
                 if len(custody_ids) <= 1:
                     value = {
@@ -106,7 +106,7 @@ class HrEmployee(models.Model):
             for each in equipment_obj:
                 if each.custody_property_id.id not in equipment_ids:
                     equipment_ids.append(each.custody_property_id.id)
-            view_id = self.env.ref('hr_custody.custody_custody_form_view').id
+            view_id = self.env.ref('hr_custody.custody_property_view_form').id
             if equipment_ids:
                 if len(equipment_ids) <= 1:
                     value = {
