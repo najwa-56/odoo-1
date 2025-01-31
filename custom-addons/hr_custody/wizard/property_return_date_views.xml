@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
-        <record model='ir.ui.view' id='property_return_date_view_form'>
+        <record model='ir.ui.view' id='property_refuse_view_form'>
             <field name="name">property.return.date.form</field>
             <field name="model">property.return.date</field>
             <field name="arch" type="xml">
@@ -22,7 +22,36 @@
             <field name="name">Custody Request</field>
             <field name="res_model">property.return.date</field>
             <field name="view_mode">form</field>
-            <field name="view_id" ref="property_return_date_view_form"/>
+            <field name="view_id" ref="property_refuse_view_form"/>
+            <field name="target">new</field>
+        </record>
+
+
+
+
+           <record model='ir.ui.view' id='property_refuse_view_form'>
+            <field name="name">property.refuse.form</field>
+            <field name="model">property.refuse</field>
+            <field name="arch" type="xml">
+                <form string="Refuse">
+                    <group>
+                        <group>
+                            <field name="reason"/>
+                        </group>
+                    </group>
+                    <footer>
+                        <button name="proceed" string="Proceed" type="object" class="oe_highlight"/>
+                        or
+                        <button string="Cancel" class="oe_link" special="cancel"/>
+                    </footer>
+                </form>
+            </field>
+        </record>
+        <record model='ir.actions.act_window' id='property_refuse_act'>
+            <field name="name">Custody Refuse</field>
+            <field name="res_model">property.refuse</field>
+            <field name="view_mode">form</field>
+            <field name="view_id" ref="property_refuse_view_form"/>
             <field name="target">new</field>
         </record>
 </odoo>

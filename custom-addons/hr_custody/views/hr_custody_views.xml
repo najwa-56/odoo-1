@@ -22,11 +22,11 @@
                             invisible=" state not in 'to_approve' or is_renew_return_date ==False"/>
                     <button string="Refuse" groups="hr.group_hr_manager"
                             type="action"
-                            name="%(hr_custody.property_return_date_act)d"
+                            name="%(hr_custody.property_refuse_act)d"
                             invisible="state not in 'to_approve' or is_renew_return_date"
                             context="{'reject_id':id,'model_id':'hr.custody'}"/>
                     <button class="btn-primary"
-                            name="%(hr_custody.property_return_date_act)d"
+                            name="%(hr_custody.property_refuse_act)d"
                             string="Refuse"
                             groups="hr.group_hr_manager" type="action"
                             invisible="state not in 'to_approve' or is_renew_return_date == False"
@@ -81,8 +81,11 @@
                                    readonly="state != 'draft'"/>
                             <field name="renew_date"
                                    invisible="is_renew_return_date == False or state != 'to_approve'"/>
-                            <field name="rejected_reason"
+                            <!-- <field name="rejected_reason"
+                                   invisible="state not in 'rejected'"/> -->
+                            <field name="refuse_reason"
                                    invisible="state not in 'rejected'"/>
+
                             <field name="renew_rejected_reason"
                                    invisible=" is_renew_reject == False or state not in 'approved' "/>
                             <field name="company_id"

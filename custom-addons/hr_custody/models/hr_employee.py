@@ -62,38 +62,15 @@ class HrEmployee(models.Model):
             each.equipment_count = len(equipment_ids)
 
     def custody_view(self):
-        """ The function Used to returning the
-        view of all custody contracts
-        related to the current employee"""
-        for each1 in self:
-            custody_obj = self.env['hr.custody'].search(
-                [('employee_id', '=', each1.id)])
-            custody_ids = []
-            for each in custody_obj:
-                custody_ids.append(each.id)
-            view_id = self.env.ref('hr_custody.custody_property_view_form').id
-            if custody_ids:
-                if len(custody_ids) <= 1:
-                    value = {
-                        'view_mode': 'form',
-                        'res_model': 'hr.custody',
-                        'view_id': view_id,
-                        'type': 'ir.actions.act_window',
-                        'name': _('Custody'),
-                        'res_id': custody_ids and custody_ids[0]
-                    }
-                else:
-                    value = {
-                        'domain': str([('id', 'in', custody_ids)]),
-                        'view_mode': 'tree,form',
-                        'res_model': 'hr.custody',
-                        'view_id': False,
-                        'type': 'ir.actions.act_window',
-                        'name': _('Custody'),
-                        'res_id': custody_ids
-                    }
-
-                return value
+        return {
+            'name': _('Custody'),
+            'type': 'ir.actions.act_window',
+            'res_model': 'hr.custody',
+            'domain': [('employee_id', '=', self.id)],  # Filters only related custody records
+            'view_mode': 'tree,form',  # Opens list view first, with form as an option
+            'view_id': False,  # Odoo will determine the best view
+            'target': 'current',
+        }
 
     def equipment_view(self):
         """The function used to returning the

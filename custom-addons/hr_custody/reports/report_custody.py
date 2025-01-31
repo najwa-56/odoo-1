@@ -58,41 +58,40 @@ class ReportCustody(models.Model):
         help='The current status of the record')
 
     def _select(self):
-        """the function used to construct the
-        SELECT statement for retrieving specific fields in a SQL query."""
+        """Constructs the SELECT statement for retrieving specific fields in a SQL query."""
         select_str = """
-             SELECT
-                    (select 1 ) AS nbr,
-                    t.id as id,
-                    t.name as name,
-                    t.date_request as date_request,
-                    t.employee_id as employee,
-                    t.purpose as purpose,
-                    t.custody_property_id as custody_name,
-                    t.return_date as return_date,
-                    t.renew_date as renew_date,
-                    t.is_renew_return_date as renew_return_date,
-                    t.state as state
+            SELECT
+                t.id as id,
+                t.name as name,
+                t.date_request as date_request,
+                t.employee_id as employee_id,
+                t.purpose as purpose,
+                t.custody_property_id as custody_property_id,  -- FIXED ALIAS
+                t.return_date as return_date,
+                t.renew_date as renew_date,
+                t.is_renew_return_date as is_renew_return_date,
+                t.state as state
         """
         return select_str
 
+
     def _group_by(self):
-        """The function used to construct
-        the GROUP BY clause for grouping fields in a SQL query."""
+        """Constructs the GROUP BY clause for grouping fields in a SQL query."""
         group_by_str = """
-                GROUP BY
-                    t.id,
-                    name,
-                    date_request,
-                    employee_id,
-                    purpose,
-                    custody_property_id,
-                    return_date,
-                    renew_date,
-                    is_renew_return_date,
-                    state
+            GROUP BY
+                t.id,
+                t.name,
+                t.date_request,
+                t.employee_id,
+                t.purpose,
+                t.custody_property_id,  -- FIXED FIELD NAME
+                t.return_date,
+                t.renew_date,
+                t.is_renew_return_date,
+                t.state
         """
         return group_by_str
+
 
     def init(self):
         """The function used to initialize the

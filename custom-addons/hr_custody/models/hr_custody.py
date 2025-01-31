@@ -213,3 +213,5 @@ class HrCustody(models.Model):
     is_mail_send = fields.Boolean(string="Mail Send",
                                   help='Indicates whether an email has '
                                        'been sent or not.')
+
+    refuse_reason = fields.Text('Refues Reason')

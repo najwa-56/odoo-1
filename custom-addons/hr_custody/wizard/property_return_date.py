@@ -36,7 +36,7 @@ class PropertyReturnDate(models.TransientModel):
     def validate_return_date(self):
         """The function used to renewal date validation"""
         custody_obj = self.env['hr.custody'].search(
-            [('id', '=', self._context.get('custody_id'))])
+            [('id', '=', self._context.get('active_id'))])
         if self.returned_date <= custody_obj.date_request:
             raise ValidationError('Please Give Valid Renewal Date')
 
@@ -44,7 +44,26 @@ class PropertyReturnDate(models.TransientModel):
         """The function used to proceed
         with the renewal process for the associated custody."""
         custody_obj = self.env['hr.custody'].search(
-            [('id', '=', self._context.get('custody_id'))])
+            [('id', '=', self._context.get('active_id'))])
         custody_obj.write({'is_renew_return_date': True,
                            'renew_date': self.returned_date,
                            'state': 'to_approve'})
+
+
+class PropertyRefuse(models.TransientModel):
+    _name = 'property.refuse'
+    _description = 'Property Refuse Reason'
+
+    reason = fields.Text('Refuse Reason',required=True)
+
+
+    
+
+    def proceed(self):
+        """The function used to proceed
+        with the renewal process for the associated custody."""
+        custody_obj = self.env['hr.custody'].search(
+            [('id', '=', self._context.get('active_id'))])
+        custody_obj.write({
+                           'refuse_reason': self.reason,
+                           'state': 'rejected'})
