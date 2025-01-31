@@ -32,7 +32,6 @@ class eq_stock_inventory_report_stock_inventory_report(models.AbstractModel):
     def _get_mulit_uom(self,record,product):
         if record.company_id.company_registry == '1131056851':
             if product.multi_uom_price_id:
-                print("yeseeeeeeeeeeeeeeeeee==========",product.multi_uom_price_id[0].uom_id.factor_inv)
                 return product.multi_uom_price_id[0].uom_id.factor_inv
             else:
                 return 1
@@ -59,12 +58,12 @@ class eq_stock_inventory_report_stock_inventory_report(models.AbstractModel):
                 beg_qty = product_beg_qty_data.get(product.id,0) 
                 location_data_dict = {'beg_qty':beg_qty,'product_qty_in':0,'product_qty_out':0,'product_qty_internal':0,
                     'product_qty_adjustment':0,'product_ending_qty':beg_qty,'location_id':location}
-                location_header_data_dict['beg_qty'] += beg_qty * factor_inv
-                location_header_data_dict['product_ending_qty'] += beg_qty * factor_inv
+                location_header_data_dict['beg_qty'] += beg_qty / factor_inv
+                location_header_data_dict['product_ending_qty'] += beg_qty / factor_inv
                 product_sale_data = product_inventory_movement_data.get(product.id) or {}
                 for each in lst:
                     value = product_sale_data.get(each,0)
-                    location_data_dict[each] = value * factor_inv
+                    location_data_dict[each] = value / factor_inv
                     location_data_dict['product_ending_qty'] += value
                     location_header_data_dict[each] += value
                     location_header_data_dict['product_ending_qty'] += value
@@ -96,12 +95,12 @@ class eq_stock_inventory_report_stock_inventory_report(models.AbstractModel):
             product_datas.setdefault(product,{'beg_qty':0,'product_qty_in':0,'product_qty_out':0,'product_qty_internal':0,
                 'product_qty_adjustment':0,'product_ending_qty':0.00})
             beg_qty = product_beg_qty_data.get(product.id,0)
-            product_datas[product]['beg_qty'] = beg_qty * factor_inv
-            product_datas[product]['product_ending_qty'] += beg_qty * factor_inv
+            product_datas[product]['beg_qty'] = beg_qty / factor_inv
+            product_datas[product]['product_ending_qty'] += beg_qty / factor_inv
             if product_inventory_movement_data:
                 product_sale_data = product_inventory_movement_data.get(product.id) or {}
                 for each in lst:
-                    value = product_sale_data.get(each,0) * factor_inv
+                    value = product_sale_data.get(each,0) / factor_inv
                     product_datas[product][each] = value
                     product_datas[product]['product_ending_qty'] += value
         if record.group_by_categ:

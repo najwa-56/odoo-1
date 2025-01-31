@@ -127,12 +127,12 @@ class wizard_stock_inventory(models.TransientModel):
                     products_data = report_stock_inv_obj.get_product_valuation_data(self,warehouse)
                     for key,product_val in products_data.items():
                         factor_inv = self._get_mulit_uom(key) 
-                        beginning_qty = product_val.get('beg_qty') * factor_inv
-                        product_qty_in = product_val.get('product_qty_in') * factor_inv
-                        product_qty_out = product_val.get('product_qty_out') * factor_inv
-                        product_qty_internal = product_val.get('product_qty_internal') * factor_inv
-                        product_qty_adjustment = product_val.get('product_qty_adjustment') * factor_inv
-                        ending_qty = product_val.get('product_ending_qty') * factor_inv
+                        beginning_qty = product_val.get('beg_qty') / factor_inv
+                        product_qty_in = product_val.get('product_qty_in') / factor_inv
+                        product_qty_out = product_val.get('product_qty_out') / factor_inv
+                        product_qty_internal = product_val.get('product_qty_internal') / factor_inv
+                        product_qty_adjustment = product_val.get('product_qty_adjustment') / factor_inv
+                        ending_qty = product_val.get('product_ending_qty') / factor_inv
 
                         worksheet.merge_range(rows, 0, rows, 1, key.display_name, product_header_format)
                         worksheet.write(rows, 2, beginning_qty, header_data_format)
@@ -167,12 +167,12 @@ class wizard_stock_inventory(models.TransientModel):
                         rows += 1
                         for key,product_val in product_value.items():
                             factor_inv = self._get_mulit_uom(key)
-                            beginning_qty = product_val.get('beg_qty') * factor_inv
-                            product_qty_in = product_val.get('product_qty_in') * factor_inv
-                            product_qty_out = product_val.get('product_qty_out') * factor_inv
-                            product_qty_internal = product_val.get('product_qty_internal') * factor_inv
-                            product_qty_adjustment = product_val.get('product_qty_adjustment') * factor_inv
-                            ending_qty = product_val.get('product_ending_qty') * factor_inv
+                            beginning_qty = product_val.get('beg_qty') / factor_inv
+                            product_qty_in = product_val.get('product_qty_in') / factor_inv
+                            product_qty_out = product_val.get('product_qty_out') / factor_inv
+                            product_qty_internal = product_val.get('product_qty_internal') / factor_inv
+                            product_qty_adjustment = product_val.get('product_qty_adjustment') / factor_inv
+                            ending_qty = product_val.get('product_ending_qty') / factor_inv
 
                             worksheet.merge_range(rows, 0 , rows, 1, key.name, product_header_format)
                             worksheet.write(rows, 2, beginning_qty, header_data_format)
@@ -223,11 +223,11 @@ class wizard_stock_inventory(models.TransientModel):
                     for key,value in products_data.items():
                         factor_inv = self._get_mulit_uom(key)
                         for header_data in value.get('location_header_data'):
-                            beginning_qty = header_data['beg_qty'] * factor_inv
-                            product_qty_in = header_data['product_qty_in'] * factor_inv
-                            product_qty_out = header_data['product_qty_out'] * factor_inv
-                            product_qty_internal = header_data['product_qty_internal'] * factor_inv
-                            product_qty_adjustment = header_data['product_qty_adjustment'] * factor_inv
+                            beginning_qty = header_data['beg_qty'] / factor_inv
+                            product_qty_in = header_data['product_qty_in'] / factor_inv
+                            product_qty_out = header_data['product_qty_out'] / factor_inv
+                            product_qty_internal = header_data['product_qty_internal'] / factor_inv
+                            product_qty_adjustment = header_data['product_qty_adjustment'] / factor_inv
                             ending_qty = header_data['product_ending_qty']
 
                             prod_beginning_qty += beginning_qty
@@ -279,12 +279,12 @@ class wizard_stock_inventory(models.TransientModel):
                             
                             for header_data in data['location_header_data']:
                                 factor_inv = self._get_mulit_uom(header_data['product_id'])
-                                beginning_qty = header_data['beg_qty'] * factor_inv
-                                product_qty_in = header_data['product_qty_in']  * factor_inv
-                                product_qty_out = header_data['product_qty_out']  * factor_inv
-                                product_qty_internal = header_data['product_qty_internal']  * factor_inv
-                                product_qty_adjustment = header_data['product_qty_adjustment']  * factor_inv
-                                ending_qty = header_data['product_ending_qty']  * factor_inv
+                                beginning_qty = header_data['beg_qty'] / factor_inv
+                                product_qty_in = header_data['product_qty_in']  / factor_inv
+                                product_qty_out = header_data['product_qty_out']  / factor_inv
+                                product_qty_internal = header_data['product_qty_internal']  / factor_inv
+                                product_qty_adjustment = header_data['product_qty_adjustment']  / factor_inv
+                                ending_qty = header_data['product_ending_qty']  / factor_inv
 
                                 categ_prod_beginning_qty += beginning_qty
                                 categ_prod_qty_in += product_qty_in
