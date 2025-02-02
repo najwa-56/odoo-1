@@ -275,7 +275,6 @@ class wizard_stock_inventory(models.TransientModel):
                         worksheet.merge_range(rows, 0, rows, 8, categ.name, header_merge_format)
                         rows += 1
                         for data in list(product_value.values()):
-                            # factor_inv = self._get_mulit_uom(key)
                             
                             for header_data in data['location_header_data']:
                                 factor_inv = self._get_mulit_uom(header_data['product_id'])
