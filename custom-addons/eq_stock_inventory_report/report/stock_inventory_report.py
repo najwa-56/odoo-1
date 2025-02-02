@@ -55,7 +55,7 @@ class eq_stock_inventory_report_stock_inventory_report(models.AbstractModel):
             for location in location_ids:
                 product_beg_qty_data = self._get_beginning_inventory(record,product.ids,warehouse,location.ids)
                 product_inventory_movement_data = self.get_product_sale_qty(record,warehouse,product.ids,location.ids)
-                beg_qty = product_beg_qty_data.get(product.id,0) 
+                beg_qty = product_beg_qty_data.get(product.id,0) / factor_inv
                 location_data_dict = {'beg_qty':beg_qty,'product_qty_in':0,'product_qty_out':0,'product_qty_internal':0,
                     'product_qty_adjustment':0,'product_ending_qty':beg_qty,'location_id':location}
                 location_header_data_dict['beg_qty'] += beg_qty / factor_inv
@@ -91,10 +91,9 @@ class eq_stock_inventory_report_stock_inventory_report(models.AbstractModel):
         product_datas = {}
         for product in product_ids:
             factor_inv = self._get_mulit_uom(record,product)
-            print("factor===============",factor_inv)
             product_datas.setdefault(product,{'beg_qty':0,'product_qty_in':0,'product_qty_out':0,'product_qty_internal':0,
                 'product_qty_adjustment':0,'product_ending_qty':0.00})
-            beg_qty = product_beg_qty_data.get(product.id,0)
+            beg_qty = product_beg_qty_data.get(product.id,0) / factor_inv
             product_datas[product]['beg_qty'] = beg_qty / factor_inv
             product_datas[product]['product_ending_qty'] += beg_qty / factor_inv
             if product_inventory_movement_data:

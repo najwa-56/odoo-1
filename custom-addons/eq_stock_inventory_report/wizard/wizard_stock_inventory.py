@@ -228,7 +228,7 @@ class wizard_stock_inventory(models.TransientModel):
                             product_qty_out = header_data['product_qty_out'] / factor_inv
                             product_qty_internal = header_data['product_qty_internal'] / factor_inv
                             product_qty_adjustment = header_data['product_qty_adjustment'] / factor_inv
-                            ending_qty = header_data['product_ending_qty']
+                            ending_qty = header_data['product_ending_qty'] / factor_inv
 
                             prod_beginning_qty += beginning_qty
                             prod_qty_in += product_qty_in
@@ -250,12 +250,12 @@ class wizard_stock_inventory(models.TransientModel):
                         for location_wise_data in value.get('location_wise_data'):
                             worksheet.merge_range(rows, 0, rows, 1, '', header_data_format)
                             worksheet.write(rows, 2, location_wise_data['location_id'].display_name, header_data_format)
-                            worksheet.write(rows, 3, location_wise_data['beg_qty'], header_data_format)
-                            worksheet.write(rows, 4, location_wise_data['product_qty_in'], header_data_format)
-                            worksheet.write(rows, 5, abs(location_wise_data['product_qty_out']), header_data_format)
-                            worksheet.write(rows, 6, abs(location_wise_data['product_qty_internal']), header_data_format)
-                            worksheet.write(rows, 7, location_wise_data['product_qty_adjustment'], header_data_format)
-                            worksheet.write(rows, 8, location_wise_data['product_ending_qty'], header_data_format)
+                            worksheet.write(rows, 3, location_wise_data['beg_qty'] / factor_inv, header_data_format)
+                            worksheet.write(rows, 4, location_wise_data['product_qty_in'] / factor_inv, header_data_format)
+                            worksheet.write(rows, 5, abs(location_wise_data['product_qty_out'] / factor_inv), header_data_format)
+                            worksheet.write(rows, 6, abs(location_wise_data['product_qty_internal'] / factor_inv), header_data_format)
+                            worksheet.write(rows, 7, location_wise_data['product_qty_adjustment'] / factor_inv, header_data_format)
+                            worksheet.write(rows, 8, location_wise_data['product_ending_qty'] / factor_inv, header_data_format)
                             rows += 1
 
                     rows += 1
@@ -306,12 +306,12 @@ class wizard_stock_inventory(models.TransientModel):
                             for location_wise_data in data['location_wise_data']:
                                 worksheet.merge_range(rows, 0, rows, 1, '', header_data_format)
                                 worksheet.write(rows, 2, location_wise_data['location_id'].display_name, header_data_format)
-                                worksheet.write(rows, 3, location_wise_data['beg_qty'], header_data_format)
-                                worksheet.write(rows, 4, location_wise_data['product_qty_in'], header_data_format)
-                                worksheet.write(rows, 5, abs(location_wise_data['product_qty_out']), header_data_format)
-                                worksheet.write(rows, 6, location_wise_data['product_qty_internal'], header_data_format)
-                                worksheet.write(rows, 7, location_wise_data['product_qty_adjustment'], header_data_format)
-                                worksheet.write(rows, 8, location_wise_data['product_ending_qty'], header_data_format)
+                                worksheet.write(rows, 3, location_wise_data['beg_qty'] / factor_inv, header_data_format)
+                                worksheet.write(rows, 4, location_wise_data['product_qty_in'] / factor_inv, header_data_format)
+                                worksheet.write(rows, 5, abs(location_wise_data['product_qty_out'] / factor_inv), header_data_format)
+                                worksheet.write(rows, 6, location_wise_data['product_qty_internal'] / factor_inv, header_data_format)
+                                worksheet.write(rows, 7, location_wise_data['product_qty_adjustment'] / factor_inv, header_data_format)
+                                worksheet.write(rows, 8, location_wise_data['product_ending_qty'] / factor_inv, header_data_format)
                                 rows += 1
 
                         rows += 1
