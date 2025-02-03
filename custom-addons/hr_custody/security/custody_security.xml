@@ -4,14 +4,14 @@
         <field name="name">Custody Multi Company</field>
         <field name="model_id" ref="model_custody_property"/>
         <field eval="True" name="global"/>
-        <field name="domain_force">['|',('company_id','=',False),('company_id','child_of',[user.company_id.id])]</field>
+        <field name="domain_force">['|',('company_id','=',False),('company_id', 'in', company_ids)]</field>
     </record>
 
     <record id="property_rule_custody_req" model="ir.rule">
         <field name="name">Custody Request Multi Company</field>
         <field name="model_id" ref="model_hr_custody"/>
         <field eval="True" name="global"/>
-        <field name="domain_force">['|',('company_id','=',False),('company_id','child_of',[user.company_id.id])]</field>
+        <field name="domain_force">['|',('company_id','=',False),('company_id', 'in', company_ids)]</field>
     </record>
 
    <record id="hr_custody_personal_rule_employee" model="ir.rule">
