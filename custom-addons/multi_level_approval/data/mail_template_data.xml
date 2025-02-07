@@ -1,0 +1,45 @@
+<?xml version="1.0" ?>
+<odoo>
+
+    <data noupdate="0">
+        <!--Email template -->
+        <record id="email_template_approved_request" model="mail.template">
+            <field name="name">Approval: approved case</field>
+            <field name="model_id" ref="multi_level_approval.model_multi_approval"/>
+            <field name="partner_to">{{ object.user_id.partner_id.id }}</field>
+            <field name="subject">Your request {{ object.display_name }} has been approved</field>
+            <field name="body_html" type="html">
+<div style="margin: 0px; padding: 0px;">
+    <p style="margin: 0px; padding: 0px; font-size: 13px;">
+        Dear  <t t-out="object.user_id.name or ''"></t>,
+        <br /><br />
+        Your request <t t-out="object.display_name or ''"></t> has been approved on <t t-out="format_date(object.complete_date) or ''"></t>
+        <br /><br />
+        Regards,
+    </p>
+</div>
+            </field>
+            <field name="lang">{{ object.user_id.lang }}</field>
+            <field name="auto_delete" eval="True"/>
+        </record>
+        <record id="email_template_refused_request" model="mail.template">
+            <field name="name">Approval: refused case</field>
+            <field name="model_id" ref="multi_level_approval.model_multi_approval"/>
+            <field name="partner_to">{{ object.user_id.partner_id.id }}</field>
+            <field name="subject">Your request {{ object.display_name }} has been refused</field>
+            <field name="body_html" type="html">
+<div style="margin: 0px; padding: 0px;">
+    <p style="margin: 0px; padding: 0px; font-size: 13px;">
+        Dear  <t t-out="object.user_id.name or ''"></t>,
+        <br /><br />
+        Your request <t t-out="object.display_name or ''"></t> has been refused on <t t-out="format_date(object.complete_date) or ''"></t>
+        <br /><br />
+        Regards,
+    </p>
+</div>
+            </field>
+            <field name="lang">{{ object.user_id.lang }}</field>
+            <field name="auto_delete" eval="True"/>
+        </record>
+    </data>
+</odoo>

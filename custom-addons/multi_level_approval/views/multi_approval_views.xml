@@ -1,0 +1,247 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="multi_approval_view_tree" model="ir.ui.view">
+        <field name="name">multi_approval_view_tree</field>
+        <field name="model">multi.approval</field>
+        <field name="arch" type="xml">
+            <tree string="Approvals" import="false">
+                <field name="priority" widget="priority" />
+                <field name="code"/>
+                <field name="name" />
+                <field name="user_id" />
+                <field name="request_date" />
+                <field name="pic_id" />
+                <field name="deadline" />
+                <field name="state" />
+            </tree>
+        </field>
+    </record>
+    <record id="multi_approval_view_filter" model="ir.ui.view">
+        <field name="name">multi_approval_view_filter</field>
+        <field name="model">multi.approval</field>
+        <field name="arch" type="xml">
+            <search string="Approvals">
+                <filter string="My Request" name="my_request" domain="[('user_id', '=', uid)]"/>
+                <separator/>
+                <field name="code"/>
+                <field name="name"/>
+                <separator/>
+                <filter string="My Approvals" name="my_approval" domain="[('pic_id','=',uid)]"/>
+                <filter string="To Review" name="to_review" domain="[('pic_id','=', uid), ('state', '=', 'Submitted')]"/>
+                <separator/>
+                <field name="user_id" />
+                <field name="pic_id" />
+                <field name="type_id" />
+                <group expand="1" string="Group By">
+                    <filter string="User" name='user' context="{'group_by':'user_id'}"/>
+                    <filter string="Type" name="type_id" context="{'group_by':'type_id'}"/>
+                    <filter string="Status" name="status" context="{'group_by':'state'}"/>
+                    <separator orientation="vertical" />
+                    <filter string="Request Date" name="date" context="{'group_by':'request_date:month'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+    <record id="multi_approval_view_form" model="ir.ui.view">
+        <field name="name">multi_approval_view_form</field>
+        <field name="model">multi.approval</field>
+        <field name="arch" type="xml">
+            <form>
+                <header>
+                    <field name='is_pic' invisible="1" />
+                    <button name="action_submit" type="object"
+                            string="Submit" invisible="state != 'Draft'" 
+                            class="oe_highlight" />
+                    <button name="action_approve" type="object"
+                            string="Approve"
+                            
+                             invisible="not is_pic or state != 'Submitted'"
+                            class="oe_highlight" />
+                    <button name="%(multi_level_approval.refused_reason_action)d" type="action"
+                             invisible="not is_pic or state != 'Submitted'"
+                            string="Refuse"/>
+                    <widget name="attach_document" string="Attach Document" action="message_post"
+                    invisible="attachment_number &lt;  1 or not id"
+                        />
+                    <widget name="attach_document" string="Attach Document" action="message_post"
+                        highlight="1" invisible="attachment_number &gt; 1 or not id"  />
+                    <button name="action_cancel" type="object"
+                            string="Cancel"  invisible="state != 'Draft'"/>
+                    <field name="state" widget="statusbar" statusbar_visible="Draft,Submitted,Approved,Cancel" />
+                </header>
+                <sheet>
+                    <div class="oe_title">
+                        <h1>
+                            <field name="code" readonly="1"/>
+                        </h1>
+
+                        <label for="name" class="oe_edit_only" />
+                        <h1>
+                            <field name="name" placeholder="Title" readonly="state != 'draft' "/>
+                        </h1>
+                        <field name="priority" widget="priority" readonly="state != 'draft' "/>
+                    </div>
+                    <div style="background: rgb(245, 245, 245);margin: 0px !important;padding: 0px 10px;border: 1px solid rgb(207, 207, 207);">
+                            <group>
+                                <field name="user_id" readonly="1"/>
+                                <field name="request_date" readonly="state != 'draft' "/>
+                                <field name="type_id" readonly="state != 'draft' "
+                                    options="{'no_create': True, 'no_open': True}"/>
+                                <field name="deadline" readonly="1"/>
+                                <field name="pic_id" readonly="1"/>
+                            </group>
+                           <group>
+                                <field name="contact_id"
+                                    invisible="contact_opt in ['None', False]"
+                                    required="contact_opt == 'Required'"
+                                    readonly="state != 'Draft'"/>
+                                
+                                <field name="date"
+                                    invisible="date_opt in ['None', False]"
+                                    required="date_opt == 'Required'"
+                                    readonly="state != 'Draft'"/>
+                                
+                                <label for="date_start" string="Period" 
+                                    invisible="period_opt in ['None', False]"/>
+                                
+                                <div invisible="period_opt in ['None', False]">
+                                    <div>
+                                        <span>From: </span>
+                                        <field name="date_start" class="oe_inline"
+                                            required="period_opt == 'Required'"
+                                            readonly="state != 'Draft'"/>
+                                    </div>
+                                    <div>
+                                        <span>to: </span>
+                                        <field name="date_end" class="oe_inline"
+                                            required="period_opt == 'Required'"
+                                            readonly="state != 'Draft'"/>
+                                    </div>
+                                </div>
+                                
+                                <field name="item_id"
+                                    invisible="item_opt in ['None', False]"
+                                    required="item_opt == 'Required'"
+                                    readonly="state != 'Draft'"/>
+                                
+                                <field name="quantity"
+                                    invisible="quantity_opt in ['None', False]"
+                                    required="quantity_opt == 'Required'"
+                                    readonly="state != 'Draft'"/>
+                                
+                                <field name="amount"
+                                    invisible="amount_opt in ['None', False]"
+                                    required="amount_opt == 'Required'"
+                                    readonly="state != 'Draft'"/>
+                                
+                                <field name="payment"
+                                    invisible="payment_opt in ['None', False]"
+                                    required="payment_opt == 'Required'"
+                                    readonly="state != 'Draft'"/>
+                                
+                                <field name="reference"
+                                    invisible="reference_opt in ['None', False]"
+                                    required="reference_opt == 'Required'"
+                                    readonly="state != 'Draft'"/>
+                                
+                                <field name="location"
+                                    invisible="location_opt in ['None', False]"
+                                    required="location_opt == 'Required'"
+                                    readonly="state != 'Draft'"/>
+                            </group>
+
+                            <group string="Items"
+                                invisible="multi_items_opt in ['None', False]"
+                                required="multi_items_opt == 'Required'"
+                                readonly="state != 'Draft'">
+                                <field name="item_ids"
+                                    nolabel="1"
+                                    colspan="2"
+                                    invisible="multi_items_opt in ['None', False]"
+                                    required="multi_items_opt == 'Required'"
+                                    readonly="state != 'Draft'"/>
+                            </group>
+
+                    </div>
+                    
+                    <notebook>
+                        <page string="Description" name="description">
+                            <field name="description" nolabel="1" placeholder='Description' readonly="state != 'draft' "/>
+                        </page>
+                        <page string="Approver(s)" name="approver" invisible="state in ['Draft', 'Cancel']">
+                            <field name="line_ids">
+                                <tree editable="top" create='false' delete='false'>
+                                    <field name="name" readonly="1"/>
+                                    <field name="user_id" readonly="1"/>
+                                    <field name="require_opt" readonly="1"/>
+                                    <field name="deadline" readonly="state not in ('draft', 'Waiting for Approval')" attrs="{'readonly': [('state', 'not in', ('draft', 'Waiting for Approval'))]}"/>
+                                    <field name="state" readonly="1"/>
+                                </tree>
+                            </field>
+                        </page>
+                        <page string="Options" name="options" invisible="1">
+                            <group string="Fields" name="option_settings">
+                                <group>
+                                    <field name="document_opt" widget="radio" options="{'horizontal': true}" />
+                                    <field name="contact_opt" widget="radio" options="{'horizontal': true}" />
+                                    <field name="date_opt" widget="radio" options="{'horizontal': true}" />
+                                    <field name="period_opt" widget="radio" options="{'horizontal': true}" />
+                                    <field name="item_opt" widget="radio" options="{'horizontal': true}" />
+                                    <field name="multi_items_opt" widget="radio" options="{'horizontal': true}" />
+                                </group>
+                                <group>
+                                    <field name="quantity_opt" widget="radio" options="{'horizontal': true}" />
+                                    <field name="amount_opt" widget="radio" options="{'horizontal': true}" />
+                                    <field name="payment_opt" widget="radio" options="{'horizontal': true}" />
+                                    <field name="reference_opt" widget="radio" options="{'horizontal': true}" />
+                                    <field name="location_opt" widget="radio" options="{'horizontal': true}" />
+                                    <field name="attachment_number" invisible="1"/>
+                                </group>
+                            </group>
+                        </page>
+                    </notebook>
+                </sheet>
+                <div class="oe_chatter">
+                    <field name="message_follower_ids" widget="mail_followers" groups="base.group_user" />
+                    <field name="activity_ids" widget="mail_activity"/>
+                    <field name="message_ids" widget="mail_thread" />
+                </div>
+            </form>
+        </field>
+    </record>
+    <record id="multi_approval_view_kanban" model="ir.ui.view">
+        <field name="name">multi_approval_view_kanban</field>
+        <field name="model">multi.approval</field>
+        <field name="arch" type="xml">
+            <kanban class="o_modules_kanban" import="false">
+                <field name="name" />
+                <field name="id" />
+                <field name="image" />
+                <field name="code" />
+                <templates>
+                    <t t-name="kanban-box">
+                        <div t-attf-class="oe_kanban_card oe_kanban_global_click">
+                            <t t-if="record.id">
+                                <img t-att-src="kanban_image('multi.approval', 'image', record.id.raw_value)" alt="Approval Image" class="oe_kanban_avatar float-left mr-3" width="64"
+                                    height="64" />
+                            </t>
+                            <div class="oe_module_desc">
+                                <h4 class="o_kanban_record_title">
+                                    <field name="code" />
+                                </h4>
+                                <p class="oe_module_name">
+                                    <field name="name" />
+                                </p>
+                                <div class="oe_module_action" t-if="!selection_mode">
+                                    <p class="">
+                                        <field name="priority" widget="priority" />
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    </t>
+                </templates>
+            </kanban>
+        </field>
+    </record>
+</odoo>

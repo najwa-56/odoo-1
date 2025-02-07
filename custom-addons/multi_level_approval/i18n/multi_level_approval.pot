@@ -1,0 +1,975 @@
+# Translation of Odoo Server.
+# This file contains the translation of the following modules:
+# 	* multi_level_approval
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Odoo Server 16.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2023-02-25 11:27+0000\n"
+"PO-Revision-Date: 2023-02-25 11:27+0000\n"
+"Last-Translator: \n"
+"Language-Team: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: \n"
+"Plural-Forms: \n"
+
+#. module: multi_level_approval
+#: model:mail.template,body_html:multi_level_approval.email_template_approved_request
+msgid ""
+"<div style=\"margin: 0px; padding: 0px;\">\n"
+"    <p style=\"margin: 0px; padding: 0px; font-size: 13px;\">\n"
+"        Dear  <t t-out=\"object.user_id.name or ''\"/>,\n"
+"        <br/><br/>\n"
+"        Your request <t t-out=\"object.display_name or ''\"/> has been approved on <t t-out=\"format_date(object.complete_date) or ''\"/>\n"
+"        <br/><br/>\n"
+"        Regards,\n"
+"    </p>\n"
+"</div>\n"
+"            "
+msgstr ""
+
+#. module: multi_level_approval
+#: model:mail.template,body_html:multi_level_approval.email_template_refused_request
+msgid ""
+"<div style=\"margin: 0px; padding: 0px;\">\n"
+"    <p style=\"margin: 0px; padding: 0px; font-size: 13px;\">\n"
+"        Dear  <t t-out=\"object.user_id.name or ''\"/>,\n"
+"        <br/><br/>\n"
+"        Your request <t t-out=\"object.display_name or ''\"/> has been refused on <t t-out=\"format_date(object.complete_date) or ''\"/>\n"
+"        <br/><br/>\n"
+"        Regards,\n"
+"    </p>\n"
+"</div>\n"
+"            "
+msgstr ""
+
+#. module: multi_level_approval
+#: model_terms:ir.ui.view,arch_db:multi_level_approval.multi_approval_type_view_kanban
+msgid "<i class=\"fa fa-edit\" role=\"img\" aria-label=\"Manage\" title=\"Manage\"/>"
+msgstr ""
+
+#. module: multi_level_approval
+#: model_terms:ir.ui.view,arch_db:multi_level_approval.multi_approval_view_form
+msgid "<span>From: </span>"
+msgstr ""
+
+#. module: multi_level_approval
+#: model_terms:ir.ui.view,arch_db:multi_level_approval.multi_approval_view_form
+msgid "<span>to: </span>"
+msgstr ""
+
+#. module: multi_level_approval
+#: model:ir.model.fields,field_description:multi_level_approval.field_multi_approval__message_needaction
+msgid "Action Needed"
+msgstr ""
+
+#. module: multi_level_approval
+#: model:ir.model.fields,field_description:multi_level_approval.field_multi_approval_type__active
+msgid "Active"
+msgstr ""
+
+#. module: multi_level_approval
+#: model:ir.model.fields,field_description:multi_level_approval.field_multi_approval__activity_ids
+msgid "Activities"
+msgstr ""
+
+#. module: multi_level_approval
+#: model:ir.model.fields,field_description:multi_level_approval.field_multi_approval__activity_exception_decoration
+msgid "Activity Exception Decoration"
+msgstr ""
+
+#. module: multi_level_approval
+#: model:ir.model.fields,field_description:multi_level_approval.field_multi_approval_type__activity_notification
+msgid "Activity Notification"
+msgstr ""
+
+#. module: multi_level_approval
+#: model:ir.model.fields,field_description:multi_level_approval.field_multi_approval__activity_state
+msgid "Activity State"
+msgstr ""
+
+#. module: multi_level_approval
+#: model:ir.model.fields,field_description:multi_level_approval.field_multi_approval__activity_type_icon
+msgid "Activity Type Icon"
+msgstr ""
+
+#. module: multi_level_approval
+#: model_terms:ir.actions.act_window,help:multi_level_approval.multi_approval_action
+#: model_terms:ir.actions.act_window,help:multi_level_approval.multi_approval_approval_action
+#: model_terms:ir.actions.act_window,help:multi_level_approval.multi_approval_request_action
+msgid "Add a new approval request"
+msgstr ""
+
+#. module: multi_level_approval
+#: model_terms:ir.actions.act_window,help:multi_level_approval.multi_approval_type_action
+msgid "Add a new approval type"
+msgstr ""
+
+#. module: multi_level_approval
+#: model:ir.model.fields,field_description:multi_level_approval.field_multi_approval__amount
+#: model:ir.model.fields,field_description:multi_level_approval.field_multi_approval_type__amount_opt
+msgid "Amount"
+msgstr ""
+
+#. module: multi_level_approval
+#: model:ir.model.fields,field_description:multi_level_approval.field_multi_approval__amount_opt
+msgid "Amount opt"
+msgstr ""
+
+#. module: multi_level_approval
+#: model:ir.model.fields,field_description:multi_level_approval.field_multi_approval_line__approval_id
+msgid "Approval"
+msgstr ""
+
+#. module: multi_level_approval
+#: model_terms:ir.ui.view,arch_db:multi_level_approval.multi_approval_view_kanban
+msgid "Approval Image"
+msgstr ""
+
+#. module: multi_level_approval
+#: model_terms:ir.ui.view,arch_db:multi_level_approval.multi_approval_type_view_kanban
+msgid "Approval Type Image"
+msgstr ""
+
+#. module: multi_level_approval
+#: model:ir.actions.act_window,name:multi_level_approval.multi_approval_type_action
+#: model_terms:ir.ui.view,arch_db:multi_level_approval.multi_approval_type_view_tree
+msgid "Approval Types"
+msgstr ""
+
+#. module: multi_level_approval
+#: model:mail.template,name:multi_level_approval.email_template_approved_request
+msgid "Approval: approved case"
+msgstr ""
+
+#. module: multi_level_approval
+#: model:mail.template,name:multi_level_approval.email_template_refused_request
+msgid "Approval: refused case"
+msgstr ""
+
+#. module: multi_level_approval
+#: model:ir.actions.act_window,name:multi_level_approval.multi_approval_action
+#: model:ir.module.category,name:multi_level_approval.multi_level_approval
+#: model:ir.ui.menu,name:multi_level_approval.menu_multi_approval
+#: model:ir.ui.menu,name:multi_level_approval.menu_multi_level_approval_root
+#: model_terms:ir.ui.view,arch_db:multi_level_approval.multi_approval_view_filter
+#: model_terms:ir.ui.view,arch_db:multi_level_approval.multi_approval_view_tree
+msgid "Approvals"
+msgstr ""
+
+#. module: multi_level_approval
+#: model_terms:ir.ui.view,arch_db:multi_level_approval.multi_approval_type_view_form
+msgid "Approvals Type"
+msgstr ""
+
+#. module: multi_level_approval
+#: model_terms:ir.ui.view,arch_db:multi_level_approval.multi_approval_view_form
+msgid "Approve"
+msgstr ""
+
+#. module: multi_level_approval
+#: model:ir.model.fields.selection,name:multi_level_approval.selection__multi_approval__state__approved
+#: model:ir.model.fields.selection,name:multi_level_approval.selection__multi_approval_line__state__approved
+msgid "Approved"
+msgstr ""
+
+#. module: multi_level_approval
+#: model:ir.model.fields,field_description:multi_level_approval.field_multi_approval__pic_id
+msgid "Approver"
+msgstr ""
+
+#. module: multi_level_approval
+#: model_terms:ir.ui.view,arch_db:multi_level_approval.multi_approval_view_form
+msgid "Approver(s)"
+msgstr ""
+
+#. module: multi_level_approval
+#: model:ir.model.fields,field_description:multi_level_approval.field_multi_approval_type__line_ids
+#: model_terms:ir.ui.view,arch_db:multi_level_approval.multi_approval_type_view_form
+msgid "Approvers"
+msgstr ""
+
+#. module: multi_level_approval
+#: model_terms:ir.ui.view,arch_db:multi_level_approval.multi_approval_type_view_form
+msgid "Archived"
+msgstr ""
+
+#. module: multi_level_approval
+#: model_terms:ir.ui.view,arch_db:multi_level_approval.multi_approval_view_form
+msgid "Attach Document"
+msgstr ""
+
+#. module: multi_level_approval
+#: model:ir.model.fields,field_description:multi_level_approval.field_multi_approval__message_attachment_count
+msgid "Attachment Count"
+msgstr ""
+
+#. module: multi_level_approval
+#: model:ir.model.fields.selection,name:multi_level_approval.selection__multi_approval__state__cancel
+#: model:ir.model.fields.selection,name:multi_level_approval.selection__multi_approval_line__state__cancel
+#: model_terms:ir.ui.view,arch_db:multi_level_approval.multi_approval_view_form
+#: model_terms:ir.ui.view,arch_db:multi_level_approval.refused_reason_view_form
+msgid "Cancel"
+msgstr ""
+
+#. module: multi_level_approval
+#: model:ir.model.fields,field_description:multi_level_approval.field_multi_approval__code
+msgid "Code"
+msgstr ""
+
+#. module: multi_level_approval
+#: model:ir.model.fields,field_description:multi_level_approval.field_multi_approval__complete_date
+msgid "Complete Date"
+msgstr ""
+
+#. module: multi_level_approval
+#: model:ir.model.fields,field_description:multi_level_approval.field_multi_approval__contact_id
+#: model:ir.model.fields,field_description:multi_level_approval.field_multi_approval_type__contact_opt
+msgid "Contact"
+msgstr ""
+
+#. module: multi_level_approval
+#: model:ir.model.fields,field_description:multi_level_approval.field_multi_approval__contact_opt
+msgid "Contact opt"
+msgstr ""
+
+#. module: multi_level_approval
+#: model_terms:ir.ui.view,arch_db:multi_level_approval.multi_approval_type_view_kanban
+msgid "Create New Request"
+msgstr ""
+
+#. module: multi_level_approval
+#: model:ir.model.fields,field_description:multi_level_approval.field_multi_approval__create_uid
+#: model:ir.model.fields,field_description:multi_level_approval.field_multi_approval_line__create_uid
+#: model:ir.model.fields,field_description:multi_level_approval.field_multi_approval_type__create_uid
+#: model:ir.model.fields,field_description:multi_level_approval.field_multi_approval_type_line__create_uid
+#: model:ir.model.fields,field_description:multi_level_approval.field_refused_reason__create_uid
+msgid "Created by"
+msgstr ""
+
+#. module: multi_level_approval
+#: model:ir.model.fields,field_description:multi_level_approval.field_multi_approval__create_date
+#: model:ir.model.fields,field_description:multi_level_approval.field_multi_approval_line__create_date
+#: model:ir.model.fields,field_description:multi_level_approval.field_multi_approval_type__create_date
+#: model:ir.model.fields,field_description:multi_level_approval.field_multi_approval_type_line__create_date
+#: model:ir.model.fields,field_description:multi_level_approval.field_refused_reason__create_date
+msgid "Created on"
+msgstr ""
+
+#. module: multi_level_approval
+#: model:ir.ui.menu,name:multi_level_approval.menu_multi_level_approval_type
+msgid "Dashboard"
+msgstr ""
+
+#. module: multi_level_approval
+#: model:ir.model.fields,field_description:multi_level_approval.field_multi_approval__date
+#: model:ir.model.fields,field_description:multi_level_approval.field_multi_approval_type__date_opt
+msgid "Date"
+msgstr ""
+
+#. module: multi_level_approval
+#: model:ir.model.fields,field_description:multi_level_approval.field_multi_approval__date_opt
+msgid "Date opt"
+msgstr ""
+
+#. module: multi_level_approval
+#: model:ir.model.fields,field_description:multi_level_approval.field_multi_approval__deadline
+#: model:ir.model.fields,field_description:multi_level_approval.field_multi_approval_line__deadline
+msgid "Deadline"
+msgstr ""
+
+#. module: multi_level_approval
+#: model:ir.model.fields,field_description:multi_level_approval.field_multi_approval__description
+#: model:ir.model.fields,field_description:multi_level_approval.field_multi_approval_type__description
+#: model_terms:ir.ui.view,arch_db:multi_level_approval.multi_approval_view_form
+msgid "Description"
+msgstr ""
+
+#. module: multi_level_approval
+#: model:ir.model.fields,field_description:multi_level_approval.field_multi_approval__display_name
+#: model:ir.model.fields,field_description:multi_level_approval.field_multi_approval_line__display_name
+#: model:ir.model.fields,field_description:multi_level_approval.field_multi_approval_type__display_name
+#: model:ir.model.fields,field_description:multi_level_approval.field_multi_approval_type_line__display_name
+#: model:ir.model.fields,field_description:multi_level_approval.field_refused_reason__display_name
+msgid "Display Name"
+msgstr ""
+
+#. module: multi_level_approval
+#: model:ir.model.fields,field_description:multi_level_approval.field_multi_approval_type__document_opt
+msgid "Document"
+msgstr ""
+
+#. module: multi_level_approval
+#. odoo-python
+#: code:addons/multi_level_approval/models/multi_approval.py:0
+#, python-format
+msgid "Document is required !"
+msgstr ""
+
+#. module: multi_level_approval
+#: model:ir.model.fields,field_description:multi_level_approval.field_multi_approval__document_opt
+msgid "Document opt"
+msgstr ""
+
+#. module: multi_level_approval
+#: model:ir.model.fields,field_description:multi_level_approval.field_multi_approval__attachment_ids
+msgid "Documents"
+msgstr ""
+
+#. module: multi_level_approval
+#: model:ir.model.fields.selection,name:multi_level_approval.selection__multi_approval__state__draft
+#: model:ir.model.fields.selection,name:multi_level_approval.selection__multi_approval_line__state__draft
+msgid "Draft"
+msgstr ""
+
+#. module: multi_level_approval
+#: model:ir.model.fields,field_description:multi_level_approval.field_multi_approval__date_end
+msgid "End Date"
+msgstr ""
+
+#. module: multi_level_approval
+#: model_terms:ir.ui.view,arch_db:multi_level_approval.multi_approval_type_view_form
+#: model_terms:ir.ui.view,arch_db:multi_level_approval.multi_approval_view_form
+msgid "Fields"
+msgstr ""
+
+#. module: multi_level_approval
+#: model:ir.model.fields,field_description:multi_level_approval.field_multi_approval__message_follower_ids
+msgid "Followers"
+msgstr ""
+
+#. module: multi_level_approval
+#: model:ir.model.fields,field_description:multi_level_approval.field_multi_approval__message_partner_ids
+msgid "Followers (Partners)"
+msgstr ""
+
+#. module: multi_level_approval
+#: model:ir.model.fields,field_description:multi_level_approval.field_multi_approval__follower
+msgid "Following Users"
+msgstr ""
+
+#. module: multi_level_approval
+#: model:ir.model.fields,help:multi_level_approval.field_multi_approval__activity_type_icon
+msgid "Font awesome icon e.g. fa-tasks"
+msgstr ""
+
+#. module: multi_level_approval
+#: model_terms:ir.ui.view,arch_db:multi_level_approval.multi_approval_view_filter
+msgid "Group By"
+msgstr ""
+
+#. module: multi_level_approval
+#: model:ir.model.fields,field_description:multi_level_approval.field_multi_approval__has_message
+msgid "Has Message"
+msgstr ""
+
+#. module: multi_level_approval
+#: model:ir.model.fields.selection,name:multi_level_approval.selection__multi_approval__priority__2
+msgid "High"
+msgstr ""
+
+#. module: multi_level_approval
+#. odoo-python
+#: code:addons/multi_level_approval/models/multi_approval.py:0
+#, python-format
+msgid "I approved"
+msgstr ""
+
+#. module: multi_level_approval
+#. odoo-python
+#: code:addons/multi_level_approval/models/multi_approval.py:0
+#, python-format
+msgid "I refused due to this reason: {}"
+msgstr ""
+
+#. module: multi_level_approval
+#: model:ir.model.fields,field_description:multi_level_approval.field_multi_approval__id
+#: model:ir.model.fields,field_description:multi_level_approval.field_multi_approval_line__id
+#: model:ir.model.fields,field_description:multi_level_approval.field_multi_approval_type__id
+#: model:ir.model.fields,field_description:multi_level_approval.field_multi_approval_type_line__id
+#: model:ir.model.fields,field_description:multi_level_approval.field_refused_reason__id
+msgid "ID"
+msgstr ""
+
+#. module: multi_level_approval
+#: model:ir.model.fields,field_description:multi_level_approval.field_multi_approval__activity_exception_icon
+msgid "Icon"
+msgstr ""
+
+#. module: multi_level_approval
+#: model:ir.model.fields,help:multi_level_approval.field_multi_approval__activity_exception_icon
+msgid "Icon to indicate an exception activity."
+msgstr ""
+
+#. module: multi_level_approval
+#: model:ir.model.fields,help:multi_level_approval.field_multi_approval__message_needaction
+msgid "If checked, new messages require your attention."
+msgstr ""
+
+#. module: multi_level_approval
+#: model:ir.model.fields,help:multi_level_approval.field_multi_approval__message_has_error
+msgid "If checked, some messages have a delivery error."
+msgstr ""
+
+#. module: multi_level_approval
+#: model:ir.model.fields,field_description:multi_level_approval.field_multi_approval__image
+#: model:ir.model.fields,field_description:multi_level_approval.field_multi_approval_type__image
+msgid "Image"
+msgstr ""
+
+#. module: multi_level_approval
+#: model:ir.model.fields,field_description:multi_level_approval.field_multi_approval__message_is_follower
+msgid "Is Follower"
+msgstr ""
+
+#. module: multi_level_approval
+#: model:ir.model.fields,field_description:multi_level_approval.field_multi_approval__is_pic
+msgid "Is Pic"
+msgstr ""
+
+#. module: multi_level_approval
+#: model:ir.model.fields,field_description:multi_level_approval.field_multi_approval__item_id
+#: model:ir.model.fields,field_description:multi_level_approval.field_multi_approval_type__item_opt
+msgid "Item"
+msgstr ""
+
+#. module: multi_level_approval
+#: model:ir.model.fields,field_description:multi_level_approval.field_multi_approval__item_opt
+msgid "Item opt"
+msgstr ""
+
+#. module: multi_level_approval
+#: model:ir.model.fields,field_description:multi_level_approval.field_multi_approval__item_ids
+#: model_terms:ir.ui.view,arch_db:multi_level_approval.multi_approval_view_form
+msgid "Items"
+msgstr ""
+
+#. module: multi_level_approval
+#: model:ir.model.fields,field_description:multi_level_approval.field_multi_approval____last_update
+#: model:ir.model.fields,field_description:multi_level_approval.field_multi_approval_line____last_update
+#: model:ir.model.fields,field_description:multi_level_approval.field_multi_approval_type____last_update
+#: model:ir.model.fields,field_description:multi_level_approval.field_multi_approval_type_line____last_update
+#: model:ir.model.fields,field_description:multi_level_approval.field_refused_reason____last_update
+msgid "Last Modified on"
+msgstr ""
+
+#. module: multi_level_approval
+#: model:ir.model.fields,field_description:multi_level_approval.field_multi_approval__write_uid
+#: model:ir.model.fields,field_description:multi_level_approval.field_multi_approval_line__write_uid
+#: model:ir.model.fields,field_description:multi_level_approval.field_multi_approval_type__write_uid
+#: model:ir.model.fields,field_description:multi_level_approval.field_multi_approval_type_line__write_uid
+#: model:ir.model.fields,field_description:multi_level_approval.field_refused_reason__write_uid
+msgid "Last Updated by"
+msgstr ""
+
+#. module: multi_level_approval
+#: model:ir.model.fields,field_description:multi_level_approval.field_multi_approval__write_date
+#: model:ir.model.fields,field_description:multi_level_approval.field_multi_approval_line__write_date
+#: model:ir.model.fields,field_description:multi_level_approval.field_multi_approval_type__write_date
+#: model:ir.model.fields,field_description:multi_level_approval.field_multi_approval_type_line__write_date
+#: model:ir.model.fields,field_description:multi_level_approval.field_refused_reason__write_date
+msgid "Last Updated on"
+msgstr ""
+
+#. module: multi_level_approval
+#: model:ir.model.fields,help:multi_level_approval.field_multi_approval_type__approve_mail_template_id
+#: model:ir.model.fields,help:multi_level_approval.field_multi_approval_type__refuse_mail_template_id
+msgid "Let it empty if don't want notify"
+msgstr ""
+
+#. module: multi_level_approval
+#: model:ir.model.fields,help:multi_level_approval.field_multi_approval_type__mail_template_id
+msgid "Let it empty if you want to send the description of the request"
+msgstr ""
+
+#. module: multi_level_approval
+#: model:ir.model.fields,field_description:multi_level_approval.field_multi_approval__line_id
+msgid "Line"
+msgstr ""
+
+#. module: multi_level_approval
+#: model:ir.model.fields,field_description:multi_level_approval.field_multi_approval__line_ids
+msgid "Lines"
+msgstr ""
+
+#. module: multi_level_approval
+#: model:ir.model.fields,field_description:multi_level_approval.field_multi_approval__location
+#: model:ir.model.fields,field_description:multi_level_approval.field_multi_approval_type__location_opt
+msgid "Location"
+msgstr ""
+
+#. module: multi_level_approval
+#: model:ir.model.fields,field_description:multi_level_approval.field_multi_approval__location_opt
+msgid "Location opt"
+msgstr ""
+
+#. module: multi_level_approval
+#: model:ir.model.fields,field_description:multi_level_approval.field_multi_approval_type__mail_notification
+msgid "Mail Notification"
+msgstr ""
+
+#. module: multi_level_approval
+#: model:ir.model.fields,field_description:multi_level_approval.field_multi_approval__message_main_attachment_id
+msgid "Main Attachment"
+msgstr ""
+
+#. module: multi_level_approval
+#: model:ir.model.fields.selection,name:multi_level_approval.selection__multi_approval__priority__1
+msgid "Medium"
+msgstr ""
+
+#. module: multi_level_approval
+#: model:ir.model.fields,field_description:multi_level_approval.field_multi_approval__message_has_error
+msgid "Message Delivery error"
+msgstr ""
+
+#. module: multi_level_approval
+#: model:ir.model.fields,field_description:multi_level_approval.field_multi_approval__message_ids
+msgid "Messages"
+msgstr ""
+
+#. module: multi_level_approval
+#: model:ir.model.fields,field_description:multi_level_approval.field_multi_approval_type__approval_minimum
+msgid "Minimum Approvers"
+msgstr ""
+
+#. module: multi_level_approval
+#: model:ir.model,name:multi_level_approval.model_multi_approval_type
+msgid "Multi Approval Type"
+msgstr ""
+
+#. module: multi_level_approval
+#: model:ir.model,name:multi_level_approval.model_multi_approval
+msgid "Multi Aproval"
+msgstr ""
+
+#. module: multi_level_approval
+#: model:ir.model,name:multi_level_approval.model_multi_approval_line
+msgid "Multi Aproval Line"
+msgstr ""
+
+#. module: multi_level_approval
+#: model:ir.model,name:multi_level_approval.model_multi_approval_type_line
+msgid "Multi Aproval Type Lines"
+msgstr ""
+
+#. module: multi_level_approval
+#: model:ir.model.fields,field_description:multi_level_approval.field_multi_approval_type__multi_items_opt
+msgid "Multi Items"
+msgstr ""
+
+#. module: multi_level_approval
+#: model:ir.model.fields,field_description:multi_level_approval.field_multi_approval__multi_items_opt
+msgid "Multi Items opt"
+msgstr ""
+
+#. module: multi_level_approval
+#: model:ir.model.fields,field_description:multi_level_approval.field_multi_approval__my_activity_date_deadline
+msgid "My Activity Deadline"
+msgstr ""
+
+#. module: multi_level_approval
+#: model:ir.actions.act_window,name:multi_level_approval.multi_approval_approval_action
+#: model_terms:ir.ui.view,arch_db:multi_level_approval.multi_approval_view_filter
+msgid "My Approvals"
+msgstr ""
+
+#. module: multi_level_approval
+#: model_terms:ir.ui.view,arch_db:multi_level_approval.multi_approval_view_filter
+msgid "My Request"
+msgstr ""
+
+#. module: multi_level_approval
+#: model:ir.actions.act_window,name:multi_level_approval.multi_approval_request_action
+#: model:ir.ui.menu,name:multi_level_approval.menu_multi_request_approval
+msgid "My Requests"
+msgstr ""
+
+#. module: multi_level_approval
+#: model:ir.model.fields,field_description:multi_level_approval.field_multi_approval_type__name
+msgid "Name"
+msgstr ""
+
+#. module: multi_level_approval
+#. odoo-python
+#: code:addons/multi_level_approval/models/multi_approval.py:0
+#: code:addons/multi_level_approval/models/multi_approval.py:0
+#, python-format
+msgid "New"
+msgstr ""
+
+#. module: multi_level_approval
+#. odoo-python
+#: code:addons/multi_level_approval/models/multi_approval_type.py:0
+#, python-format
+msgid "New Request"
+msgstr ""
+
+#. module: multi_level_approval
+#: model:ir.model.fields,field_description:multi_level_approval.field_multi_approval__activity_date_deadline
+msgid "Next Activity Deadline"
+msgstr ""
+
+#. module: multi_level_approval
+#: model:ir.model.fields,field_description:multi_level_approval.field_multi_approval__activity_summary
+msgid "Next Activity Summary"
+msgstr ""
+
+#. module: multi_level_approval
+#: model:ir.model.fields,field_description:multi_level_approval.field_multi_approval__activity_type_id
+msgid "Next Activity Type"
+msgstr ""
+
+#. module: multi_level_approval
+#: model:ir.model.fields.selection,name:multi_level_approval.selection__multi_approval_type__amount_opt__none
+#: model:ir.model.fields.selection,name:multi_level_approval.selection__multi_approval_type__contact_opt__none
+#: model:ir.model.fields.selection,name:multi_level_approval.selection__multi_approval_type__date_opt__none
+#: model:ir.model.fields.selection,name:multi_level_approval.selection__multi_approval_type__item_opt__none
+#: model:ir.model.fields.selection,name:multi_level_approval.selection__multi_approval_type__location_opt__none
+#: model:ir.model.fields.selection,name:multi_level_approval.selection__multi_approval_type__multi_items_opt__none
+#: model:ir.model.fields.selection,name:multi_level_approval.selection__multi_approval_type__payment_opt__none
+#: model:ir.model.fields.selection,name:multi_level_approval.selection__multi_approval_type__period_opt__none
+#: model:ir.model.fields.selection,name:multi_level_approval.selection__multi_approval_type__quantity_opt__none
+#: model:ir.model.fields.selection,name:multi_level_approval.selection__multi_approval_type__reference_opt__none
+msgid "None"
+msgstr ""
+
+#. module: multi_level_approval
+#: model:ir.model.fields.selection,name:multi_level_approval.selection__multi_approval__priority__0
+msgid "Normal"
+msgstr ""
+
+#. module: multi_level_approval
+#: model:ir.model.fields,field_description:multi_level_approval.field_multi_approval__message_needaction_counter
+msgid "Number of Actions"
+msgstr ""
+
+#. module: multi_level_approval
+#: model:ir.model.fields,field_description:multi_level_approval.field_multi_approval__attachment_number
+msgid "Number of Attachments"
+msgstr ""
+
+#. module: multi_level_approval
+#: model:ir.model.fields,field_description:multi_level_approval.field_multi_approval__message_has_error_counter
+msgid "Number of errors"
+msgstr ""
+
+#. module: multi_level_approval
+#: model:ir.model.fields,help:multi_level_approval.field_multi_approval__message_needaction_counter
+msgid "Number of messages which requires an action"
+msgstr ""
+
+#. module: multi_level_approval
+#: model:ir.model.fields,help:multi_level_approval.field_multi_approval__message_has_error_counter
+msgid "Number of messages with delivery error"
+msgstr ""
+
+#. module: multi_level_approval
+#: model:ir.model.fields.selection,name:multi_level_approval.selection__multi_approval_line__require_opt__optional
+#: model:ir.model.fields.selection,name:multi_level_approval.selection__multi_approval_type__amount_opt__optional
+#: model:ir.model.fields.selection,name:multi_level_approval.selection__multi_approval_type__contact_opt__optional
+#: model:ir.model.fields.selection,name:multi_level_approval.selection__multi_approval_type__date_opt__optional
+#: model:ir.model.fields.selection,name:multi_level_approval.selection__multi_approval_type__document_opt__optional
+#: model:ir.model.fields.selection,name:multi_level_approval.selection__multi_approval_type__item_opt__optional
+#: model:ir.model.fields.selection,name:multi_level_approval.selection__multi_approval_type__location_opt__optional
+#: model:ir.model.fields.selection,name:multi_level_approval.selection__multi_approval_type__multi_items_opt__optional
+#: model:ir.model.fields.selection,name:multi_level_approval.selection__multi_approval_type__payment_opt__optional
+#: model:ir.model.fields.selection,name:multi_level_approval.selection__multi_approval_type__period_opt__optional
+#: model:ir.model.fields.selection,name:multi_level_approval.selection__multi_approval_type__quantity_opt__optional
+#: model:ir.model.fields.selection,name:multi_level_approval.selection__multi_approval_type__reference_opt__optional
+#: model:ir.model.fields.selection,name:multi_level_approval.selection__multi_approval_type_line__require_opt__optional
+msgid "Optional"
+msgstr ""
+
+#. module: multi_level_approval
+#: model_terms:ir.ui.view,arch_db:multi_level_approval.multi_approval_type_view_form
+#: model_terms:ir.ui.view,arch_db:multi_level_approval.multi_approval_view_form
+msgid "Options"
+msgstr ""
+
+#. module: multi_level_approval
+#: model_terms:ir.ui.view,arch_db:multi_level_approval.multi_approval_type_view_form
+msgid "Other Information"
+msgstr ""
+
+#. module: multi_level_approval
+#: model:ir.model.fields,field_description:multi_level_approval.field_multi_approval__payment
+#: model:ir.model.fields,field_description:multi_level_approval.field_multi_approval_type__payment_opt
+msgid "Payment"
+msgstr ""
+
+#. module: multi_level_approval
+#: model:ir.model.fields,field_description:multi_level_approval.field_multi_approval__payment_opt
+msgid "Payment opt"
+msgstr ""
+
+#. module: multi_level_approval
+#: model:ir.model.fields,field_description:multi_level_approval.field_multi_approval_type__period_opt
+#: model_terms:ir.ui.view,arch_db:multi_level_approval.multi_approval_view_form
+msgid "Period"
+msgstr ""
+
+#. module: multi_level_approval
+#: model:ir.model.fields,field_description:multi_level_approval.field_multi_approval__period_opt
+msgid "Period opt"
+msgstr ""
+
+#. module: multi_level_approval
+#: model:ir.model.fields,field_description:multi_level_approval.field_multi_approval__priority
+msgid "Priority"
+msgstr ""
+
+#. module: multi_level_approval
+#: model:ir.model.fields,field_description:multi_level_approval.field_multi_approval__quantity
+#: model:ir.model.fields,field_description:multi_level_approval.field_multi_approval_type__quantity_opt
+msgid "Quantity"
+msgstr ""
+
+#. module: multi_level_approval
+#: model:ir.model.fields,field_description:multi_level_approval.field_multi_approval__quantity_opt
+msgid "Quantity opt"
+msgstr ""
+
+#. module: multi_level_approval
+#: model:ir.model.fields,field_description:multi_level_approval.field_refused_reason__reason
+msgid "Reason"
+msgstr ""
+
+#. module: multi_level_approval
+#: model:ir.model.fields,field_description:multi_level_approval.field_multi_approval__reference
+#: model:ir.model.fields,field_description:multi_level_approval.field_multi_approval_type__reference_opt
+msgid "Reference"
+msgstr ""
+
+#. module: multi_level_approval
+#: model:ir.model.fields,field_description:multi_level_approval.field_multi_approval__reference_opt
+msgid "Reference opt"
+msgstr ""
+
+#. module: multi_level_approval
+#: model_terms:ir.ui.view,arch_db:multi_level_approval.multi_approval_view_form
+#: model_terms:ir.ui.view,arch_db:multi_level_approval.refused_reason_view_form
+msgid "Refuse"
+msgstr ""
+
+#. module: multi_level_approval
+#: model:ir.model.fields.selection,name:multi_level_approval.selection__multi_approval__state__refused
+#: model:ir.model.fields.selection,name:multi_level_approval.selection__multi_approval_line__state__refused
+msgid "Refused"
+msgstr ""
+
+#. module: multi_level_approval
+#: model:ir.actions.act_window,name:multi_level_approval.refused_reason_action
+#: model:ir.model,name:multi_level_approval.model_refused_reason
+#: model:ir.model.fields,field_description:multi_level_approval.field_multi_approval_line__refused_reason
+#: model_terms:ir.ui.view,arch_db:multi_level_approval.refused_reason_view_form
+msgid "Refused Reason"
+msgstr ""
+
+#. module: multi_level_approval
+#: model:ir.model.fields,field_description:multi_level_approval.field_multi_approval__request_date
+#: model_terms:ir.ui.view,arch_db:multi_level_approval.multi_approval_view_filter
+msgid "Request Date"
+msgstr ""
+
+#. module: multi_level_approval
+#: model:ir.model.fields,field_description:multi_level_approval.field_multi_approval__user_id
+msgid "Request by"
+msgstr ""
+
+#. module: multi_level_approval
+#. odoo-python
+#: code:addons/multi_level_approval/models/multi_approval.py:0
+#: code:addons/multi_level_approval/tests/test_approval.py:0
+#: code:addons/multi_level_approval/tests/test_approval.py:0
+#, python-format
+msgid "Request the approval for: {request_name}"
+msgstr ""
+
+#. module: multi_level_approval
+#: model:ir.model.fields.selection,name:multi_level_approval.selection__multi_approval_line__require_opt__required
+#: model:ir.model.fields.selection,name:multi_level_approval.selection__multi_approval_type__amount_opt__required
+#: model:ir.model.fields.selection,name:multi_level_approval.selection__multi_approval_type__contact_opt__required
+#: model:ir.model.fields.selection,name:multi_level_approval.selection__multi_approval_type__date_opt__required
+#: model:ir.model.fields.selection,name:multi_level_approval.selection__multi_approval_type__document_opt__required
+#: model:ir.model.fields.selection,name:multi_level_approval.selection__multi_approval_type__item_opt__required
+#: model:ir.model.fields.selection,name:multi_level_approval.selection__multi_approval_type__location_opt__required
+#: model:ir.model.fields.selection,name:multi_level_approval.selection__multi_approval_type__multi_items_opt__required
+#: model:ir.model.fields.selection,name:multi_level_approval.selection__multi_approval_type__payment_opt__required
+#: model:ir.model.fields.selection,name:multi_level_approval.selection__multi_approval_type__period_opt__required
+#: model:ir.model.fields.selection,name:multi_level_approval.selection__multi_approval_type__quantity_opt__required
+#: model:ir.model.fields.selection,name:multi_level_approval.selection__multi_approval_type__reference_opt__required
+#: model:ir.model.fields.selection,name:multi_level_approval.selection__multi_approval_type_line__require_opt__required
+msgid "Required"
+msgstr ""
+
+#. module: multi_level_approval
+#: model:ir.model.fields,field_description:multi_level_approval.field_multi_approval__activity_user_id
+msgid "Responsible User"
+msgstr ""
+
+#. module: multi_level_approval
+#: model:ir.model.fields,field_description:multi_level_approval.field_multi_approval_line__sequence
+#: model:ir.model.fields,field_description:multi_level_approval.field_multi_approval_type_line__sequence
+msgid "Sequence"
+msgstr ""
+
+#. module: multi_level_approval
+#: model:res.groups,name:multi_level_approval.group_approval_manager
+msgid "Settings"
+msgstr ""
+
+#. module: multi_level_approval
+#. odoo-python
+#: code:addons/multi_level_approval/models/multi_approval.py:0
+#: code:addons/multi_level_approval/models/multi_approval.py:0
+#, python-format
+msgid "Something goes wrong!"
+msgstr ""
+
+#. module: multi_level_approval
+#: model:ir.model.fields,field_description:multi_level_approval.field_multi_approval__date_start
+msgid "Start Date"
+msgstr ""
+
+#. module: multi_level_approval
+#: model:ir.model.fields,field_description:multi_level_approval.field_multi_approval__state
+#: model:ir.model.fields,field_description:multi_level_approval.field_multi_approval_line__state
+msgid "State"
+msgstr ""
+
+#. module: multi_level_approval
+#: model_terms:ir.ui.view,arch_db:multi_level_approval.multi_approval_view_filter
+msgid "Status"
+msgstr ""
+
+#. module: multi_level_approval
+#: model:ir.model.fields,help:multi_level_approval.field_multi_approval__activity_state
+msgid ""
+"Status based on activities\n"
+"Overdue: Due date is already passed\n"
+"Today: Activity date is today\n"
+"Planned: Future activities."
+msgstr ""
+
+#. module: multi_level_approval
+#: model_terms:ir.ui.view,arch_db:multi_level_approval.multi_approval_view_form
+msgid "Submit"
+msgstr ""
+
+#. module: multi_level_approval
+#: model:ir.model.fields.selection,name:multi_level_approval.selection__multi_approval__state__submitted
+msgid "Submitted"
+msgstr ""
+
+#. module: multi_level_approval
+#. odoo-python
+#: code:addons/multi_level_approval/models/multi_approval_type.py:0
+#, python-format
+msgid "Submitted Requests"
+msgstr ""
+
+#. module: multi_level_approval
+#: model:ir.model.fields,field_description:multi_level_approval.field_multi_approval_type__mail_template_id
+msgid "Template for the request"
+msgstr ""
+
+#. module: multi_level_approval
+#: model:ir.model.fields,field_description:multi_level_approval.field_multi_approval_type__approve_mail_template_id
+msgid "Template of `Approved` Case"
+msgstr ""
+
+#. module: multi_level_approval
+#: model:ir.model.fields,field_description:multi_level_approval.field_multi_approval_type__refuse_mail_template_id
+msgid "Template of `Refused` Case"
+msgstr ""
+
+#. module: multi_level_approval
+#. odoo-python
+#: code:addons/multi_level_approval/models/multi_approval.py:0
+#, python-format
+msgid "The request {code} need to be reviewed"
+msgstr ""
+
+#. module: multi_level_approval
+#. odoo-python
+#: code:addons/multi_level_approval/models/multi_approval.py:0
+#, python-format
+msgid "There is no approver of the type \"{}\" !"
+msgstr ""
+
+#. module: multi_level_approval
+#: model:ir.model.fields,field_description:multi_level_approval.field_multi_approval__name
+#: model:ir.model.fields,field_description:multi_level_approval.field_multi_approval_line__name
+#: model:ir.model.fields,field_description:multi_level_approval.field_multi_approval_type_line__name
+#: model_terms:ir.ui.view,arch_db:multi_level_approval.multi_approval_view_form
+msgid "Title"
+msgstr ""
+
+#. module: multi_level_approval
+#: model:ir.model.fields,field_description:multi_level_approval.field_multi_approval_type__submitted_nb
+#: model:ir.ui.menu,name:multi_level_approval.menu_multi_approval_approval
+#: model_terms:ir.ui.view,arch_db:multi_level_approval.multi_approval_view_filter
+msgid "To Review"
+msgstr ""
+
+#. module: multi_level_approval
+#: model_terms:ir.ui.view,arch_db:multi_level_approval.multi_approval_type_view_kanban
+msgid "To Review:"
+msgstr ""
+
+#. module: multi_level_approval
+#: model:ir.model.fields,field_description:multi_level_approval.field_multi_approval__type_id
+#: model:ir.model.fields,field_description:multi_level_approval.field_multi_approval_type_line__type_id
+#: model_terms:ir.ui.view,arch_db:multi_level_approval.multi_approval_view_filter
+msgid "Type"
+msgstr ""
+
+#. module: multi_level_approval
+#: model:ir.model.fields,field_description:multi_level_approval.field_multi_approval_line__require_opt
+#: model:ir.model.fields,field_description:multi_level_approval.field_multi_approval_type_line__require_opt
+msgid "Type of Approval"
+msgstr ""
+
+#. module: multi_level_approval
+#: model:ir.model.fields,help:multi_level_approval.field_multi_approval__activity_exception_decoration
+msgid "Type of the exception activity on record."
+msgstr ""
+
+#. module: multi_level_approval
+#: model:ir.model.fields,field_description:multi_level_approval.field_multi_approval_line__user_id
+#: model:ir.model.fields,field_description:multi_level_approval.field_multi_approval_type_line__user_id
+#: model:res.groups,name:multi_level_approval.group_approval_user
+#: model_terms:ir.ui.view,arch_db:multi_level_approval.multi_approval_view_filter
+msgid "User"
+msgstr ""
+
+#. module: multi_level_approval
+#: model:ir.model.fields.selection,name:multi_level_approval.selection__multi_approval__priority__3
+msgid "Very High"
+msgstr ""
+
+#. module: multi_level_approval
+#: model:ir.model.fields.selection,name:multi_level_approval.selection__multi_approval_line__state__waiting_for_approval
+msgid "Waiting for Approval"
+msgstr ""
+
+#. module: multi_level_approval
+#: model:mail.template,subject:multi_level_approval.email_template_approved_request
+msgid "Your request {{ object.display_name }} has been approved"
+msgstr ""
+
+#. module: multi_level_approval
+#: model:mail.template,subject:multi_level_approval.email_template_refused_request
+msgid "Your request {{ object.display_name }} has been refused"
+msgstr ""
+
+#. module: multi_level_approval
+#. odoo-python
+#: code:addons/multi_level_approval/models/multi_approval.py:0
+#: code:addons/multi_level_approval/models/multi_approval.py:0
+#, python-format
+msgid "{} do not have the authority to approve this request !"
+msgstr ""
