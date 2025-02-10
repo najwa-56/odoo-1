@@ -8,6 +8,7 @@
     'data': [
         'security/rules.xml',
         'views/product_product_view.xml',
+        'views/hr_expense.xml',
     ],
     'installable': True,
     'application': False,

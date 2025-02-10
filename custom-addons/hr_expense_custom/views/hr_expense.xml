@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <record id="hr_custom_expense_view_pivot" model="ir.ui.view">
+        <field name="name">hr.expense.pivot</field>
+        <field name="model">hr.expense</field>
+          <field name="inherit_id" ref="hr_expense.hr_expense_view_pivot"/>
+        <field name="arch" type="xml">
+          
+                <field name="employee_id" position="after" >
+                <field name="product_category_id" type="row" />
+                </field>
+        </field>
+    </record>
+</odoo>
