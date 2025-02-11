@@ -32,6 +32,8 @@ class ResPartner(models.Model):
                                   help="Location of route.")
     sequence = fields.Integer(default=10)
     
+    route_location_id = fields.Many2one('delivery.route', string='Route',related='location_id.delivery_route_link_id',store=True,
+                                 )
 
     def get_all_dues(self):
         """This function gives all the dues and invoices details

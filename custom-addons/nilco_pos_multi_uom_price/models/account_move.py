@@ -111,6 +111,8 @@ class AccountInvoiceReport(models.Model):
     uom_name = fields.Char(string="UOM Name", store=True)
     qty = fields.Float(string="Adjusted Quantity", store=True)
     location_id = fields.Many2one('route.line', string='المسار', store=True, help="Location of route")
+    route_location_id = fields.Many2one('delivery.route', string='Route',store=True,)
+
     # Removed redefinition of 'partner_id' because it's already defined in the base model
     # partner_id = fields.Many2one('res.partner', string="Customer", readonly=True, store=True)
 
@@ -121,6 +123,7 @@ class AccountInvoiceReport(models.Model):
             , line.uom_name AS uom_name
             , (line.quantity) * (CASE WHEN move.move_type IN ('out_refund', 'in_receipt') THEN -1 ELSE 1 END) AS qty
             , partner.location_id AS location_id
+            , partner.route_location_id AS route_location_id
             -- Do not select 'partner.id AS partner_id' to avoid ambiguity
         """
         return select_str
@@ -150,6 +153,7 @@ class AccountInvoiceReport(models.Model):
         group_by_str += """
             , line.uom_name
             , partner.location_id
+            , partner.route_location_id
             -- No need to group by 'partner_id' since it's already handled
         """
         return group_by_str
