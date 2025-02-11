@@ -77,15 +77,15 @@
 
                         <label for="name" class="oe_edit_only" />
                         <h1>
-                            <field name="name" placeholder="Title" readonly="state != 'draft' "/>
+                            <field name="name" placeholder="Title" readonly="state != 'Draft' "/>
                         </h1>
-                        <field name="priority" widget="priority" readonly="state != 'draft' "/>
+                        <field name="priority" widget="priority" readonly="state != 'Draft' "/>
                     </div>
                     <div style="background: rgb(245, 245, 245);margin: 0px !important;padding: 0px 10px;border: 1px solid rgb(207, 207, 207);">
                             <group>
                                 <field name="user_id" readonly="1"/>
-                                <field name="request_date" readonly="state != 'draft' "/>
-                                <field name="type_id" readonly="state != 'draft' "
+                                <field name="request_date" readonly="state != 'Draft' "/>
+                                <field name="type_id" readonly="state != 'Draft' "
                                     options="{'no_create': True, 'no_open': True}"/>
                                 <field name="deadline" readonly="1"/>
                                 <field name="pic_id" readonly="1"/>
@@ -166,7 +166,7 @@
                     
                     <notebook>
                         <page string="Description" name="description">
-                            <field name="description" nolabel="1" placeholder='Description' readonly="state != 'draft' "/>
+                            <field name="description" nolabel="1" placeholder='Description' readonly="state != 'Draft' "/>
                         </page>
                         <page string="Approver(s)" name="approver" invisible="state in ['Draft', 'Cancel']">
                             <field name="line_ids">
@@ -174,7 +174,7 @@
                                     <field name="name" readonly="1"/>
                                     <field name="user_id" readonly="1"/>
                                     <field name="require_opt" readonly="1"/>
-                                    <field name="deadline" readonly="state not in ('draft', 'Waiting for Approval')" attrs="{'readonly': [('state', 'not in', ('draft', 'Waiting for Approval'))]}"/>
+                                    <field name="deadline" readonly="state not in ('Draft', 'Waiting for Approval')" attrs="{'readonly': [('state', 'not in', ('Draft', 'Waiting for Approval'))]}"/>
                                     <field name="state" readonly="1"/>
                                 </tree>
                             </field>
