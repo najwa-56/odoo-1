@@ -4,7 +4,7 @@
 
 #
 ##############################################################################
-from odoo import api, fields, models
+from odoo import api, fields, models,_
 
 
 class StockPicking(models.Model):

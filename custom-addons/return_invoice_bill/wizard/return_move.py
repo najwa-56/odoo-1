@@ -52,6 +52,7 @@ class ReturnMove(models.TransientModel):
                 invoice = action.create_invoices()
                 move_id = self.env['account.move'].browse(invoice.get('res_id'))
                 move_id.ref = sale_invoice_ids[0].name 
+                move_id.reversed_entry_id = sale_invoice_ids[0].id
             else:
                 invoice = picking_id.purchase_id.action_create_invoice()
                 move_id = self.env['account.move'].browse(invoice.get('res_id'))
