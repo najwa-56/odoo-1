@@ -20,7 +20,7 @@
 #    If not, see <http://www.gnu.org/licenses/>.
 #
 #############################################################################
-from odoo import fields, models
+from odoo import fields, models,api
 
 
 class ResConfigSettings(models.TransientModel):
@@ -36,3 +36,21 @@ class ResConfigSettings(models.TransientModel):
                                 help='Set the number of days for the notice'
                                      ' period.',
                                 config_parameter='hr_employee_updation.no_of_days')
+
+    contract_expiration_remainder = fields.Integer(string='Contract Expiration Remainder',
+                                                   config_parameter='hr_employee_updation.contract_expiration_remainder')
+
+
+
+    # def set_values(self):
+    #     super(ResConfigSettings, self).set_values()
+    #     param_setting = self.env['ir.config_parameter'].sudo()
+    #     param_setting.set_param('hr_employee_updation.employee_id_option', self.employee_id_option)
+
+    @api.model
+    def get_values(self):
+        res = super(ResConfigSettings, self).get_values()
+        param_setting = self.env['ir.config_parameter'].sudo()
+        contract_expiration_remainder = param_setting.get_param('hr_employee_updation.contract_expiration_remainder')
+        res.update(contract_expiration_remainder=contract_expiration_remainder)
+        return res

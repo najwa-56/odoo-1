@@ -12,5 +12,19 @@
             <field name="state">code</field>
             <field name="code">model.expiry_mail_reminder()</field>
         </record>
+
+
+        <record id="cron_contract_expir_reminder" model="ir.cron" forcecreate="True">
+		<field name="name">Contract Expiration Remainder </field>
+		<field name="user_id" ref="base.user_root" />
+		<field name="interval_number">4</field>
+		<field name="interval_type">hours</field>
+		<field name="numbercall">-1</field>
+		<field name="model_id" ref="model_hr_contract" />
+		<field name="state">code</field>
+		<field name="code">model._get_expire_contract()</field>
+	</record>
+
+
     </data>
 </odoo>

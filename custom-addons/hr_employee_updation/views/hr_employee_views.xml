@@ -12,6 +12,55 @@
         <field name="model">hr.employee</field>
         <field name="inherit_id" ref="hr.view_employee_form"/>
         <field name="arch" type="xml">
+
+         <xpath expr="//div[hasclass('oe_title')]" position="inside">
+                    <h3 class="o_row">
+                        <group>
+                            <field name="arabic_name"/>
+                            <field name="emp_code"/>
+                        </group>
+                    </h3>
+                </xpath>
+
+
+         <xpath expr="//sheet" position="before">
+                    <header>
+                        <button name="approve" invisible="state != 'draft'"  string="Approve" type="object"
+                                groups="hr.group_hr_manager" class="oe_highlight"/>
+                        <button name="service"  invisible="state != 'experiment'"  string="In Service" type="object"
+                                groups="hr.group_hr_manager" class="oe_highlight"/>
+                        <button name="return_to_work" invisible="state in ['service','draft','experiment']"
+                               
+                                string="Return To Work" type="object" groups="hr.group_hr_manager"
+                                class="oe_highlight"/>
+                        <field name="state" widget="statusbar"/>
+                    </header>
+                </xpath>
+
+                 <xpath expr="//field[@name='pin']" position="before">
+                    <field name="start_date" required="1"/>
+                    <field name="date_of_direct_action"/>
+                    <field name="trial_period"/>
+                    <field name="trial_date"/>
+                    <field name="end_date" readonly="state not in ['service']"/>
+                </xpath>
+
+                <xpath expr="//field[@name='pin']" position="before">
+
+                    <label for="service_years" string="Service Duration"/>
+                    <div>
+
+                        <div>
+
+                            (<field name="service_years" class="oe_inline"/>) year
+                            (<field name="service_months" class="oe_inline"/>) month
+                            (<field name="service_days" class="oe_inline"/>) day
+
+                        </div>
+                    </div>
+
+                </xpath>
+
             <xpath expr="//page[@name='personal_information']/group" position="after">
                 <group name="family_info_ids" colspan="4" string="Dependence Details">
                     <field name="family_info_ids">

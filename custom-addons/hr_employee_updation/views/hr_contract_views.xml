@@ -13,6 +13,12 @@
                     <span>days</span>
                 </div>
             </xpath>
+
+            <xpath expr="//field[@name='resource_calendar_id']" position="after">
+                <field name="date_start"/>
+                <field name="date_end"/>
+                <field name="trial_date_end"/>
+            </xpath>
         </field>
     </record>
 </odoo>

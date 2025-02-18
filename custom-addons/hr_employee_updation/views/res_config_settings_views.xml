@@ -23,6 +23,27 @@
                     </div>
                 </div>
             </xpath>
+
+             <xpath expr="//block[@name = 'employees_setting_container']" position="inside">
+                    <div class="col-12 col-lg-6 o_setting_box" id="website_contract_remainder_setting">
+                        <div class="o_setting_right_pane">
+                            <label string="Contract Expiration Remainder(days)" for="contract_expiration_remainder"/>
+                            <div class="text-muted">
+                                Contract Expiration Remainder
+                            </div>
+                            <div class="content-group">
+                                <div class="mt16">
+                                    <field name="contract_expiration_remainder" class="o_light_label" />
+                                </div>
+                            </div>
+                        </div>
+                </div>
+
+
+
+
+            </xpath>
+            
         </field>
     </record>
 </odoo>

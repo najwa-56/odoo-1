@@ -35,6 +35,7 @@
     'depends': ['hr', 'mail', 'hr_gamification', 'hr_contract'],
     'data': [
         'security/ir.model.access.csv',
+         'security/hr_groups.xml',
         'data/hr_employee_relation_data.xml',
         'data/ir_cron_data.xml',
         'views/hr_contract_views.xml',

@@ -22,6 +22,9 @@
 #############################################################################
 from datetime import timedelta
 from odoo import api, fields, models, _
+import dateutil.relativedelta
+from datetime import datetime
+
 
 GENDER_SELECTION = [('male', 'Male'),
                     ('female', 'Female'),
@@ -55,6 +58,91 @@ class HrEmployee(models.Model):
     family_info_ids = fields.One2many('hr.employee.family', 'employee_id',
                                       string='Family',
                                       help='Family Information')
+
+
+    state = fields.Selection(string="Employee State",
+                             selection=[('draft','Draft'),('experiment', 'In Experiment'),
+                                 ('service', 'In Service'),
+                                 ],
+                             default='draft', required=False, track_visibility='onchange')
+
+    start_date = fields.Date('Start Date',)
+    end_date = fields.Date('End Date')
+    trial_period = fields.Selection([('3_m','3 Months'),('6_m','6 Months')],required=True)
+    trial_date = fields.Date('Trial End Date')
+
+    service_days = fields.Integer(string='Service Days', compute="compute_service_years")
+    service_months = fields.Integer(string='Service Months', compute="compute_service_years")
+    service_years = fields.Integer(string='Service Years', compute="compute_service_years")
+    date_of_direct_action = fields.Date()
+    arabic_name = fields.Char('Arabic Name',required=True)
+    emp_code = fields.Char('Employee Code' , readonly=False , required=True)
+   
+
+    def approve(self):
+        current_contract = self.contract_id or self.contract_ids
+        current_contract.write({'state':'experiment'})
+        self.write({'state': 'experiment', 'emp_code': not self.emp_code and self.env['ir.sequence'].next_by_code('employee.code') or self.emp_code})
+
+    def service(self):
+        current_contract = self.contract_id or self.contract_ids
+        current_contract.write({'state': 'open'})
+        self.write({'state':'service'})
+
+    def return_to_work(self):
+        current_contract = self.contract_id or self.contract_ids
+        current_contract.write({'state': 'open'})
+        self.write({'state':'service','end_date':False})
+
+    @api.depends('start_date')
+    def compute_service_years(self):
+        for request in self:
+            if request.start_date:
+                start_date=fields.Datetime.from_string(request.start_date)
+                end_date=fields.Datetime.from_string(request.end_date and request.end_date or fields.Datetime.now())
+
+                start_y, start_m, start_d, start_h, min, sec, wd, yd, i = start_date.timetuple()
+                end_y, end_m, end_d, end_h, min, sec, wd, yd, i = end_date.timetuple()
+                request.service_years = end_y - start_y
+                request.service_months = (end_m - start_m)
+                request.service_days = (end_d - start_d)
+
+                if (end_m - start_m) < 0 and (end_d - start_d) < 0 :
+                    request.service_months = abs(12 - (start_m - end_m))
+                    request.service_years = request.service_years -1
+                    request.service_days = abs(30 - (start_d - end_d) )
+                    request.service_months = request.service_months -1
+                elif (end_d - start_d) < 0 and (end_m - start_m) >= 0:
+                    request.service_days = abs(30 - (start_d - end_d) )
+                    request.service_months = request.service_months -1
+                    if request.service_months < 0 :
+                        request.service_months = abs(12 + (request.service_months))
+                        request.service_years = request.service_years -1
+                elif (end_m - start_m) < 0 and (end_d - start_d) >= 0 :
+                    request.service_months = abs(12 - (start_m - end_m))
+                    request.service_years = request.service_years -1
+                else :
+                    request.service_years = end_y - start_y
+                    request.service_months = (end_m - start_m)
+                    request.service_days = (end_d - start_d)
+            else:
+                request.service_years = 0
+                request.service_months = 0
+                request.service_days = 0
+
+                
+
+
+    @api.onchange('trial_period','start_date')
+    def onchange_trial_end(self):
+        if self.start_date and self.trial_period:
+            start_date = fields.Datetime.from_string(self.start_date).date()
+            months = 3 if self.trial_period == '3_m' else 6
+            end_trial_date = start_date + dateutil.relativedelta.relativedelta(months=months)
+            self.trial_date = end_trial_date
+        else:
+            self.trial_date = False
+
 
     @api.depends('contract_id')
     def _compute_joining_date(self):
