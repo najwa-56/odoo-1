@@ -51,7 +51,7 @@ class ReturnMove(models.TransientModel):
                 action = self.env['sale.advance.payment.inv'].create({'sale_order_ids': [fields.Command.link(picking_id.sale_id.id)]})
                 invoice = action.create_invoices()
                 move_id = self.env['account.move'].browse(invoice.get('res_id'))
-                move_id.ref = invoice_ids and invoice_ids[0].name
+                move_id.ref = sale_invoice_ids[0].name 
             else:
                 invoice = picking_id.purchase_id.action_create_invoice()
                 move_id = self.env['account.move'].browse(invoice.get('res_id'))
