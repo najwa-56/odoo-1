@@ -124,6 +124,7 @@ class MultiApprovalType(models.Model):
             'type': 'ir.actions.act_window',
             'context': {
                 'default_type_id': self.id,
+                'default_description': self.description,
             }
         }
 
