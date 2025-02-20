@@ -110,6 +110,26 @@ class MultiApproval(models.Model):
     attachment_number = fields.Integer(
         'Number of Attachments', compute='_compute_attachment_number')
 
+
+    last_viewed_user_id = fields.Many2one(
+        'res.users', string="Last Viewed By", compute="_compute_last_viewed_user",)
+    
+    last_viewed_date = fields.Datetime(
+        string='Last Viewed Date',compute="_compute_last_viewed_user")
+
+    @api.depends_context("uid")
+    def _compute_last_viewed_user(self):
+        print("in here last view======================================")
+        auditlog_model = self.env['auditlog.log']
+        for record in self:
+            last_log = auditlog_model.search([
+                ('model_id.model', '=', 'multi.approval'),
+                ('res_id', '=', record.id),
+            ], order='create_date desc', limit=1)
+            
+            record.last_viewed_user_id = last_log.user_id.id if last_log else False
+            record.last_viewed_date = last_log.create_date if last_log else False
+
     @api.depends_context("uid")
     def _check_pic(self):
         for r in self:

@@ -13,7 +13,8 @@ The managers wil review and approve sequentially
     ''',
     'depends': [
         'mail',
-        'product'
+        'product',
+        'auditlog'
     ],
     'data': [
         'data/ir_sequence_data.xml',
