@@ -89,7 +89,7 @@ class emulti_uom_inventory_report_stock_inventory_report(models.AbstractModel):
                 for uom_price in product.multi_uom_price_id:
                     uom_factor = uom_price.uom_id.factor_inv or 1
                     location_data_dict['uom_data'].append({
-                        'uom_id': uom_price.uom_id,
+                        'uom_name': uom_price.name_field,
                         'beg_qty': beg_qty / uom_factor,
                         'product_qty_in': location_data_dict['product_qty_in'] / uom_factor,
                         'product_qty_out': location_data_dict['product_qty_out'] / uom_factor,
@@ -145,7 +145,7 @@ class emulti_uom_inventory_report_stock_inventory_report(models.AbstractModel):
             for uom_price in product.multi_uom_price_id:
                 uom_factor = uom_price.uom_id.factor_inv or 1
                 product_datas[product]['uom_data'].append({
-                    'uom_id': uom_price.uom_id,
+                    'uom_name': uom_price.name_field,
                     'beg_qty': beg_qty / uom_factor,
                     'product_qty_in': product_datas[product]['product_qty_in'] / uom_factor,
                     'product_qty_out': product_datas[product]['product_qty_out'] / uom_factor,

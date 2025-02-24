@@ -33,7 +33,7 @@
                         <div class="row">
                             <div style="width:70%;padding-left:15px;font-size:24px;">
                                 <span >
-                                    Dateeee:
+                                    Date:
                                     <span t-esc="(docs.start_date).strftime('%d-%m-%Y')"/>
                                     To
                                     <span t-esc="(docs.end_date).strftime('%d-%m-%Y')"/>
@@ -134,9 +134,9 @@
                                             </tr>
 
                                             <!-- OM Data (Now appearing immediately after each product) -->
-                                        <tr t-foreach="product_value['uom_data']" t-as="uom_row">
-                                            <td style="font-style: italic;">
-                                                <span t-esc="uom_row['uom_id'].name"/>
+                                        <tr t-foreach="product_value['uom_data']" t-as="uom_row" >
+                                             <td style="font-style: italic;background-color:darkgrey; text-align:right !important;" >
+                                                <span t-esc="uom_row['uom_name']"/>
                                             </td>
                                            
                                             <td>
@@ -219,8 +219,8 @@
                                         </tr>
 
                                         <tr t-foreach="product_value['uom_data']" t-as="uom_row">
-                                            <td style="font-style: italic;">
-                                                <span t-esc="uom_row['uom_id'].name"/>
+                                             <td style="font-style: italic;background-color:darkgrey; text-align:right !important;" >
+                                                <span t-esc="uom_row['uom_name']"/>
                                             </td>
                                            
                                             <td>
@@ -310,8 +310,8 @@
                                                     </td>
                                                 </tr>
                                                 <tr t-foreach="product_value['uom_data']" t-as="uom_row">
-                                                    <td style="font-style: italic;">
-                                                        <span t-esc="uom_row['uom_id'].name"/>
+                                                    <td style="font-style: italic;background-color:darkgrey; text-align:right !important;" >
+                                                        <span t-esc="uom_row['uom_name']"/>
                                                     </td>
                                                 
                                                     <td>
@@ -414,8 +414,8 @@
                                                 </td>
                                             </tr>
                                              <tr t-foreach="product_value['uom_data']" t-as="uom_row">
-                                                    <td style="font-style: italic;">
-                                                        <span t-esc="uom_row['uom_id'].name"/>
+                                                     <td style="font-style: italic;background-color:darkgrey; text-align:right !important;" >
+                                                        <span t-esc="uom_row['uom_name']"/>
                                                     </td>
                                                 
                                                     <td>

@@ -90,7 +90,8 @@ class multi_uom_wizard_stock_inventory(models.TransientModel):
         header_data_format = workbook.add_format({'align':'center', 'valign':'vcenter', \
                                                    'font_size':10, 'border':1})
 
-        product_header_format = workbook.add_format({'valign':'vcenter', 'font_size':10, 'border':1})
+        product_header_format = workbook.add_format({'valign':'vcenter', 'font_size':13, 'border':1})
+        product_uom_format = workbook.add_format({'valign':'vcenter', 'font_size':10, 'border':1,'bg_color':'#D3D3D3'})
 
         for warehouse in self.warehouse_ids:
             worksheet = workbook.add_worksheet(warehouse.name)
@@ -140,7 +141,7 @@ class multi_uom_wizard_stock_inventory(models.TransientModel):
                         rows += 1
 
                         for uom_row in product_val.get('uom_data', []):  # Ensure UOM data exists
-                            worksheet.merge_range(rows, 0, rows, 1,uom_row['uom_id'].name, product_header_format)
+                            worksheet.merge_range(rows, 0, rows, 1,uom_row['uom_name'], product_uom_format)
                             worksheet.write(rows, 2, uom_row['beg_qty'], header_data_format)
                             worksheet.write(rows, 3, uom_row['product_qty_in'], header_data_format)
                             worksheet.write(rows, 4, abs(uom_row['product_qty_out']), header_data_format)
@@ -190,7 +191,7 @@ class multi_uom_wizard_stock_inventory(models.TransientModel):
                             worksheet.write(rows, 7, ending_qty, header_data_format)
                             rows += 1
                             for uom_row in product_val.get('uom_data', []):  # Ensure UOM data exists
-                                worksheet.merge_range(rows, 0, rows, 1,uom_row['uom_id'].name, product_header_format)
+                                worksheet.merge_range(rows, 0, rows, 1,uom_row['uom_name'], product_uom_format)
                                 worksheet.write(rows, 2, uom_row['beg_qty'], header_data_format)
                                 worksheet.write(rows, 3, uom_row['product_qty_in'], header_data_format)
                                 worksheet.write(rows, 4, abs(uom_row['product_qty_out']), header_data_format)
@@ -264,7 +265,7 @@ class multi_uom_wizard_stock_inventory(models.TransientModel):
                             worksheet.write(rows, 8, ending_qty, header_merge_format)
                             rows += 1
                             for uom_row in header_data.get('uom_data', []):  # Ensure UOM data exists
-                                worksheet.merge_range(rows, 0, rows, 1,uom_row['uom_id'].name, product_header_format)
+                                worksheet.merge_range(rows, 0, rows, 1,uom_row['uom_name'], product_uom_format)
                                 worksheet.write(rows, 2, '', header_data_format)
                                 worksheet.write(rows, 3, uom_row['beg_qty'], header_data_format)
                                 worksheet.write(rows, 4, uom_row['product_qty_in'], header_data_format)
@@ -330,7 +331,7 @@ class multi_uom_wizard_stock_inventory(models.TransientModel):
                                 worksheet.write(rows, 8, ending_qty, header_merge_format)
                                 rows += 1
                                 for uom_row in product_val.get('uom_data', []):  # Ensure UOM data exists
-                                    worksheet.merge_range(rows, 0, rows, 1,uom_row['uom_id'].name, product_header_format)
+                                    worksheet.merge_range(rows, 0, rows, 1,uom_row['uom_name'], product_uom_format)
                                     worksheet.write(rows, 2, '', header_data_format)
                                     worksheet.write(rows, 3, uom_row['beg_qty'], header_data_format)
                                     worksheet.write(rows, 4, uom_row['product_qty_in'], header_data_format)
