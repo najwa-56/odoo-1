@@ -226,3 +226,19 @@ class HrEmployeeFamily(models.Model):
                                  help='Contact No of the family member')
     birth_date = fields.Date(string="DOB", tracking=True,
                              help='Birth date of the family member')
+
+
+
+class User(models.Model):
+    _inherit = ['res.users']
+    joining_date = fields.Date(related='employee_id.joining_date', string="Join Date", readonly=False, related_sudo=False)
+    id_expiry_date = fields.Date(related='employee_id.id_expiry_date', readonly=False, related_sudo=False)
+    passport_expiry_date = fields.Date(related='employee_id.passport_expiry_date', readonly=False, related_sudo=False)
+    state = fields.Selection(related='employee_id.state', readonly=False, related_sudo=False)
+    start_date = fields.Date(related='employee_id.start_date', readonly=False, related_sudo=False)
+    end_date = fields.Date(related='employee_id.end_date', readonly=False, related_sudo=False)
+    trial_period = fields.Selection(related='employee_id.trial_period', readonly=False, related_sudo=False)
+    trial_date = fields.Date(related='employee_id.trial_date', readonly=False, related_sudo=False)
+    date_of_direct_action = fields.Date(related='employee_id.date_of_direct_action', readonly=False, related_sudo=False)
+    arabic_name = fields.Char(related='employee_id.arabic_name', readonly=False, related_sudo=False)
+    emp_code = fields.Char(related='employee_id.arabic_name', readonly=False, related_sudo=False)
