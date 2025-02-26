@@ -273,7 +273,11 @@ class MultiApproval(models.Model):
         if requests and notify_type: 
             activities = requests.mapped("activity_ids").filtered(
                 lambda a: a.activity_type_id == notify_type and a.user_id == self.env.user)
-            activities._action_done(msg)
+            
+            # activities._action_done(msg)
+            for activity in activities:
+                activity._action_done(msg)
+
 
         requests2 = self - requests
         if requests2:
