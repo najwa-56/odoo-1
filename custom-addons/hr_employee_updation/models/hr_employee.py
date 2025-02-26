@@ -242,3 +242,29 @@ class User(models.Model):
     date_of_direct_action = fields.Date(related='employee_id.date_of_direct_action', readonly=False, related_sudo=False)
     arabic_name = fields.Char(related='employee_id.arabic_name', readonly=False, related_sudo=False)
     emp_code = fields.Char(related='employee_id.arabic_name', readonly=False, related_sudo=False)
+
+
+    def __init__(self, pool, cr):
+        """Override of __init__ to add access rights on related fields."""
+        init_res = super().__init__(pool, cr)
+
+        # List of all new related fields to be added
+        new_fields = [
+            'joining_date', 'id_expiry_date', 'passport_expiry_date', 'state',
+            'start_date', 'end_date', 'trial_period', 'trial_date', 'date_of_direct_action',
+            'arabic_name', 'emp_code'
+        ]
+
+        # Extend SELF_READABLE_FIELDS
+        type(self).SELF_READABLE_FIELDS = list(self.SELF_READABLE_FIELDS)
+        type(self).SELF_READABLE_FIELDS.extend(new_fields)
+
+        # Extend SELF_WRITEABLE_FIELDS
+        type(self).SELF_WRITEABLE_FIELDS = list(self.SELF_WRITEABLE_FIELDS)
+        type(self).SELF_WRITEABLE_FIELDS.extend(new_fields)
+
+        return init_res
+
+
+    
+
