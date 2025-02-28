@@ -125,53 +125,24 @@
         </field>
     </record>
 
-     <record id="hr_user_view_emp_form" model="ir.ui.view">
-        <field name="name">hr.user.preferences.view.form.emp.inherit</field>
-        <field name="model">res.users</field>
-        <field name="inherit_id" ref="hr.res_users_view_form_profile"/>
-        <field name="arch" type="xml">
-        <xpath expr="//div[hasclass('oe_title')]" position="inside">
-                    <h3 class="o_row">
-                        <group>
-                            <field name="arabic_name"/>
-                            <field name="emp_code"/>
-                        </group>
-                    </h3>
-                </xpath>
+  <record id="res_users_view_form_preferences_emp" model="ir.ui.view">
+            <field name="name">hr.user.preferences.form.inherit.hr.expense</field>
+            <field name="model">res.users</field>
+            <field name="inherit_id" ref="hr.res_users_view_form_profile" />
+            <field name="arch" type="xml">
+                <xpath expr="//group[@name='managers']" position="inside">
+                <field name="arabic_name" readonly="not can_edit"/>
+                            <field name="emp_code" readonly="not can_edit"/>
+                            <field name="state" invisible="1" readonly="not can_edit"/>
+                             <field name="start_date" readonly="not can_edit"/>
+                    <field name="date_of_direct_action" readonly="not can_edit"/>
+                    <field name="trial_period" readonly="not can_edit"/>
+                    <field name="trial_date" readonly="not can_edit"/>
+                    <field name="end_date" readonly="not can_edit"/>
 
-                 <xpath expr="//field[@name='pin']" position="before">
-                  <field name="state" invisible="1"/>
-                    <field name="start_date" required="1"/>
-                    <field name="date_of_direct_action"/>
-                    <field name="trial_period"/>
-                    <field name="trial_date"/>
-                    <field name="end_date" readonly="state not in ['service']"/>
-                </xpath>
-
-               
-
-            
-            <xpath expr="//page[@name='hr_settings']//field[@name='employee_type']" position="after">
-                <field name="joining_date"/>
-            </xpath>
-            <field name="identification_id" position="replace"/>
-            <field name="passport_id" position="replace"/>
-            <xpath expr="//page[@name='personal_information']/group/group[1]" position="after">
-                <group name="identification_id" string="Identification ID">
-                    <field name="identification_id"/>
-                    <field name="id_expiry_date" groups="hr.group_hr_user"
-                           invisible="identification_id in [None,False]"/>
-                   
-                </group>
-                <group name="passport_id" string="Passport ID">
-                    <field name="passport_id"/>
-                    <field name="passport_expiry_date" groups="hr.group_hr_user"
-                           invisible="passport_id in [None,False]"/>
-                  
-                </group>
-            </xpath>
-
-        </field>
+                   </xpath>
+            </field>
         </record>
+
 
 </odoo>

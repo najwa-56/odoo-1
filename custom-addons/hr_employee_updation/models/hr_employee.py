@@ -229,6 +229,25 @@ class HrEmployeeFamily(models.Model):
 
 
 
+
+
+
+class EmployeePublic(models.Model):
+    _inherit = 'hr.employee.public'
+
+    joining_date = fields.Date(related='employee_id.joining_date', string="Join Date", readonly=False)
+    id_expiry_date = fields.Date(related='employee_id.id_expiry_date', readonly=False)
+    passport_expiry_date = fields.Date(related='employee_id.passport_expiry_date', readonly=False)
+    state = fields.Selection(related='employee_id.state', readonly=False)
+    start_date = fields.Date(related='employee_id.start_date', readonly=False)
+    end_date = fields.Date(related='employee_id.end_date', readonly=False)
+    trial_period = fields.Selection(related='employee_id.trial_period', readonly=False)
+    trial_date = fields.Date(related='employee_id.trial_date', readonly=False)
+    date_of_direct_action = fields.Date(related='employee_id.date_of_direct_action', readonly=False)
+    arabic_name = fields.Char(related='employee_id.arabic_name', readonly=False)
+    emp_code = fields.Char(related='employee_id.arabic_name', readonly=False)
+
+
 class User(models.Model):
     _inherit = ['res.users']
     joining_date = fields.Date(related='employee_id.joining_date', string="Join Date", readonly=False, related_sudo=False)
@@ -243,25 +262,16 @@ class User(models.Model):
     arabic_name = fields.Char(related='employee_id.arabic_name', readonly=False, related_sudo=False)
     emp_code = fields.Char(related='employee_id.arabic_name', readonly=False, related_sudo=False)
 
-
-   
-
-
     @property
     def SELF_READABLE_FIELDS(self):
-        new_fields = [
+        return super().SELF_READABLE_FIELDS + [
             'joining_date', 'id_expiry_date', 'passport_expiry_date', 'state',
             'start_date', 'end_date', 'trial_period', 'trial_date', 'date_of_direct_action',
             'arabic_name', 'emp_code'
         ]
-        return super().SELF_READABLE_FIELDS + new_fields
-    @property
-    def SELF_WRITEABLE_FIELDS(self):
-        new_fields = [
-            'joining_date', 'id_expiry_date', 'passport_expiry_date', 'state',
-            'start_date', 'end_date', 'trial_period', 'trial_date', 'date_of_direct_action',
-            'arabic_name', 'emp_code'
-        ]
-        return super().SELF_WRITEABLE_FIELDS + new_fields
-    
 
+
+
+
+   
+     
