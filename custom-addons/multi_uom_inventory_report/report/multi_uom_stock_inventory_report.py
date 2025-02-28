@@ -86,17 +86,19 @@ class emulti_uom_inventory_report_stock_inventory_report(models.AbstractModel):
                     location_header_data_dict['product_ending_qty'] += value
 
                 # **Embed UOM data inside each product's location entry**
+                
                 for uom_price in product.multi_uom_price_id:
                     uom_factor = uom_price.uom_id.factor_inv or 1
                     location_data_dict['uom_data'].append({
                         'uom_name': uom_price.name_field,
-                        'beg_qty': beg_qty / uom_factor,
-                        'product_qty_in': location_data_dict['product_qty_in'] / uom_factor,
-                        'product_qty_out': location_data_dict['product_qty_out'] / uom_factor,
-                        'product_qty_internal': location_data_dict['product_qty_internal'] / uom_factor,
-                        'product_qty_adjustment': location_data_dict['product_qty_adjustment'] / uom_factor,
-                        'product_ending_qty': location_data_dict['product_ending_qty'] / uom_factor,
+                        'beg_qty': round(beg_qty / uom_factor,2),
+                        'product_qty_in': round(location_data_dict['product_qty_in'] / uom_factor,2),
+                        'product_qty_out': round(location_data_dict['product_qty_out'] / uom_factor,2),
+                        'product_qty_internal': round(location_data_dict['product_qty_internal'] / uom_factor,2),
+                        'product_qty_adjustment': round(location_data_dict['product_qty_adjustment'] / uom_factor,2),
+                        'product_ending_qty': round(location_data_dict['product_ending_qty'] / uom_factor,2),
                     })
+                    
 
                 location_data_lst.append(location_data_dict)
 
@@ -146,12 +148,12 @@ class emulti_uom_inventory_report_stock_inventory_report(models.AbstractModel):
                 uom_factor = uom_price.uom_id.factor_inv or 1
                 product_datas[product]['uom_data'].append({
                     'uom_name': uom_price.name_field,
-                    'beg_qty': beg_qty / uom_factor,
-                    'product_qty_in': product_datas[product]['product_qty_in'] / uom_factor,
-                    'product_qty_out': product_datas[product]['product_qty_out'] / uom_factor,
-                    'product_qty_internal': product_datas[product]['product_qty_internal'] / uom_factor,
-                    'product_qty_adjustment': product_datas[product]['product_qty_adjustment'] / uom_factor,
-                    'product_ending_qty': product_datas[product]['product_ending_qty'] / uom_factor,
+                    'beg_qty': round(beg_qty / uom_factor,2),
+                    'product_qty_in': round(product_datas[product]['product_qty_in'] / uom_factor,2),
+                    'product_qty_out': round(product_datas[product]['product_qty_out'] / uom_factor,2),
+                    'product_qty_internal': round(product_datas[product]['product_qty_internal'] / uom_factor,2),
+                    'product_qty_adjustment': round(product_datas[product]['product_qty_adjustment'] / uom_factor,2),
+                    'product_ending_qty': round(product_datas[product]['product_ending_qty'] / uom_factor,2),
                 })
 
         if record.group_by_categ:

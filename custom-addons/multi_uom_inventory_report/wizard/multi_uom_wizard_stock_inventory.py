@@ -90,8 +90,8 @@ class multi_uom_wizard_stock_inventory(models.TransientModel):
         header_data_format = workbook.add_format({'align':'center', 'valign':'vcenter', \
                                                    'font_size':10, 'border':1})
 
-        product_header_format = workbook.add_format({'valign':'vcenter', 'font_size':13, 'border':1})
-        product_uom_format = workbook.add_format({'valign':'vcenter', 'font_size':10, 'border':1,'bg_color':'#D3D3D3'})
+        product_header_format = workbook.add_format({'align':'left','valign':'vleft', 'font_size':14, 'border':1})
+        product_uom_format = workbook.add_format({'valign':'vcenter', 'font_size':12, 'border':1,'color':'blue'})
 
         for warehouse in self.warehouse_ids:
             worksheet = workbook.add_worksheet(warehouse.name)
@@ -239,7 +239,6 @@ class multi_uom_wizard_stock_inventory(models.TransientModel):
                 if not self.group_by_categ:
                     products_data = report_stock_inv_obj.get_location_wise_product(self,warehouse,self.location_ids)
                     for key,value in products_data.items():
-                        
                         for header_data in value.get('location_header_data'):
                             beginning_qty = header_data['beg_qty'] 
                             product_qty_in = header_data['product_qty_in'] 
@@ -264,16 +263,8 @@ class multi_uom_wizard_stock_inventory(models.TransientModel):
                             worksheet.write(rows, 7, product_qty_adjustment, header_merge_format)
                             worksheet.write(rows, 8, ending_qty, header_merge_format)
                             rows += 1
-                            for uom_row in header_data.get('uom_data', []):  # Ensure UOM data exists
-                                worksheet.merge_range(rows, 0, rows, 1,uom_row['uom_name'], product_uom_format)
-                                worksheet.write(rows, 2, '', header_data_format)
-                                worksheet.write(rows, 3, uom_row['beg_qty'], header_data_format)
-                                worksheet.write(rows, 4, uom_row['product_qty_in'], header_data_format)
-                                worksheet.write(rows, 5, abs(uom_row['product_qty_out']), header_data_format)
-                                worksheet.write(rows, 6, abs(uom_row['product_qty_internal']), header_data_format)
-                                worksheet.write(rows, 7, uom_row['product_qty_adjustment'], header_data_format)
-                                worksheet.write(rows, 8, uom_row['product_ending_qty'], header_data_format)
-                                rows += 1
+                            
+                            
 
                             rows += 1
 
@@ -287,6 +278,17 @@ class multi_uom_wizard_stock_inventory(models.TransientModel):
                             worksheet.write(rows, 7, location_wise_data['product_qty_adjustment'] , header_data_format)
                             worksheet.write(rows, 8, location_wise_data['product_ending_qty'] , header_data_format)
                             rows += 1
+
+                            for uom_row in location_wise_data.get('uom_data', []):  # Ensure UOM data exists
+                                worksheet.merge_range(rows, 0, rows, 1,uom_row['uom_name'], product_uom_format)
+                                worksheet.write(rows, 2, '', header_data_format)
+                                worksheet.write(rows, 3, uom_row['beg_qty'], header_data_format)
+                                worksheet.write(rows, 4, uom_row['product_qty_in'], header_data_format)
+                                worksheet.write(rows, 5, abs(uom_row['product_qty_out']), header_data_format)
+                                worksheet.write(rows, 6, abs(uom_row['product_qty_internal']), header_data_format)
+                                worksheet.write(rows, 7, uom_row['product_qty_adjustment'], header_data_format)
+                                worksheet.write(rows, 8, uom_row['product_ending_qty'], header_data_format)
+                                rows += 1
 
                     rows += 1
                     worksheet.merge_range(rows, 0, rows, 1, 'Total', header_merge_format)

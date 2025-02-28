@@ -134,10 +134,12 @@
                                             </tr>
 
                                             <!-- OM Data (Now appearing immediately after each product) -->
-                                        <tr t-foreach="product_value['uom_data']" t-as="uom_row" >
-                                             <td style="font-style: italic;background-color:darkgrey; text-align:right !important;" >
+                                        <tr t-foreach="location_wise_data['uom_data']" t-as="uom_row" >
+                                             <td style="font-style: italic;color:blue; text-align:right !important;" >
                                                 <span t-esc="uom_row['uom_name']"/>
                                             </td>
+                                           
+                                                <td></td>
                                            
                                             <td>
                                                 <span t-esc="uom_row['beg_qty']" t-options='{"widget": "float", "decimal_precision": "Product Price"}'/>
@@ -219,7 +221,7 @@
                                         </tr>
 
                                         <tr t-foreach="product_value['uom_data']" t-as="uom_row">
-                                             <td style="font-style: italic;background-color:darkgrey; text-align:right !important;" >
+                                             <td style="font-style: italic;color:blue; text-align:right !important;" >
                                                 <span t-esc="uom_row['uom_name']"/>
                                             </td>
                                            
@@ -274,7 +276,7 @@
                                     <t t-if="docs.location_ids">
                                         <t t-set="products_data_with_category" t-value="get_location_wise_product(docs,warehouse,docs.location_ids)"/>
                                         <t t-foreach="products_data_with_category" t-as="product_category">
-                                            <tr style="background-color:darkgrey;">
+                                            <tr style="color:blue;">
                                                 <td>
                                                     <span t-esc="product_category.name"/>
                                                 </td>
@@ -310,7 +312,7 @@
                                                     </td>
                                                 </tr>
                                                 <tr t-foreach="product_value['uom_data']" t-as="uom_row">
-                                                    <td style="font-style: italic;background-color:darkgrey; text-align:right !important;" >
+                                                    <td style="font-style: italic;color:blue; text-align:right !important;" >
                                                         <span t-esc="uom_row['uom_name']"/>
                                                     </td>
                                                 
@@ -374,7 +376,7 @@
                                     <t t-if="not docs.location_ids">
                                         <t t-set="products_data_with_category" t-value="get_product_valuation_data(docs,warehouse)"/>
                                         <tr t-foreach="products_data_with_category" t-as="product_categ_dict">
-                                            <tr style="background-color:darkgrey;">
+                                            <tr style="color:blue;">
                                                 <td>
                                                     <span t-esc="product_categ_dict.name"/>
                                                 </td>
@@ -414,7 +416,7 @@
                                                 </td>
                                             </tr>
                                              <tr t-foreach="product_value['uom_data']" t-as="uom_row">
-                                                     <td style="font-style: italic;background-color:darkgrey; text-align:right !important;" >
+                                                     <td style="font-style: italic;color:blue; text-align:right !important;" >
                                                         <span t-esc="uom_row['uom_name']"/>
                                                     </td>
                                                 
