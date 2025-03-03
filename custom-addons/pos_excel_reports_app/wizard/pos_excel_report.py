@@ -25,6 +25,7 @@ class PosExcel(models.TransientModel):
     _inherit = "pos.details.wizard"
 
     file = fields.Binary()
+    is_adjustment = fields.Boolean('For Adjustment')
 
 
     def print_excel_report(self):
@@ -72,6 +73,14 @@ class PosExcel(models.TransientModel):
         worksheet.set_column('F:F', 20)
         worksheet.write(row, 6, 'Subtotal(Discounts Deducted)',session_total_formate)
         worksheet.write(row, 7, 'Name Field',session_total_formate)
+
+        if self.is_adjustment:
+            worksheet.write(row, 8, 'Location',session_total_formate)
+            worksheet.write(row, 9, 'ProductID',session_total_formate)
+            worksheet.write(row, 10, 'Unit',session_total_formate)
+            worksheet.write(row, 11, 'UOM Name',session_total_formate)
+            worksheet.write(row, 12, 'Date',session_total_formate)
+
         worksheet.set_column('G:G', 20)
         configs = self.pos_config_ids
         user_tz = pytz.timezone(self.env.context.get('tz') or self.env.user.tz or 'UTC')
@@ -131,14 +140,14 @@ class PosExcel(models.TransientModel):
         else:
             payments = []
         products = sorted([{
-                'product_id': product.id,
+                'product_id': product,
                 'product_name': product.name,
                 'code': product.default_code,
                 'quantity': qty,
                 'price_unit': price_unit,
                 'discount': discount,
                 'uom': product.uom_id.name,
-                'product_uom_id': product_uom_id.name,
+                'product_uom_id': product_uom_id,
                 'name_field':name_field
             } for (product, price_unit, discount , name_field , product_uom_id), qty in products_sold.items()], key=lambda l: l['product_name'])    
         row = 6
@@ -151,9 +160,32 @@ class PosExcel(models.TransientModel):
             worksheet.write(row,2,product_id.get('quantity'),session_total_formate1)
             worksheet.write(row,3,product_id.get('price_unit'),session_total_formate1)
             worksheet.write(row,4,product_id.get('discount'),session_total_formate1)
-            worksheet.write(row,5,product_id.get('product_uom_id'),session_total_formate1)
+            worksheet.write(row,5,product_id.get('product_uom_id').name,session_total_formate1)
             worksheet.write(row,6,sub_total_disc_deducted)
             worksheet.write(row,7,product_id.get('name_field'),session_total_formate1)
+            if self.is_adjustment:
+                sold_qty = product_id.get('quantity')  # Sold quantity in different UoM
+                sold_uom = product_id.get('product_uom_id')  # The UoM in which the quantity is recorded
+                product = product_id.get('product_id')  # The actual product object
+                default_uom = product.uom_id  # The default UoM of the product
+                
+                
+                # Convert the sold quantity to the default UoM of the product
+                converted_qty = sold_uom._compute_quantity(sold_qty, default_uom)
+                product_id.get('product_uom_id')
+
+                worksheet.write(row,8, configs and configs[0].picking_type_id.default_location_src_id.name,session_total_formate1)
+                worksheet.write(row,9,product_id.get('product_id').id,session_total_formate1)
+                worksheet.write(row,10,converted_qty,session_total_formate1)
+                worksheet.write(row,11,default_uom.name,session_total_formate1)
+                worksheet.write(row, 12,self.start_date.date().strftime('%Y-%m-%d'),session_total_formate)
+               
+                
+               
+               
+
+          
+
             totals += sub_total_disc_deducted
             row +=1
         worksheet.write(row+2,5,'Total without taxes',session_total_formate1)                
