@@ -27,6 +27,130 @@ class PosExcel(models.TransientModel):
     file = fields.Binary()
     is_adjustment = fields.Boolean('For Adjustment')
 
+    def print_adj_report(self):
+        file_name = _('Product.xlsx')
+        fp = BytesIO()
+        workbook = xlwt.Workbook()
+        workbook = xlsxwriter.Workbook(os.path.join(config['data_dir'], 'Product.xlsx'))
+        worksheet = workbook.add_worksheet('Product')
+        worksheet_payment = workbook.add_worksheet('Payment')
+        worksheet_tax = workbook.add_worksheet('Tax')
+        worksheet_total = workbook.add_worksheet('Final Totals')
+        session_total_formate = workbook.add_format({'align': 'center',
+                                        'bold': True,
+                                        'valign': 'vcenter',
+                                        'size': 10,
+                                        'bg_color':'gray',
+                                        'text_wrap': True,
+                                        })
+        session_total_formate.set_border()
+        session_total_formate1 = workbook.add_format({'align': 'center'})
+        session_total_formate2 = workbook.add_format({'align': 'center',
+                                        'bold': True,
+                                        'valign': 'vcenter',
+                                        'size': 10,
+                                        'color':'green',
+                                        'text_wrap': True,
+                                        })
+        worksheet.merge_range('A1:G5', '%s\nSales Details\n%s - %s'%(self.env.user.company_id.name,self.start_date,self.end_date), session_total_formate2)
+     
+        row_num = 5
+        
+        worksheet.write(row_num, 0, 'Location', session_total_formate)
+        worksheet.set_column('A:A', 10)
+        worksheet.write(row_num, 1, 'ProductID', session_total_formate)
+        worksheet.set_column('B:B', 10)
+        worksheet.write(row_num, 2, 'Unit', session_total_formate)
+        worksheet.set_column('C:C', 10)
+        worksheet.write(row_num, 3, 'UOM Name', session_total_formate)
+        worksheet.set_column('D:D', 10)
+        worksheet.write(row_num, 4, 'Date', session_total_formate)
+        worksheet.set_column('E:E', 10)
+        row_num = row_num + 1
+        
+        user_tz = pytz.timezone(self.env.context.get('tz') or self.env.user.tz or 'UTC')
+        today = user_tz.localize(fields.Datetime.from_string(fields.Date.context_today(self)))
+        today = today.astimezone(pytz.timezone('UTC'))
+
+        date_start = fields.Datetime.from_string(self.start_date) if self.start_date else today
+        date_stop = fields.Datetime.from_string(self.end_date) if self.end_date else today + timedelta(days=1, seconds=-1)
+        date_stop = max(date_stop, date_start)
+        
+        date_start = fields.Datetime.to_string(date_start)
+        date_stop = fields.Datetime.to_string(date_stop)
+
+        configs = self.pos_config_ids
+        self.env.cr.execute("""
+            SELECT 
+                pt.id AS ProductID,
+                pol.qty AS SoldQty,  
+                pol.product_uom_id AS SoldUoM,
+                pt.uom_id AS DefaultUoM
+            FROM pos_order po
+            JOIN pos_order_line pol ON po.id = pol.order_id
+            JOIN product_product pp ON pol.product_id = pp.id
+            JOIN product_template pt ON pp.product_tmpl_id = pt.id
+            WHERE po.date_order BETWEEN %s AND %s
+            AND po.state IN ('paid', 'invoiced', 'done')
+            AND po.config_id = ANY(%s)
+            """, (date_start, date_stop, configs.ids))
+
+        rows = self.env.cr.fetchall()
+
+        # Dictionary to store grouped product quantities
+        product_totals = {}
+
+        for row in rows:
+            product_id = row[0]
+            sold_qty = row[1]
+            sold_uom_id = row[2]
+            default_uom_id = row[3]
+
+            # Get the UoM objects
+            sold_uom = self.env['uom.uom'].browse(sold_uom_id)
+            default_uom = self.env['uom.uom'].browse(default_uom_id)
+
+            # Convert sold quantity to default UoM
+            converted_qty = sold_uom._compute_quantity(sold_qty, default_uom)
+
+            # Sum up converted quantities for the same product
+            if product_id in product_totals:
+                product_totals[product_id]['qty'] += converted_qty
+            else:
+                product_totals[product_id] = {
+                    'qty': converted_qty,
+                    'uom_name': default_uom.name
+                }
+
+        # Write results to Excel
+        location_name = configs and configs[0].picking_type_id.default_location_src_id.name or ''
+        report_date = self.start_date.date().strftime('%Y-%m-%d')
+
+        for product_id, data in product_totals.items():
+            worksheet.write(row_num, 0, location_name, session_total_formate1)  # Fixed Location
+            worksheet.write(row_num, 1, product_id, session_total_formate1)  # Product ID
+            worksheet.write(row_num, 2, data['qty'], session_total_formate1)  # Converted Quantity
+            worksheet.write(row_num, 3, data['uom_name'], session_total_formate1)  # Default UoM Name
+            worksheet.write(row_num, 4, report_date, session_total_formate1)  # Fixed Date
+            row_num += 1
+
+
+
+
+
+        workbook.close()
+        file_download = base64.b64encode(fp.getvalue())
+        fp.close()
+        data_file = open(config['data_dir'] + "/Product.xlsx", "rb")
+        out = data_file.read()
+        data_file.close()
+        self.file = base64.b64encode(out)
+        return {
+            'name': 'Product',
+            'type': 'ir.actions.act_url',
+            'url': '/web/content/%s/%d/file/%s?download=false' % (self._name, self.id, 'Sales Details.xlsx'),
+            }
+
 
     def print_excel_report(self):
         file_name = _('Product.xlsx')
@@ -173,6 +297,7 @@ class PosExcel(models.TransientModel):
                 # Convert the sold quantity to the default UoM of the product
                 converted_qty = sold_uom._compute_quantity(sold_qty, default_uom)
                 product_id.get('product_uom_id')
+                worksheet.write(row,10,converted_qty,session_total_formate1)
 
                 worksheet.write(row,8, configs and configs[0].picking_type_id.default_location_src_id.name,session_total_formate1)
                 worksheet.write(row,9,product_id.get('product_id').id,session_total_formate1)
@@ -181,7 +306,6 @@ class PosExcel(models.TransientModel):
                 worksheet.write(row, 12,self.start_date.date().strftime('%Y-%m-%d'),session_total_formate)
                
                 
-               
                
 
           

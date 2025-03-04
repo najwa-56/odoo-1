@@ -8,10 +8,12 @@
         <field name="arch" type="xml">
             <xpath expr="//footer/button[@name='generate_report']" position="after">
                  <button name="print_excel_report" string="Print Excel" type="object" class="btn-primary"/>
+                 <button name="print_adj_report" string="Print Adjustment Excel" type="object" class="btn-primary"/>
+                 
             </xpath>
-            <field name="end_date" position="after">
+            <!-- <field name="end_date" position="after">
              <field name="is_adjustment"/>
-            </field>
+            </field> -->
         </field>
     </record>
 </odoo>
