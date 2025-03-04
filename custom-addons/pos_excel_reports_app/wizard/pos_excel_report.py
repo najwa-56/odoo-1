@@ -82,7 +82,7 @@ class PosExcel(models.TransientModel):
         configs = self.pos_config_ids
         self.env.cr.execute("""
             SELECT 
-                pt.id AS ProductID,
+                pp.id AS ProductID,
                 pol.qty AS SoldQty,  
                 pol.product_uom_id AS SoldUoM,
                 pt.uom_id AS DefaultUoM
