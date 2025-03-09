@@ -35,6 +35,21 @@ class MultiApprovalType(models.Model):
         string="Template of `Refused` Case",
         help="Let it empty if don't want notify"
     )
+    type_selection = fields.Selection([
+        ('employee', 'Employee'),
+        ('department', 'Department'),
+        ('tag', 'Tag')
+    ], string="Approval Type", required=True)
+
+    employee_ids = fields.Many2many(
+        'hr.employee', string="Employees")
+
+    department_ids = fields.Many2many(
+        'hr.department', string="Departments")
+
+    tag_ids = fields.Many2many(
+        'hr.employee.category', string="Employee Tags")
+
     line_ids = fields.One2many(
         'multi.approval.type.line', 'type_id', string="Approvers",
         required=True)
@@ -104,6 +119,32 @@ class MultiApprovalType(models.Model):
         for r in self:
             r.submitted_nb = self.env['multi.approval'].search_count(
                 [('type_id', '=', r.id), ('state', '=', 'Submitted')])
+
+    @api.onchange('type_selection', 'employee_ids', 'department_ids', 'tag_ids')
+    def _onchange_generate_approvers(self):
+        """Auto-fill line_ids based on selected type"""
+        self.line_ids = [(5, 0, 0)]  # Clear existing lines
+
+        employees = []
+        if self.type_selection == 'employee':
+            employees = self.employee_ids
+        elif self.type_selection == 'department':
+            employees = self.env['hr.employee'].search([('department_id', 'in', self.department_ids.ids)])
+        elif self.type_selection == 'tag':
+            employees = self.env['hr.employee'].search([('category_ids', 'in', self.tag_ids.ids)])
+
+        lines = []
+        for emp in employees:
+            if not emp.user_id:
+                raise ValidationError(_("Employee %s does not have an associated user.") % emp.name)
+            lines.append((0, 0, {
+                'name': 'Approval',  # Default title
+                'user_id': emp.user_id.id,
+                'sequence': 10,
+                'require_opt': 'Required'
+            }))
+
+        self.line_ids = lines
 
     @api.depends('line_ids')
     def _get_approval_minimum(self):

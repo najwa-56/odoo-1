@@ -51,7 +51,19 @@
                             <group string="Approvers" name="approvers">
                                 <group>
                                     <field name="approval_minimum" />
+                                    <field name="type_selection"/>
                                 </group>
+                                <group invisible="type_selection != 'employee'">
+                        <field name="employee_ids" widget="many2many_tags"/>
+                    </group>
+
+                    <group invisible="type_selection != 'department'" >
+                        <field name="department_ids" widget="many2many_tags"/>
+                    </group>
+
+                    <group invisible="type_selection != 'tag'">
+                        <field name="tag_ids" widget="many2many_tags"/>
+                    </group>
                                 <field name="line_ids">
                                     <tree editable="bottom">
                                         <field name="sequence" widget="handle" />

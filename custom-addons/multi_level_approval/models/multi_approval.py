@@ -119,7 +119,6 @@ class MultiApproval(models.Model):
 
     @api.depends_context("uid")
     def _compute_last_viewed_user(self):
-        print("in here last view======================================")
         auditlog_model = self.env['auditlog.log']
         for record in self:
             last_log = auditlog_model.search([
