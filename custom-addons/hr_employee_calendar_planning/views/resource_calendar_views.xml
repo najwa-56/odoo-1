@@ -6,6 +6,11 @@
         <field name="model">resource.calendar</field>
         <field name="inherit_id" ref="resource.resource_calendar_form" />
         <field name="arch" type="xml">
+         <field name="hours_per_day" position="after">
+                <field name="tag_ids" widget="many2many_tags"/>
+                <field name="date_start" />
+                            <field name="date_end" />
+            </field>
             <notebook position="inside">
                 <page name="employee_calendar" string="Employee Calendars">
                     <field name="employee_calendar_ids">

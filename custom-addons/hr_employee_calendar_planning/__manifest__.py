@@ -13,6 +13,7 @@
         "security/ir.model.access.csv",
         "views/hr_employee_views.xml",
         "views/resource_calendar_views.xml",
+        "views/server_action.xml",
     ],
     "post_init_hook": "post_init_hook",
     "maintainers": ["victoralmau", "pedrobaeza"],

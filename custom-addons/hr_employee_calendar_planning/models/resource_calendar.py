@@ -12,7 +12,16 @@ class ResourceCalendar(models.Model):
     active = fields.Boolean(default=True)
     auto_generate = fields.Boolean()
     employee_calendar_ids = fields.One2many("hr.employee.calendar", "calendar_id")
+    tag_ids = fields.Many2many(
+        'hr.employee.category', string="Employee Tags")
 
+    date_start = fields.Date(
+        string="Start Date",
+    )
+    date_end = fields.Date(
+        string="End Date",
+    )
+    
     @api.constrains("active")
     def _check_active(self):
         for item in self:

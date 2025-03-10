@@ -190,6 +190,29 @@ class HrEmployee(models.Model):
         return res
 
 
+
+    def action_update_employee_calendar(self):
+        for employee in self:
+            print("in server action funciton=======================================")
+            # Remove existing calendar_ids
+            employee.calendar_ids.unlink()
+            
+            # Get employee tags (category_ids)
+            employee_tags = employee.category_ids.ids
+
+            if employee_tags:
+                # Search for resource.calendar records where tag_ids match employee category_ids
+                matching_calendars = self.env["resource.calendar"].search([("tag_ids", "in", employee_tags)])
+
+                for calendar in matching_calendars:
+                    self.env["hr.employee.calendar"].create({
+                        "employee_id": employee.id,
+                        "calendar_id": calendar.id,
+                        "date_start": calendar.date_start,
+                        "date_end": calendar.date_end,  # Set start date as today
+                    })
+
+
 class HrEmployeeCalendar(models.Model):
     _name = "hr.employee.calendar"
     _description = "Employee Calendar"

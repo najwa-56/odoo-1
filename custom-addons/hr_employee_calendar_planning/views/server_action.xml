@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <record id="update_employee_calendar_action" model="ir.actions.server">
+        <field name="name">Update Employee Calendar</field>
+        <field name="model_id" ref="hr.model_hr_employee"/>
+        <field name="binding_model_id" ref="hr.model_hr_employee"/>
+        <field name="state">code</field>
+        <field name="code">
+            action = records.action_update_employee_calendar()
+        </field>
+    </record>
+
+   
+</odoo>
