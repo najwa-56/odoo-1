@@ -222,7 +222,7 @@ class emulti_uom_inventory_report_stock_inventory_report(models.AbstractModel):
     def _get_beginning_inventory(self, record, product, warehouse, location=None):
         locations_ids = location if location else self.get_location(record, warehouse)
         from_date = self.convert_withtimezone((record.start_date.strftime("%Y-%m-%d")  + ' 00:00:00'))
-        min_static_date = '2025-03-10 00:00:00'  # Static date condition
+        min_static_date = '2025-03-08 00:00:00' 
         warehouse_wise_locations = self.get_location(record, warehouse)
         locations = self.get_unique_locations(warehouse_wise_locations,locations_ids)
         query = """
