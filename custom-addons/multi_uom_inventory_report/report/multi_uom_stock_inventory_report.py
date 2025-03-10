@@ -167,7 +167,7 @@ class emulti_uom_inventory_report_stock_inventory_report(models.AbstractModel):
 
                 product_datas[product]['uom_data'].append({
                     'uom_name': uom_price.name_field,
-                    'beg_qty': round(beg_qty / uom_factor,2),
+                    'beg_qty': round(qty_beg / uom_factor,2),
                     'product_qty_in': round( product_qty_in/ uom_factor,2),
                     'product_qty_out': round( product_qty_out/ uom_factor,2),
                     'product_qty_internal': round(product_qty_internal / uom_factor,2),
