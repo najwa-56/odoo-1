@@ -89,14 +89,21 @@ class emulti_uom_inventory_report_stock_inventory_report(models.AbstractModel):
                 
                 for uom_price in product.multi_uom_price_id:
                     uom_factor = uom_price.uom_id.factor_inv or 1
+                    qty_beg = beg_qty
+                    product_qty_in = location_data_dict['product_qty_in'] 
+                    product_qty_out = location_data_dict['product_qty_out']
+                    product_qty_internal = location_data_dict['product_qty_internal']
+                    product_qty_adjustment = location_data_dict['product_qty_adjustment'] 
+                    product_ending_qty = location_data_dict['product_ending_qty'] 
+
                     location_data_dict['uom_data'].append({
                         'uom_name': uom_price.name_field,
-                        'beg_qty': round(beg_qty / uom_factor,2),
-                        'product_qty_in': round(location_data_dict['product_qty_in'] / uom_factor,2),
-                        'product_qty_out': round(location_data_dict['product_qty_out'] / uom_factor,2),
-                        'product_qty_internal': round(location_data_dict['product_qty_internal'] / uom_factor,2),
-                        'product_qty_adjustment': round(location_data_dict['product_qty_adjustment'] / uom_factor,2),
-                        'product_ending_qty': round(location_data_dict['product_ending_qty'] / uom_factor,2),
+                        'beg_qty': round(qty_beg / uom_factor,2),
+                        'product_qty_in': round(product_qty_in / uom_factor,2),
+                        'product_qty_out': round(product_qty_out / uom_factor,2),
+                        'product_qty_internal': round(product_qty_internal / uom_factor,2),
+                        'product_qty_adjustment': round(product_qty_adjustment / uom_factor,2),
+                        'product_ending_qty': round(product_ending_qty / uom_factor,2),
                     })
                     
 
@@ -112,6 +119,11 @@ class emulti_uom_inventory_report_stock_inventory_report(models.AbstractModel):
                 product_datas_with_product_category.setdefault(key.categ_id, {})
                 product_datas_with_product_category[key.categ_id].update({key: value})
             return product_datas_with_product_category
+
+
+        # Remove products where all quantities are zero
+        product_datas = {product: data for product, data in product_datas.items() 
+                 if any(data['location_header_data'][0][field] != 0 for field in lst + ['beg_qty', 'product_ending_qty'])}
 
         return product_datas
 
@@ -146,14 +158,21 @@ class emulti_uom_inventory_report_stock_inventory_report(models.AbstractModel):
             # **Embed UOM data inside each product**
             for uom_price in product.multi_uom_price_id:
                 uom_factor = uom_price.uom_id.factor_inv or 1
+                qty_beg = beg_qty
+                product_qty_in = product_datas[product]['product_qty_in']
+                product_qty_out = product_datas[product]['product_qty_out']
+                product_qty_internal = product_datas[product]['product_qty_internal']
+                product_qty_adjustment = product_datas[product]['product_qty_adjustment']
+                product_ending_qty = product_datas[product]['product_ending_qty']
+
                 product_datas[product]['uom_data'].append({
                     'uom_name': uom_price.name_field,
                     'beg_qty': round(beg_qty / uom_factor,2),
-                    'product_qty_in': round(product_datas[product]['product_qty_in'] / uom_factor,2),
-                    'product_qty_out': round(product_datas[product]['product_qty_out'] / uom_factor,2),
-                    'product_qty_internal': round(product_datas[product]['product_qty_internal'] / uom_factor,2),
-                    'product_qty_adjustment': round(product_datas[product]['product_qty_adjustment'] / uom_factor,2),
-                    'product_ending_qty': round(product_datas[product]['product_ending_qty'] / uom_factor,2),
+                    'product_qty_in': round( product_qty_in/ uom_factor,2),
+                    'product_qty_out': round( product_qty_out/ uom_factor,2),
+                    'product_qty_internal': round(product_qty_internal / uom_factor,2),
+                    'product_qty_adjustment': round(product_qty_adjustment / uom_factor,2),
+                    'product_ending_qty': round(product_ending_qty / uom_factor,2),
                 })
 
         if record.group_by_categ:
@@ -162,6 +181,10 @@ class emulti_uom_inventory_report_stock_inventory_report(models.AbstractModel):
                 product_datas_with_product_category.setdefault(key.categ_id, {})
                 product_datas_with_product_category[key.categ_id].update({key: value})
             return product_datas_with_product_category
+
+        # Remove products where all quantities are zero
+        product_datas = {product: data for product, data in product_datas.items() 
+                 if any(data[field] != 0 for field in lst + ['beg_qty', 'product_ending_qty'])}
 
         return product_datas
 
