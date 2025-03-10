@@ -222,6 +222,7 @@ class emulti_uom_inventory_report_stock_inventory_report(models.AbstractModel):
     def _get_beginning_inventory(self, record, product, warehouse, location=None):
         locations_ids = location if location else self.get_location(record, warehouse)
         from_date = self.convert_withtimezone((record.start_date.strftime("%Y-%m-%d")  + ' 00:00:00'))
+        min_static_date = '2025-03-10 00:00:00'  # Static date condition
         warehouse_wise_locations = self.get_location(record, warehouse)
         locations = self.get_unique_locations(warehouse_wise_locations,locations_ids)
         query = """
@@ -245,11 +246,11 @@ class emulti_uom_inventory_report_stock_inventory_report(models.AbstractModel):
             LEFT JOIN stock_move_line smline ON (smline.product_id = pp.id)
             LEFT JOIN uom_uom pu ON (pt.uom_id=pu.id)
             LEFT JOIN uom_uom u ON (smline.product_uom_id=u.id)
-            WHERE smline.state='done' AND smline.date <  %s AND pp.active=True AND pp.id in %s
+            WHERE smline.state='done' AND smline.date <  %s  AND smline.date > %s AND pp.active=True AND pp.id in %s
 
             GROUP BY pp.id
         """
-        params = [tuple(locations),tuple(locations),from_date,tuple(product)]
+        params = [tuple(locations),tuple(locations),from_date,min_static_date,tuple(product)]
         self.env.cr.execute(query, params)
         result = self.env.cr.dictfetchall()
         product_beg_qty_data = {}
