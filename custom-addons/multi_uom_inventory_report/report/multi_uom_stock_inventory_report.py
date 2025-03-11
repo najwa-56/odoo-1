@@ -30,15 +30,7 @@ class emulti_uom_inventory_report_stock_inventory_report(models.AbstractModel):
         }
 
     
-    def _get_mulit_uom(self, record, product):
-        """
-        Retrieves the conversion factor for the product's multi-UOM pricing.
-        Default factor is 1 if no multi-UOM pricing exists.
-        """
-        factor_inv = 1  # Default to 1 (no conversion)
-        if product.multi_uom_price_id:
-            factor_inv = product.multi_uom_price_id[0].uom_id.factor_inv or 1
-        return factor_inv
+   
 
 
     def get_location_wise_product(self, record, warehouse, location_ids):
@@ -49,7 +41,6 @@ class emulti_uom_inventory_report_stock_inventory_report(models.AbstractModel):
         location_ids = location_ids.filtered(lambda l: l.id in warehouse_wise_locations)
 
         for product in product_ids:
-            factor_inv = self._get_mulit_uom(record, product)
             location_data_lst = []
             location_header_data = []
 
@@ -65,7 +56,7 @@ class emulti_uom_inventory_report_stock_inventory_report(models.AbstractModel):
                 product_beg_qty_data = self._get_beginning_inventory(record, product.ids, warehouse, location.ids)
                 product_inventory_movement_data = self.get_product_sale_qty(record, warehouse, product.ids, location.ids)
 
-                beg_qty = product_beg_qty_data.get(product.id, 0) / factor_inv
+                beg_qty = product_beg_qty_data.get(product.id, 0) 
 
                 location_data_dict = {
                     'beg_qty': beg_qty, 'product_qty_in': 0, 'product_qty_out': 0,
@@ -79,7 +70,7 @@ class emulti_uom_inventory_report_stock_inventory_report(models.AbstractModel):
 
                 product_sale_data = product_inventory_movement_data.get(product.id) or {}
                 for each in lst:
-                    value = product_sale_data.get(each, 0) / factor_inv
+                    value = product_sale_data.get(each, 0) 
                     location_data_dict[each] = value
                     location_data_dict['product_ending_qty'] += value
                     location_header_data_dict[each] += value
@@ -137,21 +128,20 @@ class emulti_uom_inventory_report_stock_inventory_report(models.AbstractModel):
         product_datas = {}
 
         for product in product_ids:
-            factor_inv = self._get_mulit_uom(record, product)
             product_datas.setdefault(product, {
                 'beg_qty': 0, 'product_qty_in': 0, 'product_qty_out': 0,
                 'product_qty_internal': 0, 'product_qty_adjustment': 0,
                 'product_ending_qty': 0.00, 'uom_data': []  # Store UOM data inside the product
             })
 
-            beg_qty = product_beg_qty_data.get(product.id, 0) / factor_inv
+            beg_qty = product_beg_qty_data.get(product.id, 0) 
             product_datas[product]['beg_qty'] = beg_qty
             product_datas[product]['product_ending_qty'] += beg_qty
 
             if product_inventory_movement_data:
                 product_sale_data = product_inventory_movement_data.get(product.id) or {}
                 for each in lst:
-                    value = product_sale_data.get(each, 0) / factor_inv
+                    value = product_sale_data.get(each, 0) 
                     product_datas[product][each] = value
                     product_datas[product]['product_ending_qty'] += value
 
@@ -323,6 +313,8 @@ class emulti_uom_inventory_report_stock_inventory_report(models.AbstractModel):
         product_sale_data = {}
         for each in values:
             product_sale_data.setdefault(each['product_id'],each)
+        
+        print("product data===============================",product_sale_data)
         return product_sale_data
 
 # vim:expandtab:smartindent:tabstop=4:softtabstop=4:shiftwidth=4:
