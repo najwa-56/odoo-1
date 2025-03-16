@@ -150,8 +150,8 @@ class AccountMove(models.Model):
             res['l10n_sa_invoice_type_is_readonly'] = 1 if conf.is_zatca and conf.zatca_invoice_type != "Standard & Simplified" else 0
         if 'l10n_payment_means_code' in fields_list:
             res['l10n_payment_means_code'] = '10'
-        if 'invoice_date' in fields_list:
-            res['invoice_date'] = fields.Datetime.now().date()
+        # if 'invoice_date' in fields_list:
+        #     res['invoice_date'] = fields.Datetime.now().date()
         if 'l10n_sa_invoice_type' in fields_list:
             if conf.is_zatca:
                 res['l10n_sa_invoice_type'] = "Simplified" if conf.zatca_invoice_type == "Simplified" else "Standard"
