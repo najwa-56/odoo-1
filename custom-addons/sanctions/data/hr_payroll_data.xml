@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+	
+	    <record id="hr_salary_rule_employee_sanctions_hours" model="hr.salary.rule">
+            <field name="name">Employee Sanction in hours</field>
+            <field name="category_id" ref="om_hr_payroll.DED"/>
+            <field name="code">SANCTION_AMOUNT_H</field>
+            <field name="sequence" eval="203"/>
+            <field name="condition_select">none</field>
+            <!-- <field name="condition_python">True</field> -->
+            <field name="amount_select">code</field>
+            <field name="amount_python_compute">
+sanc = contract.employee_id.sanction.filtered(lambda s:s.stype == 'hours') 
+r = 0
+for s in sanc:
+        if s and s.dateof.month == payslip.date_to.month  and s.expt == 0 and s.state == 'confirm':
+            r+=-(contract.wage/(30*8))*float(s.samount)
+result =r
+            </field>
+            <!-- <field name="struct_id" ref="om_hr_payroll.structure_001"/> -->
+        </record>
+
+        <record id="hr_salary_rule_employee_sanctions_days" model="hr.salary.rule">
+            <field name="name">Employee Sanction in days</field>
+            <field name="category_id" ref="om_hr_payroll.DED"/>
+            <field name="code">SANCTION_AMOUNT_D</field>
+            <field name="sequence" eval="204"/>
+            <field name="condition_select">none</field>
+            <!-- <field name="condition_python">True</field> -->
+            <field name="amount_select">code</field>
+            <field name="amount_python_compute">
+sanc = contract.employee_id.sanction.filtered(lambda s:s.stype == 'days') 
+r = 0
+for s in sanc:
+        if s and s.dateof.month == payslip.date_to.month  and s.expt == 0 and s.state == 'confirm':
+            r+=-(contract.wage/30)*(float(s.samount))
+result =r
+            </field>
+            <!-- <field name="struct_id" ref="om_hr_payroll.structure_001"/> -->
+        </record>
+
+        <record id="hr_salary_rule_employee_sanctions_percentage_of_day" model="hr.salary.rule">
+            <field name="name">Employee Sanction in Percentage of day</field>
+            <field name="category_id" ref="om_hr_payroll.DED"/>
+            <field name="code">SANCTION_AMOUNT_P</field>
+            <field name="sequence" eval="205"/>
+            <field name="condition_select">none</field>
+            <!-- <field name="condition_python">True</field> -->
+            <field name="amount_select">code</field>
+            <field name="amount_python_compute">
+sanc = contract.employee_id.sanction.filtered(lambda s:s.stype == 'percent')
+r = 0
+for s in sanc:
+        if s and s.dateof.month == payslip.date_to.month  and s.expt == 0 and s.state == 'confirm':
+            r+=-(contract.wage/(30))*(float(s.samount)/100)
+result =r
+            </field>
+            <!-- <field name="struct_id" ref="om_hr_payroll.structure_001"/> -->
+        </record>
+        
+        <record id="hr_salary_rule_employee_sanctions_percentage_of_day" model="hr.salary.rule">
+            <field name="name">Employee Sanction in Fixed Amount</field>
+            <field name="category_id" ref="om_hr_payroll.DED"/>
+            <field name="code">SANCTION_AMOUNT_F</field>
+            <field name="sequence" eval="206"/>
+            <field name="condition_select">none</field>
+            <!-- <field name="condition_python">True</field> -->
+            <field name="amount_select">code</field>
+            <field name="amount_python_compute">
+sanc = contract.employee_id.sanction.filtered(lambda s:s.stype == 'fixed') 
+r = 0
+for s in sanc:
+        if s and s.dateof.month == payslip.date_to.month  and s.expt == 0 and s.state == 'confirm':
+            r+=-float(s.samount)
+result =r
+            </field>
+            <!-- <field name="struct_id" ref="om_hr_payroll.structure_001"/> -->
+        </record>
+</odoo>

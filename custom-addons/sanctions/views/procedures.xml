@@ -1,0 +1,123 @@
+<odoo>
+  <data>
+    <record model="ir.ui.view" id="sanctions.list2">
+      <field name="name">sanctions list</field>
+      <field name="model">sanctions.procedures</field>
+      <field name="arch" type="xml">
+        <tree>
+          <field name="employee"/>
+          <field name="sanction"/>
+          <field name="dateof" />
+          <field name="desc" />
+          <field name="stime" />
+          <field name="state"/>
+          <!-- <field name="value2"/> -->
+        </tree>
+      </field>
+    </record>
+
+    <record model="ir.ui.view" id="sanctions.form2">
+        <field name="name">sanctions form</field>
+        <field name="model">sanctions.procedures</field>
+        <field name="arch" type="xml">
+          <form>
+          <header>
+            <button name="action_draft" string="إرسال" type="object" invisible="state != 'draft'"  class="oe_highlight" />
+            <button name="action_sent" string="تأكيد المدير المباشر" type="object" invisible="state != 'manager_approve'"  class="oe_highlight" />
+            <button name="action_hr_approve" string="تأكيد الموارد البشرية" type="object" invisible="state != 'hr_approve'" class="oe_highlight"/>
+            <field name="state" widget="statusbar" statusbar_visible="draft,manager_approve,hr_approve,cancelled,confirm" />
+            <button name="set_to_draft" type="object" invisible="state not in ['draft','hr_approve','manager_approve']"  class="btn btn-secondary" string="إلغاء"/>
+				  </header>
+          <sheet>
+          <group>
+            <group>
+              <field name="dateof"/>
+              <field name="sanction"/>
+              <field name="stime" force_save="1"/>
+              <field name="stype" readonly="editable == False" force_save="1"/>
+              <field name="samount" readonly="editable == False" force_save="1"/>
+              <field name="editable" widget='boolean_button'/>
+            </group>
+            <group>
+              <field name="employee"/>
+              <field name="job" force_save="1"/>
+              <field name="admin" force_save="1"/>
+              <field name="date" force_save="1"/>
+              <field name="expt" widget='boolean_button'/>
+            </group>
+          </group>
+            <group>
+            <field name="desc"/>
+            </group>
+          </sheet>
+          </form>
+        </field>
+  </record>
+
+
+    <record id="sanctions_search_view" model="ir.ui.view">
+        <field name="name">sanctions.procedures.search</field>
+        <field name="model">sanctions.procedures</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="employee"/>
+                <field name="sanction"/>
+                <field name="admin"/>
+                <field name="stime"/>
+                <field name="job"/>
+                <field name="work_location_id"/>
+                <filter string="مؤكدة" name="state" domain="[('state', '=', 'confirm')]"/>
+                <group expand="0" string="Group By">
+                    <filter string="الموظف" name="group_by_employee" context="{'group_by': 'employee'}"/>
+                    <filter string="العقوبة" name="group_by_sanction" context="{'group_by': 'sanction'}"/>
+                    <filter string="الادارة" name="group_by_admin" context="{'group_by': 'admin'}"/>
+                    <filter string="التكرار" name="group_by_stime" context="{'group_by': 'stime'}"/>
+                    <filter string="المنصب الوظيفي" name="group_by_job" context="{'group_by': 'job'}"/>
+                    <filter string="مكان العمل"  name="group_by_location" context="{'group_by':'work_location_id'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+    <!-- actions opening views on models -->
+
+    <record model="ir.actions.act_window" id="sanctions.pro_window">
+      <field name="name">المخالفات والعقوبات</field>
+      <field name="res_model">sanctions.procedures</field>
+      <field name="view_mode">tree,form</field>
+      <field name="search_view_id" ref="sanctions_search_view"/>
+    </record>
+
+
+    <!-- server action to the one above -->
+
+    <record model="ir.actions.server" id="sanctions.action_server">
+      <field name="name">sanctions server</field>
+      <field name="model_id" ref="model_sanctions_sanctions"/>
+      <field name="state">code</field>
+      <field name="code">
+        action = {
+          "type": "ir.actions.act_window",
+          "view_mode": "tree,form",
+          "res_model": model._name,
+        }
+      </field>
+    </record>
+
+
+    <!-- Top menu item -->
+
+    <!-- <menuitem name="sanctions" web_icon="activities, static/description/icon.jpg" id="sanctions.menu_root"/> -->
+
+    <!-- menu categories -->
+<!-- 
+    <menuitem name="Menu 1" id="sanctions.menu_1" parent="sanctions.menu_root"/>
+    <menuitem name="Menu 2" id="sanctions.menu_2" parent="sanctions.menu_root"/> -->
+
+    <!-- actions -->
+
+    <menuitem name="المخالفات والعقوبات" id="sanctions.menu_2_list" parent="sanctions.menu_root"
+              action="sanctions.pro_window" sequence="1"/>
+    <!-- <menuitem name="Server to list" id="sanctions" parent="sanctions.menu_root"
+              action="sanctions.action_server"/> -->
+  </data>
+</odoo>

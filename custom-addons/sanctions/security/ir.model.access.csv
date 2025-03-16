@@ -1,0 +1,9 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_sanctions_roles,sanctions.roles,model_sanctions_roles,base.group_user,1,1,1,0
+
+
+sanction_procedures_create_am,sanction_procedures_create_am,model_sanctions_procedures,sanctions.sanction_procedures_create,1,0,1,0
+sanction_procedures_write_am,sanction_procedures_write_am,model_sanctions_procedures,sanctions.sanction_procedures_write,1,1,0,0
+
+sanction_create_am,sanction_create_am,model_sanctions_sanctions,sanctions.sanction_create,1,0,1,0
+sanction_write_am,sanction_write_am,model_sanctions_sanctions,sanctions.sanction_write,1,1,0,0

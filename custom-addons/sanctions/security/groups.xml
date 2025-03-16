@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+
+        <record model="ir.module.category" id="sanction_employee_managment">
+            <field name="name">Employee Sanction Policies</field>
+            <field name="description">Employee Sanction management</field>
+            <field name="sequence">100</field>
+        </record>
+
+        <record id="sanction_main_menu" model="res.groups">
+            <field name="name">Sanction Main menu</field>
+            <field name="category_id" ref="sanction_employee_managment" />
+            <field name="users" eval="[(4, ref('base.user_root')), (4, ref('base.user_admin'))]"/>
+        </record>
+
+
+        <record id="sanction_create" model="res.groups">
+            <field name="name">Sanction Create</field>
+            <field name="category_id" ref="sanction_employee_managment" />
+            <field name="users" eval="[(4, ref('base.user_root')), (4, ref('base.user_admin'))]"/>
+        </record>
+
+        <record id="sanction_write" model="res.groups">
+            <field name="name">Sanction write</field>
+            <field name="category_id" ref="sanction_employee_managment" />
+            <field name="users" eval="[(4, ref('base.user_root')), (4, ref('base.user_admin'))]"/>
+        </record>
+
+        <record id="sanction_procedures_create" model="res.groups">
+            <field name="name">Sanction procedures Create</field>
+            <field name="category_id" ref="sanction_employee_managment" />
+            <field name="users" eval="[(4, ref('base.user_root')), (4, ref('base.user_admin'))]"/>
+        </record>
+
+        <record id="sanction_procedures_write" model="res.groups">
+            <field name="name">Sanction procedures write</field>
+            <field name="category_id" ref="sanction_employee_managment" />
+            <field name="users" eval="[(4, ref('base.user_root')), (4, ref('base.user_admin'))]"/>
+        </record>
+
+     
+
+
+    </data>
+</odoo>
