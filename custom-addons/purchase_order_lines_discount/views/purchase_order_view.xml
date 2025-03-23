@@ -6,8 +6,8 @@
         <field name="inherit_id" ref="purchase.purchase_order_form" />
         <field name="arch" type="xml">
             <xpath expr="//field[@name='order_line']/tree/field[@name='price_unit']" position="after">
-             <field name="discount" optional="show"/>
-                <field name="fixed_discount" optional="show"/>
+             <field name="discount" optional="hide"/>
+                <field name="fixed_discount" optional="hide"/>
                 <field name="amount_before_discount" optional="show"/>
             </xpath>
 
