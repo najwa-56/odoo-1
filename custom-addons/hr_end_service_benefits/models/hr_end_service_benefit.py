@@ -4,6 +4,7 @@ from dateutil.relativedelta import relativedelta
 from odoo import models, fields, api
 from odoo.exceptions import UserError, AccessError, ValidationError
 from odoo import tools, _
+from datetime import date
 
 
 class HREndServiceBenifits(models.Model):
@@ -168,7 +169,7 @@ class HREndServiceBenifits(models.Model):
                        copy=False)
     type = fields.Selection(string="Reward Type",
                             selection=[('replacement', 'Replacement'), ('ending_service', 'Ending Service'), ],
-                            default='replacement', )
+                            default='ending_service', )
     payment_type = fields.Selection(string="Payment Type",
                                     selection=[('wage', 'Wage'), ('wage_allowance', 'Wage + Allowances'), ],
                                     default='wage_allowance', required=True)
@@ -200,33 +201,74 @@ class HREndServiceBenifits(models.Model):
     days_number = fields.Float(string="Last Month Worked Days Number", default=30)
     total_reward = fields.Float(string="Total Reward + Payslip", compute='_compute_total_reward', store=True)
 
+    # @api.onchange('employee_id', 'type')
+    # def _onchange_employee_id(self):
+    #     if self.type == 'ending_service':
+    #         allocation_ids = self.env['hr.leave.allocation'].search(
+    #             [('employee_id', '=', self.employee_id.id),
+    #              ('state', 'not in', ['draft', 'cancel', 'refuse'])])
+    #         holiday_status_ids = allocation_ids and allocation_ids.mapped('holiday_status_id')
+    #         for line in self.holiday_line_ids:
+    #             line.unlink()
+    #         lines_ids = []
+    #         for holiday_status_id in holiday_status_ids:
+    #             data_days = {}
+    #             remaining_leaves = 0
+    #             employee_id = self.employee_id and self.employee_id or False
+    #             if employee_id:
+    #                 data_days = holiday_status_id.get_days(employee_id.id)
+    #             for holiday_status in holiday_status_id:
+    #                 result = data_days.get(holiday_status.id, {})
+    #                 remaining_leaves = result.get('remaining_leaves', 0)
+    #                 if holiday_status_id.request_unit == 'hour':
+    #                     remaining_leaves = remaining_leaves / (
+    #                         employee_id.company_id.number_of_hours_per_day and employee_id.company_id.number_of_hours_per_day or 8)
+    #                 elif holiday_status_id.request_unit == 'half_day':
+    #                     remaining_leaves = remaining_leaves / 2
+    #             lines_ids.append((0, 0, {'holiday_id': holiday_status_id.id,
+    #                                      'remaining_leaves': remaining_leaves}))
+    #         self.holiday_line_ids = lines_ids
+
     @api.onchange('employee_id', 'type')
     def _onchange_employee_id(self):
-        if self.type == 'ending_service':
-            allocation_ids = self.env['hr.leave.allocation'].search(
-                [('employee_id', '=', self.employee_id.id),
-                 ('state', 'not in', ['draft', 'cancel', 'refuse'])])
-            holiday_status_ids = allocation_ids and allocation_ids.mapped('holiday_status_id')
-            for line in self.holiday_line_ids:
-                line.unlink()
+        if self.type == 'ending_service' and self.employee_id:
+            today = date.today()
+            allocation_ids = self.env['hr.leave.allocation'].search([
+                ('employee_id', '=', self.employee_id.id),
+                ('state', 'not in', ['draft', 'cancel', 'refuse'])
+            ])
+            holiday_status_ids = allocation_ids.mapped('holiday_status_id')
+
+            # Clear existing holiday lines
+            self.holiday_line_ids.unlink()
+
             lines_ids = []
             for holiday_status_id in holiday_status_ids:
-                data_days = {}
                 remaining_leaves = 0
-                employee_id = self.employee_id and self.employee_id or False
-                if employee_id:
-                    data_days = holiday_status_id.get_days(employee_id.id)
-                for holiday_status in holiday_status_id:
-                    result = data_days.get(holiday_status.id, {})
-                    remaining_leaves = result.get('remaining_leaves', 0)
-                    if holiday_status_id.request_unit == 'hour':
-                        remaining_leaves = remaining_leaves / (
-                            employee_id.company_id.number_of_hours_per_day and employee_id.company_id.number_of_hours_per_day or 8)
-                    elif holiday_status_id.request_unit == 'half_day':
-                        remaining_leaves = remaining_leaves / 2
-                lines_ids.append((0, 0, {'holiday_id': holiday_status_id.id,
-                                         'remaining_leaves': remaining_leaves}))
+
+                # Get leave allocation data
+                data_days = holiday_status_id.get_allocation_data(self.employee_id, today).get(self.employee_id, [])
+
+                # Find corresponding leave type data
+                result = next((item for item in data_days if item[0] == holiday_status_id.name), None)
+                leave_type_data = result[1] if result else {}
+
+                # Set remaining leaves
+                remaining_leaves = leave_type_data.get('virtual_remaining_leaves', 0)
+
+                # Adjust for request unit (hour or half-day)
+                if holiday_status_id.request_unit == 'hour':
+                    remaining_leaves /= self.employee_id.company_id.number_of_hours_per_day or 8
+                elif holiday_status_id.request_unit == 'half_day':
+                    remaining_leaves /= 2
+                
+                lines_ids.append((0, 0, {
+                    'holiday_id': holiday_status_id.id,
+                    'remaining_leaves': remaining_leaves
+                }))
+
             self.holiday_line_ids = lines_ids
+
 
     def unlink(self):
         for record in self:
@@ -247,7 +289,6 @@ class HREndServiceBenifits(models.Model):
             template = False
             if recipient_partners and mail_server:
                 template = self.env['ir.model.data']._xmlid_to_res_id('hr_end_service_benefits.email_es_request_submission')
-                print("template==================",template)
             if template:
                 mail_template = self.env['mail.template'].browse(template)
                 mail_id = mail_template.send_mail(record.id)
@@ -307,24 +348,53 @@ class HolidaysReward(models.Model):
     _name = 'hr.end.benefit.holiday.line'
     _description = 'Holiday Reward'
 
+    # @api.depends('reward_id.type')
     def _compute_leaves(self):
+        today = date.today()
         for record in self:
+            record.remaining_leaves = 0
             if record.reward_id and record.reward_id.type == 'ending_service':
-                data_days = {}
-                employee_id = record.reward_id and record.reward_id.employee_id or False
-                if employee_id:
-                    data_days = record.holiday_id.get_days(employee_id.id)
-                for holiday_status in record.holiday_id:
-                    if data_days:
-                        result = data_days.get(holiday_status.id, {})
-                        record.remaining_leaves = result.get('remaining_leaves', 0)
+                employee = record.reward_id.employee_id
+                if employee:
+                    target_date = today  # Use today's date as default
+
+                    # Fetch leave allocation data
+                    data_days = record.holiday_id.get_allocation_data(employee, target_date).get(employee, [])
+                    for holiday_status in record.holiday_id:
+                        # Find corresponding leave type data
+                        result = next((item for item in data_days if item[0] == holiday_status.name), None)
+                        leave_type_data = result[1] if result else {}
+
+                        # Set remaining leaves
+                        record.remaining_leaves = leave_type_data.get('virtual_remaining_leaves', 0)
+
+                        # Adjust for request unit (hour or half-day)
                         if holiday_status.request_unit == 'hour':
-                            record.remaining_leaves = record.remaining_leaves / (
-                                employee_id.company_id.number_of_hours_per_day and employee_id.company_id.number_of_hours_per_day or 8)
+                            record.remaining_leaves /= employee.company_id.number_of_hours_per_day or 8
                         elif holiday_status.request_unit == 'half_day':
-                            record.remaining_leaves = record.remaining_leaves / 2
+                            record.remaining_leaves /= 2
             else:
                 record.remaining_leaves = 0
+
+
+    # def _compute_leaves(self):
+    #     for record in self:
+    #         if record.reward_id and record.reward_id.type == 'ending_service':
+    #             data_days = {}
+    #             employee_id = record.reward_id and record.reward_id.employee_id or False
+    #             if employee_id:
+    #                 data_days = record.holiday_id.get_days(employee_id.id)
+    #             for holiday_status in record.holiday_id:
+    #                 if data_days:
+    #                     result = data_days.get(holiday_status.id, {})
+    #                     record.remaining_leaves = result.get('remaining_leaves', 0)
+    #                     if holiday_status.request_unit == 'hour':
+    #                         record.remaining_leaves = record.remaining_leaves / (
+    #                             employee_id.company_id.number_of_hours_per_day and employee_id.company_id.number_of_hours_per_day or 8)
+    #                     elif holiday_status.request_unit == 'half_day':
+    #                         record.remaining_leaves = record.remaining_leaves / 2
+    #         else:
+    #             record.remaining_leaves = 0
 
     holiday_id = fields.Many2one(comodel_name="hr.leave.type", string="Holiday", required=False, )
     reward_id = fields.Many2one(comodel_name="hr.end.service.benefit", )
