@@ -255,6 +255,9 @@ class PosOrder(models.Model):
                 # self.env['mail.mail'].create(mail_values).send()
             self.env.cr.commit()
         # Check if there are more records left and re-trigger the cron
-        remaining_count = self.search_count([('state', '=', 'paid'), ('date_order', '>=', three_days_ago)])
+        remaining_count = self.search_count([ ('state', 'in', ['paid','done']),
+            ('date_order', '>=', start_date),
+            ('date_order', '<=', end_date)])
         if remaining_count > 0:
+            _logger.error(f"❌ Still remiaing count ================= to create invoice for {remaining_count}: {str(remaining_count)}")
             self.env.ref('ksa_zatca_integration_pos.ir_cron_pos_order_with_job_count')._trigger()
