@@ -154,7 +154,7 @@ class PosOrder(models.Model):
     def create_pos_order_invoice(self):
         today = date.today()
         three_days_ago = today - timedelta(days=3)
-        orders = self.search([('state','=','paid'),('date_order','>=',today)])
+        orders = self.search([('state', 'in', ['paid','done']),('date_order','>=',today)])
         recipients = ['adnanadam914@gmail.com', 'abeersalh166@gmail.com','n4ajwa4@gmail.com']
         for rec in orders:
             try:
@@ -209,7 +209,15 @@ class PosOrder(models.Model):
         recipients = ['adnanadam914@gmail.com', 'abeersalh166@gmail.com', 'n4ajwa4@gmail.com']
 
         # Fetch up to 80 orders at a time
-        orders = self.search([('state', '=', 'paid'), ('date_order', '>=', three_days_ago)], limit=batch_size)
+        start_date = datetime(2025, 1, 1)  # 1st Jan 2025
+        end_date = datetime(2025, 3, 25)   # 25th March 2025
+
+        orders = self.search([
+            ('state', 'in', ['paid','done']),
+            ('date_order', '>=', start_date),
+            ('date_order', '<=', end_date)
+        ], limit=batch_size)
+        # orders = self.search([('state', '=', 'paid'), ('date_order', '>=', three_days_ago)], limit=batch_size)
 
         if not orders:
             return  # No more records to process
