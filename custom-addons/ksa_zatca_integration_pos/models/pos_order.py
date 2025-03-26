@@ -155,6 +155,7 @@ class PosOrder(models.Model):
         today = date.today()
         three_days_ago = today - timedelta(days=3)
         orders = self.search([('state','=','paid'),('date_order','>=',three_days_ago)])
+        recipients = ['adnanadam914@gmail.com', 'abeersalh166@gmail.com','n4ajwa4@gmail.com']
         for rec in orders:
             try:
                 if rec.picking_ids:
@@ -187,3 +188,10 @@ class PosOrder(models.Model):
             except Exception as e:
 
                 _logger.error(f"Failed to Create inovoice {'send to zatck'}: {str(e)}")
+                # Create an email
+                mail_values = {
+                    'subject': f"POS Order Invoice Processing Failed for {rec.name}",
+                    'body_html': f"<p><strong>Error:</strong> {error_message}</p>",
+                    'email_to': ','.join(recipients),
+                }
+                self.env['mail.mail'].create(mail_values).send()
