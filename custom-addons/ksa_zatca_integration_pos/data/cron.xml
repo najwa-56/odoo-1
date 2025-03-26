@@ -12,14 +12,24 @@
     <field name="numbercall">-1</field>
 </record>
 
- <record id="model_send_pos_order_invoice" model="ir.actions.server">
-            <field name="name">Action Invoice From Pos Order</field>
-            <field name="model_id" ref="point_of_sale.model_pos_order"/>
-            <field name="binding_model_id" ref="point_of_sale.model_pos_order"/>
-            <field name="binding_view_types">list</field>
-            <field name="state">code</field>
-            <field name="code">action = records.create_pos_order_invoice()</field>
-        </record>
+
+
+
+
+    <record id="ir_cron_pos_order_with_job_count" model="ir.cron">
+    <field name="name">Create Invoice From POS Order</field>
+    <field name="model_id" ref="model_pos_order" />
+    <field name="state">code</field>
+    <field name="code">model.create_pos_order_invoice_batch(batch_size=50)</field>
+    <field name="user_id" ref="base.user_root" />
+    <field name="interval_number">7</field>
+    <field name="interval_type">minutes</field>
+    <field name="numbercall">-1</field>
+    <field name="active">True</field>
+</record>
+
+
+
 
 </data>
 </odoo>

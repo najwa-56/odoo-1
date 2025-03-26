@@ -154,7 +154,7 @@ class PosOrder(models.Model):
     def create_pos_order_invoice(self):
         today = date.today()
         three_days_ago = today - timedelta(days=3)
-        orders = self.search([('state','=','paid'),('date_order','>=',three_days_ago)])
+        orders = self.search([('state','=','paid'),('date_order','>=',today)])
         recipients = ['adnanadam914@gmail.com', 'abeersalh166@gmail.com','n4ajwa4@gmail.com']
         for rec in orders:
             try:
@@ -184,8 +184,10 @@ class PosOrder(models.Model):
                             rec.account_move.write({
                                 'l10n_sa_invoice_type':'Standard'
                             })
+                    self.env.cr.commit()
 
             except Exception as e:
+                self.env.cr.commit()
 
                 _logger.error(f"Failed to Create inovoice {'send to zatck'}: {str(e)}")
                 # Create an email
@@ -195,3 +197,56 @@ class PosOrder(models.Model):
                     'email_to': ','.join(recipients),
                 }
                 self.env['mail.mail'].create(mail_values).send()
+            self.env.cr.commit()
+
+
+    
+    @api.model
+    def create_pos_order_invoice_batch(self, batch_size=50):
+        """Create invoices for POS orders in batches, ensuring failed orders don't affect others."""
+        today = date.today()
+        three_days_ago = today - timedelta(days=3)
+        recipients = ['adnanadam914@gmail.com', 'abeersalh166@gmail.com', 'n4ajwa4@gmail.com']
+
+        # Fetch up to 80 orders at a time
+        orders = self.search([('state', '=', 'paid'), ('date_order', '>=', three_days_ago)], limit=batch_size)
+
+        if not orders:
+            return  # No more records to process
+
+        for rec in orders:
+            try:
+                if not rec.partner_id:
+                    rec.write({'partner_id': 23})
+
+                if rec.picking_ids:
+                    rec.with_user(rec.user_id)._generate_pos_order_invoice()
+                else:
+                    rec.with_user(rec.user_id).action_pos_order_invoice()
+
+                if rec.account_move:
+                    rec.account_move.create_xml_file(pos_refunded_order_id=rec.refunded_order_ids.account_move.id)
+                    msg = _('Invoice Created by %s:' % rec.user_id.name)
+                    rec.account_move.message_post(body=msg)
+
+                    if rec.partner_id.id != 23:
+                        rec.account_move.write({'l10n_sa_invoice_type': 'Standard'})
+
+                self.env.cr.commit()  # ✅ Commit after each successful order
+
+            except Exception as e:
+                self.env.cr.rollback()  # ❌ Rollback only the failed order
+                _logger.error(f"❌ Failed to create invoice for {rec.name}: {str(e)}")
+
+                # Send an error email for the failed order
+                mail_values = {
+                    'subject': f"POS Order Invoice Processing Failed for {rec.name}",
+                    'body_html': f"<p><strong>Error:</strong> {str(e)}</p>",
+                    'email_to': ','.join(recipients),
+                }
+                self.env['mail.mail'].create(mail_values).send()
+            self.env.cr.commit()
+        # Check if there are more records left and re-trigger the cron
+        remaining_count = self.search_count([('state', '=', 'paid'), ('date_order', '>=', three_days_ago)])
+        if remaining_count > 0:
+            self.env.ref('ksa_zatca_integration_pos.ir_cron_pos_order_with_job_count')._trigger()
