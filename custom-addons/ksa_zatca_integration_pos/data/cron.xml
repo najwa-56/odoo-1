@@ -11,5 +11,15 @@
     <field name="interval_type">hours</field>
     <field name="numbercall">-1</field>
 </record>
+
+ <record id="model_send_pos_order_invoice" model="ir.actions.server">
+            <field name="name">Action Invoice From Pos Order</field>
+            <field name="model_id" ref="point_of_sale.model_pos_order"/>
+            <field name="binding_model_id" ref="point_of_sale.model_pos_order"/>
+            <field name="binding_view_types">list</field>
+            <field name="state">code</field>
+            <field name="code">action = records.create_pos_order_invoice()</field>
+        </record>
+
 </data>
 </odoo>
