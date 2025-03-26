@@ -184,6 +184,6 @@ class PosOrder(models.Model):
                                 'l10n_sa_invoice_type':'Standard'
                             })
 
-                except Exception as e:
+            except Exception as e:
 
-                    _logger.error(f"Failed to Create inovoice {'send to zatck'}: {str(e)}")
+                _logger.error(f"Failed to Create inovoice {'send to zatck'}: {str(e)}")
