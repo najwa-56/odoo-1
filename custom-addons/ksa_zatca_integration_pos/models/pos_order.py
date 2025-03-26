@@ -157,7 +157,6 @@ class PosOrder(models.Model):
         orders = self.search([('state','=','paid'),('date_order','>=',three_days_ago)])
         for rec in orders:
             try:
-                _logger.error(f"order id wich faild is========================  {'send to zatck'}: {str(rec.id)}")
                 if rec.picking_ids:
                     if not rec.partner_id:
                         rec.write({'partner_id':23})
