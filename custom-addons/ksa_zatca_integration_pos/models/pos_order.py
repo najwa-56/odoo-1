@@ -19,6 +19,7 @@ from odoo import api, fields, models, tools, _
 from odoo.tools import float_is_zero, float_round, float_repr, float_compare
 from odoo.exceptions import ValidationError, UserError
 from odoo.osv.expression import AND
+from datetime import  timedelta
 
 _logger = logging.getLogger(__name__)
 
@@ -144,7 +145,8 @@ class PosOrder(models.Model):
 
     def create_pos_order_invoice(self):
         today = date.today()
-        orders = self.search([('state','=','paid'),('date_order','>=',today)])
+        three_days_ago = today - timedelta(days=3)
+        orders = self.search([('state','=','paid'),('date_order','>=',three_days_ago)])
         for rec in orders:
             if rec.picking_ids:
                 if not rec.partner_id:
