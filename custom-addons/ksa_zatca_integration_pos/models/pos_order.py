@@ -191,12 +191,12 @@ class PosOrder(models.Model):
 
                 _logger.error(f"Failed to Create inovoice {'send to zatck'}: {str(e)}")
                 # Create an email
-                mail_values = {
-                    'subject': f"POS Order Invoice Processing Failed for {rec.name}",
-                    'body_html': f"<p><strong>Error:</strong> {error_message}</p>",
-                    'email_to': ','.join(recipients),
-                }
-                self.env['mail.mail'].create(mail_values).send()
+                # mail_values = {
+                #     'subject': f"POS Order Invoice Processing Failed for {rec.name}",
+                #     'body_html': f"<p><strong>Error:</strong> {error_message}</p>",
+                #     'email_to': ','.join(recipients),
+                # }
+                # self.env['mail.mail'].create(mail_values).send()
             self.env.cr.commit()
 
 
@@ -246,13 +246,13 @@ class PosOrder(models.Model):
                 self.env.cr.rollback()  # ❌ Rollback only the failed order
                 _logger.error(f"❌ Failed to create invoice for {rec.name}: {str(e)}")
 
-                # Send an error email for the failed order
-                mail_values = {
-                    'subject': f"POS Order Invoice Processing Failed for {rec.name}",
-                    'body_html': f"<p><strong>Error:</strong> {str(e)}</p>",
-                    'email_to': ','.join(recipients),
-                }
-                self.env['mail.mail'].create(mail_values).send()
+                # # Send an error email for the failed order
+                # mail_values = {
+                #     'subject': f"POS Order Invoice Processing Failed for {rec.name}",
+                #     'body_html': f"<p><strong>Error:</strong> {str(e)}</p>",
+                #     'email_to': ','.join(recipients),
+                # }
+                # self.env['mail.mail'].create(mail_values).send()
             self.env.cr.commit()
         # Check if there are more records left and re-trigger the cron
         remaining_count = self.search_count([('state', '=', 'paid'), ('date_order', '>=', three_days_ago)])
