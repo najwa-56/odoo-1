@@ -317,37 +317,13 @@
 						style="width:300px;height:60px;display:block;margin:auto;"
 						alt="Barcode" />
 					</div>
-					
-					<!-- <br/>
 
-					<table style="border:1pt solid grey;width:100%;color:black; margin-top:-20pt;">
-						<tr>
-							<td width="20%" class="text-left" style="border-bottom:1pt solid grey; font-weight:bold;">Received By:<br/><br/>Name:</td>
-							<td width="20%" class="text-right arabic" style="border-right:1pt solid grey;text-align:right;border-bottom:1pt solid grey; padding:3pt;">:استلمت من قبل<br/><br/>:الاسم</td>
-							
-							<td width="20%" class="text-left" style="border-bottom:1pt solid grey;">For <span t-field="company.name"/><br/><br/><span t-field="company.name"/></td>
-							<td width="20%" class="text-right" style="border-right:1pt solid grey;border-bottom:1pt solid grey;">‫‪</td>
-						</tr>
-						<tr>
-							<td width="20%" class="text-left" style="border-bottom:1pt solid grey;">Signature:</td>
-							<td width="20%" class="text-right arabic" style="border-right:1pt solid grey;text-align:right;border-bottom:1pt solid grey;padding:3pt;">:التوقيع</td>
-							<td width="20%" class="text-left arabic" style="padding-left:5pt;">Prepared‬‬ ‫‪By / من إعداد : </td> 
-							<td width="20%" class="text-left"><span t-field="doc.user_id.name"/></td>
-						</tr>
-						<tr>
-							<td width="20%" class="text-left" style="border-bottom:1pt solid grey;">Date:</td>
-							<td width="20%" class="text-right arabic" style="border-right:1pt solid grey;text-align:right;border-bottom:1pt solid grey; padding:3pt;">:التاريخ</td>
-							<td width="20%" class="text-left"></td>
-							<td width="20%" class="text-left"></td>
-						</tr>
-						<tr>
-							<td width="20%" class="text-left" style="border-bottom:1pt solid grey;">Client Stamp:<br/></td>
-							<td width="20%" class="text-right arabic" style="border-right:1pt solid grey;text-align:right;border-bottom:1pt solid grey; padding:3pt;">:ختم العميل</td>
-							<td width="20%" class="text-left arabic" style="padding-left:5pt;">Approved ‫‪By /وافق عليها :</td>
-							<td width="20%" class="text-left"><span t-field="doc.user_id.name"/></td>
-						</tr>
-					</table>
-					<br/> -->
+					<!-- New Condition Text -->
+<div class="col-12" style="text-align:center; font-size:16pt; font-weight:bold; color:red; margin-top:10pt;">
+    البضاعة التالفة لا ترد و لا تستبدل
+</div>
+					
+					
 					</div>
 				</div>
 			</t>

@@ -348,6 +348,7 @@
 				<div t-esc="props.data.date" />
 			</div>
 		</xpath>
+		
 
         <xpath expr="//div[hasclass('pos-receipt-amount-arabic')]" position="replace">
 		</xpath>
