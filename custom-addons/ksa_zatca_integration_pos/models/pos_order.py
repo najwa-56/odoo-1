@@ -143,34 +143,47 @@ class PosOrder(models.Model):
         qr_code_str = base64.b64encode(str_to_encode).decode('UTF-8')
         return qr_code_str
 
+#     limit_memory_hard = 26843545600
+# limit_memory_soft = 21474836480
+# limit_request = 8192
+# limit_time_cpu = 3000
+# limit_time_real = 6000
+# workers = 9
+# max_cron_threads = 2
+
     def create_pos_order_invoice(self):
         today = date.today()
         three_days_ago = today - timedelta(days=3)
         orders = self.search([('state','=','paid'),('date_order','>=',three_days_ago)])
         for rec in orders:
-            if rec.picking_ids:
-                if not rec.partner_id:
-                    rec.write({'partner_id':23})
-                rec.with_user(rec.user_id)._generate_pos_order_invoice()
-                
-                if rec.account_move:
-                    rec.account_move.create_xml_file(pos_refunded_order_id=rec.refunded_order_ids.account_move.id)
-                    msg = _('Invoice Created by %s:', rec.user_id.name)
-                    rec.account_move.message_post(body=msg)
-                    if rec.partner_id.id != 23 :
-                        rec.account_move.write({
-                            'l10n_sa_invoice_type':'Standard'
-                        })
-            else:
-                if not rec.partner_id:
-                    rec.write({'partner_id':23})
-                rec.with_user(rec.user_id).action_pos_order_invoice()
-                
-                if rec.account_move:
-                    rec.account_move.create_xml_file(pos_refunded_order_id=rec.refunded_order_ids.account_move.id)
-                    msg = _('Invoice Created by %s:', rec.user_id.name)
-                    rec.account_move.message_post(body=msg)
-                    if rec.partner_id.id != 23 :
-                        rec.account_move.write({
-                            'l10n_sa_invoice_type':'Standard'
-                        })
+            try:
+                if rec.picking_ids:
+                    if not rec.partner_id:
+                        rec.write({'partner_id':23})
+                    rec.with_user(rec.user_id)._generate_pos_order_invoice()
+                    
+                    if rec.account_move:
+                        rec.account_move.create_xml_file(pos_refunded_order_id=rec.refunded_order_ids.account_move.id)
+                        msg = _('Invoice Created by %s:', rec.user_id.name)
+                        rec.account_move.message_post(body=msg)
+                        if rec.partner_id.id != 23 :
+                            rec.account_move.write({
+                                'l10n_sa_invoice_type':'Standard'
+                            })
+                else:
+                    if not rec.partner_id:
+                        rec.write({'partner_id':23})
+                    rec.with_user(rec.user_id).action_pos_order_invoice()
+                    
+                    if rec.account_move:
+                        rec.account_move.create_xml_file(pos_refunded_order_id=rec.refunded_order_ids.account_move.id)
+                        msg = _('Invoice Created by %s:', rec.user_id.name)
+                        rec.account_move.message_post(body=msg)
+                        if rec.partner_id.id != 23 :
+                            rec.account_move.write({
+                                'l10n_sa_invoice_type':'Standard'
+                            })
+
+                except Exception as e:
+
+                    _logger.error(f"Failed to Create inovoice {'send to zatck'}: {str(e)}")
