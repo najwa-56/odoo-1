@@ -215,6 +215,7 @@ class PosOrder(models.Model):
             ('date_order', '<=', end_date)
         ], limit=batch_size)
 
+        _logger.error(f"Len of orders========================{'len of orders'}: {str(len(orders))}")
         if not orders:
             return  # No more records to process
 
@@ -229,7 +230,7 @@ class PosOrder(models.Model):
                     rec.with_user(rec.user_id).action_pos_order_invoice()
 
                 if rec.account_move:
-                    rec.account_move.create_xml_file(pos_refunded_order_id=rec.refunded_order_ids.account_move.id)
+                    # rec.account_move.create_xml_file(pos_refunded_order_id=rec.refunded_order_ids.account_move.id)
                     msg = _('Invoice Created by %s:' % rec.user_id.name)
                     rec.account_move.message_post(body=msg)
 
@@ -248,7 +249,6 @@ class PosOrder(models.Model):
             ('date_order', '>=', start_date),
             ('date_order', '<=', end_date)])
         if remaining_count > 0:
-            _logger.error(f"❌ Still remiaing count ================= to create invoice for {remaining_count}: {str(remaining_count)}")
             self.env.ref('ksa_zatca_integration_pos.ir_cron_pos_order_with_job_count')._trigger()
 
          
