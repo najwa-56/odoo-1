@@ -204,9 +204,6 @@ class PosOrder(models.Model):
     @api.model
     def create_pos_order_invoice_batch(self, batch_size=50):
         """Create invoices for POS orders in batches, ensuring failed orders don't affect others."""
-        today = date.today()
-        three_days_ago = today - timedelta(days=3)
-        recipients = ['adnanadam914@gmail.com', 'abeersalh166@gmail.com', 'n4ajwa4@gmail.com']
 
         # Fetch up to 80 orders at a time
         start_date = datetime(2025, 1, 1)  # 1st Jan 2025
@@ -217,7 +214,9 @@ class PosOrder(models.Model):
             ('date_order', '>=', start_date),
             ('date_order', '<=', end_date)
         ], limit=batch_size)
-        # orders = self.search([('state', '=', 'paid'), ('date_order', '>=', three_days_ago)], limit=batch_size)
+        
+        orders = orders.filtered(lambda o: all(line.tax_ids_after_fiscal_position for line in o.lines))
+
 
         if not orders:
             return  # No more records to process
@@ -246,18 +245,19 @@ class PosOrder(models.Model):
                 self.env.cr.rollback()  # ❌ Rollback only the failed order
                 _logger.error(f"❌ Failed to create invoice for {rec.name}: {str(e)}")
 
-                # # Send an error email for the failed order
-                # mail_values = {
-                #     'subject': f"POS Order Invoice Processing Failed for {rec.name}",
-                #     'body_html': f"<p><strong>Error:</strong> {str(e)}</p>",
-                #     'email_to': ','.join(recipients),
-                # }
-                # self.env['mail.mail'].create(mail_values).send()
             self.env.cr.commit()
         # Check if there are more records left and re-trigger the cron
-        remaining_count = self.search_count([ ('state', 'in', ['paid','done']),
+        remaining_orders = self.search([
+            ('state', 'in', ['paid', 'done']),
             ('date_order', '>=', start_date),
-            ('date_order', '<=', end_date)])
+            ('date_order', '<=', end_date)
+        ])
+        
+        remaining_orders = remaining_orders.filtered(lambda o: all(line.tax_ids_after_fiscal_position for line in o.lines))
+        remaining_count = len(remaining_orders)
+
         if remaining_count > 0:
             _logger.error(f"❌ Still remiaing count ================= to create invoice for {remaining_count}: {str(remaining_count)}")
             self.env.ref('ksa_zatca_integration_pos.ir_cron_pos_order_with_job_count')._trigger()
+
+         
