@@ -154,7 +154,7 @@ class PosOrder(models.Model):
     def create_pos_order_invoice(self):
         today = date.today()
         three_days_ago = today - timedelta(days=3)
-        orders = self.search([('state', 'in', ['paid','done']),('date_order','>=',today)])
+        orders = self.sudo().search([('state', 'in', ['paid','done']),('date_order','>=',today)])
         recipients = ['adnanadam914@gmail.com', 'abeersalh166@gmail.com','n4ajwa4@gmail.com']
         for rec in orders:
             try:
@@ -202,20 +202,21 @@ class PosOrder(models.Model):
 
     
     @api.model
-    def create_pos_order_invoice_batch(self, batch_size=50):
+    def create_pos_order_invoice_batch(self, batch_size=200):
         """Create invoices for POS orders in batches, ensuring failed orders don't affect others."""
 
-        # Fetch up to 80 orders at a time
-        start_date = datetime(2025, 1, 1)  # 1st Jan 2025
-        end_date = datetime(2025, 3, 25)   # 25th March 2025
+        # start_date = datetime(2024, 9, 1)  # 1st Jan 2025
+        # end_date = datetime(2024, 12, 31)   # 25th March 2025
 
-        orders = self.search([
+        start_date = datetime(2025, 1, 1)  # 1st Jan 2025
+        end_date = datetime(2025, 3, 25)
+
+        orders = self.sudo().search([
             ('state', 'in', ['paid','done']),
             ('date_order', '>=', start_date),
             ('date_order', '<=', end_date)
         ], limit=batch_size)
 
-        _logger.error(f"Len of orders========================{'len of orders'}: {str(len(orders))}")
         if not orders:
             return  # No more records to process
 
@@ -230,6 +231,10 @@ class PosOrder(models.Model):
                     rec.with_user(rec.user_id).action_pos_order_invoice()
 
                 if rec.account_move:
+                    rec.account_move.write({
+                        'invoice_date': rec.date_order,
+                        'delivery_date': rec.date_order,
+                    })
                     # rec.account_move.create_xml_file(pos_refunded_order_id=rec.refunded_order_ids.account_move.id)
                     msg = _('Invoice Created by %s:' % rec.user_id.name)
                     rec.account_move.message_post(body=msg)
@@ -240,15 +245,81 @@ class PosOrder(models.Model):
                 self.env.cr.commit()  # ✅ Commit after each successful order
 
             except Exception as e:
-                self.env.cr.rollback()  # ❌ Rollback only the failed order
+                self.env.cr.commit()  # ❌ Rollback only the failed order
                 _logger.error(f"❌ Failed to create invoice for {rec.name}: {str(e)}")
 
             self.env.cr.commit()
         # Check if there are more records left and re-trigger the cron
-        remaining_count = self.search_count([ ('state', 'in', ['paid','done']),
+        remaining_count = self.sudo().search_count([ ('state', 'in', ['paid','done']),
             ('date_order', '>=', start_date),
             ('date_order', '<=', end_date)])
         if remaining_count > 0:
             self.env.ref('ksa_zatca_integration_pos.ir_cron_pos_order_with_job_count')._trigger()
 
-         
+
+    
+
+    # @api.model
+    # def update_date_invoice_batch(self, batch_size=500):
+
+    #     start_date = datetime(2025, 1, 1)  # 1st Jan 2025
+    #     end_date = datetime(2025, 3, 25)   # 25th March 2025
+
+    #     orders = self.sudo().search([
+    #         ('state', 'in', ['invoiced']),
+    #         ('date_order', '>=', start_date),
+    #         ('date_order', '<=', end_date)
+    #     ], limit=batch_size)
+
+    #     if not orders:
+    #         return  # No more records to process
+
+    #     for rec in orders:
+    #         try:
+    #             if rec.account_move and rec.account_move.invoice_date != rec.date_order.date():
+    #                 rec.account_move.write({
+    #                     'invoice_date': rec.date_order.date(),
+    #                     'delivery_date': rec.date_order.date(),
+    #                 })
+
+    #                 self.env.cr.commit()  # ✅ Commit after each successful order
+
+    #         except Exception as e:
+    #             self.env.cr.commit()  # ❌ Rollback only the failed order
+    #             _logger.error(f"❌ Failed to create invoice for {rec.name}: {str(e)}")
+
+    #         self.env.cr.commit()
+    #         # Check if there are more records left and re-trigger the cron
+    #         remaining_count = self.sudo().search_count([ ('state', 'in', ['invoiced']),
+    #             ('date_order', '>=', start_date),
+    #             ('date_order', '<=', end_date)])
+    #         if remaining_count > 0:
+    #             self.env.ref('ksa_zatca_integration_pos.ir_cron_update_inv_date_job_count')._trigger()
+
+
+    @api.model
+    def update_date_invoice_test(self,batch_size=500):
+        start_date = datetime(2025, 1, 1).date()  # Convert to date
+        end_date = datetime(2025, 3, 25).date()  # Convert to date
+
+        pos_order_ids = (102544, 102543)  # ✅ Add specific POS order IDs for testing
+
+        query = """
+            UPDATE account_move am
+            invoice_date = po.date_order::DATE,
+            delivery_date = po.date_order::DATE
+            FROM pos_order po
+            WHERE po.state = 'invoiced'
+                AND po.date_order BETWEEN %s AND %s
+                AND po.account_move IS NOT NULL
+                AND am.id = po.account_move
+                AND am.move_type = 'out_invoice'
+                AND am.invoice_date IS DISTINCT FROM po.date_order::DATE
+                AND po.id IN %s; 
+        """
+
+        self.env.cr.execute(query, (start_date, end_date, pos_order_ids))
+        self.env.cr.commit()  # ✅ Commit changes
+
+    
+    
