@@ -214,9 +214,6 @@ class PosOrder(models.Model):
             ('date_order', '>=', start_date),
             ('date_order', '<=', end_date)
         ], limit=batch_size)
-        
-        orders = orders.filtered(lambda o: all(line.tax_ids_after_fiscal_position for line in o.lines))
-
 
         if not orders:
             return  # No more records to process
@@ -247,15 +244,9 @@ class PosOrder(models.Model):
 
             self.env.cr.commit()
         # Check if there are more records left and re-trigger the cron
-        remaining_orders = self.search([
-            ('state', 'in', ['paid', 'done']),
+        remaining_count = self.search_count([ ('state', 'in', ['paid','done']),
             ('date_order', '>=', start_date),
-            ('date_order', '<=', end_date)
-        ])
-        
-        remaining_orders = remaining_orders.filtered(lambda o: all(line.tax_ids_after_fiscal_position for line in o.lines))
-        remaining_count = len(remaining_orders)
-
+            ('date_order', '<=', end_date)])
         if remaining_count > 0:
             _logger.error(f"❌ Still remiaing count ================= to create invoice for {remaining_count}: {str(remaining_count)}")
             self.env.ref('ksa_zatca_integration_pos.ir_cron_pos_order_with_job_count')._trigger()
