@@ -212,8 +212,8 @@ class PosOrder(models.Model):
         # start_date = datetime(2024, 9, 1)  # 1st Jan 2025
         # end_date = datetime(2024, 12, 31)   # 25th March 2025
 
-        start_date = datetime(2025, 9, 1)  # 1st Jan 2025
-        end_date = datetime(2025, 12, 31)
+        start_date = datetime(2024, 9, 1)  # 1st Jan 2025
+        end_date = datetime(2024, 12, 31)
 
         orders = self.sudo().search([
             ('state', 'in', ['paid','done']),
