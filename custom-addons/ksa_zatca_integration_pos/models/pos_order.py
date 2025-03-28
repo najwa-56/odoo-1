@@ -80,7 +80,7 @@ class PosOrder(models.Model):
 
     def _prepare_invoice_vals(self):
         invoice_vals = super(PosOrder, self)._prepare_invoice_vals()
-        vals.update({'narration': self.date_order})
+        invoice_vals.update({'invoice_date': self.date_order})
         invoice_vals['l10n_sa_invoice_type'] = 'Simplified'
         invoice_vals['pos_reference'] = self.pos_reference
         return invoice_vals
