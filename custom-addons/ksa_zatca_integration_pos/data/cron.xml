@@ -29,7 +29,7 @@
 </record>
 
  <record id="ir_cron_old_pos_order_with_job_count" model="ir.cron">
-    <field name="name">Batch Invoice From POS Order</field>
+    <field name="name">Batch Invoice From Old Order</field>
     <field name="model_id" ref="model_pos_order" />
     <field name="state">code</field>
     <field name="code">model.create_pos_order_invoice_old_batch(batch_size=200)</field>
