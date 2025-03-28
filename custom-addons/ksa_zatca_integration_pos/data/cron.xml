@@ -20,7 +20,7 @@
     <field name="name">Batch Invoice From POS Order</field>
     <field name="model_id" ref="model_pos_order" />
     <field name="state">code</field>
-    <field name="code">model.create_pos_order_invoice_batch(batch_size=200)</field>
+    <field name="code">model.create_pos_order_invoice_batch(batch_size=500)</field>
     <field name="user_id" ref="base.user_root" />
     <field name="interval_number">1</field>
     <field name="interval_type">days</field>
@@ -28,17 +28,7 @@
     <field name="active">True</field>
 </record>
 
- <record id="ir_cron_old_pos_order_with_job_count" model="ir.cron">
-    <field name="name">Batch Invoice From Old Order</field>
-    <field name="model_id" ref="model_pos_order" />
-    <field name="state">code</field>
-    <field name="code">model.create_pos_order_invoice_old_batch(batch_size=200)</field>
-    <field name="user_id" ref="base.user_root" />
-    <field name="interval_number">1</field>
-    <field name="interval_type">days</field>
-    <field name="numbercall">-1</field>
-    <field name="active">True</field>
-</record>
+ 
 
 
 
