@@ -289,7 +289,7 @@ class PosOrder(models.Model):
                 
         """
 
-        self.env.cr.execute(query, (start_date, end_date, pos_order_ids))
+        self.env.cr.execute(query, (start_date, end_date))
         self.env.cr.commit()  # ✅ Commit changes
 
     
