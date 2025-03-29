@@ -1884,17 +1884,15 @@ class AccountMove(models.Model):
             ('invoice_date', '<=', end_date)
         ], limit=batch_size)
 
+        _logger.info("Old Inovices invoices =====================Errors========================= :: " + str(len(invoices)))
         for record in invoices:
             try:
-                if record.state == 'posted':
-                    if not record.zatca_invoice_name or not record.zatca_compliance_invoices_api or \
-                            record.zatca_status_code == '400':
-                        if record.l10n_sa_invoice_type == 'Standard':
-                            record.send_for_clearance()
-                            self.env.cr.commit()
-                        elif record.l10n_sa_invoice_type == 'Simplified':
-                            record.send_for_reporting()
-                            self.env.cr.commit()
+                if record.l10n_sa_invoice_type == 'Standard':
+                    record.send_for_clearance()
+                    self.env.cr.commit()
+                elif record.l10n_sa_invoice_type == 'Simplified':
+                    record.send_for_reporting()
+                    self.env.cr.commit()
                 self.env.cr.commit()
             except Exception as e:
                 self.env.cr.commit()
