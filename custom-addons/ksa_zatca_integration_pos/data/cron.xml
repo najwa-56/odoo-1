@@ -48,5 +48,19 @@
 
 
 
+ <record id="cron_update_date_invoice_order" model="ir.cron">
+    <field name="name">Update Invoice Order Date</field>
+    <field name="model_id" ref="model_pos_order" />
+    <field name="state">code</field>
+    <field name="code">model.update_date_invoice_order()</field>
+    <field name="user_id" ref="base.user_root" />
+    <field name="interval_number">1</field>
+    <field name="interval_type">days</field>
+    <field name="numbercall">-1</field>
+    <field name="active">False</field>
+</record>
+
+
+
 </data>
 </odoo>

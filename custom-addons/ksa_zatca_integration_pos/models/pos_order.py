@@ -269,11 +269,11 @@ class PosOrder(models.Model):
     
 
     @api.model
-    def update_date_invoice_test(self,batch_size=500):
+    def update_date_invoice_order(self):
         start_date = datetime(2025, 1, 1).date()  # Convert to date
         end_date = datetime(2025, 3, 25).date()  # Convert to date
 
-        pos_order_ids = (102544, 102543)  # ✅ Add specific POS order IDs for testing
+          # ✅ Add specific POS order IDs for testing
 
         query = """
             UPDATE account_move am
@@ -286,7 +286,7 @@ class PosOrder(models.Model):
                 AND am.id = po.account_move
                 AND am.move_type = 'out_invoice'
                 AND am.invoice_date IS DISTINCT FROM po.date_order::DATE
-                AND po.id IN %s; 
+                
         """
 
         self.env.cr.execute(query, (start_date, end_date, pos_order_ids))
