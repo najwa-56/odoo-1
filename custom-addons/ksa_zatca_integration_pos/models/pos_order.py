@@ -277,8 +277,8 @@ class PosOrder(models.Model):
 
         query = """
             UPDATE account_move am
-            invoice_date = po.date_order::DATE,
-            delivery_date = po.date_order::DATE
+            am.invoice_date = po.date_order::DATE,
+            am.delivery_date = po.date_order::DATE
             FROM pos_order po
             WHERE po.state = 'invoiced'
                 AND po.date_order BETWEEN %s AND %s
