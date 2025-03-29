@@ -206,14 +206,14 @@ class PosOrder(models.Model):
         
     
     @api.model
-    def create_pos_order_invoice_batch(self, batch_size=200):
+    def create_pos_order_invoice_batch(self, batch_size=1):
         """Create invoices for POS orders in batches, ensuring failed orders don't affect others."""
 
         # start_date = datetime(2024, 9, 1)  # 1st Jan 2025
         # end_date = datetime(2024, 12, 31)   # 25th March 2025
 
-        start_date = datetime(2024, 9, 1)  # 1st Jan 2025
-        end_date = datetime(2024, 12, 31)
+        start_date = datetime(2024, 12, 31)  # 1st Jan 2025
+        end_date = datetime(2025, 1, 1)
 
         orders = self.sudo().search([
             ('state', 'in', ['paid','done']),
@@ -235,17 +235,18 @@ class PosOrder(models.Model):
                 else:
                     rec.with_user(rec.user_id).action_pos_order_invoice()
 
-                if rec.account_move:
-                    rec.account_move.write({
+                for move in rec.account_move:  # ✅ Loop through all invoices
+                    move.write({
                         'invoice_date': rec.date_order,
                         'delivery_date': rec.date_order,
                     })
+                    
                     # rec.account_move.create_xml_file(pos_refunded_order_id=rec.refunded_order_ids.account_move.id)
                     msg = _('Invoice Created by %s:' % rec.user_id.name)
-                    rec.account_move.message_post(body=msg)
+                    move.message_post(body=msg)
 
                     if rec.partner_id.id != 23:
-                        rec.account_move.write({'l10n_sa_invoice_type': 'Standard'})
+                        move.write({'l10n_sa_invoice_type': 'Standard'})
 
                 self.env.cr.commit()  # ✅ Commit after each successful order
 

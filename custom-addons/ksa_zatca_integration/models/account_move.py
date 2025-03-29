@@ -1876,10 +1876,10 @@ class AccountMove(models.Model):
     def send_invoice_batch(self, batch_size=200):
 
         # Fetch up to 80 orders at a time
-        start_date = datetime(2025, 9, 1).date()  # 1st Jan 2025
-        end_date = datetime(2025, 12, 31).date()   # 25th March 2025
+        start_date = datetime(2025, 1, 1).date()  # 1st Jan 2025
+        end_date = datetime(2025, 3, 30).date()   # 25th March 2025
         invoices = self.sudo().search([
-            ('state', 'in', ['posted']),
+            ('state', '=', 'posted'),
             ('invoice_date', '>=', start_date),
             ('invoice_date', '<=', end_date)
         ], limit=batch_size)
