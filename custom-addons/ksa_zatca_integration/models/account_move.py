@@ -19,6 +19,8 @@ import re
 import os
 from num2words import num2words
 from datetime import date
+from datetime import datetime
+
 
 _logger = logging.getLogger(__name__)
 _zatca = logging.getLogger('Zatca Debugger for account.move :')
@@ -1871,16 +1873,15 @@ class AccountMove(models.Model):
 
 
     @api.model
-    def send_invoice_batch(self, batch_size=100):
+    def send_invoice_batch(self, batch_size=200):
 
         # Fetch up to 80 orders at a time
-        start_date = datetime(2025, 9, 1)  # 1st Jan 2025
-        end_date = datetime(2025, 12, 31)   # 25th March 2025
-
+        start_date = datetime(2025, 9, 1).date()  # 1st Jan 2025
+        end_date = datetime(2025, 12, 31).date()   # 25th March 2025
         invoices = self.sudo().search([
             ('state', 'in', ['posted']),
-            ('date_order', '>=', start_date),
-            ('date_order', '<=', end_date)
+            ('invoice_date', '>=', start_date),
+            ('invoice_date', '<=', end_date)
         ], limit=batch_size)
 
         for record in invoices:
@@ -1903,8 +1904,8 @@ class AccountMove(models.Model):
 
             remaining_count = self.sudo().search_count([
                 ('state', 'in', ['posted']),
-                ('date_order', '>=', start_date),
-                ('date_order', '<=', end_date)
+                ('invoice_date', '>=', start_date),
+                ('invoice_date', '<=', end_date)
             ])
             if remaining_count > 0:
                 self.env.ref('ksa_zatca_integration.ir_cron_send_inovoice_job_count')._trigger()
