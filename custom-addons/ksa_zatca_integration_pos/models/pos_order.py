@@ -276,18 +276,18 @@ class PosOrder(models.Model):
           # ✅ Add specific POS order IDs for testing
 
         query = """
-            UPDATE account_move am
-            am.invoice_date = po.date_order::DATE,
-            am.delivery_date = po.date_order::DATE
-            FROM pos_order po
-            WHERE po.state = 'invoiced'
-                AND po.date_order BETWEEN %s AND %s
-                AND po.account_move IS NOT NULL
-                AND am.id = po.account_move
-                AND am.move_type = 'out_invoice'
-                AND am.invoice_date IS DISTINCT FROM po.date_order::DATE
-                
-        """
+    UPDATE account_move
+    SET invoice_date = po.date_order::DATE,
+        delivery_date = po.date_order::DATE
+    FROM pos_order po
+    WHERE po.state = 'invoiced'
+        AND po.date_order BETWEEN %s AND %s
+        AND po.account_move IS NOT NULL
+        AND account_move.id = po.account_move
+        AND account_move.move_type = 'out_invoice'
+        AND account_move.invoice_date IS DISTINCT FROM po.date_order::DATE;
+"""
+
 
         self.env.cr.execute(query, (start_date, end_date))
         self.env.cr.commit()  # ✅ Commit changes
