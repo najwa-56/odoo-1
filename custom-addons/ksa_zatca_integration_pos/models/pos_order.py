@@ -154,7 +154,7 @@ class PosOrder(models.Model):
     def create_pos_order_invoice(self):
         today = date.today()
         three_days_ago = today - timedelta(days=3)
-        orders = self.sudo().search([('state', 'in', ['paid','done']),('date_order','>=',today)])
+        orders = self.sudo().search([('state', 'in', ['paid','done']),('date_order','>=',three_days_ago)])
         recipients = ['adnanadam914@gmail.com', 'abeersalh166@gmail.com','n4ajwa4@gmail.com']
         for rec in orders:
             try:

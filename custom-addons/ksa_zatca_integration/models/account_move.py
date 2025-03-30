@@ -1896,7 +1896,7 @@ class AccountMove(models.Model):
                     record.send_for_reporting()
             except Exception as e:
                 # Bypass errors.
-                _logger.info("Multi Send To Zatca Errors***************************** :: " + str(e))
+                _logger.info(f"Multi Send To Zatca Errors (Invoice ID: {record.id}) ***************************** :: {str(e)}")
 
         
 
