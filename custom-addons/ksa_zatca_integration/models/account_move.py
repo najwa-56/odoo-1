@@ -1890,7 +1890,7 @@ class AccountMove(models.Model):
         _logger.info(f"Multi Send To Zatca Errors (Invoice ID: {len(invoices)}) *****************************")
        
         invoices = invoices.filtered(lambda inv: all(line.tax_ids for line in inv.invoice_line_ids))
-       _logger.info(f"fitlered invoice Send To Zatca Errors (Invoice ID: {len(invoices)}) *****************************")
+        _logger.info(f"fitlered invoice Send To Zatca Errors (Invoice ID: {len(invoices)}) *****************************")
         for record in invoices:
             try:
                 
