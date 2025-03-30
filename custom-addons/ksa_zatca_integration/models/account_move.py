@@ -1888,7 +1888,23 @@ class AccountMove(models.Model):
         ], limit=batch_size)
 
         
-        invoices.send_multiple_to_zatca()
+        _logger.info("Old Inovices invoices =====================******========================= :: " + str(invoices.ids))
+       
+        for record in invoices:
+            try:
+                if record.state == 'posted':
+                    if not record.zatca_invoice_name or not record.zatca_compliance_invoices_api or \
+                            record.zatca_status_code == '400':
+                        if record.l10n_sa_invoice_type == 'Standard':
+                            _logger.info("stnadard =================Old Inovices invoices =====================******========================= :: " + str(record.id))
+                            record.send_for_clearance()
+                        elif record.l10n_sa_invoice_type == 'Simplified':
+                            _logger.info("Simplified Old Inovices invoices =====================******========================= :: " + str(record.id))
+                            record.send_for_reporting()
+            except Exception as e:
+                # Bypass errors.
+                _logger.info("Multi Send To Zatca Errors***************************** :: " + str(e))
+
         
 
         remaining_count = self.sudo().search_count([
