@@ -1885,8 +1885,8 @@ class AccountMove(models.Model):
 
         _logger.info("Old Inovices invoices =====================Errors========================= :: " + str(len(invoices)))
         try:
-           invoices.send_multiple_to_zatca()
-           self.env.cr.commit()
+            invoices.send_multiple_to_zatca()
+            self.env.cr.commit()
         except Exception as e:
             self.env.cr.commit()
             # Bypass errors.
