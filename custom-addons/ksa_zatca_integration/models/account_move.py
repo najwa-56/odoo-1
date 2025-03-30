@@ -1911,4 +1911,5 @@ class AccountMove(models.Model):
             ('invoice_date', '<=', end_date)
         ])
         if remaining_count > 0:
+            _logger.info("remaining_count acount Old Inovices invoices =====================******========================= :: " + str(remaining_count))
             self.env.ref('ksa_zatca_integration.ir_cron_send_inovoice_job_count')._trigger()
