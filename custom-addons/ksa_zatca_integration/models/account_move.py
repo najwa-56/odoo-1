@@ -1877,7 +1877,7 @@ class AccountMove(models.Model):
 
 
 
-    def send_invoice_batch(self, batch_size=1-0):
+    def send_invoice_batch(self, batch_size=100):
 
         # Fetch up to 80 orders at a time
         start_date = datetime(2024, 8, 31).date()  # 1st Jan 2025
