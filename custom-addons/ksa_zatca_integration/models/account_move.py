@@ -1774,6 +1774,7 @@ class AccountMove(models.Model):
                         elif record.l10n_sa_invoice_type == 'Simplified':
                             record.send_for_reporting()
             except Exception as e:
+                self.env.cr.commit()
                 # Bypass errors.
                 _logger.info("Multi Send To Zatca Errors :: " + str(e))
 
@@ -1872,40 +1873,29 @@ class AccountMove(models.Model):
 
 
 
-    @api.model
-    def send_invoice_batch(self, batch_size=50):
+    def send_invoice_batch(self, batch_size=1-0):
 
         # Fetch up to 80 orders at a time
         start_date = datetime(2024, 8, 31).date()  # 1st Jan 2025
         end_date = datetime(2025, 12, 31).date()   # 25th March 2025
         invoices = self.sudo().search([
-            ('state', '=', 'posted'),
             ('invoice_date', '>=', start_date),
             ('invoice_date', '<=', end_date)
         ], limit=batch_size)
 
         _logger.info("Old Inovices invoices =====================Errors========================= :: " + str(len(invoices)))
-        for record in invoices:
-            try:
-                if not record.zatca_invoice_name or not record.zatca_compliance_invoices_api or \
-                            record.zatca_status_code == '400':
-                    if record.l10n_sa_invoice_type == 'Standard':
-                        record.send_for_clearance()
-                        self.env.cr.commit()
-                    elif record.l10n_sa_invoice_type == 'Simplified':
-                        record.send_for_reporting()
-                        self.env.cr.commit()
-                self.env.cr.commit()
-            except Exception as e:
-                self.env.cr.commit()
-                # Bypass errors.
-                _logger.info("Old Inovices Multi Send To Zatca Errors========================= :: " + str(e))
+        try:
+           invoices.send_multiple_to_zatca()
+           self.env.cr.commit()
+        except Exception as e:
+            self.env.cr.commit()
+            # Bypass errors.
+            _logger.info("Old Inovices Multi Send To Zatca Errors========================= :: " + str(e))
 
 
-            remaining_count = self.sudo().search_count([
-                ('state', '=', 'posted'),
-                ('invoice_date', '>=', start_date),
-                ('invoice_date', '<=', end_date)
-            ])
-            if remaining_count > 0:
-                self.env.ref('ksa_zatca_integration.ir_cron_send_inovoice_job_count')._trigger()
+        remaining_count = self.sudo().search_count([
+            ('invoice_date', '>=', start_date),
+            ('invoice_date', '<=', end_date)
+        ])
+        if remaining_count > 0:
+            self.env.ref('ksa_zatca_integration.ir_cron_send_inovoice_job_count')._trigger()
