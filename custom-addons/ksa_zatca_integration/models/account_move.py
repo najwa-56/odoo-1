@@ -1873,18 +1873,20 @@ class AccountMove(models.Model):
 
 
     def send_invoice_batch(self, batch_size=250):
-        batch_size = 300
+        batch_size = 100
         start_date = datetime(2024, 8, 31).date() 
         end_date = datetime(2025, 12, 31).date() 
         invoices = self.sudo().search([
             ('invoice_date', '>=', start_date),
             ('invoice_date', '<=', end_date),
             ('state', '=', 'posted'),
-            '|', '|',
+            ('payment_state', '!=', 'reversed'),  # Exclude reversed invoices
+            ('zatca_status_code', '!=', '400'),  # Exclude invoices with status_code 400
+            '|', 
             ('zatca_invoice_name', '=', False),
-            ('zatca_compliance_invoices_api', '=', False),
-            ('zatca_status_code', '!=', '400')
+            ('zatca_compliance_invoices_api', '=', False)
         ], limit=batch_size)
+
 
        
         for record in invoices:
@@ -1892,8 +1894,10 @@ class AccountMove(models.Model):
                 
                 if record.l10n_sa_invoice_type == 'Standard':
                     record.send_for_clearance()
+                    self.env.cr.commit()
                 elif record.l10n_sa_invoice_type == 'Simplified':
                     record.send_for_reporting()
+                    self.env.cr.commit()
             except Exception as e:
                 # Bypass errors.
                 _logger.info(f"Multi Send To Zatca Errors (Invoice ID: {record.id}) ***************************** :: {str(e)}")
@@ -1904,10 +1908,11 @@ class AccountMove(models.Model):
             ('invoice_date', '>=', start_date),
             ('invoice_date', '<=', end_date),
             ('state', '=', 'posted'),
-            '|', '|',
+            ('payment_state', '!=', 'reversed'),  # Exclude reversed invoices
+            ('zatca_status_code', '!=', '400'),  # Exclude invoices with status_code 400
+            '|', 
             ('zatca_invoice_name', '=', False),
-            ('zatca_compliance_invoices_api', '=', False),
-            ('zatca_status_code', '!=', '400')
+            ('zatca_compliance_invoices_api', '=', False)
         ])
         if remaining_count > 0:
             self.env.ref('ksa_zatca_integration.ir_cron_send_inovoice_job_count')._trigger()
