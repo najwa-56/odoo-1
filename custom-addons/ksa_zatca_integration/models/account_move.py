@@ -1753,9 +1753,7 @@ class AccountMove(models.Model):
 
 
     def send_multiple_to_zatca(self):
-        _logger.info("Old Inovices invoices =====================Errors========================= :: " + str(len(self)))
         self = self.filtered(lambda x: x.zatca_icv_counter).sorted(key='zatca_icv_counter')
-        _logger.info("length of filtered Old Inovices =====================Errors========================= :: " + str(len(self)))
         # if int(self[0].zatca_icv_counter) > 1:
         #     def get_last_zatca_invoice(self, icv):
         #         record = self.search([('zatca_icv_counter', '=', icv -1)], limit=1)
@@ -1772,13 +1770,10 @@ class AccountMove(models.Model):
                     if not record.zatca_invoice_name or not record.zatca_compliance_invoices_api or \
                             record.zatca_status_code == '400':
                         if record.l10n_sa_invoice_type == 'Standard':
-                            _logger.info("stnadard =================Old Inovices invoices =====================Errors========================= :: " + str(len(self)))
                             record.send_for_clearance()
                         elif record.l10n_sa_invoice_type == 'Simplified':
-                            _logger.info("Simplified Old Inovices invoices =====================Errors========================= :: " + str(len(self)))
                             record.send_for_reporting()
             except Exception as e:
-                self.env.cr.commit()
                 # Bypass errors.
                 _logger.info("Multi Send To Zatca Errors :: " + str(e))
 
@@ -1883,8 +1878,14 @@ class AccountMove(models.Model):
         end_date = datetime(2025, 12, 31).date() 
         invoices = self.sudo().search([
             ('invoice_date', '>=', start_date),
-            ('invoice_date', '<=', end_date)
+            ('invoice_date', '<=', end_date),
+            ('state', '=', 'posted'),
+            '|', '|',
+            ('zatca_invoice_name', '=', False),
+            ('zatca_compliance_invoices_api', '=', False),
+            ('zatca_status_code', '=', '400')
         ], limit=batch_size)
+
 
         
         _logger.info("Old Inovices invoices =====================******========================= :: " + str(invoices.ids))
