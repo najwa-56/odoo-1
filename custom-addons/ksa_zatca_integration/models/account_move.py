@@ -1873,7 +1873,7 @@ class AccountMove(models.Model):
 
 
     def send_invoice_batch(self, batch_size=200):
-        batch_size = 300
+        batch_size = 400
         start_date = datetime(2024, 8, 31).date() 
         end_date = datetime(2025, 12, 31).date() 
         invoices = self.sudo().search([
@@ -1895,9 +1895,11 @@ class AccountMove(models.Model):
             try:
                 
                 if record.l10n_sa_invoice_type == 'Standard':
+                    _logger.info(f"l10n_sa_invoice_type standard Send To Zatca Errors (Invoice ID: {record.id}) ***************************** ")
                     record.send_for_clearance()
                     self.env.cr.commit()
                 elif record.l10n_sa_invoice_type == 'Simplified':
+                    _logger.info(f"l10n_sa_invoice_type Simplified Send To Zatca Errors (Invoice ID: {record.id}) ***************************** ")
                     record.send_for_reporting()
                     self.env.cr.commit()
             except Exception as e:
