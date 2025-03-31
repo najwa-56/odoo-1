@@ -1878,7 +1878,7 @@ class AccountMove(models.Model):
 
 
     def send_invoice_batch(self, batch_size=600):
-        batch_size = 700
+        batch_size = 1000
         start_date = datetime(2024, 12, 31).date() 
         end_date = datetime(2025, 3, 28).date() 
         invoices = self.sudo().search([
@@ -1897,7 +1897,8 @@ class AccountMove(models.Model):
         if not invoices:
             _logger.info(f"no left invoices lenght (Invoices length: {len(invoices)}) *****************************")
             return
-       
+
+        invoices = invoices.filtered(lambda x: x.zatca_icv_counter).sorted(key='zatca_icv_counter')
         invoices = invoices.filtered(lambda inv: all(line.tax_ids for line in inv.invoice_line_ids))
         if len(invoices) <= 20:
             batch_size + 100
