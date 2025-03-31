@@ -1878,7 +1878,7 @@ class AccountMove(models.Model):
 
 
     def send_invoice_batch(self, batch_size=600):
-        batch_size = 1000
+        batch_size = 5000
         start_date = datetime(2024, 12, 30).date()
         end_date = datetime(2025, 3, 28).date() 
         invoices = self.sudo().search([
