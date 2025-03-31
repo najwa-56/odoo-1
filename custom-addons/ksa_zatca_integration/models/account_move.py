@@ -1772,7 +1772,7 @@ class AccountMove(models.Model):
         for record in self:
             try:
                 if not record.partner_id.street:
-                record.partner_id.street = '/'
+                    record.partner_id.street = '/'
             
                 if not record.partner_id.street2:
                     record.partner_id.street2 = '/'
