@@ -1878,17 +1878,14 @@ class AccountMove(models.Model):
 
 
     def send_invoice_batch(self, batch_size=600):
-        batch_size = 50
-        start_date = datetime(2024, 8, 31).date() 
-        end_date = datetime(2025, 3, 30).date() 
+        batch_size = 200
+        start_date = datetime(2025, 1, 1).date() 
+        end_date = datetime(2025, 3, 25).date() 
         invoices = self.sudo().search([
             ('invoice_date', '>=', start_date),
             ('invoice_date', '<=', end_date),
-            ('move_type', '=', 'out_invoice'),
-            ('partner_id.is_dolfin', '=', False),
-            
+            ('move_type', '=', 'out_invoice'),            
             ('state', '=', 'posted'),
-            ('payment_state', '!=', 'reversed'),
             ('l10n_sa_zatca_status', 'ilike', 'not')
              
             
@@ -1946,7 +1943,6 @@ class AccountMove(models.Model):
                    
                         
             except Exception as e:
-                self.env.cr.commit() 
                 # Bypass errors.
                 _logger.info(f"Multi Send To Zatca Errors (Invoice ID: {record.id}) ***************************** :: {str(e)}")
 
@@ -1956,9 +1952,7 @@ class AccountMove(models.Model):
             ('invoice_date', '>=', start_date),
             ('invoice_date', '<=', end_date),
             ('move_type', '=', 'out_invoice'),
-             ('partner_id.is_dolfin', '=', False),
             ('state', '=', 'posted'),
-            ('payment_state', '!=', 'reversed'),
             ('l10n_sa_zatca_status', 'ilike', 'not')
             
         ])
