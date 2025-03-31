@@ -1935,7 +1935,7 @@ class AccountMove(models.Model):
                     cleared = record.send_for_clearance()
                     
                 elif record.l10n_sa_invoice_type == 'Simplified':
-                     _logger.info(f"l10n_sa_invoice_type standard Send To Zatca (Invoice ID: {record.id}) =============")
+                    _logger.info(f"l10n_sa_invoice_type standard Send To Zatca (Invoice ID: {record.id}) =============")
                     report = record.send_for_reporting()
                    
                         
