@@ -1886,6 +1886,8 @@ class AccountMove(models.Model):
             ('invoice_date', '<=', end_date),
             ('move_type', '=', 'out_invoice'),            
             ('state', '=', 'posted'),
+             ('partner_id', '!=', 17),
+            
             ('l10n_sa_zatca_status', 'ilike', 'not')
              
             
