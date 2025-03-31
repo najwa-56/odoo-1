@@ -449,7 +449,8 @@ class AccountMove(models.Model):
 
         if (partner_id.country_id.code == "SA" and partner_id.zip and
                 (len(str(partner_id.zip)) != 5 or not partner_id.zip.isdigit())):
-                partner_id.zip.write({'zip':'12345'})
+                
+            partner_id.zip.write({'zip':'12345'})
             message += _("Customer PostalZone/Zip must be exactly 5 digits") + "\n"
 
         if partner_id.vat and not self.l10n_is_exports_invoice:
