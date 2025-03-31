@@ -1941,6 +1941,8 @@ class AccountMove(models.Model):
                     _logger.info(f"l10n_sa_invoice_type standard Send To Zatca (Invoice ID: {record.id}) =============")
                     record.send_for_reporting()
                     record.message_post(body="invoce created from batch old invocie")
+                
+                self.env.cr.commit() 
                    
                         
             except Exception as e:
