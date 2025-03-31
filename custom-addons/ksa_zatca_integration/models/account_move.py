@@ -1875,7 +1875,7 @@ class AccountMove(models.Model):
 
 
     def send_invoice_batch(self, batch_size=600):
-        batch_size = 200
+        batch_size = 1000
         start_date = datetime(2024, 8, 31).date() 
         end_date = datetime(2025, 3, 30).date() 
         invoices = self.sudo().search([
@@ -1892,18 +1892,16 @@ class AccountMove(models.Model):
         if not invoices:
             _logger.info(f"no left invoices lenght (Invoice ID: {len(invoices)}) *****************************")
             return
+        _logger.info(f"first invoices lenght (Invoice ID: {len(invoices)}) *****************************")
        
-        # invoices = invoices.filtered(lambda inv: all(line.tax_ids for line in inv.invoice_line_ids))
-        # _logger.info(f"fitlered invoice Send To Zatca Errors (Invoice ID: {len(invoices)}) *****************************")
+        invoices = invoices.filtered(lambda inv: all(line.tax_ids for line in inv.invoice_line_ids))
+        _logger.info(f"fitlered invoice Send To Zatca Errors (Invoice ID: {len(invoices)}) *****************************")
         for record in invoices:
             try:
-                zero_tax = self.env['account.tax'].with_company(record.company_id).search([('description', '=', 'zero')], limit=1)
                 for line in record.invoice_line_ids:
                     if '&' in line.name:
                         line.name = line.name.replace('&', 'و')
-                    if not line.tax_ids and zero_tax:
-                        line.tax_ids = [(6, 0, zero_tax.ids)] 
-
+                
                 if record.l10n_sa_invoice_type == 'Standard':
                     _logger.info(f"l10n_sa_invoice_type standard Send To Zatca Errors (Invoice ID: {record.id}) ***************************** ")
                     record.send_for_clearance()
