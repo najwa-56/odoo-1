@@ -178,11 +178,11 @@ class PosOrder(models.Model):
                     rec.with_user(rec.user_id)._generate_pos_order_invoice()
                     self.env.cr.commit()
                     if rec.account_move:
-                        for line in rec.account_move.invoice_line_ids
-                            # Replace '&' with '&amp;' in the product name
+                        for line in rec.account_move.invoice_line_ids:
                             if '&' in line.name:
                                 line.name = line.name.replace('&', 'و')
                         rec.account_move.create_xml_file(pos_refunded_order_id=rec.refunded_order_ids.account_move.id)
+
                         msg = _('Invoice Created by %s:', rec.user_id.name)
                         rec.account_move.message_post(body=msg)
                         if rec.partner_id.id != 23 :
@@ -196,8 +196,7 @@ class PosOrder(models.Model):
                     self.env.cr.commit()
                     
                     if rec.account_move:
-                        for line in rec.account_move.invoice_line_ids
-                            # Replace '&' with '&amp;' in the product name
+                        for line in rec.account_move.invoice_line_ids:
                             if '&' in line.name:
                                 line.name = line.name.replace('&', 'و')
                         rec.account_move.create_xml_file(pos_refunded_order_id=rec.refunded_order_ids.account_move.id)
