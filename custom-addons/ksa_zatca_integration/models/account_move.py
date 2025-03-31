@@ -1878,7 +1878,7 @@ class AccountMove(models.Model):
 
 
     def send_invoice_batch(self, batch_size=600):
-        batch_size = 300
+        batch_size = 600
         start_date = datetime(2024, 8, 30).date() 
         end_date = datetime(2024, 12, 31).date() 
         invoices = self.sudo().search([
@@ -1897,6 +1897,8 @@ class AccountMove(models.Model):
             return
        
         invoices = invoices.filtered(lambda inv: all(line.tax_ids for line in inv.invoice_line_ids))
+        if len(invoices) == 0:
+            batch_size + 100
         
         _logger.info(f"fitlered invoice Send To Zatca Errors (Invoice ID: {len(invoices)}) *****************************")
         for record in invoices:
