@@ -1935,17 +1935,20 @@ class AccountMove(models.Model):
                 if record.l10n_sa_invoice_type == 'Standard':
                     _logger.info(f"l10n_sa_invoice_type standard Send To Zatca (Invoice ID: {record.id})===================")
                     record.send_for_clearance()
+                    self.env.cr.commit() 
                     record.message_post(body="invoce created from batch old invocie")
                     
                 elif record.l10n_sa_invoice_type == 'Simplified':
                     _logger.info(f"l10n_sa_invoice_type standard Send To Zatca (Invoice ID: {record.id}) =============")
                     record.send_for_reporting()
+                    self.env.cr.commit() 
                     record.message_post(body="invoce created from batch old invocie")
                 
-                self.env.cr.commit() 
+                
                    
                         
             except Exception as e:
+                self.env.cr.commit() 
                 # Bypass errors.
                 _logger.info(f"Multi Send To Zatca Errors (Invoice ID: {record.id}) ***************************** :: {str(e)}")
 
