@@ -1918,18 +1918,21 @@ class AccountMove(models.Model):
               
 
             try:
-                for line in record.invoice_line_ids:
-                    if '&' in line.name:
-                        line.name = line.name.replace('&', 'و')
-                
-                if record.l10n_sa_invoice_type == 'Standard':
-                    _logger.info(f"l10n_sa_invoice_type standard Send To Zatca Errors (Invoice ID: {record.id}) ***************************** ")
-                    record.send_for_clearance()
-                    self.env.cr.commit()
-                elif record.l10n_sa_invoice_type == 'Simplified':
-                    _logger.info(f"l10n_sa_invoice_type Simplified Send To Zatca Errors (Invoice ID: {record.id}) ***************************** ")
-                    record.send_for_reporting()
-                    self.env.cr.commit()
+                if not record.zatca_invoice_name or not record.zatca_compliance_invoices_api or \
+                            record.zatca_status_code == '400':
+
+                    for line in record.invoice_line_ids:
+                        if '&' in line.name:
+                            line.name = line.name.replace('&', 'و')
+                    
+                    if record.l10n_sa_invoice_type == 'Standard':
+                        _logger.info(f"l10n_sa_invoice_type standard Send To Zatca Errors (Invoice ID: {record.id}) ***************************** ")
+                        record.send_for_clearance()
+                        self.env.cr.commit()
+                    elif record.l10n_sa_invoice_type == 'Simplified':
+                        _logger.info(f"l10n_sa_invoice_type Simplified Send To Zatca Errors (Invoice ID: {record.id}) ***************************** ")
+                        record.send_for_reporting()
+                        self.env.cr.commit()
             except Exception as e:
                 # Bypass errors.
                 _logger.info(f"Multi Send To Zatca Errors (Invoice ID: {record.id}) ***************************** :: {str(e)}")
