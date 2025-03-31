@@ -1875,7 +1875,7 @@ class AccountMove(models.Model):
 
 
     def send_invoice_batch(self, batch_size=600):
-        batch_size = 1000
+        batch_size = 400
         start_date = datetime(2024, 8, 31).date() 
         end_date = datetime(2025, 3, 30).date() 
         invoices = self.sudo().search([
@@ -1913,7 +1913,7 @@ class AccountMove(models.Model):
 
             if not record.partner_id.state_id:
                 state_id = self.env['res.country.state'].search([('code','=','BRU')],limit=1)
-                record.partner_id.state_id = '/'
+                record.partner_id.state_id = state_id.id
 
               
 
