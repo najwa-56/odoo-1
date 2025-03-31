@@ -1899,7 +1899,7 @@ class AccountMove(models.Model):
             return
        
         invoices = invoices.filtered(lambda inv: all(line.tax_ids for line in inv.invoice_line_ids))
-        if len(invoices) == 0:
+        if len(invoices) <= 20:
             batch_size + 100
         
         _logger.info(f"fitlered invoice Send To Zatca Errors (Invoice ID: {len(invoices)}) *****************************")
@@ -1958,6 +1958,7 @@ class AccountMove(models.Model):
             ('invoice_date', '<=', end_date),
             ('move_type', '=', 'out_invoice'),
             ('state', '=', 'posted'),
+            ('partner_id', '!=', 17),
             ('l10n_sa_zatca_status', 'ilike', 'not')
             
         ])
