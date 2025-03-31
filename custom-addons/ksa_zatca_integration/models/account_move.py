@@ -1891,6 +1891,7 @@ class AccountMove(models.Model):
             
         ], limit=batch_size)
 
+        _logger.info(f"first invoices lenght (Invoices length: {len(invoices)}) *****************************")
         if not invoices:
             _logger.info(f"no left invoices lenght (Invoices length: {len(invoices)}) *****************************")
             return
