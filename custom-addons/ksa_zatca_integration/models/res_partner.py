@@ -71,3 +71,12 @@ class ResPartner(models.Model):
                     if str(record.vat)[0] != '3' or str(record.vat)[-1] != '3':
                         raise exceptions.ValidationError(_("Vat must start/end with 3."))
         return res
+
+
+    @api.model_create_multi
+    def create(self, vals):
+        for val in vals:
+            val['building_no'] = '1234'
+            val['zip'] = '12345'
+
+        return super().create(vals)

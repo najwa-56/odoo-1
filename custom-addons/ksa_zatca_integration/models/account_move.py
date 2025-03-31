@@ -449,6 +449,7 @@ class AccountMove(models.Model):
 
         if (partner_id.country_id.code == "SA" and partner_id.zip and
                 (len(str(partner_id.zip)) != 5 or not partner_id.zip.isdigit())):
+                partner_id.zip.write({'zip':'12345'})
             message += _("Customer PostalZone/Zip must be exactly 5 digits") + "\n"
 
         if partner_id.vat and not self.l10n_is_exports_invoice:
@@ -1887,12 +1888,15 @@ class AccountMove(models.Model):
             ('zatca_compliance_invoices_api', '=', False)
         ], limit=batch_size)
 
-        _logger.info(f"Multi Send To Zatca Errors (Invoice ID: {len(invoices)}) *****************************")
+        _logger.info(f"first invoices lenght (Invoice ID: {len(invoices)}) *****************************")
        
         invoices = invoices.filtered(lambda inv: all(line.tax_ids for line in inv.invoice_line_ids))
         _logger.info(f"fitlered invoice Send To Zatca Errors (Invoice ID: {len(invoices)}) *****************************")
         for record in invoices:
             try:
+                for line in record.invoice_line_ids:
+                    if '&' in line.name:
+                        line.name = line.name.replace('&', 'و')
                 
                 if record.l10n_sa_invoice_type == 'Standard':
                     _logger.info(f"l10n_sa_invoice_type standard Send To Zatca Errors (Invoice ID: {record.id}) ***************************** ")
