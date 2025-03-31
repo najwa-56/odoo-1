@@ -1885,6 +1885,8 @@ class AccountMove(models.Model):
             ('invoice_date', '>=', start_date),
             ('invoice_date', '<=', end_date),
             ('move_type', '=', 'out_invoice'),
+            ('partner_id.is_dolfin', '=', False),
+            
             ('state', '=', 'posted'),
             ('payment_state', '!=', 'reversed'),
             '|', '|',
@@ -1949,6 +1951,7 @@ class AccountMove(models.Model):
             ('invoice_date', '>=', start_date),
             ('invoice_date', '<=', end_date),
             ('move_type', '=', 'out_invoice'),
+             ('partner_id.is_dolfin', '=', False),
             ('state', '=', 'posted'),
             ('payment_state', '!=', 'reversed'),
             '|', '|',
