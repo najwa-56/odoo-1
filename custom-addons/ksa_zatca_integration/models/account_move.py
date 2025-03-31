@@ -1878,7 +1878,7 @@ class AccountMove(models.Model):
 
 
     def send_invoice_batch(self, batch_size=600):
-        batch_size = 200
+        batch_size = 300
         start_date = datetime(2024, 8, 31).date() 
         end_date = datetime(2025, 3, 30).date() 
         invoices = self.sudo().search([
@@ -1931,11 +1931,13 @@ class AccountMove(models.Model):
                         line.name = line.name.replace('&', 'و')
                 
                 if record.l10n_sa_invoice_type == 'Standard':
+                    _logger.info(f"l10n_sa_invoice_type standard Send To Zatca (Invoice ID: {record.id})===================")
                     cleared = record.send_for_clearance()
-                    _logger.info(f"l10n_sa_invoice_type standard Send To Zatca (Invoice ID: {record.id}) - Response: {cleared}")
+                    
                 elif record.l10n_sa_invoice_type == 'Simplified':
+                     _logger.info(f"l10n_sa_invoice_type standard Send To Zatca (Invoice ID: {record.id}) =============")
                     report = record.send_for_reporting()
-                    _logger.info(f"l10n_sa_invoice_type standard Send To Zatca (Invoice ID: {record.id}) - Response: {cleared}")
+                   
                         
             except Exception as e:
                 # Bypass errors.
