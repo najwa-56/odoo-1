@@ -1879,7 +1879,7 @@ class AccountMove(models.Model):
 
     def send_invoice_batch(self, batch_size=600):
         batch_size = 1000
-        start_date = datetime(2024, 12, 31).date() 
+        start_date = datetime(2024, 12, 30).date()
         end_date = datetime(2025, 3, 28).date() 
         invoices = self.sudo().search([
             ('invoice_date', '>=', start_date),
@@ -1900,10 +1900,11 @@ class AccountMove(models.Model):
 
         invoices = invoices.filtered(lambda x: x.zatca_icv_counter).sorted(key='zatca_icv_counter')
         invoices = invoices.filtered(lambda inv: all(line.tax_ids for line in inv.invoice_line_ids))
-        if len(invoices) <= 20:
-            batch_size + 100
-        
         _logger.info(f"fitlered invoice Send To Zatca Errors (Invoice ID: {len(invoices)}) *****************************")
+        if len(invoices) <= 20:
+            batch_size =  batch_size + 100
+        
+        
         for record in invoices:
            
             if not record.partner_id.street:
