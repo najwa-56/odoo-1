@@ -155,15 +155,33 @@ class PosOrder(models.Model):
         today = date.today()
         three_days_ago = today - timedelta(days=3)
         orders = self.sudo().search([('state', 'in', ['paid','done']),('date_order','>=',three_days_ago)])
-        recipients = ['adnanadam914@gmail.com', 'abeersalh166@gmail.com','n4ajwa4@gmail.com']
+        recipients = ['adnanadam914@gmail.com']
+        # 'abeersalh166@gmail.com','n4ajwa4@gmail.com'
         for rec in orders:
             try:
+                
+
+                zero_tax = self.env['account.tax'].with_company(rec.company_id).search([('description', '=', 'zero')], limit=1)
+
+                for line in rec.lines:
+                    
+
+                    # If no tax is assigned, set the zero-rated tax
+                    if not line.tax_ids_after_fiscal_position and zero_tax:
+                        line.tax_ids = [(6, 0, zero_tax.ids)]  # Assign the found tax
+
+
+
                 if rec.picking_ids:
                     if not rec.partner_id:
                         rec.write({'partner_id':23})
                     rec.with_user(rec.user_id)._generate_pos_order_invoice()
-                    
+                    self.env.cr.commit()
                     if rec.account_move:
+                        for line in rec.account_move.invoice_line_ids
+                            # Replace '&' with '&amp;' in the product name
+                            if '&' in line.name:
+                                line.name = line.name.replace('&', 'و')
                         rec.account_move.create_xml_file(pos_refunded_order_id=rec.refunded_order_ids.account_move.id)
                         msg = _('Invoice Created by %s:', rec.user_id.name)
                         rec.account_move.message_post(body=msg)
@@ -175,8 +193,13 @@ class PosOrder(models.Model):
                     if not rec.partner_id:
                         rec.write({'partner_id':23})
                     rec.with_user(rec.user_id).action_pos_order_invoice()
+                    self.env.cr.commit()
                     
                     if rec.account_move:
+                        for line in rec.account_move.invoice_line_ids
+                            # Replace '&' with '&amp;' in the product name
+                            if '&' in line.name:
+                                line.name = line.name.replace('&', 'و')
                         rec.account_move.create_xml_file(pos_refunded_order_id=rec.refunded_order_ids.account_move.id)
                         msg = _('Invoice Created by %s:', rec.user_id.name)
                         rec.account_move.message_post(body=msg)
@@ -184,20 +207,17 @@ class PosOrder(models.Model):
                             rec.account_move.write({
                                 'l10n_sa_invoice_type':'Standard'
                             })
-                    self.env.cr.commit()
 
             except Exception as e:
                 self.env.cr.commit()
 
                 _logger.error(f"Failed to Create inovoice {'send to zatck'}: {str(e)}")
-                # Create an email
-                # mail_values = {
-                #     'subject': f"POS Order Invoice Processing Failed for {rec.name}",
-                #     'body_html': f"<p><strong>Error:</strong> {error_message}</p>",
-                #     'email_to': ','.join(recipients),
-                # }
-                # self.env['mail.mail'].create(mail_values).send()
-            self.env.cr.commit()
+                mail_values = {
+                   'subject': f"POS Order Invoice Processing Failed for {rec.name} ({pos_reference})"
+                    'body_html': f"<p><strong>Error:</strong> {error_message}</p>",
+                    'email_to': ','.join(recipients),
+                }
+                self.env['mail.mail'].create(mail_values).send()
 
 
 
@@ -240,7 +260,7 @@ class PosOrder(models.Model):
                         'delivery_date': rec.date_order,
                     })
                     
-                    # rec.account_move.create_xml_file(pos_refunded_order_id=rec.refunded_order_ids.account_move.id)
+                    rec.account_move.create_xml_file(pos_refunded_order_id=rec.refunded_order_ids.account_move.id)
                     msg = _('Invoice Created by %s:' % rec.user_id.name)
                     move.message_post(body=msg)
 

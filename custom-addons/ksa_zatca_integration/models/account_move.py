@@ -1771,6 +1771,29 @@ class AccountMove(models.Model):
         #         raise exceptions.MissingError("Invoice " + str(seq_id.name) + " must be submitted first.")
         for record in self:
             try:
+                if not record.partner_id.street:
+                record.partner_id.street = '/'
+            
+                if not record.partner_id.street2:
+                    record.partner_id.street2 = '/'
+                
+                if not record.partner_id.city:
+                    record.partner_id.city = '/'
+                
+                if not record.partner_id.district:
+                    record.partner_id.district = '/'
+                
+                if not record.partner_id.country_id:
+                    record.partner_id.country_id = 192
+
+                if not record.partner_id.state_id:
+                    state_id = self.env['res.country.state'].search([('code','=','BRU')],limit=1)
+                    record.partner_id.state_id = state_id.id
+
+                for line in record.invoice_line_ids:
+                    if '&' in line.name:
+                        line.name = line.name.replace('&', 'و')
+
                 if record.state == 'posted':
                     if not record.zatca_invoice_name or not record.zatca_compliance_invoices_api or \
                             record.zatca_status_code == '400':
@@ -1878,7 +1901,7 @@ class AccountMove(models.Model):
 
 
     def send_invoice_batch(self, batch_size=600):
-        batch_size = 20000
+        batch_size = 10000
         start_date = datetime(2024, 12, 30).date()
         end_date = datetime(2025, 3, 28).date() 
         invoices = self.sudo().search([
@@ -1887,6 +1910,7 @@ class AccountMove(models.Model):
             ('move_type', '=', 'out_invoice'),            
             ('state', '=', 'posted'),
              ('partner_id', '!=', 17),
+             ('partner_id.is_dolfin', '!=', True),
             
             ('l10n_sa_zatca_status', 'ilike', 'not')
              
@@ -1900,9 +1924,18 @@ class AccountMove(models.Model):
 
         invoices = invoices.filtered(lambda inv: all(line.tax_ids for line in inv.invoice_line_ids))
         _logger.info(f"fitlered invoice Send To Zatca Errors (Invoice ID: {len(invoices)}) *****************************")
-        if len(invoices) <= 20:
-            batch_size =  batch_size + 100
-        
+        if len(invoices) < 100 :
+            invoices = self.sudo().search([
+            ('invoice_date', '>=', start_date),
+            ('invoice_date', '<=', end_date),
+            ('move_type', '=', 'out_invoice'),            
+            ('state', '=', 'posted'),
+             ('partner_id', '!=', 17),
+            
+            ('l10n_sa_zatca_status', 'ilike', 'not')
+             
+            
+        ], limit=batch_size + 1000)
         
         for record in invoices:
            
@@ -1953,6 +1986,7 @@ class AccountMove(models.Model):
                 _logger.info(f"Multi Send To Zatca Errors (Invoice ID: {record.id}) ***************************** :: {str(e)}")
 
         
+      
 
         remaining_count = self.sudo().search_count([
             ('invoice_date', '>=', start_date),
@@ -1960,6 +1994,7 @@ class AccountMove(models.Model):
             ('move_type', '=', 'out_invoice'),
             ('state', '=', 'posted'),
             ('partner_id', '!=', 17),
+             ('partner_id.is_dolfin', '!=', True),
             ('l10n_sa_zatca_status', 'ilike', 'not')
             
         ])
