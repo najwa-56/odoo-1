@@ -1889,19 +1889,17 @@ class AccountMove(models.Model):
             
             ('state', '=', 'posted'),
             ('payment_state', '!=', 'reversed'),
-            '|', '|',
-            ('zatca_invoice_name', '=', False),
-            ('zatca_compliance_invoices_api', '=', False),
-            ('zatca_status_code', '!=', '400')
+            ('l10n_sa_zatca_status', 'ilike', 'not')
              
             
         ], limit=batch_size)
 
         if not invoices:
-            _logger.info(f"no left invoices lenght (Invoice ID: {len(invoices)}) *****************************")
+            _logger.info(f"no left invoices lenght (Invoices length: {len(invoices)}) *****************************")
             return
        
         invoices = invoices.filtered(lambda inv: all(line.tax_ids for line in inv.invoice_line_ids))
+        
         _logger.info(f"fitlered invoice Send To Zatca Errors (Invoice ID: {len(invoices)}) *****************************")
         for record in invoices:
            
@@ -1961,10 +1959,7 @@ class AccountMove(models.Model):
              ('partner_id.is_dolfin', '=', False),
             ('state', '=', 'posted'),
             ('payment_state', '!=', 'reversed'),
-            '|', '|',
-            ('zatca_invoice_name', '=', False),
-            ('zatca_compliance_invoices_api', '=', False),
-            ('zatca_status_code', '!=', '400')
+            ('l10n_sa_zatca_status', 'ilike', 'not')
             
         ])
         if remaining_count > 0:
