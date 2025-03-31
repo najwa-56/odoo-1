@@ -1881,12 +1881,10 @@ class AccountMove(models.Model):
         invoices = self.sudo().search([
             ('invoice_date', '>=', start_date),
             ('invoice_date', '<=', end_date),
+            ('move_type', '=', 'out_invoice'),
             ('state', '=', 'posted'),
             ('payment_state', '!=', 'reversed'),  # Exclude reversed invoices
-            ('zatca_status_code', '!=', '400'),  # Exclude invoices with status_code 400
-            '|', 
-            ('zatca_invoice_name', '=', False),
-            ('zatca_compliance_invoices_api', '=', False)
+            
         ], limit=batch_size)
 
         if not invoices:
@@ -1897,6 +1895,28 @@ class AccountMove(models.Model):
         invoices = invoices.filtered(lambda inv: all(line.tax_ids for line in inv.invoice_line_ids))
         _logger.info(f"fitlered invoice Send To Zatca Errors (Invoice ID: {len(invoices)}) *****************************")
         for record in invoices:
+           
+            if not record.partner_id.street:
+                record.partner_id.street = '/'
+            
+            if not record.partner_id.street2:
+                record.partner_id.street2 = '/'
+            
+            if not record.partner_id.city:
+                record.partner_id.city = '/'
+            
+            if not record.partner_id.district:
+                record.partner_id.district = '/'
+            
+            if not record.partner_id.country_id:
+                record.partner_id.country_id = 192
+
+            if not record.partner_id.state_id:
+                state_id = self.env['res.country.state'].search([('code','=','BRU')],limit=1)
+                record.partner_id.state_id = '/'
+
+              
+
             try:
                 for line in record.invoice_line_ids:
                     if '&' in line.name:
@@ -1919,12 +1939,10 @@ class AccountMove(models.Model):
         remaining_count = self.sudo().search_count([
             ('invoice_date', '>=', start_date),
             ('invoice_date', '<=', end_date),
+            ('move_type', '=', 'out_invoice'),
             ('state', '=', 'posted'),
             ('payment_state', '!=', 'reversed'),  # Exclude reversed invoices
-            ('zatca_status_code', '!=', '400'),  # Exclude invoices with status_code 400
-            '|', 
-            ('zatca_invoice_name', '=', False),
-            ('zatca_compliance_invoices_api', '=', False)
+            
         ])
         if remaining_count > 0:
             self.env.ref('ksa_zatca_integration.ir_cron_send_inovoice_job_count')._trigger()
