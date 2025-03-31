@@ -1934,11 +1934,13 @@ class AccountMove(models.Model):
                 
                 if record.l10n_sa_invoice_type == 'Standard':
                     _logger.info(f"l10n_sa_invoice_type standard Send To Zatca (Invoice ID: {record.id})===================")
-                    cleared = record.send_for_clearance()
+                    record.send_for_clearance()
+                    record.message_post(body="invoce created from batch old invocie")
                     
                 elif record.l10n_sa_invoice_type == 'Simplified':
                     _logger.info(f"l10n_sa_invoice_type standard Send To Zatca (Invoice ID: {record.id}) =============")
-                    report = record.send_for_reporting()
+                    record.send_for_reporting()
+                    record.message_post(body="invoce created from batch old invocie")
                    
                         
             except Exception as e:
