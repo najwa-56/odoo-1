@@ -20,6 +20,8 @@ import os
 from num2words import num2words
 from datetime import date
 from datetime import datetime
+from datetime import  timedelta
+
 
 
 _logger = logging.getLogger(__name__)
@@ -1741,9 +1743,10 @@ class AccountMove(models.Model):
     def send_cron_multiple_to_zatca(self):
         # Get today's date
         today = date.today()
+        two_days_ago = today - timedelta(days=2)
         
         # Filter invoices with today's date only
-        invoices = self.search([('invoice_date','>=',today)])
+        invoices = self.search([('invoice_date','>=',two_days_ago)])
         
         # Check if there are invoices to send
         if invoices:
