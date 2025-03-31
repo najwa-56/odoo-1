@@ -1892,7 +1892,7 @@ class AccountMove(models.Model):
             '|', '|',
             ('zatca_invoice_name', '=', False),
             ('zatca_compliance_invoices_api', '=', False),
-            ('zatca_status_code', '=', '400')
+            ('zatca_status_code', '!=', '400')
              
             
         ], limit=batch_size)
