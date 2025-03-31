@@ -1878,7 +1878,7 @@ class AccountMove(models.Model):
 
 
     def send_invoice_batch(self, batch_size=600):
-        batch_size = 300
+        batch_size = 200
         start_date = datetime(2024, 8, 31).date() 
         end_date = datetime(2025, 3, 30).date() 
         invoices = self.sudo().search([
@@ -1886,7 +1886,12 @@ class AccountMove(models.Model):
             ('invoice_date', '<=', end_date),
             ('move_type', '=', 'out_invoice'),
             ('state', '=', 'posted'),
-            ('payment_state', '!=', 'reversed'),  # Exclude reversed invoices
+            ('payment_state', '!=', 'reversed'),
+            '|', '|',
+            ('zatca_invoice_name', '=', False),
+            ('zatca_compliance_invoices_api', '=', False),
+            ('zatca_status_code', '=', '400')
+             
             
         ], limit=batch_size)
 
@@ -1920,19 +1925,17 @@ class AccountMove(models.Model):
               
 
             try:
-                if not record.zatca_invoice_name or not record.zatca_compliance_invoices_api or \
-                            record.zatca_status_code == '400':
-
-                    for line in record.invoice_line_ids:
-                        if '&' in line.name:
-                            line.name = line.name.replace('&', 'و')
-                    
-                    if record.l10n_sa_invoice_type == 'Standard':
-                        cleared = record.send_for_clearance()
-                        _logger.info(f"l10n_sa_invoice_type standard Send To Zatca (Invoice ID: {record.id}) - Response: {cleared}")
-                    elif record.l10n_sa_invoice_type == 'Simplified':
-                        report = record.send_for_reporting()
-                        _logger.info(f"l10n_sa_invoice_type standard Send To Zatca (Invoice ID: {record.id}) - Response: {cleared}")
+               
+                for line in record.invoice_line_ids:
+                    if '&' in line.name:
+                        line.name = line.name.replace('&', 'و')
+                
+                if record.l10n_sa_invoice_type == 'Standard':
+                    cleared = record.send_for_clearance()
+                    _logger.info(f"l10n_sa_invoice_type standard Send To Zatca (Invoice ID: {record.id}) - Response: {cleared}")
+                elif record.l10n_sa_invoice_type == 'Simplified':
+                    report = record.send_for_reporting()
+                    _logger.info(f"l10n_sa_invoice_type standard Send To Zatca (Invoice ID: {record.id}) - Response: {cleared}")
                         
             except Exception as e:
                 # Bypass errors.
@@ -1945,7 +1948,11 @@ class AccountMove(models.Model):
             ('invoice_date', '<=', end_date),
             ('move_type', '=', 'out_invoice'),
             ('state', '=', 'posted'),
-            ('payment_state', '!=', 'reversed'),  # Exclude reversed invoices
+            ('payment_state', '!=', 'reversed'),
+            '|', '|',
+            ('zatca_invoice_name', '=', False),
+            ('zatca_compliance_invoices_api', '=', False),
+            ('zatca_status_code', '=', '400')
             
         ])
         if remaining_count > 0:
