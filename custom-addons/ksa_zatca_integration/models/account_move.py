@@ -1878,7 +1878,7 @@ class AccountMove(models.Model):
 
 
     def send_invoice_batch(self, batch_size=600):
-        batch_size = 100
+        batch_size = 50
         start_date = datetime(2024, 8, 31).date() 
         end_date = datetime(2025, 3, 30).date() 
         invoices = self.sudo().search([
@@ -1961,7 +1961,7 @@ class AccountMove(models.Model):
             '|', '|',
             ('zatca_invoice_name', '=', False),
             ('zatca_compliance_invoices_api', '=', False),
-            ('zatca_status_code', '=', '400')
+            ('zatca_status_code', '!=', '400')
             
         ])
         if remaining_count > 0:
