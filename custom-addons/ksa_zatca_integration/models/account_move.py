@@ -1925,11 +1925,9 @@ class AccountMove(models.Model):
         
         
         for record in invoices:
-            if not record.zatca_invoice_name or not record.zatca_compliance_invoices_api or \
-                            record.zatca_status_code == '400':
-
-            if record.partner_id.is_company and len(record.partner_id.vat) != 15:
-                record.partner_id.vat = 300000000000003
+            if not record.zatca_invoice_name or not record.zatca_compliance_invoices_api or record.zatca_status_code == '400':              
+                if record.partner_id.is_company and len(record.partner_id.vat) != 15:
+                    record.partner_id.vat = 300000000000003
                 
                 if not record.partner_id.is_company and  record.partner_id.vat :
                     if len(record.partner_id.vat) != 15:
@@ -1982,7 +1980,7 @@ class AccountMove(models.Model):
                     # Bypass errors.
                     _logger.info(f"Multi Send To Zatca Errors (Invoice ID: {record.id}) ***************************** :: {str(e)}")
 
-            
+        
       
 
         # remaining_count = self.sudo().search_count([
