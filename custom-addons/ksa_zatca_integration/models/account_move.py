@@ -1903,21 +1903,17 @@ class AccountMove(models.Model):
 
 
     def send_invoice_batch(self, batch_size=600):
-        batch_size = 10000
-        start_date = datetime(2024, 12, 30).date()
-        end_date = datetime(2025, 3, 28).date() 
+        today = date.today()
+        two_days_ago = today - timedelta(days=2)
         invoices = self.sudo().search([
-            ('invoice_date', '>=', start_date),
-            ('invoice_date', '<=', end_date),
+            ('invoice_date', '>=', two_days_ago),
+            ('invoice_date', '<=', today),
             ('move_type', '=', 'out_invoice'),            
             ('state', '=', 'posted'),
-             ('partner_id', '!=', 17),
-             ('partner_id.is_dolfin', '!=', True),
-            
-            ('l10n_sa_zatca_status', 'ilike', 'not')
+             
              
             
-        ], limit=batch_size)
+        ])
 
         _logger.info(f"first invoices lenght (Invoices length: {len(invoices)}) *****************************")
         if not invoices:
@@ -1926,87 +1922,78 @@ class AccountMove(models.Model):
 
         invoices = invoices.filtered(lambda inv: all(line.tax_ids for line in inv.invoice_line_ids))
         _logger.info(f"fitlered invoice Send To Zatca Errors (Invoice ID: {len(invoices)}) *****************************")
-        if len(invoices) < 100 :
-            invoices = self.sudo().search([
-            ('invoice_date', '>=', start_date),
-            ('invoice_date', '<=', end_date),
-            ('move_type', '=', 'out_invoice'),            
-            ('state', '=', 'posted'),
-             ('partner_id', '!=', 17),
-            
-            ('l10n_sa_zatca_status', 'ilike', 'not')
-             
-            
-            ], limit=batch_size + 1000)
-            invoices = invoices.filtered(lambda inv: all(line.tax_ids for line in inv.invoice_line_ids))
+        
         
         for record in invoices:
+            if not record.zatca_invoice_name or not record.zatca_compliance_invoices_api or \
+                            record.zatca_status_code == '400':
+
             if record.partner_id.is_company and len(record.partner_id.vat) != 15:
                 record.partner_id.vat = 300000000000003
-            
-            if not record.partner_id.is_company and  record.partner_id.vat :
-                if len(record.partner_id.vat) != 15:
-                    record.partner_id.vat = 300000000000003
-                    record.is_company = True
-
-            if not record.partner_id.street:
-                record.partner_id.street = '/'
-            
-            if not record.partner_id.street2:
-                record.partner_id.street2 = '/'
-            
-            if not record.partner_id.city:
-                record.partner_id.city = '/'
-            
-            if not record.partner_id.district:
-                record.partner_id.district = '/'
-            
-            if not record.partner_id.country_id:
-                record.partner_id.country_id = 192
-
-            if not record.partner_id.state_id:
-                state_id = self.env['res.country.state'].search([('code','=','BRU')],limit=1)
-                record.partner_id.state_id = state_id.id
-
-              
-
-            try:
-               
-                for line in record.invoice_line_ids:
-                    if '&' in line.name:
-                        line.name = line.name.replace('&', 'و')
                 
-                if record.l10n_sa_invoice_type == 'Standard':
-                    _logger.info(f"l10n_sa_invoice_type standard Send To Zatca (Invoice ID: {record.id})===================")
-                    record.send_for_clearance()
-                    self.env.cr.commit() 
-                    record.message_post(body="invoce created from batch old invocie")
+                if not record.partner_id.is_company and  record.partner_id.vat :
+                    if len(record.partner_id.vat) != 15:
+                        record.partner_id.vat = 300000000000003
+                        record.is_company = True
+
+                if not record.partner_id.street:
+                    record.partner_id.street = '/'
+                
+                if not record.partner_id.street2:
+                    record.partner_id.street2 = '/'
+                
+                if not record.partner_id.city:
+                    record.partner_id.city = '/'
+                
+                if not record.partner_id.district:
+                    record.partner_id.district = '/'
+                
+                if not record.partner_id.country_id:
+                    record.partner_id.country_id = 192
+
+                if not record.partner_id.state_id:
+                    state_id = self.env['res.country.state'].search([('code','=','BRU')],limit=1)
+                    record.partner_id.state_id = state_id.id
+
+                
+
+                try:
+                
+                    for line in record.invoice_line_ids:
+                        if '&' in line.name:
+                            line.name = line.name.replace('&', 'و')
                     
-                elif record.l10n_sa_invoice_type == 'Simplified':
-                    _logger.info(f"l10n_sa_invoice_type standard Send To Zatca (Invoice ID: {record.id}) =============")
-                    record.send_for_reporting()
-                    self.env.cr.commit() 
-                    record.message_post(body="invoce created from batch old invocie")
-                
-                
-                   
+                    if record.l10n_sa_invoice_type == 'Standard':
+                        _logger.info(f"l10n_sa_invoice_type standard Send To Zatca (Invoice ID: {record.id})===================")
+                        record.send_for_clearance()
+                        self.env.cr.commit() 
+                        record.message_post(body="invoice send to zatca from cron job")
                         
-            except Exception as e:
-                # Bypass errors.
-                _logger.info(f"Multi Send To Zatca Errors (Invoice ID: {record.id}) ***************************** :: {str(e)}")
+                    elif record.l10n_sa_invoice_type == 'Simplified':
+                        _logger.info(f"l10n_sa_invoice_type standard Send To Zatca (Invoice ID: {record.id}) =============")
+                        record.send_for_reporting()
+                        self.env.cr.commit() 
+                        record.message_post(body="invoice send to zatca from cron job")
+                    
+                    
+                    
+                            
+                except Exception as e:
+                    # Bypass errors.
+                    _logger.info(f"Multi Send To Zatca Errors (Invoice ID: {record.id}) ***************************** :: {str(e)}")
 
-        
+            
       
 
-        remaining_count = self.sudo().search_count([
-            ('invoice_date', '>=', start_date),
-            ('invoice_date', '<=', end_date),
-            ('move_type', '=', 'out_invoice'),
-            ('state', '=', 'posted'),
-            ('partner_id', '!=', 17),
-             ('partner_id.is_dolfin', '!=', True),
-            ('l10n_sa_zatca_status', 'ilike', 'not')
+        # remaining_count = self.sudo().search_count([
+        #     ('invoice_date', '>=', start_date),
+        #     ('invoice_date', '<=', end_date),
+        #     ('move_type', '=', 'out_invoice'),
+        #     ('state', '=', 'posted'),
+        #     ('partner_id', '!=', 17),
+        #     ('partner_id.is_dolfin', '!=', True),
+        #     ('l10n_sa_zatca_status', 'ilike', 'not')
             
-        ])
-        if remaining_count > 0:
-            self.env.ref('ksa_zatca_integration.ir_cron_send_inovoice_job_count')._trigger()
+        # ])
+        # if remaining_count > 0:
+        #     self.env.ref('ksa_zatca_integration.ir_cron_send_inovoice_job_count')._trigger()
