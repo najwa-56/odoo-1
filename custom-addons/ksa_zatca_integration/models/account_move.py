@@ -1927,17 +1927,20 @@ class AccountMove(models.Model):
         
         
         for record in invoices:
-            if not record.zatca_invoice_name or not record.zatca_compliance_invoices_api or record.zatca_status_code == '400':              
+            if not record.zatca_invoice_name or not record.zatca_compliance_invoices_api or record.zatca_status_code == '400':
+               if not (record.partner_id.vat.startswith('3') and record.partner_id.vat.endswith('3')):
+                    record.partner_id.vat = '300000000000003'
+           
                 if record.partner_id.is_company and len(record.partner_id.vat) != 15:
-                    record.partner_id.vat = 300000000000003
+                    record.partner_id.vat = '300000000000003'
                 
                 if not record.partner_id.is_company and  record.partner_id.vat :
                     if len(record.partner_id.vat) != 15:
-                        record.partner_id.vat = 300000000000003
+                        record.partner_id.vat = '300000000000003'
                         record.is_company = True
-                        
+
                 if record.partner_id.is_company and  not record.partner_id.vat :
-                    record.partner_id.vat = 300000000000003
+                    record.partner_id.vat = '300000000000003'
 
                 if not record.partner_id.street:
                     record.partner_id.street = '/'
