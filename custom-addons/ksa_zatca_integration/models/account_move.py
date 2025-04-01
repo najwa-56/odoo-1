@@ -1913,6 +1913,8 @@ class AccountMove(models.Model):
             ('invoice_date', '<=', end_date),
             ('move_type', '=', 'out_invoice'),            
             ('state', '=', 'posted'),
+            ('state', '=', 'posted'),
+            ('l10n_sa_zatca_status', 'ilike', 'Error')
              
              
             
