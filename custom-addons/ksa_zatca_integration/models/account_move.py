@@ -1903,11 +1903,13 @@ class AccountMove(models.Model):
 
 
     def send_invoice_batch(self, batch_size=600):
-        today = date.today()
-        two_days_ago = today - timedelta(days=2)
+        # today = date.today()
+        # two_days_ago = today - timedelta(days=2)
+        start_date = datetime(2024, 8, 31)  # 1st Jan 2025
+        end_date = datetime(2025, 1, 1)
         invoices = self.sudo().search([
-            ('invoice_date', '>=', two_days_ago),
-            ('invoice_date', '<=', today),
+            ('invoice_date', '>=', start_date),
+            ('invoice_date', '<=', end_date),
             ('move_type', '=', 'out_invoice'),            
             ('state', '=', 'posted'),
              
