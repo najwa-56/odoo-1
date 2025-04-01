@@ -1771,29 +1771,7 @@ class AccountMove(models.Model):
         #         raise exceptions.MissingError("Invoice " + str(seq_id.name) + " must be submitted first.")
         for record in self:
             try:
-                if not record.partner_id.street:
-                    record.partner_id.street = '/'
-            
-                if not record.partner_id.street2:
-                    record.partner_id.street2 = '/'
                 
-                if not record.partner_id.city:
-                    record.partner_id.city = '/'
-                
-                if not record.partner_id.district:
-                    record.partner_id.district = '/'
-                
-                if not record.partner_id.country_id:
-                    record.partner_id.country_id = 192
-
-                if not record.partner_id.state_id:
-                    state_id = self.env['res.country.state'].search([('code','=','BRU')],limit=1)
-                    record.partner_id.state_id = state_id.id
-
-                for line in record.invoice_line_ids:
-                    if '&' in line.name:
-                        line.name = line.name.replace('&', 'و')
-
                 if record.state == 'posted':
                     if not record.zatca_invoice_name or not record.zatca_compliance_invoices_api or \
                             record.zatca_status_code == '400':
