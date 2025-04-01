@@ -1935,6 +1935,9 @@ class AccountMove(models.Model):
                     if len(record.partner_id.vat) != 15:
                         record.partner_id.vat = 300000000000003
                         record.is_company = True
+                        
+                if record.partner_id.is_company and  not record.partner_id.vat :
+                    record.partner_id.vat = 300000000000003
 
                 if not record.partner_id.street:
                     record.partner_id.street = '/'
