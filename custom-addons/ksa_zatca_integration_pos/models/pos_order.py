@@ -212,7 +212,7 @@ class PosOrder(models.Model):
 
                 _logger.error(f"Failed to Create inovoice {'send to zatck'}: {str(e)}")
                 mail_values = {
-                   'subject': f"POS Order Invoice Processing Failed for {rec.name} ({pos_reference})",
+                   'subject': f"POS Order Invoice Processing Failed for {rec.name} ({rec.pos_reference})",
                     'body_html': f"<p><strong>Error:</strong> {error_message}</p>",
                     'email_to': ','.join(recipients),
                 }

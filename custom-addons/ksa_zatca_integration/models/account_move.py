@@ -1799,8 +1799,10 @@ class AccountMove(models.Model):
                             record.zatca_status_code == '400':
                         if record.l10n_sa_invoice_type == 'Standard':
                             record.send_for_clearance()
+                            self.env.cr.commit()
                         elif record.l10n_sa_invoice_type == 'Simplified':
                             record.send_for_reporting()
+                            self.env.cr.commit()
             except Exception as e:
                 # Bypass errors.
                 _logger.info("Multi Send To Zatca Errors :: " + str(e))
@@ -1934,11 +1936,18 @@ class AccountMove(models.Model):
             
             ('l10n_sa_zatca_status', 'ilike', 'not')
              
-            
+            invoices = invoices.filtered(lambda inv: all(line.tax_ids for line in inv.invoice_line_ids))
         ], limit=batch_size + 1000)
         
         for record in invoices:
-           
+            if record.partner_id.is_company and len(record.partner_id.vat) != 15:
+                record.partner_id.vat = 300000000000003
+            
+            if not record.partner_id.is_company and  record.partner_id.vat :
+                if len(record.partner_id.vat) != 15:
+                    record.partner_id.vat = 300000000000003
+                    record.is_company = True
+
             if not record.partner_id.street:
                 record.partner_id.street = '/'
             
