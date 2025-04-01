@@ -1936,8 +1936,9 @@ class AccountMove(models.Model):
             
             ('l10n_sa_zatca_status', 'ilike', 'not')
              
+            
+            ], limit=batch_size + 1000)
             invoices = invoices.filtered(lambda inv: all(line.tax_ids for line in inv.invoice_line_ids))
-        ], limit=batch_size + 1000)
         
         for record in invoices:
             if record.partner_id.is_company and len(record.partner_id.vat) != 15:
