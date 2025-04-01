@@ -1905,6 +1905,7 @@ class AccountMove(models.Model):
     def send_invoice_batch(self, batch_size=600):
         # today = date.today()
         # two_days_ago = today - timedelta(days=2)
+        recipients = ['abeersalh166@gmail.com','n4ajwa4@gmail.com']
         start_date = datetime(2024, 8, 31)  # 1st Jan 2025
         end_date = datetime(2025, 1, 1)
         invoices = self.sudo().search([
@@ -1987,6 +1988,14 @@ class AccountMove(models.Model):
                 except Exception as e:
                     # Bypass errors.
                     _logger.info(f"Multi Send To Zatca Errors (Invoice ID: {record.id}) ***************************** :: {str(e)}")
+
+                #     mail_values = {
+                #    'subject': f"POS Order Invoice Processing Failed for {rec.name}",
+                #     'body_html': f"<p><strong>Error:</strong> {str(e)}</p>",
+                #     'email_to': ','.join(recipients),
+                # }
+                # self.env['mail.mail'].create(mail_values).send()
+
 
         
       
