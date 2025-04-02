@@ -1776,7 +1776,7 @@ class AccountMove(models.Model):
         for record in self:
             try:
 
-                if record.state == 'posted':
+                if record.state == 'posted' and not partner_id.is_dolfin:
                     if not record.zatca_invoice_name or not record.zatca_compliance_invoices_api or \
                             record.zatca_status_code == '400':
                         if record.l10n_sa_invoice_type == 'Standard':
@@ -1895,6 +1895,7 @@ class AccountMove(models.Model):
             ('invoice_date', '<=', today),
             ('move_type', '=', 'out_invoice'),            
             ('state', '=', 'posted'),
+            ('partner_id.is_dolfin', '!=', True),
              
              
             
