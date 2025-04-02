@@ -1771,7 +1771,7 @@ class AccountMove(models.Model):
         #         raise exceptions.MissingError("Invoice " + str(seq_id.name) + " must be submitted first.")
         for record in self:
             try:
-                
+
                 if record.state == 'posted':
                     if not record.zatca_invoice_name or not record.zatca_compliance_invoices_api or \
                             record.zatca_status_code == '400':
@@ -1884,13 +1884,12 @@ class AccountMove(models.Model):
         # today = date.today()
         # two_days_ago = today - timedelta(days=2)
         recipients = ['abeersalh166@gmail.com','n4ajwa4@gmail.com']
-        start_date = datetime(2024, 8, 31)  # 1st Jan 2025
+        start_date = datetime(2024, 9, 1)  # 1st Jan 2025
         end_date = datetime(2025, 1, 1)
         invoices = self.sudo().search([
             ('invoice_date', '>=', start_date),
             ('invoice_date', '<=', end_date),
             ('move_type', '=', 'out_invoice'),            
-            ('state', '=', 'posted'),
             ('state', '=', 'posted'),
             ('l10n_sa_zatca_status', 'ilike', 'Error')
              
