@@ -8,7 +8,7 @@
 	    </record>
 	</data>
 
-	<template id="external_layout_seti">
+	<template id="external_layout_seti2">
 		<t t-if="o and 'company_id' in o">
         <t t-set="company" t-value="o.company_id"/>
     	</t>
@@ -16,7 +16,8 @@
         <t t-set="company" t-value="res_company"/>
     	</t>
 		<div class="header first-page">
-	    	<table style="border:1pt solid white;width:100%;font-size:12px; margin-top:10px;font-family:Alexandria-Regular !important" width="100%">
+		<br/>
+	    	<table style="border:1pt solid white;width:100%;font-size:12px; margin-top:30px;font-family:Alexandria-Regular !important" width="100%">
 	    		<link rel="stylesheet" href="/ksa_zatca_integration/static/src/css/style.css"/>
 	            <tr>
 					
@@ -26,6 +27,7 @@
 	            </tr>
 	        	
 	        </table>
+			<br/>
         </div>
         <div class="article o_report_layout_standard">
             <t t-raw="0"/>
@@ -36,7 +38,7 @@
 	</template>
 
 	<template id="report_tax_invoice_document2">
-		<t t-call="ksa_zatca_integration.external_layout_seti">
+		<t t-call="ksa_zatca_integration.external_layout_seti2">
 				<t t-foreach="doc" t-as="o">
 				<div class="page" dir="ltr">
 	    		<link rel="stylesheet" href="/ksa_zatca_integration/static/src/css/style.css"/>
