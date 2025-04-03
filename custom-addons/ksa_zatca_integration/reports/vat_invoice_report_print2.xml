@@ -16,11 +16,11 @@
         <t t-set="company" t-value="res_company"/>
     	</t>
 		<div class="header">
-	    	<table style="border:1pt solid white;width:100%;font-size:12px; margin-top:-10px;font-family:Alexandria-Regular !important" width="100%">
+	    	<table style="border:1pt solid white;width:100%;font-size:12px; margin-top:10px;font-family:Alexandria-Regular !important" width="100%">
 	    		<link rel="stylesheet" href="/ksa_zatca_integration/static/src/css/style.css"/>
 	            <tr>
 					
-	                <td colspan="3" width="40%" class="text-center"><img t-if="company.logo" t-att-src="image_data_uri(company.logo)" style="height: 150px;width: 150px;" alt="Logo"/></td>
+	               <td colspan="3" width="40%" class="text-center"><img t-if="company.logo" t-att-src="image_data_uri(company.logo)" style="height: 100px;width: 100px;" alt="Logo"/></td>
 
 	               
 	            </tr>
@@ -372,11 +372,11 @@
         <t t-set="company" t-value="res_company"/>
     	</t>
 		<div class="header">
-	    	<table style="border:1pt solid grey;width:100%;font-size:12px; margin-top:-10px;" width="100%">
+	    	<table style="border:1pt solid grey;width:100%;font-size:12px; margin-top:10px;" width="100%">
 	    		<link rel="stylesheet" href="/ksa_zatca_integration/static/src/css/style.css"/>
 	            <tr>
 	                
-	                <td  colspan="3" width="30%" class="text-right"><img t-if="company.logo" t-att-src="image_data_uri(company.logo)" style="height: 80px;width: 80px;margin-top=-5px;" alt="Logo"/></td>
+	                <td colspan="3" width="40%" class="text-center"><img t-if="company.logo" t-att-src="image_data_uri(company.logo)" style="height: 100px;width: 100px;" alt="Logo"/></td>
 
 	                </tr>
 	        </table>

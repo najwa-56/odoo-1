@@ -16,16 +16,17 @@
         <t t-set="company" t-value="res_company"/>
     	</t>
 		<div class="header">
-	    	<table style="border:1pt solid white;width:100%;font-size:12px; margin-top:-10px;font-family:Alexandria-Regular !important" width="100%">
+	    	<table style="border:1pt solid white;width:100%;font-size:12px; margin-top:10px;font-family:Alexandria-Regular !important" width="100%">
 	    		<link rel="stylesheet" href="/ksa_zatca_integration/static/src/css/style.css"/>
 	            <tr>
 					
-	                <td colspan="3" width="40%" class="text-center"><img t-if="company.logo" t-att-src="image_data_uri(company.logo)" style="height: 150px;width: 150px;" alt="Logo"/></td>
+	               <td colspan="3" width="40%" class="text-center"><img t-if="company.logo" t-att-src="image_data_uri(company.logo)" style="height: 100px;width: 100px;" alt="Logo"/></td>
 
 	               
 	            </tr>
 	        	
 	        </table>
+			<br/>
         </div>
         <div class="article o_report_layout_standard">
             <t t-raw="0"/>
@@ -46,7 +47,7 @@
 					<br/>
                     					<br/>
 
-					<table style="border:2pt solid black;width:100%;color:black; margin-top:-30pt; font-family:ArbFONTS-GE_Dinar_One_Medium !important" class="table-condensed table-sm">
+					<table style="border:2pt solid black;width:100%;color:black; margin-top:20pt; font-family:ArbFONTS-GE_Dinar_One_Medium !important" class="table-condensed table-sm">
 							<tr style="border:2pt solid black">
 								<td style="font-weight: bold;text-align:center;color:black;background-color:#dddddd;FONT-SIZE: 12pt"><span class="text-right arabic">  الفاتورة الضريبية  </span></td> 
 							</tr>
@@ -108,11 +109,11 @@
 		                <div class="col-6">
 							<center>
 							<t t-if="o.move_type ==  'in_invoice'">
-								<span class="arabic" style="font-weight: bold;text-align:center !important;">معلومات المستفيد</span>
+								<span class="arabic" style="font-weight: bold;text-align:center !important;">بيانات العميل</span>
 							</t>
 							
 							<t t-else="">
-							<span class="text-center !important arabic" style="font-weight: bold;text-align:center !important">معلومات البائع</span>
+							<span class="text-center !important arabic" style="font-weight: bold;text-align:center !important">بيانات المنشأة</span>
 							</t>
 							
 						</center>
@@ -266,7 +267,7 @@
 		<thead>
 							
 			<center>
-				<span class="arabic" style="font-weight: bold;text-align:center !important;">المبالغ الإجمالية</span>
+				<span class="arabic" style="font-weight: bold;text-align:center !important;">المبلغ الإجمالي</span>
 			</center>
 			<t t-set="discount_before_total" t-value="doc.amount_untaxed + discount_total"/>
 			<tr style="border:2pt solid black">
@@ -319,10 +320,11 @@
 					</div>
 
 					<!-- New Condition Text -->
-<div class="col-12" style="text-align:center; font-size:16pt; font-weight:bold; color:red; margin-top:10pt;">
-البضاعة التي تعرضت لتلف وبضاعة الشوكولاته لاترد ولا تستبدل عدا ذلك يلزم إحضار أصل الفاتورة
-</div>
-					
+<div class="col-12 arabic" style="text-align:center; font-size:12pt; font-weight:bold; color:red; margin-top:5pt;">
+    <p>  سياسة الاستبدال والاسترجاع خلال 15 يوم و يُشترط إحضار أصل الفاتورة</p>
+    
+    <p>لا يُمكن استرجاع أو استبدال المنتجات التالفة أو منتجات الشوكولاتة</p>
+</div>			
 					
 					</div>
 				</div>
@@ -346,11 +348,11 @@
         <t t-set="company" t-value="res_company"/>
     	</t>
 		<div class="header">
-	    	<table style="border:1pt solid grey;width:100%;font-size:12px; margin-top:-10px;" width="100%">
+	    	<table style="border:1pt solid grey;width:100%;font-size:12px; margin-top:10px;" width="100%">
 	    		<link rel="stylesheet" href="/ksa_zatca_integration/static/src/css/style.css"/>
 	            <tr>
 	                
-	                <td  colspan="3" width="30%" class="text-right"><img t-if="company.logo" t-att-src="image_data_uri(company.logo)" style="height: 80px;width: 80px;margin-top=-5px;" alt="Logo"/></td>
+	                <td colspan="3" width="40%" class="text-center"><img t-if="company.logo" t-att-src="image_data_uri(company.logo)" style="height: 100px;width: 100px;" alt="Logo"/></td>
 
 	                </tr>
 	        </table>

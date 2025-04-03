@@ -9,7 +9,7 @@
         <t t-set="company" t-value="res_company"/>
     	</t>
 		<div class="header">
-	    	<table style="border:1pt solid white;width:100%;font-size:12px; margin-top:-10px;font-family:Alexandria-Regular !important" width="100%">
+	    	<table style="border:1pt solid white;width:100%;font-size:12px; margin-top:10px;font-family:Alexandria-Regular !important" width="100%">
 	    		<link rel="stylesheet" href="/mai_e_invoice_ksa/static/src/css/style.css"/>
 	            <tr>
 					<td colspan="2" width="30%" class="text-left">
@@ -21,7 +21,7 @@
 					
 	                <br/>
 					
-						<td colspan="3" width="40%" class="text-center"><img t-if="company.logo" t-att-src="image_data_uri(company.logo)" style="height: 150px;width: 150px;" alt="Logo"/></td>
+						<td colspan="3" width="40%" class="text-center"><img t-if="company.logo" t-att-src="image_data_uri(company.logo)" style="height: 100px;width: 100px;" alt="Logo"/></td>
 	
 					   
 
@@ -30,9 +30,7 @@
 	                	<t t-if="company.street">
 	                		<span style="padding-left:5px;" t-field="company.street"/><br/>
 	                	</t>
-	                	<t t-if="company.street2">
-	                		<span style="padding-left:5px;" t-field="company.street2"/><br/>
-	                	</t>
+	                	
 	                	<t t-if="company.city">
 	                		<span style="padding-left:5px;" t-field="company.city"/><br/>
 	                	</t>
@@ -45,14 +43,13 @@
 						<t t-if="company.company_registry">
 	                		<span style="padding-left:5px;" t-field="company.company_registry"/><br/>
 	                	</t>
-						<t t-if="company.vat">
-							<span class="text-left arabic" style="padding-left:5px;" t-field="company.vat"/><br/>
-						</t>
+						
 						
 	                </td>
 	            </tr>
 	        	
 	        </table>
+			<br/>
         </div>
         <div class="article o_report_layout_standard">
             <t t-raw="0"/>
@@ -69,12 +66,17 @@
 					<link rel="stylesheet" href="/ksa_zatca_integration/static/src/css/style.css"/>
 					<t t-set="company" t-value="res_company"/>
 					<div class="font">
-						<table style="border:1pt solid grey;width:100%;color:black; margin-top:5pt;" class="table-condensed table-sm">
+						<table style="border:1pt solid grey;width:100%;color:black; margin-top:20pt;" class="table-condensed table-sm">
 							<tr>
 								<td style="padding:4pt;margin:5pt;font-weight: bold;text-align:center;background-color:#DCDCDC;"><span class="text-right arabic">Simplified Tax Invoice / فاتورة ضريبية مبسطة</span></td> 
 							</tr>
 					    </table>
 					    <br/>
+						<div class="col-3" style="margin-top:5pt; padding-left:25pt;">
+						<img t-if="o.pos_reference"  t-attf-src="/report/barcode/Code128/{{o.pos_reference.split(' ')[1]}}"
+						style="width:250px;height:50px;display:block;margin:auto;"
+						alt="Barcode" />
+					</div>
 						<div class="row mt32 mb32">
 		                <div class="col-9">
 							<table style="border:1pt solid grey;width:100%;padding:10pt;margin-top:10pt;color:black;" class="table table-bordered table-sm">
@@ -203,7 +205,7 @@
 		<thead>
 							
 			<center>
-				<span class="arabic" style="font-weight: bold;text-align:center !important;">المبالغ الإجمالية</span>
+				<span class="arabic" style="font-weight: bold;text-align:center !important;">المبلغ الإجمالي</span>
 			</center>
 			<t t-set="discount_before_total" t-value="doc.amount_untaxed + discount_total"/>
 			<tr style="border:2pt solid black">
@@ -247,11 +249,14 @@
 							</tr>
 						</thead>
 					</table>
-					<div class="col-3" style="margin-top:5pt; padding-left:25pt;">
-						<img t-if="o.pos_reference"  t-attf-src="/report/barcode/Code128/{{o.pos_reference.split(' ')[1]}}"
-						style="width:250px;height:50px;display:block;margin:auto;"
-						alt="Barcode" />
-					</div>
+					
+<div class="col-12 arabic" style="text-align:center; font-size:12pt; font-weight:bold; color:red; margin-top:5pt;">
+    <p>  سياسة الاستبدال والاسترجاع خلال 15 يوم و يُشترط إحضار أصل الفاتورة</p>
+    
+    <p>لا يُمكن استرجاع أو استبدال المنتجات التالفة أو منتجات الشوكولاتة</p>
+</div>
+
+
 
 					</div>
 				</div>
