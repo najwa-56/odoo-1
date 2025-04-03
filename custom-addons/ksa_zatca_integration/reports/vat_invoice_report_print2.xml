@@ -15,7 +15,7 @@
     	<t t-if="not o or not 'company_id' in o">
         <t t-set="company" t-value="res_company"/>
     	</t>
-		<div class="header">
+		<div class="header first-page">
 	    	<table style="border:1pt solid white;width:100%;font-size:12px; margin-top:10px;font-family:Alexandria-Regular !important" width="100%">
 	    		<link rel="stylesheet" href="/ksa_zatca_integration/static/src/css/style.css"/>
 	            <tr>
@@ -371,7 +371,7 @@
     	<t t-if="not o or not 'company_id' in o">
         <t t-set="company" t-value="res_company"/>
     	</t>
-		<div class="header">
+		<div class="header first-page">
 	    	<table style="border:1pt solid grey;width:100%;font-size:12px; margin-top:10px;" width="100%">
 	    		<link rel="stylesheet" href="/ksa_zatca_integration/static/src/css/style.css"/>
 	            <tr>
