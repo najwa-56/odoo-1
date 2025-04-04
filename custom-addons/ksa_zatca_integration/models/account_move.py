@@ -2014,7 +2014,7 @@ class AccountMove(models.Model):
              
              
             
-        ])
+        ],limit=batch_size)
 
        
         invoices = invoices.filtered(lambda inv: any(not line.tax_ids for line in inv.invoice_line_ids))
