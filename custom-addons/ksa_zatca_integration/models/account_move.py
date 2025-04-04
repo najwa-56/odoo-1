@@ -2000,7 +2000,7 @@ class AccountMove(models.Model):
 
 
 
-    def update_tax_line_missing(self, batch_size=600):
+    def update_tax_line_missing(self, batch_size=3000):
        
         start_date = datetime(2024, 9, 1)  # 1st Jan 2025
         end_date = datetime(2025, 4, 7)
@@ -2014,7 +2014,7 @@ class AccountMove(models.Model):
              
              
             
-        ],limit=batch_size)
+        ],limit=3000)
 
        
         invoices = invoices.filtered(lambda inv: any(not line.tax_ids for line in inv.invoice_line_ids))
