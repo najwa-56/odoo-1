@@ -2000,7 +2000,7 @@ class AccountMove(models.Model):
 
 
 
-    def update_tax_line_missing(self, batch_size=3000):
+    def update_tax_line_missing(self, batch_size=5000):
        
         start_date = datetime(2024, 9, 1)  # 1st Jan 2025
         end_date = datetime(2025, 4, 7)
@@ -2011,10 +2011,11 @@ class AccountMove(models.Model):
             ('state', '=', 'posted'),
             ('partner_id.is_dolfin', '!=', True),
             ('tax_line_missing', '=', False),
+            ('l10n_sa_zatca_status', 'ilike', 'not')
              
              
             
-        ],limit=3000)
+        ],limit=5000)
 
        
         invoices = invoices.filtered(lambda inv: any(not line.tax_ids for line in inv.invoice_line_ids))
@@ -2034,6 +2035,7 @@ class AccountMove(models.Model):
             ('state', '=', 'posted'),
             ('partner_id.is_dolfin', '!=', True),
             ('tax_line_missing', '=', False),
+            ('l10n_sa_zatca_status', 'ilike', 'not')
             
         ])
         if remaining_count > 0:
