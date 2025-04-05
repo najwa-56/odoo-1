@@ -2000,43 +2000,4 @@ class AccountMove(models.Model):
 
 
 
-    def update_tax_line_missing(self, batch_size=5000):
-       
-        start_date = datetime(2024, 9, 1)  # 1st Jan 2025
-        end_date = datetime(2025, 4, 7)
-        invoices = self.sudo().search([
-            ('invoice_date', '>=', start_date),
-            ('invoice_date', '<=', end_date),
-            ('move_type', '=', 'out_invoice'),            
-            ('state', '=', 'posted'),
-            ('partner_id.is_dolfin', '!=', True),
-            ('tax_line_missing', '=', False),
-            ('l10n_sa_zatca_status', 'ilike', 'not')
-             
-             
-            
-        ],limit=5000)
-
-       
-        invoices = invoices.filtered(lambda inv: any(not line.tax_ids for line in inv.invoice_line_ids))
-        
-        _logger.info(f"fitlered invoice not have tax line missing (InvoiceIDs: {len(invoices)}) *****************************")
-        
-        for record in invoices:
-            record.write({
-                'tax_line_missing':True
-            })
-            self.env.cr.commit() 
-
-        remaining_count = self.sudo().search_count([
-            ('invoice_date', '>=', start_date),
-            ('invoice_date', '<=', end_date),
-            ('move_type', '=', 'out_invoice'),            
-            ('state', '=', 'posted'),
-            ('partner_id.is_dolfin', '!=', True),
-            ('tax_line_missing', '=', False),
-            ('l10n_sa_zatca_status', 'ilike', 'not')
-            
-        ])
-        if remaining_count > 0:
-            self.env.ref('ksa_zatca_integration.cron_update_tax_line_missing')._trigger()
+    

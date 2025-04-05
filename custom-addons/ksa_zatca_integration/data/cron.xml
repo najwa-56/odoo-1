@@ -31,17 +31,6 @@
 
 
 
-   <record id="cron_update_tax_line_missing" model="ir.cron">
-    <field name="name">Update Tax Line Missing</field>
-    <field name="model_id" ref="model_account_move" />
-    <field name="state">code</field>
-    <field name="code">model.update_tax_line_missing(batch_size=600)</field>
-    <field name="user_id" ref="base.user_root" />
-    <field name="interval_number">20</field>
-    <field name="interval_type">minutes</field>
-    <field name="numbercall">-1</field>
-    <field name="active">True</field>
-</record>
 
 
 
