@@ -1886,7 +1886,7 @@ class AccountMove(models.Model):
 
 
 
-    def send_invoice_batch(self, batch_size=600):
+    def send_invoice_batch(self):
         today = date.today()
         two_days_ago = today - timedelta(days=2)
         recipients = ['abeersalh166@gmail.com','n4ajwa4@gmail.com']
@@ -1975,11 +1975,11 @@ class AccountMove(models.Model):
                     _logger.info(f"Multi Send To Zatca Errors (Invoice ID: {record.id}) ***************************** :: {str(e)}")
 
                     mail_values = {
-                   'subject': f"Sent Invoice To Zatca Processing Failed for {rec.name}",
-                    'body_html': f"<p><strong>Error:</strong> {str(e)}</p>",
-                    'email_to': ','.join(recipients),
-                }
-                self.env['mail.mail'].create(mail_values).send()
+                        'subject': f"Sent Invoice To Zatca Processing Failed for {rec.name}",
+                        'body_html': f"<p><strong>Error:</strong> {str(e)}</p>",
+                        'email_to': ','.join(recipients),
+                        }
+                    self.env['mail.mail'].create(mail_values).send()
 
 
         
@@ -1999,5 +1999,50 @@ class AccountMove(models.Model):
         #     self.env.ref('ksa_zatca_integration.ir_cron_send_inovoice_job_count')._trigger()
 
 
+
+    def resend_invoice(self):
+        today = date.today()
+        two_days_ago = today - timedelta(days=2)      
+        invoices = self.sudo().search([
+            ('invoice_date', '>=', two_days_ago),
+            ('invoice_date', '<=', today),
+            ('move_type', '=', 'out_invoice'),            
+            ('state', '=', 'posted'),
+            ('partner_id.is_dolfin', '!=', True),
+            ('l10n_sa_zatca_status', 'ilike', 'error')
+             
+             
+            
+        ])
+
+        if not invoices:
+            return
+
+        invoices = invoices.filtered(lambda inv: all(line.tax_ids for line in inv.invoice_line_ids))        
+        
+        for record in invoices:
+
+            try:
+            
+                for line in record.invoice_line_ids:
+                    if '&' in line.name:
+                        line.name = line.name.replace('&', 'و')
+                
+                if record.l10n_sa_invoice_type == 'Standard':
+                    record.send_for_clearance()
+                    self.env.cr.commit() 
+                    
+                elif record.l10n_sa_invoice_type == 'Simplified':
+                    record.send_for_reporting()
+                    self.env.cr.commit() 
+                
+                
+                
+                        
+            except Exception as e:
+                # Bypass errors.
+                _logger.info(f"Multi Send To Zatca Errors (Invoice ID: {record.id}) ***************************** :: {str(e)}")
+
+               
 
     
