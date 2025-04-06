@@ -2029,11 +2029,13 @@ class AccountMove(models.Model):
                         line.name = line.name.replace('&', 'و')
                 
                 if record.l10n_sa_invoice_type == 'Standard':
-                    record.send_for_clearance()
+                    record.create_xml_file()
+                    record.invoices_clearance_single_api()
                     self.env.cr.commit() 
                     
                 elif record.l10n_sa_invoice_type == 'Simplified':
-                    record.send_for_reporting()
+                    record.create_xml_file()
+                    record.invoices_reporting_single_api(no_xml_generate=0)
                     self.env.cr.commit() 
                 
                 
