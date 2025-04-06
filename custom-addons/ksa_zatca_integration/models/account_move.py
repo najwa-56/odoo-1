@@ -1975,7 +1975,7 @@ class AccountMove(models.Model):
                     _logger.info(f"Multi Send To Zatca Errors (Invoice ID: {record.id}) ***************************** :: {str(e)}")
 
                     mail_values = {
-                   'subject': f"POS Order Invoice Processing Failed for {rec.name}",
+                   'subject': f"Sent Invoice To Zatca Processing Failed for {rec.name}",
                     'body_html': f"<p><strong>Error:</strong> {str(e)}</p>",
                     'email_to': ','.join(recipients),
                 }
