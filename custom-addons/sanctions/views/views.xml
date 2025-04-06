@@ -17,6 +17,7 @@
         <tree>
           <field name="reference_no" readonly ="1"/>
           <field name="name"/>
+          <field name="type"/>
           <!-- <field name="value2"/> -->
         </tree>
       </field>
@@ -30,6 +31,7 @@
           <sheet>
             <group>
             <field name="name"/>
+             <field name="type" required="1"/>
             <!-- <field name="jobs" widget="many2many_tags"/> -->
             </group>
                 <notebook>

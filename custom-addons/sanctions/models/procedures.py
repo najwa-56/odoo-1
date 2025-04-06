@@ -53,27 +53,32 @@ class Procedures(models.Model):
     def _onchange_sanction(self):
         if self.sanction:
             sanction_employee = self.env['sanctions.procedures'].search_count([('employee','=',self.employee.id),('sanction','=',self.sanction.id)])
-            
-            if sanction_employee == 0 and self.sanction.rols.filtered(lambda r: r.times == 'first'):
+            if self.sanction.type == 'continuous':
+                if sanction_employee == 0 and self.sanction.rols.filtered(lambda r: r.times == 'first'):
+                    self.stime = "أول مرة"
+                    self.stype = self.sanction.rols.filtered(lambda r: r.times == 'first').type
+                    self.samount = self.sanction.rols.filtered(lambda r: r.times == 'first').amount
+                elif sanction_employee == 1 and self.sanction.rols.filtered(lambda r: r.times == 'second'):
+                    self.stime = "ثاني مرة"
+                    self.stype = self.sanction.rols.filtered(lambda r: r.times == 'second').type
+                    self.samount = self.sanction.rols.filtered(lambda r: r.times == 'second').amount
+                elif sanction_employee == 2 and self.sanction.rols.filtered(lambda r: r.times == 'third'):
+                    self.stime = "ثالث مرة"
+                    self.stype = self.sanction.rols.filtered(lambda r: r.times == 'third').type
+                    self.samount = self.sanction.rols.filtered(lambda r: r.times == 'third').amount
+                elif sanction_employee == 3 and self.sanction.rols.filtered(lambda r: r.times == 'fourth'):
+                    self.stime = "رابع مرة"
+                    self.stype = self.sanction.rols.filtered(lambda r: r.times == 'fourth').type
+                    self.samount = self.sanction.rols.filtered(lambda r: r.times == 'fourth').amount
+                else:
+                    self.stime = "أكثر من "+str(sanction_employee)+" مرات"
+                    self.stype = self.sanction.rols.filtered(lambda r: r.times == 'more').type
+                    self.samount = self.sanction.rols.filtered(lambda r: r.times == 'more').amount
+            else:
                 self.stime = "أول مرة"
                 self.stype = self.sanction.rols.filtered(lambda r: r.times == 'first').type
                 self.samount = self.sanction.rols.filtered(lambda r: r.times == 'first').amount
-            elif sanction_employee == 1 and self.sanction.rols.filtered(lambda r: r.times == 'second'):
-                self.stime = "ثاني مرة"
-                self.stype = self.sanction.rols.filtered(lambda r: r.times == 'second').type
-                self.samount = self.sanction.rols.filtered(lambda r: r.times == 'second').amount
-            elif sanction_employee == 2 and self.sanction.rols.filtered(lambda r: r.times == 'third'):
-                self.stime = "ثالث مرة"
-                self.stype = self.sanction.rols.filtered(lambda r: r.times == 'third').type
-                self.samount = self.sanction.rols.filtered(lambda r: r.times == 'third').amount
-            elif sanction_employee == 3 and self.sanction.rols.filtered(lambda r: r.times == 'fourth'):
-                self.stime = "رابع مرة"
-                self.stype = self.sanction.rols.filtered(lambda r: r.times == 'fourth').type
-                self.samount = self.sanction.rols.filtered(lambda r: r.times == 'fourth').amount
-            else:
-                self.stime = "أكثر من "+str(sanction_employee)+" مرات"
-                self.stype = self.sanction.rols.filtered(lambda r: r.times == 'more').type
-                self.samount = self.sanction.rols.filtered(lambda r: r.times == 'more').amount
+
         else:
             self.stime = None
             self.stype = None

@@ -12,6 +12,17 @@ class Sanctions(models.Model):
     # jobs = fields.Many2many('hr.job',string='تطبق على الوظائف',required=True)
     rols = fields.One2many('sanctions.roles','model_id',string='القواعد',required=True)
     reference_no = fields.Char(string='الكود', readonly=True, default=lambda self: _('New'))
+
+    type = fields.Selection([
+        ('continuous', 'Continuous'),
+        ('frequently', 'Frequently'),
+      
+        
+
+    ], string='Type',  copy=False,
+       tracking=True, help='Type of the sanctions', default='continuous')
+
+
     @api.model
     def create(self, vals):
         if vals.get('reference_no', _('New')) == _('New'):
