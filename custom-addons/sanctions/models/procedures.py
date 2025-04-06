@@ -49,7 +49,7 @@ class Procedures(models.Model):
             # self.stype = self.sanction.rols.search([('times','=','first')]).type
             # self.samount = self.env['sanctions.procedures'].search_count([('employee','=',self.employee.id)])
 
-    @api.onchange('sanction')
+    @api.onchange('sanction','dateof')
     def _onchange_sanction(self):
         if self.sanction:
             
