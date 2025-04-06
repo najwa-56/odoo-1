@@ -29,6 +29,14 @@
                 <field name="multi_discount" groups="mixed_discount_app.mixed_discount_purchase"/>
                 <field name="discount" optional="hide" groups="mixed_discount_app.mixed_discount_purchase"/>
             </xpath>
+
+            <xpath expr="//field[@name='currency_id']" position="after">
+                <field name="global_discount"/>
+                <field name="per_product_discount" readonly="1"/>
+                <button name="action_apply_global_discount" string="Apply Discount" type="object" class="btn-secondary" />
+            </xpath>
+
+            
         </field>
     </record>
 
