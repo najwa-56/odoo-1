@@ -15,23 +15,18 @@ class PurchaseOrder(models.Model):
     global_discount = fields.Monetary(string="Global Discount")
     per_product_discount = fields.Monetary(string="Per Product Discount", compute="_compute_per_product_discount", store=True)
 
-    @api.depends('global_discount', 'order_line.product_qty')
+    @api.depends('global_discount', 'amount_total')
     def _compute_per_product_discount(self):
         for order in self:
-            total_qty = sum(order.order_line.mapped('product_qty'))
-            order.per_product_discount = order.global_discount / total_qty if total_qty else 0.0
+            order.per_product_discount = order.global_discount / order.amount_total if order.amount_total > 0 else 1 
 
     def action_apply_global_discount(self):
         for order in self:
-            total_qty = sum(order.order_line.mapped('product_qty'))
-            if total_qty == 0:
-                continue
-            per_product_discount = order.global_discount / total_qty
             for line in order.order_line:
                 if line.price_unit == 0:
-                    raise ValidationError(f"Product '{line.product_id.display_name}' has no unit price set.")
-                discount_amount = per_product_discount * line.product_qty
-                discount_percent = (discount_amount / (line.price_unit * line.product_qty)) * 100
+					continue
+                    # raise ValidationError(f"Product '{line.product_id.display_name}' has no unit price set.")
+                discount_percent = (order.per_product_discount  / (line.price_unit * line.product_qty)) * 100
                 line.discount =  line.discount + round(discount_percent, 2)
 
 
