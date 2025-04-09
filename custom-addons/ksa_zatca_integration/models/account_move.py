@@ -1942,6 +1942,14 @@ class AccountMove(models.Model):
                 
                 if not record.partner_id.country_id:
                     record.partner_id.country_id = 192
+                
+                if not record.partner_id.building_no:
+                    record.partner_id.building_no = '1234'
+
+                if not record.partner_id.zip:
+                    record.partner_id.zip = '12345'
+
+            
 
                 if not record.partner_id.state_id:
                     state_id = self.env['res.country.state'].search([('code','=','BRU')],limit=1)
