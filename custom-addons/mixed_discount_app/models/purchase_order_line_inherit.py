@@ -24,8 +24,7 @@ class PurchaseOrder(models.Model):
         for order in self:
             for line in order.order_line:
                 if line.price_unit == 0:
-					continue
-                    # raise ValidationError(f"Product '{line.product_id.display_name}' has no unit price set.")
+                    continue
                 discount_percent = (order.per_product_discount  / (line.price_unit * line.product_qty)) * 100
                 line.discount =  line.discount + round(discount_percent, 2)
 
