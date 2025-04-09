@@ -12,10 +12,10 @@ import re
 class PurchaseOrder(models.Model):
     _inherit = 'purchase.order'
 
-    global_discount = fields.Monetary(string="Global Discount")
-    per_product_discount = fields.Monetary(string="Per Product Discount", compute="_compute_per_product_discount", store=True)
+    global_discount = fields.Float(string="Global Discount",digits='Discount')
+    per_product_discount = fields.Float(string="Per Product Discount", compute="_compute_per_product_discount", digits='Discount' , store=True)
 
-    @api.depends('global_discount', 'amount_total')
+    @api.depends('global_discount')
     def _compute_per_product_discount(self):
         for order in self:
             order.per_product_discount = order.global_discount / order.amount_total if order.amount_total > 0 else 1 
@@ -25,8 +25,8 @@ class PurchaseOrder(models.Model):
             for line in order.order_line:
                 if line.price_unit == 0:
                     continue
-                discount_percent = (order.per_product_discount  / (line.price_unit * line.product_qty)) * 100
-                line.discount =  line.discount + round(discount_percent, 2)
+                line.discount =  order.per_product_discount
+				
 
 
 class PurchaseOrderLine(models.Model):
@@ -121,6 +121,15 @@ class PurchaseOrderLine(models.Model):
 			for sale_id in self:
 				sale_id.get_multi_discount()
 		return res
+
+
+	# @api.depends('product_qty', 'product_uom', 'company_id', 'purchase_multi_uom_cost')
+    # def _compute_price_unit_and_date_planned_and_name(self):
+	# 	super()._compute_price_unit_and_date_planned_and_name()
+    #     for line in self:
+	# 		line.price_unit = float_round(line.product_id.standard_price, precision_digits=max(line.currency_id.decimal_places,
+    #                                                                    self.env['decimal.precision'].precision_get(
+    #                                                                        'Product Price')))
 
 	# @api.depends('discount')
 	# def _compute_amount(self):
