@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+
+   
+	
+		<record id="hr_salary_rule_employee_bonus_allowance" model="hr.salary.rule">
+            <field name="name">Employee Bonus</field>
+            <field name="category_id" ref="om_hr_payroll.ALW"/>
+            <field name="code">BONUS_AMOUNT</field>
+            <field name="sequence" eval="40"/>
+            <field name="condition_select">python</field>
+            <field name="condition_python">result = (inputs.BONUS_AMOUNT and inputs.BONUS_AMOUNT.amount > 0)</field>
+            <field name="amount_select">code</field>
+            <field name="amount_python_compute">result = inputs.BONUS_AMOUNT and inputs.BONUS_AMOUNT.amount</field>
+        </record>
+        
+        
+        <record id="hr_salary_rule_employee_bonus_percentage_allowance" model="hr.salary.rule">
+            <field name="name">Employee Bonus in Percentage</field>
+            <field name="category_id" ref="om_hr_payroll.ALW"/>
+            <field name="code">BONUS_PERCENTAGE</field>
+            <field name="sequence" eval="40"/>
+            <field name="condition_select">python</field>
+            <field name="condition_python">result = (inputs.BONUS_PERCENTAGE and inputs.BONUS_PERCENTAGE.amount > 0)</field>
+            <field name="amount_select">code</field>
+            <field name="amount_python_compute">result = (contract.wage + (categories.HRA or 0.0)) * (inputs.BONUS_PERCENTAGE and inputs.BONUS_PERCENTAGE.amount or 0.0) / 100</field>
+        </record>
+</odoo>

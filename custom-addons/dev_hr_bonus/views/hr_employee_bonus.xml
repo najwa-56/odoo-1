@@ -1,0 +1,89 @@
+<?xml version='1.0' encoding='utf-8'?>
+<odoo>
+		<!-- Hr Bonus  form view -->
+		<record id="hr_bonus_view" model="ir.ui.view">
+			<field name="name">hr.bonus.view</field>
+			<field name="model">hr.bonus</field>
+			<field name="arch" type="xml">
+				<form string="Hr Bonus">
+					<header>
+	                    <button name="do_confirm" string="Confirm" invisible="state != 'tentative'" type="object" class="oe_highlight"/>
+	                    <button name="mail_send" invisible="state != 'confirmed'" string="Send mail To Employee" type="object" class="oe_highlight"/>
+	                    <button name="do_done" invisible="state != 'mail_sent'" string="Validate" type="object" class="oe_highlight" />
+	                    <button name="do_cancel" string="Cancel" invisible="state != 'confirmed'" type="object"/>
+	                    <button name="set_to_draft" string="Set to Draft" invisible="state != 'cancelled'" type="object"/>
+	                    <field name="state" widget="statusbar" statusbar_visible="tentative,confirmed,mail_sent,done,cancel" />
+                	</header>
+					<sheet>
+                        <div class="oe_title">
+                            <h1>
+                                <field name="name" placeholder="Bonus Summary" style="width: 60%%"/>
+                            </h1>
+                        </div>
+                        <group>
+                            <group><field name="date" required="1" readonly="state in ['done', 'confirmed']"/></group>
+                            <group><field name="applied_date" readonly="state in ['done', 'confirmed']"/></group>
+                        </group>
+
+                        <group>
+	                    	<group>
+	                    		<field name="bonus_target" readonly="state in ['done', 'confirmed']"/>
+	                    	</group>
+	                    	<group >
+	                    		<field name="amount" invisible="bonus_target != 'amount'" readonly="state in ['done', 'confirmed']"/>
+								<field name="percentage_amt" class="oe_inline" invisible="bonus_target != 'per'" readonly="state in ['done', 'confirmed']"/>
+	                    	</group>
+	                    </group>
+
+					    <group>
+	                    	<group>
+	                    		<field name="target" readonly="state in ['done', 'confirmed']"/>
+                                <field name="country_ids" widget="many2many_tags" invisible="target != 'country'" readonly="state in ['done', 'confirmed']" />
+		                    	<field name="state_ids" widget="many2many_tags" invisible="target != 'state'" readonly="state in ['done', 'confirmed']"/>
+		                    	<field name="company_ids" widget="many2many_tags" invisible="target != 'company'" readonly="state in ['done', 'confirmed']"/>
+		                    	<field name="department_ids" widget="many2many_tags" invisible="target != 'department'" readonly="state in ['done', 'confirmed']"/>
+		                    	<field name="job_ids" widget="many2many_tags" invisible="target != 'job'" readonly="state in ['done', 'confirmed']"/>
+	                    	</group>
+	                    	<group>
+						    </group>
+	                    </group>
+
+                    <notebook>
+                        <page string="Bonus Detail">
+                            <separator string="Bonus Description"/>
+                            <field name="description"/>
+                        </page>
+                        <page string="Employees">
+                            <field name="employee_ids" colspan="4"
+                                nolabel="1" widget="one2many" mode="tree" readonly="state in ['done', 'confirmed']">
+                                <tree string="Bonus Applied to Employees" editable="top">
+                                    <field name="employee_id" string="To" />
+                                    <field name="email"/>
+                                    <field name="mail_sent" readonly="1"/>
+<!--										<field name="amount" readonly="1"/>-->
+<!--		                                <field name="percentage_amt" invisible="1"/>-->
+                                    <field name="company_id" invisible="1"/>
+                                </tree>
+                             </field>
+                        </page>
+	                	</notebook>
+					</sheet>
+				</form>
+			</field>
+		</record>
+		
+
+		 
+		<!-- action Hr Bonus -->
+		<record id="hr_bonus_action_file" model="ir.actions.act_window">
+			<field name="name">Hr Bonus</field>
+			<field name="res_model">hr.bonus</field>
+			<field name="view_mode">tree,form,kanban</field>
+			<field name="help" type="html">
+				<p class="oe_view_nocontent_create">Click here to create new Bonus.
+                </p>
+			</field>
+		</record>
+		<menuitem parent="hr.menu_human_resources_configuration" action="hr_bonus_action_file" sequence="1" id="action_menu_marksheet" name="Hr Bonus"  />
+
+</odoo>
