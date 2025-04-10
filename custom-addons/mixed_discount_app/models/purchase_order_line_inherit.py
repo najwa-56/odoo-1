@@ -18,14 +18,14 @@ class PurchaseOrder(models.Model):
     @api.depends('global_discount')
     def _compute_per_product_discount(self):
         for order in self:
-            order.per_product_discount = order.global_discount / order.amount_total if order.amount_total > 0 else 1 
+            order.per_product_discount = (order.global_discount / order.amount_untaxed if order.amount_untaxed > 0 else 1 ) * 100
 
     def action_apply_global_discount(self):
         for order in self:
             for line in order.order_line:
                 if line.price_unit == 0:
                     continue
-                line.discount =  order.per_product_discount
+                line.discount =  line.discount + order.per_product_discount
 				
 
 
