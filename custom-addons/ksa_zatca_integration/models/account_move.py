@@ -1749,7 +1749,7 @@ class AccountMove(models.Model):
     def send_cron_multiple_to_zatca(self):
         # Get today's date
         today = date.today()
-        two_days_ago = today - timedelta(days=2)
+        two_days_ago = today - timedelta(days=7)
         
         # Filter invoices with today's date only
         invoices = self.search([('invoice_date','>=',two_days_ago)])
@@ -1778,7 +1778,7 @@ class AccountMove(models.Model):
         for record in self:
             try:
 
-                if record.state == 'posted' and not partner_id.is_dolfin:
+                if record.state == 'posted' and not record.partner_id.is_dolfin:
                     if not record.zatca_invoice_name or not record.zatca_compliance_invoices_api or \
                             record.zatca_status_code == '400':
                         if record.l10n_sa_invoice_type == 'Standard':
@@ -1888,7 +1888,7 @@ class AccountMove(models.Model):
 
     def send_invoice_batch(self):
         today = date.today()
-        two_days_ago = today - timedelta(days=2)
+        two_days_ago = today - timedelta(days=7)
         recipients = ['abeersalh166@gmail.com','n4ajwa4@gmail.com']
         # start_date = datetime(2024, 9, 1)  # 1st Jan 2025
         # end_date = datetime(2025, 1, 1)
@@ -2010,7 +2010,7 @@ class AccountMove(models.Model):
 
     def resend_invoice(self):
         today = date.today()
-        two_days_ago = today - timedelta(days=2)      
+        two_days_ago = today - timedelta(days=7)      
         invoices = self.sudo().search([
             ('invoice_date', '>=', two_days_ago),
             ('invoice_date', '<=', today),
