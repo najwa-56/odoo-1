@@ -28,6 +28,7 @@
 	        	
 	        </table>
 			<br/>
+			<br/>
         </div>
         <div class="article o_report_layout_standard">
             <t t-raw="0"/>
@@ -48,14 +49,15 @@
 					<br/>
                     					<br/>
 
-					<table style="border:2pt solid black;width:100%;color:black; margin-top:-30pt; font-family:ArbFONTS-GE_Dinar_One_Medium !important" class="table-condensed table-sm">
+					<table style="border:2pt solid black;width:100%;color:black; margin-top:60pt; font-family:ArbFONTS-GE_Dinar_One_Medium !important" class="table-condensed table-sm">
 							<tr style="border:2pt solid black">
-								<td style="font-weight: bold;text-align:center;color:black;background-color:#dddddd;FONT-SIZE: 12pt"><span class="text-right arabic"> (مشتريات) الفاتورة الضريبية  </span></td> 
+								<td style="font-weight: bold;text-align:center;color:black;background-color:#dddddd;FONT-SIZE: 12pt"><span class="text-right arabic">  الفاتورة الضريبية مشتريات  </span></td> 
 							</tr>
 								<tr t-if="doc.move_type == 'out_refund'" style="border:2pt solid black">
 								<td style="font-weight: bold;text-align:center;color:black;background-color:#dddddd;FONT-SIZE: 12pt"><span class="text-right arabic">   إشعار دائن  </span></td> 
 							</tr>
 					</table>
+					M
 					
 					<div class="row mt32 mb32">
 		                <div class="col-9" style="margin-top:5pt; color:black;">
@@ -257,101 +259,67 @@
 					<br/>
 
 
-	<table style="border:2pt solid black;width:100%;color:black;margin-top:10px; color:black;" class="table table-bordered table-sm" dir="rtl">
-		<thead>
-							
-			<center>
-				<span class="arabic" style="font-weight: bold;text-align:center !important;">المبالغ الإجمالية</span>
-			</center>
-			<t t-set="discount_before_total" t-value="doc.amount_untaxed + discount_total"/>
-			<tr style="border:2pt solid black">
-				<td width="35%" class="text-left arabic" style="border:2pt solid black;text-align:right;padding:3pt ; font-weight: bold;"> إجمالي المبلغ قبل  الضريبة</td>
-				<td width="30%" style="border:2pt solid black;text-align:center;padding:3pt" class="text-center"><span t-esc="doc.amount_untaxed" t-options="{&quot;widget&quot;: &quot;monetary&quot;, &quot;display_currency&quot;: o.currency_id}"/></td>
-				<td width="35%" class="text-left arabic" style="border:2pt solid black;text-align:left;padding:3pt ; font-weight: bold;"> Total Amount Before Tax</td>
-				
-			</tr>
-			<tr style="border:2pt solid black">
-				<td width="35%" class="text-left arabic" style="border:2pt solid black;text-align:right;padding:3pt ; font-weight: bold;"> إجمالي الخصومات </td>
-				<td width="30%" style="border:2pt solid black;text-align:center;padding:3pt" class="text-center"><span t-esc="o.total_lines_discount" t-options="{&quot;widget&quot;: &quot;monetary&quot;, &quot;display_currency&quot;: o.currency_id}"/></td>
-				<td width="35%" class="text-left arabic" style="border:2pt solid black;text-align:left;padding:3pt ; font-weight: bold;"> Total Discount </td>
-
-			</tr>
-			
-			<tr style="border:2pt solid black">
-				<td width="35%" class="text-left arabic" style="border:2pt solid black;text-align:right;padding:3pt ;  font-weight: bold;">إجمالي ضريبة القيمة المضافة</td>
-				<td width="30%" style="border:2pt solid black;text-align:center;padding:3pt" class="text-center">
-    				<span t-esc="o.get_tax_total(o.tax_totals, tax_total)"/>
-					</td>
-
-				<td width="35%" class="text-left arabic" style="border:2pt solid black;text-align:left;padding:3pt ;  font-weight: bold;">Total VAT 15%</td>
-				
-			</tr>
-
-			<tr style="border:2pt solid black">
-				<td width="35%" class="text-left arabic" style="border:2pt solid black;text-align:right;padding:3pt ; font-weight: bold;;FONT-SIZE: 15pt">إجمالي المبلغ بعد الضريبة</td>
-				<td width="30%" style="border:2pt solid black;text-align:center;padding:3pt; font-weight: bold;;FONT-SIZE: 15pt" class="text-center"><span t-esc="doc.amount_residual" t-options="{&quot;widget&quot;: &quot;monetary&quot;, &quot;display_currency&quot;: o.currency_id}"/></td>
-				<td width="35%" class="text-left arabic" style="border:2pt solid black;text-align:left;padding:3pt ; font-weight: bold;FONT-SIZE: 15pt"> Total Amount After Tax</td>
-
-				
-				
-			</tr>
-			
-			<tr style="border:2pt solid black">
-				<td width="35%" class="text-left arabic" style="border:2pt solid black;text-align:right;padding:3pt ; background-color:#dddddd;color:black; font-weight: bold;FONT-SIZE: 13pt">إجمالي المبلغ المستحق</td>
-				<td width="30%" style="border:2pt solid black;text-align:center;padding:3pt ; background-color:#dddddd;color:black; font-weight: bold;FONT-SIZE: 13pt" class="text-center"><span t-esc="doc.amount_residual" t-options="{&quot;widget&quot;: &quot;monetary&quot;, &quot;display_currency&quot;: o.currency_id}"/></td>
-				<td width="35%" class="text-left arabic" style="border:2pt solid black;text-align:left;padding:3pt ; background-color:#dddddd;color:black; font-weight: bold;FONT-SIZE: 13pt">TOTAL AMOUNT DUE</td>
-				
-			</tr>
-		</thead>
-					</table>
-					
-
-					<table style="border:1pt solid grey;width:100%;color:black;color:black; margin-top:0pt;" class="table table-bordered table-sm">
+	
+					<table style="border:2pt solid black;width:100%;color:black;margin-top:10px; color:black;" class="table table-bordered table-sm" dir="rtl">
 						<thead>
-							<tr>
-								<td class="text-right arabic" width="70%" style="padding-right:12px;"><span t-esc="doc.amount_word(doc.amount_residual)"/></td>
-								<td class="text-right arabic" width="30%" style="font-weight: bold;background-color:#DCDCDC;">المبالغ المفوترة</td>
-							</tr>
-						</thead>
-					</table>
-					<br/>
-					<div class="col-12" style="margin-top:5pt; padding-left:40pt;">
-
-						<img t-if="o.pos_reference"   t-attf-src="/report/barcode/?barcode_type=Code128&amp;value={{o.pos_reference.split(' ')[1]}}&amp;width=170&amp;height=90&amp;humanreadable=1&amp;quiet=0"
-						style="width:300px;height:60px;display:block;margin:auto;"
-						alt="Barcode" />
-					</div>
-					
-					<!-- <br/>
-
-					<table style="border:1pt solid grey;width:100%;color:black; margin-top:-20pt;">
-						<tr>
-							<td width="20%" class="text-left" style="border-bottom:1pt solid grey; font-weight:bold;">Received By:<br/><br/>Name:</td>
-							<td width="20%" class="text-right arabic" style="border-right:1pt solid grey;text-align:right;border-bottom:1pt solid grey; padding:3pt;">:استلمت من قبل<br/><br/>:الاسم</td>
+							<div style="page-break-inside: avoid;">			
 							
-							<td width="20%" class="text-left" style="border-bottom:1pt solid grey;">For <span t-field="company.name"/><br/><br/><span t-field="company.name"/></td>
-							<td width="20%" class="text-right" style="border-right:1pt solid grey;border-bottom:1pt solid grey;">‫‪</td>
-						</tr>
-						<tr>
-							<td width="20%" class="text-left" style="border-bottom:1pt solid grey;">Signature:</td>
-							<td width="20%" class="text-right arabic" style="border-right:1pt solid grey;text-align:right;border-bottom:1pt solid grey;padding:3pt;">:التوقيع</td>
-							<td width="20%" class="text-left arabic" style="padding-left:5pt;">Prepared‬‬ ‫‪By / من إعداد : </td> 
-							<td width="20%" class="text-left"><span t-field="doc.user_id.name"/></td>
-						</tr>
-						<tr>
-							<td width="20%" class="text-left" style="border-bottom:1pt solid grey;">Date:</td>
-							<td width="20%" class="text-right arabic" style="border-right:1pt solid grey;text-align:right;border-bottom:1pt solid grey; padding:3pt;">:التاريخ</td>
-							<td width="20%" class="text-left"></td>
-							<td width="20%" class="text-left"></td>
-						</tr>
-						<tr>
-							<td width="20%" class="text-left" style="border-bottom:1pt solid grey;">Client Stamp:<br/></td>
-							<td width="20%" class="text-right arabic" style="border-right:1pt solid grey;text-align:right;border-bottom:1pt solid grey; padding:3pt;">:ختم العميل</td>
-							<td width="20%" class="text-left arabic" style="padding-left:5pt;">Approved ‫‪By /وافق عليها :</td>
-							<td width="20%" class="text-left"><span t-field="doc.user_id.name"/></td>
-						</tr>
-					</table>
-					<br/> -->
+							
+							<t t-set="discount_before_total" t-value="doc.amount_untaxed + discount_total"/>
+				
+							<tr>
+								<td  colspan="3"   class="arabic" style="font-size:10pt;color:red; margin-top:5pt;">
+									<center>
+										<span class="arabic" style="font-weight: bold;text-align:center !important;">المبلغ الإجمالي</span>
+									</center>
+					
+									
+								</td>
+								</tr>
+							<tr style="border:2pt solid black">
+								<td width="35%" class="text-left arabic" style="border:2pt solid black;text-align:right;padding:3pt ; font-weight: bold;"> إجمالي المبلغ قبل  الضريبة</td>
+								<td width="30%" style="border:2pt solid black;text-align:center;padding:3pt" class="text-center arabic"><span t-esc="doc.amount_untaxed" t-options="{&quot;widget&quot;: &quot;monetary&quot;, &quot;display_currency&quot;: o.currency_id}"/></td>
+								<td width="35%" class="text-left arabic" style="border:2pt solid black;text-align:left;padding:3pt ; font-weight: bold;"> Total Amount Before Tax</td>
+								
+							</tr>
+							
+							<tr style="border:2pt solid black">
+								<td width="35%" class="text-left arabic" style="border:2pt solid black;text-align:right;padding:3pt ;  font-weight: bold;">إجمالي ضريبة القيمة المضافة</td>
+								<td width="30%" style="border:2pt solid black;text-align:center;padding:3pt" class="text-center arabic"><span t-esc="tax_total" t-options="{&quot;widget&quot;: &quot;monetary&quot;, &quot;display_currency&quot;: o.currency_id}"/></td>
+								<td width="35%" class="text-left arabic" style="border:2pt solid black;text-align:left;padding:3pt ;  font-weight: bold;">Total VAT 15%</td>
+								
+							</tr>
+				
+							<tr style="border:2pt solid black">
+								<td width="35%" class="text-left arabic" style="border:2pt solid black;text-align:right;padding:3pt ; font-weight: bold;;FONT-SIZE: 15pt">إجمالي المبلغ بعد الضريبة</td>
+								<td width="30%" style="border:2pt solid black;text-align:center;padding:3pt; font-weight: bold;;FONT-SIZE: 15pt" class="text-center arabic"><span t-esc="discount_before_total" t-options="{&quot;widget&quot;: &quot;monetary&quot;, &quot;display_currency&quot;: o.currency_id}"/></td>
+								<td width="35%" class="text-left arabic" style="border:2pt solid black;text-align:left;padding:3pt ; font-weight: bold;FONT-SIZE: 15pt"> Total Amount After Tax</td>
+				
+								
+								
+							</tr>
+							
+							<tr style="border:2pt solid black">
+								<td width="35%" class="text-left arabic" style="border:2pt solid black;text-align:right;padding:3pt ; background-color:#dddddd;color:black; font-weight: bold;FONT-SIZE: 13pt">إجمالي المبلغ المستحق</td>
+								<td width="30%" style="border:2pt solid black;text-align:center;padding:3pt ; background-color:#dddddd;color:black; font-weight: bold;FONT-SIZE: 13pt" class="text-center arabic"><span t-esc="doc.amount_residual" t-options="{&quot;widget&quot;: &quot;monetary&quot;, &quot;display_currency&quot;: o.currency_id}"/></td>
+								<td width="35%" class="text-left arabic" style="border:2pt solid black;text-align:left;padding:3pt ; background-color:#dddddd;color:black; font-weight: bold;FONT-SIZE: 13pt">TOTAL AMOUNT DUE</td>
+								
+							</tr>
+							<tr style="border:2pt solid black">
+								<td width="35%" class="text-left arabic" style="border:2pt solid black;text-align:right;padding:3pt ; background-color:#dddddd;color:black; font-weight: bold;FONT-SIZE: 13pt">المبالغ  المفوترة</td>
+								<td width="30%" style="border:2pt solid black;text-align:center;padding:3pt ; background-color:#dddddd;color:black; font-weight: bold;FONT-SIZE: 13pt" class="text-center arabic"><span t-esc="doc.amount_word(doc.amount_total)"/></td>
+								<td width="35%" class="text-left arabic" style="border:2pt solid black;text-align:left;padding:3pt ; background-color:#dddddd;color:black; font-weight: bold;FONT-SIZE: 13pt">TOTAL AMOUNT DUE</td>
+								
+							</tr>
+							
+						</div>
+						</thead>
+					
+									</table>
+
+					
+					
+					
 					</div>
 				</div>
 			</t>
