@@ -5,6 +5,7 @@
       <field name="model">sanctions.procedures</field>
       <field name="arch" type="xml">
         <tree>
+          <field name="date"/>
           <field name="employee"/>
           <field name="sanction"/>
           <field name="dateof" />

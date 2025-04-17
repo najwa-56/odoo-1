@@ -39,6 +39,23 @@
             <field name="users" eval="[(4, ref('base.user_root')), (4, ref('base.user_admin'))]"/>
         </record>
 
+
+        
+
+        <record id="sanction_delect" model="res.groups">
+            <field name="name">Sanction Delete</field>
+            <field name="category_id" ref="sanction_employee_managment" />
+            <field name="users" eval="[(4, ref('base.user_root')), (4, ref('base.user_admin'))]"/>
+        </record>
+
+
+
+        <record id="sanction_procedures_delete" model="res.groups">
+            <field name="name">Sanction procedures Delete</field>
+            <field name="category_id" ref="sanction_employee_managment" />
+            <field name="users" eval="[(4, ref('base.user_root')), (4, ref('base.user_admin'))]"/>
+        </record>
+
      
 
 
