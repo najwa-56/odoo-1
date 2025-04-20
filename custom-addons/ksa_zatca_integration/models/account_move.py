@@ -1417,7 +1417,9 @@ class AccountMove(models.Model):
                    'Accept-Version': 'V2',
                    'Authorization': 'Basic ' + auth,
                    'Content-Type': 'application/json'}
-
+        _logger.error("self.zatca_invoice_hash. " + str(self.zatca_invoice_hash))
+        _logger.error("self.invoice_uuid. " + str(self.invoice_uuid))
+        _logger.error("self.zatca_invoice_hash. " + str(self.zatca_invoice.decode('UTF-8')))
         data = {
             'invoiceHash': self.zatca_invoice_hash,
             # 'invoiceHash': self.hash_with_c14n_canonicalization(api_invoice=1),
