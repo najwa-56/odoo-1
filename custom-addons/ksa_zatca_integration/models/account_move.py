@@ -1417,9 +1417,15 @@ class AccountMove(models.Model):
                    'Accept-Version': 'V2',
                    'Authorization': 'Basic ' + auth,
                    'Content-Type': 'application/json'}
-        _logger.error("self.zatca_invoice_hash. " + str(self.zatca_invoice_hash))
-        _logger.error("self.invoice_uuid. " + str(self.invoice_uuid))
-        _logger.error("self.zatca_invoice_hash. " + str(self.zatca_invoice.decode('UTF-8')))
+        _logger.error("ZATCA Invoice Hash: %s", self.zatca_invoice_hash)
+        _logger.error("ZATCA Invoice UUID: %s", self.invoice_uuid)
+
+        try:
+            xml_str = self.zatca_invoice.decode('utf-8')
+            _logger.error("Decoded ZATCA XML:\n%s", xml_str)
+        except Exception as e:
+            _logger.error("Failed to decode ZATCA invoice XML: %s", str(e))
+
         data = {
             'invoiceHash': self.zatca_invoice_hash,
             # 'invoiceHash': self.hash_with_c14n_canonicalization(api_invoice=1),
