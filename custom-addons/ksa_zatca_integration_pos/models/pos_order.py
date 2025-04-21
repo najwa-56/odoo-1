@@ -105,7 +105,7 @@ class PosOrder(models.Model):
                     self_id.account_move.l10n_is_nominal_invoice = account_move.get('l10n_is_nominal_invoice', 0)
                     self_id.account_move.credit_debit_reason = account_move.get('credit_debit_reason', None)
                     if len(self_id.refunded_order_ids.account_move.ids) > 1:
-                        raise exceptions.ValidationError("only 1 invoice can be returned at a time.")
+                        raise ValidationError("only 1 invoice can be returned at a time.")
                     self_id.account_move.create_xml_file(pos_refunded_order_id=self_id.refunded_order_ids.account_move.id)
             
         except Exception as e:
