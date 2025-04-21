@@ -20,10 +20,10 @@
 #    If not, see <http://www.gnu.org/licenses/>.
 #
 #############################################################################
-from datetime import timedelta
 from odoo import api, fields, models, _
 import dateutil.relativedelta
-from datetime import datetime
+from datetime import datetime, timedelta, date
+
 
 
 GENDER_SELECTION = [('male', 'Male'),
@@ -77,6 +77,7 @@ class HrEmployee(models.Model):
     date_of_direct_action = fields.Date()
     arabic_name = fields.Char('Arabic Name',required=True)
     emp_code = fields.Char('Employee Code' , readonly=False , required=True)
+    attachment_ids = fields.One2many('hr.employee.attachment', 'employee_id', string="Attachments")
    
 
     def approve(self):
@@ -274,4 +275,48 @@ class User(models.Model):
 
 
    
+
+class HrEmployeeAttachment(models.Model):
+    _name = 'hr.employee.attachment'
+    _description = 'Employee Attachment'
+
+    name = fields.Char(string="Attachment Name", required=True)
+    file = fields.Binary(string="File", required=True)
+    employee_id = fields.Many2one('hr.employee', string="Employee", ondelete="cascade")
+    start_date = fields.Date(string="Start Date")
+    end_date = fields.Date(string="End Date")
+    notify_before_days = fields.Integer(string="Notify Before (days)")
+    notified = fields.Boolean(string="Already Notified", default=False)
+
      
+
+
+
+    @api.model
+    def notify_expiring_attachments(self):
+        today = date.today()
+        records = self.search([
+            ('end_date', '!=', False),
+            ('notify_before_days', '!=', False),
+            ('notified', '=', False)
+        ])
+
+        for record in records:
+            notify_date = record.end_date - timedelta(days=record.notify_before_days)
+            if today >= notify_date:
+                hr_group = self.env.ref('hr.group_hr_manager')
+                recipients = hr_group.sudo().users.mapped('partner_id.email')
+
+                if recipients:
+                    mail_values = {
+                        'subject': f"Attachment Expiry Notification: {record.name}",
+                        'body_html': f"""
+                            <p><strong>Employee:</strong> {record.employee_id.name}</p>
+                            <p><strong>Attachment:</strong> {record.name}</p>
+                            <p><strong>Expires on:</strong> {record.end_date}</p>
+                        """,
+                        'email_to': ','.join(recipients),
+                    }
+                    self.env['mail.mail'].sudo().create(mail_values).send()
+                    record.notified = True
+

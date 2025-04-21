@@ -3,3 +3,6 @@ access_hr_employee_family_employee_user,access.hr.employee.family.employee.user,
 access_hr_employee_family_manager_user,access.hr.employee.family.manager.user,model_hr_employee_family,hr.group_hr_manager,1,1,1,1
 access_hr_employee_family_user,access.hr.employee.family.user,model_hr_employee_family,hr.group_hr_user,1,1,1,1
 access_hr_employee_relation_user,access.hr.employee.relation.user,model_hr_employee_relation,base.group_user,1,1,1,1
+
+access_hr_employee_attachment_user,access.hr.employee.attachment.user,model_hr_employee_attachment,base.group_user,1,0,0,0
+access_hr_employee_attachment_hr_manager,access.hr.employee.attachment.hr.manager,model_hr_employee_attachment,hr.group_hr_manager,1,1,1,1
