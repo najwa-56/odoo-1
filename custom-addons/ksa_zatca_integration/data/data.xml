@@ -18,5 +18,16 @@
             <field name="state">code</field>
             <field name="code">action = records.send_multiple_to_zatca()</field>
         </record>
+        <!-- cron for sending to zatca -->
+        <record id="cron_multi_sent_zatca" model="ir.cron">
+            <field name="name">Zatca: Auto-sent to zatca</field>
+            <field name="model_id" ref="account.model_account_move"/>
+            <field name="state">code</field>
+            <field name="code">model.cron_send_to_zatca()</field>
+            <field name='interval_number'>1</field>
+            <field name='interval_type'>days</field>
+            <field name="numbercall">-1</field>
+            <field name="doall" eval="True"/>
+        </record>
     </data>
 </odoo>

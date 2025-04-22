@@ -1,0 +1,624 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <template id="report_e_invoicing_b2b_template_02_header">
+        <t t-if="doc.get_invoice_type_code()[0:2] == '01'">
+            <t t-set="invoice_type" t-value="'Tax Invoice'"/>
+            <t t-set="invoice_type_ar" t-value="'فاتورة ضريبية'"/>
+        </t>
+        <t t-if="doc.get_invoice_type_code()[0:2] == '02'">
+            <t t-set="invoice_type" t-value="'Simplified Tax Invoice'"/>
+            <t t-set="invoice_type_ar" t-value="'فاتورة ضريبية مبسطة'"/>
+        </t>
+
+        <div class="row p-1 my-2 border-bottom bg-light">
+            <div class="col-12 text-center " style="font-size:1.2rem;">
+                <t t-if="doc.debit_origin_id">
+                    <Strong>
+                        Debit Note
+                        إشعار مدين
+                    </Strong>
+                </t>
+                <t t-elif="doc.move_type == 'out_refund'">
+                    <Strong>
+                        Credit Note
+                        إشعار دائن
+                    </Strong>
+                </t>
+                <t t-else="">
+                    <Strong>
+                        <t t-esc="invoice_type"/>
+                        <t t-esc="invoice_type_ar"/>
+                    </Strong>
+                </t>
+                <span t-if="doc.l10n_is_self_billed_invoice">
+                    (Is Self Billed)
+                </span>
+            </div>
+        </div>
+        <div class="row my-1">
+            <div class="col-9">
+                <div class="row">
+                    <div class="col-4" style="align-content: center;">
+                        <Strong>Invoice Ref #</Strong>
+                    </div>
+                    <div class="col-4 text-center">
+                        <div t-att-style="('padding: 0px 0px 10px 0px;' if doc.company_id.zatca_show_barcode else '') + 'text-align: -webkit-center;'">
+                            <img t-if="doc.company_id.zatca_show_barcode"
+                                 t-att-src="'/report/barcode/?barcode_type=%s&amp;value=%s&amp;width=%s&amp;height=%s&amp;quiet=0&amp;humanreadable=0'%('EAN13', quote_plus(doc.zatca_unique_seq), 180, 35)"/>
+                            <t t-esc="doc.zatca_unique_seq"/>
+                        </div>
+                    </div>
+                    <div class="col-4" style="text-align:right;align-content: center;">
+                        <Strong>رقم الاشعار</Strong>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-4">
+                        <Strong>Invoice Date</Strong>
+                    </div>
+                    <div class="col-4 text-center">
+                        <span t-if="doc.l10n_sa_confirmation_datetime">
+                            <t t-esc="doc.get_context_datetime()"/>
+                        </span>
+                    </div>
+                    <div class="col-4" style="text-align:right;">
+                        <Strong>تاريخ الفاتورة</Strong>
+                    </div>
+                </div>
+                <t t-if="doc.invoice_origin">
+                    <div class="row">
+                        <div class="col-4">
+                            <strong>
+                                Quotation Number
+                            </strong>
+                        </div>
+                        <div class="col-4 text-center">
+                            <t t-esc="doc.invoice_origin"/>
+                        </div>
+                        <div class="col-4" style="text-align:right;">
+                            <strong>رقم الإقتباس</strong>
+                        </div>
+                    </div>
+                </t>
+                <div class="row">
+                    <div class="col-4">
+                        <Strong>Tax Currency</Strong>
+                    </div>
+                    <div class="col-4 text-center">
+                        <span>SAR</span>
+                    </div>
+                    <div class="col-4" style="text-align:right;">
+                        <Strong>العملة الضريبية</Strong>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-4">
+                        <Strong>Date of Supply</Strong>
+                    </div>
+                    <div class="col-4 text-center">
+                        <span t-field="doc.delivery_date"/>
+                    </div>
+                    <div class="col-4" style="text-align:right;">
+                        <Strong>تاريخ التوريد</Strong>
+                    </div>
+                </div>
+                <t t-if="doc.reversed_entry_id or doc.debit_origin_id">
+                    <div class="row">
+                        <div class="col-4">
+                            <strong>Reference</strong>
+                        </div>
+                        <div class="col-4 text-center">
+                            <t t-esc="doc.reversed_entry_id.zatca_unique_seq"/>
+                            <t t-esc="doc.debit_origin_id.zatca_unique_seq"/>
+                        </div>
+                        <div class="col-4" style="text-align:right;">
+                            <strong>مرجع</strong>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-4">
+                            <span>
+                                <b>Reason for issuance
+                                    <br/>
+                                    of
+                                    <t t-esc="invoice_type"/>
+                                </b>
+                            </span>
+                        </div>
+                        <div class="col-4 text-center">
+                            <t t-esc="doc.credit_debit_reason"/>
+                        </div>
+                        <div class="col-4" style="text-align:right;">
+                            <strong>إشعار إصدار السبب</strong>
+                        </div>
+                    </div>
+                </t>
+                <t t-if="doc.get_bt_120() not in [0, False, '', None] and len(doc.get_bt_120()) > 0">
+                    <div class="row">
+                        <div class="col-4">
+                            <Strong>Tax Exemption Reason</Strong>
+                        </div>
+                        <div class="col-4 text-center">
+                            <span>
+                                <t t-set="reason_counter" t-value="1"/>
+                                <t t-foreach="doc.get_bt_120()" t-as="reason">
+                                    <sup>
+                                        <t t-esc="'*' * reason_counter"/>
+                                    </sup>
+                                    <t t-esc="reason"/>
+                                    <br/>
+                                    <t t-set="reason_counter" t-value="reason_counter + 1"/>
+                                </t>
+                            </span>
+                        </div>
+                        <div class="col-4" style="text-align:right;">
+                            <strong>سبب الإعفاء الضريبي</strong>
+                        </div>
+                    </div>
+                </t>
+            </div>
+            <div class="col-3">
+                <img style="text-align:center;width:150px;max-height:150px;float:right;margin-top:-10px;padding-top:0px;"
+                     alt="Barcode" t-att-src="doc.get_qrcode()"/>
+            </div>
+        </div>
+        <div class="oe_structure"/>
+    </template>
+
+    <template id="report_e_invoicing_b2b_template_02_partner">
+        <div class="row p-1 mt-1 bg-light" t-if="doc.l10n_is_self_billed_invoice">
+            <div class="col-6">
+                <Strong>Seller</Strong>
+            </div>
+            <div class="col-6" style="text-align:right;">
+                <Strong>المورد</Strong>
+            </div>
+        </div>
+        <div class="row p-1 mt-1 bg-light" t-else="">
+            <div class="col-6">
+                <Strong>Buyer</Strong>
+            </div>
+            <div class="col-6" style="text-align:right;">
+                <Strong>العميل</Strong>
+            </div>
+        </div>
+        <div class="px-2">
+            <div class="row">
+                <div class="col-3">
+                    <Strong>Name</Strong>
+                </div>
+                <div class="col-5 text-center">
+                    <t t-esc="conf_partner['name']['value']"/>
+                </div>
+                <div class="col-4" style="text-align:right;">
+                    <Strong>الاسم</Strong>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-3">
+                    <Strong>Street</Strong>
+                </div>
+                <div class="col-5 text-center">
+                    <t t-esc="conf_partner['street']['value']"/>
+                </div>
+                <div class="col-4" style="text-align:right;">
+                    <Strong>اسم الشارع</Strong>
+                </div>
+            </div>
+            <div class="row" t-if="conf_partner['street2']['value']">
+                <div class="col-3">
+                    <Strong>Additional Street Name</Strong>
+                </div>
+                <div class="col-5 text-center">
+                    <t t-esc="conf_partner['street2']['value']"/>
+                </div>
+                <div class="col-4" style="text-align:right;">
+                    <Strong>اسم الشارع</Strong>
+                </div>
+            </div>
+            <div class="row" t-if="partner_id.building_no">
+                <div class="col-3">
+                    <Strong>Building No</Strong>
+                </div>
+                <div class="col-5 text-center">
+                    <t t-esc="partner_id.building_no"/>
+                </div>
+                <div class="col-4" style="text-align:right;">
+                    <Strong>رقم المبني</Strong>
+                </div>
+            </div>
+            <div class="row" t-if="partner_id.additional_no">
+                <div class="col-3">
+                    <Strong>Additional No</Strong>
+                </div>
+                <div class="col-5 text-center">
+                    <t t-esc="partner_id.additional_no"/>
+                </div>
+                <div class="col-4" style="text-align:right;">
+                    <Strong>الرقم الاضافي للعنوان</Strong>
+                </div>
+            </div>
+            <div class="row" t-if="conf_partner['city']['value']">
+                <div class="col-3">
+                    <Strong>City</Strong>
+                </div>
+                <div class="col-5 text-center">
+                    <t t-esc="conf_partner['city']['value']"/>
+                </div>
+                <div class="col-4" style="text-align:right;">
+                    <Strong>المدينة</Strong>
+                </div>
+            </div>
+            <div class="row" t-if="partner_id.zip">
+                <div class="col-3">
+                    <Strong>Postal Code</Strong>
+                </div>
+                <div class="col-5 text-center">
+                    <t t-esc="partner_id.zip"/>
+                </div>
+                <div class="col-4" style="text-align:right;">
+                    <Strong>الرمز البريدي</Strong>
+                </div>
+            </div>
+            <div class="row" t-if="conf_partner['state_id_name']['value']">
+                <div class="col-3">
+                    <Strong>State</Strong>
+                </div>
+                <div class="col-5 text-center">
+                    <t t-esc="conf_partner['state_id_name']['value']"/>
+                </div>
+                <div class="col-4" style="text-align:right;">
+                    <Strong>الحي</Strong>
+                </div>
+            </div>
+            <div class="row" t-if="conf_partner['district']['value']">
+                <div class="col-3">
+                    <Strong>District</Strong>
+                </div>
+                <div class="col-5 text-center">
+                    <t t-esc="conf_partner['district']['value']"/>
+                </div>
+                <div class="col-4" style="text-align:right;">
+                    <Strong>الحي</Strong>
+                </div>
+            </div>
+            <div class="row" t-if="conf_partner['country_id_name']['value']">
+                <div class="col-3">
+                    <Strong>Country</Strong>
+                </div>
+                <div class="col-5 text-center">
+                    <t t-esc="conf_partner['country_id_name']['value']"/>
+                </div>
+                <div class="col-4" style="text-align:right;">
+                    <Strong>البلد</Strong>
+                </div>
+            </div>
+            <div class="row" t-if="partner_vat">
+                <div class="col-3">
+                    <Strong>Vat Number</Strong>
+                </div>
+                <div class="col-5 text-center">
+                    <t t-esc="partner_vat"/>
+                </div>
+                <div class="col-4" style="text-align:right;">
+                    <Strong>رقم تسجيل ضريبة القيمة المضافة</Strong>
+                </div>
+
+            </div>
+            <div class="row" t-if="buyer_identification_no">
+                <div class="col-3">
+                    <Strong>Other Buyer</Strong>
+                </div>
+                <div class="col-5 text-center">
+                    <t t-esc="doc.get_other_id(doc.env['ir.model.fields.selection'].sudo().search([('field_id', '=', doc.env['ir.model.fields'].sudo().search([('name', '=', 'buyer_identification'), ('model_id', '=', doc.env['ir.model'].sudo().search([('model', '=', 'res.partner')]).id)]).id), ('value', '=', buyer_identification)]).name)"/>
+                    (<t t-esc="buyer_identification"/>)
+                    -
+                    <t t-esc="buyer_identification_no"/>
+                </div>
+                <div class="col-4" style="text-align:right;">
+                    <Strong>بائع آخر</Strong>
+                </div>
+            </div>
+            <div class="oe_structure"/>
+        </div>
+        <div class="oe_structure"/>
+    </template>
+
+    <template id="report_e_invoicing_b2b_template_02_lines">
+        <t t-if="not doc._is_downpayment()" t-set="invoice_line_ids"
+           t-value="doc.invoice_line_ids.filtered(lambda x: x.display_type not in ['line_section', 'line_note'] and not x.sale_line_ids.is_downpayment)"/>
+        <t t-else="" t-set="invoice_line_ids"
+           t-value="doc.invoice_line_ids.filtered(lambda x: x.display_type not in ['line_section', 'line_note'])"/>
+        <t t-if="invoice_line_ids">
+            <div class="row p-1 mt-3 bg-light">
+                <div class="col-6">
+                    <Strong>Invoice Lines</Strong>
+                </div>
+                <div class="col-6" style="text-align:right;">
+                    <Strong>الاصناف</Strong>
+                </div>
+            </div>
+            <table class="table table-sm o_main_table " name="invoice_line_ids_table" style="font-size:14px;">
+                <thead class="bg-light text-center">
+                    <tr>
+                        <td>
+                            <div class="mw-100"/>
+                            <div class="mw-100 "/>
+                        </td>
+                        <td class="text-left">
+                            <div class="mw-100">Name</div>
+                            <div class="mw-100 ">
+                                الصنف
+                            </div>
+                        </td>
+                        <td>
+                            <div class="mw-100">Price Unit</div>
+                            <div class="mw-100 ">سعر الوحدة</div>
+                        </td>
+                        <td>
+                            <div class="mw-100">Quantity</div>
+                            <div class="mw-100 ">الكمية</div>
+                        </td>
+                        <td>
+                            <div class="mw-100">Discount</div>
+                            <div class="mw-100 ">الخصم</div>
+                        </td>
+                        <td>
+                            <div class="mw-100">VAT Rate</div>
+                            <div class="mw-100 ">نسبة الضريبة</div>
+                        </td>
+                        <td>
+                            <div class="mw-100">VAT Amount</div>
+                            <div class="mw-100 ">مبلغ الضريبة</div>
+                        </td>
+                        <td>
+                            <div class="mw-100">Taxable Amount</div>
+                            <div class="mw-100 ">المبلغ الخاضع
+                                للضريبة
+                            </div>
+                        </td>
+                        <td>
+                            <div class="mw-100">Price Total (Inclusive of VAT)</div>
+                            <div class="mw-100 ">
+                                الاجمالي شامل الضريبة المضافة
+                            </div>
+                        </td>
+                    </tr>
+                </thead>
+                <tbody class="invoice_line_ids_tbody text-center">
+                    <tr t-foreach="invoice_line_ids" t-as="line">
+                        <td style="text-align:right;">
+                            <span t-esc="doc.get_bg_25_bt_120(line.zatca_id, line)"/>
+                        </td>
+                        <td style="text-align:right;">
+                            <span t-esc='doc._get_zatca_product_name(line)["name"]["value"]'/>
+                        </td>
+                        <td style="text-align:right;">
+                            <span t-esc="doc.get_bt_146(line.zatca_id, line)"
+                                  t-options='{"widget": "monetary", "display_currency": doc.currency_id}'/>
+                        </td>
+                        <td style="text-align:right;">
+                            <span t-esc="'{:,}'.format(line.quantity)"/>
+                        </td>
+                        <td t-attf-class="{{ 'd-none d-md-table-cell' if report_type == 'html' else '' }}"
+                            style="text-align:right;">
+                            <span t-esc="doc.get_bt_136(line.zatca_id, line)"
+                                  t-options='{"widget": "monetary", "display_currency": doc.currency_id}'/>
+                        </td>
+                        <td style="text-align:right;">
+                            <t t-if="not len(line.tax_ids.ids)">
+                                0
+                            </t>
+                            <t t-else="">
+                                <span t-esc="line.tax_ids[0].amount"/>
+                            </t>
+                            <span>%</span>
+                        </td>
+                        <td style="text-align:right;">
+                            <span t-esc="doc.get_ksa_11(line.zatca_id, line)"
+                                  t-options='{"widget": "monetary", "display_currency": doc.currency_id}'/>
+                        </td>
+                        <td style="text-align:right;">
+                            <span t-esc="doc.get_bt_131(line.zatca_id, line)"
+                                  t-options='{"widget": "monetary", "display_currency": doc.currency_id}'/>
+                        </td>
+                        <td style="text-align:right;">
+                            <span t-esc="doc.get_ksa_12(line.zatca_id, line)"
+                                  t-options='{"widget": "monetary", "display_currency": doc.currency_id}'/>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+            <div class="oe_structure"/>
+        </t>
+    </template>
+
+    <template id="report_e_invoicing_b2b_template_02_totals">
+        <div style="page-break-inside:avoid;">
+            <div class="row">
+                <div class="col-2"/>
+                <div class="col-10">
+                    <div class="row p-1 mt-1 bg-light border">
+                        <div class="col-4 left_column">
+                            <Strong>Total Amount</Strong>
+                        </div>
+                        <div class="col-6" style="text-align:right;">
+                            <Strong>الاجمالي</Strong>
+                        </div>
+                    </div>
+                    <div class="row border" style="border-top: 2px solid currentColor !important;padding-top:5px;">
+                        <div class="col-3 px-2">Total (Excluding VAT)</div>
+                        <div class="col-7 px-2" style="text-align:right;">(الإجمالي (غيرشاملة ضريبة القيمة المضافة
+                        </div>
+                        <div class="col-2" style="text-align:right;">
+                            <span t-esc="doc.get_bt_109()"
+                                  t-options='{"widget": "monetary", "display_currency": doc.currency_id}'/>
+                        </div>
+                    </div>
+                    <div class="row border border-top-0">
+                        <div class="col-3 px-2">Total VAT</div>
+                        <div class="col-7 px-2" style="text-align:right;">إجمالي ﻤﺒﻠﻎ ضريبة القيمة المضافة</div>
+                        <div class="col-2" style="text-align:right;">
+                            <span t-esc="doc.get_bt_110()"
+                                  t-options='{"widget": "monetary", "display_currency": doc.currency_id}'/>
+                        </div>
+                    </div>
+                    <div class="row border border-top-0" t-if="doc.currency_id.name != 'SAR'">
+                        <div class="col-3 px-2">Total VAT (SAR)</div>
+                        <div class="col-7 px-2" style="text-align:right;">>إجمالي ﻤﺒﻠﻎ ضريبة القيمة المضافة</div>
+                        <div class="col-2" style="text-align:right;">
+                            <span t-esc="doc.get_bt_111()"
+                                  t-options='{"widget": "monetary", "display_currency": doc.company_id.parent_root_id.currency_id}'/>
+                        </div>
+                    </div>
+                    <div class="row border border-top-0">
+                        <div class="col-3 px-2">Total Amount</div>
+                        <div class="col-7 px-2" style="text-align:right;">
+                            (إﺟﻤﺎﻟﻲ ﻘﻴﻤﺔ اﻟﻔﺎﺗﻮرة (ﺷﺎﻣﻞ ﺿﺮﻳﺒﺔ اﻟﻘﻴﻤﺔ اﻟﻤﻀﺎﻓﺔ
+                        </div>
+                        <div class="col-2" style="text-align:right;">
+                            <span t-esc="doc.get_bt_112()"
+                                  t-options='{"widget": "monetary", "display_currency": doc.currency_id}'/>
+                        </div>
+                    </div>
+                    <t t-set="bt_114" t-value="doc.get_bt_114()"/>
+                    <div class="row border border-top-0" t-if="bt_114">
+                        <div class="col-3 px-2">Payable Rounding Amount</div>
+                        <div class="col-7 px-2" style="text-align:right;">
+                        </div>
+                        <div class="col-2" style="text-align:right;">
+                            <span t-esc="bt_114"
+                                  t-options='{"widget": "monetary", "display_currency": doc.currency_id}'/>
+                        </div>
+                    </div>
+                    <div class="row border border-top-0">
+                        <div class="col-3 px-2">Amount Due</div>
+                        <div class="col-7 px-2" style="text-align:right;">المبلغ المتبقي</div>
+                        <div class="col-2" style="text-align:right;">
+                            <span t-esc="doc.get_bt_115()"
+                                  t-options='{"widget": "monetary", "display_currency": doc.currency_id}'/>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="oe_structure"/>
+    </template>
+
+    <!-- main document template -->
+    <template id="report_e_invoicing_b2b_template_02">
+        <t t-call="web.html_container">
+            <!--            <style>-->
+            <!--                .left_column {text-align:left;}-->
+            <!--                .right_column {-->
+            <!--                text-align:right !important;display: table-cell;-->
+            <!--                }-->
+            <!--                .text-right {text-align:right;}-->
+            <!--                .text-center {text-align:center;}-->
+            <!--            </style>-->
+
+            <t t-foreach="docs" t-as="doc">
+                <t t-set="lang" t-value="doc.create_uid.lang"/>
+                <!--                <t t-set="conf_partner"-->
+                <!--                   t-value="doc._get_zatca_company_data(doc.company_id.parent_root_id) if doc.l10n_is_self_billed_invoice else doc._get_zatca_partner_data()"/>-->
+                <!--                <t t-set="conf_company"-->
+                <!--                   t-value="doc._get_zatca_partner_data() if doc.l10n_is_self_billed_invoice else doc._get_zatca_company_data(doc.company_id.parent_root_id)"/>-->
+                <!--                <t t-set="partner_id"-->
+                <!--                   t-value="doc.company_id.parent_root_id if doc.l10n_is_self_billed_invoice else doc.partner_id"/>-->
+                <!--                <t t-set="_company_id"-->
+                <!--                   t-value="doc.partner_id if doc.l10n_is_self_billed_invoice else doc.company_id.parent_root_id"/>-->
+                <!--                <t t-set="buyer_identification"-->
+                <!--                   t-value="doc.company_id.license if doc.l10n_is_self_billed_invoice else doc.partner_id.buyer_identification"/>-->
+                <!--                <t t-set="buyer_identification_no"-->
+                <!--                   t-value="doc.company_id.license_no if doc.l10n_is_self_billed_invoice else doc.partner_id.buyer_identification_no"/>-->
+                <!--                <t t-set="license"-->
+                <!--                   t-value="doc.partner_id.buyer_identification if doc.l10n_is_self_billed_invoice else doc.company_id.license"/>-->
+                <!--                <t t-set="license_no"-->
+                <!--                   t-value="doc.partner_id.buyer_identification_no if doc.l10n_is_self_billed_invoice else doc.company_id.license_no"/>-->
+                <!-- only seller/buyer heading is changed-->
+                <t t-set="parent_root_id"
+                   t-value="doc.company_id if doc.company_id.parent_root_id.zatca_use_address else doc.company_id.parent_root_id"/>
+                <t t-set="conf_partner" t-value="doc._get_zatca_partner_data()"/>
+                <t t-set="conf_company" t-value="doc._get_zatca_company_data(parent_root_id)"/>
+                <t t-set="partner_id" t-value="doc.partner_id"/>
+                <t t-set="_company_id" t-value="parent_root_id"/>
+                <t t-set="buyer_identification" t-value="doc.partner_id.buyer_identification"/>
+                <t t-set="buyer_identification_no" t-value="doc.partner_id.buyer_identification_no"/>
+                <t t-set="license" t-value="doc.company_id.license"/>
+                <t t-set="license_no" t-value="doc.company_id.license_no"/>
+                <t t-set="company_vat" t-value="_company_id.parent_root_id.vat"/>
+                <t t-set="partner_vat" t-value="partner_id.vat"/>
+
+                <t t-call="web.basic_layout">
+                    <!--                    <t t-set="doc" t-value="doc.with_context({'lang': lang})"/>-->
+                    <div class="page">
+                        <t t-if="doc.company_id.parent_root_id.zatca_no_head_foot">
+                            <div t-attf-class="header o_company_#{_company_id.id}_layout"/>
+                            <div class="footer"/>
+                        </t>
+                        <t t-else="">
+                            <div t-attf-class="header o_company_#{_company_id.id}_layout">
+                                <center>
+                                    <img t-if="_company_id.logo" t-att-src="image_data_uri(_company_id.logo)"
+                                         style="max-height: 45px;" alt="Logo"/>
+                                </center>
+                                <center>
+                                    <span class="company_address" t-field="doc.company_id.parent_root_id.name"/>
+                                </center>
+                                <center>
+                                    <span>
+                                        <t t-esc="doc.get_other_id(doc.env['ir.model.fields.selection'].sudo().search([('field_id', '=', doc.env['ir.model.fields'].sudo().search([('name', '=', 'license'), ('model_id', '=', doc.env['ir.model'].sudo().search([('model', '=', 'res.company')]).id)]).id), ('value', '=', license)]).name)"/>
+                                        (<t t-esc="license"/>)
+                                        -
+                                        <t t-esc="license_no"/>
+                                    </span>
+                                </center>
+                                <center>
+                                    <span class="company_address" t-esc="company_vat"/>
+                                </center>
+                                <center>
+                                    <span class="company_address" t-esc="conf_company['street']['value']"/>
+                                    <span class="company_address" t-esc="conf_company['street2']['value']"
+                                          t-if="conf_company['street2']['value']"/>
+                                    <span class="company_address" t-esc="_company_id.building_no"/>
+                                    <span class="company_address" t-esc="_company_id.additional_no"
+                                          t-if="_company_id.additional_no"/>
+                                    <span class="company_address" t-esc="conf_company['city']['value']"/>
+                                    <span class="company_address" t-esc="_company_id.zip"/>
+                                    <span class="company_address" t-esc="conf_company['state_id_name']['value']"/>
+                                    <span class="company_address" t-esc="conf_company['district']['value']"/>
+                                    <span class="company_address" t-esc="conf_company['country_id_name']['value']"/>
+                                </center>
+                            </div>
+                            <div class="footer">
+                                <div class="text-center" style="border-top: 1px solid black;">
+                                    <ul class="list-inline mb4">
+                                        <div t-field="_company_id.report_footer"/>
+                                    </ul>
+                                    <div t-if="report_type == 'pdf'" class="text-muted">
+                                        Page:<span class="page"/>/
+                                        <span class="topage"/>
+                                    </div>
+                                    <div t-if="report_type == 'pdf' and display_name_in_footer" class="text-muted">
+                                        <span t-out="o.name">(document name)</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </t>
+
+                        <div dir="ltr">
+                            <!-- Invoice fields-->
+                            <t t-call="ksa_zatca_integration.report_e_invoicing_b2b_template_02_header"/>
+                            <!-- partner fields-->
+                            <t t-call="ksa_zatca_integration.report_e_invoicing_b2b_template_02_partner"/>
+                            <!-- Invoice fields-->
+                            <t t-call="ksa_zatca_integration.report_e_invoicing_b2b_template_02_lines"/>
+                            <!-- Invoice total-->
+                            <t t-call="ksa_zatca_integration.report_e_invoicing_b2b_template_02_totals"/>
+                        </div>
+                    </div>
+                </t>
+            </t>
+        </t>
+    </template>
+</odoo>

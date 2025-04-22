@@ -9,6 +9,7 @@ class ResPartner(models.Model):
     building_no = fields.Char('Building Number', help="https://splonline.com.sa/en/national-address-1/")
     additional_no = fields.Char('Additional Number', help="https://splonline.com.sa/en/national-address-1/")
     district = fields.Char('District')
+    country_id_code = fields.Char(related="country_id.code", string="Country Code ")
     country_id_name = fields.Char(related="country_id.name")
     # vat = fields.Char(help="|) VAT registration number (if applicable) for the buyer and in case the buyer "
     #                        "is part of a VAT group then the VAT group Registration number should be entered."
@@ -21,7 +22,7 @@ class ResPartner(models.Model):
                                              ('MOM', 'Momrah license'), ('MLS', 'MHRSD license'), ('700', '700 Number'),
                                              ('SAG', 'MISA license'), ('NAT', 'National ID'), ('GCC', 'GCC ID'),
                                              ('IQA', 'Iqama Number'), ('PAS', 'Passport ID'), ('OTH', 'Other OD')],
-                                            string="Buyer Identification",default="CRN",
+                                            string="Buyer Identification",
                                             help="|) required only if buyer is not VAT registered."
                                                  "||) In case of multiple commercial registrations, the seller should "
                                                  "fill the commercial registration of the branch in respect of which "
@@ -32,35 +33,32 @@ class ResPartner(models.Model):
                                                "||) In case of multiple commercial registrations, the seller should "
                                                "fill the commercial registration of the branch in respect of which "
                                                "the Tax Invoice is being issued.")
-# reports invoice fields
-    building_no = fields.Char('Building No')
-    additional_no = fields.Char('Additional No')
-    other_seller_id = fields.Char('Other Seller Id')
-    
-   
-   
+
     @api.constrains('zip')
     def constrains_brksa64(self):
         for record in self:
             # BR-KSA-67
             if record.company_id and record.is_zatca:
                 zip = record.company_id.sanitize_int(record.zip)
-                if (record.country_id.id and record.country_id.code == 'SA' and
-                        (not zip or len(str(zip)) != 5 or not zip.isdigit())):
+                if (record.country_id.id and record.country_id.code == 'SA' and record.zip and
+                        (len(str(zip)) != 5 or not zip.isdigit())):
                     raise exceptions.ValidationError(_("zip must be exactly 5 digits in case of SA"))
 
     def write(self, vals):
-        vals_dict = [vals] if type(vals) == dict else vals
-        sanitize = self[0].company_id.sanitize_int if self else self.company_id.sanitize_int
+        vals_dict = [vals] if isinstance(vals, dict) else vals
         for val_dict in vals_dict:
-            if 'vat' in val_dict:
-                val_dict['vat'] = sanitize(val_dict['vat'])
-            if 'building_no' in val_dict:
-                val_dict['building_no'] = sanitize(val_dict['building_no'])
-            if 'additional_no' in val_dict:
-                val_dict['additional_no'] = sanitize(val_dict['additional_no'])
-            if 'zip' in val_dict:
-                val_dict['zip'] = sanitize(val_dict['zip'])
+            country_code = self.country_id.code or val_dict.get('country_id') and self.env[
+                'res.country'].browse(val_dict['country_id']).code
+            if country_code == 'SA':
+                sanitize = self.company_id.sanitize_int if self else self.env.company.sanitize_int
+                if 'vat' in val_dict:
+                    val_dict['vat'] = sanitize(val_dict['vat'])
+                if 'building_no' in val_dict:
+                    val_dict['building_no'] = sanitize(val_dict['building_no'])
+                if 'additional_no' in val_dict:
+                    val_dict['additional_no'] = sanitize(val_dict['additional_no'])
+                if 'zip' in val_dict:
+                    val_dict['zip'] = sanitize(val_dict['zip'])
         res = super(ResPartner, self).write(vals)
         # BR-KSA-40
         for record in self:
@@ -71,12 +69,3 @@ class ResPartner(models.Model):
                     if str(record.vat)[0] != '3' or str(record.vat)[-1] != '3':
                         raise exceptions.ValidationError(_("Vat must start/end with 3."))
         return res
-
-
-    @api.model_create_multi
-    def create(self, vals):
-        for val in vals:
-            val['building_no'] = '1234'
-            val['zip'] = '12345'
-
-        return super().create(vals)

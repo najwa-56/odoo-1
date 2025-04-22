@@ -3,7 +3,9 @@ from odoo import fields, models, exceptions, api, _
 from .compliance import Standard, Simplified
 from odoo.tools import mute_logger
 import lxml.etree as ET
+import datetime
 import requests
+import logging
 import base64
 import math
 import json
@@ -12,6 +14,7 @@ import uuid
 import os
 import re
 
+_zatca = logging.getLogger('Zatca Debugger for account.move :')
 # ZATCA SDK Dummy Values
 zatca_sdk_private_key = "MHQCAQEEIDyLDaWIn/1/g3PGLrwupV4nTiiLKM59UEqUch1vDfhpoAcGBSuBBAAKoUQDQgAEYYMMoOaFYAhMO/steotf" \
                         "Zyavr6p11SSlwsK9azmsLY7b1b+FLhqMArhB2dqHKboxqKNfvkKDePhpqjui5hcn0Q=="
@@ -45,9 +48,9 @@ class ResCompany(models.Model):
                                 ('MOM', 'Momrah license'), ('MLS', 'MHRSD license'),
                                 ('SAG', 'MISA license'), ('OTH', 'Other OD'),
                                 ('700', '700 Number')],
-                               required=0, string="License",
+                               required=False, string="License",
                                help="In case multiple IDs exist then one of the above must be entered")
-    license_no = fields.Char(string="License Number (Other seller ID)", required=0)
+    license_no = fields.Char(string="License Number (Other seller ID)", required=False)
 
     building_no = fields.Char(related='partner_id.building_no', readonly=False)
     additional_no = fields.Char(related='partner_id.additional_no', readonly=False)
@@ -55,15 +58,8 @@ class ResCompany(models.Model):
     industry_id = fields.Many2one(related="partner_id.industry_id", readonly=False)
     country_id_name = fields.Char(related="country_id.name")
 
-    # reports invoice fields
-    other_seller_id = fields.Char(related='partner_id.other_seller_id', store=True, readonly=False, string='Other Seller Id')
-    arabic_name = fields.Char('Name')
-    arabic_street = fields.Char('Street')
-    arabic_street2 = fields.Char('Street2')
-    arabic_city = fields.Char('City')
-    arabic_state = fields.Char('State')
-    arabic_country = fields.Char('Country')
-    arabic_zip = fields.Char('Zip')
+    def _get_company_address_field_names(self):
+        return super(ResCompany, self)._get_company_address_field_names() + ['country_id_name']
 
     def sanitize_int(self, value):
         return re.sub(r'\D', '', str(value))
@@ -84,11 +80,12 @@ class ResCompany(models.Model):
 
     is_zatca = fields.Boolean()
     parent_is_zatca = fields.Boolean(compute="_compute_zatca_parent_id", compute_sudo=True)
-    parent_root_id = fields.Many2one('res.company', compute='_compute_zatca_parent_id', compute_sudo=True)
+    parent_root_id = fields.Many2one('res.company', compute='_compute_zatca_parent_id',
+                                     compute_sudo=True)
     is_self_billed = fields.Boolean("Self Billed")
 
     zatca_certificate_status = fields.Boolean()
-    zatca_icv_counter = fields.Char(default=1, readonly=1)
+    zatca_icv_counter = fields.Char(default=1, readonly=True)
 
     zatca_status = fields.Char()
     zatca_onboarding_status = fields.Boolean()
@@ -97,7 +94,8 @@ class ResCompany(models.Model):
 
     # Required fields
     zatca_link = fields.Char("Api Link")
-    api_type = fields.Selection([('Sandbox', 'Sandbox'), ('Simulation', 'Simulation'), ('Live', 'Live')])
+    api_type = fields.Selection(
+        [('Sandbox', 'Sandbox'), ('Simulation', 'Simulation'), ('Live', 'Live')])
 
     is_group_vat = fields.Boolean("Is Group Vat", compute="_compute_is_group_vat", store=True)
     csr_common_name = fields.Char("Common Name")  # CN
@@ -114,13 +112,26 @@ class ResCompany(models.Model):
     csr_industry_business_category = fields.Char("Industry ")  # BusinessCategory
 
     csr_otp = fields.Char("Otp")
-    zatca_send_from_pos = fields.Boolean('Send to Zatca on Post invoice')
-    parent_zatca_send_from_pos = fields.Boolean('Send to Zatca on Post invoice',
-                                                compute="_compute_zatca_parent_id", store=True)
+    zatca_send_from_pos = fields.Boolean('Send to Zatca on Post invoice', default=True)
+    parent_zatca_send_from_pos = fields.Boolean('Send to Zatca on Post invoice ',
+                                                compute="_compute_stored_zatca_parent_id", store=True)
+    zatca_cron_send = fields.Boolean('Auto Send to Zatca once a day')
+    parent_zatca_cron_send = fields.Boolean('Auto Send to Zatca once a day ',
+                                            compute="_compute_stored_zatca_parent_id", store=True)
     zatca_pos_pay = fields.Boolean('Show POS payments in pos receipts')
+    zatca_pos_no_invoice = fields.Boolean("Don't downlaod pos invoices")
+    zatca_no_head_foot = fields.Boolean("Show empty Header & Footer in invoices")
+    zatca_show_barcode = fields.Boolean("Show barcode in reports")
+    zatca_use_address = fields.Boolean("Use Branch Address, Other Seller & Logo")
+    zatca_skip_cus_addr_val = fields.Boolean("Skip Customer Address Validation")
 
     zatca_is_sandbox = fields.Boolean('Testing ? (to check simplified invoices)')
     zatca_is_fatoora_simulation_portal = fields.Boolean('FATOORA Simulation Portal')
+    disable_odoo_invoices = fields.Boolean('disable odoo default invoice', default=False)
+    l10n_sa_invoice_template = fields.Selection(
+        [('Template 1', 'Template 1'), ('Template 2', 'Template 2')],
+        default="Template 1", string="Invoice Template")
+    l10n_sa_show_a4 = fields.Boolean('Show Simplified Report as A4', default=False)
 
     # Never show these fields on front (Security and Integrity of zatca could be compromised.)
     csr_certificate = fields.Char("Certificate", required=False)
@@ -140,10 +151,17 @@ class ResCompany(models.Model):
     @api.depends('parent_id')
     def _compute_zatca_parent_id(self):
         for record in self:
-            record.parent_is_zatca = record.parent_ids.filtered(lambda x: not x.parent_id).is_zatca or record.is_zatca
+            record.parent_is_zatca = record.parent_ids.filtered(
+                lambda x: not x.parent_id).is_zatca or record.is_zatca
             record.parent_root_id = record.parent_ids.filtered(lambda x: not x.parent_id) or record
+
+    @api.onchange('parent_id', 'parent_root_id')
+    @api.depends('parent_id', 'parent_root_id')
+    def _compute_stored_zatca_parent_id(self):
+        for record in self:
             for res in record.child_ids + record:
                 res.parent_zatca_send_from_pos = res.parent_root_id.zatca_send_from_pos
+                res.parent_zatca_cron_send = res.parent_root_id.zatca_cron_send
 
     @api.onchange('vat')
     @api.depends('vat', 'is_zatca')
@@ -168,7 +186,8 @@ class ResCompany(models.Model):
         if not conf.is_zatca:
             raise exceptions.AccessDenied(_("Zatca is not activated."))
 
-        if conf.zatca_status in ["production credentials received", "production credentials renewed."]:
+        if conf.zatca_status in ["production credentials received",
+                                 "production credentials renewed."]:
             raise exceptions.AccessError(_("auto_compliance already done."))
 
         if conf.zatca_status in [None, False, '']:
@@ -181,12 +200,16 @@ class ResCompany(models.Model):
         if 'Onboarding started, required ' in conf.zatca_status:
             # compliance checks
             zatca_invoice_hash = 'NWZlY2ViNjZmZmM4NmYzOGQ5NTI3ODZjNmQ2OTZjNzljMmRiYzIzOWRkNGU5MWI0NjcyOWQ3M2EyN2ZiNTdlOQ=='
-            types = ['standard', 'simplified'] if conf.zatca_invoice_type == 'Standard & Simplified' else (['standard'] if conf.zatca_invoice_type == "Standard" else ['simplified'])
+            types = ['standard',
+                     'simplified'] if conf.zatca_invoice_type == 'Standard & Simplified' else (
+                ['standard'] if conf.zatca_invoice_type == "Standard" else ['simplified'])
             for type in types:
                 if type == "standard":
-                    xmls = {'invoice': Standard.invoice(""), 'credit': Standard.credit(""), 'debit': Standard.debit("")}
+                    xmls = {'invoice': Standard.invoice(""), 'credit': Standard.credit(""),
+                            'debit': Standard.debit("")}
                 else:
-                    xmls = {'invoice': Simplified.invoice(""), 'credit': Simplified.credit(""), 'debit': Simplified.debit("")}
+                    xmls = {'invoice': Simplified.invoice(""), 'credit': Simplified.credit(""),
+                            'debit': Simplified.debit("")}
                 for check in xmls:
                     invoice = base64.b64decode(xmls[check]).decode()
                     is_tax_invoice = 1 if type == "standard" else 0
@@ -213,33 +236,53 @@ class ResCompany(models.Model):
                             </ext:UBLExtension>
                         </ext:UBLExtensions>
                         <cbc:UBLVersionID>2.1</cbc:UBLVersionID>'''
-                        invoice = invoice.replace("<cbc:UBLVersionID>2.1</cbc:UBLVersionID>", ubl_2_1)
+                        invoice = invoice.replace("<cbc:UBLVersionID>2.1</cbc:UBLVersionID>",
+                                                  ubl_2_1)
                     invoice = invoice.replace("zatca_invoice_pih", str(zatca_invoice_hash))
+                    datetime_now = datetime.datetime.now()
+                    datetime_xml = """<cbc:IssueDate>%s</cbc:IssueDate><cbc:IssueTime>%s</cbc:IssueTime>""" % (
+                        move.get_l10n_field_type('date', datetime_now),
+                        move.get_l10n_field_type('time', datetime_now)
+                    )
+                    invoice = (invoice[:invoice.find("<cbc:IssueDate>")] + datetime_xml +
+                               invoice[invoice.find("</cbc:IssueTime>") + 16:])
                     if type == "standard":
-                        invoice = invoice[:invoice.find("<cac:AccountingSupplierParty>")] + "l10n_AccountingSupplierParty" + invoice[invoice.find("</cac:AccountingSupplierParty>") + 31:]
+                        invoice = (invoice[:invoice.find("<cac:AccountingSupplierParty>")] +
+                                   "l10n_AccountingSupplierParty" +
+                                   invoice[invoice.find("</cac:AccountingSupplierParty>") + 31:])
                     AccountingSupplierParty = move.get_AccountingSupplierParty(conf)
-                    invoice = invoice.replace('l10n_AccountingSupplierParty', str(AccountingSupplierParty))
-                    zatca_invoice_hash = move.hash_with_c14n_canonicalization(conf, xml=invoice, auto_compliance=1)
+                    invoice = invoice.replace('l10n_AccountingSupplierParty',
+                                              str(AccountingSupplierParty))
+                    zatca_invoice_hash = move.hash_with_c14n_canonicalization(conf, xml=invoice,
+                                                                              auto_compliance=1)
                     xml_file = ET.fromstring(invoice).getroottree()
-                    invoice_uuid = xml_file.find("//{urn:oasis:names:specification:ubl:schema:xsd:CommonBasicComponents-2}UUID").text
-                    zdate = xml_file.find("//{urn:oasis:names:specification:ubl:schema:xsd:CommonBasicComponents-2}IssueDate").text
-                    ztime = xml_file.find("//{urn:oasis:names:specification:ubl:schema:xsd:CommonBasicComponents-2}IssueTime").text
-                    bt_115 = xml_file.find("//{urn:oasis:names:specification:ubl:schema:xsd:CommonBasicComponents-2}PayableAmount").text
-                    bt_110 = xml_file.find("//{urn:oasis:names:specification:ubl:schema:xsd:CommonBasicComponents-2}TaxAmount").text
+                    invoice_uuid = xml_file.find(
+                        "//{urn:oasis:names:specification:ubl:schema:xsd:CommonBasicComponents-2}UUID").text
+                    zdate = xml_file.find(
+                        "//{urn:oasis:names:specification:ubl:schema:xsd:CommonBasicComponents-2}IssueDate").text
+                    ztime = xml_file.find(
+                        "//{urn:oasis:names:specification:ubl:schema:xsd:CommonBasicComponents-2}IssueTime").text
+                    bt_115 = xml_file.find(
+                        "//{urn:oasis:names:specification:ubl:schema:xsd:CommonBasicComponents-2}PayableAmount").text
+                    bt_110 = xml_file.find(
+                        "//{urn:oasis:names:specification:ubl:schema:xsd:CommonBasicComponents-2}TaxAmount").text
                     timestamp_enc = zdate + "T" + ztime
 
                     if not is_tax_invoice:
-                        signature_value = move.apply_signature(conf, auto_compliance=1, zatca_invoice_hash=zatca_invoice_hash)
+                        signature_value = move.apply_signature(conf, auto_compliance=1,
+                                                               zatca_invoice_hash=zatca_invoice_hash)
                         invoice = invoice.replace('zatca_signature_hash', str(base_64_5))
                         invoice = invoice.replace('zatca_signature_value', str(signature_value))
-                        qr_code = move.compliance_qr_code(conf, bt_115, bt_110, zatca_invoice_hash, signature_value, timestamp_enc)
+                        qr_code = move.compliance_qr_code(conf, bt_115, bt_110, zatca_invoice_hash,
+                                                          signature_value, timestamp_enc)
                         invoice = invoice.replace("l10n_zatca_qr", str(qr_code))
 
                     invoice = invoice.replace('zatca_invoice_hash', str(zatca_invoice_hash))
 
-                    move.compliance_invoices_api(auto_compliance=1, conf=conf, is_tax_invoice=type, bt_3=check,
-                                                 zatca_invoice_hash=zatca_invoice_hash, zatca_invoice=invoice,
-                                                 invoice_uuid=invoice_uuid)
+                    move.compliance_invoices_api(
+                        auto_compliance=1, conf=conf, is_tax_invoice=type, bt_3=check,
+                        zatca_invoice_hash=zatca_invoice_hash, zatca_invoice=invoice,
+                        invoice_uuid=invoice_uuid)
 
                     if 'Onboarding was failed in invoice' in conf.zatca_status:
                         raise exceptions.ValidationError(_("Compliance Failed") + "\n" +
@@ -250,7 +293,8 @@ class ResCompany(models.Model):
                 raise exceptions.AccessError(_("Unexpected Error in getting PCSID") + "\n" +
                                              _("Try Again."))
 
-        if conf.zatca_status in ["Requesting for production credentials now.", "Onboarding completed, request for production credentials now"]:
+        if conf.zatca_status in ["Requesting for production credentials now.",
+                                 "Onboarding completed, request for production credentials now"]:
             conf.zatca_status = "Requesting for production credentials now."
             conf.production_credentials()
 
@@ -303,12 +347,19 @@ class ResCompany(models.Model):
 
             # zatca fields
             conf_name = conf.name[0:64]
-            conf.csr_common_name = (odoo.release.description + odoo.release.version.replace("+e", "e") + "-" + str(self.id)).replace(" ", '').replace("e", '').replace("+", '').replace("_", '')
-            conf.csr_serial_number = ("1-Odoo|2-17|3-%s_%s_%s" % (odoo.release.version.replace('17.0', '').replace("+e", "e").replace("-", ""), self.id, str(uuid.uuid4()).replace("-", ""))).encode('utf-8')
+            conf.csr_common_name = (
+                    odoo.release.description + odoo.release.version.replace("+e", "e") + "-" +
+                    str(self.id)).replace(
+                " ", '').replace("e", '').replace("+", '').replace("_", '')
+            conf.csr_serial_number = ("1-Odoo|2-17|3-%s_%s_%s" % (
+                odoo.release.version.replace('17.0', '').replace("+e", "e").replace("-", ""),
+                self.id, str(uuid.uuid4()).replace("-", ""))).encode('utf-8')
             conf.csr_organization_unit_name = conf.csr_individual_vat if conf.is_group_vat else conf_name
             conf.csr_organization_name = conf_name
-            conf.csr_invoice_type = '1000' if conf.zatca_invoice_type == 'Standard' else ('0100' if conf.zatca_invoice_type == 'Simplified' else '1100')
-            conf.csr_location_address = self.env['ir.config_parameter'].sudo().get_param('web.base.url')
+            conf.csr_invoice_type = '1000' if conf.zatca_invoice_type == 'Standard' else (
+                '0100' if conf.zatca_invoice_type == 'Simplified' else '1100')
+            conf.csr_location_address = self.env['ir.config_parameter'].sudo().get_param(
+                'web.base.url')
             conf.csr_industry_business_category = conf.partner_id.industry_id.name or "IT"
 
             config_cnf = '''
@@ -358,8 +409,7 @@ class ResCompany(models.Model):
                 # ZATCA sanbox private key
                 private_key = zatca_sdk_private_key
                 private_key = private_key.replace('-----BEGIN EC PRIVATE KEY-----', '') \
-                                         .replace('-----END EC PRIVATE KEY-----', '')\
-                                         .replace(' ', '').replace('\n', '')
+                    .replace('-----END EC PRIVATE KEY-----', '').replace(' ', '').replace('\n', '')
                 self.zatca_prod_private_key = private_key
             else:
                 private_key = 'openssl ecparam -name secp256k1 -genkey -noout'
@@ -370,9 +420,7 @@ class ResCompany(models.Model):
             if not self.zatca_is_sandbox:
                 private_key = os.popen(private_key).read()
                 private_key = private_key.replace('-----BEGIN EC PRIVATE KEY-----', '') \
-                                         .replace('-----END EC PRIVATE KEY-----', '')\
-                                         .replace(' ', '')\
-                                         .replace('\n', '')
+                    .replace('-----END EC PRIVATE KEY-----', '').replace(' ', '').replace('\n', '')
                 self.zatca_prod_private_key = private_key
 
             for x in range(1, math.ceil(len(private_key) / 64)):
@@ -427,7 +475,7 @@ class ResCompany(models.Model):
             else:
                 raise exceptions.ValidationError(_("Invalid Invoice Type defined."))
             conf.zatca_on_board_status_details = json.dumps(zatca_on_board_status_details)
-            conf.zatca_status = 'Onboarding started, required ' + str(qty) + ' invoices' + "\n" + message
+            conf.zatca_status = 'Onboarding started, required %s invoices\n%s' % (qty, message)
 
         except Exception as e:
             if 'odoo.exceptions' in str(type(e)):
@@ -451,6 +499,7 @@ class ResCompany(models.Model):
         # link = "https://gw-fatoora.zatca.gov.sa/e-invoicing/developer-portal"
         conf = self.sudo()
         link = conf.zatca_link
+        print("in complince=========================")
 
         if endpoint == '/compliance':
             zatca_otp = conf.csr_otp
@@ -486,7 +535,8 @@ class ResCompany(models.Model):
             csr = conf.zatca_csr_base64
             data = {'csr': csr.replace('\n', '')}
         try:
-            req = requests.post(link + endpoint, headers=headers, data=json.dumps(data), timeout=(30, 60))
+            req = requests.post(link + endpoint, headers=headers, data=json.dumps(data),
+                                timeout=(30, 60))
             if req.status_code == 500:
                 try:
                     response = req.text
@@ -496,7 +546,8 @@ class ResCompany(models.Model):
                         raise e
                     response = json.loads(req.text)
                     raise exceptions.AccessError(self.error_message(response))
-                raise exceptions.AccessError(_("Invalid Request, zatca, \ncontact system administer."))
+                raise exceptions.AccessError(
+                    _("Invalid Request, zatca, \ncontact system administer."))
             elif req.status_code == 400:
                 try:
                     response = req.text
@@ -506,7 +557,8 @@ class ResCompany(models.Model):
                         raise e
                     response = json.loads(req.text)
                     raise exceptions.AccessError(self.error_message(response))
-                raise exceptions.AccessError(_("Invalid Request, odoo, \ncontact system administer."))
+                raise exceptions.AccessError(
+                    _("Invalid Request, odoo, \ncontact system administer."))
             elif req.status_code == 401:
                 try:
                     response = req.text
@@ -581,8 +633,8 @@ class ResCompany(models.Model):
         if not certificate:
             conf.zatca_certificate_status = 0
             raise exceptions.MissingError(_("Certificate not found."))
-        certificate = certificate.replace('-----BEGIN CERTIFICATE-----', '').replace('-----END CERTIFICATE-----', '')\
-                                 .replace(' ', '').replace('\n', '')
+        certificate = certificate.replace('-----BEGIN CERTIFICATE-----', '') \
+            .replace('-----END CERTIFICATE-----', '').replace(' ', '').replace('\n', '')
         for x in range(1, math.ceil(len(certificate) / 64)):
             certificate = certificate[:64 * x + x - 1] + '\n' + certificate[64 * x + x - 1:]
         certificate = "-----BEGIN CERTIFICATE-----\n" + certificate + "\n-----END CERTIFICATE-----"
@@ -595,17 +647,14 @@ class ResCompany(models.Model):
 
         certificate_signature_algorithm = "openssl x509 -in /tmp/zatca_cert.pem -text -noout"
         zatca_cert_public_key = os.popen(certificate_public_key).read()
-        zatca_cert_public_key = zatca_cert_public_key.replace('-----BEGIN PUBLIC KEY-----', '')\
-                                                     .replace('-----END PUBLIC KEY-----', '')\
-                                                     .replace('\n', '').replace(' ', '')
+        zatca_cert_public_key = zatca_cert_public_key.replace('-----BEGIN PUBLIC KEY-----', '') \
+            .replace('-----END PUBLIC KEY-----', '').replace('\n', '').replace(' ', '')
         conf.zatca_cert_public_key = zatca_cert_public_key
         cert = os.popen(certificate_signature_algorithm).read()
         cert_find = cert.rfind("Signature Algorithm: ecdsa-with-SHA256")
         if cert_find > 0 and cert_find + 38 < len(cert):
-            cert_sig_algo = cert[cert.rfind("Signature Algorithm: ecdsa-with-SHA256") + 38:].replace('\n', '')\
-                                                                                            .replace(':', '')\
-                                                                                            .replace(' ', '')\
-                                                                                            .replace('SignatureValue', '')
+            cert_sig_algo = cert[cert.rfind("Signature Algorithm: ecdsa-with-SHA256") + 38:] \
+                .replace('\n', '').replace(':', '').replace(' ', '').replace('SignatureValue', '')
             conf.zatca_cert_sig_algo = cert_sig_algo
         else:
             raise exceptions.ValidationError(_("Invalid Certificate (CSID) Provided."))
@@ -647,9 +696,9 @@ class ResCompany(models.Model):
             # if recompute_phase1_ending_date:
             #     records = self.env['account.move'].sudo().search([('company_id', '=', self.id)])
             #     records._compute_l10n_sa_zatca_status()
-            if record.parent_is_zatca:
+            if record.is_zatca:
                 if len(str(record.vat)) != 15:
-                    raise exceptions.ValidationError('Vat must be exactly 15 digits')
+                    raise exceptions.ValidationError(_('Vat must be exactly 15 digits'))
                 if str(record.vat)[0] != '3' or str(record.vat)[-1] != '3':
                     raise exceptions.ValidationError(_("Vat must start/end with 3."))
         return res

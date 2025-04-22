@@ -17,12 +17,6 @@ import json
 import math
 import re
 import os
-from num2words import num2words
-from datetime import date
-from datetime import datetime
-from datetime import  timedelta
-
-
 
 _logger = logging.getLogger(__name__)
 _zatca = logging.getLogger('Zatca Debugger for account.move :')
@@ -36,65 +30,18 @@ message = "Based on the VAT regulation, after issuing an invoice, it is prohibit
 class AccountMove(models.Model):
     _inherit = "account.move"
 
-# start of new report
-    date_due = fields.Date('Date Due')
-    invoice_date_supply = fields.Date('Date Of Supply') 
-
-    # def amount_word(self, amount):
-    #     language = self.partner_id.lang or 'en'
-    #     language_id = self.env['res.lang'].search([('code', '=', 'ar_001')])
-    #     if language_id:
-    #         language = language_id.iso_code
-    #     amount_str =  str('{:2f}'.format(amount))
-    #     amount_str_splt = amount_str.split('.')
-    #     before_point_value = amount_str_splt[0]
-    #     after_point_value = amount_str_splt[1][:2]           
-    #     before_amount_words = num2words(int(before_point_value),lang=language)
-    #     after_amount_words = num2words(int(after_point_value),lang=language)
-    #     amount = before_amount_words + ' ' + after_amount_words
-    #     return amount
-    def amount_word(self, amount , lang="ar_001"):
-        return self.currency_id.with_context(lang=lang).amount_to_text(amount)
-
-
-    def total_amount_words(self, amount):
-        words_amount = self.currency_id.amount_to_text(amount)
-        return words_amount
-
-    @api.model
-    def get_qr_code(self):
-
-        def get_qr_encoding(tag, field):
-            company_name_byte_array = field.encode('UTF-8')
-            company_name_tag_encoding = tag.to_bytes(length=1, byteorder='big')
-            company_name_length_encoding = len(company_name_byte_array).to_bytes(length=1, byteorder='big')
-            return company_name_tag_encoding + company_name_length_encoding + company_name_byte_array
-
-        qr_code_str = ''
-        seller_name_enc = get_qr_encoding(1, self.company_id.display_name)
-        company_vat_enc = get_qr_encoding(2, self.company_id.vat or '')
-        time_sa = fields.Datetime.context_timestamp(self.with_context(tz='Asia/Riyadh'), self.l10n_sa_confirmation_datetime or self.create_date)
-        timestamp_enc = get_qr_encoding(3, time_sa.isoformat())
-        invoice_total_enc = get_qr_encoding(4, str(self.amount_total))
-        total_vat_enc = get_qr_encoding(5, str(self.currency_id.round(self.amount_total - self.amount_untaxed)))
-
-        str_to_encode = seller_name_enc + company_vat_enc + timestamp_enc + invoice_total_enc + total_vat_enc
-        qr_code_str = base64.b64encode(str_to_encode).decode('UTF-8')
-        return qr_code_str
-# end of new report
-
-    zatca_hash_cleared_invoice = fields.Binary("cleared invoice returned from ZATCA", attachment=True, readonly=1, copy=False)
+    zatca_hash_cleared_invoice = fields.Binary("cleared invoice returned from ZATCA", attachment=True, readonly=True, copy=False)
     zatca_hash_cleared_invoice_name = fields.Char(copy=False)
 
-    pdf_report = fields.Binary(attachment=True, readonly=1, copy=False)
-    zatca_invoice = fields.Binary("generated invoice for ZATCA", attachment=True, readonly=1, copy=False)
+    pdf_report = fields.Binary(attachment=True, readonly=True, copy=False)
+    zatca_invoice = fields.Binary("generated invoice for ZATCA", attachment=True, readonly=True, copy=False)
     zatca_invoice_name = fields.Char(copy=False)
     credit_debit_reason = fields.Char(string="Reasons for issuance of credit / debit note", copy=False,
                                       help="Reasons as per Article 40 (paragraph 1) of KSA VAT regulations")
-    zatca_compliance_invoices_api = fields.Html(readonly=1, copy=False)
+    zatca_compliance_invoices_api = fields.Html(readonly=True, copy=False)
     l10n_sa_invoice_type_is_readonly = fields.Boolean(copy=False)
     l10n_sa_invoice_type = fields.Selection([('Standard', 'Standard'), ('Simplified', 'Simplified')],
-                                            string="Invoice Type", copy=False)
+                                            string="Invoice Type", copy=True)
 
     l10n_is_third_party_invoice = fields.Boolean(string="Is Third Party",
                                                  help="Flag indicating whether the invoice was created by a third party")
@@ -118,46 +65,50 @@ class AccountMove(models.Model):
                                                string="Payment Means Code",
                                                help='The means, expressed as code, for how a payment is expected to be or has been settled.'
                                                     '(subset of UNTDID 4461)')
-    ksa_note = fields.Char(size=1000, required=0)
+    ksa_note = fields.Char(size=1000, required=False)
     l10n_sa_rounding_amount = fields.Monetary(string='Rounding Amount', currency_field='currency_id')
 
     # Never show these fields on front
     is_zatca = fields.Boolean(related="company_id.parent_is_zatca")
     is_self_billed = fields.Boolean(related="company_id.parent_root_id.is_self_billed")
+    disable_odoo_invoices = fields.Boolean(related="company_id.parent_root_id.disable_odoo_invoices")
     l10n_sa_phase1_end_date = fields.Date(related="company_id.parent_root_id.l10n_sa_phase1_end_date")
-    zatca_unique_seq = fields.Char(readonly=1, copy=False)
-    zatca_icv_counter = fields.Char(readonly=1, copy=False)
-    invoice_uuid = fields.Char('zatca uuid', readonly=1, copy=False)
-    zatca_invoice_hash = fields.Char(readonly=1, copy=False)
-    zatca_invoice_hash_hex = fields.Char(readonly=1, copy=False)
-    zatca_hash_invoice = fields.Binary("ZATCA generated invoice for hash", attachment=True, readonly=1, copy=False)
-    zatca_hash_invoice_name = fields.Char(readonly=1, copy=False)
+    zatca_unique_seq = fields.Char(readonly=True, copy=False)
+    zatca_icv_counter = fields.Char(readonly=True, copy=False)
+    invoice_uuid = fields.Char('zatca uuid', readonly=True, copy=False)
+    zatca_invoice_hash = fields.Char(readonly=True, copy=False)
+    zatca_invoice_hash_hex = fields.Char(readonly=True, copy=False)
+    zatca_hash_invoice = fields.Binary("ZATCA generated invoice for hash", attachment=True, readonly=True, copy=False)
+    zatca_hash_invoice_name = fields.Char(readonly=True, copy=False)
     l10n_sa_response_datetime = fields.Datetime(string='Response DateTime', readonly=True, copy=False)
     l10n_sa_remaining_time = fields.Char(string='Remaining Time', readonly=True, copy=False,
                                          compute="_compute_l10n_sa_remaining_time")
     l10n_sa_qr_code_str = fields.Char(string='Zatka QR Code ', copy=False)
-    sa_qr_code_str = fields.Char(string='Zatka QR Code', copy=False, readonly=1)
-    # l10n_sa_is_tax_invoice = fields.Boolean(readonly=1, copy=False)
-    l10n_sa_zatca_status = fields.Char("E-Invoice status", copy=False, readonly=1)
-    
-    pos_reference = fields.Char(string='Receipt Number')
-
-    tax_line_missing = fields.Boolean('Missing Tax Line')
+    sa_qr_code_str = fields.Char(string='Zatka QR Code', copy=False, readonly=True)
+    l10n_sa_zatca_status = fields.Char("E-Invoice status", copy=False, readonly=True)
 
     def _get_zatca_ubl_functions(self):
         return ZatcaUBL
 
+    def _get_zatca_invoice(self, is_pos=False):
+        if self.company_id.l10n_sa_invoice_template == 'Template 1':
+            report_dict = ["ksa_zatca_integration.report_e_invoicing_b2b_01"] * 2
+        else:
+            report_dict = ["ksa_zatca_integration.report_e_invoicing_b2b_02"] * 2
+        if not is_pos and not self.company_id.parent_root_id.l10n_sa_show_a4:
+            report_dict[1] = 'ksa_zatca_integration.report_e_invoicing_b2c'
+        return report_dict
+
     @api.model
     def default_get(self, fields_list):
         res = super(AccountMove, self).default_get(fields_list)
-        res['credit_debit_reason'] = 'مرتجع العملاء'
         conf = self.journal_id.company_id.parent_root_id or self.company_id.parent_root_id or self.env.company.sudo().parent_root_id
         if 'l10n_sa_invoice_type_is_readonly' in fields_list:
             res['l10n_sa_invoice_type_is_readonly'] = 1 if conf.is_zatca and conf.zatca_invoice_type != "Standard & Simplified" else 0
         if 'l10n_payment_means_code' in fields_list:
             res['l10n_payment_means_code'] = '10'
-        # if 'invoice_date' in fields_list:
-        #     res['invoice_date'] = fields.Datetime.now().date()
+        if 'invoice_date' in fields_list:
+            res['invoice_date'] = fields.Datetime.now().date()
         if 'l10n_sa_invoice_type' in fields_list:
             if conf.is_zatca:
                 res['l10n_sa_invoice_type'] = "Simplified" if conf.zatca_invoice_type == "Simplified" else "Standard"
@@ -325,11 +276,12 @@ class AccountMove(models.Model):
 
     def invoice_ksa_validations(self, bt_3):
         message = ""
-        partner_id, company_id, buyer_identification, buyer_identification_no, license, license_no = self._get_partner_comapny(self.company_id)
+        conf = self.company_id.parent_root_id.sudo()
+        partner_id, company_id, buyer_identification, buyer_identification_no, license, license_no, company_vat, partner_vat = self._get_partner_comapny(self.company_id)
         # odoo validations for zatca
         invoice_line_tax_ids = self.invoice_line_ids.filtered(lambda x: x.display_type not in ['line_section', 'line_note'])
         invoice_line_ids = invoice_line_tax_ids.filtered(lambda x: not x.sale_line_ids.is_downpayment)
-        if len(invoice_line_tax_ids) != len([invoice_line_tax_id.tax_ids for invoice_line_tax_id in invoice_line_tax_ids if invoice_line_tax_id.tax_ids.ids]):
+        if len(invoice_line_tax_ids) != len([invoice_line_tax_id.l10n_sa_get_tax_ids() for invoice_line_tax_id in invoice_line_tax_ids if invoice_line_tax_id.l10n_sa_get_tax_ids().ids]):
             message += _("one or more invoice line does not have a tax.") + "\n"
         if not self._is_downpayment():
             if len(invoice_line_ids.ids) <= 0:
@@ -366,29 +318,36 @@ class AccountMove(models.Model):
         if len(missing_product_fields) > 0:
             message += ' , '.join(missing_product_fields) + _("are missing.") + '\n'
 
-        company_data = self._get_zatca_partner_data() if self.l10n_is_self_billed_invoice else self._get_zatca_company_data(self.company_id.parent_root_id)
-        company_fields = [company_data["district"]['field'], company_data["city"]['field'], company_data["street"]['field'], 'building_no', 'zip', 'vat']
-        company_fields += ["buyer_identification", "buyer_identification_no"] if self.l10n_is_self_billed_invoice else ['license', 'license_no']
-        company_fields_ids = ['country_id']
+
+        if not self.l10n_is_self_billed_invoice or (self.l10n_is_self_billed_invoice and not conf.zatca_skip_cus_addr_val):
+            company_data = self._get_zatca_partner_data() if self.l10n_is_self_billed_invoice else self._get_zatca_company_data(self.company_id if self.company_id.parent_root_id.zatca_use_address else self.company_id.parent_root_id)
+            company_fields = [company_data["district"]['field'], company_data["city"]['field'], company_data["street"]['field'], 'building_no', 'zip', 'vat']
+            company_fields += ["buyer_identification", "buyer_identification_no"] if self.l10n_is_self_billed_invoice else ['license', 'license_no']
+            company_fields_ids = ['country_id']
+            if company_id.state_id.id:
+                state_fields = [company_data['state_id_name']['field']]
+                missing_state_field_fields = [company_id.state_id._fields[state_field].string for state_field in state_fields if not company_id.state_id[state_field]]
+                if len(missing_state_field_fields) > 0:
+                    message += ' , '.join(missing_state_field_fields) + ' ' + _("are missing in Company State.") + '\n'
+
+            if company_id.building_no and len(company_id.building_no) != 4:
+                message += _('Company Building Number must be exactly 4 digits.') + "\n"
+            if company_id.zip and len(company_id.zip) != 5:
+                message += _('Company zip must be exactly 5 digits.') + "\n"
+        else:
+            company_fields = ['vat']
+            company_fields += ["buyer_identification", "buyer_identification_no"] if self.l10n_is_self_billed_invoice else ['license', 'license_no']
+            company_fields_ids = []
+
         missing_company_fields = [company_id._fields[company_field].string for company_field in company_fields if not company_id[company_field]]
         missing_company_fields_ids = [company_id._fields[company_field].string for company_field in company_fields_ids if not company_id[company_field]['id']]
-        if company_id.state_id.id:
-            state_fields = [company_data['state_id_name']['field']]
-            missing_state_field_fields = [company_id.state_id._fields[state_field].string for state_field in state_fields if not company_id.state_id[state_field]]
-            if len(missing_state_field_fields) > 0:
-                message += ' , '.join(missing_state_field_fields) + ' ' + _("are missing in Company State.") + '\n'
-
         if len(missing_company_fields) > 0 or len(missing_company_fields_ids) > 0:
             message += ' , '.join(missing_company_fields_ids + missing_company_fields) + ' ' + _("are missing in Company Address.") + '\n'
 
-        if company_id.building_no and len(company_id.building_no) != 4:
-            message += _('Company Building Number must be exactly 4 digits.') + "\n"
-        if company_id.zip and len(company_id.zip) != 5:
-            message += _('Company zip must be exactly 5 digits.') + "\n"
-        if company_id.vat:
-            if len(company_id.vat) != 15:
+        if company_vat:
+            if len(company_vat) != 15:
                 message += _('Company Vat must be exactly 15 digits.') + "\n"
-            if str(company_id.vat)[0] != '3' or str(company_id.vat)[-1] != '3':
+            if str(company_vat)[0] != '3' or str(company_vat)[-1] != '3':
                 message += _('Company Vat must start/end with 3.') + "\n"
         if license not in ['CRN', "MOM", "MLS", "SAG", "OTH", "700"]:
             company_field = "buyer_identification" if self.l10n_is_self_billed_invoice else 'license'
@@ -401,28 +360,32 @@ class AccountMove(models.Model):
     def _get_partner_comapny(self, company_id):
         if self.l10n_is_self_billed_invoice:
             self_company = company_id
-            partner_id = company_id.parent_root_id
+            partner_id = company_id if company_id.parent_root_id.zatca_use_address else company_id.parent_root_id
             company_id = self.partner_id
             license = self.partner_id.buyer_identification
             license_no = self.partner_id.buyer_identification_no
             buyer_identification = self_company.license
             buyer_identification_no = self_company.license_no
+            partner_vat = partner_id.parent_root_id.vat
+            company_vat = company_id.vat
         else:
             partner_id = self.partner_id
             buyer_identification = self.partner_id.buyer_identification
             buyer_identification_no = self.partner_id.buyer_identification_no
             license = company_id.license
             license_no = company_id.license_no
-            company_id = company_id.parent_root_id
+            company_id = company_id if company_id.parent_root_id.zatca_use_address else company_id.parent_root_id
+            partner_vat = partner_id.vat
+            company_vat = company_id.parent_root_id.vat
 
-        return partner_id, company_id, buyer_identification, buyer_identification_no, license, license_no
+        return partner_id, company_id, buyer_identification, buyer_identification_no, license, license_no, company_vat, partner_vat
 
     def tax_invoice_validations(self):
         message = "For tax invoice \n"
         conf = self.company_id.parent_root_id.sudo()
-        partner_id, company_id, buyer_identification, buyer_identification_no, license, license_no = self._get_partner_comapny(self.company_id)
+        partner_id, company_id, buyer_identification, buyer_identification_no, license, license_no, company_vat, partner_vat = self._get_partner_comapny(self.company_id)
 
-        if not (buyer_identification and buyer_identification_no) and not partner_id.vat:
+        if not (buyer_identification and buyer_identification_no) and not partner_vat:
             message += _("customer vat or buyer_identification is required") + "\n"
 
         if conf.csr_invoice_type[0:1] != '1':
@@ -433,39 +396,46 @@ class AccountMove(models.Model):
             if not (buyer_identification or buyer_identification_no):
                 message += _("buyer_identification is required for exports invoice") + "\n"
 
-        partner_data = self._get_zatca_company_data(self.company_id.parent_root_id) if self.l10n_is_self_billed_invoice else self._get_zatca_partner_data()
-        partner_fields = [partner_data["city"]['field'], partner_data["street"]['field'], 'zip']
-        partner_fields_ids = ['country_id']
-        if partner_id.country_id.code == 'SA':
-            partner_fields += ['building_no', partner_data["city"]['field'], partner_data["district"]["field"]]
-        if partner_id.state_id.id:
-            state_fields = [partner_data['state_id_name']['field']]
-            missing_state_fields = [partner_id.state_id._fields[state_field].string for state_field in state_fields if not partner_id.state_id[state_field]]
-            if len(missing_state_fields) > 0:
-                message += ' , '.join(missing_state_fields) + ' ' + _("are missing in Customer State.") + '\n'
+        if self.l10n_is_self_billed_invoice or (not self.l10n_is_self_billed_invoice and not conf.zatca_skip_cus_addr_val):
+            partner_data = self._get_zatca_company_data(self.company_id if self.company_id.parent_root_id.zatca_use_address else self.company_id.parent_root_id) if self.l10n_is_self_billed_invoice else self._get_zatca_partner_data()
+            partner_fields = [partner_data["city"]['field'], partner_data["street"]['field'], 'zip']
+            partner_fields_ids = ['country_id']
+            if partner_id.country_id.code == 'SA':
+                partner_fields += ['building_no', partner_data["city"]['field'], partner_data["district"]["field"]]
+            if partner_id.state_id.id:
+                state_fields = [partner_data['state_id_name']['field']]
+                missing_state_fields = [partner_id.state_id._fields[state_field].string for state_field in state_fields if not partner_id.state_id[state_field]]
+                if len(missing_state_fields) > 0:
+                    message += ' , '.join(missing_state_fields) + ' ' + _("are missing in Customer State.") + '\n'
 
-        missing_partner_fields = [partner_id._fields[partner_field].string for partner_field in partner_fields if not partner_id[partner_field]]
-        missing_partner_fields_ids = [partner_id._fields[partner_fields_id].string for partner_fields_id in partner_fields_ids if not partner_id[partner_fields_id]['id']]
+            missing_partner_fields = [partner_id._fields[partner_field].string for partner_field in partner_fields if not partner_id[partner_field]]
+            missing_partner_fields_ids = [partner_id._fields[partner_fields_id].string for partner_fields_id in partner_fields_ids if not partner_id[partner_fields_id]['id']]
 
-        if len(missing_partner_fields) > 0 or len(missing_partner_fields_ids) > 0:
-            message += ' , '.join(missing_partner_fields_ids + missing_partner_fields) +\
-                       ' ' + _("are missing in Customer Address, which are required for tax invoices") + "\n"
+            if len(missing_partner_fields) > 0 or len(missing_partner_fields_ids) > 0:
+                message += ' , '.join(missing_partner_fields_ids + missing_partner_fields) +\
+                           ' ' + _("are missing in Customer Address, which are required for tax invoices") + "\n"
 
-        if (partner_id.country_id.code == "SA" and partner_id.zip and
-                (len(str(partner_id.zip)) != 5 or not partner_id.zip.isdigit())):
+            if (partner_id.country_id.code == "SA" and partner_id.zip and
+                    (len(str(partner_id.zip)) != 5 or not partner_id.zip.isdigit())):
+                message += _("Customer PostalZone/Zip must be exactly 5 digits") + "\n"
 
-            partner_id.write({'zip':'12345'})
-            message += _("Customer PostalZone/Zip must be exactly 5 digits") + "\n"
-
-        if partner_id.vat and not self.l10n_is_exports_invoice:
-            if len(str(partner_id.vat)) != 15:
+        if partner_vat and not self.l10n_is_exports_invoice:
+            if len(str(partner_vat)) != 15:
                 message += _("Customer Vat must be exactly 15 digits") + "\n"
-            if str(partner_id.vat)[0] != '3' or str(partner_id.vat)[-1] != '3':
+            if str(partner_vat)[0] != '3' or str(partner_vat)[-1] != '3':
                 message += _("Customer Vat must start/end with 3") + "\n"
-            if company_id.vat == partner_id.vat:
+            if company_vat == partner_vat:
                 message += _("Vat can't be same for customer and company.") + "\n"
 
         if message != "For tax invoice \n":
+            raise exceptions.ValidationError(message)
+
+    def simplified_invoice_validations(self):
+        message = "For simplified invoice \n"
+        if self.partner_id.company_type == 'company' and self.amount_total >= 1000:
+            message += _("partner with company_type = 'company' are considered as B2B") + "\n"
+            message += _("as per ZATCA for B2B, upto 1000 SAR can be used in Simplified invoices") + "\n"
+        if message != "For simplified invoice \n":
             raise exceptions.ValidationError(message)
 
     def l10n_is_positive(self, field, value):
@@ -501,46 +471,27 @@ class AccountMove(models.Model):
         return str(value)
 
     def _get_zatca_company_data(self, company_id):
-        data = {}
-        if self.company_id.id == 3:
-            # Fetch fields from journal
-            journal_id = self.journal_id
-            data = {
-                "name": {'value': journal_id.branch_name, 'field': 'name'},
-                "street": {'value': journal_id.street, 'field': 'street'},
-                "street2": {'value': journal_id.street2, 'field': 'street2'},
-                "district": {'value': journal_id.district, 'field': 'district'},
-                "city": {'value': journal_id.city, 'field': 'city'}
-            }
-            # These fields must be in res.country.state
-            data.update({
-                "state_id_name": {'value': journal_id.city, 'field': 'name'},  # state_id.name
-            })
-            # These fields must be in res.country
-            data.update({
-                "country_id_name": {'value': company_id.country_id.name, 'field': 'name'},  # only for reports
-            })
-        else:
-            # arabic only fields
-            lang = self.env.user.partner_id.lang
-            # lang = 'ar_001'
-            conf = company_id.with_context(lang=lang).sudo()
-            # These fields must be in res.company
-            data = {
-                "name": {'value': conf.name, 'field': 'name'},
-                "street": {'value': conf.street, 'field': 'street'},
-                "street2": {'value': conf.street2, 'field': 'street2'},
-                "district": {'value': conf.district, 'field': 'district'},
-                "city": {'value': conf.city, 'field': 'city'}
-            }
-            # These fields must be in res.country.state
-            data.update({
-                "state_id_name": {'value': conf.state_id.name, 'field': 'name'},  # state_id.name
-            })
-            # These fields must be in res.country
-            data.update({
-                "country_id_name": {'value': conf.country_id.name, 'field': 'name'},  # only for reports
-            })
+        # arabic only fields
+        lang = self.env.user.partner_id.lang
+        # lang = 'ar_001'
+        conf = company_id.with_context(lang=lang).sudo()
+        # These fields must be in res.company
+        data = {
+            "name": {'value': conf.parent_root_id.name, 'field': 'name'},
+            "street": {'value': conf.street, 'field': 'street'},
+            "street2": {'value': conf.street2, 'field': 'street2'},
+            "district": {'value': conf.district, 'field': 'district'},
+            "city": {'value': conf.city, 'field': 'city'}
+        }
+        # These fields must be in res.country.state
+        data.update({
+            "state_id_name": {'value': conf.state_id.name, 'field': 'name'},  # state_id.name
+        })
+        # These fields must be in res.country
+        data.update({
+            "country_id_name": {'value': conf.country_id.name, 'field': 'name'},  # only for reports
+        })
+
         return data
 
     def _get_zatca_product_name(self, invoice_line_id):
@@ -595,16 +546,16 @@ class AccountMove(models.Model):
         if previous_hash:
             raise exceptions.AccessDenied("This function is no longer available.")
         conf = self.company_id.parent_root_id.sudo()
-        conf_partner = self._get_zatca_company_data(self.company_id.parent_root_id) if self.l10n_is_self_billed_invoice else self._get_zatca_partner_data()
+        conf_partner = self._get_zatca_company_data(self.company_id if self.company_id.parent_root_id.zatca_use_address else self.company_id.parent_root_id) if self.l10n_is_self_billed_invoice else self._get_zatca_partner_data()
         if not conf.is_zatca:
             raise exceptions.AccessDenied(_("Zatca is not activated."))
 
-        partner_id, company_id, buyer_identification, buyer_identification_no, license, license_no = self._get_partner_comapny(self.company_id)
+        partner_id, company_id, buyer_identification, buyer_identification_no, license, license_no, company_vat, partner_vat = self._get_partner_comapny(self.company_id)
         signature, signature_certificate, base_64_5 = self.get_signature()
 
         document_currency = self.currency_id.name
         document_level_charge = 0
-        bt_31 = company_id.vat
+        bt_31 = company_vat
         bg_23_list = {}
         ksa = {'∑31': 0, '∑32': 0}
         bt = {12: 0, 126: 0,
@@ -626,13 +577,15 @@ class AccountMove(models.Model):
         if is_tax_invoice:
             self.tax_invoice_validations()
 
-            if self.l10n_is_exports_invoice:
+            if self.l10n_is_exports_invoice and not conf.zatca_skip_cus_addr_val:
                 partner_fields_ids = ['state_id']
                 missing_partner_fields_ids = [partner_id._fields[partner_fields_id].string for partner_fields_id in partner_fields_ids if not partner_id[partner_fields_id]['id']]
                 if len(missing_partner_fields_ids) > 0:
                     message = ' , '.join(missing_partner_fields_ids) + ' ' + _("are missing in Customer Address") + ', '\
                               + _("which are required for tax invoices, in case of non-ksa resident.")
                     raise exceptions.ValidationError(message)
+        else:
+            self.simplified_invoice_validations()
 
         if not is_tax_invoice and conf.csr_invoice_type[1:2] != '1':
             raise exceptions.AccessDenied(_("Certificate not allowed for Simplified Invoices."))
@@ -766,7 +719,9 @@ class AccountMove(models.Model):
                     </cac:PartyIdentification>''' % (buyer_identification, buyer_identification_no)
         if is_tax_invoice:
             ubl_2_1 += '''
-                    <cac:PostalAddress>
+                    <cac:PostalAddress>'''
+            if partner_id.street:
+                ubl_2_1 += '''
                         <cbc:StreetName>%s</cbc:StreetName>''' % self.l10n_check_allowed_size(1, 1000, conf_partner["street"]["value"],
                                                                                               "Customer " + partner_id._fields[conf_partner["street"]["field"]].string)
             if partner_id.street2:
@@ -783,7 +738,8 @@ class AccountMove(models.Model):
                 ubl_2_1 += '''
                         <cbc:CitySubdivisionName>%s</cbc:CitySubdivisionName>''' % self.l10n_check_allowed_size(1, 127, conf_partner["district"]["value"],
                                                                                                                 "Customer %s" % partner_id._fields[conf_partner["district"]["field"]].string)
-            ubl_2_1 += '''
+            if partner_id.city:
+                ubl_2_1 += '''
                         <cbc:CityName>%s</cbc:CityName>''' % self.l10n_check_allowed_size(1, 127, conf_partner["city"]["value"],
                                                                                           "Customer %s" % partner_id._fields[conf_partner["city"]["field"]].string)
             if partner_id.country_id.code == 'SA' or partner_id.zip:
@@ -795,21 +751,23 @@ class AccountMove(models.Model):
                             self.l10n_check_allowed_size(0, 127, conf_partner["state_id_name"]["value"],
                                                          "Customer %s %s" % (partner_id._fields['state_id'].string,
                                                                              partner_id.state_id._fields[conf_partner["state_id_name"]["field"]].string)))
-            ubl_2_1 += '''
+            if partner_id.country_id:
+                ubl_2_1 += '''
                         <cac:Country>
                             <cbc:IdentificationCode>%s</cbc:IdentificationCode>
-                        </cac:Country>
+                        </cac:Country>'''  % partner_id.country_id.code
+            ubl_2_1 += '''
                     </cac:PostalAddress>
-                    <cac:PartyTaxScheme>''' % partner_id.country_id.code
-            if partner_id.vat and not self.l10n_is_exports_invoice:
+                    <cac:PartyTaxScheme>'''
+            if partner_vat and not self.l10n_is_exports_invoice:
                 ubl_2_1 += '''
-                        <cbc:CompanyID>%s</cbc:CompanyID>''' % partner_id.vat
+                        <cbc:CompanyID>%s</cbc:CompanyID>''' % partner_vat
             ubl_2_1 += '''
                         <cac:TaxScheme>
                             <cbc:ID>VAT</cbc:ID>
                         </cac:TaxScheme>
                     </cac:PartyTaxScheme>'''
-        bt_121 = list(set(self.invoice_line_ids.tax_ids.mapped('tax_exemption_selection')))
+        bt_121 = list(set(self.invoice_line_ids.l10n_sa_get_tax_ids().mapped('tax_exemption_selection')))
         if is_tax_invoice or \
                 (not is_tax_invoice and ('VATEX-SA-EDU' in bt_121 or 'VATEX-SA-HEA' in bt_121)) or \
                 (not is_tax_invoice and self.l10n_is_summary_invoice):
@@ -899,19 +857,24 @@ class AccountMove(models.Model):
                 raise exceptions.ValidationError(_("Multiple tax reasons for same tax group can't be applied in one invoice."))
             for bt_121 in bg_23_list[tax_category]:
                 bg_23 = bg_23_list[tax_category][bt_121]
-                bt[116] = self.get_l10n_field_type('amount', bg_23['∑bt_116_p'] - bg_23['∑bt_92'] + bg_23['∑bt_99'])
+                bt[116] = self.get_l10n_field_type('amount', bg_23['∑bt_116_p'] - bg_23['∑bt_92_p'] + bg_23['∑bt_99'])
                 bt[118] = tax_category
                 bt[119] = self.get_l10n_field_type('percentage', self.get_l10n_field_type('amount', bg_23['bt_119']))
 
                 bt[117] = bt[116] * (bt[119] / 100)
                 bt[116] = self.get_l10n_field_type('amount', bg_23['∑bt_116'] - bg_23['∑bt_92'] + bg_23['∑bt_99'])
-                bt[117] += bg_23['∑bt_117']
+                bt[117] += bg_23['∑bt_117'] - bg_23['∑bt_92_117']
                 bt['∑117'] += bt[117]
                 bt[117] = self.get_l10n_field_type('amount', bt[117])
 
-                if bt[118] == 'O' and sum([bg_23_list[tax_category][x]['∑bt_92'] for x in bg_23_list[tax_category]]):
-                    raise exceptions.ValidationError(_('In an invoice with an invoice line with tax category') + " " + bt[151] + " " +
-                                                     _('cannot have a document level allowance with tax category') + " " + bt[151])
+                # if bt[118] == 'O' and sum([bg_23_list[tax_category][x]['∑bt_92'] for x in bg_23_list[tax_category]]):
+                #     raise exceptions.ValidationError(_('In an invoice with an invoice line with tax category') + " " + bt[151] + " " +
+                #                                      _('cannot have a document level allowance with tax category') + " " + bt[151])
+
+                if bg_23['∑bt_92'] and not bg_23['∑bt_116_p'] and not bg_23['∑bt_116']:
+                    raise exceptions.ValidationError(
+                        _('A document level allowance with tax category') + " " + bt[118] + " " +
+                        _('should have atleast 1 invoice line with tax category') + " " + bt[118])
 
                 tax_subtotal_xml += '''
                 <cac:TaxSubtotal>
@@ -996,9 +959,9 @@ class AccountMove(models.Model):
         _logger.info("ZATCA: Invoice & its hash generated for invoice " + str(self.name))
 
     def get_AccountingSupplierParty(self, company_id):
-        conf_company = self._get_zatca_partner_data() if self.l10n_is_self_billed_invoice else self._get_zatca_company_data(company_id.parent_root_id)
-        partner_id, company_id, buyer_identification, buyer_identification_no, license, license_no = self._get_partner_comapny(company_id)
-        bt_31 = company_id.vat
+        conf_company = self._get_zatca_partner_data() if self.l10n_is_self_billed_invoice else self._get_zatca_company_data(company_id if company_id.parent_root_id.zatca_use_address else company_id.parent_root_id)
+        partner_id, company_id, buyer_identification, buyer_identification_no, license, license_no, company_vat, partner_vat = self._get_partner_comapny(company_id)
+        bt_31 = company_vat
         ubl_2_1 = '''
             <cac:AccountingSupplierParty>
                 <cac:Party>'''
@@ -1006,11 +969,12 @@ class AccountMove(models.Model):
                     <cac:PartyIdentification>
                         <cbc:ID schemeID="%s">%s</cbc:ID>
                     </cac:PartyIdentification>
-                    <cac:PostalAddress>
+                    <cac:PostalAddress>''' % (license, license_no))
+        if company_id.street:
+            ubl_2_1 += ('''  
                         <cbc:StreetName>%s</cbc:StreetName>''' %
-                    (license, license_no,
-                     self.get_l10n_field_type('text', self.l10n_check_allowed_size(1, 1000, conf_company['street']['value'],
-                                                                                   "Company " + company_id._fields[conf_company['street']['field']].string))))
+                        self.get_l10n_field_type('text', self.l10n_check_allowed_size(1, 1000, conf_company['street']['value'],
+                                                                                      "Company " + company_id._fields[conf_company['street']['field']].string)))
         if conf_company["street2"]['value']:
             ubl_2_1 += ('''
                         <cbc:AdditionalStreetName>%s</cbc:AdditionalStreetName>''' %
@@ -1018,27 +982,34 @@ class AccountMove(models.Model):
                                                                                       "Company " + company_id._fields[conf_company['street2']['field']].string)))
         if len(str(company_id.zip)) != 5:
             raise exceptions.ValidationError(_('Company/Seller PostalZone/Zip must be exactly 5 digits'))
-        ubl_2_1 += '''  
+        if company_id.building_no:
+            ubl_2_1 += '''  
                         <cbc:BuildingNumber>%s</cbc:BuildingNumber>''' % company_id.building_no
         if company_id.additional_no:
             ubl_2_1 += '''  
                         <cbc:PlotIdentification>%s</cbc:PlotIdentification>''' % company_id.additional_no
-        ubl_2_1 += ('''  
-                        <cbc:CitySubdivisionName>%s</cbc:CitySubdivisionName>
-                        <cbc:CityName>%s</cbc:CityName>
-                        <cbc:PostalZone>%s</cbc:PostalZone>''' %
-                    (self.l10n_check_allowed_size(1, 127, conf_company["district"]['value'], "Company " + company_id._fields[conf_company["district"]['field']].string),
-                     self.l10n_check_allowed_size(1, 127, conf_company["city"]['value'], "Company " + company_id._fields[conf_company["city"]['field']].string),
-                     company_id.zip))
+        if company_id.district:
+            ubl_2_1 += ('''  
+                        <cbc:CitySubdivisionName>%s</cbc:CitySubdivisionName>''' %
+                        self.l10n_check_allowed_size(1, 127, conf_company["district"]['value'], "Company " + company_id._fields[conf_company["district"]['field']].string))
+        if company_id.city:
+            ubl_2_1 += ('''  
+                        <cbc:CityName>%s</cbc:CityName>''' %
+                        self.l10n_check_allowed_size(1, 127, conf_company["city"]['value'], "Company " + company_id._fields[conf_company["city"]['field']].string))
+        if company_id.zip:
+            ubl_2_1 += '''
+                        <cbc:PostalZone>%s</cbc:PostalZone>''' % company_id.zip
         if conf_company["state_id_name"]['value']:
             ubl_2_1 += ('''
                         <cbc:CountrySubentity>%s</cbc:CountrySubentity>''' %
                         self.l10n_check_allowed_size(0, 127, conf_company["state_id_name"]['value'],
                                                      "Company %s %s" % (company_id._fields['state_id'].string, company_id.state_id._fields[conf_company["state_id_name"]['field']].string)))
-        ubl_2_1 += ('''
+        if company_id.zip:
+            ubl_2_1 += '''
                         <cac:Country>
                             <cbc:IdentificationCode>%s</cbc:IdentificationCode>
-                        </cac:Country>
+                        </cac:Country>''' % (company_id.country_id.code)
+        ubl_2_1 += ('''
                     </cac:PostalAddress>
                     <cac:PartyTaxScheme>
                         <cbc:CompanyID>%s</cbc:CompanyID>
@@ -1051,7 +1022,7 @@ class AccountMove(models.Model):
                     </cac:PartyLegalEntity>
                 </cac:Party>
             </cac:AccountingSupplierParty>''' %
-                    (company_id.country_id.code, bt_31,
+                    (bt_31,
                      self.get_l10n_field_type('text', self.l10n_check_allowed_size(1, 1000, conf_company["name"]['value'],
                                                                                    "Company " + company_id._fields[conf_company["name"]['field']].string))))
         return ubl_2_1
@@ -1260,7 +1231,7 @@ class AccountMove(models.Model):
                               str('Onboarding failed, restart process !!') + "</b></center></td></tr>"
                     string += "</table>"
                     conf.zatca_on_board_status_details = json.dumps(zatca_on_board_status_details)
-                    conf.zatca_status = 'Onboarding was failed in invoice (' + str(self.name) + '), Kindly restart onboarding process.'
+                    conf.zatca_status = 'Onboarding was failed in invoice (%s), Kindly restart onboarding process.' % self.name
                     conf.zatca_onboarding_status = 0
                     conf.zatca_certificate_status = 0
                     conf.csr_certificate = None
@@ -1361,8 +1332,8 @@ class AccountMove(models.Model):
                 self.zatca_compliance_invoices_api = json_iterated
                 self._l10n_sa_onchnage_l10n_sa_zatca_status()
 
-                partner_id, company_id, unknown, unknown, unknown, unknown = self._get_partner_comapny(self.company_id)
-                file_name_specification = (str(company_id.vat) + "_" + self.l10n_sa_confirmation_datetime.strftime('%Y%m%dT%H%M%SZ')
+                partner_id, company_id, unknown, unknown, unknown, unknown, company_vat, partner_vat = self._get_partner_comapny(self.company_id)
+                file_name_specification = (str(company_vat) + "_" + self.l10n_sa_confirmation_datetime.strftime('%Y%m%dT%H%M%SZ')
                                            + "_" + str(re.sub(r"[^a-zA-Z0-9]", "-", self.zatca_unique_seq)))
                 atts = self.env['ir.attachment'].sudo().search([('res_model', '=', 'account.move'),
                                                                 ('res_field', '=', 'zatca_hash_cleared_invoice'),
@@ -1417,14 +1388,6 @@ class AccountMove(models.Model):
                    'Accept-Version': 'V2',
                    'Authorization': 'Basic ' + auth,
                    'Content-Type': 'application/json'}
-        _logger.error("ZATCA Invoice Hash: %s", self.zatca_invoice_hash)
-        _logger.error("ZATCA Invoice UUID: %s", self.invoice_uuid)
-
-        try:
-            xml_str = self.zatca_invoice.decode('utf-8')
-            _logger.error("Decoded ZATCA XML:\n%s", xml_str)
-        except Exception as e:
-            _logger.error("Failed to decode ZATCA invoice XML: %s", str(e))
 
         data = {
             'invoiceHash': self.zatca_invoice_hash,
@@ -1605,6 +1568,7 @@ class AccountMove(models.Model):
         self.zatca_hash_invoice_name = self.zatca_invoice_name.replace('.xml', '_hash.xml')
 
     # TODO: multi record suppport
+    @mute_logger('Zatca Debugger for account.move :')
     def _compute_qr_code_str(self):
         _zatca.info('_compute_qr_code_str')
         self = self.sudo()
@@ -1655,12 +1619,12 @@ class AccountMove(models.Model):
         try:
             for record in self:
                 qr_code_str = ''
-                conf_company = self._get_zatca_partner_data() if self.l10n_is_self_billed_invoice else self._get_zatca_company_data(self.company_id.parent_root_id)
-                partner_id, company_id, buyer_identification, buyer_identification_no, license, license_no = self._get_partner_comapny(record.company_id)
+                conf_company = self._get_zatca_partner_data() if self.l10n_is_self_billed_invoice else self._get_zatca_company_data(self.company_id if self.company_id.parent_root_id.zatca_use_address else self.company_id.parent_root_id)
+                partner_id, company_id, buyer_identification, buyer_identification_no, license, license_no, company_vat, partner_vat = self._get_partner_comapny(record.company_id)
 
-                if record.l10n_sa_confirmation_datetime and company_id.vat:
+                if record.l10n_sa_confirmation_datetime and company_vat:
                     seller_name_enc = get_qr_encoding(1, conf_company["name"]['value'])
-                    company_vat_enc = get_qr_encoding(2, company_id.vat)
+                    company_vat_enc = get_qr_encoding(2, company_vat)
                     timestamp_enc = get_qr_encoding(3, self.l10n_sa_confirmation_datetime.strftime('%Y-%m-%dT%H:%M:%SZ'))
                     invoice_total_enc = get_qr_encoding(4, str(bt_115))
                     total_vat_enc = get_qr_encoding(5, str(bt_110))
@@ -1684,12 +1648,16 @@ class AccountMove(models.Model):
                     if not is_tax_invoice:
                         str_to_encode += ecdsa_cert_value
                     qr_code_str = base64.b64encode(str_to_encode).decode()
-                record.l10n_sa_qr_code_str = qr_code_str
-                record.sa_qr_code_str = qr_code_str
+                record.with_context(zatca_write_nocompute=True).write({
+                    'l10n_sa_qr_code_str': qr_code_str,
+                    'sa_qr_code_str': qr_code_str,
+                })
         except Exception as e:
             _logger.info("QR code can't be generated via compute_qr_code_str " + str(e))
-            self.l10n_sa_qr_code_str = ""
-            self.sa_qr_code_str = ""
+            self.with_context(zatca_write_nocompute=True).write({
+                'l10n_sa_qr_code_str': "",
+                'sa_qr_code_str': "",
+            })
 
     def compliance_qr_code(self, company_id, bt_115, bt_110, zatca_invoice_hash, signature_value, timestamp_enc):
         def get_qr_encoding(tag, field):
@@ -1699,11 +1667,11 @@ class AccountMove(models.Model):
             return company_name_tag_encoding + company_name_length_encoding + company_name_byte_array
 
         conf_company = self._get_zatca_company_data(company_id)
-        partner_id, company_id, buyer_identification, buyer_identification_no, license, license_no = self._get_partner_comapny(company_id)
+        partner_id, company_id, buyer_identification, buyer_identification_no, license, license_no, company_vat, partner_vat = self._get_partner_comapny(company_id)
 
         try:
             seller_name_enc = get_qr_encoding(1, conf_company["name"]['value'])
-            company_vat_enc = get_qr_encoding(2, company_id.vat)
+            company_vat_enc = get_qr_encoding(2, company_vat)
             timestamp_enc = get_qr_encoding(3, timestamp_enc)
             invoice_total_enc = get_qr_encoding(4, str(bt_115))
             total_vat_enc = get_qr_encoding(5, str(bt_110))
@@ -1744,35 +1712,26 @@ class AccountMove(models.Model):
         return self.invoices_clearance_single_api()
 
     def send_for_reporting(self, no_xml_generate=0):
-        _logger.info(f"no_xml_generate============== {no_xml_generate} ===================.")
-        for rec in self:
-            if (rec._context.get('xml_generate', 0) or not rec.zatca_invoice) and not no_xml_generate:
-                _logger.info(f"in if conditoins ============== {rec._context.get('xml_generate', 0)} ===================.")
-                _logger.info(f"in if conditoins ============== {rec.zatca_invoice} ===================.")
-                _logger.info(f"in if conditoins ============== {rec._context.get('xml_generate', 0)} ===================.")
-                rec.create_xml_file()
-            return rec.invoices_reporting_single_api(no_xml_generate)
+        if (self._context.get('xml_generate', 0) or not self.zatca_invoice) and not no_xml_generate:
+            self.create_xml_file()
+        return self.invoices_reporting_single_api(no_xml_generate)
 
-    
-    def send_cron_multiple_to_zatca(self):
-        # Get today's date
-        today = date.today()
-        two_days_ago = today - timedelta(days=7)
-        
-        # Filter invoices with today's date only
-        invoices = self.search([('invoice_date','>=',two_days_ago)])
-        
-        # Check if there are invoices to send
-        if invoices:
-            # Send filtered invoices to ZATCA
-            invoices.send_multiple_to_zatca()
-            _logger.info(f"Sent {len(invoices)} invoices to ZATCA for {today}")
-        else:
-            _logger.info(f"No invoices found for {today} to send to ZATCA.")
+    def cron_send_to_zatca(self):
+        company_id = self.company_id.sudo().search([('zatca_cron_send', '=', True)])
+        records = self.sudo().search([
+            ('company_id', 'in', company_id.ids),
+            ('state', 'in', ['posted']),
+            "|", "|",
+            ('zatca_invoice_name', 'in', [None, False, '']),
+            ('zatca_compliance_invoices_api', 'in', [None, False, '']),
+            ('zatca_status_code', '=', "400"),
+        ])
 
+        records.send_multiple_to_zatca()
 
     def send_multiple_to_zatca(self):
         self = self.filtered(lambda x: x.zatca_icv_counter).sorted(key='zatca_icv_counter')
+
         # if int(self[0].zatca_icv_counter) > 1:
         #     def get_last_zatca_invoice(self, icv):
         #         record = self.search([('zatca_icv_counter', '=', icv -1)], limit=1)
@@ -1785,37 +1744,20 @@ class AccountMove(models.Model):
         #         raise exceptions.MissingError("Invoice " + str(seq_id.name) + " must be submitted first.")
         for record in self:
             try:
-
-                if record.state == 'posted' and not record.partner_id.is_dolfin:
+                if record.state == 'posted':
                     if not record.zatca_invoice_name or not record.zatca_compliance_invoices_api or \
                             record.zatca_status_code == '400':
                         if record.l10n_sa_invoice_type == 'Standard':
                             record.send_for_clearance()
-                            self.env.cr.commit()
                         elif record.l10n_sa_invoice_type == 'Simplified':
                             record.send_for_reporting()
-                            self.env.cr.commit()
             except Exception as e:
                 # Bypass errors.
                 _logger.info("Multi Send To Zatca Errors :: " + str(e))
 
-    def action_post(self):
-        res = super().action_post()
-        for record in self:
-            conf = record.company_id.parent_root_id.sudo()
-            if (conf.is_zatca
-                    and ((not conf.is_self_billed and record.move_type in ['out_invoice', 'out_refund']) or
-                         (conf.is_self_billed and record.move_type in ['out_invoice', 'out_refund', 'in_invoice', 'in_refund']))
-                    and record.l10n_sa_invoice_type and record.l10n_sa_phase1_end_date and record.invoice_date > record.l10n_sa_phase1_end_date):
-                if (record.move_type in ['in_invoice', 'in_refund'] and record.l10n_is_self_billed_invoice) or record.move_type in ['out_invoice', 'out_refund']:
-                    record.create_xml_file()
-                    
-                    if record.company_id.parent_root_id.zatca_send_from_pos and not record.partner_id.is_dolfin:
-                        if record.l10n_sa_invoice_type == 'Standard':
-                            record.send_for_clearance()
-                        elif record.l10n_sa_invoice_type == 'Simplified':
-                            record.send_for_reporting()
-        return res
+    # def action_post(self):
+    #     res = super().action_post()
+    #     return res
 
     @api.depends('invoice_date')
     def _compute_delivery_date(self):
@@ -1838,6 +1780,19 @@ class AccountMove(models.Model):
     def _post(self, soft=True):
         res = super()._post(soft)
         for record in self:
+            conf = record.company_id.parent_root_id.sudo()
+            record.write({'l10n_sa_confirmation_datetime': fields.Datetime.now()})
+            if (conf.is_zatca
+                    and ((not conf.is_self_billed and record.move_type in ['out_invoice', 'out_refund']) or
+                         (conf.is_self_billed and record.move_type in ['out_invoice', 'out_refund', 'in_invoice', 'in_refund']))
+                    and record.l10n_sa_invoice_type and record.l10n_sa_phase1_end_date and record.invoice_date > record.l10n_sa_phase1_end_date):
+                if (record.move_type in ['in_invoice', 'in_refund'] and record.l10n_is_self_billed_invoice) or record.move_type in ['out_invoice', 'out_refund']:
+                    record.create_xml_file()
+                    if conf.parent_zatca_send_from_pos:
+                        if record.l10n_sa_invoice_type == 'Standard':
+                            record.send_for_clearance()
+                        elif record.l10n_sa_invoice_type == 'Simplified':
+                            record.send_for_reporting()
             record.write({'l10n_sa_confirmation_datetime': fields.Datetime.now()})
             record._l10n_sa_onchnage_l10n_sa_zatca_status()
         return res
@@ -1869,198 +1824,7 @@ class AccountMove(models.Model):
             return True
         return False
 
-
-
-    def get_tax_total(self, tax_totals, amount_tax):
-        if tax_totals:
-            groups_by_subtotal = tax_totals.get('groups_by_subtotal', {})
-            tax_group_amount = amount_tax
-
-            untaxed_keys = ['Untaxed Amount', 'المبلغ دون الضريبة ']
-
-            for key in untaxed_keys:
-                _untax_amount = groups_by_subtotal.get(key, [])
-                if _untax_amount:  
-                    for tax_group in _untax_amount:
-                        if tax_group.get('tax_group_amount'):
-                            tax_group_amount = tax_group.get('tax_group_amount', 0)
-                            break  
-                    if tax_group_amount != amount_tax: 
-                        break
-
-            return tax_group_amount
-
-        return amount_tax
-
-
-
-    def send_invoice_batch(self):
-        today = date.today()
-        two_days_ago = today - timedelta(days=7)
-        recipients = ['abeersalh166@gmail.com','n4ajwa4@gmail.com']
-        # start_date = datetime(2024, 9, 1)  # 1st Jan 2025
-        # end_date = datetime(2025, 1, 1)
-        invoices = self.sudo().search([
-            ('invoice_date', '>=', two_days_ago),
-            ('invoice_date', '<=', today),
-            ('move_type', '=', 'out_invoice'),            
-            ('state', '=', 'posted'),
-            ('partner_id.is_dolfin', '!=', True),
-             
-             
-            
-        ])
-
-        _logger.info(f"first invoices lenght (Invoices length: {len(invoices)}) *****************************")
-        if not invoices:
-            _logger.info(f"no left invoices lenght (Invoices length: {len(invoices)}) *****************************")
+    def _get_unbalanced_moves(self, container):
+        if self.env.context.get('zatca_write_nocompute', False):
             return
-
-        invoices = invoices.filtered(lambda inv: all(line.tax_ids for line in inv.invoice_line_ids))
-        _logger.info(f"fitlered invoice Send To Zatca Errors (Invoice ID: {len(invoices)}) *****************************")
-        
-        
-        for record in invoices:
-            if not record.zatca_invoice_name or not record.zatca_compliance_invoices_api or record.zatca_status_code == '400':
-                if not (record.partner_id.vat.startswith('3') and record.partner_id.vat.endswith('3')):
-                    record.partner_id.vat = '300000000000003'
-           
-                if record.partner_id.is_company and len(record.partner_id.vat) != 15:
-                    record.partner_id.vat = '300000000000003'
-                
-                if not record.partner_id.is_company and  record.partner_id.vat :
-                    if len(record.partner_id.vat) != 15:
-                        record.partner_id.vat = '300000000000003'
-                        record.is_company = True
-
-                if record.partner_id.is_company and  not record.partner_id.vat :
-                    record.partner_id.vat = '300000000000003'
-
-                if not record.partner_id.street:
-                    record.partner_id.street = '/'
-                
-                if not record.partner_id.street2:
-                    record.partner_id.street2 = '/'
-                
-                if not record.partner_id.city:
-                    record.partner_id.city = '/'
-                
-                if not record.partner_id.district:
-                    record.partner_id.district = '/'
-                
-                if not record.partner_id.country_id:
-                    record.partner_id.country_id = 192
-                
-                if not record.partner_id.building_no:
-                    record.partner_id.building_no = '1234'
-
-                if not record.partner_id.zip:
-                    record.partner_id.zip = '12345'
-
-            
-
-                if not record.partner_id.state_id:
-                    state_id = self.env['res.country.state'].search([('code','=','BRU')],limit=1)
-                    record.partner_id.state_id = state_id.id
-
-                
-
-                try:
-                
-                    for line in record.invoice_line_ids:
-                        if '&' in line.name:
-                            line.name = line.name.replace('&', 'و')
-                    
-                    if record.l10n_sa_invoice_type == 'Standard':
-                        _logger.info(f"l10n_sa_invoice_type standard Send To Zatca (Invoice ID: {record.id})===================")
-                        record.send_for_clearance()
-                        self.env.cr.commit() 
-                        record.message_post(body="invoice send to zatca from cron job")
-                        
-                    elif record.l10n_sa_invoice_type == 'Simplified':
-                        _logger.info(f"l10n_sa_invoice_type standard Send To Zatca (Invoice ID: {record.id}) =============")
-                        record.send_for_reporting()
-                        self.env.cr.commit() 
-                        record.message_post(body="invoice send to zatca from cron job")
-                    
-                    
-                    
-                            
-                except Exception as e:
-                    # Bypass errors.
-                    _logger.info(f"Multi Send To Zatca Errors (Invoice ID: {record.id}) ***************************** :: {str(e)}")
-
-                    mail_values = {
-                        'subject': f"Sent Invoice To Zatca Processing Failed for {record.name}",
-                        'body_html': f"<p><strong>Error:</strong> {str(e)}</p>",
-                        'email_to': ','.join(recipients),
-                        }
-                    self.env['mail.mail'].create(mail_values).send()
-
-
-        
-      
-
-        # remaining_count = self.sudo().search_count([
-        #     ('invoice_date', '>=', start_date),
-        #     ('invoice_date', '<=', end_date),
-        #     ('move_type', '=', 'out_invoice'),
-        #     ('state', '=', 'posted'),
-        #     ('partner_id', '!=', 17),
-        #     ('partner_id.is_dolfin', '!=', True),
-        #     ('l10n_sa_zatca_status', 'ilike', 'not')
-            
-        # ])
-        # if remaining_count > 0:
-        #     self.env.ref('ksa_zatca_integration.ir_cron_send_inovoice_job_count')._trigger()
-
-
-
-    def resend_invoice(self):
-        today = date.today()
-        two_days_ago = today - timedelta(days=7)      
-        invoices = self.sudo().search([
-            ('invoice_date', '>=', two_days_ago),
-            ('invoice_date', '<=', today),
-            ('move_type', '=', 'out_invoice'),            
-            ('state', '=', 'posted'),
-            ('partner_id.is_dolfin', '!=', True),
-            ('l10n_sa_zatca_status', 'ilike', 'error')
-             
-             
-            
-        ])
-
-        if not invoices:
-            return
-
-        invoices = invoices.filtered(lambda inv: all(line.tax_ids for line in inv.invoice_line_ids))        
-        
-        for record in invoices:
-
-            try:
-            
-                for line in record.invoice_line_ids:
-                    if '&' in line.name:
-                        line.name = line.name.replace('&', 'و')
-                
-                if record.l10n_sa_invoice_type == 'Standard':
-                    record.create_xml_file()
-                    record.invoices_clearance_single_api()
-                    self.env.cr.commit() 
-                    
-                elif record.l10n_sa_invoice_type == 'Simplified':
-                    record.create_xml_file()
-                    record.invoices_reporting_single_api(no_xml_generate=0)
-                    self.env.cr.commit() 
-                
-                
-                
-                        
-            except Exception as e:
-                # Bypass errors.
-                _logger.info(f"Multi Send To Zatca Errors (Invoice ID: {record.id}) ***************************** :: {str(e)}")
-
-               
-
-    
+        return super(AccountMove, self)._get_unbalanced_moves(container)
