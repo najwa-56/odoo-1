@@ -16,39 +16,19 @@ export class MainDashboard extends Component {
         this.state = useState({
             dashboards_templates: ['zatca.DashboardMain'],
         })
-        this.custom_props = {};
-        onMounted(async () => {
+        onWillStart(async () => {
+
+        });
+        onMounted(() => {
             this.title = 'Dashboard'
             var self = this
-            await self.getTransmissionsToday();
-            await self.getInvoicesThisYear();
-            await self.getTaxAmountThisYear();
-            await self.getPostedInvoices();
-            this.render();
-        });
-    }
-
-    async getPostedInvoices() {
-        var yearlyRecords = await this.getThisYearRecords();
-        if (yearlyRecords) {
-            var invoiceCount = 0;
-            var standardCount = 0;
-            var simplifiedCount = 0;
-            yearlyRecords.forEach(record => {
-                if (record.state == 'posted' && record.zatca_invoice == false) {
-                    invoiceCount++;
-                    if (record.l10n_sa_invoice_type === 'Standard') {
-                        standardCount++;
-                    } else if (record.l10n_sa_invoice_type === 'Simplified') {
-                        simplifiedCount++;
-                    }
-                }
+            $(document).ready(function () {
+                self.getTransmissionsToday();
+                self.getInvoicesThisYear();
+                self.getTaxAmountThisYear();
+                self.getPostedInvoices();
             });
-
-            this.custom_props.posted_invoice = invoiceCount;
-            this.custom_props.standard_posted_invoice = "Standard: " + standardCount;
-            this.custom_props.simplified_posted_invoice = "Simplified: " + simplifiedCount;
-        }
+        });
     }
 
     async getTransmissionsToday() {
@@ -84,26 +64,48 @@ export class MainDashboard extends Component {
             });
             failed_records = todayRecords.length - success_records;
             // Update HTML elements with the counts
-            this.custom_props.transmissions_today = todayRecords.length;
-            this.custom_props.simplified_today = "Simplified: " + simplifiedCount;
-            this.custom_props.standard_today = "Standard: " + standardCount;
-            this.custom_props.transmissions_success_today = success_records;
-            this.custom_props.transmissions_failed_today = failed_records;
+            $('#transmissions_today').text(todayRecords.length);
+            $('#simplified_today').text("Simplified: " + simplifiedCount);
+            $('#standard_today').text("Standard: " + standardCount);
+            $('#transmissions_success_today').text(success_records);
+            $('#transmissions_failed_today').text(failed_records);
 
             if (todayRecords.length > 0) {
                 var lastTransmissionName = todayRecords[0].name;
                 var lastTransmissionDateTime = todayRecords[0].l10n_sa_response_datetime;
                 // Update HTML elements with the last transmission information
-                this.custom_props.last_transmission_name = lastTransmissionName;
-                this.custom_props.last_transmission_date_time = lastTransmissionDateTime;
+                $('#last_transmission_name').text(lastTransmissionName);
+                $('#last_transmission_date_time').text(lastTransmissionDateTime);
             } else {
                 // If no records found, display appropriate message
-                this.custom_props.last_transmission_name = "No transmissions today";
-                this.custom_props.last_transmission_date_time = "";
+                $('#last_transmission_name').text("No transmissions today");
+                $('#last_transmission_date_time').text("");
             }
         }
     }
+    async getPostedInvoices() {
+        var yearlyRecords = await this.getThisYearRecords();
+            if (yearlyRecords) {
+            var invoiceCount = 0;
+            var standardCount = 0;
+            var simplifiedCount = 0;
+            yearlyRecords.forEach(record => {
+                    if (record.state == 'posted' && record.zatca_invoice == false)
+                    {
+                    invoiceCount++;
+                    if (record.l10n_sa_invoice_type === 'Standard') {
+                            standardCount++;
+                        } else if (record.l10n_sa_invoice_type === 'Simplified') {
+                            simplifiedCount++;
+                        }
+                    }
+                });
 
+               $('#posted_invoice').text(invoiceCount);
+                $('#standard_posted_invoice').text("Standard: " + standardCount);
+                $('#simplified_posted_invoice').text("Simplified: " + simplifiedCount);
+            }
+        }
     async getCompany() {
         var domain = [['is_zatca', '=', true]];
         var company = await this.orm.call('res.company', 'search_read', [domain], {fields: ['id']});
@@ -120,14 +122,14 @@ export class MainDashboard extends Component {
             const currentDate = new Date();
             const startOfYear = new Date(currentDate.getFullYear(), 0, 1); // January 1st of the current year
             const endOfYear = new Date(currentDate.getFullYear() + 1, 0, 0); // December 31st of the current year
-            // var domain = [['company_id', 'in', company_ids], ['move_type', '=', 'out_invoice'],
-            //     ['l10n_sa_confirmation_datetime', '>=', startOfYear.toISOString()],
-            //     ['l10n_sa_confirmation_datetime', '<=', endOfYear.toISOString()]];
+            var domain = [['company_id', 'in', company_ids], ['move_type', '=', 'out_invoice'],
+                ['l10n_sa_confirmation_datetime', '>=', startOfYear.toISOString()],
+                ['l10n_sa_confirmation_datetime', '<=', endOfYear.toISOString()]];
 
             // // use this domain from 2025
-            var domain = [['company_id', 'in', company_ids], ['move_type', '=', 'out_invoice'],
-                ['l10n_sa_response_datetime', '>=', startOfYear.toISOString()],
-                ['l10n_sa_response_datetime', '<=', endOfYear.toISOString()]];
+            // var domain = [['company_id', 'in', company_ids], ['move_type', '=', 'out_invoice'],
+            //     ['l10n_sa_response_datetime', '>=', startOfYear.toISOString()],
+            //     ['l10n_sa_response_datetime', '<=', endOfYear.toISOString()]];
 
             var records = await this.orm.call('account.move', 'search_read', [domain], {fields: ['l10n_sa_invoice_type', 'l10n_sa_zatca_status', 'amount_tax_signed', 'state', 'zatca_invoice']});
             return records
@@ -168,13 +170,18 @@ export class MainDashboard extends Component {
             });
 
             // Update HTML elements with the counts
-            this.custom_props.invoices_yearly = invoiceCountYearly;
-            this.custom_props.simplified_yearly = "Simplified: " + simplifiedCountYearly;
-            this.custom_props.standard_yearly = "Standard: " + standardCountYearly;
-            this.custom_props.yearly_approved = approved_yearly;
-            this.custom_props.yearly_approved_simplified = "Simplified: " + simplified_yearly_approved;
-            this.custom_props.yearly_approved_standard = "Standard: " + standard_yearly_approved;
+            $('#invoices_yearly').text(invoiceCountYearly);
+            $('#simplified_yearly').text("Simplified: " + simplifiedCountYearly);
+            $('#standard_yearly').text("Standard: " + standardCountYearly);
+
+            $('#yearly_approved').text(approved_yearly);
+            $('#yearly_approved_simplified').text("Simplified: " + simplified_yearly_approved);
+            $('#yearly_approved_standard').text("Standard: " + standard_yearly_approved);
         }
+    }
+
+    formatCost(cost, res_currency_id) {
+        return formatMonetary(cost, {currencyId: res_currency_id});
     }
 
     async getTaxAmountThisYear() {
@@ -211,18 +218,15 @@ export class MainDashboard extends Component {
             res_currency_id = res_currency_id && res_currency_id[0]['id'];
 
             // Update HTML elements with the tax amounts and approved tax amounts
-            this.custom_props.tax_amount_yearly = this.formatCost(totalTaxAmountYearly, res_currency_id);
-            this.custom_props.simplified_tax_amount = "Simplified: " + this.formatCost(simplifiedTaxAmount, res_currency_id);
-            this.custom_props.standard_tax_amount = "Standard: " + this.formatCost(standardTaxAmount, res_currency_id);
-            this.custom_props.tax_approved_yearly = this.formatCost(totalTaxApprovedAmountYearly, res_currency_id);
-            this.custom_props.simplified_tax_approved_yearly = "Simplified: " + this.formatCost(simplifiedTaxApprovedAmount, res_currency_id);
-            this.custom_props.standard_tax_approved_yearly = "Standard: " + this.formatCost(standardTaxApprovedAmount, res_currency_id);
+            $('#tax_amount_yearly').text(this.formatCost(totalTaxAmountYearly, res_currency_id));
+            $('#simplified_tax_amount').text("Simplified: " + this.formatCost(simplifiedTaxAmount, res_currency_id));
+            $('#standard_tax_amount').text("Standard: " + this.formatCost(standardTaxAmount, res_currency_id));
+            $('#tax_approved_yearly').text(this.formatCost(totalTaxApprovedAmountYearly, res_currency_id));
+            $('#simplified_tax_approved_yearly').text("Simplified: " + this.formatCost(simplifiedTaxApprovedAmount, res_currency_id));
+            $('#standard_tax_approved_yearly').text("Standard: " + this.formatCost(standardTaxApprovedAmount, res_currency_id));
         }
     }
 
-    formatCost(cost, res_currency_id) {
-        return formatMonetary(cost, {currencyId: res_currency_id});
-    }
 }
 
 registry.category("actions").add("zatca_main_dashboard", MainDashboard)

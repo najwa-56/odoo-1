@@ -19,66 +19,6 @@ arabic_tax = {
     "Private healthcare to citizen": "الخدمات الصحية الخاصة للمواطنين",
     "supply of qualified military goods": "توريد السلع العسكرية المؤهلة",
 }
-charge_reson_list = [
-    ('AA', 'Advertising'), ('AAA', 'Telecommunication'), ('AAC', 'Technical modification'),
-    ('AAD', 'Job-order production'), ('AAE', 'Outlays'), ('AAF', 'Off-premises'),
-    ('AAH', 'Additional processing'), ('AAI', 'Attesting'), ('AAS', 'Acceptance'),
-    ('AAT', 'Rush delivery'), ('AAV', 'Special construction'), ('AAY', 'Airport facilities'),
-    ('AAZ', 'Concession'), ('ABA', 'Compulsory storage'), ('ABB', 'Fuel removal'),
-    ('ABC', 'Into plane'), ('ABD', 'Overtime'), ('ABF', 'Tooling'), ('ABK', 'Miscellaneous'),
-    ('ABL', 'Additional packaging'), ('ABN', 'Dunnage'), ('ABR', 'Containerisation'),
-    ('ABS', 'Carton packing'), ('ABT', 'Hessian wrapped'), ('ABU', 'Polyethylene wrap packing'),
-    ('ACF', 'Miscellaneous treatment'), ('ACG', 'Enamelling treatment'), ('ACH', 'Heat treatment'),
-    ('ACI', 'Plating treatment'), ('ACJ', 'Painting'), ('ACK', 'Polishing'), ('ACL', 'Priming'),
-    ('ACM', 'Preservation treatment'), ('ACS', 'Fitting'), ('ADC', 'Consolidation'),
-    ('ADE', 'Bill of lading'), ('ADJ', 'Airbag'), ('ADK', 'Transfer'), ('ADL', 'Slipsheet'),
-    ('ADM', 'Binding'), ('ADN', 'Repair or replacement of broken returnable package'),
-    ('ADO', 'Efficient logistics'), ('ADP', 'Merchandising'), ('ADQ', 'Product mix'),
-    ('ADR', 'Other services'), ('ADT', 'Pick-up'), ('ADW', 'Chronic illness'),
-    ('ADY', 'New product introduction'), ('ADZ', 'Direct delivery'), ('AEA', 'Diversion'),
-    ('AEB', 'Disconnect'), ('AEC', 'Distribution'), ('AED', 'Handling of hazardous cargo'),
-    ('AEF', 'Rents and leases'), ('AEH', 'Location differential'), ('AEI', 'Aircraft refueling'),
-    ('AEJ', 'Fuel shipped into storage'), ('AEK', 'Cash on delivery'),
-    ('AEL', 'Small order processing service'), ('AEM', 'Clerical or administrative services'),
-    ('AEN', 'Guarantee'), ('AEO', 'Collection and recycling'), ('AEP', 'Copyright fee collection'),
-    ('AES', 'Veterinary inspection service'), ('AET', 'Pensioner service'),
-    ('AEU', 'Medicine free pass holder'), ('AEV', 'Environmental protection service'),
-    ('AEW', 'Environmental clean-up service'),
-    ('AEX', 'National cheque processing service outside account area'),
-    ('AEY', 'National payment service outside account area'),
-    ('AEZ', 'National payment service within account area'), ('AJ', 'Adjustments'),
-    ('AU', 'Authentication'), ('CA', 'Cataloguing'), ('CAB', 'Cartage'), ('CAD', 'Certification'),
-    ('CAE', 'Certificate of conformance'), ('CAF', 'Certificate of origin'), ('CAI', 'Cutting'),
-    ('CAJ', 'Consular service'), ('CAK', 'Customer collection'), ('CAL', 'Payroll payment service'),
-    ('CAM', 'Cash transportation'), ('CAN', 'Home banking service'),
-    ('CAO', 'Bilateral agreement service'), ('CAP', 'Insurance brokerage service'),
-    ('CAQ', 'Cheque generation'), ('CAR', 'Preferential merchandising location'), ('CAS', 'Crane'),
-    ('CAT', 'Special colour service'), ('CAU', 'Sorting'),
-    ('CAV', 'Battery collection and recycling'), ('CAW', 'Product take back fee'),
-    ('CD', 'Car loading'), ('CG', 'Cleaning'), ('CS', 'Cigarette stamping'),
-    ('CT', 'Count and recount'), ('DAB', 'Layout/design'), ('DAD', 'Driver assigned unloading'),
-    ('DL', 'Delivery'), ('EG', 'Engraving'), ('EP', 'Expediting'),
-    ('ER', 'Exchange rate guarantee'), ('FAA', 'Fabrication'), ('FAB', 'Freight equalization'),
-    ('FAC', 'Freight extraordinary handling'), ('FC', 'Freight service'),
-    ('FH', 'Filling/handling'), ('FI', 'Financing'), ('GAA', 'Grinding'), ('HAA', 'Hose'),
-    ('HD', 'Handling'), ('HH', 'Hoisting and hauling'), ('IAA', 'Installation'),
-    ('IAB', 'Installation and warranty'), ('ID', 'Inside delivery'), ('IF', 'Inspection'),
-    ('IR', 'Installation and training'), ('IS', 'Invoicing'), ('KO', 'Koshering'),
-    ('L1', 'Carrier count'), ('LA', 'Labelling'), ('LAA', 'Labour'), ('LAB', 'Repair and return'),
-    ('LF', 'Legalisation'), ('MAE', 'Mounting'), ('MI', 'Mail invoice'),
-    ('ML', 'Mail invoice to each location'), ('NAA', 'Non-returnable containers'),
-    ('OA', 'Outside cable connectors'), ('PA', 'Invoice with shipment'),
-    ('PAA', 'Phosphatizing (steel treatment)'), ('PC', 'Packing'), ('PL', 'Palletizing'),
-    ('RAB', 'Repacking'), ('RAC', 'Repair'), ('RAD', 'Returnable container'), ('RAF', 'Restocking'),
-    ('RE', 'Re-delivery'), ('RF', 'Refurbishing'), ('RH', 'Rail wagon hire'), ('RV', 'Loading'),
-    ('SA', 'Salvaging'), ('SAA', 'Shipping and handling'), ('SAD', 'Special packaging'),
-    ('SAE', 'Stamping'), ('SAI', 'Consignee unload'), ('SG', 'Shrink-wrap'),
-    ('SH', 'Special handling'), ('SM', 'Special finish'), ('SU', 'Set-up'), ('TAB', 'Tank renting'),
-    ('TAC', 'Testing'), ('TT', 'Transportation - third party billing'),
-    ('TV', 'Transportation by vendor'), ('V1', 'Drop yard'), ('V2', 'Drop dock'),
-    ('WH', 'Warehousing'), ('XAA', 'Combine all same day shipment'), ('YY', 'Split pick-up'),
-    ('ZZZ', 'Mutually defined'),
-]
 
 
 class AccountTax(models.Model):
@@ -86,7 +26,7 @@ class AccountTax(models.Model):
 
     is_zatca = fields.Boolean(related="company_id.parent_is_zatca")
     classified_tax_category = fields.Selection([("E", "E"), ("S", "S"), ("Z", "Z"),
-                                                ("O", "O")], 'Tax Category', default="S", required=True)
+                                                ("O", "O")], 'Tax Category', default="S", required=1)
     tax_exemption_selection = fields.Selection([
         # Tax Category E
         ("VATEX-SA-29", "Financial services mentioned in Article 29 of the VAT Regulations"),
@@ -110,9 +50,8 @@ class AccountTax(models.Model):
                          "(Tax Category O)"),
     ],
         string="Tax exemption Reason Text")
-    tax_exemption_code = fields.Char("Tax exemption Reason Code", readonly=True)
-    tax_exemption_text = fields.Char("Tax exemption Reason Text ", readonly=False)
-    l10n_charge_reason = fields.Selection(charge_reson_list, string="Charge Reason Code")
+    tax_exemption_code = fields.Char("Tax exemption Reason Code", readonly=1)
+    tax_exemption_text = fields.Char("Tax exemption Reason Text ", readonly=0)
 
     @api.onchange('classified_tax_category')
     def _onchange_classified_tax_category(self):
@@ -145,8 +84,7 @@ class AccountTax(models.Model):
                                                                                                          "'Reason is free text, to be provided by the taxpayer on case to case basis.']")
             self.tax_exemption_code = self.tax_exemption_selection
             if self.classified_tax_category != 'O':
-                self.tax_exemption_text = arabic_tax[self.env['ir.model.fields.selection'].sudo()
-                .search([('value', '=', self.tax_exemption_selection)]).name]
+                self.tax_exemption_text = arabic_tax[self.env['ir.model.fields.selection'].sudo().search([('value', '=', self.tax_exemption_selection)]).name]
             else:
                 self.tax_exemption_text = None
 

@@ -58,21 +58,13 @@
                 </xpath>
                 <xpath expr="//notebook" position="inside">
                     <page id="zatca_configurations" string="Zatca Configurations"
-                          groups="ksa_zatca_integration.l10n_sa_group_zatca_user">
+                          groups="ksa_zatca_integration.l10n_sa_group_zatca_user"
+                          invisible="parent_id">
                         <div class="app_settings_block" data-string="ZATCA" string="ZATCA"
                              data-key="ZATCA">
                             <h2>ZATCA</h2>
-                            <span invisible="not parent_id">for other settings see parent company
-                                <br/>
-                                <br/>
-                            </span>
                             <group>
-                                <field name="is_zatca" invisible="parent_id"/>
-                                <field name="parent_is_zatca" invisible="1"/>
-                                <field name="zatca_show_barcode" required="parent_is_zatca"
-                                       invisible="is_zatca or not parent_is_zatca"/>
-                                <field name="l10n_sa_invoice_template" required="parent_is_zatca"
-                                       invisible="is_zatca or not parent_is_zatca"/>
+                                <field name="is_zatca"/>
                             </group>
                             <div class="row mt16 o_settings_container" invisible="not is_zatca">
                                 <div class="col-12 col-lg-12 o_setting_box">
@@ -128,30 +120,8 @@
                                         </group>
                                         <group>
                                             <field name="industry_id" required="is_zatca"/>
-                                            <field name="l10n_sa_invoice_template" required="is_zatca"/>
                                             <field name="is_self_billed"/>
-                                            <field name="zatca_cron_send"/>
-                                            <p invisible="not zatca_cron_send" colspan="2"
-                                               style="padding: 20px 0px;">
-                                                <b style="font-size: large;">Note:</b>
-                                                <br/>
-                                                this will work only for Simplified Invoices,
-                                                <br/>
-                                                <b>For Standard Invoices,
-                                                    it is required to sent immediately, so do it yourself manually.
-                                                </b>
-                                            </p>
-                                            <field name="zatca_skip_cus_addr_val"/>
-                                            <p invisible="not zatca_skip_cus_addr_val" colspan="2"
-                                               style="padding: 20px 0px;">
-                                                <b style="font-size: large;">Note:</b>
-                                                <br/>
-                                                this will give warnings,
-                                                <br/>
-                                                <b>Repeated non-compliance (that result in warnings) will be
-                                                    investigated by ZATCA and may be subject to applicable penalties
-                                                </b>
-                                            </p>
+                                            <field name="zatca_send_from_pos" force_save="1"/>
                                             <field name="csr_otp" force_save="1" invisible="api_type == 'Sandbox'"/>
                                         </group>
                                     </group>
@@ -177,15 +147,15 @@
                                         <span invisible="zatca_status in
                                                 ['production credentials received.', 'production credentials renewed.']"
                                               groups="ksa_zatca_integration.l10n_sa_group_zatca_admin"/>
-                                        <!--                                        <button name="generate_zatca_certificate"-->
-                                        <!--                                                string="Generate Compliance CSID" type="object"-->
-                                        <!--                                                class="btn-primary width_height_100"-->
-                                        <!--                                                invisible="zatca_onboarding_status or zatca_certificate_status or zatca_status in-->
-                                        <!--                                                ['production credentials received.', 'production credentials renewed.']"-->
-                                        <!--                                                groups="ksa_zatca_integration.l10n_sa_group_zatca_admin"/>-->
-                                        <!--                                        <span invisible="zatca_onboarding_status or zatca_certificate_status or zatca_status in-->
-                                        <!--                                                ['production credentials received.', 'production credentials renewed.']"-->
-                                        <!--                                              groups="ksa_zatca_integration.l10n_sa_group_zatca_admin"/>-->
+<!--                                        <button name="generate_zatca_certificate"-->
+<!--                                                string="Generate Compliance CSID" type="object"-->
+<!--                                                class="btn-primary width_height_100"-->
+<!--                                                invisible="zatca_onboarding_status or zatca_certificate_status or zatca_status in-->
+<!--                                                ['production credentials received.', 'production credentials renewed.']"-->
+<!--                                                groups="ksa_zatca_integration.l10n_sa_group_zatca_admin"/>-->
+<!--                                        <span invisible="zatca_onboarding_status or zatca_certificate_status or zatca_status in-->
+<!--                                                ['production credentials received.', 'production credentials renewed.']"-->
+<!--                                              groups="ksa_zatca_integration.l10n_sa_group_zatca_admin"/>-->
                                         <!--                                        ONLY FOR DEBUGGING-->
                                         <button name="reset_zatca" string="Reset ZATCA" type="object"
                                                 class="btn-primary width_height_100" invisible="0"
@@ -216,26 +186,29 @@
                                                 ['Onboarding completed, request for production credentials now']"
                                               groups="ksa_zatca_integration.l10n_sa_group_zatca_admin"/>
                                     </group>
-                                    <group col="3" name="zatca_configurations"
-                                           style="margin-top: 20px;border: 1px dotted black;padding: 10px;">
-                                        <group>
-                                            <field name="zatca_show_barcode"/>
-                                            <field name="zatca_use_address"/>
-                                        </group>
-                                        <group>
-                                            <field name="l10n_sa_show_a4"/>
-                                            <field name="zatca_send_from_pos" force_save="1"/>
-                                        </group>
-                                        <group>
-                                            <field name="zatca_no_head_foot"/>
-                                            <field name="disable_odoo_invoices"/>
-                                        </group>
-                                    </group>
                                 </div>
                             </div>
                         </div>
                     </page>
                 </xpath>
+
+
+                <xpath expr="//group[@name='social_media']" position="before">
+                    <group>
+                        <field name="arabic_name"/>
+                        <label for="arabic_street" string="Arabic Address"/>
+                        <div class="o_address_format">
+                            <field name="arabic_street" placeholder="Arabic Street..." class="o_address_street"/>
+                            <field name="arabic_street2" placeholder="Arabic Street 2..." class="o_address_street"/>
+                            <field name="arabic_city" placeholder="Arabic City" class="o_address_city"/>
+                            <field name="arabic_state" class="o_address_state" placeholder="Arabic State" options="{&quot;no_open&quot;: True}"/>
+                            <field name="arabic_zip" placeholder="Arabic ZIP" class="o_address_zip"/>
+                            <field name="arabic_country" placeholder="Arabic Country" class="o_address_country" options="{&quot;no_open&quot;: True}"/>
+                        </div>
+                    </group>
+                </xpath>
+
+                
             </field>
         </record>
     </data>

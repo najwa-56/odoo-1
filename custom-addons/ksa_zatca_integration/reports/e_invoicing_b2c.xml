@@ -7,33 +7,22 @@
                     <t t-set="doc" t-value="doc.account_move"/>
                 </t>
                 <t t-if="doc.debit_origin_id">
-                    <t t-set="invoice_type" t-value="'Debit Note'"/>
-                    <t t-set="invoice_type_ar" t-value="'إشعار ﻣﺪﻳﻦ'"/>
+                    <t t-set="invoice_type" t-value="'Simplified Debit Note'"/>
+                    <t t-set="invoice_type_ar" t-value="'اشعار ﻣﺪﻳﻦ مبسطة'"/>
                 </t>
                 <t t-elif="doc.move_type == 'out_refund'">
-                    <t t-set="invoice_type" t-value="' Credit Note'"/>
-                    <t t-set="invoice_type_ar" t-value="'إشعار دائن'"/>
+                    <t t-set="invoice_type" t-value="' Simplified Credit Note'"/>
+                    <t t-set="invoice_type_ar" t-value="'اشعار دائن مبسطة'"/>
                 </t>
                 <t t-else="">
                     <t t-set="invoice_type" t-value="'Simplified Tax Invoice'"/>
                     <t t-set="invoice_type_ar" t-value="'فاتورة ضريبية مبسطة'"/>
                 </t>
 
-                <t t-set="parent_root_id"
-                   t-value="doc.company_id if doc.company_id.parent_root_id.zatca_use_address else doc.company_id.parent_root_id"/>
                 <t t-set="conf_partner"
-                   t-value="doc._get_zatca_company_data(parent_root_id) if doc.l10n_is_self_billed_invoice else doc._get_zatca_partner_data()"/>
+                   t-value="doc._get_zatca_company_data(doc.company_id.parent_root_id) if doc.l10n_is_self_billed_invoice else doc._get_zatca_partner_data()"/>
                 <t t-set="conf_company"
-                   t-value="doc._get_zatca_partner_data() if doc.l10n_is_self_billed_invoice else doc._get_zatca_company_data(parent_root_id)"/>
-                <t t-set="partner_id"
-                   t-value="parent_root_id if doc.l10n_is_self_billed_invoice else doc.partner_id"/>
-                <t t-set="_company_id"
-                   t-value="doc.partner_id if doc.l10n_is_self_billed_invoice else parent_root_id"/>
-                <t t-set="buyer_identification"
-                   t-value="doc.company_id.license if doc.l10n_is_self_billed_invoice else doc.partner_id.buyer_identification"/>
-                <t t-set="buyer_identification_no"
-                   t-value="doc.company_id.license_no if doc.l10n_is_self_billed_invoice else doc.partner_id.buyer_identification_no"/>
-                <t t-set="company_vat" t-value="_company_id.parent_root_id.vat"/>
+                   t-value="doc._get_zatca_partner_data() if doc.l10n_is_self_billed_invoice else doc._get_zatca_company_data(doc.company_id.parent_root_id)"/>
 
                 <div dir="ltr">
                     <div class="pos-receipt page_block">
@@ -44,24 +33,24 @@
                             color: white;
                             }
                             .data_column{
-                            font-size:10px !important;
+                            font-size:13px !important;
                             }
                             .label_column.arabic_label{
                             text-align:right;
-                            font-size:9px !important;
+                            font-size:12px !important;
                             float:right;
                             }
                             .label_column{
-                            font-size:10px;
+                            font-size:12px;
                             font-weight:bold
                             }
                             .total_table td.right_column.arabic_label, .reason_table span.right_column.arabic_label{
-                            font-size:9px !important;
+                            font-size:11px !important;
                             font-weight:bold;
                             }
                             .total_table td.right_column, .reason_table span.right_column{
                             text-align:right;
-                            font-size:10px;
+                            font-size:11px;
                             padding: 5px 0;
                             }
                             .reason_table span.right_column{
@@ -72,13 +61,13 @@
                             }
                             .total_table td.left_column{
                             text-align:left;
-                            font-size:10px;
+                            font-size:11px;
                             padding: 5px 0;
                             font-weight:bold;
                             }
                             .reason_table span.left_column{
                             text-align:left;
-                            font-size:9px;
+                            font-size:11px;
                             padding: 5px 0;
                             font-weight:bold;
                             }
@@ -87,7 +76,7 @@
                             font-family: 'Arial';
                             text-align:center;
                             font-size: 14px;
-                            width: 300px;
+                            width: 320px;
                             padding:0;
                             margin:0;
                             }
@@ -107,8 +96,8 @@
                             }
                             .invline_data{
                             text-align:left;
-                            font-size:10px;
-                            padding: 1px 0;
+                            font-size:15px;
+                            padding: 2px 0;
                             }
                         </style>
                         <style type="text/css">
@@ -126,14 +115,14 @@
                             ]]>
                         </style>
                         <div class="pos-receipt page_block"
-                             style="text-align: left;padding-bottom: 0px;display: inline-block;overflow: hidden;">
-                            <t t-if="_company_id.logo">
-                                <img t-attf-src="data:image/*;base64,{{_company_id.logo}}"
+                             style="text-align: center;padding-bottom: 0px;display: inline-block;overflow: hidden;">
+                            <t t-if="doc.company_id.parent_root_id.logo">
+                                <img t-attf-src="data:image/*;base64,{{doc.company_id.parent_root_id.logo}}"
                                      style="max-height:500px; max-width:50%;display: block;margin: 0 auto;"
                                      t-options='{"widget": "image"}'/>
                                 <br/>
                             </t>
-                            <t t-if="not _company_id.logo">
+                            <t t-if="not doc.company_id.parent_root_id.logo">
                                 <h2 style="text-align: center;" class="pos-receipt-center-align">
                                     <t t-esc="conf_company['name']['value']"/>
                                 </h2>
@@ -162,11 +151,7 @@
                                         </td>
                                         <td width="40%" class="data_column">
                                             <span id="invoice_number">
-                                                <div t-att-style="('text-align:-webkit-center;' if doc.company_id.zatca_show_barcode else '') + 'padding: 0px 0px 10px 0px;'">
-                                                    <img t-if="doc.company_id.zatca_show_barcode"
-                                                         t-att-src="'/report/barcode/?barcode_type=%s&amp;value=%s&amp;width=%s&amp;height=%s&amp;quiet=0&amp;humanreadable=0'%('EAN13', quote_plus(doc.zatca_unique_seq), 150, 35)"/>
-                                                    <t t-esc="doc.zatca_unique_seq"/>
-                                                </div>
+                                                <t t-esc="doc.zatca_unique_seq"/>
                                             </span>
                                         </td>
                                         <td width="30%">
@@ -188,7 +173,7 @@
                                             <span class="label_column arabic_label">تاريخ إصدار الفاتورة</span>
                                         </td>
                                     </tr>
-                                    <tr>
+                                    <!--<tr>
                                         <td>
                                             <span class="label_column">
                                                 <b>Tax Currency</b>
@@ -200,7 +185,7 @@
                                         <td>
                                             <span class="label_column arabic_label">العملة الضريبية</span>
                                         </td>
-                                    </tr>
+                                    </tr>-->
                                     <t t-if="doc.reversed_entry_id or doc.debit_origin_id">
                                         <tr>
                                             <td>
@@ -219,7 +204,7 @@
                                             </td>
                                         </tr>
                                     </t>
-                                    <tr>
+                                   <!-- <tr>
                                         <td>
                                             <span class="label_column">
                                                 <b>Supply Date</b>
@@ -233,7 +218,7 @@
                                         <td>
                                             <span class="label_column arabic_label">ﺗﺎرﻳﺦ اﻟﺘﻮرﻳﺪ</span>
                                         </td>
-                                    </tr>
+                                    </tr>-->
                                     <!--                            Company/Seller details -->
                                     <tr>
                                         <td>
@@ -258,7 +243,7 @@
                                         </td>
                                         <td>
                                             <span class="data_column">
-                                                <t t-esc="company_vat"/>
+                                                <t t-esc="doc.company_id.parent_root_id.vat"/>
                                             </span>
                                         </td>
                                         <td>
@@ -274,21 +259,21 @@
                                         </td>
                                         <td>
                                             <span class="data_column">
-                                                <t t-esc="_company_id.building_no"/>,
+                                                <t t-esc="doc.company_id.parent_root_id.building_no"/>,
                                                 <t t-esc="conf_company['street']['value']"/>
                                                 <t t-if="conf_company['street2']['value']"><t
                                                         t-esc="conf_company['street2']['value']"/>,
                                                 </t>
-                                                <t t-if="_company_id.additional_no"><t
-                                                        t-esc="_company_id.additional_no"/>,
+                                                <t t-if="doc.company_id.parent_root_id.additional_no"><t
+                                                        t-esc="doc.company_id.parent_root_id.additional_no"/>,
                                                 </t>
                                                 <t t-esc="conf_company['district']['value']"/>,
-                                                <t t-esc="_company_id.zip"/>,
+                                                <t t-esc="doc.company_id.parent_root_id.zip"/>,
                                                 <t t-esc="conf_company['city']['value']"/>,
                                                 <t t-if="conf_company['state_id_name']['value']"><t
                                                         t-esc="conf_company['state_id_name']['value']"/>,
                                                 </t>
-                                                <t t-esc="conf_company['country_id_name']['value']"/>
+                                                <t t-esc="doc.company_id.parent_root_id.country_id.name"/>
                                             </span>
                                         </td>
                                         <td>
@@ -296,7 +281,7 @@
                                         </td>
                                     </tr>
                                     <!--                            Customer/Buyer details -->
-                                    <tr t-if="conf_partner['name']['value']">
+                                   <!-- <tr t-if="conf_partner['name']['value']">
                                         <td>
                                             <span class="label_column">
                                                 <b>Customer Name</b>
@@ -311,7 +296,7 @@
                                             <span class="label_column arabic_label">اسم العميل</span>
                                         </td>
                                     </tr>
-                                    <tr t-if="buyer_identification">
+                                    <tr t-if="doc.partner_id.buyer_identification">
                                         <td>
                                             <span class="label_column">
                                                 <b>Other Buyer Type</b>
@@ -319,20 +304,15 @@
                                         </td>
                                         <td>
                                             <span class="data_column">
-                                                <t t-if="doc.l10n_is_self_billed_invoice">
-                                                    <t t-esc="doc.get_other_id(doc.env['ir.model.fields.selection'].sudo().search([('field_id', '=', doc.env['ir.model.fields'].sudo().search([('name', '=', 'license'), ('model_id', '=', doc.env['ir.model'].sudo().search([('model', '=', 'res.company')]).id)]).id), ('value', '=', buyer_identification)]).name)"/>
-                                                </t>
-                                                <t t-else="">
-                                                    <t t-esc="doc.get_other_id(doc.env['ir.model.fields.selection'].sudo().search([('field_id', '=', doc.env['ir.model.fields'].sudo().search([('name', '=', 'buyer_identification'), ('model_id', '=', doc.env['ir.model'].sudo().search([('model', '=', 'res.partner')]).id)]).id), ('value', '=', buyer_identification)]).name)"/>
-                                                </t>
-                                                (<t t-esc="buyer_identification"/>)
+                                                <t t-esc="doc.get_other_id(doc.env['ir.model.fields.selection'].sudo().search([('field_id', '=', doc.env['ir.model.fields'].sudo().search([('name', '=', 'buyer_identification'), ('model_id', '=', doc.env['ir.model'].sudo().search([('model', '=', 'res.partner')]).id)]).id), ('value', '=', doc.partner_id.buyer_identification)]).name)"/>
+                                                (<t t-esc="doc.partner_id.buyer_identification"/>)
                                             </span>
                                         </td>
                                         <td>
                                             <span class="label_column arabic_label">بائع آخر</span>
                                         </td>
                                     </tr>
-                                    <tr t-if="buyer_identification">
+                                    <tr t-if="doc.partner_id.buyer_identification">
                                         <td>
                                             <span class="label_column">
                                                 <b>Other Buyer Id</b>
@@ -340,13 +320,13 @@
                                         </td>
                                         <td>
                                             <span class="data_column">
-                                                <t t-esc="buyer_identification_no"/>
+                                                <t t-esc="doc.partner_id.buyer_identification_no"/>
                                             </span>
                                         </td>
                                         <td>
                                             <span class="label_column arabic_label">معرف آخر</span>
                                         </td>
-                                    </tr>
+                                    </tr>-->
                                 </table>
                                 <hr/>
                                 <t t-if="not doc._is_downpayment()"
@@ -378,26 +358,31 @@
                                             <br/>
                                             <span class="label_column">Total Inclusive of VAT</span>
                                         </th>
-                                        <th class="invline_column">
+                                        <!--<th class="invline_column">
                                             <span class="label_column arabic_label">خصومات</span>
                                             <br/>
                                             <span class="label_column">Discount</span>
-                                        </th>
+                                        </th>-->
                                         <th class="invline_column">
                                             <span class="label_column arabic_label">السعر</span>
                                             <br/>
                                             <span class="label_column">Price</span>
+                                        </th>
+                                         <th class="invline_column">
+
                                         </th>
                                         <th class="invline_column">
                                             <span class="label_column arabic_label">الكمية</span>
                                             <br/>
                                             <span class="label_column">Quantity</span>
                                         </th>
+
                                         <!--                                <th class="invline_column" style="text-align:center;">-->
                                         <!--                                    نوع<br/>Type-->
                                         <!--                                </th>-->
                                     </tr>
-                                    <t t-foreach="invoice_line_ids" t-as="line">
+                                    <t t-foreach="invoice_line_ids" t-as="line" t-key="line.id">
+                                        <t t-set="bt_141" t-value="doc.get_bt_141(line.zatca_id)"/>
                                         <tr>
                                             <td colspan='4'
                                                 class="invline_data"
@@ -407,20 +392,24 @@
                                         </tr>
                                         <tr>
                                             <td class="invline_data">
-                                                <span t-esc="doc.get_ksa_12(line.zatca_id, line)"
+                                                <span t-esc="doc.get_ksa_12(line.zatca_id)"
+                                                      t-options='{"widget": "monetary", "display_currency": doc.currency_id}'/>
+                                            </td>
+                                           <!-- <td class="invline_data">
+                                                <span t-esc="doc.get_bt_136(line.zatca_id)"
+                                                      t-options='{"widget": "monetary", "display_currency": doc.currency_id}'/>
+                                            </td>-->
+                                            <td class="invline_data">
+                                                <span t-esc="doc.get_bt_146(line.zatca_id)"
                                                       t-options='{"widget": "monetary", "display_currency": doc.currency_id}'/>
                                             </td>
                                             <td class="invline_data">
-                                                <span t-esc="doc.get_bt_136(line.zatca_id, line)"
-                                                      t-options='{"widget": "monetary", "display_currency": doc.currency_id}'/>
-                                            </td>
-                                            <td class="invline_data">
-                                                <span t-esc="doc.get_bt_146(line.zatca_id, line)"
-                                                      t-options='{"widget": "monetary", "display_currency": doc.currency_id}'/>
+
                                             </td>
                                             <td class="invline_data">
                                                 <t t-esc="line.quantity"/>
                                             </td>
+
                                             <!--                                    <td class="invline_data">-->
                                             <!--                                        <t t-esc="line.product_uom_id.name"/>-->
                                             <!--                                    </td>-->
@@ -484,7 +473,7 @@
                                         </td>
                                     </tr>
                                     <!--                            Not required by zatca-->
-                                    <tr>
+                                    <!--<tr>
                                         <td class="left_column">
                                             <span>Amount Due</span>
                                         </td>
@@ -495,16 +484,16 @@
                                         <td class="right_column arabic_label">
                                             <span>المبلغ المتبقي</span>
                                         </td>
-                                    </tr>
+                                    </tr>-->
                                 </table>
                                 <hr></hr>
-                                <t t-if="doc._get_zatca_ubl_functions().get_pos_order_id(doc)">
+                                <t t-if="doc.env['ir.module.module'].sudo().search([('name', '=', 'point_of_sale')]) == 'installed'">
                                     <t t-set="pos_order"
-                                       t-value="doc.env['pos.order'].sudo().browse(doc._get_zatca_ubl_functions().get_pos_order_id(doc))"/>
+                                       t-value="doc.env['pos.order'].sudo().search([('name', '=', doc.invoice_origin)])"/>
                                     <table width="100%" class="total_table" t-if="pos_order.id">
                                         <t t-if="doc.company_id.zatca_pos_pay">
                                             <t t-foreach="pos_order.payment_ids.filtered(lambda x: x.amount > 0)"
-                                               t-as="line">
+                                               t-as="line" t-key="line.id">
                                                 <tr>
                                                     <td width="30%" class="left_column">
                                                         <span>
@@ -575,7 +564,7 @@
                              style="page-break-inside: avoid !important;
                              page-break-after: avoid !important;
                              page-break-before: auto !important;">
-                            <img id="phase2qrcode" alt="Barcode" t-att-src="doc.get_qrcode()" style="width: 300px;"/>
+                            <img id="phase2qrcode" alt="Barcode" t-att-src="doc.get_qrcode()" style="width: 150px;"/>
                         </div>
                         <div class="pos-receipt page_block">
                             <span style="text-align:center">Thank You</span>

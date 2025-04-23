@@ -8,8 +8,6 @@
                 <xpath expr="//sheet/group" position="after">
                     <field name="is_zatca" invisible="1"/>
                     <group>
-                        <field name="l10n_charge_reason" invisible="amount_type != 'fixed'"
-                               groups="ksa_zatca_integration.l10n_sa_group_zatca_user"/>
                         <field name="classified_tax_category"
                                invisible="not is_zatca or type_tax_use != 'sale'"
                                groups="ksa_zatca_integration.l10n_sa_group_zatca_user"/>

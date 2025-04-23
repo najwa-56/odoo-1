@@ -1,28 +1,9 @@
-import xml.etree.ElementTree as ET
 from odoo import exceptions, _
 
 amount_verification = 0  # for debug mode
 
 
 class ZatcaUBL():
-
-    def get_pos_order_id(self):
-        if self.invoice_origin and self.env['ir.module.module'].sudo().search(
-                [('name', '=', 'point_of_sale')]).state == 'installed':
-            pos_order = self.env['pos.order'].sudo().search([('name', '=', self.invoice_origin)])
-            if len(pos_order.ids) > 1:
-                for message in self.message_ids:
-                    body_str = str(message.body)
-                    try:
-                        root = ET.fromstring(body_str)
-                        pos_order_id = 0
-                        for elem in root.findall(".//*[@data-oe-model='pos.order']"):
-                            pos_order_id = elem.get('data-oe-id')
-                        return int(pos_order_id)
-                    except ET.ParseError:
-                        pass
-            return pos_order.id
-        return False
 
     def set_zatca_id(self, invoice_line_id, bt):
         # def next_invoice_line_id(invoice_line_id):
@@ -40,23 +21,19 @@ class ZatcaUBL():
         bt[126] += 1
         invoice_line_id.zatca_id = bt[126]
 
-    def _get_bg_23_list(self, invoice_line_id, bg_23_list, bt, tax_category, tax_rate, net_amount,
-                        is_bg_20, bt_120, bt_121, is_bg_25=False, bt_117=0):
+    def _get_bg_23_list(self, invoice_line_id, bg_23_list, bt, tax_category, tax_rate, net_amount, is_bg_20, bt_120, bt_121, is_bg_25=False, bt_117=0):
         if not bg_23_list.get(tax_category, False):
             bg_23_list[tax_category] = {}
         if not bg_23_list[tax_category].get(bt_121, False):
-            bg_23_list[tax_category][bt_121] = {'∑bt_92': 0, '∑bt_99': 0, '∑bt_116_p': 0,
-                                                '∑bt_116': 0, '∑bt_117': 0, 'bt_119': tax_rate,
-                                                'bt_120': bt_120, '∑bt_92_p': 0, '∑bt_92_117': 0}
+            bg_23_list[tax_category][bt_121] = {'∑bt_92': 0, '∑bt_99': 0, '∑bt_116_p': 0, '∑bt_116': 0,
+                                                '∑bt_117': 0, 'bt_119': tax_rate, 'bt_120': bt_120}
         if tax_category == "O":
             # if bt_120 not in bg_23_list[tax_category][bt_121]['bt_120']:
             #     bg_23_list[tax_category][bt_121]['bt_120'] += ",%s" % bt_120
             if invoice_line_id.id:
-                if invoice_line_id.l10n_sa_get_tax_ids() and (
-                        not invoice_line_id.l10n_sa_get_tax_ids().tax_exemption_text or
-                        not invoice_line_id.l10n_sa_get_tax_ids().tax_exemption_code):
-                    raise exceptions.MissingError(
-                        _("Tax exemption Reason Text is missing in Tax Category") + " 'O' ")
+                if invoice_line_id.tax_ids and (not invoice_line_id.tax_ids.tax_exemption_text or
+                                                not invoice_line_id.tax_ids.tax_exemption_code):
+                    raise exceptions.MissingError(_("Tax exemption Reason Text is missing in Tax Category") + " 'O' ")
         if is_bg_25:
             if bt_117:
                 bg_23_list[tax_category][bt_121]['∑bt_117'] += bt_117
@@ -64,10 +41,6 @@ class ZatcaUBL():
                 bg_23_list[tax_category][bt_121]['∑bt_116_p'] += net_amount
             bg_23_list[tax_category][bt_121]['∑bt_116'] += net_amount
         elif is_bg_20:
-            if bt_117:
-                bg_23_list[tax_category][bt_121]['∑bt_92_117'] += bt_117
-            else:
-                bg_23_list[tax_category][bt_121]['∑bt_92_p'] += net_amount
             bg_23_list[tax_category][bt_121]['∑bt_92'] += net_amount
         else:
             bg_23_list[tax_category][bt_121]['∑bt_99'] += net_amount
@@ -103,32 +76,20 @@ class ZatcaUBL():
 
     def get_document_level_allowance(self, bt, ubl_2_1, document_currency, bg_23_list):
         document_level_allowance = 0
-        invoice_line_ids = self.invoice_line_ids.filtered(
-            lambda x: x.display_type not in ['line_section', 'line_note'] and x.price_unit < 0)
-        for invoice_line_id in invoice_line_ids:
-            bt_120 = invoice_line_id.l10n_sa_get_tax_ids().tax_exemption_text if len(
-                invoice_line_id.l10n_sa_get_tax_ids()) > 0 else 'Not subject to VAT'
-            bt_121 = invoice_line_id.l10n_sa_get_tax_ids().tax_exemption_code if len(
-                invoice_line_id.l10n_sa_get_tax_ids()) > 0 else 'VATEX-SA-OOS'
-            # bt[92] = self.get_l10n_field_type('amount', abs(invoice_line_id.price_unit))
-            bt[92] = self.get_l10n_field_type('amount',
-                                              abs(ZatcaUBL.get_price_unit(invoice_line_id)))
+        if document_level_allowance:
+            bt[120] = False
+            bt[121] = False
+            bt[92] = self.get_l10n_field_type('amount', 0)
             bt['∑92'] += bt[92]
-            bt[
-                95] = invoice_line_id.l10n_sa_get_tax_ids().classified_tax_category if invoice_line_id.l10n_sa_get_tax_ids() else "O"
-            bt[96] = self.get_l10n_field_type('percentage', self.get_l10n_field_type(
-                'amount', invoice_line_id.l10n_sa_get_tax_ids().amount))
+            bt[93] = self.get_l10n_field_type('amount', 0)
+            bt[96] = self.get_l10n_field_type('percentage', self.get_l10n_field_type('amount', 0))
             bt[97] = self.get_l10n_field_type('text', "Discount")
             bt[98] = "95"
             # allowance on document level (bg-20)
             if bt[95] == 'S' and bt[96] <= 0:
-                raise exceptions.ValidationError(
-                    _('In Document level allowance for Tax Category') + " %s " % bt[95] + _(
-                        "must be greater then 0"))
+                raise exceptions.ValidationError(_('In Document level allowance for Tax Category') + " %s " % bt[95] + _("must be greater then 0"))
             if bt[95] in ['Z', 'E', 'O'] and bt[96] != 0:
-                raise exceptions.ValidationError(
-                    _('In Document level allowance for Tax Category') + " %s " % bt[95] + _(
-                        "must be 0"))
+                raise exceptions.ValidationError(_('In Document level allowance for Tax Category') + " %s " % bt[95] + _("must be 0"))
 
             ubl_2_1 += '''
             <cac:AllowanceCharge>
@@ -136,116 +97,54 @@ class ZatcaUBL():
                 <cbc:AllowanceChargeReasonCode>%s</cbc:AllowanceChargeReasonCode>
                 <cbc:AllowanceChargeReason>%s</cbc:AllowanceChargeReason>
                 <cbc:Amount currencyID="%s">%s</cbc:Amount>
-                <cac:TaxCategory>''' % (bt[98], bt[97], document_currency,
-                                        self.l10n_is_positive("AllowanceChargeAmount (bt-92)",
-                                                              bt[92]))
-            ubl_2_1 += ZatcaUBL._get_tax_category(self, bt[95], bt[96], bt_120, bt_121)
+                <cac:TaxCategory>''' % (bt[98], bt[97], document_currency, self.l10n_is_positive("AllowanceChargeAmount (bt-92)", bt[92]))
+            ubl_2_1 += ZatcaUBL._get_tax_category(self, bt[95], bt[96], bt[120], bt[121])
             ubl_2_1 += '''
                 </cac:TaxCategory>
             </cac:AllowanceCharge>'''
-            bt_117 = abs(self.get_l10n_field_type('amount', invoice_line_id.price_total + bt[
-                92]) if invoice_line_id.l10n_sa_get_tax_ids().price_include else 0)
-            bg_23_list, bt = ZatcaUBL._get_bg_23_list(self, invoice_line_id, bg_23_list, bt,
-                                                      bt[95], bt[96], bt[92], 1, bt_120, bt_121,
-                                                      False, bt_117)
+            bg_23_list, bt = ZatcaUBL._get_bg_23_list(self, False, bg_23_list, bt, bt[95], bt[96], bt[92], 1, bt[120], bt[121])
         return bt, ubl_2_1, bg_23_list
 
     def get_price_unit(self):
-        if self.l10n_sa_get_tax_ids().price_include:
-            line = self
-            #
-            # copied from odoo/addons/account_edi_ubl_cii/models/account_edi_xml_ubl_20.py
-            #
-
-            # Price subtotal without discount:
-            net_price_subtotal = line.price_subtotal
-            # Price subtotal with discount:
-            if line.discount == 100.0:
-                gross_price_subtotal = 0.0
-            else:
-                gross_price_subtotal = net_price_subtotal / (1.0 - (line.discount or 0.0) / 100.0)
-            # Price subtotal with discount / quantity:
-            gross_price_unit = gross_price_subtotal / line.quantity if line.quantity else 0.0
-
-            return round(gross_price_unit, 10)
-            # return self.price_unit / (1 + self.l10n_sa_get_tax_ids()[0].amount / 100)
+        if self.tax_ids.price_include:
+            return self.env['account.edi.xml.ubl_20']._get_invoice_line_price_vals(self)['price_amount']
+            # return self.price_unit / (1 + self.tax_ids[0].amount / 100)
         else:
             return self.price_unit
 
-    def get_allowance_charge(self, invoice_line_id, document_currency, bt, bt_120, bt_121):
-        bt_141 = self.get_l10n_field_type('amount', invoice_line_id.amount)
-        bt[141] += bt_141
-        bt_145 = invoice_line_id.l10n_charge_reason  # from UNTDID 7161 code list
-        bt_144 = self.env['ir.model.fields.selection'].sudo().search([
-            ('field_id', '=', self.env['ir.model.fields'].sudo().search([
-                ('name', '=', 'l10n_charge_reason'),
-                ('model_id', '=', self.env['ir.model'].sudo().search([
-                    ('model', '=', 'account.tax')]).id)]).id),
-            ('value', '=', bt_145)]).name
-        allowance_charge_xml = ('''
-        <cac:AllowanceCharge>
-            <cbc:ChargeIndicator>true</cbc:ChargeIndicator>
-            <cbc:AllowanceChargeReasonCode>%s</cbc:AllowanceChargeReasonCode>
-            <cbc:AllowanceChargeReason>%s</cbc:AllowanceChargeReason>
-            <cbc:Amount currencyID="%s">%s</cbc:Amount>''' % (
-            bt_145, self.l10n_check_allowed_size(0, 1000, bt_144, 'AllowanceChargeReason'),
-            document_currency, self.l10n_is_positive("AllowanceChargeAmount (bt-141)", bt_141)))
-        allowance_charge_xml += "</cac:AllowanceCharge>"
-        return allowance_charge_xml
-
     def _get_invoice_line(self, bg_23_list, bt, ksa):
-        invoice_line_ids = self.invoice_line_ids.filtered(
-            lambda x: x.display_type not in ['line_section', 'line_note'] and x.price_unit >= 0)
-
         if not self._is_downpayment():
-            invoice_line_ids = invoice_line_ids.filtered(
-                lambda x: not x.sale_line_ids.is_downpayment)
+            invoice_line_ids = self.invoice_line_ids.filtered(lambda x: x.display_type not in ['line_section', 'line_note'] and not x.sale_line_ids.is_downpayment)
+        else:
+            invoice_line_ids = self.invoice_line_ids.filtered(lambda x: x.display_type not in ['line_section', 'line_note'])
         # invoice_line_ids = self.invoice_line_ids.filtered(lambda x: not x.display_type)
         document_currency = self.currency_id.name
         invoice_line_xml = ''
         item_price_charge = 0
         for invoice_line_id in invoice_line_ids:
-            bt_120 = invoice_line_id.l10n_sa_get_tax_ids().tax_exemption_text if len(
-                invoice_line_id.l10n_sa_get_tax_ids()) > 0 else 'Not subject to VAT'
-            bt_121 = invoice_line_id.l10n_sa_get_tax_ids().tax_exemption_code if len(
-                invoice_line_id.l10n_sa_get_tax_ids()) > 0 else 'VATEX-SA-OOS'
-            bt[137] = self.get_l10n_field_type('amount', ZatcaUBL.get_price_unit(
-                invoice_line_id) * invoice_line_id.quantity)
+            bt[137] = self.get_l10n_field_type('amount', ZatcaUBL.get_price_unit(invoice_line_id) * invoice_line_id.quantity)
             bt[138] = self.get_bt_138(invoice_line_id, bt)
             bt[136] = self.get_l10n_field_type('amount', bt[137] * bt[138] / 100)
             bt[129] = abs(invoice_line_id.quantity)
-            bt[
-                147] = 0  # NO ITEM PRICE DISCOUNT bt[148] * invoice_line_id.discount/100 if invoice_line_id.discount else 0
+            bt[141] = self.get_l10n_field_type('amount', 0)
+            bt[147] = 0  # NO ITEM PRICE DISCOUNT bt[148] * invoice_line_id.discount/100 if invoice_line_id.discount else 0
             bt[148] = ZatcaUBL.get_price_unit(invoice_line_id)
             bt[146] = bt[148] - bt[147]
             bt[149] = 1  # ??
-            bt[
-                151] = invoice_line_id.l10n_sa_get_tax_ids().classified_tax_category if invoice_line_id.l10n_sa_get_tax_ids() else "O"
-            bt[152] = self.get_l10n_field_type('percentage', self.get_l10n_field_type(
-                'amount', invoice_line_id.l10n_sa_get_tax_ids().amount))
-
-            if bt[151] == 'S' and bt[152] <= 0:
-                raise exceptions.ValidationError(
-                    _('In Invoice line the tax rate for tax category') + " %s " % bt[95] + _(
-                        "must be greater then 0"))
-            if bt[151] in ['O', 'Z', 'E'] and bt[152] != 0:
-                raise exceptions.ValidationError(
-                    _('In Invoice line the tax rate for tax category') + " " + bt[151] + " " + _(
-                        "must be 0"))
-                # bt[152] = 100 if bt[152] > 100 else (0 if bt[152] < 0 else bt[152])
-
-            allowance_charge_xml = ""
-            # if bt[141]:  # charge on invoice line: (BG-28)
-            for invoice_charge_line in invoice_line_id.tax_ids.filtered(
-                    lambda x: x.amount_type == 'fixed'):
-                raise exceptions.ValidationError(_('Fixed tax not suppoerted yet'))
-                allowance_charge_xml += ZatcaUBL.get_allowance_charge(
-                    self, invoice_charge_line, document_currency, bt, bt_120, bt_121)
 
             bt[131] = self.get_l10n_field_type('amount', ((bt[146] / bt[149]) * bt[129]))
             bt[131] = self.get_l10n_field_type('amount', bt[131] - bt[136] + bt[141])
 
             bt['∑131'] += bt[131]
+            bt[151] = invoice_line_id.tax_ids.classified_tax_category if invoice_line_id.tax_ids else "O"
+            bt[152] = self.get_l10n_field_type('percentage', self.get_l10n_field_type('amount', invoice_line_id.tax_ids.amount))
+            if bt[151] in ['O', 'Z', 'E'] and bt[152] != 0:
+                raise exceptions.ValidationError(_('In Invoice line the tax rate for tax category') + " " + bt[151] + " " + _("must be 0"))
+                # bt[152] = 100 if bt[152] > 100 else (0 if bt[152] < 0 else bt[152])
+
+            bt_120 = invoice_line_id.tax_ids.tax_exemption_text if len(invoice_line_id.tax_ids) > 0 else 'Not subject to VAT'
+            bt_121 = invoice_line_id.tax_ids.tax_exemption_code if len(invoice_line_id.tax_ids) > 0 else 'VATEX-SA-OOS'
+
             ZatcaUBL.set_zatca_id(self, invoice_line_id, bt)
 
             invoice_line_xml += ('''
@@ -253,8 +152,7 @@ class ZatcaUBL():
                 <cbc:ID>%s</cbc:ID>
                 <cbc:InvoicedQuantity unitCode="PCE">%s</cbc:InvoicedQuantity>
                 <cbc:LineExtensionAmount currencyID="%s">%s</cbc:LineExtensionAmount>''' %
-                                 (self.l10n_check_allowed_size(1, 6, invoice_line_id.zatca_id,
-                                                               "bt-126"),
+                                 (self.l10n_check_allowed_size(1, 6, invoice_line_id.zatca_id, "bt-126"),
                                   self.l10n_is_positive("AllowanceChargeAmount (bt-129)", bt[129]),
                                   document_currency, bt[131]))
             if bt[138]:  # allowance on invoice line: (BG-27)
@@ -266,40 +164,51 @@ class ZatcaUBL():
                 invoice_line_xml += ('''
                     <cbc:MultiplierFactorNumeric>%s</cbc:MultiplierFactorNumeric>
                     <cbc:Amount currencyID="%s">%s</cbc:Amount>
-                    <cbc:BaseAmount currencyID="%s">%s</cbc:BaseAmount>
-                    <cac:TaxCategory>''' %
+                    <cbc:BaseAmount currencyID="%s">%s</cbc:BaseAmount>''' %
                                      (bt[138], document_currency,
-                                      self.get_l10n_field_type('amount', self.l10n_is_positive(
-                                          "AllowanceChargeAmount (bt-136)", bt[136])),
+                                      self.get_l10n_field_type('amount', self.l10n_is_positive("AllowanceChargeAmount (bt-136)", bt[136])),
                                       document_currency,
-                                      self.get_l10n_field_type('amount', self.l10n_is_positive(
-                                          "AllowanceChargeBaseAmount (bt-137)", bt[137]))))
-                invoice_line_xml += ZatcaUBL._get_tax_category(self, bt[151], bt[152], bt_120,
-                                                               bt_121)
-                # if bt[151] != 'O':
-                #     invoice_line_xml += '''
-                #         <cac:TaxCategory>
-                #             <cbc:ID>S</cbc:ID>
-                #             <cbc:Percent>15</cbc:Percent>
-                #             <cac:TaxScheme>
-                #                 <cbc:ID>VAT</cbc:ID>
-                #             </cac:TaxScheme>
-                #         </cac:TaxCategory>'''
+                                      self.get_l10n_field_type('amount', self.l10n_is_positive("AllowanceChargeBaseAmount (bt-137)", bt[137]))))
+                if bt[151] != 'O':
+                    invoice_line_xml += '''
+                        <cac:TaxCategory>
+                            <cbc:ID>S</cbc:ID>
+                            <cbc:Percent>15</cbc:Percent>
+                            <cac:TaxScheme>
+                                <cbc:ID>VAT</cbc:ID>
+                            </cac:TaxScheme>
+                        </cac:TaxCategory>'''
                 invoice_line_xml += '''
-                        </cac:TaxCategory>
                     </cac:AllowanceCharge>'''
-            invoice_line_xml += allowance_charge_xml
+            if bt[141]:  # charge on invoice line: (BG-28)
+                bt[142] = self.get_l10n_field_type('amount', 0)
+                bt[144] = "Cleaning"
+                bt[145] = "CG"  # from UNTDID 7161 code list
+                invoice_line_xml += ('''
+                <cac:AllowanceCharge>
+                    <cbc:ChargeIndicator>true</cbc:ChargeIndicator>
+                    <cbc:AllowanceChargeReasonCode>%s</cbc:AllowanceChargeReasonCode>
+                    <cbc:AllowanceChargeReason>%s</cbc:AllowanceChargeReason>
+                    <cbc:Amount currencyID="%s">%s</cbc:Amount>
+                    <cac:TaxCategory>
+                        <cbc:ID>S</cbc:ID>
+                        <cbc:Percent>15</cbc:Percent>
+                        <cac:TaxScheme>
+                            <cbc:ID>VAT</cbc:ID>
+                        </cac:TaxScheme>
+                    </cac:TaxCategory>
+                </cac:AllowanceCharge>''' %
+                                     (bt[145], self.l10n_check_allowed_size(0, 1000, bt[144], 'AllowanceChargeReason'),
+                                      document_currency, self.l10n_is_positive("AllowanceChargeAmount (bt-141)", bt[141])))
 
-            if invoice_line_id.l10n_sa_get_tax_ids().price_include:
+            if invoice_line_id.tax_ids.price_include:
                 ksa[11] = self.get_l10n_field_type('amount', invoice_line_id.price_total - bt[131])
             else:
-                ksa[11] = self.get_l10n_field_type('amount', bt[131] * bt[152] / 100)
+                ksa[11] = self.get_l10n_field_type('amount', bt[131] * bt[152]/100)
             ksa[12] = self.get_l10n_field_type('amount', bt[131] + ksa[11])
 
-            bt_117 = ksa[11] if invoice_line_id.l10n_sa_get_tax_ids().price_include else 0
-            bg_23_list, bt = ZatcaUBL._get_bg_23_list(self, invoice_line_id, bg_23_list, bt,
-                                                      bt[151], bt[152], bt[131], False, bt_120,
-                                                      bt_121, True, bt_117)
+            bt_117 = ksa[11] if invoice_line_id.tax_ids.price_include else 0
+            bg_23_list, bt = ZatcaUBL._get_bg_23_list(self, invoice_line_id, bg_23_list, bt, bt[151], bt[152], bt[131], False, bt_120, bt_121, True, bt_117)
 
             # BR-KSA-52 and BR-KSA-53
             invoice_line_xml += ('''
@@ -308,18 +217,16 @@ class ZatcaUBL():
                     <cbc:RoundingAmount currencyID="%s">%s</cbc:RoundingAmount>
                 </cac:TaxTotal>
                 <cac:Item>
-                    <cbc:Name>%s</cbc:Name>''' % (
-                document_currency, self.l10n_is_positive("TaxAmount (ksa-11)", ksa[11]),
-                document_currency, self.l10n_is_positive("RoundingAmount (ksa-12)", ksa[12]),
-                self.l10n_check_allowed_size(
-                    1, 1000, self._get_zatca_product_name(invoice_line_id)["name"]["value"],
-                    "Partner " + self._get_zatca_product_name(invoice_line_id)["name"]["field"])))
+                    <cbc:Name>%s</cbc:Name>''' %
+                                 (document_currency, self.l10n_is_positive("TaxAmount (ksa-11)", ksa[11]),
+                                  document_currency, self.l10n_is_positive("RoundingAmount (ksa-12)", ksa[12]),
+                                  self.l10n_check_allowed_size(1, 1000, self._get_zatca_product_name(invoice_line_id)["name"]["value"],
+                                                               "Partner " + self._get_zatca_product_name(invoice_line_id)["name"]["field"])))
             if invoice_line_id.product_id.barcode and invoice_line_id.product_id.code_type:
                 invoice_line_xml += '''
                     <cac:StandardItemIdentification>
                         <cbc:ID schemeID="%s">%s</cbc:ID>
-                    </cac:StandardItemIdentification>''' % (
-                    invoice_line_id.product_id.code_type, invoice_line_id.product_id.barcode)
+                    </cac:StandardItemIdentification>''' % (invoice_line_id.product_id.code_type, invoice_line_id.product_id.barcode)
             invoice_line_xml += '''
                     <cac:ClassifiedTaxCategory>'''
             invoice_line_xml += ZatcaUBL._get_tax_category(self, bt[151], bt[152], bt_120, bt_121)
@@ -329,8 +236,7 @@ class ZatcaUBL():
                 <cac:Price>
                     <cbc:PriceAmount currencyID="%s">%s</cbc:PriceAmount>
                     <cbc:BaseQuantity unitCode="PCE">%s</cbc:BaseQuantity>''' %
-                                 (document_currency,
-                                  self.l10n_is_positive("TaxAmount (bt-146)", bt[146]),
+                                 (document_currency, self.l10n_is_positive("TaxAmount (bt-146)", bt[146]),
                                   self.l10n_is_positive("BaseQuantity (bt-149)", bt[149])))
             if bt[147]:  # item price discount
                 invoice_line_xml += ('''
@@ -340,11 +246,9 @@ class ZatcaUBL():
                         <cbc:BaseAmount currencyID="%s">%s</cbc:Amount>
                     </cac:AllowanceCharge>''' %
                                      (document_currency,
-                                      self.get_l10n_field_type('amount', self.l10n_is_positive(
-                                          "AllowanceChargeAmount (bt-147)", bt[147])),
+                                      self.get_l10n_field_type('amount', self.l10n_is_positive("AllowanceChargeAmount (bt-147)", bt[147])),
                                       document_currency,
-                                      self.get_l10n_field_type('amount', self.l10n_is_positive(
-                                          "AllowanceChargeBaseAmount (bt-148)", bt[148]))))
+                                      self.get_l10n_field_type('amount', self.l10n_is_positive("AllowanceChargeBaseAmount (bt-148)", bt[148]))))
             if item_price_charge:  # item price charge
                 invoice_line_xml += ('''
                     <cac:AllowanceCharge>
@@ -353,11 +257,9 @@ class ZatcaUBL():
                         <cbc:BaseAmount currencyID="%s">%s</cbc:Amount>
                     </cac:AllowanceCharge>''' %
                                      (document_currency,
-                                      self.l10n_is_positive("AllowanceChargeAmount (bt-??)",
-                                                            bt['??']),
+                                      self.l10n_is_positive("AllowanceChargeAmount (bt-??)", bt['??']),
                                       document_currency,
-                                      self.l10n_is_positive("AllowanceChargeBaseAmount (bt-??)",
-                                                            bt['??'])))
+                                      self.l10n_is_positive("AllowanceChargeBaseAmount (bt-??)", bt['??'])))
             invoice_line_xml += '''
                 </cac:Price>
             </cac:InvoiceLine>'''
@@ -372,31 +274,19 @@ class ZatcaUBL():
 
         LegalMonetaryTotal = [
             "<cac:LegalMonetaryTotal>",
-            "<cbc:%s currencyID='%s'>%s</cbc:%s>" % (
-                "LineExtensionAmount", document_currency, bt[106], "LineExtensionAmount"),
-            "<cbc:%s currencyID='%s'>%s%s</cbc:%s>" % (
-                "TaxExclusiveAmount", document_currency, bt[109],
-                (" | " + str(self.amount_untaxed) if amount_verification else ''),
-                "TaxExclusiveAmount"),
-            "<cbc:%s currencyID='%s'>%s%s</cbc:%s>" % (
-                "TaxInclusiveAmount", document_currency, bt[112],
-                (" | " + str(self.amount_total) if amount_verification else ''),
-                "TaxInclusiveAmount"),
+            "<cbc:%s currencyID='%s'>%s</cbc:%s>" % ("LineExtensionAmount", document_currency, bt[106], "LineExtensionAmount"),
+            "<cbc:%s currencyID='%s'>%s%s</cbc:%s>" % ("TaxExclusiveAmount", document_currency, bt[109], (" | " + str(self.amount_untaxed) if amount_verification else ''), "TaxExclusiveAmount"),
+            "<cbc:%s currencyID='%s'>%s%s</cbc:%s>" % ("TaxInclusiveAmount", document_currency, bt[112], (" | " + str(self.amount_total) if amount_verification else ''), "TaxInclusiveAmount"),
         ]
         if bt[107]:
             self.l10n_is_positive("AllowanceTotalAmount (bt-107)", bt[107])
-            LegalMonetaryTotal.append("<cbc:%s currencyID='%s'>%s</cbc:%s>" % (
-                "AllowanceTotalAmount", document_currency, bt[107], "AllowanceTotalAmount"))
+            LegalMonetaryTotal.append("<cbc:%s currencyID='%s'>%s</cbc:%s>" % ("AllowanceTotalAmount", document_currency, bt[107], "AllowanceTotalAmount"))
         if bt[108]:
             self.l10n_is_positive("ChargeTotalAmount (bt-108)", bt[108])
-            LegalMonetaryTotal.append("<cbc:%s currencyID='%s'>%s</cbc:%s>" % (
-                "ChargeTotalAmount", document_currency, bt[108], "ChargeTotalAmount"))
+            LegalMonetaryTotal.append("<cbc:%s currencyID='%s'>%s</cbc:%s>" % ("ChargeTotalAmount", document_currency, bt[108], "ChargeTotalAmount"))
         if bt[114]:
-            LegalMonetaryTotal.append("<cbc:%s currencyID='%s'>%s</cbc:%s>" % (
-                "PayableRoundingAmount", document_currency, bt[114], "PayableRoundingAmount"))
-        LegalMonetaryTotal.append("<cbc:%s currencyID='%s'>%s%s</cbc:%s>" % (
-            "PayableAmount", document_currency, bt[115],
-            (" | " + str(self.amount_residual) if amount_verification else ''), "PayableAmount"))
+            LegalMonetaryTotal.append("<cbc:%s currencyID='%s'>%s</cbc:%s>" % ("PayableRoundingAmount", document_currency, bt[114], "PayableRoundingAmount"))
+        LegalMonetaryTotal.append("<cbc:%s currencyID='%s'>%s%s</cbc:%s>" % ("PayableAmount", document_currency, bt[115], (" | " + str(self.amount_residual) if amount_verification else ''), "PayableAmount"))
         LegalMonetaryTotal.append("</cac:LegalMonetaryTotal>")
 
         return LegalMonetaryTotal
