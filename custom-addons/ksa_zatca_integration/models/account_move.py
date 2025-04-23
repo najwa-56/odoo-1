@@ -1896,7 +1896,7 @@ class AccountMove(models.Model):
 
     def send_invoice_batch(self):
         today = date.today()
-        two_days_ago = today - timedelta(days=7)
+        two_days_ago = today - timedelta(days=15)
         recipients = ['abeersalh166@gmail.com','n4ajwa4@gmail.com']
         # start_date = datetime(2024, 9, 1)  # 1st Jan 2025
         # end_date = datetime(2025, 1, 1)
@@ -1906,10 +1906,8 @@ class AccountMove(models.Model):
             ('move_type', '=', 'out_invoice'),            
             ('state', '=', 'posted'),
             ('partner_id.is_dolfin', '!=', True),
-             
-             
-            
-        ])
+            ('partner_id', '!=', 17),
+            ('l10n_sa_zatca_status', 'ilike', 'not')],limit=500)
 
         _logger.info(f"first invoices lenght (Invoices length: {len(invoices)}) *****************************")
         if not invoices:
@@ -1990,29 +1988,29 @@ class AccountMove(models.Model):
                     # Bypass errors.
                     _logger.info(f"Multi Send To Zatca Errors (Invoice ID: {record.id}) ***************************** :: {str(e)}")
 
-                    mail_values = {
-                        'subject': f"Sent Invoice To Zatca Processing Failed for {record.name}",
-                        'body_html': f"<p><strong>Error:</strong> {str(e)}</p>",
-                        'email_to': ','.join(recipients),
-                        }
-                    self.env['mail.mail'].create(mail_values).send()
+                    # mail_values = {
+                    #     'subject': f"Sent Invoice To Zatca Processing Failed for {record.name}",
+                    #     'body_html': f"<p><strong>Error:</strong> {str(e)}</p>",
+                    #     'email_to': ','.join(recipients),
+                    #     }
+                    # self.env['mail.mail'].create(mail_values).send()
 
 
         
       
 
-        # remaining_count = self.sudo().search_count([
-        #     ('invoice_date', '>=', start_date),
-        #     ('invoice_date', '<=', end_date),
-        #     ('move_type', '=', 'out_invoice'),
-        #     ('state', '=', 'posted'),
-        #     ('partner_id', '!=', 17),
-        #     ('partner_id.is_dolfin', '!=', True),
-        #     ('l10n_sa_zatca_status', 'ilike', 'not')
+        remaining_count = self.sudo().search_count([
+            ('invoice_date', '>=', today),
+            ('invoice_date', '<=', two_days_ago),
+            ('move_type', '=', 'out_invoice'),
+            ('state', '=', 'posted'),
+            ('partner_id', '!=', 17),
+            ('partner_id.is_dolfin', '!=', True),
+            ('l10n_sa_zatca_status', 'ilike', 'not')
             
-        # ])
-        # if remaining_count > 0:
-        #     self.env.ref('ksa_zatca_integration.ir_cron_send_inovoice_job_count')._trigger()
+        ])
+        if remaining_count > 0:
+            self.env.ref('ksa_zatca_integration.ir_cron_send_inovoice_job_count')._trigger()
 
 
 
