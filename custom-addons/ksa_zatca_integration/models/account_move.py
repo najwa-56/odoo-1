@@ -1738,12 +1738,8 @@ class AccountMove(models.Model):
         return self.invoices_clearance_single_api()
 
     def send_for_reporting(self, no_xml_generate=0):
-        _logger.info(f"no_xml_generate============== {no_xml_generate} ===================.")
         for rec in self:
             if (rec._context.get('xml_generate', 0) or not rec.zatca_invoice) and not no_xml_generate:
-                _logger.info(f"in if conditoins ============== {rec._context.get('xml_generate', 0)} ===================.")
-                _logger.info(f"in if conditoins ============== {rec.zatca_invoice} ===================.")
-                _logger.info(f"in if conditoins ============== {rec._context.get('xml_generate', 0)} ===================.")
                 rec.create_xml_file()
             return rec.invoices_reporting_single_api(no_xml_generate)
 
