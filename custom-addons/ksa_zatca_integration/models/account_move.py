@@ -1910,81 +1910,82 @@ class AccountMove(models.Model):
         
         
         for record in invoices:
-            if not record.zatca_invoice_name or not record.zatca_compliance_invoices_api or record.zatca_status_code == '400':
-                if not (record.partner_id.vat.startswith('3') and record.partner_id.vat.endswith('3')):
-                    record.partner_id.vat = '300000000000003'
-           
-                if record.partner_id.is_company and len(record.partner_id.vat) != 15:
-                    record.partner_id.vat = '300000000000003'
-                
-                if not record.partner_id.is_company and  record.partner_id.vat :
-                    if len(record.partner_id.vat) != 15:
+            if record.company_id.zatca_status:
+                if not record.zatca_invoice_name or not record.zatca_compliance_invoices_api or record.zatca_status_code == '400':
+                    if not (record.partner_id.vat.startswith('3') and record.partner_id.vat.endswith('3')):
                         record.partner_id.vat = '300000000000003'
-                        record.is_company = True
-
-                if record.partner_id.is_company and  not record.partner_id.vat :
-                    record.partner_id.vat = '300000000000003'
-
-                if not record.partner_id.street:
-                    record.partner_id.street = '/'
-                
-                if not record.partner_id.street2:
-                    record.partner_id.street2 = '/'
-                
-                if not record.partner_id.city:
-                    record.partner_id.city = '/'
-                
-                if not record.partner_id.district:
-                    record.partner_id.district = '/'
-                
-                if not record.partner_id.country_id:
-                    record.partner_id.country_id = 192
-                
-                if not record.partner_id.building_no:
-                    record.partner_id.building_no = '1234'
-
-                if not record.partner_id.zip:
-                    record.partner_id.zip = '12345'
-
             
-
-                if not record.partner_id.state_id:
-                    state_id = self.env['res.country.state'].search([('code','=','BRU')],limit=1)
-                    record.partner_id.state_id = state_id.id
-
-                
-
-                try:
-                
-                    for line in record.invoice_line_ids:
-                        if '&' in line.name:
-                            line.name = line.name.replace('&', 'و')
+                    if record.partner_id.is_company and len(record.partner_id.vat) != 15:
+                        record.partner_id.vat = '300000000000003'
                     
-                    if record.l10n_sa_invoice_type == 'Standard':
-                        _logger.info(f"l10n_sa_invoice_type standard Send To Zatca (Invoice ID: {record.id})===================")
-                        record.send_for_clearance()
-                        self.env.cr.commit() 
-                        record.message_post(body="invoice send to zatca from cron job")
+                    if not record.partner_id.is_company and  record.partner_id.vat :
+                        if len(record.partner_id.vat) != 15:
+                            record.partner_id.vat = '300000000000003'
+                            record.is_company = True
+
+                    if record.partner_id.is_company and  not record.partner_id.vat :
+                        record.partner_id.vat = '300000000000003'
+
+                    if not record.partner_id.street:
+                        record.partner_id.street = '/'
+                    
+                    if not record.partner_id.street2:
+                        record.partner_id.street2 = '/'
+                    
+                    if not record.partner_id.city:
+                        record.partner_id.city = '/'
+                    
+                    if not record.partner_id.district:
+                        record.partner_id.district = '/'
+                    
+                    if not record.partner_id.country_id:
+                        record.partner_id.country_id = 192
+                    
+                    if not record.partner_id.building_no:
+                        record.partner_id.building_no = '1234'
+
+                    if not record.partner_id.zip:
+                        record.partner_id.zip = '12345'
+
+                
+
+                    if not record.partner_id.state_id:
+                        state_id = self.env['res.country.state'].search([('code','=','BRU')],limit=1)
+                        record.partner_id.state_id = state_id.id
+
+                    
+
+                    try:
+                    
+                        for line in record.invoice_line_ids:
+                            if '&' in line.name:
+                                line.name = line.name.replace('&', 'و')
                         
-                    elif record.l10n_sa_invoice_type == 'Simplified':
-                        _logger.info(f"l10n_sa_invoice_type standard Send To Zatca (Invoice ID: {record.id}) =============")
-                        record.send_for_reporting()
-                        self.env.cr.commit() 
-                        record.message_post(body="invoice send to zatca from cron job")
-                    
-                    
-                    
+                        if record.l10n_sa_invoice_type == 'Standard':
+                            _logger.info(f"l10n_sa_invoice_type standard Send To Zatca (Invoice ID: {record.id})===================")
+                            record.send_for_clearance()
+                            self.env.cr.commit() 
+                            record.message_post(body="invoice send to zatca from cron job")
                             
-                except Exception as e:
-                    # Bypass errors.
-                    _logger.info(f"Multi Send To Zatca Errors (Invoice ID: {record.id}) ***************************** :: {str(e)}")
+                        elif record.l10n_sa_invoice_type == 'Simplified':
+                            _logger.info(f"l10n_sa_invoice_type standard Send To Zatca (Invoice ID: {record.id}) =============")
+                            record.send_for_reporting()
+                            self.env.cr.commit() 
+                            record.message_post(body="invoice send to zatca from cron job")
+                        
+                        
+                        
+                                
+                    except Exception as e:
+                        # Bypass errors.
+                        _logger.info(f"Multi Send To Zatca Errors (Invoice ID: {record.id}) ***************************** :: {str(e)}")
 
-                    # mail_values = {
-                    #     'subject': f"Sent Invoice To Zatca Processing Failed for {record.name}",
-                    #     'body_html': f"<p><strong>Error:</strong> {str(e)}</p>",
-                    #     'email_to': ','.join(recipients),
-                    #     }
-                    # self.env['mail.mail'].create(mail_values).send()
+                        # mail_values = {
+                        #     'subject': f"Sent Invoice To Zatca Processing Failed for {record.name}",
+                        #     'body_html': f"<p><strong>Error:</strong> {str(e)}</p>",
+                        #     'email_to': ','.join(recipients),
+                        #     }
+                        # self.env['mail.mail'].create(mail_values).send()
 
 
         
