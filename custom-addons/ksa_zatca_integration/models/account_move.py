@@ -1898,6 +1898,8 @@ class AccountMove(models.Model):
             ('partner_id.is_dolfin', '!=', True),
             ('partner_id', '!=', 17),
             ('company_id', '!=', 3),
+             ('company_id.is_zatca', '=', True),
+            
             ('l10n_sa_zatca_status', 'ilike', 'not')],limit=500)
 
         _logger.info(f"first invoices lenght (Invoices length: {len(invoices)}) *****************************")
@@ -1910,7 +1912,7 @@ class AccountMove(models.Model):
         
         
         for record in invoices:
-            if record.company_id.zatca_status:
+            if record.company_id.is_zatca:
                 if not record.zatca_invoice_name or not record.zatca_compliance_invoices_api or record.zatca_status_code == '400':
                     if not (record.partner_id.vat.startswith('3') and record.partner_id.vat.endswith('3')):
                         record.partner_id.vat = '300000000000003'
@@ -1999,6 +2001,7 @@ class AccountMove(models.Model):
             ('partner_id.is_dolfin', '!=', True),
             ('partner_id', '!=', 17),
             ('company_id', '!=', 3),
+             ('company_id.is_zatca', '=', True),
             ('l10n_sa_zatca_status', 'ilike', 'not')])
         if remaining_count > 0:
             self.env.ref('ksa_zatca_integration.ir_cron_send_inovoice_job_count')._trigger()
