@@ -1417,15 +1417,9 @@ class AccountMove(models.Model):
                    'Accept-Version': 'V2',
                    'Authorization': 'Basic ' + auth,
                    'Content-Type': 'application/json'}
-        _logger.error("ZATCA Invoice Hash: %s", self.zatca_invoice_hash)
-        _logger.error("ZATCA Invoice UUID: %s", self.invoice_uuid)
+      
 
-        try:
-            xml_str = self.zatca_invoice.decode('utf-8')
-            _logger.error("Decoded ZATCA XML:\n%s", xml_str)
-        except Exception as e:
-            _logger.error("Failed to decode ZATCA invoice XML: %s", str(e))
-
+       
         data = {
             'invoiceHash': self.zatca_invoice_hash,
             # 'invoiceHash': self.hash_with_c14n_canonicalization(api_invoice=1),
@@ -1907,6 +1901,7 @@ class AccountMove(models.Model):
             ('state', '=', 'posted'),
             ('partner_id.is_dolfin', '!=', True),
             ('partner_id', '!=', 17),
+            ('company_id', '!=', 3),
             ('l10n_sa_zatca_status', 'ilike', 'not')],limit=500)
 
         _logger.info(f"first invoices lenght (Invoices length: {len(invoices)}) *****************************")
@@ -2000,15 +1995,14 @@ class AccountMove(models.Model):
       
 
         remaining_count = self.sudo().search_count([
-            ('invoice_date', '>=', today),
-            ('invoice_date', '<=', two_days_ago),
-            ('move_type', '=', 'out_invoice'),
+            ('invoice_date', '>=', two_days_ago),
+            ('invoice_date', '<=', today),
+            ('move_type', '=', 'out_invoice'),            
             ('state', '=', 'posted'),
-            ('partner_id', '!=', 17),
             ('partner_id.is_dolfin', '!=', True),
-            ('l10n_sa_zatca_status', 'ilike', 'not')
-            
-        ])
+            ('partner_id', '!=', 17),
+            ('company_id', '!=', 3),
+            ('l10n_sa_zatca_status', 'ilike', 'not')])
         if remaining_count > 0:
             self.env.ref('ksa_zatca_integration.ir_cron_send_inovoice_job_count')._trigger()
 
