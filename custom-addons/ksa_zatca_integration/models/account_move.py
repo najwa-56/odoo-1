@@ -1886,7 +1886,7 @@ class AccountMove(models.Model):
 
     def send_invoice_batch(self):
         today = date.today()
-        two_days_ago = today - timedelta(days=15)
+        two_days_ago = today - timedelta(days=2)
         recipients = ['abeersalh166@gmail.com','n4ajwa4@gmail.com']
         # start_date = datetime(2024, 9, 1)  # 1st Jan 2025
         # end_date = datetime(2025, 1, 1)
@@ -2010,14 +2010,15 @@ class AccountMove(models.Model):
 
     def resend_invoice(self):
         today = date.today()
-        two_days_ago = today - timedelta(days=7)      
+        two_days_ago = today - timedelta(days=15)      
         invoices = self.sudo().search([
             ('invoice_date', '>=', two_days_ago),
             ('invoice_date', '<=', today),
             ('move_type', '=', 'out_invoice'),            
             ('state', '=', 'posted'),
             ('partner_id.is_dolfin', '!=', True),
-            ('l10n_sa_zatca_status', 'ilike', 'error')
+            ('l10n_sa_zatca_status', 'ilike', 'error'),
+            ('company_id.is_zatca', '=', True),
              
              
             
@@ -2051,7 +2052,7 @@ class AccountMove(models.Model):
                         
             except Exception as e:
                 # Bypass errors.
-                _logger.info(f"Multi Send To Zatca Errors (Invoice ID: {record.id}) ***************************** :: {str(e)}")
+                _logger.info(f"RESEnd Send To Zatca Errors (Invoice ID: {record.id}) ***************************** :: {str(e)}")
 
                
 
