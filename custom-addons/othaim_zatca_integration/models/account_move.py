@@ -20,7 +20,8 @@ class AccountMove(models.Model):
 
     tax_line_missing = fields.Boolean('Missing Tax Line')
 
-   
+    def amount_word(self, amount , lang="ar_001"):
+        return self.currency_id.with_context(lang=lang).amount_to_text(amount)
 
     def send_invoice_batch(self):
         today = date.today()

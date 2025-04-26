@@ -13,6 +13,7 @@
       
         
         'data/cron.xml',
+        'views/res_company.xml',
         'reports/report.xml',
         'reports/vat_invoice_report_print.xml',
         'reports/vat_invoice_report_print2.xml',
