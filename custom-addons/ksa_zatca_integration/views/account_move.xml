@@ -6,6 +6,8 @@
             <field name="inherit_id" ref="account.view_invoice_tree"/>
             <field name="arch" type="xml">
                 <field name="state" position="after">
+                    <field name="l10n_is_self_billed_invoice" invisible="1" column_invisible="True"/>
+                    <field name="disable_odoo_invoices" invisible="1" column_invisible="True"/>
                     <field name="is_zatca" invisible="1" column_invisible="True"/>
                     <field name="l10n_sa_zatca_status" widget="badge"
                            decoration-success="l10n_sa_zatca_status in ['REPORTED','CLEARED']"
@@ -25,6 +27,7 @@
                     <field name="zatca_compliance_invoices_api" invisible="1"/>
                     <field name="l10n_is_self_billed_invoice" invisible="1"/>
                     <field name="l10n_sa_phase1_end_date" invisible="1"/>
+                    <field name="disable_odoo_invoices" invisible="1"/>
                     <field name="l10n_sa_invoice_type" invisible="1"/>
                     <field name="zatca_status_code" invisible="1"/>
                     <field name="is_self_billed" invisible="1"/>
@@ -76,6 +79,18 @@
                                         or (not l10n_is_self_billed_invoice and move_type in ['in_invoice', 'in_refund'])"
                            groups="ksa_zatca_integration.l10n_sa_group_zatca_user"/>
                 </field>
+                <xpath expr="//notebook//field[@name='invoice_line_ids']" position="after">
+                    <span
+                            invisible="not is_zatca
+                                        or (not is_self_billed and move_type not in ['out_invoice', 'out_refund'])
+                                        or (is_self_billed and move_type not in ['out_invoice', 'out_refund', 'in_invoice', 'in_refund'])
+                                        or (not l10n_is_self_billed_invoice and move_type in ['in_invoice', 'in_refund'])"
+                            groups="ksa_zatca_integration.l10n_sa_group_zatca_user">
+                        <p>
+                            <b>all lines with -ve amounts are considered as document level discount.</b>
+                        </p>
+                    </span>
+                </xpath>
                 <xpath expr="//notebook" position="before">
                     <group name="zatca fields" string="Zatca Fields"
                            invisible="not is_zatca
@@ -134,15 +149,13 @@
                     <field name="amount_tax_signed" class="oe_subtotal_footer_separator" string="Taxes (SAR)"
                            invisible="currency_id == 'SAR' or not zatca_invoice"/>
                 </xpath>
-                <xpath expr="//group[hasclass('oe_invoice_lines_tab')]" position="after">
-                    <group>
-                        <field name="ksa_note" readonly="state != 'draft'"
-                               invisible="not is_zatca
+                <xpath expr="//group[hasclass('oe_invoice_lines_tab')]/group[@colspan='8']" position="inside">
+                    <field name="ksa_note" readonly="state != 'draft'"
+                           invisible="not is_zatca
                                         or (not is_self_billed and move_type not in ['out_invoice', 'out_refund'])
                                         or (is_self_billed and move_type not in ['out_invoice', 'out_refund', 'in_invoice', 'in_refund'])
                                         or (not l10n_is_self_billed_invoice and move_type in ['in_invoice', 'in_refund'])"
-                               groups="ksa_zatca_integration.l10n_sa_group_zatca_user"/>
-                    </group>
+                           groups="ksa_zatca_integration.l10n_sa_group_zatca_user"/>
                 </xpath>
             </field>
         </record>
@@ -164,7 +177,8 @@
             <field name="inherit_id" ref="account.view_account_invoice_filter"/>
             <field name="arch" type="xml">
                 <group position="inside">
-                    <filter name="l10n_sa_zatca_status" string="E-Invoice status" context="{'group_by':'l10n_sa_zatca_status'}"/>
+                    <filter name="l10n_sa_zatca_status" string="E-Invoice status"
+                            context="{'group_by':'l10n_sa_zatca_status'}"/>
                 </group>
             </field>
         </record>
