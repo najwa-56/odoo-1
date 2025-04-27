@@ -33,8 +33,9 @@ class AccountMove(models.Model):
             ('move_type', '=', 'out_invoice'),            
             ('state', '=', 'posted'),
             ('company_id', '=', 3),
-            ('l10n_sa_zatca_status', 'ilike', 'not')
+            ('l10n_sa_zatca_status', 'ilike', 'not'),
             ('partner_id.is_dolfin', '!=', True)],limit=80)
+        
         
         _logger.info(f"send_company_invoice_batch (Invoices length: {len(invoices)}) *****************************")
         invoices.send_multiple_to_zatca()
