@@ -22,5 +22,12 @@
         'reports/simpli_vat_invoice_report.xml',
         'reports/standard_invoice_low_margin.xml',
     ],
+
+    'assets': {
+        'web.assets_backend': [
+            'othaim_zatca_integration/static/src/css/style.css',
+          
+        ],
+    },
     
 }
