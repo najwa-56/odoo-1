@@ -30,17 +30,7 @@
 
 
 
-<record id="ir_cron_send_inovoice_compnay3_job_count" model="ir.cron">
-    <field name="name">Batch Compnay3 Old Invoice Send To Zatca</field>
-    <field name="model_id" ref="model_account_move" />
-    <field name="state">code</field>
-    <field name="code">model.send_invoice_company3_batch()</field>
-    <field name="user_id" ref="base.user_root" />
-    <field name="interval_number">1</field>
-    <field name="interval_type">hours</field>
-    <field name="numbercall">-1</field>
-    <field name="active">True</field>
-</record>
+
 
 
 
