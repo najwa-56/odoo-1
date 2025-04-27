@@ -98,9 +98,8 @@
 							<br/>
 						</div>
 						<div class="col-3" style="margin-top:-5pt; padding-left:25pt;">
-							<img t-if="doc.get_qrcode()"
-								style="display:block;margin-left:30px;"
-								t-att-src="'/report/barcode/?barcode_type=%s&amp;value=%s&amp;width=%s&amp;height=%s'%('QR', doc.get_qrcode(), 130, 130)"/>
+							<img style="text-align:center;width:200px;max-height:200px;float:right;margin-top:-10px;padding-top:0px;"
+                         alt="Barcode" t-att-src="doc.get_qrcode()"/>
 			            </div>
 			        </div>
 			        <br/>
