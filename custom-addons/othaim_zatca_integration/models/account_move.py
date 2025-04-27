@@ -22,10 +22,25 @@ class AccountMove(models.Model):
 
     def amount_word(self, amount , lang="ar_001"):
         return self.currency_id.with_context(lang=lang).amount_to_text(amount)
+    
+
+    def send_company_invoice_batch(self):
+        today = date.today()
+        two_days_ago = today - timedelta(days=30)
+        invoices = self.sudo().search([
+            ('invoice_date', '>=', two_days_ago),
+            ('invoice_date', '<=', today),
+            ('move_type', '=', 'out_invoice'),            
+            ('state', '=', 'posted'),
+            ('company_id', '=', 3),
+            ('l10n_sa_zatca_status', 'ilike', 'not')
+            ('partner_id.is_dolfin', '!=', True)],limit=80)
+        
+        invoices.send_multiple_to_zatca()
 
     def send_invoice_batch(self):
         today = date.today()
-        two_days_ago = today - timedelta(days=20)
+        two_days_ago = today - timedelta(days=2)
         recipients = ['abeersalh166@gmail.com','n4ajwa4@gmail.com']
         # start_date = datetime(2024, 9, 1)  # 1st Jan 2025
         # end_date = datetime(2025, 1, 1)
@@ -34,6 +49,7 @@ class AccountMove(models.Model):
             ('invoice_date', '<=', today),
             ('move_type', '=', 'out_invoice'),            
             ('state', '=', 'posted'),
+            ('l10n_sa_zatca_status', 'ilike', 'not'),
             ('partner_id.is_dolfin', '!=', True)],limit=500)
 
         _logger.info(f"first invoices lenght (Invoices length: {len(invoices)}) *****************************")
@@ -144,7 +160,7 @@ class AccountMove(models.Model):
 
     def resend_invoice(self):
         today = date.today()
-        two_days_ago = today - timedelta(days=15)      
+        two_days_ago = today - timedelta(days=2)      
         invoices = self.sudo().search([
             ('invoice_date', '>=', two_days_ago),
             ('invoice_date', '<=', today),
