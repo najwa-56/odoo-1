@@ -14,6 +14,8 @@
         
         'data/cron.xml',
         'views/res_company.xml',
+        'views/account_journal_views.xml',
+        
         'reports/report.xml',
         'reports/vat_invoice_report_print.xml',
         'reports/vat_invoice_report_print2.xml',
