@@ -17,7 +17,7 @@
     	</t>
 		<div class="header first-page">
 		<br/>
-	    	<table style="border:1pt solid white;width:100%;font-size:12px; margin-top:60px;font-family:Alexandria-Regular !important" width="100%">
+	    	<table style="border:1pt solid white;width:100%;font-size:12px; margin-top:60px;font-family:Tajawal !important" width="100%">
 	    		<link rel="stylesheet" href="/othaim_zatca_integration/static/src/css/style.css"/>
 	            <tr>
 					
@@ -40,7 +40,7 @@
 	<template id="report_tax_invoice_document">
 		<t t-call="othaim_zatca_integration.external_layout_seti">
 				<t t-foreach="doc" t-as="o">
-				<div class="page" dir="ltr">
+				<div class="page" dir="ltr" style="font-family:Tajawal !important">
 	    		<link rel="stylesheet" href="/othaim_zatca_integration/static/src/css/style.css"/>
 					<t t-set="company" t-value="res_company"/>
 					<div class="font">
@@ -48,7 +48,7 @@
 					<br/>
                     					<br/>
 
-					<table style="border:2pt solid black;width:100%;color:black; margin-top:20pt; font-family:ArbFONTS-GE_Dinar_One_Medium !important" class="table-condensed table-sm">
+					<table style="border:2pt solid black;width:100%;color:black; margin-top:20pt; font-family:Tajawal !important" class="table-condensed table-sm">
 							<tr style="border:2pt solid black">
 								<td style="font-weight: bold;text-align:center;color:black;background-color:#dddddd;FONT-SIZE: 12pt"><span class="text-right arabic">  الفاتورة الضريبية  </span></td> 
 							</tr>
@@ -368,12 +368,12 @@
 	<template id="preview_report_tax_invoice_document">
 		<t t-call="othaim_zatca_integration.external_layout_seti_preview">
 			<t t-foreach="doc" t-as="o">
-				<div class="page" style="padding-top:45px">
+				<div class="page" style="padding-top:45px; font-family:Tajawal !important">
 					<link rel="stylesheet" href="/othaim_zatca_integration/static/src/css/style.css"/>
 					<t t-set="company" t-value="res_company"/>
 					<div class="font">
 
-					<table style="border:1pt solid grey;width:100%;color:black; margin-top:-28pt; font-family:DroidArabicKufiRegular !important" class="table-condensed table-sm">
+					<table style="border:1pt solid grey;width:100%;color:black; margin-top:-28pt; font-family:Tajawal !important" class="table-condensed table-sm">
 							<tr>
 								<td style="padding:4pt;margin:5pt;font-weight: bold;text-align:center;background-color:#DCDCDC;"><span class="text-right arabic">Tax Invoice / فاتورة ضريبية </span></td> 
 							</tr>
