@@ -73,9 +73,9 @@ class PosOrder(models.Model):
         self = self.sudo().search([('pos_reference', '=', pos_reference)])
         if not self.company_id.zatca_send_from_pos:
             if len(self.refunded_order_ids.account_move.ids) > 1:
-                raise exceptions.ValidationError("only 1 invoice can be returned at a time.")
+                raise ValidationError("only 1 invoice can be returned at a time.")
                 
-        report_action = self.env.ref('ksa_zatca_integration.action_report_simplified_tax_invoice').sudo()
+        report_action = self.env.ref('othaim_zatca_integration.action_report_simplified_tax_invoice').sudo()
         return self.env['ir.actions.report']._render_qweb_html(report_action, self.account_move.ids)[0].decode('utf-8')
 
     def _prepare_invoice_vals(self):

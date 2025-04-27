@@ -32,17 +32,17 @@ patch(InvoiceButton.prototype, {
             if (orderWithInvoice?.account_move) {
                 if (orderWithInvoice.is_invoice_b2c) {
                     // Call B2C simplified tax invoice report
-                    await this.report.doAction("ksa_zatca_integration.action_report_simplified_tax_invoice", [
+                    await this.report.doAction("othaim_zatca_integration.action_report_simplified_tax_invoice", [
                         orderWithInvoice.account_move,
                     ]);
                 } else if (orderWithInvoice.is_invoice) {
                     // Call the standard tax invoice report
-                    await this.report.doAction("ksa_zatca_integration.action_report_tax_invoice", [
+                    await this.report.doAction("othaim_zatca_integration.action_report_tax_invoice", [
                         orderWithInvoice.account_move,
                     ]);
                 }
                 else{
-                    await this.report.doAction("ksa_zatca_integration.action_report_tax_invoice", [
+                    await this.report.doAction("othaim_zatca_integration.action_report_tax_invoice", [
                         orderWithInvoice.account_move,
                     ]);
                 }

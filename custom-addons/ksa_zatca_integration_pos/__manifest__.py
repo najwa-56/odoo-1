@@ -14,7 +14,7 @@
     'category': 'Invoicing',
     'version': '16.1.1',
     'price': 300, 'currency': 'USD',
-    'depends': ['ksa_zatca_integration', 'point_of_sale','l10n_gcc_pos','l10n_sa_pos'],
+    'depends': ['othaim_zatca_integration', 'point_of_sale','l10n_gcc_pos','l10n_sa_pos'],
     'external_dependencies': {
         'python': ['cryptography', 'lxml']
     },
