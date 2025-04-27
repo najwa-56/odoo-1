@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <odoo>
+    <data>
 
     <record id="pos_paperformat_standard" model="report.paperformat">
         <field name="name">B2B Paper Format</field>
@@ -23,8 +24,8 @@
         <field name="report_name">ksa_zatca_integration_pos.report_e_invoicing_b2c_invoice_template</field>
         <field name="report_file">ksa_zatca_integration_pos.report_e_invoicing_b2c_invoice_template</field>
         <field name="print_report_name">object.zatca_invoice_name.replace('.xml', '')</field>
-        <field name="paperformat_id" ref="ksa_zatca_integration_pos.paperformat_standard"/>
+        <!-- <field name="paperformat_id" ref="ksa_zatca_integration_pos.paperformat_standard"/> -->
     </record>
-
+</data>
 
 </odoo>
