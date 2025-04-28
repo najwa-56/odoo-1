@@ -24,35 +24,19 @@ class AccountMove(models.Model):
         return self.currency_id.with_context(lang=lang).amount_to_text(amount)
     
 
-    def send_company_invoice_batch(self):
-        today = date.today()
-        two_days_ago = today - timedelta(days=30)
-        invoices = self.sudo().search([
-            ('invoice_date', '>=', two_days_ago),
-            ('invoice_date', '<=', today),
-            ('move_type', '=', 'out_invoice'),            
-            ('state', '=', 'posted'),
-            ('company_id', '=', 3),
-            ('l10n_sa_zatca_status', 'ilike', 'not'),
-            ('partner_id.is_dolfin', '!=', True)],limit=80)
-        
-        
-        _logger.info(f"send_company_invoice_batch (Invoices length: {len(invoices)}) *****************************")
-        invoices.send_multiple_to_zatca()
+    
 
     def send_invoice_batch(self):
         today = date.today()
         two_days_ago = today - timedelta(days=2)
         recipients = ['abeersalh166@gmail.com','n4ajwa4@gmail.com']
-        # start_date = datetime(2024, 9, 1)  # 1st Jan 2025
-        # end_date = datetime(2025, 1, 1)
         invoices = self.sudo().search([
             ('invoice_date', '>=', two_days_ago),
             ('invoice_date', '<=', today),
             ('move_type', '=', 'out_invoice'),            
             ('state', '=', 'posted'),
             ('l10n_sa_zatca_status', 'ilike', 'not'),
-            ('partner_id.is_dolfin', '!=', True)],limit=500)
+            ('partner_id.is_dolfin', '!=', True)])
 
         _logger.info(f"first invoices lenght (Invoices length: {len(invoices)}) *****************************")
         if not invoices:
@@ -145,18 +129,7 @@ class AccountMove(models.Model):
         
       
 
-        remaining_count = self.sudo().search_count([
-            ('invoice_date', '>=', two_days_ago),
-            ('invoice_date', '<=', today),
-            ('move_type', '=', 'out_invoice'),
-            ('state', '=', 'posted'),
-            ('partner_id', '!=', 17),
-            ('partner_id.is_dolfin', '!=', True),
-            ('l10n_sa_zatca_status', 'ilike', 'not')
-            
-        ])
-        if remaining_count > 0:
-            self.env.ref('othaim_zatca_integration.ir_cron_send_inovoice_job_count')._trigger()
+        
 
 
 
