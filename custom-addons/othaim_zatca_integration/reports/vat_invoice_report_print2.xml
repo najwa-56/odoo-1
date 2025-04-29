@@ -77,7 +77,7 @@
 						</div>
 						<div class="col-3" style="margin-top:5pt; padding-left:25pt;">
 							<img style="text-align:center;width:200px;max-height:200px;float:right;margin-top:-10px;padding-top:0px;"
-                         alt="Barcode" t-att-src="doc.get_qrcode()"/>
+                         alt="Barcode" t-att-src="doc.get_qr_code()"/>
 			            </div>
 			        </div>
 							<br/>
