@@ -37,7 +37,7 @@ class AccountMove(models.Model):
     zatca_invoice = fields.Binary("generated invoice for ZATCA", attachment=True, readonly=True, copy=False)
     zatca_invoice_name = fields.Char(copy=False)
     credit_debit_reason = fields.Char(string="Reasons for issuance of credit / debit note", copy=False,
-                                      help="Reasons as per Article 40 (paragraph 1) of KSA VAT regulations")
+                                      help="Reasons as per Article 40 (paragraph 1) of KSA VAT regulations",default='Customer Refund')
     zatca_compliance_invoices_api = fields.Html(readonly=True, copy=False)
     l10n_sa_invoice_type_is_readonly = fields.Boolean(copy=False)
     l10n_sa_invoice_type = fields.Selection([('Standard', 'Standard'), ('Simplified', 'Simplified')],
