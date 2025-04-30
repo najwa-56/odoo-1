@@ -114,6 +114,8 @@ class PosOrder(models.Model):
                     if len(self_id.refunded_order_ids.account_move.ids) > 1:
                         raise ValidationError("only 1 invoice can be returned at a time.")
                     self_id.account_move.create_xml_file(pos_refunded_order_id=self_id.refunded_order_ids.account_move.id)
+                    self_id.account_move.send_multiple_to_zatca()
+
             
         except Exception as e:
             _logger.error(f"Failed to send to ZATCA for POS reference {'send to zatck'}: {str(e)}")
