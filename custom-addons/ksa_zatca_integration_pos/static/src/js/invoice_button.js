@@ -86,25 +86,25 @@ patch(InvoiceButton.prototype, {
     
     
                 // First: if ZATCA status needs reporting or clearance
-                if (zatcaStatus && (zatcaStatus.includes('not') || zatcaStatus.includes('error'))) {
-                    if (invoiceType === 'Standard') {
-                        // Standard Invoice -> send for clearance
-                        await this.orm.call(
-                            "account.move",
-                            "send_for_clearance",
-                            [invoiceId],
-                            { context: this.env.session.user_context }
-                        );
-                    } else if (invoiceType === 'Simplified') {
-                        // Simplified Invoice -> send for reporting
-                        await this.orm.call(
-                            "account.move",
-                            "send_for_reporting",
-                            [invoiceId],
-                            { context: this.env.session.user_context }
-                        );
-                    }
-                }
+                // if (zatcaStatus && (zatcaStatus.includes('not') || zatcaStatus.includes('error'))) {
+                //     if (invoiceType === 'Standard') {
+                //         // Standard Invoice -> send for clearance
+                //         await this.orm.call(
+                //             "account.move",
+                //             "send_for_clearance",
+                //             [invoiceId],
+                //             { context: this.env.session.user_context }
+                //         );
+                //     } else if (invoiceType === 'Simplified') {
+                //         // Simplified Invoice -> send for reporting
+                //         await this.orm.call(
+                //             "account.move",
+                //             "send_for_reporting",
+                //             [invoiceId],
+                //             { context: this.env.session.user_context }
+                //         );
+                //     }
+                // }
     
                 // Second: after sending, download the invoice report
                 if (orderWithInvoice.is_invoice_b2c) {
