@@ -24,7 +24,7 @@
 </button>
 
         
-            <div class="zatca-flags d-flex flex-column flex-wrap" t-if="pos.company.parent_is_zatca">
+            <!-- <div class="zatca-flags d-flex flex-column flex-wrap" t-if="pos.company.parent_is_zatca">
                 <h3><center>Zatca Flags</center></h3>
                 <button class="button js_invoice btn btn-light py-3 text-start rounded-0 border-bottom"
                         t-att-class="{ 'highlight text-bg-primary': currentOrder.l10n_is_third_party_invoice }"
@@ -48,7 +48,7 @@
                            t-att-value="currentOrder.credit_debit_reason"
                            style="grid-column-end: 2;border-top-width: 1px;"/>
                 </div>
-            </div>
+            </div> -->
         </xpath>
     </t>
 
