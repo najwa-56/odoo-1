@@ -37,7 +37,7 @@ class res_users(models.Model):
                 self = api.Environment(cr, SUPERUSER_ID, {})[cls._name] 
                 access_management_obj = self.env['access.management']
 
-                if access_management_obj.search([('user_ids','in',res),('disable_login','=',True)]).id:
+                if access_management_obj.sudo().search([('user_ids','in',res),('disable_login','=',True)]).id:
                     raise AccessDenied()
         except AccessDenied:
             _logger.info("Login failed for db:%s login:%s from ", db, login)

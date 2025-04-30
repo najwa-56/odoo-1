@@ -135,7 +135,8 @@ class hide_view_nodes(models.Model):
                             if fields:
                                 string_value = ""
                             for f in fields:
-                                string_value += " " + f.text
+                                if f.text:
+                                    string_value += " " + f.text
 
                         if btn.get('name') and string_value:
                             domain = [('button_type', '=', btn.get('type')), ('attribute_string', '=', string_value),

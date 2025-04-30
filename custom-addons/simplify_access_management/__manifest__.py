@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #################################################################################
 # Author      : Terabits Technolab (<www.terabits.xyz>)
-# Copyright(c): 2023-24
+# Copyright(c): 2023-25
 # All Rights Reserved.
 #
 # This module is copyright property of the author mentioned above.
@@ -11,12 +11,12 @@
 
 {
     'name': 'Simplify Access Management',
-    'version': '17.0.5.4.3',
+    'version': '17.0.7.7.18',
     'sequence': 5,
     'author': 'Terabits Technolab',
     'license': 'OPL-1',
     'category': 'Services',
-    'website': 'https://www.terabits.xyz/r/SNS',
+    'website': 'https://www.terabits.xyz/apps/17.0/simplify_access_management',
     'summary': """All In One Access Management App for setting the correct access rights for fields, models, menus, views for any module and for any user.
         All in one access management App,
         Easier then Record rules setup,
@@ -99,7 +99,7 @@
         user access,
         advance user,
         model access rights,
-        sales access rights,sales user permissions,
+        sales access rights,sales user permissions,dashboard ninja
         inventery access rights, timesheet access rights,
         accounting access rights, accounting user permission,
         invoicing access rights,
@@ -228,11 +228,11 @@
 	
     """,
     "images": ["static/description/banner.gif"],
-    "price": "370.99",
+    "price": "268.97",
     "currency": "USD",
     'data': [
-        'security/ir.model.access.csv',
         'security/res_groups.xml',
+        'security/ir.model.access.csv',
         'data/view_data.xml',
         'views/access_management_view.xml',
         'views/res_users_view.xml',
@@ -245,11 +245,13 @@
             '/simplify_access_management/static/src/js/cog_menu.js',
             '/simplify_access_management/static/src/js/form_controller.js',
             '/simplify_access_management/static/src/js/pivot_grp_menu.js',
+            '/simplify_access_management/static/src/js/pivot_renderer.js',
             '/simplify_access_management/static/src/js/model_field_selector.js',
             '/simplify_access_management/static/src/js/search_bar_menu.js',
         ],
 
     },
+	
     'depends': ['web', 'advanced_web_domain_widget'],
     'post_init_hook': 'post_install_action_dup_hook',
     'application': True,

@@ -8,7 +8,7 @@
             <field name="inherit_id" ref="base.view_users_form"/>
             <field name="arch" type="xml">
                 <xpath expr="//notebook" position="inside">
-                    <page string='Access Management' groups="simplify_access_management.group_access_management_spt">
+                    <page string='Access Management' groups="simplify_access_management.group_access_management_bits">
                         <field name='access_management_ids'>
                             <tree>
                                 <field name="name" />

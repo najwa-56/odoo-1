@@ -13,10 +13,13 @@ class BaseModel(models.AbstractModel):
         res = super().get_views(views, options)
         form_toolbar = res['views'].get('form', {}).get('toolbar') or False
         tree_toolbar = res['views'].get('list', {}).get('toolbar') or False
-        remove_action = self.env['remove.action'].search(
-            [('access_management_id.company_ids', 'in', self.env.company.id),
+        remove_action = self.env['remove.action'].sudo().search(
+            [('access_management_id.active', '=', True),
              ('access_management_id', 'in', self.env.user.access_management_ids.ids),
              ('model_id.model', '=', self._name)])
+        
+        remove_action -= remove_action.filtered(lambda x: x.access_management_id.is_apply_on_without_company == False and self.env.company.id not in x.access_management_id.company_ids.ids)
+
         if form_toolbar or tree_toolbar:
             remove_server_action = remove_action.mapped('server_action_ids.action_id').ids
             remove_print_action = remove_action.mapped('report_action_ids.action_id').ids
@@ -38,20 +41,18 @@ class BaseModel(models.AbstractModel):
                 prints = [rec for rec in res['views']['list']['toolbar']['print'] if
                           rec.get('id', False) not in remove_print_action]
                 res['views']['list']['toolbar']['print'] = prints
-
-        # views_keys = res['views'].keys()
-        # for view in remove_action.mapped('view_data_ids.techname'):
-        #     if view in views_keys:
-        #         res['views'].pop(view)
+      
         return res
 
     @api.model
     def load_views(self, views, options=None):
         actions_and_prints = []
-        for access in self.env['remove.action'].search([('access_management_id.company_ids', 'in', self.env.company.id),
-                                                        ('access_management_id', 'in',
-                                                         self.env.user.access_management_ids.ids),
-                                                        ('model_id.model', '=', self._name)]):
+        remove_action = self.env['remove.action'].sudo().search([('access_management_id.active', '=', True),
+                                                ('access_management_id', 'in',self.env.user.access_management_ids.ids),
+                                                ('model_id.model', '=', self._name)])
+        remove_action -= remove_action.filtered(lambda x: x.access_management_id.is_apply_on_without_company == False and self.env.company.id not in x.access_management_id.company_ids.ids)
+
+        for access in remove_action:
             actions_and_prints = actions_and_prints + access.mapped('report_action_ids.action_id').ids
             actions_and_prints = actions_and_prints + access.mapped('server_action_ids.action_id').ids
             for view_data in access.view_data_ids:
@@ -77,121 +78,7 @@ class BaseModel(models.AbstractModel):
                                     res['fields_views'][view]['toolbar']['action'].remove(act)
         return res
 
-    @api.model
-    def _get_view(self, view_id=None, view_type='form', **options):
-        arch, view = super()._get_view(view_id, view_type, **options)
-        access_management_obj = self.env['access.management']
-        # cids = request.httprequest.cookies.get('cids') and request.httprequest.cookies.get('cids').split(',')[0] or request.env.company.id
-        readonly_access_id = access_management_obj.search(
-            [('company_ids', 'in', self.env.company.id), ('active', '=', True), ('user_ids', 'in', self.env.user.id),
-             ('readonly', '=', True)])
-
-        access_recs = self.env['access.domain.ah'].search(
-            [('access_management_id.company_ids', 'in', self.env.company.id),
-             ('access_management_id.user_ids', 'in', self.env.user.id), ('access_management_id.active', '=', True),
-             ('model_id.model', '=', self._name)])
-
-        access_model_recs = self.env['remove.action'].search(
-            [('access_management_id.company_ids', 'in', self.env.company.id),
-             ('access_management_id.user_ids', 'in', self.env.user.id),
-             ('access_management_id.active', '=', True),
-             ('model_id.model', '=', self._name)])
-        if view_type == 'form':
-            access_management_id = access_management_obj.search([('company_ids', 'in', self.env.company.id),
-                                                                 ('active', '=', True),
-                                                                 ('user_ids', 'in', self.env.user.id),
-                                                                 ('hide_chatter', '=', True)],
-                                                                limit=1).id
-            if access_management_id:
-                for div in arch.xpath("//div[@class='oe_chatter']"):
-                    div.getparent().remove(div)
-            else:
-                if self.env['hide.chatter'].search([('access_management_id.company_ids', 'in', self.env.company.id),
-                                                    ('access_management_id.active', '=', True),
-                                                    ('access_management_id.user_ids', 'in', self.env.user.id),
-                                                    ('model_id.model', '=', self._name),
-                                                    ('hide_chatter', '=', True)],
-                                                   limit=1):
-
-                    for div in arch.xpath("//div[@class='oe_chatter']"):
-                        div.getparent().remove(div)
-
-        if view_type in ['kanban', 'tree']:
-            restrict_import = access_management_obj.search([('company_ids', 'in', self.env.company.id),
-                                                            ('active', '=', True),
-                                                            ('user_ids', 'in', self.env.user.id),
-                                                            ('hide_import', '=', True)], limit=1).id
-
-            if access_model_recs.filtered(lambda x: x.restrict_import) or restrict_import:
-                doc = arch
-                doc.attrib.update({'import': 'false'})
-                arch = doc
-
-            restrict_export = access_management_obj.search([('company_ids', 'in', self.env.company.id),
-                                                            ('active', '=', True),
-                                                            ('user_ids', 'in', self.env.user.id),
-                                                            ('hide_export', '=', True)], limit=1).id
-
-            if access_model_recs.filtered(lambda x: x.restrict_export) or restrict_export:
-                doc = arch
-                doc.attrib.update({'export_xlsx': 'false'})
-                arch = doc
-
-        if readonly_access_id:
-            if view_type == 'form':
-                arch.attrib.update({'create': 'false', 'delete': 'false', 'edit': 'false'})
-
-            if view_type == 'tree':
-                arch.attrib.update({'create': 'false', 'delete': 'false', 'edit': 'false'})
-
-            if view_type == 'kanban':
-                arch.attrib.update({'create': 'false', 'delete': 'false', 'edit': 'false'})
-
-        else:
-
-            if access_model_recs:
-                delete = 'true'
-                edit = 'true'
-                create = 'true'
-                for access_model in access_model_recs:
-                    if access_model.restrict_create:
-                        create = 'false'
-                    if access_model.restrict_edit:
-                        edit = 'false'
-                    if access_model.restrict_delete:
-                        delete = 'false'
-
-                if view_type == 'form':
-                    arch.attrib.update({'create': create, 'delete': delete, 'edit': edit})
-
-                if view_type == 'tree':
-                    arch.attrib.update({'create': create, 'delete': delete, 'edit': edit})
-
-                if view_type == 'kanban':
-                    arch.attrib.update({'create': create, 'delete': delete, 'edit': edit})
-
-            if access_recs:
-                delete = 'false'
-                edit = 'false'
-                create = 'false'
-                for access_rec in access_recs:
-                    if access_rec.create_right:
-                        create = 'true'
-                    if access_rec.write_right:
-                        edit = 'true'
-                    if access_rec.delete_right:
-                        delete = 'true'
-
-                if view_type == 'form':
-                    arch.attrib.update({'create': create, 'delete': delete, 'edit': edit})
-
-                if view_type == 'tree':
-                    arch.attrib.update({'create': create, 'delete': delete, 'edit': edit})
-
-                if view_type == 'kanban':
-                    arch.attrib.update({'create': create, 'delete': delete, 'edit': edit})
-
-        return arch, view
+    
 
     # @api.model
     # def fields_view_get(self, view_id=None, view_type='form', toolbar=False, submenu=False):
@@ -318,7 +205,7 @@ class BaseModel(models.AbstractModel):
                                             FROM access_management_users_rel_ah as amusr
                                             WHERE amusr.user_id=%s))
                                     """, [model_numeric_id, self.env.user.id])
-                    records = self.env['access.domain.ah'].browse(row[0] for row in self._cr.fetchall())
+                    records = self.env['access.domain.ah'].sudo().browse(row[0] for row in self._cr.fetchall())
         except:
             pass
         return records
@@ -345,50 +232,51 @@ class BaseModel(models.AbstractModel):
                 if self.sudo()._name == "res.partner":
                     domain_list += partner_domain
                 dom = safe_eval(record.domain) if record.domain else []
-                dom = expression.normalize_domain(dom)
-                model_name = self._name
-                if isinstance(dom, list):
-                    for dom_tuple in dom:
-                        if isinstance(dom_tuple, tuple):
-                            left_value = dom_tuple[0]
-                            operator_value = dom_tuple[1]
-                            right_value = dom_tuple[2]
-                            left_value_split_list = left_value.split('.')
-                            model_string = model_name
-                            left_user = False
-                            left_company = False
-                            for field in left_value_split_list:
+                if dom:
+                    dom = expression.normalize_domain(dom)
+                    model_name = self._name
+                    if isinstance(dom, list):
+                        for dom_tuple in dom:
+                            if isinstance(dom_tuple, tuple):
+                                left_value = dom_tuple[0]
+                                operator_value = dom_tuple[1]
+                                right_value = dom_tuple[2]
+                                left_value_split_list = left_value.split('.')
+                                model_string = model_name
                                 left_user = False
                                 left_company = False
-                                model_obj = self.env[model_string]
-                                field_type = model_obj.fields_get()[field]['type']
-                                if field_type in ['many2one', 'many2many', 'one2many']:
-                                    field_relation = model_obj.fields_get()[field]['relation']
-                                    model_string = field_relation
-                                    if model_string == 'res.users':
-                                        left_user = True
-                                    if model_string == 'res.company':
-                                        left_company = True
+                                for field in left_value_split_list:
+                                    left_user = False
+                                    left_company = False
+                                    model_obj = self.env[model_string]
+                                    field_type = model_obj.fields_get()[field]['type']
+                                    if field_type in ['many2one', 'many2many', 'one2many']:
+                                        field_relation = model_obj.fields_get()[field]['relation']
+                                        model_string = field_relation
+                                        if model_string == 'res.users':
+                                            left_user = True
+                                        if model_string == 'res.company':
+                                            left_company = True
 
-                            if left_user:
-                                if operator_value in ['in', 'not in']:
-                                    if isinstance(right_value, list) and 0 in right_value:
-                                        zero_index = right_value.index(0)
-                                        right_value[zero_index] = self.env.user.id
+                                if left_user:
+                                    if operator_value in ['in', 'not in']:
+                                        if isinstance(right_value, list) and 0 in right_value:
+                                            zero_index = right_value.index(0)
+                                            right_value[zero_index] = self.env.user.id
 
-                            if left_company:
-                                if operator_value in ['in', 'not in']:
-                                    if isinstance(right_value, list) and 0 in right_value:
-                                        zero_index = right_value.index(0)
-                                        right_value[zero_index] = self.env.company.id
-                            already_add = False
-                            if operator_value == 'date_filter':
-                                domain_list += prepare_domain_v2(dom_tuple)
+                                if left_company:
+                                    if operator_value in ['in', 'not in']:
+                                        if isinstance(right_value, list) and 0 in right_value:
+                                            zero_index = right_value.index(0)
+                                            right_value[zero_index] = self.env.company.id
+                                already_add = False
+                                if operator_value == 'date_filter':
+                                    domain_list += prepare_domain_v2(dom_tuple)
+                                else:
+                                    domain_list.append(dom_tuple)
                             else:
                                 domain_list.append(dom_tuple)
-                        else:
-                            domain_list.append(dom_tuple)
-                # domain_list.append(dom)
+                    # domain_list.append(dom)
                 search_domain = domain_list
                 if 'active' in self._fields:
                     search_domain = ['|', ('active', '=', False), ('active', '=', True)] + search_domain
@@ -458,12 +346,12 @@ class BaseModel(models.AbstractModel):
                             rec._display_access_management_error(mode='write', rule=access_rule)
         return super().write(vals)
     
-    @api.model
-    def _name_search(self, name, domain=None, operator='ilike', limit=None, order=None):
-        if not self.env.context.get('is_access_rights'):
-            return super(BaseModel,self)._name_search(name, domain, operator, limit, order)
-        domain = expression.AND([domain,[('name', 'ilike', name)]])
-        return self._search(domain, limit=limit, order=order)
+    # @api.model
+    # def _name_search(self, name, domain=None, operator='ilike', limit=None, order=None):
+    #     if not self.env.context.get('is_access_rights'):
+    #         return super(BaseModel,self)._name_search(name, domain, operator, limit, order)
+    #     domain = expression.AND([domain,[('name', 'ilike', name)]])
+    #     return self._search(domain, limit=limit, order=order)
 
     # @api.model_create_multi
     # @api.returns('self', lambda value: value.id)
@@ -482,3 +370,135 @@ class BaseModel(models.AbstractModel):
     #                         self._display_access_management_error(mode='create',rule=access_rule)
 
     #     return super().create(vals_list)
+
+    def _get_view(self, view_id=None, view_type='form', **options):
+        arch, view = super()._get_view(view_id, view_type, **options)
+        access_management_obj = self.env['access.management']
+        # cids = request.httprequest.cookies.get('cids') and request.httprequest.cookies.get('cids').split(',')[0] or request.env.company.id
+        readonly_access_id = access_management_obj.sudo().search(
+            [('company_ids', 'in', self.env.company.id), ('active', '=', True), ('user_ids', 'in', self.env.user.id),
+             ('readonly', '=', True)])
+
+        access_recs = self.env['access.domain.ah'].sudo().search(
+            [('access_management_id.user_ids', 'in', self.env.user.id), ('access_management_id.active', '=', True),
+             ('model_id.model', '=', self._name)])
+        
+        access_recs -= access_recs.filtered(lambda x: x.access_management_id.is_apply_on_without_company == False and self.env.company.id not in x.access_management_id.company_ids.ids)
+
+        access_model_recs = self.env['remove.action'].sudo().search(
+            [('access_management_id.user_ids', 'in', self.env.user.id),
+             ('access_management_id.active', '=', True),
+             ('model_id.model', '=', self._name)])
+        
+        access_model_recs -= access_model_recs.filtered(lambda x: x.access_management_id.is_apply_on_without_company == False and self.env.company.id not in x.access_management_id.company_ids.ids)
+
+        if view_type == 'form':
+            access_management_id = access_management_obj.sudo().search([
+                                                                 ('active', '=', True),
+                                                                 ('user_ids', 'in', self.env.user.id),
+                                                                 ('hide_chatter', '=', True)],
+                                                                limit=1)
+            if access_management_id and access_management_id.is_apply_on_without_company:
+                for div in arch.xpath("//div[@class='oe_chatter']"):
+                    div.getparent().remove(div)
+            elif self.env.company in access_management_id.company_ids:
+                for div in arch.xpath("//div[@class='oe_chatter']"):
+                    div.getparent().remove(div)
+            else:
+                hide_chatter_id = self.env['hide.chatter'].sudo().search([('access_management_id.active', '=', True),
+                                                    ('access_management_id.user_ids', 'in', self.env.user.id),
+                                                    ('model_id.model', '=', self._name),
+                                                    ('hide_chatter', '=', True)],
+                                                   limit=1)
+                
+                if hide_chatter_id and hide_chatter_id.access_management_id.is_apply_on_without_company:
+                    for chatter_path in arch.xpath("//div[@class='oe_chatter']"):
+                        chatter_path.getparent().remove(chatter_path)
+
+                elif self.env.company in hide_chatter_id.access_management_id.company_ids:
+                    for chatter_path in arch.xpath("//div[@class='oe_chatter']"):
+                        chatter_path.getparent().remove(chatter_path)
+
+        if view_type in ['kanban', 'tree']:
+            restrict_import = access_management_obj.sudo().search([
+                                                            ('active', '=', True),
+                                                            ('user_ids', 'in', self.env.user.id),
+                                                            ('hide_import', '=', True)], limit=1)
+            
+            restrict_import = restrict_import.filtered(lambda x: x.is_apply_on_without_company or self.env.company.id in x.company_ids.ids)
+            if access_model_recs.filtered(lambda x: x.restrict_import) or restrict_import :
+                doc = arch
+                doc.attrib.update({'import': 'false'})
+                arch = doc
+
+            restrict_export = access_management_obj.sudo().search([
+                                                            ('active', '=', True),
+                                                            ('user_ids', 'in', self.env.user.id),
+                                                            ('hide_export', '=', True)], limit=1)
+            restrict_export = restrict_export.filtered(lambda x: x.is_apply_on_without_company or self.env.company.id in x.company_ids.ids)
+
+            if access_model_recs.filtered(lambda x: x.restrict_export) or restrict_export:
+                doc = arch
+                doc.attrib.update({'export_xlsx': 'false'})
+                arch = doc
+
+        if readonly_access_id:
+            if view_type == 'form':
+                arch.attrib.update({'create': 'false', 'delete': 'false', 'edit': 'false'})
+
+            if view_type == 'tree':
+                arch.attrib.update({'create': 'false', 'delete': 'false', 'edit': 'false'})
+
+            if view_type == 'kanban':
+                arch.attrib.update({'create': 'false', 'delete': 'false', 'edit': 'false'})
+
+        else:
+
+            if access_model_recs:
+                delete = 'true'
+                edit = 'true'
+                create = 'true'
+                for access_model in access_model_recs:
+                    if access_model.restrict_create:
+                        create = 'false'
+                    if access_model.restrict_edit:
+                        edit = 'false'
+                    if access_model.restrict_delete:
+                        delete = 'false'
+
+                if view_type == 'form':
+                    arch.attrib.update({'create': create, 'delete': delete, 'edit': edit})
+
+                if view_type == 'tree':
+                    arch.attrib.update({'create': create, 'delete': delete, 'edit': edit})
+
+                if view_type == 'kanban':
+                    arch.attrib.update({'create': create, 'delete': delete, 'edit': edit})
+
+            if access_recs:
+                delete = 'false'
+                edit = 'false'
+                create = 'false'
+                for access_rec in access_recs:
+                    if access_rec.create_right:
+                        create = 'true'
+                    if access_rec.write_right:
+                        edit = 'true'
+                    if access_rec.delete_right:
+                        delete = 'true'
+
+                if view_type == 'form':
+                    arch.attrib.update({'create': create, 'delete': delete, 'edit': edit})
+
+                if view_type == 'tree':
+                    arch.attrib.update({'create': create, 'delete': delete, 'edit': edit})
+
+                if view_type == 'kanban':
+                    arch.attrib.update({'create': create, 'delete': delete, 'edit': edit})
+
+        return arch, view   
+    # @api.model
+    # def _get_view(self, view_id=None, view_type='form', **options):
+    #     arch, view = super()._get_view(view_id, view_type, **options)
+
+    #     return arch, view

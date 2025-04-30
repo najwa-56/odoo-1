@@ -27,13 +27,13 @@ class ir_ui_menu(models.Model):
     @api.model_create_multi
     def create(self, vals_list):
         res = super(ir_ui_menu, self).create(vals_list)
-        menu_item_obj = self.env['menu.item']
+        menu_item_obj = self.env['menu.item'].sudo()
         for record in res:
             menu_item_obj.create({'name':record.display_name,'menu_id':record.id})
         return res
 
     def unlink(self):
-        menu_item_obj = self.env['menu.item']
+        menu_item_obj = self.env['menu.item'].sudo()
         for record in self:
             menu_item_obj.search([('menu_id','=',record.id)]).unlink()
         return super(ir_ui_menu, self).unlink()

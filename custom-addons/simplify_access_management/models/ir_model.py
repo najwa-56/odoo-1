@@ -66,7 +66,8 @@ class ir_module_module(models.Model):
         res = super(ir_module_module, self)._button_immediate_function(function)
         if function.__name__ in ['button_install', 'button_upgrade']:
             for record in self.env['ir.model'].search([]):
-                if record.name == 'Email Thread':
-                    pass
-                record.abstract = self.env[record.model]._abstract
+                try:
+                    record.abstract = self.env[record.model]._abstract
+                except:
+                    return res
         return res

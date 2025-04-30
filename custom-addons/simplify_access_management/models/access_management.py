@@ -53,11 +53,11 @@ class access_management(models.Model):
                                         help="Developer mode will be hidden from the defined users.")
 
     company_ids = fields.Many2many('res.company', 'access_management_comapnay_rel', 'access_management_id',
-                                   'company_id', 'Companies', required=True, default=lambda self: self.env.company)
+                                   'company_id', 'Companies', default=lambda self: self.env.company)
 
     hide_filters_groups_ids = fields.One2many('hide.filters.groups', 'access_management_id', 'Hide Filters/Group By',
                                               copy=True)
-
+    is_apply_on_without_company = fields.Boolean(string="Apply Without Company", default=True,help="When 'Apply Without Company' is selected, the rules will be applied to every company.")
     def _count_total_rules(self):
         for rec in self:
             rule = 0
@@ -122,13 +122,29 @@ class access_management(models.Model):
         return res
 
     def get_remove_options(self, model):
-        restrict_export = self.env['access.management'].search([('company_ids', 'in', self.env.company.id),
-                                                                ('active', '=', True),
+        
+        restrict_export = self.env['access.management'].sudo().search([('active', '=', True),
                                                                 ('user_ids', 'in', self.env.user.id),
-                                                                ('hide_export', '=', True)], limit=1).id
-        remove_action = self.env['remove.action'].sudo().search(
-            [('access_management_id.company_ids', 'in', self.env.company.id),
+                                                                ('hide_export', '=', True),
+                                                                ('is_apply_on_without_company', '=', True)], limit=1).id
+        if not restrict_export:
+            # restrict_export = self.env['access.management'].sudo().search([('company_ids', 'in', self.env.company.id),
+            #                                                     ('active', '=', True),
+            #                                                     ('user_ids', 'in', self.env.user.id),
+            #                                                     ('hide_export', '=', True)], limit=1).id
+            restrict_export = self.env['access.management'].sudo().search([
+                                                            ('active', '=', True),
+                                                            ('user_ids', 'in', self.env.user.id),
+                                                            ('hide_export', '=', True)], limit=1)
+            restrict_export = restrict_export.filtered(lambda x: x.is_apply_on_without_company or self.env.company.id in x.company_ids.ids)
+           
+
+        remove_action = self.env['remove.action'].sudo().search([('access_management_id.active', '=', True),
+             ('access_management_id.user_ids', 'in', self.env.user.id),
              ('access_management_id', 'in', self.env.user.access_management_ids.ids), ('model_id.model', '=', model)])
+        
+        remove_action -= remove_action.filtered(lambda x: x.access_management_id.is_apply_on_without_company == False and self.env.company.id not in x.access_management_id.company_ids.ids)
+        
         options = []
         added_export = False
 
@@ -170,10 +186,12 @@ class access_management(models.Model):
                 hide_schedule_activity = False
 
         if model and hide_send_mail or hide_log_notes or hide_schedule_activity:
-            hide_ids = self.env['hide.chatter'].search([('access_management_id.company_ids', 'in', company_id),
+            hide_ids = self.env['hide.chatter'].sudo().search([
                                                         ('access_management_id.active', '=', True),
                                                         ('access_management_id.user_ids', 'in', user_id),
                                                         ('model_id.model', '=', model)])
+            
+            hide_ids -= hide_ids.filtered(lambda x: x.access_management_id.is_apply_on_without_company == False and self.env.company.id not in x.access_management_id.company_ids.ids)
 
             if hide_ids:
                 if hide_send_mail and hide_ids.filtered(lambda x: x.hide_send_mail):
@@ -192,17 +210,23 @@ class access_management(models.Model):
         }
 
     def is_spread_sheet_available(self, action_model, action_id):
-        model = self.env[action_model].sudo().browse(action_id).res_model
-        if self.search([('user_ids', 'in', self.env.user.id), ('company_ids', 'in', self.env.company.id), ('active', '=', True),('hide_spreadsheet','=',True)]):
-            return True
-
-        if model:
-            if self.env['remove.action'].search([('access_management_id.active', '=', True),
-                                                 ('access_management_id.user_ids', 'in', self.env.user.id), 
-                                                 ('access_management_id.company_ids', 'in', self.env.company.id),
-                                                 ('model_id.model', '=', model),
-                                                 ('restrict_spreadsheet', '=', True)]):
+        if action_model and action_id:
+            model = self.env[action_model].sudo().browse(action_id).res_model
+            if self.search([('user_ids', 'in', self.env.user.id), ('company_ids', 'in', self.env.company.id), ('active', '=', True),('hide_spreadsheet','=',True)]):
                 return True
+            restrict_spreadsheet = self.env['remove.action'].sudo().search([('access_management_id.active', '=', True),
+                                                    ('access_management_id.user_ids', 'in', self.env.user.id),
+                                                    ('model_id.model', '=', model),
+                                                    ('restrict_spreadsheet', '=', True)])
+            restrict_spreadsheet -= restrict_spreadsheet.filtered(lambda x: x.access_management_id.is_apply_on_without_company == False and self.env.company.id not in x.access_management_id.company_ids.ids)
+            if model:
+                # if self.env['remove.action'].sudo().search([('access_management_id.active', '=', True),
+                #                                      ('access_management_id.user_ids', 'in', self.env.user.id), 
+                #                                      ('access_management_id.company_ids', 'in', self.env.company.id),
+                #                                      ('model_id.model', '=', model),
+                #                                      ('restrict_spreadsheet', '=', True)]):
+                if restrict_spreadsheet:
+                    return True
 
         return False
 
@@ -212,15 +236,19 @@ class access_management(models.Model):
         return False
  
     def is_export_hide(self, model=False):
-        if self.search([('user_ids', 'in', self.env.user.id), ('company_ids', 'in', self.env.company.id), ('active', '=', True), ('hide_export','=',True)]):
+        
+        am = self.search([('user_ids', 'in', self.env.user.id), ('active', '=', True), ('hide_export','=',True)])
+        if am.filtered(lambda x: x.is_apply_on_without_company or self.env.company.id in x.company_ids.ids):
             return True
 
         if model:
-            if self.env['remove.action'].search([('access_management_id.active', '=', True),
+            restrict_export = self.env['remove.action'].sudo().search([('access_management_id.active', '=', True),
                                                  ('access_management_id.user_ids', 'in', self.env.user.id), 
-                                                 ('access_management_id.company_ids', 'in', self.env.company.id),
                                                  ('model_id.model', '=', model),
-                                                 ('restrict_export', '=', True)]):
+                                                 ('restrict_export', '=', True)])
+
+            restrict_export -= restrict_export.filtered(lambda x: x.access_management_id.is_apply_on_without_company == False and self.env.company.id not in x.access_management_id.company_ids.ids)
+            if restrict_export:
                 return True
 
         return False
@@ -229,10 +257,12 @@ class access_management(models.Model):
         if model:
             hidden_fields = []
             hide_field_obj = self.env['hide.field'].sudo()
-            for hide_field in hide_field_obj.search(
-                        [('access_management_id.company_ids', 'in', self.env.company.id),
-                         ('model_id.model', '=', model), ('access_management_id.active', '=', True),
-                         ('access_management_id.user_ids', 'in', self._uid), ('invisible', '=', True)]):
+            hide_fields = hide_field_obj.search(
+                        [('model_id.model', '=', model), ('access_management_id.active', '=', True),
+                         ('access_management_id.user_ids', 'in', self._uid), ('invisible', '=', True)])
+
+            hide_fields -= hide_fields.filtered(lambda x: x.access_management_id.is_apply_on_without_company == False and self.env.company.id not in x.access_management_id.company_ids.ids)
+            for hide_field in hide_fields:
                 for field in hide_field.field_id:
                     if field.name:
                         hidden_fields.append(field.name)

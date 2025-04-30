@@ -4,7 +4,7 @@
 
         <record id="access_management_form_view_ah" model="ir.ui.view">
             <field name="name">access_management_form_view_ah</field>
-            <field name="groups_id" eval="[(4, ref('group_access_management_spt'))]"/>
+            <field name="groups_id" eval="[(4, ref('group_access_management_bits'))]"/>
             <field name="model">access.management</field>
             <field name="arch" type="xml">
                 <form context="{'buypass_access':True}">
@@ -34,9 +34,9 @@
                             <group>
                                 <field name="name" default_focus="1" required='1'/>
                                 <field name="readonly"/>
+                                <field name="is_apply_on_without_company"/>
                                 <field name="company_ids" options="{'no_create': True}" widget="many2many_tags"
-                                       groups="base.group_multi_company"/>
-                                <!-- <field name="self_model_ids" widget="many2many_tags" invisible="1"/> -->
+                                       groups="base.group_multi_company" invisible="is_apply_on_without_company != False"/>
                                 <field name="total_rules" invisible="1"/>
                             </group>
                             <group>
@@ -258,7 +258,7 @@
                                     </a>
                                 </p>
                             </page>
-                            <page string='Hide Filter/Group By'>
+                            <page string='Search Panel Access'>
                                 <field name="hide_filters_groups_ids">
                                     <tree editable="bottom">
                                         <field name="model_id" context="{'is_access_rights': True}"
@@ -287,16 +287,16 @@
                                 </p>
                             </page>
                             <page string='Chatter'>
-                                <field name="hide_chatter_ids">
+                                <field name="hide_chatter_ids" readonly="hide_chatter == True">
                                     <tree editable="bottom">
                                         <field name="model_id" context="{'is_access_rights': True}"
                                                options="{'no_open': True, 'no_create': True, 'no_create_edit': True}"
                                                width="20" domain="[('model','not in',['access.management', 'access.domain.ah', 'action.data', 'hide.field', 'hide.view.nodes', 'store.model.nodes', 'remove.action', 'view.data'])]"
                                                required="1"/>
                                         <field name="hide_chatter" width="20"/>
-                                        <field name="hide_send_mail" width="20"/>
-                                        <field name="hide_log_notes" width="20"/>
-                                        <field name="hide_schedule_activity" width="20"/>
+                                        <field name="hide_send_mail" width="20" readonly="hide_chatter == True or parent.hide_send_mail == True"/>
+                                        <field name="hide_log_notes" width="20" readonly="hide_chatter == True or parent.hide_log_notes == True"/>
+                                        <field name="hide_schedule_activity" width="20" readonly="hide_chatter == True or parent.hide_schedule_activity == True"/>
 
                                     </tree>
                                 </field>
@@ -313,9 +313,9 @@
                                 <group>
                                     <group string="Chatter">
                                         <field name="hide_chatter"/>
-                                        <field name="hide_send_mail"/>
-                                        <field name="hide_log_notes"/>
-                                        <field name="hide_schedule_activity"/>
+                                        <field name="hide_send_mail" readonly="hide_chatter == True"/>
+                                        <field name="hide_log_notes" readonly="hide_chatter == True"/>
+                                        <field name="hide_schedule_activity" readonly="hide_chatter == True"/>
                                     </group>
                                     <group string="Import &amp; Export">
                                         <field name="hide_import"/>
@@ -335,7 +335,7 @@
                                     In this tab you can apply the rule for every model.
                                     <br/>
                                     <br/>You can hide chatter, send message, log notes, schedule activities, import,
-                                    export from everywhere with single chabox
+                                    export from everywhere with single checkbox
                                     <br/>
                                     <br/>selection for specific user.
                                 </p>
@@ -373,7 +373,7 @@
 
         <record id="access_management_tree_view_ah" model="ir.ui.view">
             <field name="name">access_management_tree_view_ah</field>
-            <field name="groups_id" eval="[(4, ref('group_access_management_spt'))]"/>
+            <field name="groups_id" eval="[(4, ref('group_access_management_bits'))]"/>
             <field name="model">access.management</field>
             <field name="arch" type="xml">
                 <tree decoration-muted="(not active)">
@@ -396,7 +396,7 @@
         </record>
 
         <menuitem id="main_menu_simplify_access_management" name="Access Studio" action="action_access_management_ah"
-                  groups="group_access_management_spt"
+                  groups="group_access_management_bits"
                   web_icon="simplify_access_management,static/description/icon.png"/>
 
     </data>
