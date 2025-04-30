@@ -107,7 +107,9 @@ patch(InvoiceButton.prototype, {
                 }
     
                 // Second: after sending, download the invoice report
-                if (invoiceType === 'Simplified') {
+                if (orderWithInvoice.is_invoice_b2c) {
+                    // invoiceType === 'Simplified'
+                   
                     // B2C simplified tax invoice
                     await this.report.doAction(
                         "othaim_zatca_integration.action_report_simplified_tax_invoice",

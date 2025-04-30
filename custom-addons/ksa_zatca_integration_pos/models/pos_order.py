@@ -80,7 +80,14 @@ class PosOrder(models.Model):
 
     def _prepare_invoice_vals(self):
         invoice_vals = super(PosOrder, self)._prepare_invoice_vals()
-        invoice_vals['l10n_sa_invoice_type'] = 'Simplified'
+        
+        if invoice_vals.get('partner_id',False):
+            partner_id = self.env['res.partner'].search([('id','=',invoice_vals.get('partner_id'))])
+            if partner_id.id == 23 :
+                invoice_vals['l10n_sa_invoice_type'] = 'Simplified'
+            else:
+                invoice_vals['l10n_sa_invoice_type'] = 'Standard'
+
         invoice_vals['pos_reference'] = self.pos_reference
         return invoice_vals
 
@@ -164,12 +171,9 @@ class PosOrder(models.Model):
                 zero_tax = self.env['account.tax'].with_company(rec.company_id).search([('description', '=', 'zero')], limit=1)
 
                 for line in rec.lines:
-                    
-
                     # If no tax is assigned, set the zero-rated tax
                     if not line.tax_ids_after_fiscal_position and zero_tax:
                         line.tax_ids = [(6, 0, zero_tax.ids)]  # Assign the found tax
-
 
 
                 if rec.picking_ids:
