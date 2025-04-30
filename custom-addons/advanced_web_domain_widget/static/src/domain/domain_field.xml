@@ -77,11 +77,11 @@
                                     t-on-click="() => this.checkProps()"
                                 />
                             </t>
-                        </t>
-                        <t t-if="props.editInDialog and !props.readonly">
-                            <button class="btn btn-sm btn-primary o_field_domain_dialog_button" t-on-click.prevent="onEditDialogBtnClick">Edit Domain</button>
-                        </t>
+                        </t> 
                     </div>
+                    <t t-if="props.editInDialog and !props.readonly">
+                        <button class="btn btn-sm btn-primary o_field_domain_dialog_button" t-on-click.prevent="onEditDialogBtnClick">Edit Domain</button>
+                    </t>
                 </t>
             </t>
             <t t-else="">
@@ -148,9 +148,9 @@
                         </t>
                         <t t-else="">
                             <t t-if="state.isValid">
-                                <!-- <button class="btn btn-sm btn-link o_domain_show_selection_button" type="button" t-on-click.stop="onButtonClick">
+                                <button class="btn btn-sm btn-link o_domain_show_selection_button" type="button" t-on-click.stop="onButtonClick">
                                     <t t-esc="state.recordCount" /> record(s)
-                                </button> -->
+                                </button>
                             </t>
                             <t t-else="">
                                 <span class="text-warning" role="alert">
@@ -158,19 +158,19 @@
                                 </span>
                             </t>
                             <t t-if="!!env.debug and !props.readonly">
-                                <!-- <button
+                                <button
                                     class="btn btn-sm btn-icon fa fa-refresh o_refresh_count"
                                     role="img"
                                     aria-label="Refresh"
                                     title="Refresh"
                                     t-on-click="() => this.checkProps()"
-                                /> -->
+                                />
                             </t>
-                        </t>
-                        <t t-if="props.editInDialog and !props.readonly">
-                            <button class="btn btn-sm btn-primary o_field_domain_dialog_button" t-on-click.prevent="onEditDialogBtnClick">Edit Domain</button>
-                        </t>
+                        </t> 
                     </div>
+                    <t t-if="props.editInDialog and !props.readonly">
+                        <button class="btn btn-sm btn-primary o_field_domain_dialog_button" t-on-click.prevent="onEditDialogBtnClick">Edit Domain</button>
+                    </t>
                 </t>
             </t>
             <t t-else="">

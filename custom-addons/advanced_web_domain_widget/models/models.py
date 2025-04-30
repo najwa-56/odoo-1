@@ -1,5 +1,5 @@
 from odoo import api, fields, models, tools, _
-
+from odoo.addons.advanced_web_domain_widget.models.domain_prepare import prepare_domain_v2
 
 class BaseModel(models.AbstractModel):
     _inherit = 'base'
@@ -20,4 +20,9 @@ class BaseModel(models.AbstractModel):
     
     @api.model
     def get_widget_count(self, args):
-        return self.sudo().search_count(args)
+        # return self.sudo().search_count(args)
+        domain_list = []
+        for domain in args:
+            if isinstance(domain, tuple) or isinstance(domain, list):
+                domain_list += prepare_domain_v2(domain)
+        return self.sudo().search_count(domain_list)

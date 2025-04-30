@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #################################################################################
 # Author      : Terabits Technolab (<www.terabits.xyz>)
-# Copyright(c): 2021
+# Copyright(c): 2023-2025
 # All Rights Reserved.
 #
 # This module is copyright property of the author mentioned above.
@@ -10,7 +10,7 @@
 #################################################################################
 {
     "name": "Advanced Web Domain Widget",
-    "version": "17.0.2.2.0",
+    "version": "17.0.3.3.2",
     "summary": "Set all relational fields domain by selecting its records unsing `in, not in` operator.",
     "sequence": 10,
     "author": "Terabits Technolab",
@@ -19,7 +19,7 @@
     "description": """
       
         """,
-    "price": "29.00",
+    "price": "1.00",
     "currency": "USD",
     "depends": ["web"],
     "data": [

@@ -147,7 +147,7 @@
     <t t-name="web.TreeEditorBits.condition:readonly">
         <t t-set="description" t-value="getDescription(node)" />
         <div class="o_tree_editor_condition d-flex gap-1 px-2 border bg-100">
-            <ModelFieldSelector path="node.path" resModel="props.resModel" readonly="true" />
+            <ModelFieldSelector path="node.path" resModel="props.resModel" readonly="true" /> 
             <span class="fst-italic" t-esc="description.operatorDescription" />
             <t t-if="description.valueDescription">
                 <t t-set="values" t-value="description.valueDescription.values" />

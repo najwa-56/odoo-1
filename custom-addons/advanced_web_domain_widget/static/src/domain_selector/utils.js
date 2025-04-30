@@ -149,7 +149,7 @@ export function getDomainTreeDescription(
         fieldDef,
         displayNames[fieldDef?.relation || fieldDef?.comodel]
     );
-    let description = `${getDescription(path)} ${operatorDescription} `;
+    let description = `${getDescription(path)} ${operatorDescription}`;
     if (valueDescription) {
         const { values, join, addParenthesis } = valueDescription;
         const jointedValues = values.join(` ${join} `);

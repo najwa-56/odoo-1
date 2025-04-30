@@ -2,6 +2,53 @@ from odoo.http import request
 from datetime import datetime,timedelta
 from dateutil.relativedelta import relativedelta
 
+def compute_domain(domain_tuple,model):
+    """
+    This function takes a tuple of a domain and a model name as input. It parses
+    the domain and replaces 0 with the current user's ID or the current company's
+    ID if the field on the left-hand side of the domain is a many2one or many2many
+    field that references res.users or res.company. It then returns the modified
+    domain.
+    
+    :param domain_tuple: A tuple of a domain and a model name
+    :type domain_tuple: tuple
+    :return: The modified domain
+    :rtype: tuple
+    """
+    left_value = domain_tuple[0]
+    operator_value = domain_tuple[1]
+    right_value = domain_tuple[2]
+    left_value_split_list = left_value.split('.')
+    left_user = False
+    left_company = False
+    field_obj = request.env['ir.model.fields'].sudo()
+    model_obj = request.env[model]._name
+    for field in left_value_split_list:
+        left_user = False
+        left_company = False
+        model_field = field_obj.search([('model_id.model','=',model_obj),('name','=',field)],limit=1)
+        field_type = model_field.ttype
+        if field_type in ['many2one', 'many2many', 'one2many']:
+            model_obj = model_field.relation
+            field_relation = model_field.relation
+            relation_model = field_relation
+            if relation_model == 'res.users':
+                left_user = True
+            if relation_model == 'res.company': 
+                left_company = True
+    
+    if left_user:
+        if operator_value in ['in', 'not in']:
+            if isinstance(right_value, list) and 0 in right_value:
+                zero_index = right_value.index(0)
+                right_value[zero_index] = request.env.user.id
+
+    if left_company:
+        if operator_value in ['in', 'not in']:
+            if isinstance(right_value, list) and 0 in right_value:
+                zero_index = right_value.index(0)
+                right_value[zero_index] = request.env.company.id
+
 def prepare_domain_v2(domain):
     if isinstance(domain, tuple) or isinstance(domain, list):
         field_name = domain[0]

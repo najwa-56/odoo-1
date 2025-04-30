@@ -103,9 +103,7 @@ export class RecordAutocompleteBits extends RecordAutocomplete {
         ]
       : undefined;
     // fine for now but we don't like this kind of dependence of core to views
-    const SelectCreateDialog = registry
-      .category("dialogs")
-      .get("select_create");
+    const SelectCreateDialog = registry.category("dialogs").get("select_create");
     this.addDialog(SelectCreateDialog, {
       title: _t("Search: %s", fieldString),
       dynamicFilters,

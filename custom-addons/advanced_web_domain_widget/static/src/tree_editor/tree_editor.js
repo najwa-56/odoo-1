@@ -86,13 +86,13 @@ function restoreVirtualOperators(tree, otherTree) {
     }
     for (const { tree, operator } of diffs) {
         tree.operator = operator;
-    }
+    }    
 }
 
-export class TreeEditorBits extends Component {
+export class TreeEditorBits extends Component {  
     static template = "web.TreeEditorBits";
     static components = {
-        Dropdown,
+        Dropdown, 
         DropdownItem,
         ModelFieldSelector,
     };
@@ -228,7 +228,21 @@ export class TreeEditorBits extends Component {
 
     getDescription(node) {
         const fieldDef = this.getFieldDef(node.path);
+        if(node.operator == "date_filter"){
+            return this.prepareLeaf(node,fieldDef);
+        }
         return leafToString(node, fieldDef, this.displayNames[getResModel(fieldDef)]);
+    }
+    prepareLeaf(node,fieldDef){
+        return {
+            'operatorDescription':node.operator,
+            'valueDescription':{
+                'addParenthesis':false,
+                'join':'=',
+                'values':['today']
+            }
+        }
+
     }
 
     getValueEditorInfo(node) {
