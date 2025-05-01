@@ -98,6 +98,10 @@ class PosOrder(models.Model):
             for order_id in order_ids:
                 self_id = self.browse(order_id['id'])
                 if self_id.account_move.id:
+                    if self_id.account_move:
+                        for line in self_id.account_move.invoice_line_ids:
+                            if '&' in line.name:
+                                line.name = line.name.replace('&', 'و')
                     
                     if self_id.partner_id.id != 23 :
                         self_id.account_move.write({

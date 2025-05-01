@@ -26,10 +26,10 @@ class AccountMoveReport(models.Model):
     def _l10n_sa_pdf_conversion(self, collected_streams):
         is_tax_invoice = 1 if self.l10n_sa_invoice_type == 'Standard' else 0
         xml = self.zatca_hash_cleared_invoice if is_tax_invoice else self.zatca_invoice
-        if not xml:
-            raise exceptions.MissingError(
-                _("Cleared invoice from zatca is required.") if is_tax_invoice else _(
-                    "xml not generated."))
+        # if not xml:
+        #     raise exceptions.MissingError(
+        #         _("Cleared invoice from zatca is required.") if is_tax_invoice else _(
+        #             "xml not generated."))
         if xml:
             xml_facturx = base64.b64decode(xml)
             pdf_stream = collected_streams[self.id]['stream']
