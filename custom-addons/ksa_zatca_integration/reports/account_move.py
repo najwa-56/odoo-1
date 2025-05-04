@@ -8,6 +8,7 @@ import logging
 import base64
 import qrcode
 import io
+_logger = logging.getLogger(__name__)
 
 _zatca = logging.getLogger('Zatca Debugger for account.move :')
 ubl_CAC = "urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-2"
@@ -26,47 +27,101 @@ class AccountMoveReport(models.Model):
     def _l10n_sa_pdf_conversion(self, collected_streams):
         is_tax_invoice = 1 if self.l10n_sa_invoice_type == 'Standard' else 0
         xml = self.zatca_hash_cleared_invoice if is_tax_invoice else self.zatca_invoice
-        # if not xml:
-        #     raise exceptions.MissingError(
-        #         _("Cleared invoice from zatca is required.") if is_tax_invoice else _(
-        #             "xml not generated."))
-        if xml:
-            xml_facturx = base64.b64decode(xml)
-            pdf_stream = collected_streams[self.id]['stream']
 
-            pdf_content = pdf_stream.getvalue()
-            reader_buffer = io.BytesIO(pdf_content)
-            reader = OdooPdfFileReader(reader_buffer, strict=False)
-            writer = OdooPdfFileWriter()
-            writer.cloneReaderDocumentRoot(reader)
-            if '/Outlines' not in writer._root_object:
-                outlines_dict = DictionaryObject()
-                outlines_dict.update({
-                    NameObject("/Count"): 0,
-                })
-                writer._root_object.update({
-                    NameObject("/Outlines"): outlines_dict
-                })
-
-            writer.addAttachment(self.zatca_invoice_name, xml_facturx, subtype='text/xml')
+        # Only proceed with attachment and PDF/A if XML is available and valid
+        if xml and isinstance(xml, (str, bytes)):
+            try:
+                xml_facturx = base64.b64decode(xml)
+            except Exception as decode_err:
+                _logger.warning("Failed to decode ZATCA XML for invoice %s: %s", self.name, decode_err)
+                return collected_streams  # Skip PDF/A logic, allow report to continue
 
             try:
-                writer.convert_to_pdfa()
-            except Exception as e:
-                _zatca.exception("Error while converting to PDF/A: %s", e)
+                pdf_stream = collected_streams[self.id]['stream']
+                pdf_content = pdf_stream.getvalue()
+                reader_buffer = io.BytesIO(pdf_content)
+                reader = OdooPdfFileReader(reader_buffer, strict=False)
+                writer = OdooPdfFileWriter()
+                writer.cloneReaderDocumentRoot(reader)
 
-            content = self.env['ir.qweb']._render(
-                'account_edi_ubl_cii.account_invoice_pdfa_3_facturx_metadata',
-                {'title': self.name, 'date': fields.Date.context_today(self)})
-            writer.add_file_metadata(content.encode())
+                # Ensure /Outlines key exists
+                if '/Outlines' not in writer._root_object:
+                    outlines_dict = DictionaryObject()
+                    outlines_dict.update({NameObject("/Count"): 0})
+                    writer._root_object.update({NameObject("/Outlines"): outlines_dict})
 
-            pdf_stream.close()
-            writer_buffer = io.BytesIO()
-            writer.write(writer_buffer)
-            collected_streams[self.id]['stream'] = writer_buffer
-            reader_buffer.close()
-            # writer_buffer.close()
+                writer.addAttachment(self.zatca_invoice_name, xml_facturx, subtype='text/xml')
+
+                try:
+                    writer.convert_to_pdfa()
+                except Exception as e:
+                    _zatca.exception("Error while converting to PDF/A for invoice %s: %s", self.name, e)
+
+                metadata_xml = self.env['ir.qweb']._render(
+                    'account_edi_ubl_cii.account_invoice_pdfa_3_facturx_metadata',
+                    {'title': self.name, 'date': fields.Date.context_today(self)}
+                )
+                writer.add_file_metadata(metadata_xml.encode())
+
+                pdf_stream.close()
+                writer_buffer = io.BytesIO()
+                writer.write(writer_buffer)
+                collected_streams[self.id]['stream'] = writer_buffer
+                reader_buffer.close()
+                # writer_buffer.close()  # Usually not needed, let GC handle it
+            except Exception as final_error:
+                _logger.exception("Unhandled error in ZATCA PDF/A conversion for invoice %s: %s", self.name, final_error)
+
+        else:
+            _logger.info("ZATCA XML not available for invoice %s; skipping PDF/A embedding.", self.name)
+
         return collected_streams
+
+
+    # def _l10n_sa_pdf_conversion(self, collected_streams):
+    #     is_tax_invoice = 1 if self.l10n_sa_invoice_type == 'Standard' else 0
+    #     xml = self.zatca_hash_cleared_invoice if is_tax_invoice else self.zatca_invoice
+    #     # if not xml:
+    #     #     raise exceptions.MissingError(
+    #     #         _("Cleared invoice from zatca is required.") if is_tax_invoice else _(
+    #     #             "xml not generated."))
+    #     if xml:
+    #         xml_facturx = base64.b64decode(xml)
+    #         pdf_stream = collected_streams[self.id]['stream']
+
+    #         pdf_content = pdf_stream.getvalue()
+    #         reader_buffer = io.BytesIO(pdf_content)
+    #         reader = OdooPdfFileReader(reader_buffer, strict=False)
+    #         writer = OdooPdfFileWriter()
+    #         writer.cloneReaderDocumentRoot(reader)
+    #         if '/Outlines' not in writer._root_object:
+    #             outlines_dict = DictionaryObject()
+    #             outlines_dict.update({
+    #                 NameObject("/Count"): 0,
+    #             })
+    #             writer._root_object.update({
+    #                 NameObject("/Outlines"): outlines_dict
+    #             })
+
+    #         writer.addAttachment(self.zatca_invoice_name, xml_facturx, subtype='text/xml')
+
+    #         try:
+    #             writer.convert_to_pdfa()
+    #         except Exception as e:
+    #             _zatca.exception("Error while converting to PDF/A: %s", e)
+
+    #         content = self.env['ir.qweb']._render(
+    #             'account_edi_ubl_cii.account_invoice_pdfa_3_facturx_metadata',
+    #             {'title': self.name, 'date': fields.Date.context_today(self)})
+    #         writer.add_file_metadata(content.encode())
+
+    #         pdf_stream.close()
+    #         writer_buffer = io.BytesIO()
+    #         writer.write(writer_buffer)
+    #         collected_streams[self.id]['stream'] = writer_buffer
+    #         reader_buffer.close()
+    #         # writer_buffer.close()
+    #     return collected_streams
 
     def get_zatca_onboarding_status(self):
         com = self.company_id.parent_root_id.sudo()
