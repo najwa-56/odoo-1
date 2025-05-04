@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <!-- Create a new security category -->
+        <record id="module_category_sales_man" model="ir.module.category">
+            <field name="name">Sales Man Management</field>
+            <field name="description">Helps you manage your salespeople and their dashboards.</field>
+            <field name="sequence">20</field>
+        </record>
+
+        <!-- Create supervisor group -->
+        <record id="group_salesman_supervisor" model="res.groups">
+            <field name="name">Supervisor</field>
+            <field name="category_id" ref="module_category_sales_man"/>
+        </record>
+
+         <!-- Create supervisor group -->
+        <record id="group_salesman" model="res.groups">
+            <field name="name">salesman</field>
+            <field name="category_id" ref="module_category_sales_man"/>
+        </record>
+
+        <!-- Record rule to restrict access to employees based on supervisor -->
+        <record id="rule_hr_employee_supervisor" model="ir.rule">
+            <field name="name">Employees: supervisor sees only his salespeople</field>
+            <field name="model_id" ref="hr.model_hr_employee"/>
+            <field name="domain_force">['|', ('salesman_supervisor', '=', user.partner_id.id), ('salesman_supervisor', '=', False)]</field>
+            <field name="groups" eval="[(4, ref('group_salesman_supervisor'))]"/>
+            <field name="perm_read" eval="True"/>
+            <field name="perm_write" eval="False"/>
+            <field name="perm_create" eval="False"/>
+            <field name="perm_unlink" eval="False"/>
+        </record>
+
+        <!-- Record rule for daily visits -->
+        <record id="rule_daily_visit_supervisor" model="ir.rule">
+            <field name="name">Daily Visits: supervisors can see all visits</field>
+            <field name="model_id" ref="model_daily_visit"/>
+            <field name="domain_force">[(1, '=', 1)]</field>
+            <field name="groups" eval="[(4, ref('group_salesman_supervisor'))]"/>
+            <field name="perm_read" eval="True"/>
+            <field name="perm_write" eval="True"/>
+            <field name="perm_create" eval="True"/>
+            <field name="perm_unlink" eval="True"/>
+        </record>
+    </data>
+</odoo>

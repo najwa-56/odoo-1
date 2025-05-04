@@ -1,0 +1,9 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_hr_employee_supervisor,hr.employee.supervisor,hr.model_hr_employee,salesman_manager.group_salesman_supervisor,1,0,0,0
+access_ks_dashboard_ninja_supervisor,ks_dashboard_ninja.board.supervisor,ks_dashboard_ninja.model_ks_dashboard_ninja_board,salesman_manager.group_salesman_supervisor,1,0,0,0
+access_weekly_routs_supervisor,weekly.routs.supervisor,model_weekly_routs,salesman_manager.group_salesman_supervisor,1,1,1,1
+access_weekly_routs_line_supervisor,weekly.routs.line.supervisor,model_weekly_routs_line,salesman_manager.group_salesman_supervisor,1,1,1,1
+access_weekly_routs_salesman,weekly.routs.salesman,model_weekly_routs,salesman_manager.group_salesman,1,0,0,0
+access_weekly_routs_line_salesman,weekly.routs.line.salesman,model_weekly_routs_line,salesman_manager.group_salesman,1,0,0,0
+access_daily_visit_supervisor,daily.visit.supervisor,model_daily_visit,salesman_manager.group_salesman_supervisor,1,1,1,1
+access_daily_visit_salesman,daily.visit.salesman,model_daily_visit,salesman_manager.group_salesman,1,1,1,0

@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<odoo>
+    <record model="ir.ui.view" id="sale_order_view_aljard">
+        <field name="name">sale.order.view.aljard</field>
+        <field name="model">sale.order</field>
+        <field name="inherit_id" ref="sale.view_order_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="/form/sheet/notebook/page/field[@name='order_line']/tree/field[@name='name']" position="after">
+                <field name="inventory_counting"/>
+                 <field name="consumption" groups="salesman_manager.group_salesman_supervisor" force_save="'1"/>
+            </xpath>
+
+            <xpath expr="/form/sheet/notebook/page/field[@name='order_line']/tree/field[@name='name']" position="after">
+                <field name="multiplied_field" groups="salesman_manager.group_salesman_supervisor" force_save="'1"/>
+            </xpath>
+
+            <xpath expr="//group[@name='sale_total']" position="inside">
+                <field name="total_consumption_amount_perSO" groups="salesman_manager.group_salesman_supervisor" force_save="'1"/>
+            </xpath>
+        </field>
+    </record>
+</odoo>

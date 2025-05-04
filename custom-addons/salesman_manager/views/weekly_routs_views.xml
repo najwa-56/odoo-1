@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <!-- هذا xml الخاص بصفحة اسناد المسارات -->
+        <!-- Tree View for Weekly Routes -->
+        <record id="view_weekly_routs_tree" model="ir.ui.view">
+            <field name="name">weekly.routs.tree</field>
+            <field name="model">weekly.routs</field>
+            <field name="arch" type="xml">
+                <tree string="اسناد المسارات">
+                    <field name="reference"/>
+                    <field name="creation_date"/>
+                     <field name="user_id" options="{'no_create': True, 'no_quick_create': True, 'no_open': True}"/>
+                    <field name="Starting_date"/>
+                     <field name="Ending_date"/>
+                </tree>
+            </field>
+        </record>
+
+        <!-- Form View for Weekly Routes -->
+        <record id="view_weekly_routs_form" model="ir.ui.view">
+            <field name="name">weekly.routs.form</field>
+            <field name="model">weekly.routs</field>
+            <field name="arch" type="xml">
+                <form string="اسناد المسارات">
+                    <sheet>
+                        <div class="oe_title">
+                            <h1><field name="reference" readonly="1"/></h1>
+                        </div>
+
+                        <group>
+                            <group>
+                                <field name="reference" invisible="1"/>
+                                <field name="user_id" options="{'no_create': True, 'no_quick_create': True, 'no_open': True}" string="المندوب"/>
+                                <field name="Starting_date"/>
+                                <field name="Ending_date"/>
+                            </group>
+                        </group>
+                        <notebook>
+                            <page string="المسارات">
+                                <field name="route_lines" > <!--One record is linked to many records in another model -->
+                                    <tree editable="bottom">
+                                        <field name="day"/>
+                                        <field name="day_name"/>
+                                        <field name="delivery_route_id"/>
+                                        <field name="delivery_line_ids" domain="[('delivery_route_link_id', '=', delivery_route_id)]" widget="many2many_tags"/>
+                                    </tree>
+                                </field>
+                            </page>
+                        </notebook>
+                    </sheet>
+                </form>
+
+            </field>
+            <field name="groups_id" eval="[(6, 0, [ref('salesman_manager.group_salesman_supervisor')])]"/>
+        </record>
+
+        <!-- Search View for Weekly Routes -->
+        <record id="view_weekly_routs_search" model="ir.ui.view">
+            <field name="name">weekly.routs.search</field>
+            <field name="model">weekly.routs</field>
+            <field name="arch" type="xml">
+                <search string="اسناد المسارات">
+                    <field name="reference"/>
+                   <!-- <field name="employee"/>-->
+                    <field name="creation_date"/>
+                </search>
+            </field>
+        </record>
+
+        <!-- Action for Weekly Routes -->
+        <record id="action_weekly_routs" model="ir.actions.act_window">
+            <field name="name">اسناد المسارات</field>
+            <field name="res_model">weekly.routs</field>
+            <field name="view_mode">tree,form</field>
+            <field name="help" type="html">
+                <p class="o_view_nocontent_smiling_face">
+                    قم بإنشاء أول مسار أسبوعي
+                </p>
+            </field>
+            <field name="view_ids" eval="[(5, 0, 0),
+                                          (0, 0, {'view_mode': 'tree', 'view_id': ref('view_weekly_routs_tree')}),
+                                          (0, 0, {'view_mode': 'form', 'view_id': ref('view_weekly_routs_form')})]"/>
+        </record>
+
+        <!-- Menu for Weekly Routes -->
+        <menuitem id="menu_weekly_routs"
+                  name="اسناد المسارات"
+                  parent="menu_sales_man_root"
+                  action="action_weekly_routs"
+                  sequence="20"/>
+    </data>
+</odoo>

@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <!-- هذا xml الخاص بصفحة قائمة المناديب -->
+        <!-- Create the custom tree view for salespeople -->
+        <record id="view_sales_man_tree" model="ir.ui.view">
+            <field name="name">sales.man.tree</field>
+            <field name="model">hr.employee</field>
+            <field name="arch" type="xml">
+                <tree string="قائمة المناديب">
+                    <field name="name"/>
+                    <field name="mobile_phone"/>
+                    <field name="salesman_supervisor"/>
+                    <button name="action_open_dashboard" string="عرض لوحة القيادة" type="object" icon="fa-tachometer"/>
+                </tree>
+            </field>
+        </record>
+
+        <!-- Create action for the salespeople list -->
+        <record id="action_sales_man" model="ir.actions.act_window">
+            <field name="name">قائمة المناديب</field>
+            <field name="res_model">hr.employee</field>
+            <field name="view_id" ref="view_sales_man_tree"/>
+        </record>
+
+        <!-- Add menu item for the salespeople list -->
+        <menuitem id="menu_sales_man_root" name="إدارة المناديب" sequence="10" groups="salesman_manager.group_salesman_supervisor" />
+        <menuitem id="menu_sales_man_configuration" name="التهئة" sequence="50" parent="menu_sales_man_root" groups="salesman_manager.group_salesman_supervisor" />
+        <menuitem id="menu_sales_man" name="قائمة المناديب" parent="menu_sales_man_root" action="action_sales_man" sequence="10" />
+    </data>
+</odoo>

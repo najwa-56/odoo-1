@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+
+        <!-- Inherit the dashboard form view to add the salesman field -->
+        <record id="view_ks_dashboard_ninja_form_inherit" model="ir.ui.view">
+            <field name="name">ks_dashboard_ninja.board.form.inherit</field>
+            <field name="model">ks_dashboard_ninja.board</field>
+            <field name="inherit_id" ref="ks_dashboard_ninja.board_form"/>
+            <field name="arch" type="xml">
+                <xpath expr="//field[@name='name']" position="after">
+                    <field name="salesman"/>
+                    <field name="employee_id"/>
+                </xpath>
+            </field>
+        </record>
+
+        <!-- Create a new search view for dashboards instead of inheriting -->
+        <record id="view_ks_dashboard_ninja_search" model="ir.ui.view">
+            <field name="name">ks_dashboard_ninja.board.search</field>
+            <field name="model">ks_dashboard_ninja.board</field>
+            <field name="arch" type="xml">
+                <search>
+                    <field name="name"/>
+                    <field name="salesman"/>
+                    <field name="employee_id"/>
+                    <filter string="With Salesman" name="has_salesman" domain="[('salesman', '!=', False)]"/>
+                    <filter string="Without Salesman" name="no_salesman" domain="[('salesman', '=', False)]"/>
+                </search>
+            </field>
+        </record>
+    </data>
+</odoo>
