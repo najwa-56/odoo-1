@@ -221,12 +221,12 @@ class PosOrder(models.Model):
                 self.env.cr.commit()
 
                 _logger.error(f"Failed to Create inovoice {'send to zatck'}: {str(e)}")
-                mail_values = {
-                   'subject': f"POS Order Invoice Processing Failed for {rec.name}",
-                    'body_html': f"<p><strong>Error:</strong> {str(e)}</p>",
-                    'email_to': ','.join(recipients),
-                }
-                self.env['mail.mail'].create(mail_values).send()
+                # mail_values = {
+                #    'subject': f"POS Order Invoice Processing Failed for {rec.name}",
+                #     'body_html': f"<p><strong>Error:</strong> {str(e)}</p>",
+                #     'email_to': ','.join(recipients),
+                # }
+                # self.env['mail.mail'].create(mail_values).send()
 
 
 
