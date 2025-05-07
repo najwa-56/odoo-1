@@ -13,12 +13,24 @@
                         <field name="delivery_route_link_id" invisible="1"/>
                         <field name="cust_tree_ids"
                                invisible="delivery_route_link_id == False">
-                            <tree delete="false" create="True" default_order="id desc" ><!--We add create=true and delete false-->
+                            <tree delete="false" create="True" default_order="id desc" >
                                 <field name="sequence" widget="handle"/>
                                 <field name="name" />
                             </tree>
                         </field>
                     </group>
+
+
+                    
+
+                    <group string="Add Existing Customers"
+                    invisible="delivery_route_link_id == False">
+                    <field name="available_partner_ids" widget="many2many_tags"/>
+                </group>
+
+               
+
+
                 </sheet>
             </form>
         </field>

@@ -19,7 +19,7 @@
 #    THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 #
 ###############################################################################
-from odoo import models, fields
+from odoo import models, fields,api
 
 
 class RouteLines(models.Model):
@@ -46,3 +46,17 @@ class RouteLines(models.Model):
                                                              "route line seen "
                                                              "under route"
                                                              " line.")
+
+
+    available_partner_ids = fields.Many2many(
+        'res.partner',
+        string='Add Existing Customers',
+        domain="[('location_id', '=', False)]",
+        help='Select existing customers to assign to this route'
+    )
+
+    @api.onchange('available_partner_ids')
+    def _onchange_available_partner_ids(self):
+        for partner in self.available_partner_ids:
+            partner.location_id = self.id
+        self.available_partner_ids = [(5, 0, 0)]  # clear the selection after assigning
