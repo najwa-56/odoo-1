@@ -1,0 +1,12 @@
+<odoo>
+    <record id="view_hr_leave_type_form_inherit_limit_days" model="ir.ui.view">
+        <field name="name">hr.leave.type.form.inherit.limit.days</field>
+        <field name="model">hr.leave.type</field>
+        <field name="inherit_id" ref="hr_holidays.edit_holiday_status_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='time_type']" position="after">
+                <field name="leave_request_limit_days"/>
+            </xpath>
+        </field>
+    </record>
+</odoo>
