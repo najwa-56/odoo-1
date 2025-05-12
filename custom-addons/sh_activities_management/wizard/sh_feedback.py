@@ -53,7 +53,6 @@ class ActivityFeedback(models.TransientModel):
             default_res_model=activity_id.res_model,
         )
         messages, next_activities = activity_id._action_done(feedback=self.feedback)
-        print("\n\n\n....next_activities..",next_activities)
         if next_activities:
             return False
         return {

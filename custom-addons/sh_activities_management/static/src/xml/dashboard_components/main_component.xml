@@ -16,7 +16,7 @@
 							<span class="d-none d-xl-block me-auto"></span>
 						</div>
 						<div class="o_control_panel_actions" style='width:auto;'>
-							<div class="o-filter-value d-flex align-items-start w-100" t-if="is_system_user">
+							<div class="o-filter-value d-flex align-items-start w-100" t-if="is_system_user and is_activate_model">
 								<div class="w-100 border-success rounded">
 									<Many2XAutocomplete t-props="many2XAutocompletePropsModel" />
 								</div>

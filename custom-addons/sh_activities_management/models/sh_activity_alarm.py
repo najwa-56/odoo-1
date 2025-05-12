@@ -46,7 +46,7 @@ class ActitivyAlarm(models.Model):
             rec.name = rec.name_get()[0][1]
 
     @api.model
-    def _run_activity_reminder(self):            
+    def _run_activity_reminder(self):         
         company_ids = self.env['res.company'].sudo().search([])
         for company in company_ids:
             if company.sh_display_activity_reminder:
@@ -166,13 +166,14 @@ class ActitivyAlarm(models.Model):
                                                             notification_user_id.partner_id, 
                                                             'simple_notification',
                                                             {
-                                                                'type': 'simple_notification', 
+                                                                'type': 'warning', 
+                                                                # 'type': 'simple_notification', 
                                                                 'title': _('Activity Reminder '+'('+str(activity.activity_type_id.name)+')'),
                                                                 'message_is_html': message, 
                                                                 'message': message,
                                                                 'sticky': True,
                                                                 }]
-                                                        notifications.append(notification_data_list)                                                     
+                                                        notifications.append(notification_data_list)    
                                                         if notifications:                                                    
                                                             obj=self.env['bus.bus']._sendmany(notifications)                                                                                                                                                                 
 

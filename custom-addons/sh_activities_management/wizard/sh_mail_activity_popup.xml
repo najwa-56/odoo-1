@@ -28,6 +28,8 @@
                 </group>
                 <footer>
                     <button name="action_schedule_activity" string="Schedule" type="object" class="btn-primary" />
+                    <button name="action_done" string="Mark as Done" type="object" class="btn-secondary" context="{'mail_activity_quick_update': True}" />
+                    <button string="Done &amp; Schedule Next" name="action_done_schedule" class="btn-secondary" type="object"/>
                     <button string="Cancel" class="btn-default" special="cancel" />
                 </footer>
             </form>

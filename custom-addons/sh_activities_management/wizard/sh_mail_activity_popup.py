@@ -3,6 +3,7 @@
 
 from odoo import models, fields, api
 from datetime import timedelta
+from odoo.tools.misc import clean_context
 
 
 class MailActivityPopup(models.TransientModel):
@@ -49,13 +50,30 @@ class MailActivityPopup(models.TransientModel):
             for rec in self:
                 if rec.sh_date_deadline:
                     rec.sh_reminder_date_deadline = rec.sh_date_deadline + timedelta(hours=0, minutes=0, seconds=0)
+                    
+    def action_done(self):
+        activity_ids = self.action_schedule_activity()
+        if activity_ids:
+            activity_ids_obj = self.env['mail.activity'].browse(activity_ids)
+            for activity in activity_ids_obj:
+                activity = activity.with_context(clean_context(self.env.context))
+                messages, next_activities = activity._action_done(
+                    feedback=False, attachment_ids=False)
+                activity.state = 'done'
+                activity.active = False
+                activity.activity_done = True
+                activity._compute_state()
+                if activity.state == 'done':
+                    activity.date_done = fields.Date.today()
+                activity.feedback = False
 
     def action_schedule_activity(self):
+        activity_ids = []
         if self.env.context.get('active_ids'):
             model_id = self.env['ir.model'].sudo().search(
                 [('model', '=', self.env.context.get('active_model'))], limit=1)
             for partner in self.env.context.get('active_ids'):
-                self.env['mail.activity'].sudo().create({
+                activity_id=self.env['mail.activity'].sudo().create({
                     'res_model_id': model_id.id,
                     'res_id': partner,
                     'user_id': self.sh_user_id.id,
@@ -70,10 +88,11 @@ class MailActivityPopup(models.TransientModel):
                     'sh_activity_alarm_ids':[(6, 0, self.sh_activity_alarm_ids.ids)],
                     'sh_date_deadline':self.sh_reminder_date_deadline,
                 })
+                activity_ids.append(activity_id.id)
                 if self.sh_user_ids and self.sh_create_individual_activity:
                     for user in self.sh_user_ids:
                         if self.sh_user_id.id != user.id:
-                            self.env['mail.activity'].sudo().create({
+                            activity_id=self.env['mail.activity'].sudo().create({
                                 'res_model_id': model_id.id,
                                 'res_id': partner,
                                 'user_id': self.sh_user_id.id,
@@ -88,3 +107,71 @@ class MailActivityPopup(models.TransientModel):
                                 'sh_activity_alarm_ids':[(6, 0, self.sh_activity_alarm_ids.ids)],
                                 'sh_date_deadline':self.sh_reminder_date_deadline,
                             })
+                            activity_ids.append(activity_id.id)
+        return activity_ids
+
+    def schedule_next_activity(self):
+        activity_ids = []
+        if self.env.context.get('active_ids'):
+            model_id = self.env['ir.model'].sudo().search(
+                [('model', '=', self.env.context.get('active_model'))], limit=1)
+            for partner in self.env.context.get('active_ids'):
+                activity_id = self.env['mail.activity'].sudo().create({
+                    'res_model_id': model_id.id,
+                    'res_id': partner,
+                    'user_id': self.sh_user_id.id,
+                    'date_deadline': self.sh_date_deadline,
+                    'sh_user_ids': [(6, 0, self.sh_user_ids.ids)],
+                    'supervisor_id': self.sh_supervisor_id.id,
+                    'activity_type_id': self.sh_activity_type_id.id,
+                    'summary': self.sh_summary,
+                    'res_model': self.env.context.get('active_model'),
+                    'note': self.sh_note,
+                    'sh_activity_tags': [(6, 0, self.sh_activity_tags.ids)],
+                    'sh_activity_alarm_ids':[(6, 0, self.sh_activity_alarm_ids.ids)],
+                    'sh_date_deadline':self.sh_reminder_date_deadline,
+                })
+                activity_ids.append(activity_id.id)
+                if self.sh_user_ids and self.sh_create_individual_activity:
+                    for user in self.sh_user_ids:
+                        if self.sh_user_id.id != user.id:
+                            activity_id = self.env['mail.activity'].sudo().create({
+                                'res_model_id': model_id.id,
+                                'res_id': partner,
+                                'user_id': self.sh_user_id.id,
+                                'date_deadline': self.sh_date_deadline,
+                                'sh_user_ids': [(6, 0, user.ids)],
+                                'supervisor_id': self.sh_supervisor_id.id,
+                                'activity_type_id': self.sh_activity_type_id.id,
+                                'summary': self.sh_summary,
+                                'res_model': self.env.context.get('active_model'),
+                                'note': self.sh_note,
+                                'sh_activity_tags': [(6, 0, self.sh_activity_tags.ids)],
+                                'sh_activity_alarm_ids':[(6, 0, self.sh_activity_alarm_ids.ids)],
+                                'sh_date_deadline':self.sh_reminder_date_deadline,
+                            })
+                            activity_ids.append(activity_id.id)
+        if activity_ids:
+            activity_ids_obj = self.env['mail.activity'].browse(activity_ids)
+            for activity in activity_ids_obj:
+                activity = activity.with_context(clean_context(self.env.context))
+                messages, next_activities = activity._action_done(
+                    feedback=False, attachment_ids=False)
+                activity.state = 'done'
+                activity.active = False
+                activity.activity_done = True
+                activity._compute_state()
+                if activity.state == 'done':
+                    activity.date_done = fields.Date.today()
+                activity.feedback = False
+        
+
+    def action_done_schedule(self):
+        self.schedule_next_activity()
+        return {
+            'name': 'Schedule Activity',
+            'type':'ir.actions.act_window',
+            'res_model': 'sh.mail.activity',
+            'view_mode': 'form',
+            'target': 'new'
+        }

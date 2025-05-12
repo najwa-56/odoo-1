@@ -12,6 +12,9 @@ import { DateTimeInput } from "@web/core/datetime/datetime_input";
 import { _t } from "@web/core/l10n/translation";
 import { ListRenderer } from "@web/views/list/list_renderer";
 
+
+
+
 // Let the dashboard extravaganza begin!
 export class ActivityDashboard extends Component {
 
@@ -20,6 +23,8 @@ export class ActivityDashboard extends Component {
         super.setup();
         this.orm = useService("orm");
         this.user = useService("user");
+        this.company=useService("company")
+        this.currentCompanyId = useService("company").currentCompany.id;
         this.state = useState({
             infos: {},
             model: { id: false },
@@ -39,7 +44,7 @@ export class ActivityDashboard extends Component {
         onWillStart(async () => {
             
             const getModel = await this.orm.call("activity.dashboard", "get_model", []);
-            this.getModel = getModel;      
+            this.getModel = getModel;   
             
             const getUser = await this.orm.call("activity.dashboard", "get_user", []);
             this.getUser = getUser; 
@@ -52,6 +57,11 @@ export class ActivityDashboard extends Component {
             this.is_activity_supervisor = await this.user.hasGroup("sh_activities_management.group_activity_supervisor");
             this.is_activity_user = await this.user.hasGroup("sh_activities_management.group_activity_user");
             this.is_system_user = await this.user.hasGroup("base.group_system");
+
+            const args = [this.currentCompanyId];
+            const get_is_model_activate = await this.orm.call("activity.dashboard", "get_model_activate", args);
+            this.is_activate_model = get_is_model_activate[0];
+            this.document_models = get_is_model_activate[1];
         });
        
     }
@@ -211,7 +221,7 @@ export class ActivityDashboard extends Component {
     }
 
     getDomainModel() {
-        return [];
+        return [['id','in',this.document_models]];
     }
     // Updating the Team - because teamwork makes the ticket dream work.
     updateModel(selectedMenus) {
@@ -227,23 +237,6 @@ export class ActivityDashboard extends Component {
         }
     }
 
-    // Updating The Model
-    get many2XAutocompletePropsModelRecord(){
-        return {
-            resModel: "ir.model",
-            value: this.state.selected_model ? this.state.selected_model : '',
-            fieldString: _t("Select a Model"),
-            getDomain: this.getDomainModel.bind(this),
-            activeActions: {},
-            update: this.updateModel.bind(this),
-            placeholder: _t("Select a Model..."),
-            quickCreate: null,
-        };
-    }
-
-    getDomainModel() {
-        return [];
-    }
     // Updating the Team - because teamwork makes the ticket dream work.
     updateModel(selectedMenus) {
         if (selectedMenus) {

@@ -21,17 +21,17 @@ class MarkAsDone(models.TransientModel):
                 activity_id.feedback = self.feedback
                 activity_id.activity_done = True
                 activity_id._compute_state()
-                messages = self.env['mail.message']
-                record = self.env[activity_id.res_model].sudo().browse(activity_id.res_id)
-                record.sudo().message_post_with_view(
-                    'mail.message_activity_done',
-                    values={
-                        'activity': activity_id,
-                        'feedback': self.feedback,
-                        'display_assignee': activity_id.user_id != self.env.user
-                    },
-                    subtype_id=self.env['ir.model.data']._xmlid_to_res_id('mail.mt_activities'),
-                    mail_activity_type_id=activity_id.activity_type_id.id,
-                )
+                # messages = self.env['mail.message']
+                # record = self.env[activity_id.res_model].sudo().browse(activity_id.res_id)
+                # record.sudo().message_post_with_view(
+                #     'mail.message_activity_done',
+                #     values={
+                #         'activity': activity_id,
+                #         'feedback': self.feedback,
+                #         'display_assignee': activity_id.user_id != self.env.user
+                #     },
+                #     subtype_id=self.env['ir.model.data']._xmlid_to_res_id('mail.mt_activities'),
+                #     mail_activity_type_id=activity_id.activity_type_id.id,
+                # )
                 
-                messages |= record.sudo().message_ids[0]
+                # messages |= activity_id.sudo().message_ids[0]

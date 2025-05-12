@@ -17,6 +17,18 @@ class ActivityDashboard(models.Model):
     @api.model
     def get_model(self):
         return [{'id': model.id, 'name': model.name} for model in self.env['ir.model'].sudo().search([])]
+    
+    # Get Current company activate document model and its models
+    @api.model
+    def get_model_activate(self,current_company_id):
+        company=self.env["res.company"].sudo().browse(current_company_id)
+        document_models=[]
+        if company.sh_document_model:
+            if company.sh_document_model_ids:
+                domain = [('id','in',company.sh_document_model_ids.ids)]
+                document_models = self.env["ir.model"].sudo().search(domain).ids
+        is_document_model=company.sh_document_model
+        return is_document_model,document_models
 
     @api.model
     def get_user(self):
@@ -32,13 +44,13 @@ class ActivityDashboard(models.Model):
         user = request.env['res.users'].sudo().browse(uid)
         cids = request.httprequest.cookies.get('cids', str(user.company_id.id))
         cids = [int(cid) for cid in cids.split(',')]
+        # domain = []
         domain = [
             ('company_id','in',cids)
         ]
         if filter_type and filter_type != None:
             domain.append(('activity_type_id','=',int(filter_type)))
 
-        domain = []
 
         if filter_date == 'custom' and not (start_date and end_date):
             start_date = end_date = False
@@ -46,10 +58,16 @@ class ActivityDashboard(models.Model):
             start_date, end_date = self.generate_start_end_date(option=filter_date)
 
         if isinstance(start_date, str) and isinstance(end_date, str):
-            start_date = datetime.strptime(start_date, "%m/%d/%Y").replace(hour=0, minute=0, second=0)
-            end_date = datetime.strptime(end_date, "%m/%d/%Y").replace(hour=23, minute=59, second=59)
-            domain.append(('create_date', '>=', start_date))
-            domain.append(('create_date', '<=', end_date))
+            start_date_time = datetime.strptime(start_date, "%m/%d/%Y").replace(hour=0, minute=0, second=0) #update name purpose with using only date field
+            end_date_time = datetime.strptime(end_date, "%m/%d/%Y").replace(hour=23, minute=59, second=59)
+            domain.append(('create_date', '>=', start_date_time))
+            domain.append(('create_date', '<=', end_date_time))
+            
+            sh_start_date = datetime.strptime(start_date, "%m/%d/%Y") #only date field
+            sh_end_date = datetime.strptime(end_date, "%m/%d/%Y")
+            
+            domain=expression.OR([domain, [('date_done', '>=', sh_start_date),('date_done', '<=', sh_end_date)]])
+            domain=expression.OR([domain, [('date_deadline', '>=', sh_start_date),('date_deadline', '<=', sh_end_date)]])
 
 
         # FILTER USER
@@ -110,7 +128,8 @@ class ActivityDashboard(models.Model):
         result_all = self._cr.fetchall()
 
         all_activities_ids = [r[0] for r in result_all]
-        activities = self.env['mail.activity'].browse(all_activities_ids)
+        activities = self.env['mail.activity'].search([('id','in',all_activities_ids),'|',('active','=',True),('active','=',False)])
+        # activities = self.env['mail.activity'].browse(all_activities_ids)
 
         # return {}
 
@@ -137,7 +156,8 @@ class ActivityDashboard(models.Model):
         result_planned_activities = self._cr.fetchall()
 
         planned_activities_list = [r[0] for r in result_planned_activities]
-        planned_activities = self.env['mail.activity'].browse(planned_activities_list)
+        planned_activities = self.env['mail.activity'].search([('id','in',planned_activities_list)])
+        # planned_activities = self.env['mail.activity'].browse(planned_activities_list)
         
         # -------------------------------------
         # PLANNED ACTIVITES
@@ -164,7 +184,8 @@ class ActivityDashboard(models.Model):
 
         
         overdue_activities_list = [r[0] for r in result_overdue_activities]
-        overdue_activities = self.env['mail.activity'].browse(overdue_activities_list)
+        overdue_activities = self.env['mail.activity'].search([('id','in',overdue_activities_list)])
+        # overdue_activities = self.env['mail.activity'].browse(overdue_activities_list)
 
         # -------------------------------------
         # OVERDUE ACTIVITES
@@ -187,7 +208,8 @@ class ActivityDashboard(models.Model):
         self.env.cr.execute(query, where_params_completed_activities)    
         result_completed_activities = self._cr.fetchall()
         completed_activities_list = [r[0] for r in result_completed_activities]
-        completed_activities = self.env['mail.activity'].browse(completed_activities_list)
+        completed_activities = self.env['mail.activity'].search([('id','in',completed_activities_list),'|',('active','=',True),('active','=',False)])
+        # completed_activities = self.env['mail.activity'].browse(completed_activities_list)
         # -------------------------------------
         # COMPLETED ACTIVITES
         # ------------------------------------- 
@@ -212,7 +234,8 @@ class ActivityDashboard(models.Model):
         result_cancelled_activities = self._cr.fetchall()
         
         cancelled_activities_list = [r[0] for r in result_cancelled_activities]
-        cancelled_activities = self.env['mail.activity'].browse(cancelled_activities_list)
+        cancelled_activities = self.env['mail.activity'].search([('id','in',cancelled_activities_list),'|',('active','=',True),('active','=',False)])
+        # cancelled_activities = self.env['mail.activity'].browse(cancelled_activities_list)
         
 
         # -------------------------------------
@@ -294,13 +317,13 @@ class ActivityDashboard(models.Model):
         user = request.env['res.users'].sudo().browse(uid)
         cids = request.httprequest.cookies.get('cids', str(user.company_id.id))
         cids = [int(cid) for cid in cids.split(',')]
+        # domain = []
         domain = [
             ('company_id','in',cids)
         ]
         if filter_type and filter_type != None:
             domain.append(('activity_type_id','=',int(filter_type)))
 
-        domain = []
 
         if filter_date == 'custom' and not (start_date and end_date):
             start_date = end_date = False
@@ -308,10 +331,16 @@ class ActivityDashboard(models.Model):
             start_date, end_date = self.generate_start_end_date(option=filter_date)
 
         if isinstance(start_date, str) and isinstance(end_date, str):
-            start_date = datetime.strptime(start_date, "%m/%d/%Y").replace(hour=0, minute=0, second=0)
-            end_date = datetime.strptime(end_date, "%m/%d/%Y").replace(hour=23, minute=59, second=59)
-            domain.append(('create_date', '>=', start_date))
-            domain.append(('create_date', '<=', end_date))
+            start_date_time = datetime.strptime(start_date, "%m/%d/%Y").replace(hour=0, minute=0, second=0)
+            end_date_time = datetime.strptime(end_date, "%m/%d/%Y").replace(hour=23, minute=59, second=59)
+            domain.append(('create_date', '>=', start_date_time)) #update name purpose with using only date field
+            domain.append(('create_date', '<=', end_date_time))
+            
+            sh_start_date = datetime.strptime(start_date, "%m/%d/%Y") #only date field
+            sh_end_date = datetime.strptime(end_date, "%m/%d/%Y")
+            
+            domain=expression.OR([domain, [('date_done', '>=', sh_start_date),('date_done', '<=', sh_end_date)]])
+            domain=expression.OR([domain, [('date_deadline', '>=', sh_start_date),('date_deadline', '<=', sh_end_date)]])
 
 
         # FILTER USER
@@ -361,7 +390,6 @@ class ActivityDashboard(models.Model):
         # -------------------------------------
         # ALL ACTIVITES
         # -------------------------------------
-
         from_clause, where_clause_all_activities, where_params_all_activities = self.env['mail.activity']._where_calc(domain).get_sql()
 
         query = f'''
@@ -401,7 +429,14 @@ class ActivityDashboard(models.Model):
 
         planned_activities_list = [int(r[0]) for r in result_planned_activities]
         planned_activities_search = self.env['mail.activity'].search([('id','in',planned_activities_list)])#,limit=limit,offset=offset)
+        
+        planned_activities_search_sudo_browse = self.env['mail.activity'].sudo().browse(planned_activities_list) #Use this for display only accessible record. Ex :- private project record is only display created user
         planned_activities = self.env['mail.activity'].browse(planned_activities_search.ids[:self.env.user.company_id.sh_planned_table])
+        need_to_remove_planned_activities = planned_activities_search_sudo_browse - planned_activities_search
+        if need_to_remove_planned_activities:
+            for planned_remove in need_to_remove_planned_activities:
+                planned_activities_list.remove(planned_remove.id)
+        
         
         # -------------------------------------
         # PLANNED ACTIVITES
@@ -617,19 +652,20 @@ class ActivityDashboard(models.Model):
         users = self.env["res.users"].sudo().search_read(domain,['id','name'])
         return users
 
-    @api.model
-    def get_document_models(self):
-        document_models = False
-        uid = request.session.uid
-        user = request.env['res.users'].sudo().browse(uid)
-        cids = request.httprequest.cookies.get('cids', str(user.company_id.id))
-        cids = [int(cid) for cid in cids.split(',')]
-        company_id = self.env['res.company'].sudo().browse(cids)[0]
-        if company_id.sh_document_model:
-            if company_id.sh_document_model_ids:
-                domain = [('id','in',company_id.sh_document_model_ids.ids)]
-                document_models = self.env["ir.model"].sudo().search_read(domain,['id','name'])
-        return document_models
+    # Comment this code because of no use  and use this some code in get_model_activate method
+    # @api.model
+    # def get_document_models(self):
+    #     document_models = False
+    #     uid = request.session.uid
+    #     user = request.env['res.users'].sudo().browse(uid)
+    #     cids = request.httprequest.cookies.get('cids', str(user.company_id.id))
+    #     cids = [int(cid) for cid in cids.split(',')]
+    #     company_id = self.env['res.company'].sudo().browse(cids)[0]
+    #     if company_id.sh_document_model:
+    #         if company_id.sh_document_model_ids:
+    #             domain = [('id','in',company_id.sh_document_model_ids.ids)]
+    #             document_models = self.env["ir.model"].sudo().search_read(domain,['id','name'])
+    #     return document_models
 
     @api.model
     def get_document_model_records(self,filter_model):

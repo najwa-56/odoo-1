@@ -107,6 +107,17 @@ class MailActivity(models.Model):
     reference = fields.Reference(string='Related Document',
         selection='_reference_models')
 
+    def unlink(self):
+        for rec in self:
+            rec._compute_state()
+            model_name = rec.res_model.replace(".", "_")
+            self.env.cr.execute("Select id from "+(model_name) + " where id = "+(str(rec.res_id)))
+            origin_record_id = self._cr.fetchall()
+            if not origin_record_id:
+                return super(MailActivity, self).unlink()
+        return False
+        
+
     @api.model
     def _reference_models(self):
         all_dic = {}            
@@ -138,7 +149,8 @@ class MailActivity(models.Model):
         for activity in self:
             activity.res_name = ''
             if activity.res_model and activity.res_id:
-                activity.res_name = self.env[activity.res_model].browse(activity.res_id).name_get()[0][1]
+                activity.res_name = self.env[activity.res_model].browse(activity.res_id).display_name
+                # activity.res_name = self.env[activity.res_model].browse(activity.res_id).name_get()[0][1]
 
     @api.onchange('state')
     def onchange_state(self):
@@ -406,9 +418,6 @@ class MailActivity(models.Model):
         }
 
     def action_feedback(self, feedback=False, attachment_ids=None):
-        messages, _next_activities = self.with_context(
-            clean_context(self.env.context)
-        )._action_done(feedback=feedback, attachment_ids=attachment_ids)
         self.state = 'done'
         self.active = False
         self.activity_done = True
@@ -416,6 +425,10 @@ class MailActivity(models.Model):
         if self.state == 'done':
             self.date_done = fields.Date.today()
         self.feedback = feedback
+        messages, _next_activities = self.with_context(
+            clean_context(self.env.context)
+        )._action_done(feedback=feedback, attachment_ids=attachment_ids)
+        return messages[0].id if messages else False
         # return messages[0].id if messages else False
 
     def action_done_from_popup(self, feedback=False):
@@ -433,7 +446,6 @@ class MailActivity(models.Model):
 #         return messages.ids and messages.ids[0] or False
 
     def _action_done(self, feedback=False, attachment_ids=None):
-        self.ensure_one()
         """ Private implementation of marking activity as done: posting a message, deleting activity
             (since done), and eventually create the automatical next activity (depending on config).
             :param feedback: optional feedback from user when marking activity as done
@@ -445,7 +457,7 @@ class MailActivity(models.Model):
         # marking as 'done'
         messages = self.env['mail.message']
         next_activities_values = []
-        next_activities =None
+
         # Search for all attachments linked to the activities we are about to unlink. This way, we
         # can link them to the message posted and prevent their deletion.
         attachments = self.env['ir.attachment'].search_read([
@@ -458,57 +470,145 @@ class MailActivity(models.Model):
             activity_id = attachment['res_id']
             activity_attachments[activity_id].append(attachment['id'])
 
-        for activity in self:
-            # extract value to generate next activities
-            if activity.chaining_type == 'trigger':
-                Activity = self.env['mail.activity'].with_context(activity_previous_deadline=activity.date_deadline)  # context key is required in the onchange to set deadline
-                vals = Activity.default_get(Activity.fields_get())
+        for model, activity_data in self._classify_by_model().items():
+            # Allow user without access to the record to "mark as done" activities assigned to them. At the end of the
+            # method, the activity is unlinked or archived which ensure the user has enough right on the activities.
+            records_sudo = self.env[model].sudo().browse(activity_data['record_ids'])
+            for record_sudo, activity in zip(records_sudo, activity_data['activities']):
+                # extract value to generate next activities
+                if activity.chaining_type == 'trigger':
+                    vals = activity.with_context(activity_previous_deadline=activity.date_deadline)._prepare_next_activity_values()
+                    next_activities_values.append(vals)
 
-                vals.update({
-                    'previous_activity_type_id': activity.activity_type_id.id,
-                    'res_id': activity.res_id,
-                    'res_model': activity.res_model,
-                    'res_model_id': self.env['ir.model']._get(activity.res_model).id,
-                })
-                virtual_activity = Activity.new(vals)
-                virtual_activity._onchange_previous_activity_type_id()
-                virtual_activity._onchange_activity_type_id()
-                next_activities_values.append(virtual_activity._convert_to_write(virtual_activity._cache))
+                # post message on activity, before deleting it
+                activity_message = record_sudo.message_post_with_source(
+                    'mail.message_activity_done',
+                    attachment_ids=attachment_ids,
+                    author_id=self.env.user.partner_id.id,
+                    render_values={
+                        'activity': activity,
+                        'feedback': feedback,
+                        'display_assignee': activity.user_id != self.env.user
+                    },
+                    mail_activity_type_id=activity.activity_type_id.id,
+                    subtype_xmlid='mail.mt_activities',
+                )
+                if activity.activity_type_id.keep_done:
+                    attachment_ids = (attachment_ids or []) + activity_attachments.get(activity.id, [])
+                    if attachment_ids:
+                        activity.attachment_ids = attachment_ids
 
-            # post message on activity, before deleting it
-            record = self.env[activity.res_model].browse(activity.res_id)            
-            record.sudo().message_post_with_source(
-               'mail.message_activity_done',
-                attachment_ids=[],
-                render_values={
-                    'activity': activity,
-                    'feedback': self.feedback,
-                    'display_assignee': activity.user_id != self.env.user
-                },
-                mail_activity_type_id=activity.activity_type_id.id,
-                subtype_xmlid='mail.mt_activities',
-            )
-            # Moving the attachments in the message
-            # TODO: Fix void res_id on attachment when you create an activity with an image
-            # directly, see route /web_editor/attachment/add
-            activity_message = record.message_ids[0]
-            message_attachments = self.env['ir.attachment'].browse(activity_attachments[activity.id])
-            if message_attachments:
-                message_attachments.write({
-                    'res_id': activity_message.id,
-                    'res_model': activity_message._name,
-                })
-                activity_message.attachment_ids = message_attachments
-            messages |= activity_message
+                # Moving the attachments in the message
+                # TODO: Fix void res_id on attachment when you create an activity with an image
+                # directly, see route /web_editor/attachment/add
+                if activity_attachments[activity.id]:
+                    message_attachments = self.env['ir.attachment'].browse(activity_attachments[activity.id])
+                    if message_attachments:
+                        message_attachments.write({
+                            'res_id': activity_message.id,
+                            'res_model': activity_message._name,
+                        })
+                        activity_message.attachment_ids = message_attachments
+                messages += activity_message
+
+        next_activities = self.env['mail.activity']
         if next_activities_values:
             next_activities = self.env['mail.activity'].create(next_activities_values)
+
+        # activity_to_keep = self.filtered('activity_type_id.keep_done')
+        # activity_to_keep.action_archive()
+        # (self - activity_to_keep).unlink()  # will unlink activity, dont access `self` after that
+        
         self.active = False
         self.date_done = fields.Date.today()
         self.feedback = feedback
         self.state = "done"
         self.activity_done = True
         self._compute_state()
+
         return messages, next_activities
+
+    # def _action_done(self, feedback=False, attachment_ids=None):
+    #     self.ensure_one()
+    #     """ Private implementation of marking activity as done: posting a message, deleting activity
+    #         (since done), and eventually create the automatical next activity (depending on config).
+    #         :param feedback: optional feedback from user when marking activity as done
+    #         :param attachment_ids: list of ir.attachment ids to attach to the posted mail.message
+    #         :returns (messages, activities) where
+    #             - messages is a recordset of posted mail.message
+    #             - activities is a recordset of mail.activity of forced automically created activities
+    #     """
+    #     # marking as 'done'
+    #     print("\n\n\n\n\n\n447 feedback :::::::::::::::: ",feedback)
+    #     messages = self.env['mail.message']
+    #     next_activities_values = []
+    #     next_activities =None
+    #     # Search for all attachments linked to the activities we are about to unlink. This way, we
+    #     # can link them to the message posted and prevent their deletion.
+    #     attachments = self.env['ir.attachment'].search_read([
+    #         ('res_model', '=', self._name),
+    #         ('res_id', 'in', self.ids),
+    #     ], ['id', 'res_id'])
+
+    #     activity_attachments = defaultdict(list)
+    #     for attachment in attachments:
+    #         activity_id = attachment['res_id']
+    #         activity_attachments[activity_id].append(attachment['id'])
+
+    #     for activity in self:
+    #         # extract value to generate next activities
+    #         if activity.chaining_type == 'trigger':
+    #             Activity = self.env['mail.activity'].with_context(activity_previous_deadline=activity.date_deadline)  # context key is required in the onchange to set deadline
+    #             vals = Activity.default_get(Activity.fields_get())
+
+    #             vals.update({
+    #                 'previous_activity_type_id': activity.activity_type_id.id,
+    #                 'res_id': activity.res_id,
+    #                 'res_model': activity.res_model,
+    #                 'res_model_id': self.env['ir.model']._get(activity.res_model).id,
+    #             })
+    #             virtual_activity = Activity.new(vals)
+    #             virtual_activity._onchange_previous_activity_type_id()
+    #             virtual_activity._onchange_activity_type_id()
+    #             next_activities_values.append(virtual_activity._convert_to_write(virtual_activity._cache))
+
+    #         # post message on activity, before deleting it
+    #         record = self.env[activity.res_model].browse(activity.res_id)            
+    #         record.sudo().message_post_with_source(
+    #            'mail.message_activity_done',
+    #             attachment_ids=[],
+    #             render_values={
+    #                 'activity': activity,
+    #                 'feedback': self.feedback,
+    #                 'display_assignee': activity.user_id != self.env.user
+    #             },
+    #             mail_activity_type_id=activity.activity_type_id.id,
+    #             subtype_xmlid='mail.mt_activities',
+    #         )
+    #         # Moving the attachments in the message
+    #         # TODO: Fix void res_id on attachment when you create an activity with an image
+    #         # directly, see route /web_editor/attachment/add
+    #         activity_message = record.message_ids[0]
+    #         message_attachments = self.env['ir.attachment'].browse(activity_attachments[activity.id])
+    #         if message_attachments:
+    #             message_attachments.write({
+    #                 'res_id': activity_message.id,
+    #                 'res_model': activity_message._name,
+    #             })
+    #             activity_message.attachment_ids = message_attachments
+    #         messages |= activity_message
+    #     if next_activities_values:
+    #         next_activities = self.env['mail.activity'].create(next_activities_values)
+    #     # self.active = False
+    #     # print(f"\n\n\n==>> FROM _action_done() self.active: {self.active}")
+    #     # self.date_done = fields.Date.today()
+    #     # print(f"\n\n\n==>> self.date_done: {self.date_done}")
+    #     # self.feedback = feedback
+    #     # print(f"\n\n\n==>> self.feedback: {self.feedback}")
+    #     # self.state = "done"
+    #     # self.activity_done = True
+    #     # self._compute_state()
+    #     # return messages, next_activities
 
     def activity_format(self):
         self = self.filtered(lambda r: r.active == True)

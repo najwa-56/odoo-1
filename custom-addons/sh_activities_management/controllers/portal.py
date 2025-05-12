@@ -26,33 +26,6 @@ DummyAttendance = namedtuple(
     'DummyAttendance', 'hour_from, hour_to, dayofweek, day_period, week_type')
 
 
-class ActivityRequestChatterController(PortalChatter):
-
-    @http.route('/mail/chatter_post', type='http', methods=['POST'], auth='public', website=True)
-    def portal_chatter_post(self, res_model, res_id, message, **kw):
-        res = super(ActivityRequestChatterController, self).portal_chatter_post(
-            res_model, res_id, message, **kw)
-        if kw.get('doc_file'):
-            file_read = kw.get('doc_file')
-            result = base64.b64encode(file_read.read())
-            attachment_list = []
-            message_id = request.env['mail.message'].sudo().search(
-                [('res_id', '=', res_id)], limit=1)
-            attachment_list.append(request.env['ir.attachment'].sudo().create({
-                'name': file_read.filename,
-                'datas': result,
-                'type': 'binary',
-                'mimetype': file_read.mimetype,
-                'datas_fname': file_read.filename,
-                'store_fname': file_read.filename,
-                'res_model': res_model,
-                'res_id': res_id,
-            }).id)
-            message_id.sudo().write(
-                {'attachment_ids': [(6, 0, attachment_list)]})
-        return res
-
-
 class ShActivityPortal(CustomerPortal):
 
     def _prepare_home_portal_values(self,counters):       
@@ -73,7 +46,6 @@ class ShActivityPortal(CustomerPortal):
         else:
             values['activity_count'] = activity_count   
 
-        print("\n\n\n....values......",values)     
         return values
 
     @http.route(['/my/activities', '/my/activities/page/<int:page>'], type='http', auth="user", website=True)
@@ -202,7 +174,6 @@ class ShActivityPortal(CustomerPortal):
     @http.route('/done-activity', type='http', auth="public", methods=["POST"], website=True, csrf=False)
     def done_activity(self, **post):        
         dic = {}
-        print("\n\n\n......post....",post)
         if post.get('feedback'):
             activity_id = request.env['mail.activity'].sudo().search(
                 [('id', '=', int(post.get('id')))], limit=1)
@@ -317,7 +288,6 @@ class ShActivityPortal(CustomerPortal):
     def create_activity(self,**kw):        
         vals={}
         dic={}
-        print("\n\n\n.asdmwjdnfwjefdj",kw)
         if kw.get('due_date'):
             vals.update({
                 'date_deadline':  datetime.strptime(kw.get('due_date'), DEFAULT_SERVER_DATE_FORMAT).date(),
@@ -371,7 +341,6 @@ class ShActivityPortal(CustomerPortal):
         if vals:
             res_model = request.env['ir.model'].sudo().search([('id','=',int(kw.get('rel_doc_name')))])                
             target_records = request.env[res_model.model].browse(vals['res_id'])
-            print("\n\n\n...target_records....",target_records.sudo().message_follower_ids,int(kw.get('assigned_to')))
             user = request.env['res.users'].sudo().browse(int(kw.get('assigned_to')))
             if user.partner_id:
                 check_follow =True
@@ -380,7 +349,6 @@ class ShActivityPortal(CustomerPortal):
                         if follower.partner_id ==  user.partner_id:
                             check_follow = False
                 if check_follow:                                  
-                    print("\n\\nn.....exception....")
                     dic.update({
                         'create_error':'Assigned user '+ user.display_name +' has no access to the document and is not able to handle this activity.'                        
                     })

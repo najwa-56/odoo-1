@@ -4,3 +4,4 @@
 from . import sh_feedback
 from . import sh_mail_activity_popup
 from . import sh_mark_as_done_wizard
+from . import mail_activity_schedule
