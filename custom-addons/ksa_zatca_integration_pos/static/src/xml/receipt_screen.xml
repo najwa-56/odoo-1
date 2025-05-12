@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <templates id="template" xml:space="preserve">
 
-    <t t-name="ksa.ReceiptScreen" t-inherit="point_of_sale.ReceiptScreen" t-inherit-mode="extension">
+    <!-- <t t-name="ksa.ReceiptScreen" t-inherit="point_of_sale.ReceiptScreen" t-inherit-mode="extension">
         <xpath expr="//div[hasclass('notice')]" position="after">
             <div class="zatca_status_box mt-2">
                 <div class='notice zatca_status'
@@ -18,6 +18,6 @@
         <div>
             <h1>Rendering Receipt ...</h1>
         </div>
-    </t>
+    </t> -->
 
 </templates>

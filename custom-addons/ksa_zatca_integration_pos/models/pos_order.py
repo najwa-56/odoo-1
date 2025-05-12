@@ -66,6 +66,30 @@ class PosOrder(models.Model):
     account_move_state = fields.Selection(string='Status ', related='account_move.state')
     l10n_sa_invoice_type = fields.Selection(string="Invoice Type", related='account_move.l10n_sa_invoice_type')
 
+    is_invoice_b2c = fields.Boolean('is_invoice_b2c', copy=False)
+
+    is_invoice_b2b = fields.Boolean('is_invoice_b2b', copy=False)
+    is_no_invoice = fields.Boolean('is_no_invoice', copy=False)
+
+    
+
+
+    @api.model
+    def _order_fields(self, ui_order):
+        res = super(PosOrder, self)._order_fields(ui_order)
+        if ui_order.get("is_invoice_b2c"):
+            res.update({"is_invoice_b2c": ui_order["is_invoice_b2c"]})
+        
+        if ui_order.get("is_invoice_b2b"):
+            res.update({"is_invoice_b2b": ui_order["is_invoice_b2b"]})
+
+        
+        if ui_order.get("is_no_invoice"):
+            res.update({"is_no_invoice": ui_order["is_no_invoice"]})
+
+        return res
+    
+
     def send_for_reporting(self):
         self.account_move.send_for_reporting(no_xml_generate=1)
 
@@ -97,23 +121,19 @@ class PosOrder(models.Model):
         try:
             for order_id in order_ids:
                 self_id = self.browse(order_id['id'])
+                
                 if self_id.account_move.id:
                     if self_id.account_move:
                         for line in self_id.account_move.invoice_line_ids:
                             if '&' in line.name:
                                 line.name = line.name.replace('&', 'و')
                     
-                    if self_id.partner_id.id != 23 :
-                        self_id.account_move.write({
-                            'l10n_sa_invoice_type':'Standard'
-                        })
+                    
                     account_move = {}
                     for x in orders:
                         if x['data']['name'] == order_id['pos_reference']:
                             account_move = x['data']
-                    self_id.account_move.l10n_is_third_party_invoice = account_move.get('l10n_is_third_party_invoice', 0)
-                    self_id.account_move.l10n_is_summary_invoice = account_move.get('l10n_is_summary_invoice', 0)
-                    self_id.account_move.l10n_is_nominal_invoice = account_move.get('l10n_is_nominal_invoice', 0)
+                    
                     self_id.account_move.credit_debit_reason = account_move.get('credit_debit_reason', None)
                     if len(self_id.refunded_order_ids.account_move.ids) > 1:
                         raise ValidationError("only 1 invoice can be returned at a time.")
@@ -156,13 +176,6 @@ class PosOrder(models.Model):
         qr_code_str = base64.b64encode(str_to_encode).decode('UTF-8')
         return qr_code_str
 
-#     limit_memory_hard = 26843545600
-# limit_memory_soft = 21474836480
-# limit_request = 8192
-# limit_time_cpu = 3000
-# limit_time_real = 6000
-# workers = 9
-# max_cron_threads = 2
 
     def create_pos_order_invoice(self):
         today = date.today()
@@ -232,94 +245,5 @@ class PosOrder(models.Model):
 
     
         
-    
-    @api.model
-    def create_pos_order_invoice_batch(self, batch_size=1):
-        """Create invoices for POS orders in batches, ensuring failed orders don't affect others."""
-
-        # start_date = datetime(2024, 9, 1)  # 1st Jan 2025
-        # end_date = datetime(2024, 12, 31)   # 25th March 2025
-
-        start_date = datetime(2024, 12, 31)  # 1st Jan 2025
-        end_date = datetime(2025, 1, 1)
-
-        orders = self.sudo().search([
-            ('state', 'in', ['paid','done']),
-            ('date_order', '>=', start_date),
-            ('account_move', '=', False),
-            ('date_order', '<=', end_date)
-        ], limit=batch_size)
-
-        if not orders:
-            return  # No more records to process
-
-        for rec in orders:
-            try:
-                if not rec.partner_id:
-                    rec.write({'partner_id': 23})
-
-                if rec.picking_ids:
-                    rec.with_user(rec.user_id)._generate_pos_order_invoice()
-                else:
-                    rec.with_user(rec.user_id).action_pos_order_invoice()
-
-                for move in rec.account_move:  # ✅ Loop through all invoices
-                    move.write({
-                        'invoice_date': rec.date_order,
-                        'delivery_date': rec.date_order,
-                    })
-                    
-                    rec.account_move.create_xml_file(pos_refunded_order_id=rec.refunded_order_ids.account_move.id)
-                    msg = _('Invoice Created by %s:' % rec.user_id.name)
-                    move.message_post(body=msg)
-
-                    if rec.partner_id.id != 23:
-                        move.write({'l10n_sa_invoice_type': 'Standard'})
-
-                self.env.cr.commit()  # ✅ Commit after each successful order
-
-            except Exception as e:
-                self.env.cr.commit()  # ❌ Rollback only the failed order
-                _logger.error(f"❌ Failed to create invoice for {rec.name}: {str(e)}")
-
-            self.env.cr.commit()
-        # Check if there are more records left and re-trigger the cron
-        remaining_count = self.sudo().search_count([ ('state', 'in', ['paid','done']),
-            ('date_order', '>=', start_date),
-            ('date_order', '<=', end_date)])
-        if remaining_count > 0:
-            self.env.ref('ksa_zatca_integration_pos.ir_cron_pos_order_with_job_count')._trigger()
-
-
-
-   
-    
-
-    
-
-    @api.model
-    def update_date_invoice_order(self):
-        start_date = datetime(2025, 1, 1).date()  # Convert to date
-        end_date = datetime(2025, 3, 25).date()  # Convert to date
-
-          # ✅ Add specific POS order IDs for testing
-
-        query = """
-    UPDATE account_move
-    SET invoice_date = po.date_order::DATE,
-        delivery_date = po.date_order::DATE
-    FROM pos_order po
-    WHERE po.state = 'invoiced'
-        AND po.date_order BETWEEN %s AND %s
-        AND po.account_move IS NOT NULL
-        AND account_move.id = po.account_move
-        AND account_move.move_type = 'out_invoice'
-        AND account_move.invoice_date IS DISTINCT FROM po.date_order::DATE;
-"""
-
-
-        self.env.cr.execute(query, (start_date, end_date))
-        self.env.cr.commit()  # ✅ Commit changes
-
     
     

@@ -9,18 +9,9 @@ patch(InvoiceButton.prototype, {
         super.setup(...arguments);
         this.orm = useService("orm");
     },
-    async get_report(name) {
-        let response = await this.orm.call('pos.order', 'get_simplified_zatca_report', [[], name]);
-        if (response)
-            response = $($(response)).find('.pos-receipt').parent().html();
-        return response;
-    },
+    
 
-    // async tryReprint() {
-    //     let report = await this.get_report(this.props.order.name)
-    //     this.printer.printHtml($(report)[0], { webPrintFallback: true });
-    // },
-
+  
     async _downloadInvoice(orderId) {
         try {
             const [orderWithInvoice] = await this.orm.read(
@@ -29,18 +20,14 @@ patch(InvoiceButton.prototype, {
                 ["account_move"],
                 { load: false }
             );
+           
             if (orderWithInvoice?.account_move) {
                 if (orderWithInvoice.is_invoice_b2c) {
                     // Call B2C simplified tax invoice report
                     await this.report.doAction("othaim_zatca_integration.action_report_simplified_tax_invoice", [
                         orderWithInvoice.account_move,
                     ]);
-                } else if (orderWithInvoice.is_invoice) {
-                    // Call the standard tax invoice report
-                    await this.report.doAction("othaim_zatca_integration.action_report_tax_invoice", [
-                        orderWithInvoice.account_move,
-                    ]);
-                }
+                } 
                 else{
                     await this.report.doAction("othaim_zatca_integration.action_report_tax_invoice", [
                         orderWithInvoice.account_move,

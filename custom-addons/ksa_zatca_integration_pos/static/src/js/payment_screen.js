@@ -10,97 +10,130 @@ import { OrderReceipt } from "@point_of_sale/app/screens/receipt_screen/receipt/
 
 
 patch(PaymentScreen.prototype, {
-    // setup() {
-    //     super.setup(...arguments);
-    //     if (!this.currentOrder.is_to_invoice())
-    //         this.toggleIsToInvoice();
-    // },
-    
-    // async _isOrderValid(isForceValidate) {
-    //     const res = await super._isOrderValid(...arguments);
-    //     if (res)
-    //         if (this.currentOrder.get_total_with_tax() == 0 && _.contains([undefined, false, NaN, ''], this.currentOrder.credit_debit_reason)) {
-    //             this.popup.add(ErrorPopup, {
-    //                 title: _t("Zatca Validation Error"),
-    //                 body: _t(
-    //                     "Reason is compulsory for returns for zatca."
-    //                 ),
-    //             });
-    //             return false;
-    //         }
-    //         else if (!this.currentOrder.is_to_invoice()){
-    //             this.popup.add(ErrorPopup, {
-    //                 title: _t("Zatca Validation Error"),
-    //                 body: _t(
-    //                     "Invoice is compulsory for zatca."
-    //                 ),
-    //             });
-    //             return false;
-    //         }
-    //     return res
-    // },
+   
     shouldDownloadInvoice() {
-        if (this.currentOrder.is_invoice || this.currentOrder.is_invoice_b2c) {
+        if (this.currentOrder.is_invoice_b2b || this.currentOrder.is_invoice_b2c) {
             return true
         }
         
         return false
     },
-    toggleIsThirdParty() {
-        this.currentOrder.l10n_is_third_party_invoice = this.currentOrder.l10n_is_third_party_invoice ? 0 : 1;
-    },
-    toggleIsNominal() {
-        this.currentOrder.l10n_is_nominal_invoice = this.currentOrder.l10n_is_nominal_invoice ? 0 : 1;
-    },
-    toggleIsSummary() {
-        this.currentOrder.l10n_is_summary_invoice = this.currentOrder.l10n_is_summary_invoice ? 0 : 1;
-    },
+   
+
+  
+    
     Refund_Reason() {
         // this.currentOrder.credit_debit_reason = arguments[0].currentTarget.value;
         this.currentOrder.credit_debit_reason = 'مرتجع العميل';
     },
-    toggleIsInvoice() {
+    
+
+    toggleIsInvoiceB2b() {
+        this.currentOrder.set_to_invoice_b2b(true);
+        this.currentOrder.set_to_invoice_b2c(false);
+
+        this.currentOrder.set_no_invoice(false);
+        this.currentOrder.set_to_invoice(true);
        
-        // Only toggle is_invoice and make sure is_invoice_b2c is untoggled if is_invoice is turned on
-        if (!this.currentOrder.is_invoice) {
-            
-            this.currentOrder.is_invoice = 1;
-            this.currentOrder.is_invoice_b2c = 0;  // Ensure B2C is untoggled
-        } else {
-            this.currentOrder.is_invoice = 0;  // Toggle off the is_invoice
-        }
-        if (this.currentOrder.is_invoice) {
-            if (!this.currentOrder.is_to_invoice()){
-                this.toggleIsToInvoice();
-        }
-        }
     },
     
     toggleIsInvoiceB2c() {
+        this.currentOrder.set_to_invoice_b2c(true);
+        this.currentOrder.set_to_invoice_b2b(false);
+
+        this.currentOrder.set_no_invoice(false);
+        this.currentOrder.set_to_invoice(true);
         
+    },
 
-        // Only toggle is_invoice_b2c and make sure is_invoice is untoggled if is_invoice_b2c is turned on
-        if (!this.currentOrder.is_invoice_b2c) {
-            this.currentOrder.is_invoice_b2c = 1;
-            this.currentOrder.is_invoice = 0;  // Ensure the regular invoice is untoggled
-        } else {
-            this.currentOrder.is_invoice_b2c = 0;  // Toggle off the is_invoice_b2c
-        }
+    toggleNoInvoice() {
+        this.currentOrder.set_no_invoice(true);
 
-        if (this.currentOrder.is_invoice_b2c) {
-            if (!this.currentOrder.is_to_invoice()){
-                this.toggleIsToInvoice();
-        }
-        }
+        this.currentOrder.set_to_invoice_b2b(false);
+        this.currentOrder.set_to_invoice_b2c(false);
+        this.currentOrder.set_to_invoice(false);
     },
     
+
     
-    async get_report(name) {
-        let response = await this.orm.call('pos.order', 'get_simplified_zatca_report', [[], name]);
-        if (response)
-            response = $($(response)).find('.pos-receipt').parent().html()
-        return response
+    
+    
+  
+
+ 
+
+
+   
+    async _finalizeValidation() {
+        if (this.currentOrder.is_paid_with_cash() || this.currentOrder.get_change()) {
+            this.hardwareProxy.openCashbox();
+        }
+        this.currentOrder.date_order = luxon.DateTime.now();
+        for (const line of this.paymentLines) {
+            if (!line.amount === 0) {
+                this.currentOrder.remove_paymentline(line);
+            }
+        }
+        this.currentOrder.finalized = true;
+
+        this.env.services.ui.block();
+        let syncOrderResult;
+        try {
+            // 1. Save order to server.
+            syncOrderResult = await this.pos.push_single_order(this.currentOrder);
+            if (!syncOrderResult) {
+                return;
+            }
+            // 2. Invoice.
+            if (this.shouldDownloadInvoice() && this.currentOrder.is_to_invoice()) {
+                if (syncOrderResult[0]?.account_move) {
+
+                    if (this.currentOrder.is_invoice_b2c) {
+                        // Call B2C simplified tax invoice report
+                        await this.report.doAction("othaim_zatca_integration.action_report_simplified_tax_invoice", [
+                            syncOrderResult[0].account_move,
+                        ]);
+                    } else if (this.currentOrder.is_invoice_b2b) {
+                        // Call the standard tax invoice report
+                        await this.report.doAction("othaim_zatca_integration.action_report_tax_invoice", [
+                            syncOrderResult[0].account_move,
+                        ]);
+                    }
+
+                   
+                } else {
+                    throw {
+                        code: 401,
+                        message: "Backend Invoice",
+                        data: { order: this.currentOrder },
+                    };
+                }
+            }
+        } catch (error) {
+            if (error instanceof ConnectionLostError) {
+                this.pos.showScreen(this.nextScreen);
+                Promise.reject(error);
+                return error;
+            } else {
+                throw error;
+            }
+        } finally {
+            this.env.services.ui.unblock();
+        }
+
+        // 3. Post process.
+        if (
+            syncOrderResult &&
+            syncOrderResult.length > 0 &&
+            this.currentOrder.wait_for_push_order()
+        ) {
+            await this.postPushOrderResolve(syncOrderResult.map((res) => res.id));
+        }
+
+        await this.afterOrderValidation(!!syncOrderResult && syncOrderResult.length > 0);
     },
+
+
 
     async afterOrderValidation(suggestToSync = true) {
         // Remove the order from the local storage so that when we refresh the page, the order
@@ -124,10 +157,13 @@ patch(PaymentScreen.prototype, {
         // continue working even offline.
         let nextScreen = this.nextScreen;
 
+        const is_b2b_or_b2c = this.currentOrder.is_to_b2b_invoice?.() || this.currentOrder.is_to_b2c_invoice?.();
+        print("is_b2b_or_b2c=====================",is_b2b_or_b2c)
         if (
             nextScreen === "ReceiptScreen" &&
             !this.currentOrder._printed &&
-            this.pos.config.iface_print_auto
+            this.pos.config.iface_print_auto &&
+            !is_b2b_or_b2c
         ) {
             const invoiced_finalized = this.currentOrder.is_to_invoice()
                 ? this.currentOrder.finalized
@@ -152,119 +188,8 @@ patch(PaymentScreen.prototype, {
         }
 
         this.pos.showScreen(nextScreen);
-    },
-
-
-    // async afterOrderValidation(suggestToSync = true) {
-    //     // Remove the order from the local storage so that when we refresh the page, the order
-    //     // won't be there
-    //     this.pos.db.remove_unpaid_order(this.currentOrder);
-
-    //     // Ask the user to sync the remaining unsynced orders.
-    //     if (suggestToSync && this.pos.db.get_orders().length) {
-    //         const { confirmed } = await this.popup.add(ConfirmPopup, {
-    //             title: _t("Remaining unsynced orders"),
-    //             body: _t("There are unsynced orders. Do you want to sync these orders?"),
-    //         });
-    //         if (confirmed) {
-    //             // NOTE: Not yet sure if this should be awaited or not.
-    //             // If awaited, some operations like changing screen
-    //             // might not work.
-    //             this.pos.push_orders();
-    //         }
-    //     }
-    //     // Always show the next screen regardless of error since pos has to
-    //     // continue working even offline.
-    //     let nextScreen = this.nextScreen;
-
-    //     if (
-    //         nextScreen === "ReceiptScreen" &&
-    //         !this.currentOrder._printed &&
-    //         this.pos.config.iface_print_auto
-    //     ) {
-    //         const invoiced_finalized = this.currentOrder.is_to_invoice()
-    //             ? this.currentOrder.finalized
-    //             : true;
-
-    //         if (this.hardwareProxy.printer && invoiced_finalized) {
-    //             let report = await this.get_report(this.props.order.name)
-    //             const printResult = await this.printer.printHtml($(report)[0], { webPrintFallback: true });
-    //             if (printResult && this.pos.config.iface_print_skip_screen) {
-    //                 this.pos.removeOrder(this.currentOrder);
-    //                 this.pos.add_new_order();
-    //                 nextScreen = "ProductScreen";
-    //             }
-    //         }
-    //     }
-
-    //     this.pos.showScreen(nextScreen);
-    // },
-    async _finalizeValidation() {
-        if (this.currentOrder.is_paid_with_cash() || this.currentOrder.get_change()) {
-            this.hardwareProxy.openCashbox();
-        }
-
-        this.currentOrder.date_order = luxon.DateTime.now();
-        for (const line of this.paymentLines) {
-            if (!line.amount === 0) {
-                this.currentOrder.remove_paymentline(line);
-            }
-        }
-        this.currentOrder.finalized = true;
-
-        // 1. Save order to server.
-        this.env.services.ui.block();
-        const syncOrderResult = await this.pos.push_single_order(this.currentOrder);
-        this.env.services.ui.unblock();
-
-        if (syncOrderResult instanceof ConnectionLostError) {
-            this.pos.showScreen(this.nextScreen);
-            return;
-        } else if (!syncOrderResult) {
-            return;
-        }
-
-        try {
-            // 2. Invoice.
-            if (this.shouldDownloadInvoice() && this.currentOrder.is_to_invoice()) {
-                if (syncOrderResult[0]?.account_move) {
-                    if (this.currentOrder.is_invoice_b2c) {
-                        // Call B2C simplified tax invoice report
-                        await this.report.doAction("othaim_zatca_integration.action_report_simplified_tax_invoice", [
-                            syncOrderResult[0].account_move,
-                        ]);
-                    } else if (this.currentOrder.is_invoice) {
-                        // Call the standard tax invoice report
-                        await this.report.doAction("othaim_zatca_integration.action_report_tax_invoice", [
-                            syncOrderResult[0].account_move,
-                        ]);
-                    }
-                } else {
-                    throw {
-                        code: 401,
-                        message: "Backend Invoice",
-                        data: { order: this.currentOrder },
-                    };
-                }
-            }
-        } catch (error) {
-            if (error instanceof ConnectionLostError) {
-                Promise.reject(error);
-                return error;
-            } else {
-                throw error;
-            }
-        }
-
-        // 3. Post process.
-        if (
-            syncOrderResult &&
-            syncOrderResult.length > 0 &&
-            this.currentOrder.wait_for_push_order()
-        ) {
-            await this.postPushOrderResolve(syncOrderResult.map((res) => res.id));
-        }
-
-        await this.afterOrderValidation(!!syncOrderResult && syncOrderResult.length > 0);
     }
+
+
+  
 });
