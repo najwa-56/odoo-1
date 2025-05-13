@@ -10,11 +10,14 @@
                 <tree string="الزيارات">
                     <field name="reference"/>
                     <field name="created_by"/>
-                    <field name="creation_date"/>
+                    <field name="creation_date" invisible="1"/>
+                    <field name="start_time"/>
+                    <field name="end_time"/>
                     <field name="partner_id"/>
                 </tree>
             </field>
         </record>
+
 
         <!-- Form View for Daily Visits -->
         <record id="view_daily_visit_form" model="ir.ui.view">
@@ -38,30 +41,52 @@
                             </group>
                         </group>
                         <notebook>
-                            <page string="تفاصيل">
-
-                                <group invisible="is_it_sold">
-                                    <label for="reason_ifNotSold" string="في حال الاجابه لا اذكر السبب مع ارفاق صوره"
-                                           style="text-align: right;"/>
+                            <page string="تفاصيل" style="text-align: right;">
+                                <group invisible="is_it_sold" col="5">
+                                    <label for="reason_ifNotSold" string="في حال الاجابة لا، اذكر السبب مع إرفاق صورة"
+                                           class="text-muted"/>
+                                    <separator string="" colspan="4"/>
                                     <group col="2">
-                                        <field name="reason_ifNotSold" placeholder="اذكر السبب..." nolabel="1"
-                                               style="text-align: right;"/>
-                                        <field name="attachment_ifNotSold" widget="image" class="oe_avatar"/>
+                                        <field name="attachment_ifNotSold"
+                                               string="ارفق الصورة"
+                                               widget="binary"
+                                               class="oe_inline"
+                                        />
+
+                                        <field name="reason_ifNotSold"
+                                               string="السبب"
+                                               placeholder="اذكر السبب..."
+                                               widget="text"
+                                               style="height: 120px; width: 300px;"/>
                                     </group>
                                 </group>
 
                                 <group invisible="not is_it_sold">
-                                    <label for="order_id" string="في حال الاجابه نعم" style="text-align: right;"/>
+                                    <label for="order_id" string="في حال الإجابة نعم" class="text-muted"/>
+                                    <separator string="" colspan="4"/>
+
                                     <group col="2">
+
                                         <field name="today_date" invisible="1"/>
-                                        <field name="order_id" options="{'no_create': True}"
-                                               domain="[('user_id', '=', uid), ('date_order', '>=', today_date)]"
-                                               style="text-align: right;"/>
-                                        <field name="attachment_before" widget="image" class="oe_avatar"/>
-                                        <field name="attachment_after" widget="image" class="oe_avatar"/>
+                                        <group>
+                                            <field name="attachment_before" widget="binary" class="oe_inline"/>
+                                        </group>
+                                        <separator string="" colspan="4"/>
+                                        <group>
+                                        <button name="action_open_sale_order"
+                                                string="بيع"
+                                                class="btn-primary"
+                                                type="object"
+                                                context="{'search_default_quotation': 1, 'default_type': 'quotation', 'default_partner_id': partner_id}"
+                                                groups="salesman_manager.group_salesman"/>
+                                         </group>
+                                        <field name="order_id" widget="many2many_tags" groups="salesman_manager.group_salesman_supervisor"/>
+                                        <group>
+                                            <field name="attachment_after" widget="binary" class="oe_inline"/>
+                                        </group>
                                     </group>
                                 </group>
-
+                            
                             </page>
                         </notebook>
                     </sheet>

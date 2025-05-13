@@ -55,6 +55,7 @@ class SaleOrderLine(models.Model):
     # -----------------------------------------------------
     # multiplcation consumption * price
     # -----------------------------------------------------
+
     multiplied_field = fields.Float('Multiplied Field',compute="_compute_total_consumption_value", readonly=True, store=True)
     order_history_line = fields.One2many( 'sale.order.history', 'name', string='Order History Lines')
 

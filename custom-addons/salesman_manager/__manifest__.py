@@ -9,7 +9,7 @@
     'category': 'Sales',
     'author': 'Lovable',
     'website': 'https://lovable.dev',
-    'depends': ['hr', 'ks_dashboard_ninja','customer_route_management', 'sale'],
+    'depends': ['hr', 'ks_dashboard_ninja','customer_route_management', 'sale' ,'contacts', 'web_googlemap'],
     'data': [
         'security/salesman_manager_security.xml',
         'security/ir.model.access.csv',
@@ -22,6 +22,7 @@
         'views/daily_visit_views.xml',
         'views/route_line.xml',
         'views/sale_order_line.xml',
+
 
     ],
     'installable': True,

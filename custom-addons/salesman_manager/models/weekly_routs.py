@@ -31,7 +31,7 @@ class WeeklyRouts(models.Model):
     today_route_lines = fields.One2many('weekly.routs.line',compute='_compute_today_route_lines',string="Today's Routes",store=False,)
     @api.depends('route_lines.day','route_lines')
     def _compute_today_route_lines(self):
-        today = fields.Date.today()
+        today = fields.Date.context_today(self)
         for rec in self:
             rec.today_route_lines = rec.route_lines.filtered(lambda line: line.day == today)
 
