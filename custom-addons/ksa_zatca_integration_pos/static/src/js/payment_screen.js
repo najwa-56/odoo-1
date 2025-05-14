@@ -158,7 +158,7 @@ patch(PaymentScreen.prototype, {
         let nextScreen = this.nextScreen;
 
         const is_b2b_or_b2c = this.currentOrder.is_to_b2b_invoice?.() || this.currentOrder.is_to_b2c_invoice?.();
-        print("is_b2b_or_b2c=====================",is_b2b_or_b2c)
+        console.log("is_b2b_or_b2c=====================",is_b2b_or_b2c , this.pos.config.iface_print_skip_screen ,this.pos.config.iface_print_auto )
         if (
             nextScreen === "ReceiptScreen" &&
             !this.currentOrder._printed &&
