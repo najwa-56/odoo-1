@@ -1,32 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <odoo>
     <data>
-
-
-        <record id="new_act_res_partner_2_sale_order" model="ir.actions.act_window">
-            <field name="name">مبيعات اليوم</field>
-            <field name="type">ir.actions.act_window</field>
-            <field name="res_model">sale.order</field>
-            <field name="view_mode">tree,form</field>
-            <field name="domain">[('date_order', '&gt;=', (context_today().strftime('%Y-%m-%d') + ' 00:00:00')),
-                ('date_order', '&lt;=', (context_today().strftime('%Y-%m-%d') + ' 23:59:59'))
-                ]
-            </field>
-        </record>
-
         <record id="delivery_route_lines_form_inherited" model="ir.ui.view">
             <field name="name">Route Inherited</field>
             <field name="model">route.line</field>
             <field name="inherit_id" ref="customer_route_management.route_lines_view_form"/>
             <field name="arch" type="xml">
-                <field name="company_id" position="after">
-                <field name="active_weekly_ref"/>
-            </field>
+                <data>
                     <xpath expr="//field[@name='cust_tree_ids']" position="replace">
-                      
-                        <field name="cust_tree_ids" context="{'active_weekly_ref': active_weekly_ref}" invisible="delivery_route_link_id == False">
-                            <tree delete="false" create="True"
-                                  default_order="id desc">
+                        <field name="cust_tree_ids" invisible="delivery_route_link_id == False">
+                            <tree delete="false" create="True" default_order="id desc">
+
                                 <field name="sequence" widget="handle"/>
                                 <field name="name"/>
                                 <button name="action_open_daily_visit"
@@ -35,26 +19,20 @@
                                         style="background-color: red; border-radius: 50%; padding: 10px;"
                                         type="object"
                                         groups="salesman_manager.group_salesman"/>
-
-                             
                                 <field name="status"
                                        decoration-success="status == 'sale'"
                                        decoration-danger="status == 'visit'"
                                        decoration-warning="status == 'not_yet'"
                                        widget="badge"
                                 />
-                              
-                                <field name="specific_visit_id"/>
+                                <field name="specific_visit_id" />
                                 <button name="action_open_specific_visit"
                                         type="object"
                                         string="Open Visit"
                                         icon="fa-external-link"
-                                        attrs="{'invisible': [('specific_visit_id', '=', False)]}"/>
-
-
+                                        attrs="{'invisible': [('specific_visit_id', '=', False)]}" groups="salesman_manager.group_salesman_supervisor"/>
                             </tree>
                         </field>
-
                     </xpath>
 
                     <xpath expr="//form" position="inside">
@@ -66,6 +44,7 @@
                             </div>
                         </group>
                     </xpath>
+                </data>
             </field>
         </record>
 

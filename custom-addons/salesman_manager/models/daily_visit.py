@@ -7,21 +7,29 @@ class DailyVisit( models.Model ):
     _order = 'creation_date desc'
     _rec_name = 'reference'
 
-    reference = fields.Char( string='الرقم المرجعي', copy=False, required=True, default='New', readonly=True )
+    reference = fields.Char( string='reference number', copy=False, required=True, default='New', readonly=True )
     created_by = fields.Many2one( 'res.users', string='Created By', default=lambda self: self.env.user, readonly=True )
     creation_date = fields.Datetime( string='Creation Date', default=fields.Datetime.now, readonly=True )
-    partner_id = fields.Many2one( 'res.partner', string='العميل' )
-    is_it_sold = fields.Boolean( string='هل تم البيع' )
-    reason_ifNotSold = fields.Char( string='السبب' )
-    attachment_ifNotSold = fields.Binary( string='صورة' )
-    order_id = fields.Many2many( comodel_name='sale.order', string="رقم الطلب", ondelete='cascade', index=True,
+    partner_id = fields.Many2one( 'res.partner', string='customer' )
+    is_it_sold = fields.Boolean( string='is it sold' )
+    reason_ifNotSold = fields.Char( string='reason' )
+    attachment_ifNotSold = fields.Binary( string='picture' )
+    order_id = fields.Many2many( comodel_name='sale.order', string="order number", ondelete='cascade', index=True,
                                  copy=False )
-    attachment_before = fields.Binary( string='صورة قبل' )
-    attachment_after = fields.Binary( string='صورة بعد' )
+    attachment_before = fields.Binary( string='picture befor' )
+    attachment_after = fields.Binary( string='picture after' )
     start_time = fields.Datetime( string='Start Time', readonly=True )
     end_time = fields.Datetime( string='End Time', readonly=True )
 
-    # for display today orders
+    #used to link weekly.routs reference to daily.visit
+    weekly_route_id = fields.Many2one('weekly.routs',string='Weekly Route',domain="[('user_id', '=', uid)]")
+    ref = fields.Char(string="reference number WK", copy=False, required=True,default="New", readonly=True)
+
+
+
+    #----------------------------------------------------------
+    #for display today orders
+    #----------------------------------------------------------
     @api.model
     def _get_today (self):
         return date.today()
@@ -30,9 +38,9 @@ class DailyVisit( models.Model ):
 
 
 
-    #----------------------------------
+    #----------------------------------------------------------
     #calculate total_consumption_amount for all SO per customer
-    #----------------------------------
+    #----------------------------------------------------------
     total_consumption_amount = fields.Float(
         string='المبلغ المستحق',
         compute='_compute_total_consumption_amount',
@@ -57,10 +65,11 @@ class DailyVisit( models.Model ):
 
 
 
-
-    #capture the starting time when the form is initialized and the ending time when the form is saved.
-    #and also creatce refrence number
-    #and link visit to partner
+    #----------------------------------------------------------
+    # capture the starting time when the form is initialized and the ending time when the form is saved.
+    # and also creatce refrence number
+    # and link visit to partner
+    #----------------------------------------------------------
     @api.model_create_multi
     def create (self, vals_list):
         for vals in vals_list:
@@ -85,9 +94,11 @@ class DailyVisit( models.Model ):
 
         return visits
 
+    #----------------------------------------------------------
     #The custom write method ensures that whenever a DailyVisit record is updated,
     # the status of the associated res.partner (partner) is also updated
     # based on the is_it_sold field of the visit.
+    #----------------------------------------------------------
     def write (self, vals):
         res = super().write( vals )
         for visit in self:
@@ -95,14 +106,6 @@ class DailyVisit( models.Model ):
                 visit.partner_id._update_status_from_visit( visit.is_it_sold )
         return res
 
-
-    #test
-    weekly_route_id = fields.Many2one(
-        'weekly.routs',
-        string='Weekly Route',
-        domain="[('user_id', '=', uid)]"
-    )
-    ref = fields.Char(string="الرقم المرجعي", copy=False, required=True,default="New", readonly=True)
 
 
 

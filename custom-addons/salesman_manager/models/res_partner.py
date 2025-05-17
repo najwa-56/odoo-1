@@ -7,28 +7,34 @@ from odoo.exceptions import UserError
 
 class ResPartner(models.Model):
     _inherit = 'res.partner'
-  
+    #_order = 'sequence'
 
-    daily_visit_ids = fields.One2many(
-        'daily.visit',
-        'partner_id',
-        string='Daily Visits'
-    )
-    specific_visit_id = fields.Many2one(
-        'daily.visit',
-        string='Specific Visit',
-        compute='_compute_specific_visit',
-        store=False,
-    )
+    #adding map from google_maps_partner to rout line
+    #def open_map(self):
+    #    super(ResPartner, self).open_map()
 
+
+    visit = fields.Many2many(comodel_name='daily.visit', string="Visits", ondelete='cascade', index=True, copy=False)
+    daily_visit_ids = fields.One2many('daily.visit','partner_id',string='Daily Visits')
+    specific_visit_id = fields.Many2one('daily.visit',string='Specific Visit',compute='_compute_specific_visit',)
+    status = fields.Selection( [
+        ('not_yet', 'not yet '),
+        ('visit', 'visit'),
+        ('sale', 'sale'),
+    ], string="Status", default='not_yet' )
+
+    #---------------------------------------------------------------------------------------------------------
+    #once you created a new visit it is should be saved in field specific_visit_id for a spicific weekly route
+    #---------------------------------------------------------------------------------------------------------
     @api.depends('daily_visit_ids')
     def _compute_specific_visit(self):
         for rec in self:
             ref = None
-            print("context=================",self.env.context)
-            params = self.env.context.get('params')
-            if params and params.get('model') == 'weekly.routs' and params.get('id'):
-                weekly_route = self.env['weekly.routs'].browse(params['id'])
+            print("context========================",self.env.context)
+            active_weekly_ref = self.env.context.get('active_weekly_ref') 
+            if active_weekly_ref:
+                weekly_route = self.env['weekly.routs'].browse(active_weekly_ref)
+                print("weekly_route=====================",weekly_route)
                 ref = weekly_route.reference
 
             if ref:
@@ -50,14 +56,10 @@ class ResPartner(models.Model):
             'target': 'current',
         }
 
+    #---------------------------------------------------------------------------------------------
     #This code is used to set the status of a partner to either "visit" or "sale"
     # based on whether a related daily.visit record has the is_it_sold field set to True or False
-    status = fields.Selection( [
-        ('not_yet', 'لاشيء'),
-        ('visit', 'تمت الزيارة'),
-        ('sale', 'تم البيع'),
-    ], string="Status", default='not_yet' )
-
+    #---------------------------------------------------------------------------------------------
     def _update_status_from_visit (self, is_it_sold):
         for partner in self:
             if is_it_sold is True:
@@ -68,13 +70,10 @@ class ResPartner(models.Model):
                 partner.status = 'not_yet'
 
 
-    #test
-    weekly_route_id = fields.Many2one(
-        'weekly.routs',
-        string='Weekly Route',
-        domain="[('user_id', '=', uid)]"
-    )
-
+    #---------------------------------------------------------------------------------------------
+    # once you click on button action_open_daily_visit it should be open Daily Visit form and linke
+    #it with the last weekly rout
+    #---------------------------------------------------------------------------------------------
     def action_open_daily_visit (self):
         self.ensure_one()
 
@@ -97,7 +96,12 @@ class ResPartner(models.Model):
             },
         }
 
+
+    #--------------------------------------------------------------------------------------------------------------
+    #to shows list of unpaid invoices
     #we inhirit action_view_partner_invoices function and we add a new domain which is 'payment_state', '!=', 'paid'
+    #---------------------------------------------------------------------------------------------------------------
+
     def action_view_partner_invoices_custom(self):
         self.ensure_one()
         action = super(ResPartner, self).action_view_partner_invoices()

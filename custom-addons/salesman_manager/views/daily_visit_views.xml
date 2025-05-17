@@ -50,8 +50,8 @@
                                 <field name="partner_id" options="{'no_create': True}"/>
                                 <field name="total_consumption_amount"/>
                                 <field name="is_it_sold"/>
-                                <field name="weekly_route_id"/> <!-- test  -->
-                                <field name="ref"/> <!-- test  -->
+                                <field name="weekly_route_id" invisible="1"/>
+                                <field name="ref"/>
 
                             </group>
                         </group>

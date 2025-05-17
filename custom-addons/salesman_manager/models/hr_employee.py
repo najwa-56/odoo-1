@@ -4,12 +4,14 @@ from odoo import models, fields, api
 class HrEmployee(models.Model):
     _inherit = 'hr.employee'
 
-    salesman_supervisor = fields.Many2one('res.partner', string="المراقبة")
+    salesman_supervisor = fields.Many2one('res.partner', string="supervisor")
 
+    #----------------------------------------------------------
+    #Open the dashboard related to this salesman
+    #----------------------------------------------------------
     def action_open_dashboard(self):
-        """Open the dashboard related to this salesman"""
-        self.ensure_one()
 
+        self.ensure_one()
         # First try to find dashboard by employee's user_partner_id
         dashboard = self.env['ks_dashboard_ninja.board'].search([('salesman', '=', self.user_partner_id.id)], limit=1)
 

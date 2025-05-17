@@ -40,13 +40,11 @@
                             <page string="المسارات">
                                 <field name="route_lines" > <!--One record is linked to many records in another model -->
                                     <tree editable="bottom">
-                                        <field name="ref"/>
+                                        <field name="ref" invisible="1"/>
                                         <field name="day"/>
                                         <field name="day_name"/>
-                                        <field name="route_line_ids" context="{'active_weekly_ref': ref,'default_active_weekly_ref': ref}" domain="[('delivery_route_link_id', '=', delivery_route_id)]" widget="many2many_tags"/>
-                                        
-                                        <field name="delivery_route_id" context="{'active_weekly_ref': ref}"/>
-                                        <field name="delivery_line_ids" context="{'active_weekly_ref': ref,'default_active_weekly_ref': ref}" domain="[('delivery_route_link_id', '=', delivery_route_id)]" widget="many2many_tags"/>
+                                        <field name="delivery_route_id"/>
+                                        <field name="delivery_line_ids" domain="[('delivery_route_link_id', '=', delivery_route_id)]" widget="many2many_tags"/>
                                     </tree>
                                 </field>
                             </page>

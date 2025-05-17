@@ -4,9 +4,9 @@ from odoo import models, fields, api
 class KsDashboardNinja(models.Model):
     _inherit = 'ks_dashboard_ninja.board'
 
-    salesman = fields.Many2one('res.partner', string="المندوب",
+    salesman = fields.Many2one('res.partner', string="salesman",
                                help="The partner associated with the salesperson")
-    employee_id = fields.Many2one('hr.employee', string="الموظف المندوب",
+    employee_id = fields.Many2one('hr.employee', string="saleman",
                                   help="Direct reference to the employee record")
 
     @api.model

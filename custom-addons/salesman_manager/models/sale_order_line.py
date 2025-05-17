@@ -9,8 +9,8 @@ class SaleOrderLine(models.Model):
     #calculating consumption
     # -----------------------------------------------------
 
-    inventory_counting = fields.Float('الجرد', store=True)
-    consumption = fields.Float('الصرف', readonly=True, store=True)
+    inventory_counting = fields.Float('inventory counting', store=True)
+    consumption = fields.Float('consumption', readonly=True, store=True)
 
     #quantity suggestion based on the last order
     @api.onchange('inventory_counting')
@@ -32,8 +32,9 @@ class SaleOrderLine(models.Model):
                 line.product_uom_qty = 0
 
 
-
+    # -----------------------------------------------------------
     #allow editing only product_uom_qty within ±5% of consumption
+    # -----------------------------------------------------------
     @api.onchange('product_uom_qty')
     def _onchange_product_uom_qty_check(self):
         for line in self:

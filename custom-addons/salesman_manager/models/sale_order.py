@@ -11,7 +11,9 @@ class SaleOrder(models.Model):
             order.total_consumption_amount_perSO = sum(line.multiplied_field for line in order.order_line)
 
 
+    #---------------------------------------------------------------------------------------------------------
     #To automatically save any new sale.order created into the order_id Many2many field in daily.visit model
+    #---------------------------------------------------------------------------------------------------------
     @api.model
     def create(self, vals):
         # First create the sale order normally
