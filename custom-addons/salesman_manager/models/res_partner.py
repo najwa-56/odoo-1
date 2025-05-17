@@ -7,18 +7,51 @@ from odoo.exceptions import UserError
 
 class ResPartner(models.Model):
     _inherit = 'res.partner'
-    #_order = 'sequence'
+  
 
-    #adding map from google_maps_partner to rout line
-    #def open_map(self):
-    #    super(ResPartner, self).open_map()
+    daily_visit_ids = fields.One2many(
+        'daily.visit',
+        'partner_id',
+        string='Daily Visits'
+    )
+    specific_visit_id = fields.Many2one(
+        'daily.visit',
+        string='Specific Visit',
+        compute='_compute_specific_visit',
+        store=False,
+    )
 
-    visit = fields.Many2many(comodel_name='daily.visit', string="الزيارات", ondelete='cascade', index=True, copy=False)
-    weekly_route_ids = fields.Many2many( 'weekly.routs.line', string="Weekly Routes" )
+    @api.depends('daily_visit_ids')
+    def _compute_specific_visit(self):
+        for rec in self:
+            ref = None
+            print("context=================",self.env.context)
+            params = self.env.context.get('params')
+            if params and params.get('model') == 'weekly.routs' and params.get('id'):
+                weekly_route = self.env['weekly.routs'].browse(params['id'])
+                ref = weekly_route.reference
+
+            if ref:
+                visit = rec.daily_visit_ids.filtered(lambda v: v.ref == ref)
+                rec.specific_visit_id = visit[:1] if visit else False
+            else:
+                rec.specific_visit_id = False
+
+    def action_open_specific_visit (self):
+        self.ensure_one()
+        if not self.specific_visit_id:
+            return
+        return {
+            'type': 'ir.actions.act_window',
+            'name': 'Daily Visit',
+            'res_model': 'daily.visit',
+            'view_mode': 'form',
+            'res_id': self.specific_visit_id.id,
+            'target': 'current',
+        }
 
     #This code is used to set the status of a partner to either "visit" or "sale"
     # based on whether a related daily.visit record has the is_it_sold field set to True or False
-
     status = fields.Selection( [
         ('not_yet', 'لاشيء'),
         ('visit', 'تمت الزيارة'),
@@ -34,20 +67,23 @@ class ResPartner(models.Model):
             else:
                 partner.status = 'not_yet'
 
-    # Reference to the most recent daily.visit
-    last_daily_visit_id = fields.Many2one('daily.visit', string='Last Visit')
 
-    # Make sure the status is updated based on the latest visit
-    @api.model
-    def create(self, vals):
-        partner = super(ResPartner, self).create(vals)
-        if partner.last_daily_visit_id:
-            partner._update_status_from_visit(partner.last_daily_visit_id.is_it_sold)
-        return partner
+    #test
+    weekly_route_id = fields.Many2one(
+        'weekly.routs',
+        string='Weekly Route',
+        domain="[('user_id', '=', uid)]"
+    )
+
     def action_open_daily_visit (self):
         self.ensure_one()
 
-        # Just open the visit form without creating it or assigning status directly
+        # Find the first weekly route record for the current user (example ordering by creation_date desc)
+        first_route = self.env['weekly.routs'].search(
+            [('user_id', '=', self.env.uid)], order='creation_date desc, id desc', limit=1
+        )
+        print("------------------------------",first_route.reference)
+
         return {
             'type': 'ir.actions.act_window',
             'name': 'Daily Visit',
@@ -56,9 +92,10 @@ class ResPartner(models.Model):
             'target': 'current',
             'context': {
                 'default_partner_id': self.id,
+                'default_weekly_route_id': first_route.id if first_route else False,
+                'default_ref': first_route.reference,
             },
         }
-
 
     #we inhirit action_view_partner_invoices function and we add a new domain which is 'payment_state', '!=', 'paid'
     def action_view_partner_invoices_custom(self):

@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <!-- this weekly route report that allows supervisor tracking the saleman-->
+        <!-- Tree View for My Routes -->
+        <record id="view_routes_report_tree" model="ir.ui.view">
+            <field name="name">routes.tree</field>
+            <field name="model">weekly.routs</field>
+            <field name="arch" type="xml">
+                <tree string="المسارات">
+                    <field name="reference"/>
+                    <field name="creation_date"/>
+                    <field name="user_id"/>
+                </tree>
+            </field>
+        </record>
+
+        <!-- Form View for My Routes-->
+        <record id="view_routes_report_form" model="ir.ui.view">
+            <field name="name">routes.form</field>
+            <field name="model">weekly.routs</field>
+            <field name="arch" type="xml">
+                <form string="المسارات" create="false" edit="false" delete="false">
+                    <sheet>
+                        <group>
+                            <group>
+                                <field name="reference" readonly="1"/>
+                                <field name="creation_date" readonly="1"
+                                       groups="salesman_manager.group_salesman_supervisor"/>
+                                <field name="user_id" readonly="1" groups="salesman_manager.group_salesman_supervisor"/>
+                            </group>
+                        </group>
+                        <notebook>
+                            <page string="المسارات">
+                                <field name="route_lines">
+                                    <tree>
+                                        <field name="day" groups="salesman_manager.group_salesman_supervisor"/>
+                                        <field name="day_name" groups="salesman_manager.group_salesman_supervisor"/>
+                                        <field name="delivery_route_id" context="{'active_weekly_ref': parent.reference}"
+                                               groups="salesman_manager.group_salesman_supervisor"/>
+                                        <field name="delivery_line_ids" context="{'active_weekly_ref': parent.reference}" widget="many2many_tags"/>
+
+                                        
+                                    </tree>
+                                    <form> <!-- once salesman click on delivery_line_ids (المسار) it should be open a form that have only delivery_line_ids -->
+                                        <field name="delivery_line_ids"  context="{'active_weekly_ref': parent.reference}"/>
+                                    </form>
+                                </field>
+                            </page>
+                        </notebook>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+
+        <!-- Search View for My Routes -->
+        <record id="view_my_routes_search_report" model="ir.ui.view">
+            <field name="name">my.routes.search</field>
+            <field name="model">weekly.routs</field>
+            <field name="arch" type="xml">
+                <search string="المسارات ">
+                    <field name="reference"/>
+                    <field name="creation_date"/>
+                    <field name="user_id"/>
+                </search>
+            </field>
+        </record>
+
+        <!-- Action for My Routes -->
+        <record id="action_routes_report" model="ir.actions.act_window">
+            <field name="name">المسارات</field>
+            <field name="res_model">weekly.routs</field>
+            <field name="view_mode">tree,form</field>
+            <field name="view_ids" eval="[(5, 0, 0),
+                                          (0, 0, {'view_mode': 'tree', 'view_id': ref('view_routes_report_tree')}),
+                                          (0, 0, {'view_mode': 'form', 'view_id': ref('view_routes_report_form')})]"/>
+
+        </record>
+
+        <!-- Menu for My Routes - only accessible to salespeople groups="salesman_manager.group_salesman"-->
+        <menuitem id="menu_sales_man_reports"
+                  name="التقارير"
+                  sequence="50"
+                  parent="menu_sales_man_root"
+                  groups="salesman_manager.group_salesman_supervisor"/>
+
+        <menuitem id="weekly_routes_report"
+                  name="تقرير المسارات"
+                  action="action_routes_report"
+                  parent="menu_sales_man_reports"
+                  sequence="1"
+                  groups="salesman_manager.group_salesman_supervisor"
+        />
+    </data>
+</odoo>

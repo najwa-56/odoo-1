@@ -1,6 +1,6 @@
 from odoo import models, fields, api, _
 from datetime import datetime,date
-from odoo.exceptions import UserError
+
 class DailyVisit( models.Model ):
     _name = 'daily.visit'
     _description = 'Daily Visit'
@@ -96,20 +96,13 @@ class DailyVisit( models.Model ):
         return res
 
 
+    #test
+    weekly_route_id = fields.Many2one(
+        'weekly.routs',
+        string='Weekly Route',
+        domain="[('user_id', '=', uid)]"
+    )
+    ref = fields.Char(string="الرقم المرجعي", copy=False, required=True,default="New", readonly=True)
 
-    #--------
-    #"""Return the sale orders action"""
-    #-------
 
-    def action_open_sale_order (self):
-        return {
-            'type': 'ir.actions.act_window',
-            'res_model': 'sale.order',
-            'view_mode': 'form',
-            'target': 'new',
-            'context': {
-                'default_type': 'quotation',
-                'default_partner_id': self.partner_id.id,
-                'search_default_quotation': 1
-            }
-        }
+

@@ -6,6 +6,7 @@ class WeeklyRouts(models.Model):
     _name = 'weekly.routs'
     _description = 'Weekly Routes'
     _rec_name = 'reference' # This makes the reference field be used as display name in the header of the for view near to new button
+    _order = 'creation_date desc, id desc'
 
     reference = fields.Char(string="الرقم المرجعي", copy=False, required=True,default="New", readonly=True)
     #employee = fields.Many2one('res.partner', string="المندوب", required=True, ondelete='restrict')
@@ -31,7 +32,7 @@ class WeeklyRouts(models.Model):
     today_route_lines = fields.One2many('weekly.routs.line',compute='_compute_today_route_lines',string="Today's Routes",store=False,)
     @api.depends('route_lines.day','route_lines')
     def _compute_today_route_lines(self):
-        today = fields.Date.context_today(self)
+        today = fields.Date.cotext_today(self)
         for rec in self:
             rec.today_route_lines = rec.route_lines.filtered(lambda line: line.day == today)
 

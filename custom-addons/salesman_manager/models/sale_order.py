@@ -3,7 +3,6 @@ from odoo import models, fields, api
 class SaleOrder(models.Model):
     _inherit = 'sale.order'
 
-    order_history_line = fields.One2many( 'sale.order.history', 'name', string='Order History Lines')
     total_consumption_amount_perSO = fields.Float(string='Total consumption Amount', compute='_compute_total_consumption_amount_perSO', store=True)
 
     @api.depends('order_line.multiplied_field')

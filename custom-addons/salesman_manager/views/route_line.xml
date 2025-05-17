@@ -3,7 +3,6 @@
     <data>
 
 
-        <!--step1 create a new window action with a new domain
         <record id="new_act_res_partner_2_sale_order" model="ir.actions.act_window">
             <field name="name">مبيعات اليوم</field>
             <field name="type">ir.actions.act_window</field>
@@ -14,67 +13,47 @@
                 ]
             </field>
         </record>
-        -->
-        <record id="res_partner_view_googlemap" model="ir.ui.view">
-            <field name="name">res.partner.view.googlemap.inherit</field>
-            <field name="model">res.partner</field>
-            <field name="arch" type="xml">
-                <googlemap res_partner="id"/>
-            </field>
-        </record>
-        <!-- Create a new window action in your sales_mannager module -->
-        <record id="action_res_partner_googlemap_custom" model="ir.actions.act_window">
-            <field name="name">Partners Map</field>
-            <field name="res_model">res.partner</field>
-            <field name="view_mode">googlemap</field>
-            <field name="view_id" ref="res_partner_view_googlemap"/>
-        </record>
-
 
         <record id="delivery_route_lines_form_inherited" model="ir.ui.view">
             <field name="name">Route Inherited</field>
             <field name="model">route.line</field>
             <field name="inherit_id" ref="customer_route_management.route_lines_view_form"/>
             <field name="arch" type="xml">
-                <data>
-                    <xpath expr="//form/sheet/group/field[@name='route']" position="before">
-                        <group>
-                            <div style="text-align: right;">
-                                <button name="%(action_res_partner_googlemap_custom)d"
-                                        type="action"
-                                        string="الخريطة"
+                <field name="company_id" position="after">
+                <field name="active_weekly_ref"/>
+            </field>
+                    <xpath expr="//field[@name='cust_tree_ids']" position="replace">
+                      
+                        <field name="cust_tree_ids" context="{'active_weekly_ref': active_weekly_ref}" invisible="delivery_route_link_id == False">
+                            <tree delete="false" create="True"
+                                  default_order="id desc">
+                                <field name="sequence" widget="handle"/>
+                                <field name="name"/>
+                                <button name="action_open_daily_visit"
+                                        string="تسجيل زيارة"
                                         class="btn-primary"
-                                        icon="fa-map-marker"
+                                        style="background-color: red; border-radius: 50%; padding: 10px;"
+                                        type="object"
+                                        groups="salesman_manager.group_salesman"/>
+
+                             
+                                <field name="status"
+                                       decoration-success="status == 'sale'"
+                                       decoration-danger="status == 'visit'"
+                                       decoration-warning="status == 'not_yet'"
+                                       widget="badge"
                                 />
-                            </div>
-                        </group>
-                    </xpath>
-                    <xpath expr="//tree" position="inside">
-                        <button name="action_open_daily_visit"
-                                string="تسجيل زيارة"
-                                class="btn-primary"
-                                style="background-color: red; border-radius: 50%; padding: 10px;"
-                                type="object"
-                                groups="salesman_manager.group_salesman"/>
+                              
+                                <field name="specific_visit_id"/>
+                                <button name="action_open_specific_visit"
+                                        type="object"
+                                        string="Open Visit"
+                                        icon="fa-external-link"
+                                        attrs="{'invisible': [('specific_visit_id', '=', False)]}"/>
 
-                        <!-- <button name="open_map" string="الخريطة" class="btn-primary" style="background-color: red; border-radius: 50%; padding: 10px;" type="object"/>-->
-                        <!--<button name="action_view_partner_invoices_custom" string="الفواتير الغير مسددة"
-                                class="btn-primary" style="background-color: red; border-radius: 50%; padding: 10px;"
-                                type="object"
-                                groups="salesman_manager.group_salesman"
-                        />-->
-                        <field name="status"
-                               decoration-success="status == 'sale'"
-                               decoration-danger="status == 'visit'"
-                               decoration-warning="status == 'not_yet'"
-                               widget="badge"
-                        />
-                        <field name="visit" widget="many2many_tags"
-                               groups="salesman_manager.group_salesman_supervisor"
-                               domain="[('partner_id.weekly_route_ids.day', '=', context_today())]"
 
-                        />
-
+                            </tree>
+                        </field>
 
                     </xpath>
 
@@ -87,7 +66,6 @@
                             </div>
                         </group>
                     </xpath>
-                </data>
             </field>
         </record>
 
@@ -98,7 +76,6 @@
                   parent="menu_sales_man_root"
                   action="customer_route_management.delivery_route_action"
                   sequence="19"/>
-
 
     </data>
 </odoo>
