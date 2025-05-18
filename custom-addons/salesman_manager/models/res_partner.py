@@ -17,11 +17,14 @@ class ResPartner(models.Model):
     visit = fields.Many2many(comodel_name='daily.visit', string="Visits", ondelete='cascade', index=True, copy=False)
     daily_visit_ids = fields.One2many('daily.visit','partner_id',string='Daily Visits')
     specific_visit_id = fields.Many2one('daily.visit',string='Specific Visit',compute='_compute_specific_visit',)
-    status = fields.Selection( [
-        ('not_yet', 'not yet '),
-        ('visit', 'visit'),
-        ('sale', 'sale'),
-    ], string="Status", default='not_yet' )
+    
+    status = fields.Selection([
+        ('not_yet', 'Not Yet'),
+        ('visit', 'Visit'),
+        ('sale', 'Sale'),
+    ], string="Status", default='not_yet', compute='_compute_specific_visit', store=False)
+
+
 
     #---------------------------------------------------------------------------------------------------------
     #once you created a new visit it is should be saved in field specific_visit_id for a spicific weekly route
@@ -30,18 +33,22 @@ class ResPartner(models.Model):
     def _compute_specific_visit(self):
         for rec in self:
             ref = None
-            print("context========================",self.env.context)
             active_weekly_ref = self.env.context.get('active_weekly_ref') 
             if active_weekly_ref:
                 weekly_route = self.env['weekly.routs'].browse(active_weekly_ref)
-                print("weekly_route=====================",weekly_route)
                 ref = weekly_route.reference
 
             if ref:
                 visit = rec.daily_visit_ids.filtered(lambda v: v.ref == ref)
                 rec.specific_visit_id = visit[:1] if visit else False
+                if visit:
+                    rec.status = 'sale' if visit[0].is_it_sold else 'not_yet'
+                else:
+                    rec.status = 'not_yet'
             else:
                 rec.specific_visit_id = False
+                rec.status = 'not_yet'
+
 
     def action_open_specific_visit (self):
         self.ensure_one()
