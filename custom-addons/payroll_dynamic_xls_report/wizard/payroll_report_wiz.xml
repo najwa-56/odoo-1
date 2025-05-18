@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record model="ir.ui.view" id="view_payroll_report_view_form">
+        <field name="name">payroll.report.wiz.form</field>
+        <field name="model">payroll.report.wiz</field>
+        <field name="arch" type="xml">
+            <form string="Payroll Report">
+                <group colspan="4" col="4">
+                    <!-- <field name="from_date"/>
+                    <field name="date_end"/> -->
+                    <field name="report" widget="selection"/>
+                    <!-- <field name="show_logo"/> -->
+                </group>
+                <group>
+                    <!-- <field name="filter" widget="radio"/>
+                    <field name="employee_id" invisible="filter != 'employee'" required="filter == 'employee'"/>
+                    <field name="department_id" invisible="filter != 'department'" required="filter == 'department'" />
+                    <field name="company_id"  invisible="filter != 'company'" required="filter == 'company'" /> -->
+                    <field name="batch_id" required="1"/>
+                </group>
+              <footer>
+                    <button name="get_item_data" type="object" string="Export Excel" class="oe_highlight"/>
+                    Or
+                    <button string="Cancel" class="oe_link" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <record model="ir.ui.view" id="view_payroll_excel">
+        <field name="name">view.payrol.report.excel</field>
+        <field name="model">payroll.report.excel</field>
+        <field name="arch" type="xml">
+            <form string="Download Your Payroll Here">
+                <sheet>
+                <field name="name" invisible="1"/>
+                <field name="file_download" filename="name"/>
+                <footer>
+                    <button string="Close" class="btn-secondary" special="cancel"/>
+                </footer>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_payroll_reporting_excel" model="ir.actions.act_window">
+        <field name="name">Payroll Report Dynamic</field>
+        <field name="res_model">payroll.report.wiz</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+    </record>
+
+   
+
+
+
+    <record model="ir.actions.server" id="action_hr_payroll_print_report_pdf_xls_run_dynamic">
+        <field name="name">Payslip Dynamic</field>
+        <field name="model_id" ref="om_hr_payroll.model_hr_payslip_run"/>
+        <field name="binding_model_id" ref="om_hr_payroll.model_hr_payslip_run"/>
+        <field name="binding_view_types">form</field>
+        <field name="state">code</field>
+        <field name="code">
+            action = {
+                "type": "ir.actions.act_window",
+                "view_type": "form",
+                "view_mode": "form",
+                "res_model": "payroll.report.wiz",
+                'context':{'active_model': 'hr.payslip.run', 'active_id': record.id, 'default_report':1,'default_show_logo': False, 'default_filter':'batch', 'default_batch_id':record.id, 'default_from_date': record.date_start,'default_date_end': record.date_end },
+                'target': 'new',
+                'res_id': False,
+            }
+        </field>
+    </record>
+
+    
+
+   
+</odoo>
