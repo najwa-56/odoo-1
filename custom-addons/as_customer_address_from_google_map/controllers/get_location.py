@@ -31,7 +31,7 @@ class Google_Map(http.Controller):
             'location_name': location_name,
             'partner_latitude': latitude, 
             'partner_longitude': longitude,
-             'date_localization': fields.Date.context_today(self)
+             'date_localization': fields.Datetime.now()
         })
         if addres_component_length and address:
             addres_component_length = len(address)
@@ -45,7 +45,7 @@ class Google_Map(http.Controller):
                 'location_name': location_name,
                 'partner_latitude': latitude,
                 'partner_longitude': longitude,
-                'date_localization': fields.Date.context_today(self)
+                'date_localization': fields.Datetime.now()
             }
             state_id = False
             country_id = False
