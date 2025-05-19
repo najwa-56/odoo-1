@@ -30,7 +30,8 @@ class Google_Map(http.Controller):
         get_partner_rec.write({
             'location_name': location_name,
             'partner_latitude': latitude, 
-            'partner_longitude': longitude
+            'partner_longitude': longitude,
+             'date_localization': fields.Date.context_today(self)
         })
         if addres_component_length and address:
             addres_component_length = len(address)
@@ -44,7 +45,7 @@ class Google_Map(http.Controller):
                 'location_name': location_name,
                 'partner_latitude': latitude,
                 'partner_longitude': longitude,
-                'date_localization': fields.Datetime.now()
+                'date_localization': fields.Date.context_today(self)
             }
             state_id = False
             country_id = False
@@ -62,10 +63,18 @@ class Google_Map(http.Controller):
                 elif 'locality' in types and not partner_address['city']:
                     partner_address['city'] = long_name
                 elif 'administrative_area_level_1' in types:
-                    state_id = request.env['res.country.state'].search([('name', '=ilike', long_name)])
+                    state_id = request.env['res.country.state'].with_context(lang='ar_001').search([
+                        ('name', '=ilike', long_name)
+                    ], limit=1)
+                    
+                    if not state_id:
+                        state_id = request.env['res.country.state'].with_context(lang='en_US').search([
+                            ('name', '=ilike', long_name)
+                        ], limit=1)
+                        
                     partner_address['state_id'] = state_id.id or False
                 elif 'country' in types:
-                    country_id = request.env['res.country'].search([('name', '=ilike', long_name)])
+                    country_id = request.env['res.country'].search([('id', '=', 192)])
                     partner_address['country_id'] = country_id.id or False
                 elif 'postal_code' in types:
                     partner_address['zip'] = long_name
