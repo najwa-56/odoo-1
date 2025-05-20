@@ -8,20 +8,30 @@ from odoo.tools import float_compare, float_is_zero
 class HrPayslipLine(models.Model):
     _inherit = 'hr.payslip.line'
 
-    def _get_partner_id(self, credit_account):
+    # def _get_partner_id(self, credit_account):
+    #     """
+    #     Get partner_id of slip line to use in account_move_line
+    #     """
+    #     # use partner of salary rule or fallback on employee's address
+    #     register_partner_id = self.salary_rule_id.register_id.partner_id
+    #     partner_id = register_partner_id.id
+    #     if credit_account:
+    #         if register_partner_id or self.salary_rule_id.account_credit.account_type in ('asset_receivable', 'liability_payable'):
+    #             return partner_id
+    #     else:
+    #         if register_partner_id or self.salary_rule_id.account_debit.account_type in ('asset_receivable', 'liability_payable'):
+    #             return partner_id
+    #     return False
+
+
+    def _get_partner_id(self, employee_id):
         """
-        Get partner_id of slip line to use in account_move_line
+        Get partner_id of slip line to use in account_move_line.
+        Always use employee address as partner.
         """
-        # use partner of salary rule or fallback on employee's address
-        register_partner_id = self.salary_rule_id.register_id.partner_id
-        partner_id = register_partner_id.id
-        if credit_account:
-            if register_partner_id or self.salary_rule_id.account_credit.account_type in ('asset_receivable', 'liability_payable'):
-                return partner_id
-        else:
-            if register_partner_id or self.salary_rule_id.account_debit.account_type in ('asset_receivable', 'liability_payable'):
-                return partner_id
-        return False
+        # Prefer work_contact_id, fallback to address_id
+        partner = employee_id.work_contact_id or employee_id.address_id
+        return partner.id if partner else False
 
 
 class HrPayslip(models.Model):
@@ -86,7 +96,8 @@ class HrPayslip(models.Model):
                 if debit_account_id:
                     debit_line = (0, 0, {
                         'name': line.name,
-                        'partner_id': line._get_partner_id(credit_account=False),
+                        # 'partner_id': line._get_partner_id(credit_account=False),
+                        'partner_id': line._get_partner_id(slip.employee_id),
                         'account_id': debit_account_id,
                         'journal_id': slip.journal_id.id,
                         'date': date,
@@ -101,7 +112,8 @@ class HrPayslip(models.Model):
                 if credit_account_id:
                     credit_line = (0, 0, {
                         'name': line.name,
-                        'partner_id': line._get_partner_id(credit_account=True),
+                        # 'partner_id': line._get_partner_id(credit_account=True),
+                        'partner_id': line._get_partner_id(slip.employee_id),
                         'account_id': credit_account_id,
                         'journal_id': slip.journal_id.id,
                         'date': date,
