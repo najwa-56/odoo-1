@@ -22,11 +22,6 @@ class ResPartner(models.Model):
     ], string="Status", default='not_yet', compute='_compute_specific_visit', store=False)
 
 
-    #---------------------------------------------------------------------------------------------------------
-    # adding map from google_maps_partner to rout line
-    #---------------------------------------------------------------------------------------------------------
-    def open_map(self):
-        super(ResPartner, self).open_map()
 
     #---------------------------------------------------------------------------------------------------------
     #once you created a new visit it is should be saved in field specific_visit_id for a spicific weekly route
