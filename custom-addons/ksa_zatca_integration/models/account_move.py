@@ -1829,3 +1829,17 @@ class AccountMove(models.Model):
         if self.env.context.get('zatca_write_nocompute', False):
             return
         return super(AccountMove, self)._get_unbalanced_moves(container)
+    
+
+
+    def _get_violated_lock_dates(self, invoice_date, has_tax):
+        """Get all the lock dates affecting the current invoice_date.
+        :param invoice_date: The invoice date
+        :param has_tax: If any taxes are involved in the lines of the invoice
+        :return: a list of tuples containing the lock dates affecting this move, ordered chronologically.
+        """
+        company = self.company_id
+        if not company:
+            company = self.env.company
+        return company._get_violated_lock_dates(invoice_date, has_tax)
+        # return self.company_id._get_violated_lock_dates(invoice_date, has_tax)
