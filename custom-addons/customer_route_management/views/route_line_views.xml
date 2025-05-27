@@ -23,9 +23,12 @@
 
                     
 
-                    <group string="Add Existing Customers"
-                    invisible="delivery_route_link_id == False">
-                    <field name="available_partner_ids" widget="many2many_tags"/>
+                    <group string="Add Customers"
+                        invisible="delivery_route_link_id == False">
+                        <button name="action_add_customers" type="object" string="Add Existing Customers" class="btn-primary"/>
+                            <button name="action_create_customer" type="object" string="Create New Customer" class="btn-primary"/>
+
+                    <!-- <field name="available_partner_ids" widget="many2many_tags"/> -->
                 </group>
 
                

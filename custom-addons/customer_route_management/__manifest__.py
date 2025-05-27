@@ -48,6 +48,7 @@
         'report/delivery_route_reports.xml',
         'report/delivery_route_templates.xml',
         'wizard/route_report_views.xml',
+        'wizard/add_cusotmer.xml',
     ],
     'assets': {
         'web.assets_backend': [

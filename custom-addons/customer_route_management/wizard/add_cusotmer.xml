@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_select_customer_route_wizard_form" model="ir.ui.view">
+    <field name="name">select.customer.route.wizard.form</field>
+    <field name="model">select.customer.route.wizard</field>
+    <field name="arch" type="xml">
+        <form string="Add Existing Customers">
+            <group>
+                <field name="customer_ids">
+                    <tree>
+                        <field name="name"/>
+                       
+                    </tree>
+                </field>
+
+                
+            </group>
+            <footer>
+                <button string="Add to Route" type="object" name="action_add_customers_to_route" class="btn-primary"/>
+                <button string="Cancel" class="btn-secondary" special="cancel"/>
+            </footer>
+        </form>
+    </field>
+</record>
+</odoo>

@@ -5,3 +5,7 @@ access_route_line_user,route.line user,model_route_line,customer_route_managemen
 access_route_line_manager,route.line manager,model_route_line,customer_route_management.group_delivery_route_manager,1,1,1,1
 access_route_report_user,route_report user,model_route_report,customer_route_management.group_delivery_route_user,1,0,0,0
 access_route_report_manager,route_report manager,model_route_report,customer_route_management.group_delivery_route_manager,1,1,1,1
+
+access_select_customer_route_wizard,select_customer_route_wizard,model_select_customer_route_wizard,,1,1,1,1
+
+

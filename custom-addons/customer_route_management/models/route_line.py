@@ -60,3 +60,32 @@ class RouteLines(models.Model):
         for partner in self.available_partner_ids:
             partner.location_id = self.id
         self.available_partner_ids = [(5, 0, 0)]  # clear the selection after assigning
+
+
+    
+    def action_add_customers(self):
+        return {
+            'name': 'Select Customers',
+            'type': 'ir.actions.act_window',
+            'res_model': 'select.customer.route.wizard',
+            'view_mode': 'form',
+            'target': 'new',
+            'context': {
+                'default_route_line_id': self.id,
+            }
+        }
+    
+
+
+    def action_create_customer(self):
+        return {
+            'name': 'Create Customer',
+            'type': 'ir.actions.act_window',
+            'res_model': 'res.partner',
+            'view_mode': 'form',
+            'target': 'new',
+            'context': {
+                'default_location_id': self.id,
+                'form_view_ref': 'base.view_partner_form',  # or your custom form
+            }
+        }
