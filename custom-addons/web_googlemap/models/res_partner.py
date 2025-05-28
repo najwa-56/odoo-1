@@ -9,6 +9,7 @@ class ResPartner(models.Model):
 
     @api.model
     def write_latitude_longitude(self, partner_id):
+        return True
         lat = self.env.context.get('partner_latitude')
         lng = self.env.context.get('partner_longitude')
         if partner_id and lat and lng:
