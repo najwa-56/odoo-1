@@ -21,6 +21,13 @@ class ResourceCalendar(models.Model):
     date_end = fields.Date(
         string="End Date",
     )
+
+
+    def copy(self, default=None):
+        default = dict(default or {})
+        default['employee_calendar_ids'] = [(5, 0, 0)]  # remove One2many links
+        return super().copy(default)
+
     
     @api.constrains("active")
     def _check_active(self):
