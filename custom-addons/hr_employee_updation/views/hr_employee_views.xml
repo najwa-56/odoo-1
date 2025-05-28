@@ -42,7 +42,7 @@
                     <field name="date_of_direct_action"/>
                     <field name="trial_period"/>
                     <field name="trial_date"/>
-                    <field name="end_date" readonly="state not in ['service']"/>
+                    <field name="end_date" />
                 </xpath>
 
                 <xpath expr="//field[@name='pin']" position="before">
