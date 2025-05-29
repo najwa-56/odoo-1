@@ -13,6 +13,7 @@ class ResPartner(models.Model):
     def write(self, vals):
         # Reset latitude/longitude in case we modify the address without
         # updating the related geolocation fields
+        return super().write(vals)
         if any(field in vals for field in ['street', 'zip', 'city', 'state_id', 'country_id']) \
                 and not all('partner_%s' % field in vals for field in ['latitude', 'longitude']):
             vals.update({
