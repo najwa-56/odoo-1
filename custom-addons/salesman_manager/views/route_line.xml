@@ -2,12 +2,12 @@
 <odoo>
     <data>
 
-        <record id="action_partner_map_view" model="ir.actions.act_window">
+        <!-- <record id="action_partner_map_view" model="ir.actions.act_window">
             <field name="name">Partner Map</field>
             <field name="res_model">res.partner</field>
             <field name="view_mode">googlemap</field>
             <field name="view_id" ref="web_googlemap.res_partner_view_googlemap"/>
-        </record>
+        </record> -->
 
         <record id="delivery_route_lines_form_inherited" model="ir.ui.view">
             <field name="name">Route Inherited</field>
@@ -15,7 +15,7 @@
             <field name="inherit_id" ref="customer_route_management.route_lines_view_form"/>
             <field name="arch" type="xml">
                 <data>
-                    <xpath expr="//field[@name='route']" position="after">
+                    <!-- <xpath expr="//field[@name='route']" position="after">
                         <group>
                             <button name="%(action_partner_map_view)d"
                                     type="action"
@@ -23,7 +23,7 @@
                                     class="btn-primary"
                             />
                         </group>
-                    </xpath>
+                    </xpath> -->
                     <xpath expr="//field[@name='cust_tree_ids']" position="replace">
                         <field name="cust_tree_ids" invisible="delivery_route_link_id == False">
                             <tree create="True">
