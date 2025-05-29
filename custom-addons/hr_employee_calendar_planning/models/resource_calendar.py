@@ -26,6 +26,7 @@ class ResourceCalendar(models.Model):
     def copy(self, default=None):
         default = dict(default or {})
         default['employee_calendar_ids'] = [(5, 0, 0)]  # remove One2many links
+        default['company_id'] = False
         return super().copy(default)
 
     
@@ -52,6 +53,8 @@ class ResourceCalendar(models.Model):
 
     @api.constrains("company_id")
     def _check_company_id(self):
+        if self.env.context.get("skip_check_company_id"):
+            return
         for item in self.filtered("company_id"):
             total_items = self.env["hr.employee.calendar"].search_count(
                 [

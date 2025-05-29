@@ -166,13 +166,33 @@ class HrEmployee(models.Model):
         for item in self:
             item._regenerate_calendar()
 
+    # def copy(self, default=None):
+    #     self.ensure_one()
+    #     new = super().copy(default)
+    #     # Define a good main calendar for being able to regenerate it later
+    #     new.resource_id.calendar_id = fields.first(new.calendar_ids).calendar_id
+    #     new.filtered("calendar_ids").regenerate_calendar()
+    #     return new
+
+
     def copy(self, default=None):
         self.ensure_one()
         new = super().copy(default)
-        # Define a good main calendar for being able to regenerate it later
-        new.resource_id.calendar_id = fields.first(new.calendar_ids).calendar_id
-        new.filtered("calendar_ids").regenerate_calendar()
+
+        # Only keep calendar lines where calendar company matches employee company
+        safe_calendar_ids = new.calendar_ids.filtered(
+            lambda l: l.calendar_id.company_id == new.company_id or not l.calendar_id.company_id
+        )
+
+        if safe_calendar_ids:
+            new.resource_id.calendar_id = fields.first(safe_calendar_ids).calendar_id
+            new.with_context(skip_check_company_id=True).regenerate_calendar()
+        else:
+            new.resource_id.calendar_id = False
+
         return new
+
+
 
     @api.model_create_multi
     def create(self, vals_list):
