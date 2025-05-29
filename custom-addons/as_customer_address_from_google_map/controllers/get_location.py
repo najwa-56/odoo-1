@@ -29,10 +29,13 @@ class Google_Map(http.Controller):
         get_partner_rec = request.env['res.partner'].sudo().browse(int(active_id))
         get_partner_rec.write({
             'location_name': location_name,
-            'partner_latitude': latitude, 
-            'partner_longitude': longitude,
+            'partner_latitude': latitude if not get_partner_rec.partner_latitude else get_partner_rec.partner_latitude, 
+            'partner_longitude': longitude if not get_partner_rec.partner_longitude else get_partner_rec.partner_longitude,
              'date_localization': fields.Datetime.now()
         })
+        msg = ('Update Sudo from set_current_location_name_contact')
+        get_partner_rec.message_post(body=msg)
+
         if addres_component_length and address:
             addres_component_length = len(address)
             partner_address = {
