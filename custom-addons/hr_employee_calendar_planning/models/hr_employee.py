@@ -245,7 +245,7 @@ class HrEmployeeCalendar(models.Model):
         string="End Date",
     )
     employee_id = fields.Many2one(
-        comodel_name="hr.employee", string="Employee", required=True, ondelete="cascade"
+        comodel_name="hr.employee", string="Employee", required=True, ondelete="cascade",copy=False
     )
     company_id = fields.Many2one(related="employee_id.company_id")
     calendar_id = fields.Many2one(

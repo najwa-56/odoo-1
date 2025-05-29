@@ -51,27 +51,27 @@ class ResourceCalendar(models.Model):
                     )
                 )
 
-    @api.constrains("company_id")
-    def _check_company_id(self):
-        if self.env.context.get("skip_check_company_id"):
-            return
-        for item in self.filtered("company_id"):
-            total_items = self.env["hr.employee.calendar"].search_count(
-                [
-                    ("calendar_id.company_id", "=", item.company_id.id),
-                    ("employee_id.company_id", "!=", item.company_id.id),
-                    ("employee_id.company_id", "!=", False),
-                ]
-            )
-            if total_items:
-                raise ValidationError(
-                    _(
-                        "%(item_name)s is used in %(total_items)s employee(s)"
-                        " related to another company.",
-                        item_name=item.name,
-                        total_items=total_items,
-                    )
-                )
+    # @api.constrains("company_id")
+    # def _check_company_id(self):
+    #     if self.env.context.get("skip_check_company_id"):
+    #         return
+    #     for item in self.filtered("company_id"):
+    #         total_items = self.env["hr.employee.calendar"].search_count(
+    #             [
+    #                 ("calendar_id.company_id", "=", item.company_id.id),
+    #                 ("employee_id.company_id", "!=", item.company_id.id),
+    #                 ("employee_id.company_id", "!=", False),
+    #             ]
+    #         )
+    #         if total_items:
+    #             raise ValidationError(
+    #                 _(
+    #                     "%(item_name)s is used in %(total_items)s employee(s)"
+    #                     " related to another company.",
+    #                     item_name=item.name,
+    #                     total_items=total_items,
+    #                 )
+    #             )
 
     def write(self, vals):
         res = super().write(vals)
@@ -81,5 +81,5 @@ class ResourceCalendar(models.Model):
                     [("calendar_id", "=", record.id)]
                 )
                 for employee in calendars.mapped("employee_id"):
-                    employee._regenerate_calendar()
+                    employee.with_context(skip_check_company_id=True)._regenerate_calendar()
         return res
