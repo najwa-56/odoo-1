@@ -18,18 +18,18 @@
             </field>
         </record>
 
-        <!-- step1 create a new window action with a new domain -->
+        <!-- step1 create a new window action with a new domain
         <record id="new_act_res_partner_2_sale_order3" model="ir.actions.act_window">
             <field name="name">مبيعات اليوم</field>
             <field name="type">ir.actions.act_window</field>
             <field name="res_model">sale.order</field>
             <field name="view_mode">form</field>
             <field name="target">new</field>
-            <!--<field name="domain">[('date_order', '&gt;=', (context_today().strftime('%Y-%m-%d') + ' 00:00:00')),
+            <field name="domain">[('date_order', '&gt;=', (context_today().strftime('%Y-%m-%d') + ' 00:00:00')),
                 ('date_order', '&lt;=', (context_today().strftime('%Y-%m-%d') + ' 23:59:59'))
                 ]
-            </field>-->
-        </record>
+            </field>
+        </record>-->
 
         <!-- Form View for Daily Visits -->
         <record id="view_daily_visit_form" model="ir.ui.view">
@@ -38,76 +38,94 @@
             <field name="arch" type="xml">
                 <form string="الزيارات">
                     <sheet>
-                        <div class="oe_title"> <!-- to make reference field in the header -->
+
+                        <!-- Reference in Header -->
+                        <div class="oe_title">
                             <h1>
                                 <field name="reference" readonly="1"/>
                             </h1>
                         </div>
-                        <group>
-                            <group>
-                                <field name="reference" invisible="1"/>
-                                <field name="created_by"/>
-                                <field name="partner_id" options="{'no_create': True}"/>
-                                <field name="total_consumption_amount"/>
-                                <field name="is_it_sold"/>
-                                <field name="weekly_route_id" invisible="1"/>
-                                <field name="ref"/>
 
-                            </group>
+                        <!-- Main Info -->
+                        <group col="2">
+                            <field name="reference" invisible="1"/>
+                            <field name="created_by"/>
+                            <field name="partner_id" options="{'no_create': True}"/>
+                            <field name="total_consumption_amount"/>
+                            <field name="is_it_sold"/>
+                            <field name="weekly_route_id" invisible="1"/>
+                            <field name="ref"/>
                         </group>
+
                         <notebook>
                             <page string="تفاصيل" style="text-align: right;">
-                                <group invisible="is_it_sold" col="5">
-                                    <label for="reason_ifNotSold" string="في حال الاجابة لا، اذكر السبب مع إرفاق صورة"
-                                           class="text-muted"/>
-                                    <separator string="" colspan="4"/>
-                                    <group col="2">
-                                        <field name="attachment_ifNotSold"
-                                               string="ارفق الصورة"
-                                               widget="binary"
-                                               class="oe_inline"
+
+                                <!-- Not Sold Section -->
+                                <group invisible="is_it_sold" col="1">
+                                    <div class="text-muted o_form_label">في حال عدم البيع، اذكر السبب مع إرفاق صورة
+                                    </div>
+                                    <separator string="" colspan="1"/>
+                                    <field name="attachment_ifNotSold"
+                                           string="ارفق الصورة"
+                                           widget="binary"
+                                           class="oe_inline"/>
+                                    <field name="reason_ifNotSold"
+                                           string="السبب"
+                                           placeholder="اذكر السبب..."
+                                           widget="text"
+                                           class="o_form_textarea"/>
+
+                                    <div class="o_form_label">Check out</div>
+                                    <div>
+                                        <button name="action_check_out"
+                                                type="object"
+                                                string="---Check out---"
+                                                class="btn btn-primary"
                                         />
-
-                                        <field name="reason_ifNotSold"
-                                               string="السبب"
-                                               placeholder="اذكر السبب..."
-                                               widget="text"
-                                               style="height: 120px; width: 300px;"/>
-                                    </group>
+                                    </div>
+                                    <separator string="" colspan="1"/>
+                                    <field name="check_out_time" nolabel="1" groups="salesman_manager.group_salesman_supervisor"/>
                                 </group>
 
-                                <group invisible="not is_it_sold">
-                                    <label for="order_id" string="في حال الإجابة نعم" class="text-muted"/>
-                                    <separator string="" colspan="4"/>
+                                <!-- Sold Section -->
+                                <group invisible="not is_it_sold" col="2">
+                                    <div class="text-muted o_form_label" style="padding-bottom: 10px;">في حال البيع
+                                    </div>
+                                    <div class="o_form_label"></div>
+                                    <field name="today_date" invisible="1"/>
+                                    <field name="attachment_before" widget="binary" class="oe_inline"/>
+                                    <div class="o_form_label">sale</div>
+                                    <div>
+                                        <button name="action_create_sale_order"
+                                                type="object"
+                                                string="------- بيع ------"
+                                                class="btn btn-primary"/>
+                                    </div>
+                                    <div class="o_form_label"></div>
+                                    <field name="order_id"
+                                           widget="many2many_tags"
+                                           nolabel="1"
+                                           groups="salesman_manager.group_salesman_supervisor"/>
+                                    <field name="attachment_after" widget="binary" class="oe_inline"/>
 
-                                    <group col="2">
-
-                                        <field name="today_date" invisible="1"/>
-                                        <group>
-                                            <field name="attachment_before" widget="binary" class="oe_inline"/>
-                                        </group>
-                                        <separator string="" colspan="4"/>
-                                        <group>
-                                        <button name="%(new_act_res_partner_2_sale_order3)d"
-                                                string="بيع"
-                                                class="btn-primary"
-                                                type="action"
-                                                context="{'search_default_quotation': 1, 'default_type': 'quotation', 'default_partner_id': partner_id}"
-                                                groups="salesman_manager.group_salesman"/>
-                                         </group>
-                                        <field name="order_id" widget="many2many_tags" groups="salesman_manager.group_salesman_supervisor"/>
-                                        <group>
-                                            <field name="attachment_after" widget="binary" class="oe_inline"/>
-                                        </group>
-                                    </group>
+                                    <div class="o_form_label">Check out</div>
+                                    <div>
+                                        <button name="action_check_out"
+                                                type="object"
+                                                string="---Check out---"
+                                                class="btn btn-primary"/>
+                                    </div>
+                                    <field name="check_out_time" nolabel="1" groups="salesman_manager.group_salesman_supervisor"/>
                                 </group>
-                            
+
+
                             </page>
                         </notebook>
                     </sheet>
                 </form>
             </field>
         </record>
+
 
         <!-- Search View for Daily Visits -->
         <record id="view_daily_visit_search" model="ir.ui.view">

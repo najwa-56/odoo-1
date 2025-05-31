@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <record id="view_order_form_inherit_visit_fields_and_button" model="ir.ui.view">
+        <field name="name">sale.order.form.visit.fields.and.button</field>
+        <field name="model">sale.order</field>
+        <field name="inherit_id" ref="sale.view_order_form"/>
+        <field name="arch" type="xml">
+
+            <xpath expr="//header" position="inside">
+                <button name="action_back_to_visit"
+                        type="object"
+                        string="Back to Visit"
+                        class="btn-secondary"
+                        icon="fa-arrow-left"/>
+            </xpath>
+
+            <xpath expr="//field[@name='partner_id']" position="after">
+                <field name="visit_id" groups="salesman_manager.group_salesman_supervisor"/>
+                <field name="visit_reference" readonly="1" groups="salesman_manager.group_salesman_supervisor"/>
+            </xpath>
+
+        </field>
+    </record>
+</odoo>

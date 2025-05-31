@@ -7,3 +7,5 @@ access_weekly_routs_salesman,weekly.routs.salesman,model_weekly_routs,salesman_m
 access_weekly_routs_line_salesman,weekly.routs.line.salesman,model_weekly_routs_line,salesman_manager.group_salesman,1,0,0,0
 access_daily_visit_supervisor,daily.visit.supervisor,model_daily_visit,salesman_manager.group_salesman_supervisor,1,1,1,1
 access_daily_visit_salesman,daily.visit.salesman,model_daily_visit,salesman_manager.group_salesman,1,1,1,0
+access_daily_visit_report_admin,daily.visit.report,model_daily_visit_report,salesman_manager.group_salesman_supervisor,1,0,0,0
+access_daily_realtime_report_supervisor,daily.realtime.report,model_daily_realtime_report,salesman_manager.group_salesman_supervisor,1,0,0,0

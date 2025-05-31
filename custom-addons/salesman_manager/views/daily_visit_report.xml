@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <record id="view_daily_visit_report_tree" model="ir.ui.view">
+            <field name="name">daily.visit.report.tree</field>
+            <field name="model">daily.visit.report</field>
+            <field name="arch" type="xml">
+                <tree string="Daily Visit Report">
+                    <field name="reference"/>
+                    <field name="created_by"/>
+                    <field name="partner_id"/>
+                    <field name="is_it_sold"/>
+                    <field name="creation_date"/>
+                    <field name="check_out_time"/>
+                    <field name="time_spending_in_customer"
+                           decoration-danger="time_spending_in_customer &gt; avg_time_spent_per_customer"/>
+                    <field name="avg_time_spent_per_customer" optional="hide"/>
+                    <field name="time_between_customers" decoration-danger="time_between_customers &gt; tag_max_value"/>
+                    <field name="tag_max_value" optional="hide"/>
+                    <button name="action_open_specific_visit"
+                            type="object"
+                            string="Open visit"
+                            class="btn-primary"/>
+
+
+                </tree>
+            </field>
+        </record>
+
+        <record id="view_daily_visit_report_search" model="ir.ui.view">
+            <field name="name">daily.visit.report.search</field>
+            <field name="model">daily.visit.report</field>
+            <field name="arch" type="xml">
+                <search string="Daily Visit Report">
+                    <field name="created_by"/>
+                    <filter string="This Year" name="filter_year"
+                            domain="[('creation_date', '>=', (context_today().replace(month=1, day=1)))]"/>
+                    <filter string="This Month" name="filter_month"
+                            domain="[('creation_date', '>=', (context_today().replace(day=1)))]"/>
+                    <filter string="Today" name="filter_today"
+                            domain="[('creation_date', '=', context_today())]"/>
+                    <group expand="0" string="Group By">
+                        <filter name="group_by_date" string="Check In" context="{'group_by':'creation_date'}"/>
+                    </group>
+                </search>
+            </field>
+        </record>
+
+
+        <record id="action_daily_visit_report" model="ir.actions.act_window">
+            <field name="name">Daily Visit Report</field>
+            <field name="res_model">daily.visit.report</field>
+            <field name="view_mode">tree</field>
+            <field name="view_id" ref="view_daily_visit_report_tree"/>
+            <field name="search_view_id" ref="view_daily_visit_report_search"/>
+        </record>
+
+        <menuitem id="menu_daily_visit_report_root"
+                  name="المتابعة اللحظية"
+                  parent="menu_sales_man_reports"
+                  action="action_daily_visit_report"/>
+
+    </data>
+</odoo>

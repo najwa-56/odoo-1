@@ -1,10 +1,32 @@
 from odoo import models, fields, api
+from odoo.exceptions import UserError
 
 class SaleOrder(models.Model):
     _inherit = 'sale.order'
 
     total_consumption_amount_perSO = fields.Float(string='Total consumption Amount', compute='_compute_total_consumption_amount_perSO', store=True)
+    visit_id = fields.Many2one( 'daily.visit', string='Visit Reference' )
+    visit_reference = fields.Char( string='Visit Reference', related='visit_id.reference', store=True )
 
+    # ---------------------------------------------------------------------------------------------------------
+    # Button action to navigate back to the linked visit form.
+    # ---------------------------------------------------------------------------------------------------------
+    def action_back_to_visit (self):
+        self.ensure_one()
+        if not self.visit_id:
+            raise UserError( "No visit is linked to this sale order." )
+        return {
+            'type': 'ir.actions.act_window',
+            'name': 'Visit',
+            'res_model': 'daily.visit',
+            'res_id': self.visit_id.id,
+            'view_mode': 'form',
+            'target': 'current',
+        }
+
+    # ---------------------------------------------------------------------------------------------------------
+    #
+    # ---------------------------------------------------------------------------------------------------------
     @api.depends('order_line.multiplied_field')
     def _compute_total_consumption_amount_perSO(self):
         for order in self:

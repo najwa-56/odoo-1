@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+
+        <!-- Tree View -->
+        <record id="view_daily_realtime_report_tree" model="ir.ui.view">
+            <field name="name">daily.realtime.report.tree</field>
+            <field name="model">daily.realtime.report</field>
+            <field name="arch" type="xml">
+                <tree string="المتابعة اللحظية اليومية" decoration-info="status == 'new'">
+                    <field name="reference"/>
+                    <field name="created_by"/>
+                    <field name="partner_id"/>
+                    <field name="creation_date"/>
+                    <field name="check_out_time"/>
+                    <field name="time_spending_in_customer" decoration-danger="time_spending_in_customer &gt; avg_time_spent_per_customer"/>
+                    <field name="avg_time_spent_per_customer" optional="hide"/>
+                    <field name="time_between_customers" decoration-danger="time_between_customers &gt; tag_max_value"/>
+                    <field name="tag_max_value" optional="hide"/>
+                    <field name="status"/>
+                    <button name="action_open_specific_visit"
+                            string="Open visit"
+                            type="object"
+                            class="oe_highlight"/>
+                </tree>
+            </field>
+        </record>
+
+        <!-- Action -->
+        <record id="action_daily_realtime_report" model="ir.actions.act_window">
+            <field name="name">المتابعة اللحظية اليومية</field>
+            <field name="res_model">daily.realtime.report</field>
+            <field name="view_mode">tree</field>
+            <field name="domain">[
+                ('creation_date', '&gt;=', (context_today().strftime('%Y-%m-%d') + ' 00:00:00')),
+                ('creation_date', '&lt;', (context_today().strftime('%Y-%m-%d') + ' 23:59:59'))
+                ]
+            </field>
+        </record>
+
+        <!-- Menu Item -->
+        <menuitem id="menu_daily_realtime_report"
+                  name="المتابعة اللحظية اليومية"
+                  parent="menu_sales_man_reports"
+                  action="action_daily_realtime_report"/>
+    </data>
+</odoo>

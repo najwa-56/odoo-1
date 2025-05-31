@@ -16,15 +16,41 @@ class DailyVisit( models.Model ):
     attachment_ifNotSold = fields.Binary( string='picture' )
     order_id = fields.Many2many( comodel_name='sale.order', string="order number", ondelete='cascade', index=True,
                                  copy=False )
-    attachment_before = fields.Binary( string='picture befor' )
+    attachment_before = fields.Binary( string='picture before' )
     attachment_after = fields.Binary( string='picture after' )
     start_time = fields.Datetime( string='Start Time', readonly=True )
     end_time = fields.Datetime( string='End Time', readonly=True )
+    check_out_time = fields.Datetime(string='Check out Time', readonly=True)
+    status = fields.Selection( [('new', 'New'),('', '')], string="Status", default='new' )  #used for daily.realtime.report
 
     #used to link weekly.routs reference to daily.visit
     weekly_route_id = fields.Many2one('weekly.routs',string='Weekly Route',domain="[('user_id', '=', uid)]")
     ref = fields.Char(string="reference number WK", copy=False, required=True,default="New", readonly=True)
 
+
+    #----------------------------------------------------------
+    #for capture check out time
+    #----------------------------------------------------------
+    def action_check_out(self):
+        for record in self:
+            record.check_out_time = fields.Datetime.now()
+
+    # -------------------------------------------------------------------
+    # sale order creation action , pass customer name and visit reference
+    # -------------------------------------------------------------------
+    def action_create_sale_order (self):
+        self.ensure_one()
+        return {
+            'type': 'ir.actions.act_window',
+            'name': 'Create Sale Order',
+            'res_model': 'sale.order',
+            'view_mode': 'form',
+            'target': 'current',
+            'context': {
+                'default_partner_id': self.partner_id.id if self.partner_id else False,
+                'default_visit_id': self.id,
+            }
+        }
 
 
     #----------------------------------------------------------
