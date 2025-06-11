@@ -93,6 +93,16 @@
 									<td style="width:50%; text-align:center;"><span t-field="o.invoice_date"/></td>
 									<td class="arabic" style="width:25%; text-align:right;">تاريخ الفاتورة</td>
 								</tr>
+
+								<tr>
+									<td style="font-weight:bold; width:25%;">Print Date</td>
+									<td style="width:50%; text-align:center;"> <span t-esc="context_timestamp(datetime.datetime.now()).strftime('%Y-%m-%d %H:%M')"/></td>
+									<td class="arabic" style="width:25%; text-align:right;">وقت الطباعة</td>
+								</tr>
+
+
+							
+								
 								
 							</table>
 							<br/>
