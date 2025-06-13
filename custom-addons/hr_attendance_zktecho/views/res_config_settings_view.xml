@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<odoo>
+	<data>
+		<record id="inherited_res_config_settings_view_form"
+			model="ir.ui.view">
+			<field name="name">res.config.settings.view.form.inherit</field>
+			<field name="model">res.config.settings</field>
+			<field name="inherit_id"
+				ref="hr_attendance.res_config_settings_view_form" />
+			<field name="arch" type="xml">
+				<app data-string="Attendances" position="inside">
+					<block title="Duplicate &amp; Multiple Punches" name="dup_bunches">
+                        <setting string="Attendances from Backend" company_dependent="1" help="Allow Users to Check in/out from Odoo.">
+                            <div class="mt16 row" title="Count of extra hours is considered from this date. Potential extra hours prior to this date are not considered.">
+                                    <label for="duplicate_punches_seconds" string="Start from" class="o_light_label col-lg-3"/>
+                                    <field name="duplicate_punches_seconds" class="col-lg-3 w-75" /><span class="o_form_label">seconds</span>
+                                </div>
+								<div class="text-muted">
+									The time in which multiple attendance punches aren't
+									fetched/ignored
+								</div>
+                        </setting>
+                    </block>
+				
+				
+					<!-- <h2>Duplicate &amp; Multiple Punches</h2>
+					<div class="row mt16 o_settings_container" name="dup_bunches">
+						<div class="col-md-16 o_setting_box">
+							<div class="o_setting_right_pane">
+								<span class="o_form_label">Do not fetch multiple punches within</span>
+								<field name="duplicate_punches_seconds" style="width: 40px;"/>
+								<span class="o_form_label">seconds</span>
+							</div>
+						</div>
+					</div> -->
+				</app>
+			</field>
+		</record>
+	</data>
+</odoo>
