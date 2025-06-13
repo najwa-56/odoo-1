@@ -1,0 +1,117 @@
+<odoo>
+
+    <data>
+    <record id="view_task_name_tree" model="ir.ui.view">
+        <field name="name">task Name Tree</field>
+        <field name="model">task.name</field>
+        <field name="arch" type="xml">
+            <tree  default_order="sequence">
+                <field name="sequence"/>
+                <field name="name"/>
+                <field name="dependent_task_id"/>
+                <field name="fallback_task_id"/>
+                <field name="tag_ids" widget="many2many_tags"/>
+                 <field name="delay_days"/>
+                <field name="delay_hours"/>
+                <field name="delay_minutes"/>
+                <field name="default_employee_id"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_task_name_form" model="ir.ui.view">
+        <field name="name">task Name Form</field>
+        <field name="model">task.name</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <group>
+                        <field name="name"/>
+                        <field name="default_employee_id"/>
+                        <field name="tag_ids" widget="many2many_tags"/>
+
+                    </group>
+
+                     <group string="Follow-Up Task Logic">
+                          <field name="dependent_task_id"/>
+                         <field name="fallback_task_id"/>
+                     </group>
+
+                     <group string="Delay Before Task start ">
+                            <field name="delay_days"/>
+                            <field name="delay_hours"/>
+                            <field name="delay_minutes"/>
+                     </group>
+
+                     <group string="time after Task start ">
+                            <field name="due_date_delay"/>
+                     </group>
+
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_mass_update_default_employee" model="ir.actions.server">
+    <field name="name">Update Default Employee</field>
+    <field name="model_id" ref="model_task_name"/>
+    <field name="binding_model_id" ref="model_task_name"/>
+    <field name="state">code</field>
+    <field name="binding_view_types">tree</field>
+    <field name="code">
+        action = {
+    'type': 'ir.actions.act_window',
+    'res_model': 'task.name.reassign.wizard',
+    'view_mode': 'form',
+    'target': 'new',
+    'context': {
+        'active_ids': env.context.get('active_ids', [])
+      }
+   }
+        </field>
+     </record>
+
+
+        <record id="view_task_name_kanban" model="ir.ui.view">
+           <field name="name">task.name.kanban</field>
+           <field name="model">task.name</field>
+           <field name="arch" type="xml">
+            <kanban class="o_kanban_example" default_order="sequence" >
+                <field name="sequence"/>
+             <field name="name"/>
+             <field name="tag_ids"/>
+             <field name="default_employee_id"/>
+             <templates>
+                <t t-name="kanban-box">
+                    <div t-attf-class="oe_kanban_global_click o_kanban_card">
+                        <div class="o_kanban_details">
+                            <strong><field name="name"/></strong>
+                            <field name="default_employee_id"/>
+                            <div>
+                                <span>Next:</span>
+                                 <field name="dependent_task_id"/>
+                            </div>
+                            <div>
+                                <field name="tag_ids" widget="many2many_tags"/>
+                            </div>
+                        </div>
+                    </div>
+                </t>
+            </templates>
+           </kanban>
+         </field>
+        </record>
+
+
+    <record id="action_task_name" model="ir.actions.act_window">
+        <field name="name">task Names</field>
+        <field name="res_model">task.name</field>
+        <field name="view_mode">kanban,tree,form</field>
+    </record>
+
+    <menuitem id="menu_custom_task_root" name="Custom task"/>
+    <menuitem id="menu_custom_task_name" name="Task Names"
+              parent="menu_employee_task_root" action="action_task_name"/>
+
+    </data>
+</odoo>
