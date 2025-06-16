@@ -27,6 +27,7 @@
                         invisible="delivery_route_link_id == False">
                         <button name="action_add_customers" type="object" string="Add Existing Customers" class="btn-primary"/>
                             <button name="action_create_customer" type="object" string="Create New Customer" class="btn-primary"/>
+                            <button name="action_update_customer" type="object" string="Update Customer" class="btn-primary"/>
 
                     <!-- <field name="available_partner_ids" widget="many2many_tags"/> -->
                 </group>
