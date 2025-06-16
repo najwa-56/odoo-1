@@ -13,8 +13,6 @@ export class KsKeywordSelection extends Component {
         this.ks_sample_final_data = [];
         this.state = useState({ values: []});
         this._rpc = useService("rpc");
-//        this.sharedState = useService("shared_state");
-//        this.state.values = this.sharedState.getValue();
         onWillStart(async()=>{
             this.ks_data_model = await this._rpc('/web/dataset/call_kw/ks_dashboard_ninja.arti_int/ks_get_keywords',{
                 model:'ks_dashboard_ninja.arti_int',
@@ -30,8 +28,6 @@ export class KsKeywordSelection extends Component {
         var value = ev.target.value;
         var self=this;
         var ks_active_target =  $(self.search.el).find(".active")
-//        this.sharedState.setValue({"value":value,'id':this.state.values.length})
-//        this.state.values = this.sharedState.getValue();
         if (value.length){
             var ks_value = value.toUpperCase();
             self.state.values =[];
@@ -58,7 +54,6 @@ export class KsKeywordSelection extends Component {
         var self = this;
          var value = $(ev.currentTarget).find(".ai-title")[0].textContent;
          this.props.record.update({[this.props.name]: value });
-//        self.props.update(value);
          this.input.el.value = value;
          $('#ks_keywords_container .createAI-card').each(function() {
             if ($(this).hasClass('active')) {
@@ -75,24 +70,3 @@ export const KsKeywordSelectionfield = {
 
 registry.category("fields").add('ks_keyword_selection', KsKeywordSelectionfield);
 
-//const sharedStateService = {
-//    start(env) {
-//        let recent_search = [];
-//        return {
-//            getValue() {
-//                return recent_search;
-//            },
-//            setValue(value) {
-//                if(recent_search.length == 5) {
-//                    recent_search.pop();
-//                    recent_search.unshift(value);
-//                }
-//                else {
-//                    recent_search.unshift(value);
-//                }
-//            },
-//        };
-//    },
-//};
-//
-//registry.category("services").add("shared_state", sharedStateService);

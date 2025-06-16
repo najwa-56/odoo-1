@@ -8,19 +8,15 @@ import { useService } from "@web/core/utils/hooks";
 import { useSetupAction } from "@web/webclient/actions/action_hook";
 import { localization } from "@web/core/l10n/localization";
 import { browser } from '@web/core/browser/browser';
-import { strftimeToLuxonFormat } from "@web/core/l10n/dates";
 import { session } from "@web/session";
-import { download } from "@web/core/network/download";
 import { BlockUI } from "@web/core/ui/block_ui";
 import { WebClient } from "@web/webclient/webclient";
 import {FormViewDialog} from "@web/views/view_dialogs/form_view_dialog";
 import { ConfirmationDialog } from "@web/core/confirmation_dialog/confirmation_dialog";
-import { patch } from "@web/core/utils/patch";
 import { isBrowserChrome, isMobileOS } from "@web/core/browser/feature_detection";
 import { loadBundle } from '@web/core/assets';
-import {globalfunction } from '@ks_dashboard_ninja/js/ks_global_functions'
+import { globalfunction } from '@ks_dashboard_ninja/js/ks_global_functions'
 import { Ksdashboardtile } from '@ks_dashboard_ninja/components/ks_dashboard_tile_view/ks_dashboard_tile';
-//import { Ksdashboardlistview } from '@ks_dashboard_ninja/components/ks_dashboard_list_view/ks_dashboard_list';
 import { Ksdashboardtodo } from '@ks_dashboard_ninja/components/ks_dashboard_to_do_item/ks_dashboard_to_do';
 import { Ksdashboardkpiview } from '@ks_dashboard_ninja/components/ks_dashboard_kpi_view/ks_dashboard_kpi';
 import { Ksdashboardgraph } from '@ks_dashboard_ninja/components/ks_dashboard_graphs/ks_dashboard_graphs';
@@ -50,7 +46,6 @@ export class KsAIDashboardNinja extends Component {
        this.ks_ai_del_id =this.props.action.context['ks_delete_dash_id'];
         this.ks_mode = 'active';
         this.action_manager = parent;
-//      this.controllerID = params.controllerID;
         this.name = "ks_dashboard";
         this.ksIsDashboardManager = false;
         this.ksDashboardEditMode = false;
@@ -66,9 +61,7 @@ export class KsAIDashboardNinja extends Component {
         //Dn Filters Iitialization
 
         this.date_format = localization.dateFormat
-        //        this.date_format = this.date_format.replace(/\bYY\b/g, "YYYY");
         this.datetime_format = localization.dateTimeFormat
-        //            this.is_dateFilter_rendered = false;
         this.ks_date_filter_data;
 
         // Adding date filter selection options in dictionary format : {'id':{'days':1,'text':"Text to show"}}
@@ -215,7 +208,6 @@ export class KsAIDashboardNinja extends Component {
         // Events //
         const ks_element = this.main_body.el;
         Object.values(ks_element.querySelectorAll(".ks_dashboarditem_chart_container")).map((item) => { item.addEventListener('click', this.onkschartcontainerclick.bind(this))})
-//        Object.values(ks_element.querySelectorAll(".ks_list_view_container")).map((item) => { item.addEventListener('click', this.onkschartcontainerclick.bind(this))})
         Object.values(ks_element.querySelectorAll(".ks_dashboard_kpi_dashboard")).map((item) => { item.addEventListener('click', this.onkschartcontainerclick.bind(this))})
 
        $(document.querySelectorAll(".modal-body .ks_dashboard_item_button_container")).remove();
@@ -398,19 +390,16 @@ export class KsAIDashboardNinja extends Component {
     onselectallitems(){
             this.ksSelectedgraphid = []
             document.querySelectorAll(".modal-body .ks_list_view_container").forEach((item) =>{
-//                $(item).addClass('.active')
                 $(item).find('.select-btn').addClass("active");
                 this.ksSelectedgraphid.push(parseInt($(item).parent()[0].id))
             });
             document.querySelectorAll(".modal-body .ks_dashboard_kpi_dashboard").forEach((item) =>{
-//                $(item).parent().addClass('.active')
                 $(item).find('.select-btn').addClass("active");
                 this.ksSelectedgraphid.push(parseInt($(item).parent()[0].id))
             });
 
 
             document.querySelectorAll(".modal-body .ks_dashboarditem_chart_container").forEach((item) =>{
-//                $(item).addClass('.active')
                 $(item).find('.select-btn').addClass("active");
                 this.ksSelectedgraphid.push(parseInt($(item).parent()[0].id))
             });
@@ -426,21 +415,15 @@ export class KsAIDashboardNinja extends Component {
     onremoveallitems(){
 
            document.querySelectorAll(".modal-body .ks_list_view_container").forEach((item) =>{
-//                $(item).removeClass('ks_img_selected')
-//                $(item).find('.ks_img_display').addClass("d-none");
                 $(item).find('.select-btn').removeClass("active");
             })
 
             document.querySelectorAll(".modal-body .ks_dashboard_kpi_dashboard").forEach((item) =>{
-//                $(item).parent().removeClass('ks_img_selected')
-//                $(item).find('.ks_img_display').addClass("d-none");
                 $(item).find('.select-btn').removeClass("active");
             });
 
             document.querySelectorAll(".modal-body .ks_dashboarditem_chart_container").forEach((item) =>{
                 $(item).find('.select-btn').removeClass("active");
-//                $(item).removeClass('ks_img_selected')
-//                $(item).find('.ks_img_display').addClass("d-none");
             });
             this.ksSelectedgraphid = [];
              $('#ks_ai_add_item').addClass("d-none")

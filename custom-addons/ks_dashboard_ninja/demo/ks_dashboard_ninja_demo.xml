@@ -13,16 +13,6 @@
             <field name="ks_dashboard_group_access" eval="False"/>
         </record>
 
-        <record id="ks_my_default_dashboard_board" model="ks_dashboard_ninja.board">
-            <field name="name">My Dashboard</field>
-            <field name="ks_dashboard_state">Locked</field>
-            <field name="ks_dashboard_menu_name">My Dashboard</field>
-            <field name="ks_dashboard_top_menu_id" eval="ref('ks_dashboard_ninja.dashboards_menu_root')"/>
-            <field name="ks_dashboard_active">1</field>
-            <field name="ks_dashboard_default_template" ref="ks_dashboard_ninja.ks_blank"/>
-            <field name="ks_dashboard_group_access" eval="False"/>
-        </record>
-
         <record id="demo_template2_dashboard" model="ks_dashboard_ninja.board">
             <field name="name">Template2 Dashboard</field>
             <field name="ks_dashboard_menu_name">Template2</field>

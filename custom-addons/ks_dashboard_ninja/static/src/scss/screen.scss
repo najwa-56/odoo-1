@@ -6,19 +6,19 @@
         border-radius: 16px;
 
         &.one {
-            background-color: $color-FFE2E5;
+            background-color: var(--color-FFE2E5);
         }
 
         &.two {
-            background-color: $color-FFF4DE;
+            background-color: var(--color-FFF4DE);
         }
 
         &.three {
-            background-color: $color-DCFCE7;
+            background-color: var(--color-DCFCE7);
         }
 
         &.four {
-            background-color: $color-F3E8FF;
+            background-color: var(--color-F3E8FF);
         }
 
         & .info {
@@ -30,7 +30,7 @@
             font-weight: 600;
             line-height: 32px;
             text-align: left;
-            color: $color-black;
+            color: var(--color-black);
         }
 
         .sub-info {
@@ -38,7 +38,7 @@
             font-weight: 500;
             line-height: 24px;
             text-align: left;
-            color: $color-black;
+            color: var(--color-black);
         }
 
         .screen-title {
@@ -46,7 +46,7 @@
             font-weight: 500;
             line-height: 16px;
             text-align: left;
-            color: $color-737791;
+            color: var(--color-737791);
         }
 
         .screen-ratio {
@@ -54,7 +54,7 @@
             font-weight: 500;
             line-height: 16px;
             text-align: left;
-            color: $color-E7495E;
+            color: var(--color-E7495E);
         }
     }
 }
@@ -73,7 +73,7 @@
     .dashboard-container {
         min-height: 355px;
         border-radius: 20px;
-        border: 1px solid $color-E5E7EB;
+        border: 1px solid var(--color-E5E7EB);
         min-width: 512px;
         cursor: pointer;
 
@@ -87,7 +87,7 @@
                 font-weight: 500;
                 line-height: 32px;
                 text-align: left;
-                color: $color-05004E;
+                color: var(--color-05004E);
             }
 
             .hover-options {
@@ -111,10 +111,4 @@
             }
         }
     }
-}
-
-@media screen and (min-width:900px) and (max-width:1400px) {
-  .custom-dash-collapse {
-    left: -120px;
-  }
 }

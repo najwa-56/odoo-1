@@ -4,6 +4,7 @@ import { registry } from "@web/core/registry";
 import { CharField } from "@web/views/fields/char/char_field";
 const { Component, useEffect, useRef, useState } = owl;
 import { renderToElement, renderToString } from "@web/core/utils/render";
+import { ksrenderfunnelchart } from "@ks_dashboard_ninja/js/charts_render_global_functions";
 
 export class ks_funnel_chart extends Component{
     setup(){
@@ -37,17 +38,19 @@ export class ks_funnel_chart extends Component{
                     } else if (!rec.ks_chart_data_count_type) {
                         $(self.funnelRef.el).append($("<div class='graph_text'>").text("Select Chart Data Count Type"));
                     } else {
-                        this.get_funnel_chart(rec);
+                        ksrenderfunnelchart.bind(this)($(this.funnelRef.el), rec, 'preview');
                     }
                 } else {
                     $(self.funnelRef.el).append($("<div class='graph_text'>").text("Select a Model first."));
                 }
             }else if(rec.ks_data_calculation_type === "query" && rec.ks_query_result) {
                 if(rec.ks_xlabels && rec.ks_ylabels){
-                        this.get_funnel_chart(rec);
+                        ksrenderfunnelchart.bind(this)($(this.funnelRef.el), rec, 'preview');
                 } else {
                     $(self.funnelRef.el).append($("<div class='graph_text'>").text("Please choose the X-labels and Y-labels"));
                 }
+            }else if(rec.ks_data_calculation_type === "query" && this.props.record.data.ks_custom_query) {
+                    $(self.funnelRef.el).append($("<div class='graph_text'>").text("The query is invalid. Please provide a correctly structured query."));
             }else {
                     $(self.funnelRef.el).append($("<div class='graph_text'>").text("Please run the appropriate Query"));
 
@@ -115,7 +118,7 @@ export class ks_funnel_chart extends Component{
             series.appear(1000);
 
             if(this.props.record.data.ks_show_data_value && this.props.record.data.ks_data_label_type=="value"){
-                series.labels.template.set("text", "{value}");
+                series.labels.template.set("text", "{value.formatNumber('0.00')}");
             }else if(this.props.record.data.ks_show_data_value && this.props.record.data.ks_data_label_type=="percent"){
                 series.labels.template.set("text", "{valuePercentTotal.formatNumber('0.00')}%");
             }else{

@@ -1,5 +1,5 @@
 .encapsulated-form-view {
-    background-color: $color-white !important;
+    background-color: var(--color-white) !important;
     padding: 24px 40px !important;
 
     .o_dropdown_button::after {
@@ -14,12 +14,12 @@
 
     .o-checkbox {
         &.form-check .form-check-input {
-            border-color: $color-placeholders;
+            border-color: var(--color-placeholders);
         }
 
         .form-check-input[type="checkbox"]:checked {
-            background-color: $color-E7495E !important;
-            border-color: $color-E7495E !important;
+            background-color: var(--color-E7495E) !important;
+            border-color: var(--color-E7495E) !important;
         }
     }
 
@@ -31,15 +31,15 @@
     // buttons
     .o_field_domain_dialog_button,
     .o_form_button_save {
-        background-color: $color-primary-main !important;
-        border: 1px solid $color-primary-main !important;
+        background-color: var(--color-primary-main) !important;
+        border: 1px solid var(--color-primary-main) !important;
         border-radius: 10px;
         min-height: 40px;
         padding: 0 12px;
         font-size: $font-16;
         font-weight: $f-w-400;
         line-height: 19.6px !important;
-        color: $color-white;
+        color: var(--color-white);
         cursor: pointer;
         height: 100%;
 
@@ -66,26 +66,26 @@
     }
 
     .o_form_button_cancel {
-        border: 0.81px solid $color-E5E7EB;
+        border: 0.81px solid var(--color-E5E7EB);
         font-size: $font-16;
         font-weight: $f-w-500;
         line-height: 19.6px !important;
         text-align: left;
-        color: $color-1E1E1E;
+        color: var(--color-1E1E1E);
         border-radius: 8px;
         min-height: 35px;
         text-align: center;
         height: 100%;
         padding: 0 20px;
-        background-color: $color-white;
+        background-color: var(--color-white);
         min-width: 80px;
 
         &:hover {
-            background-color: $color-secondary-bg;
+            background-color: var(--color-secondary-bg);
         }
 
         &:focus {
-            border: 1px solid $color-E7495E;
+            border: 1px solid var(--color-E7495E);
         }
     }
 
@@ -97,20 +97,20 @@
 
 
         & .btn.btn-primary {
-            background-color: $color-primary-main !important;
-            border: 1px solid $color-primary-main !important;
+            background-color: var(--color-primary-main) !important;
+            border: 1px solid var(--color-primary-main) !important;
             border-radius: 10px;
             min-height: 40px;
             padding: 0 12px;
             font-size: $font-16;
             font-weight: $f-w-400;
             line-height: 19.6px;
-            color: $color-white;
+            color: var(--color-white);
             cursor: pointer;
 
             &:hover {
-                background-color: $btn-hover !important;
-                color: $color-white !important;
+                background-color: var(--btn-hover) !important;
+                color: var(--color-white) !important;
             }
 
             span {
@@ -144,8 +144,8 @@
     }
 
     .o_content {
-        border: 1px solid $color-E5E7EB;
-        background-color: $color-F5F8FB !important;
+        border: 1px solid var(--color-E5E7EB);
+        background-color: var(--color-F5F8FB) !important;
         border-radius: 20px;
         padding: 20px 24px !important;
         overflow: visible !important;
@@ -177,7 +177,7 @@
             font-weight: $f-w-400 !important;
             // line-height: 9.66px;
             text-align: left;
-            color: $color-black !important;
+            color: var(--color-black) !important;
         }
 
         .o_field_ks_dashboard_item_type {
@@ -203,16 +203,17 @@
                     font-size: $font-12 !important;
                     font-weight: $f-w-500 !important;
                     line-height: 15px;
-                    color: $color-black !important;
+                    color: var(--color-black) !important;
                 }
 
                 .chart-card {
-                    border: 1px solid $color-E5E7EB !important;
+                    border: 1px solid var(--color-E5E7EB) !important;
                     min-height: 69px;
                     margin-bottom: 4px;
                     display: flex;
                     align-items: center;
                     justify-content: center;
+                    background-color: var(--color-white-131B2F);
 
                     .chart-thum {
                         display: flex;
@@ -221,13 +222,13 @@
                         width: 47px !important;
 
                         svg {
-                            stroke: $color-737791;
+                            stroke: var(--color-737791);
                         }
 
                     }
 
                     &:hover {
-                        background-color: $color-FFF5F5 !important;
+                        background-color: var(--color-FFF5F5) !important;
 
 
                     }
@@ -241,12 +242,12 @@
 
                 .active {
                     .chart-card {
-                        background-color: $color-FFF5F5 !important;
-                        border: 0.76px solid $color-E7495E !important;
+                        background-color: var(--color-FFF5F5-24304B) !important;
+                        border: 0.76px solid var(--color-E7495E-6789C6) !important;
 
                         .chart-thum {
                             svg {
-                                stroke: $color-E7495E;
+                                stroke: var(--color-E7495E-6789C6);
                             }
                         }
                     }
@@ -274,7 +275,7 @@
             border-radius: 50%;
             overflow: hidden;
 
-            border: 1px solid $color-E5E7EB !important;
+            border: 1px solid var(--color-E5E7EB) !important;
 
             &::before {
                 height: 100% !important;
@@ -282,16 +283,6 @@
                 width: 100% !important;
             }
 
-            // &:checked::before {
-            //     content: "" !important;
-            // }
-
-            // &:checked::after {
-            //     content: '';
-            //     display: block;
-            //     height: 20px;
-            //     width: 20px;
-            // }
         }
     }
 
@@ -371,12 +362,13 @@
         line-height: 24px;
         letter-spacing: 0.01em;
         text-align: left;
-        color: $color-black;
+        color: var(--color-black);
         margin-bottom: 12px;
     }
 
     .encapsulated-preview-box {
         border-radius: 20px;
+        background-color: var(--color-white-131B2F) !important;
         // text-align: cent.ks_dashboard_item_header_l6: center;
         // align-items: center;
 
@@ -457,7 +449,7 @@
             }
 
             .img-bg {
-                background-color: $color-white;
+                background-color: var(--color-white);
             }
 
             .ks_dashboard_item_main_body_l2 {
@@ -507,11 +499,11 @@
 
     .o_form_image_controls {
         button {
-            border: 1px solid $color-CDAAAA;
+            border: 1px solid var(--color-CDAAAA);
             border-radius: 50%;
             height: 30px;
             width: 30px;
-            background: $color-white;
+            background: var(--color-white);
             margin-right: 8px;
         }
     }
@@ -521,42 +513,33 @@
         font-weight: $f-w-400;
         line-height: 9.66px;
         text-align: left;
-        color: $color-black;
+        color: var(--color-black);
     }
 }
 
 .encapsulated-textarea {
-
-    // border: 1px solid $color-D1D5DB;
-    // padding: 16px 12px;
-    // border-radius: 8px;
-    // background-color: $color-white;
     &.o_field_invalid {
         textarea {
-            border-color: $color-danger !important;
+            border-color: var(--color-danger) !important;
         }
     }
 
     textarea {
-        border: 1px solid $color-D1D5DB !important;
+        border: 1px solid var(--color-D1D5DB) !important;
         padding: 16px 12px !important;
         border-radius: 8px;
-        background-color: $color-white;
+        background-color: var(--color-white);
         min-height: 179px;
         max-height: 179px;
         overflow: auto !important;
+        color: var(--color-black);
         @include custom-scrollbar;
 
-        // border: none !important;
-
-        // &:hover {
-        //     border: none !important;
-        // }
         &::placeholder {
             font-size: $font-14;
             font-weight: $f-w-400;
             line-height: 20.99px;
-            color: $color-placeholders;
+            color: var(--color-placeholders);
         }
     }
 
@@ -588,7 +571,7 @@
         font-weight: $f-w-500 !important;
         line-height: 24px !important;
         text-align: left;
-        color: $color-dark-black !important;
+        color: var(--color-dark-black) !important;
     }
 }
 
@@ -637,15 +620,15 @@
 }
 
 .encapsulated-input-common {
-    border: 0.81px solid $color-D1D5DB !important;
+    border: 0.81px solid var(--color-D1D5DB) !important;
     border-radius: 6px;
     padding: 12px 10px !important;
     font-size: 14px;
     font-weight: 400;
     line-height: 18.52px;
     text-align: left;
-    color: $color-black;
-    background-color: $color-white !important;
+    color: var(--color-black);
+    background-color: var(--color-white) !important;
 }
 
 .encapsulated-d-content {
@@ -668,46 +651,46 @@
     background-color: #c7d6f0 !important;
     backdrop-filter: blur(4px);
 }
+
 .ks_body_class progress[value] {
     -webkit-appearance: none;
     appearance: none;
     overflow: hidden;
 }
+
 .ks_body_class progress[value]::-webkit-progress-value {
-    background-color: #3b82f6; /* Blue color for the filled portion */
-//     border-radius: 5px; /* Rounded corners on the filled part */
+    background-color: #3b82f6;
+    //     border-radius: 5px; /* Rounded corners on the filled part */
 }
 
-// progress[value]::-webkit-progress-value {
-//     background-color: #3b82f6; /* Blue color for filled portion */
-//     border-radius: 5px; /* Rounded corners */
-// }
+/* For Firefox */
+
+.ks_body_class progress[value]::-moz-progress-bar {
+    background-color: #3b82f6;
+    border-radius: 5px;
+}
+
+.ks_body_class progress[value] {
+    background-color: #c7d6f0;
+    border: none;
+    border-radius: 5px;
+    appearance: none;
+}
+
+
 
 .truncate-2-lines {
-  display: -webkit-box;
-  -webkit-box-orient: vertical;
-  -webkit-line-clamp: 2;
-  overflow: hidden;
-  text-overflow: ellipsis;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
-// for responsive custom-date-filter
-@media screen and (max-width:1230px) {
-    .ks_body_class .screen-info {
-        .ks_date_input_fields {
-            .start-date {
-                width: 130px;
-                text-overflow: ellipsis;
-                white-space: nowrap;
-                overflow: hidden;
 
-                input#ks_btn_middle_child,
-                input#ks_btn_last_child {
-                    text-overflow: ellipsis;
-                    padding-right: 30px !important;
-                }
-            }
-        }
+
+.ks_form_sheet {
+    .o_dropdown_button::after {
+        display: none !important;
     }
 }
-

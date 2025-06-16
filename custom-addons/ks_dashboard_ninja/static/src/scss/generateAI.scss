@@ -1,29 +1,34 @@
 .generated-chart {
     row-gap: 12px;
     column-gap: 8px;
+
     @media screen and (min-width:992px) {
         .col-lg-4 {
-            padding:0 6px !important;
-            }
+            padding: 0 6px !important;
         }
-     .row {
-         row-gap:12px;
-         padding:0 24px;
-         }
+    }
+
+    .row {
+        row-gap: 12px;
+        padding: 0 24px;
+    }
+
     .generated-cart-box {
         box-shadow: 0px 3.29px 16.47px 0px #EEEEEE80;
-        border: 0.82px solid $color-E5E7EB;
+        border: 0.82px solid var(--color-E5E7EB);
         border-radius: 16px;
         min-height: 292px;
-        background-color: $color-white;
+        background-color: var(--color-white);
         position: relative;
-//         min-width: 421px;
-        height:100%;
+        //         min-width: 421px;
+        height: 100%;
+
         .select-btn {
             position: absolute;
             right: 12px;
             top: 9px;
             z-index: 10;
+            display: block !important;
 
             #count_selected_btn {
                 border: initial;
@@ -31,7 +36,7 @@
             }
 
             svg {
-                stroke: $color-737791;
+                stroke: var(--color-737791);
             }
 
             &.active {
@@ -51,17 +56,18 @@
                 font-weight: $f-w-500;
                 line-height: 26.35px;
                 text-align: left;
-                color: $color-05004E;
+                color: var(--color-05004E);
             }
 
-           
+
         }
 
         .chart-preview {
             padding: 8px 12px;
             min-height: 228px;
-            position:relative;
-            height:100%;
+            position: relative;
+            height: 100%;
+
             .chart {
                 height: 100%;
                 width: 100%;
@@ -78,7 +84,7 @@
         font-weight: $f-w-500;
         line-height: 19.6px;
         text-align: left;
-        color: $color-black;
+        color: var(--color-black);
     }
 
     p {
@@ -86,23 +92,26 @@
         font-weight: $f-w-400;
         line-height: 16.8px;
         text-align: left;
-        color: $color-737791;
+        color: var(--color-737791);
     }
 }
 
 .btn-box {
-    .select-deselect#ks_ai_add_all_item,.select-deselect#ks_ai_remove_all_item,.select-deselect#ks_close_dialog {
+
+    .select-deselect#ks_ai_add_all_item,
+    .select-deselect#ks_ai_remove_all_item,
+    .select-deselect#ks_close_dialog {
         font-size: $font-14;
         font-weight: $f-w-500;
         line-height: 22.4px;
         text-align: left;
-//         color: $color-151D48;
+        //         color: $color-151D48;
         min-height: 40px;
         padding: 0 20px;
-        background-color: $color-white;
+        background-color: var(--color-white);
         cursor: pointer;
         border: none;
-        color: inherit !important;
+        color: var(--color-black) !important;
 
         &:focus {
             outline: none;
@@ -110,12 +119,12 @@
         }
 
         svg {
-            stroke: #737791;
+            stroke: var(--color-737791);
         }
 
         &.active {
             svg {
-                fill: #6789C6;
+                fill: var(--color-6789C6);
                 stroke: white;
             }
         }

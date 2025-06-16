@@ -41,7 +41,7 @@
                             </li>
                         </t>
                         <t t-else="">
-                            <li class="p-2"><a class="line-seperator-ks" href="#"></a></li>
+                            <li class="p-2"><a class="line-seperator-ks" href="#"/></li>
                         </t>
                     </t>
                 </div>
@@ -360,9 +360,9 @@
 
 
     <t t-name="dn_favourite_filter_dropdown">
-        <div id="favFilterMain" t-if="ks_dashboard_data.ks_dashboard_items_ids.length" title="Favourite Filter" t-att-class="Object.keys(ks_dashboard_data.ks_dashboard_favourite_filter).length ? 'me-2 hide-in-edit' : 'hide-in-edit ks_hide me-2'">
+        <div id="favFilterMain" t-if="ks_dashboard_data.ks_dashboard_items_ids.length" title="Favourite Filter" t-att-class="Object.keys(ks_dashboard_data.ks_dashboard_favourite_filter).length ? ' hide-in-edit' : ' hide-in-edit ks_hide'">
             <t t-if="Object.keys(ks_dashboard_data.ks_dashboard_favourite_filter).length">
-                <div class="dropdown dash-dd-2 me-lg-2 ms-2 d-md-block d-none favFilterDropdown">
+                <div class="dropdown dash-dd-2 ms-2 d-md-block d-none favFilterDropdown">
                     <a class="text-decoration-none dropdown-toggle save-filter" href="#" role="button"
                         data-bs-toggle="dropdown" aria-expanded="false">
                         <svg width="20" height="20" viewBox="0 0 20 20" fill="none"

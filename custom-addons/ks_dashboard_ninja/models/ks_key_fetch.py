@@ -1,9 +1,12 @@
-import base64
-import logging
-import requests
+# -*- coding: utf-8 -*-
+
 import json
-from odoo import api, fields, models, _
+import logging
+
+import requests
 from odoo.exceptions import ValidationError
+
+from odoo import fields, models, _
 
 _logger = logging.getLogger(__name__)
 

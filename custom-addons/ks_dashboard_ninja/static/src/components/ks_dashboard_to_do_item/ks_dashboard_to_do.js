@@ -1,12 +1,13 @@
 /** @odoo-module **/
 import { Component, onWillStart, useState ,onMounted, onWillRender,useRef,onWillPatch, onRendered } from "@odoo/owl";
-import {globalfunction } from '@ks_dashboard_ninja/js/ks_global_functions';
+import { globalfunction } from '@ks_dashboard_ninja/js/ks_global_functions';
 import { loadBundle } from "@web/core/assets";
 import { isMobileOS } from "@web/core/browser/feature_detection";
 import { useService } from "@web/core/utils/hooks";
-import {Todoeditdialog,addtododialog} from "@ks_dashboard_ninja/components/ks_dashboard_to_do_item/editdialog";
+import { Todoeditdialog, addtododialog } from "@ks_dashboard_ninja/components/ks_dashboard_to_do_item/editdialog";
 import { ConfirmationDialog } from "@web/core/confirmation_dialog/confirmation_dialog";
 import { _t } from "@web/core/l10n/translation";
+import { KsItemButton } from '@ks_dashboard_ninja/components/chart_buttons/chart_buttons';
 
 export class Ksdashboardtodo extends Component{
     setup(){
@@ -16,9 +17,16 @@ export class Ksdashboardtodo extends Component{
         this.mailChatService = useService("mail.chat_window");
         this.threadService = useService("mail.thread");
         this.state = useState({to_do_view_data : ""})
+        this.todoRootRef = useRef("todoRootRef");
         this.item = this.props.item
         this.ks_dashboard_data = this.props.dashboard_data
+        this.item.ksIsDashboardManager = this.props.dashboard_data.ks_dashboard_manager
+        this.item.ks_dashboard_list = this.props.dashboard_data.ks_dashboard_list
         this.prepare_item();
+    }
+
+    get isMobile() {
+        return isMobileOS();
     }
 
 
@@ -30,7 +38,7 @@ export class Ksdashboardtodo extends Component{
             args: [
                 [parseInt(item_id)], self.ks_dashboard_data.ks_dashboard_id,{}
             ],
-            kwargs:{context:this.props.dashboard_data.context},
+            kwargs: { context: self.env.getContext() },
         }).then(function(new_item_data) {
             this.ks_dashboard_data.ks_item_data[item_id] = new_item_data[item_id];
             this.item = this.ks_dashboard_data.ks_item_data[item_id] ;
@@ -50,7 +58,7 @@ export class Ksdashboardtodo extends Component{
         return this.ks_dashboard_data.ks_dashboard_list;
     }
 
-        prepare_item() {
+    prepare_item() {
             var self = this;
             var item = self.item
             self.ks_to_do_view_name = 'Test';
@@ -61,8 +69,8 @@ export class Ksdashboardtodo extends Component{
             self.ks_chart_title = item.name;
 
             if (item.ks_info){
-                var ks_description = item.ks_info.split('\n');
-                var ks_description = ks_description.filter(element => element !== '')
+                var ks_description = item.ks_info.replace?.(/\\n/g, '\n').split?.('\n');
+                var ks_description = ks_description.filter(element => element !== '')?.join?.(' ') ?? false
             }else {
                 var ks_description = false;
             }
@@ -248,6 +256,6 @@ Ksdashboardtodo.props = {
     on_dialog: { type: Boolean, optional: true },
     explain_ai_whole: { type: Boolean, optional: true }
 };
-Ksdashboardtodo.components = {Todoeditdialog, addtododialog}
+Ksdashboardtodo.components = { Todoeditdialog, addtododialog, KsItemButton }
 
 Ksdashboardtodo.template = "Ksdashboardtodo";

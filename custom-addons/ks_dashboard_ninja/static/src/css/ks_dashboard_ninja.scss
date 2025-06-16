@@ -8,7 +8,7 @@
 
 .ks_dashboard_main_content {
     overflow: auto;
-    height: calc(100vh - 175px);
+//     height: calc(100vh - 175px);
     max-height:100%;
 }
 .ks_dashboard_ninja_header{
@@ -453,7 +453,7 @@ margin-top:10px;
 .ks_date_filter_selected > span, .ks_layout_selected > span{
     font-weight: bold;
 }
-.ks_date_filter_selected > span::before, .ks_layout_selected > span::before{
+.ks_layout_selected > span::before{
     font-family: FontAwesome;
     position: absolute;
     left: 6px;

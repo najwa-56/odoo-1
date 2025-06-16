@@ -1,0 +1,12 @@
+.ks_body_class .grid-stack-item>.grid-stack-item-content {
+    box-shadow: none !important;
+}
+
+.ks_body_class .grid-stack-item.ui-draggable{
+    cursor: move;
+    .ks_dashboard_item_header_hover {
+            display: none !important;
+        }
+}
+
+

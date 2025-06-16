@@ -1,11 +1,15 @@
 /** @odoo-module **/
-import { Component,useState ,onWillUpdateProps,useEffect,onMounted,useRef} from "@odoo/owl";
+import { Component,useState ,onWillUpdateProps,useEffect,onMounted,useRef, onWillUnmount} from "@odoo/owl";
 import {globalfunction } from '@ks_dashboard_ninja/js/ks_global_functions';
 import { formatFloat } from "@web/core/utils/numbers";
 import { formatInteger } from "@web/views/fields/formatters";
 import { useService } from "@web/core/utils/hooks";
 import { jsonrpc } from "@web/core/network/rpc_service";
 import { _t } from "@web/core/l10n/translation";
+import { onAudioEnded } from '@ks_dashboard_ninja/js/ks_global_functions';
+import { isMobileOS } from "@web/core/browser/feature_detection";
+import { KsItemButton } from '@ks_dashboard_ninja/components/chart_buttons/chart_buttons';
+
 
 export class Ksdashboardkpiview extends Component{
         file_type_magic_word= {'/': 'jpg','R': 'gif','i': 'png','P': 'svg+xml'}
@@ -16,11 +20,15 @@ export class Ksdashboardkpiview extends Component{
         this.mailChatService = useService("mail.chat_window");
         this.threadService = useService("mail.thread");
         this.ks_kpi = useRef('ks_kpi')
+        this.aiAudioRef = useRef("aiAudioRef");
+
         this.ksAllowItemClick = false;
         this.state = useState({item_info_kpi1:{},item_info_kpi2:{},item_info_kpi3:{}})
         onMounted(() => this._update_view());
         this.item = this.props.item
         this.ks_dashboard_data = this.props.dashboard_data
+        this.item.ksIsDashboardManager = this.props.dashboard_data.ks_dashboard_manager
+        this.item.ks_dashboard_list = this.props.dashboard_data.ks_dashboard_list
         this.classname = ' encapsulated-kpi-tile ks_dashboard_kpi ks_dashboard_kpi_dashboard ks_dashboard_custom_srollbar ks_dashboarditem_id ks_dashboard_item_hover ks_db_item_preview_color_picker grid-stack-item-content'
         this.ks_ai_analysis = this.props.dashboard_data.ks_ai_explain_dash
         if (this.ks_ai_analysis){
@@ -35,31 +43,15 @@ export class Ksdashboardkpiview extends Component{
         }
         this.prepareKpiData();
         var update_interval = this.props.dashboard_data.ks_set_interval
-        onWillUpdateProps(async(nextprops)=>{
-            if(nextprops.ksdatefilter !='none'){
-                await this.ksFetchUpdateItem(this.item.id)
-            }
-            if (Object.keys(nextprops.pre_defined_filter).length){
-                if (nextprops.pre_defined_filter?.item_ids?.includes(this.item.id)){
+        onWillUpdateProps( async (nextprops) => {
+            if (nextprops?.itemsToUpdateList?.length){
+                if (nextprops.itemsToUpdateList?.includes(this.item.id)){
                     await this.ksFetchUpdateItem(this.item.id)
                 }
             }
-            if (Object.keys(nextprops.custom_filter).length){
-                if (nextprops.custom_filter?.item_ids?.includes(this.item.id)){
-                    await this.ksFetchUpdateItem(this.item.id)
-                }
-            }
-
-
         })
-        useEffect(()=>{
-            if (update_interval && !this.env.inDialog){
-                const interval = setInterval(() => {
-                    this.ksFetchUpdateItem(this.item.id);
-                }, update_interval);
-                return () => clearInterval(interval);
-            }
-
+        onWillUnmount( () => {
+            this.aiAudioRef.el?.removeEventListener('ended', onAudioEnded)
         })
     }
     ksFetchUpdateItem(item_id) {
@@ -68,9 +60,9 @@ export class Ksdashboardkpiview extends Component{
                 model: 'ks_dashboard_ninja.board',
                 method: 'ks_fetch_item',
                 args: [
-                    [parseInt(item_id)], self.ks_dashboard_data.ks_dashboard_id,self.__owl__.parent.component.ksGetParamsForItemFetch(self.item.id)
+                    [parseInt(item_id)], self.ks_dashboard_data.ks_dashboard_id, self.env.ksGetParamsForItemFetch(self.item.id)
                 ],
-                kwargs:{context:this.props.dashboard_data.context},
+                kwargs: { context: self.env.getContext() },
             }).then(function(new_item_data) {
                 this.ks_dashboard_data.ks_item_data[item_id] = new_item_data[item_id];
                 this.item = this.ks_dashboard_data.ks_item_data[item_id] ;
@@ -78,13 +70,15 @@ export class Ksdashboardkpiview extends Component{
                 this.prepareKpiData()
                 this._update_view();
             }.bind(this));
-        }
+    }
 
+    get isMobile() {
+        return isMobileOS();
+    }
 
     _update_view(){
         if(!this.kpi_data[1]){
             if (this.field.ks_target_view === "Progress Bar" && this.field.ks_goal_enable) {
-//                $('#' + this.item.id).find('#ks_progressbar').val(parseInt(this.target_deviation));
                 if(this.ks_kpi.el?.querySelector('#ks_progressbar')){
                     this.ks_kpi.el.querySelector('#ks_progressbar').value = parseInt(this.target_deviation);
                 }
@@ -137,6 +131,7 @@ export class Ksdashboardkpiview extends Component{
         const dashboardItem = this.ks_kpi.el.querySelector('.ks_dashboarditem_id');
         dashboardItem.style.backgroundColor = this.ks_rgba_background_color;
         dashboardItem.style.color = this.ks_rgba_font_color;
+        this.aiAudioRef.el?.addEventListener('ended', onAudioEnded)
     }
 
     ksSum(count_1, count_2, item_info, field, target_1, kpi_data) {
@@ -214,6 +209,7 @@ export class Ksdashboardkpiview extends Component{
     }
 
     prepareKpiData() {
+//        if(!kpi_data) return
         var self = this;
         var field = this.item;
         this.ks_date_filter_selection = field.ks_date_filter_selection;
@@ -252,16 +248,13 @@ export class Ksdashboardkpiview extends Component{
             var pre_deviation = previous_period_data ? formatInteger(parseInt((pre_diffrence / previous_period_data) * 100)) + '%' : "100%"
         }
         if (this.item.ks_info){
-            var ks_description = this.item.ks_info.split('\n');
-            var ks_description = ks_description.filter(element => element !== '')
+            var ks_description = this.item.ks_info.replace?.(/\\n/g, '\n').split?.('\n');
+            var ks_description = ks_description.filter(element => element !== '')?.join?.(' ') ?? false
         }else {
             var ks_description = false;
         }
         this.item['ksIsDashboardManager'] = self.ks_dashboard_data.ks_dashboard_manager;
         this.item['ksIsUser'] = true;
-//        if (this.item.ks_tv_play){
-//            this.item['ksIsUser'] = false;
-//        }
         var ks_icon_url;
         if (field.ks_icon_select == "Custom") {
             if (field.ks_icon[0]) {
@@ -270,7 +263,6 @@ export class Ksdashboardkpiview extends Component{
                 ks_icon_url = false;
             }
         }
-//            parseInt(Math.round((count_1 / target_1) * 100)) ? formatInteger(Math.round((count_1 / target_1) * 100)) : "0"
         var target_progress_deviation = String(Math.round((count_1  / target_1) * 100));
          if(field.ks_multiplier_active){
             var target_progress_deviation = String(Math.round(((count_1 * field.ks_multiplier) / target_1) * 100));
@@ -302,9 +294,9 @@ export class Ksdashboardkpiview extends Component{
             ks_rgba_button_color:ks_rgba_button_color,
             ks_info: ks_description,
         }
+        this.previous_period_data = previous_period_data
 
         this.target_deviation = parseInt(item_info.target_progress_deviation) ? parseInt(item_info.target_progress_deviation) : "0"
-        if (item_info.target_deviation === Infinity) item_info.target_arrow = false;
         item_info.target_progress_deviation = parseInt(item_info.target_progress_deviation) ? formatInteger(parseInt(item_info.target_progress_deviation)) : "0"
         if (field.ks_multiplier_active){
             item_info['count_1'] = globalfunction._onKsGlobalFormatter(kpi_data[0]['record_data'] * field.ks_multiplier, field.ks_data_format, field.ks_precision_digits);
@@ -443,15 +435,19 @@ export class Ksdashboardkpiview extends Component{
 };
 
 Ksdashboardkpiview.props = {
-    item: { type: Object, Optional:true},
-    dashboard_data: { type: Object, Optional:true},
-    ksdatefilter :{type :String, Optional:true},
-    pre_defined_filter:{type: Object, Optional:true},
-    custom_filter :{type:Object, Optional:true},
-    ks_speak:{type:Function , Optional:true},
+    item: { type: Object, optional:true},
+    dashboard_data: { type: Object, optional:true},
+    ksdatefilter :{type :String, optional:true},
+    pre_defined_filter:{type: Object, optional:true},
+    custom_filter :{type:Object, optional:true},
+    itemsToUpdateList : { type: Array, optional: true },
+    ks_speak:{type:Function , optional:true},
     hideButtons: { type: Number, optional: true },
     on_dialog: { type: Boolean, optional: true },
     generate_dialog: { type: Boolean, optional: true },
+    onItemClick: { type: Function },
 };
 
 Ksdashboardkpiview.template = "Ksdashboardkpiview";
+Ksdashboardkpiview.components = { KsItemButton };
+

@@ -43,8 +43,6 @@
                                 <div class="d-flex align-items-center w-100">
                                     <div class="ai-thum-img">
                                         <img src="/ks_dashboard_ninja/static/images/3dcube.svg" alt="searched-icon" class="img-fluid" loading="lazy"/>
-    <!--                                    <img t-att-src="'ks_dashboard_ninja/static/images/'+val['type']+'-chart.svg'"-->
-    <!--                                         alt=""/>-->
                                     </div>
                                     <div class="ai-title  searched-title">
                                     <t t-esc="val['value']"/>
@@ -58,32 +56,6 @@
                     </t>
                  </t>
             </div>
-<!--            <div class="createAI-panel scrollbar" t-ref="ks_search">-->
-<!--                <t t-foreach="state.values" t-as="val" t-key="val.id">-->
-<!--                    <t t-if="val.id">-->
-<!--                        <div class=" generate-item createAI-card" t-on-click="_onResponseSelect">-->
-<!--                            <div class="ai-title">-->
-<!--                                <t t-esc="val['value']"/>-->
-<!--                            </div>-->
-<!--                            <div class="ks_dashboard_option_category">-->
-<!--                                <span class="ks_dashboard_option">Generate With AI</span>-->
-<!--                            </div>-->
-<!--                        </div>-->
-
-<!--                    </t>-->
-<!--                    <t t-else="">-->
-<!--                        <div class="createAI-card" t-on-click="_onResponseSelect">-->
-<!--                            <div class="ai-thum-img">-->
-<!--                                <img t-att-src="'ks_dashboard_ninja/static/images/'+val['type']+'-chart.svg'"-->
-<!--                                     alt=""/>-->
-<!--                            </div>-->
-<!--                            <div class="ai-title">-->
-<!--                                <t t-esc="val['value']"/>-->
-<!--                            </div>-->
-<!--                        </div>-->
-<!--                    </t>-->
-<!--                </t>-->
-<!--            </div>-->
         </div>
     </t>
 </templates>

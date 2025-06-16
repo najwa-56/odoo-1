@@ -18,7 +18,7 @@
                             </button>
                             <button class="o_clear_file_button" title="Clear"
                                 aria-label="Clear" t-on-click="(ev) => this.ks_remove_icon(ev)">
-                                <svg width="16" height="16" viewBox="0 0 16 16" class="me-1" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <svg width="16" height="16" viewBox="0 0 16 16" class="" fill="none" xmlns="http://www.w3.org/2000/svg">
                                     <path d="M14 3.98665C11.78 3.76665 9.54667 3.65332 7.32 3.65332C6 3.65332 4.68 3.71999 3.36 3.85332L2 3.98665" fill="#241C1D"/>
                                     <path d="M14 3.98665C11.78 3.76665 9.54667 3.65332 7.32 3.65332C6 3.65332 4.68 3.71999 3.36 3.85332L2 3.98665" stroke="#241C1D" stroke-linecap="round" stroke-linejoin="round"/>
                                     <path d="M5.66699 3.31337L5.81366 2.44004C5.92033 1.80671 6.00033 1.33337 7.12699 1.33337H8.87366C10.0003 1.33337 10.087 1.83337 10.187 2.44671L10.3337 3.31337" stroke="#241C1D" stroke-linecap="round" stroke-linejoin="round"/>

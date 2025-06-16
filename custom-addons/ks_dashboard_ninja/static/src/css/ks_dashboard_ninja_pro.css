@@ -75,20 +75,11 @@
 
 .ks_chart_card_body{
     position: absolute;
-    top: 53px;
+    top: 65px;
     left: 8px;
     right: 8px;
     bottom: 8px;
 }
-
-.ks_chart_card_body{
-    position: absolute;
-    top: 53px;
-    left: 8px;
-    right: 8px;
-    bottom: 8px;
-}
-
 
 /*---------------------------------------------------*/
 table#ksListViewTable {
@@ -125,6 +116,7 @@ table#ksListViewTable {
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
+    width: 75%
 }
 
 .ks_pager {

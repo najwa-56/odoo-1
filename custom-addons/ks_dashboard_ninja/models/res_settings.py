@@ -1,7 +1,12 @@
-from odoo import api, fields, models,_
-from odoo.exceptions import ValidationError
-import requests
+# -*- coding: utf-8 -*-
+
 import json
+
+import requests
+from odoo.exceptions import ValidationError
+
+from odoo import fields, models, _
+
 
 class ResConfig(models.TransientModel):
     _inherit = "res.config.settings"

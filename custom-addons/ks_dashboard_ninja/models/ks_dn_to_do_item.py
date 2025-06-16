@@ -1,8 +1,12 @@
+# -*- coding: utf-8 -*-
+
 import json
-from odoo import models, fields, api, _
-import copy
 import re
-from odoo.exceptions import ValidationError, UserError
+
+from odoo.exceptions import ValidationError
+
+from odoo import models, fields, api, _
+
 
 class KsDashboardNinjaItems(models.Model):
     _inherit = 'ks_dashboard_ninja.item'

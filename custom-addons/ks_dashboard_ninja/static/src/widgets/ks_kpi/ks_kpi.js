@@ -104,6 +104,9 @@ class KsKpiPreview extends Component {
         get value() {
             var self = this;
             var field = self.props.record.data;
+            if(!field.ks_kpi_data){
+            return
+            }
             var kpi_data = JSON.parse(field.ks_kpi_data);
             var count_1 = kpi_data[0].record_data;
             var count_2 = kpi_data[1] ? kpi_data[1].record_data : undefined;
@@ -302,6 +305,10 @@ class KsKpiPreview extends Component {
         ks_changes(){
             var self = this;
             var field =  self.props.record.data;
+            if(this.props.record.data.ks_custom_query && self.props.record.data.ks_query_result==='null'){
+            $(this.ks_kpi_ref.el).empty().append($("<div class='graph_text'>").text("The query is invalid. Please provide a correctly structured query."));
+            return
+            }
             var ks_valid_date_selection = ['l_day', 't_week', 't_month', 't_quarter', 't_year'];
             if (field.ks_kpi_data){
                 var kpi_data = JSON.parse(field.ks_kpi_data);
@@ -348,7 +355,7 @@ class KsKpiPreview extends Component {
                         }
                         var diffrence = count - target_1
                     }else if (field.ks_data_comparison === 'Percentage' && field.ks_model_id_2 && field.ks_target_view == "Number"){
-                        var count = parseInt((count_1 / count_2) * 100)
+                        var count = ((count_1 / count_2) * 100)
                         if (field.ks_multiplier_active){
                             count = count * field.ks_multiplier
                         }

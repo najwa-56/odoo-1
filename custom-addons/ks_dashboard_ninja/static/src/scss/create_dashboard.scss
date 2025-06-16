@@ -14,13 +14,13 @@
 
             .modal-header {
                 padding: 12px 16px;
-                background-color: $color-bg-main;
+                background-color: var(--color-bg-main-164E63);
                 border-radius: 16px 16px 0 0;
                 border-bottom: 0;
                 justify-content: start !important;
 
                 @include max-575 {
-                    background-color: $color-bg-main !important;
+                    background-color: var(--color-bg-main) !important;
                 }
 
                 .modal-title {
@@ -28,10 +28,10 @@
                     font-weight: $f-w-500;
                     line-height: 22.4px;
                     text-align: left;
-                    color: $color-black;
+                    color: var(--color-black);
 
                     @include max-575 {
-                        color: $color-black !important;
+                        color: var(--color-black) !important;
                     }
                 }
 
@@ -46,6 +46,8 @@
             }
 
             .modal-body {
+                background-color: var(--color-white-222B3F);
+
                 .encapsulated-tile-container {
                     min-height: 180px;
                     position: relative;
@@ -80,7 +82,8 @@
                 }
 
                 .screen-info,
-                .chart_button_container {
+                .chart_button_container,
+                .ks_explain_todo {
                     display: none !important;
                 }
 
@@ -95,16 +98,16 @@
 
                 }
 
-                // delete-modal 
+                // delete-modal
                 .modal-para {
                     font-size: $font-24;
                     font-weight: $f-w-500;
                     line-height: 33.6px;
                     text-align: center;
-                    color: $color-black;
+                    color: var(--color-black);
                 }
 
-                // duplicate dashboard 
+                // duplicate dashboard
                 .duplicate-db {
                     .o_form_renderer {
                         display: flex !important;
@@ -133,12 +136,12 @@
                     line-height: 9.66px;
                     letter-spacing: 0.0015em;
                     text-align: left;
-                    color: $color-black;
+                    color: var(--color-black);
                     margin-bottom: 8px;
                     opacity: 1 !important;
 
                     &:focus {
-                        border: 1px solid $color-black;
+                        border: 1px solid var(--color-black);
                     }
                 }
 
@@ -179,9 +182,7 @@
                 }
 
                 .ui-widget.ui-autocomplete {
-                    // position: absolute !important;
-                    // width: 100%;
-                    // max-width: 100% !important;
+
                     box-shadow: 0px 4px 12px 0px #00000040;
                     border-radius: 8px;
                     border: none;
@@ -193,12 +194,12 @@
                         font-weight: $f-w-400;
                         line-height: 16px;
                         text-align: left;
-                        color: $color-paragraph ;
+                        color: var(--color-paragraph);
 
                         &:hover,
                         &.ui-state-active {
-                            color: $color-secondary-main;
-                            background-color: $color-E6FCF5;
+                            color: var(--color-04A9CC-white);
+                            background-color: var(--color-E6FCF5);
                         }
                     }
                 }
@@ -213,7 +214,7 @@
                             padding: 0 16px;
 
                             .nav-tabs {
-                                border-bottom: 1px solid $color-E5E7EB;
+                                border-bottom: 1px solid var(--color-E5E7EB);
                                 padding-left: 0;
                                 padding-right: 0;
                                 background-color: transparent;
@@ -224,14 +225,14 @@
                                     line-height: 24px;
                                     letter-spacing: 0.01em;
                                     text-align: left;
-                                    color: $color-black;
+                                    color: var(--color-black);
                                     padding: 16px;
                                     border: none;
                                     background-color: transparent;
 
                                     &.active {
-                                        color: $color-E7495E;
-                                        border-bottom: 2px solid $color-E7495E;
+                                        color: var(--color-E7495E);
+                                        border-bottom: 2px solid var(--color-E7495E);
                                     }
                                 }
                             }
@@ -245,21 +246,23 @@
                                     margin: -16px 0;
 
                                     table {
-                                        table-layout: auto !important;
 
                                         thead {
                                             tr {
                                                 th {
 
+                                                    &:last-child {
+                                                        width: 84px !important;
+                                                    }
 
-                                                    width: auto !important;
-                                                    background-color: $color-secondary-bg;
+                                                    background-color: var(--color-secondary-bg);
                                                     font-size: $font-16;
                                                     font-weight: $f-w-500;
                                                     line-height: 18px;
                                                     padding: 12px 24px;
                                                     text-align: left;
-                                                    color: $color-paragraph;
+                                                    color: var(--color-paragraph);
+                                                    border-bottom: 1px solid var(--color-EAECF0) !important;
 
                                                     @include max-768 {
                                                         width: fit-content !important;
@@ -273,14 +276,14 @@
                                             tr {
                                                 td {
                                                     padding: 16px 24px;
-                                                    border-bottom: 1px solid $color-EAECF0;
-                                                    background-color: $color-white !important;
-                                                    --table-accent-bg: $color-white;
+                                                    border-bottom: 1px solid var(--color-EAECF0);
+                                                    background-color: var(--color-white) !important;
+                                                    --table-accent-bg: var(--color-white);
                                                     font-size: 14px;
                                                     font-weight: 400;
                                                     line-height: 20px;
                                                     text-align: left;
-                                                    color: $color-black;
+                                                    color: var(--color-black);
                                                     vertical-align: middle;
 
                                                     button {
@@ -288,8 +291,8 @@
                                                             display: flex;
                                                             justify-content: center;
                                                             align-items: center;
-                                                            background-color: $color-bg-main !important;
-                                                            border: 0.38px solid $color-CDAAAA;
+                                                            background-color: var(--color-bg-main) !important;
+                                                            border: 0.38px solid var(--color-CDAAAA);
                                                             border-radius: 50% !important;
                                                             height: 30px;
                                                             width: 30px;
@@ -301,7 +304,7 @@
                                                         font-weight: $f-w-400;
                                                         line-height: 20px;
                                                         text-align: left;
-                                                        color: $color-secondary-main !important;
+                                                        color: var(--color-04A9CC-imp) !important;
                                                     }
                                                 }
                                             }
@@ -318,6 +321,8 @@
             .modal-footer {
                 border: 0;
                 justify-content: flex-end !important;
+                background-color: var(--color-white-222B3F);
+                border-radius: 0 0 16px 16px ;
 
                 .o_form_buttons_edit {
                     justify-content: end !important;
@@ -359,7 +364,7 @@
 
     &.o_field_invalid {
         input {
-            border-color: $color-danger !important;
+            border-color: var(--color-danger) !important;
         }
     }
 
@@ -374,9 +379,9 @@
             font-weight: 400;
             line-height: 20.99px;
             text-align: left;
-            color: $color-black;
+            color: var(--color-black);
             padding: 12px 10px;
-            border: 0.91px solid $color-D1D5DB;
+            border: 0.91px solid var(--color-D1D5DB);
             border-radius: 8px;
             width: 100%;
             display: inline-block;
@@ -414,15 +419,15 @@
 
     input,
     select {
-        border: 0.81px solid $color-D1D5DB !important;
+        border: 0.81px solid var(--color-D1D5DB) !important;
         border-radius: 6px;
         padding: 12px 10px !important;
         font-size: $font-14;
         font-weight: $f-w-400;
         line-height: 18.52px;
         text-align: left;
-        color: $color-black;
-        background-color: $color-white !important;
+        color: var(--color-black);
+        background-color: var(--color-white) !important;
         padding-right: 21px !important;
 
 
@@ -437,22 +442,12 @@
             font-weight: $f-w-400;
             line-height: 18.52px;
             text-align: left;
-            color: $color-placeholders;
+            color: var(--color-placeholders);
         }
     }
 
     select {
         background-image: none !important;
-        // background: transparent url(/ks_dashboard_ninja/static/src/scss/../../images/icons/down-arrow.svg) no-repeat right center !important;
-        // background-position: calc(100% - 20px) center !important;
-        // &#ks_date_filter_selection_0:not(:hover),
-        // &#ks_set_interval_0:not(:hover),
-        // &#ks_type_0:not(:hover),
-        // &#ks_data_format_0:not(:hover) {
-        //     background: transparent url(/ks_dashboard_ninja/static/src/scss/../../images/icons/down-arrow.svg) no-repeat right center !important;
-        //     background-position: calc(100% - 20px) center !important;
-
-        // }
     }
 
     &.start-date,
@@ -475,7 +470,7 @@
 
         div {
             span {
-                border: 0.91px solid $color-D1D5DB;
+                border: 0.91px solid var(--color-D1D5DB);
                 border-radius: 8px;
                 min-height: 44px;
                 width: 100%;
@@ -518,25 +513,18 @@
         transition: all 350ms ease-in-out;
     }
 
-    // &:focus,
-    // &:focus-within {
-    //     &::after {
-    //         transform: rotate(-180deg);
-    //         top: 8px;
-    //     }
-    // }
 }
 
 .encap-custom-input {
-    border: 0.81px solid $color-D1D5DB !important;
+    border: 0.81px solid var(--color-D1D5DB) !important;
     border-radius: 6px;
     padding: 6px 4px !important;
     font-size: 14px;
     font-weight: 400;
     line-height: 18.52px;
     text-align: left;
-    color: $color-black;
-    background-color: $color-white !important;
+    color: var(--color-black);
+    background-color: var(--color-white) !important;
     min-height: 45px;
 
     input {

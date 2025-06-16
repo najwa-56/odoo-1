@@ -1,0 +1,151 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+
+
+    <t t-name="ks_dashboard_ninja.KsDashboardNinjaHeader" owl="1">
+        <KsHeader dashboard_data="ks_get_current_dashboard_data" mode="ks_dashboard_data.ks_dashboard_manager ? 'manager' : 'user'"
+                  headerRootRef="headerRootRef"/>
+        <main class="main-box" t-ref="ks_main_body">
+            <t t-call="ks_dashboard_ninja.ks_main_body_container"/>
+        </main>
+    </t>
+
+    <!--    Dashboard Main Body Container -->
+    <t t-name="ks_dashboard_ninja.ks_main_body_container" owl="1">
+
+        <div class="ks_dashboard_main_content explain-ai-main-content" t-att-class="ks_dashboard_item_length === 0 ? ' h-0' : ''" t-ref="ks_main_body">
+            <t t-if="ks_dashboard_item_length != 0">
+                <t t-if="!state.should_loading">
+                    <t t-call="ks_dashboard_item_template"/>
+                </t>
+                <div t-else="state.should_loading">
+                    <t t-call="ks_loading_template"/>
+                </div>
+            </t>
+        </div>
+        <t t-if="ks_dashboard_item_length === 0">
+            <t t-call="ksNoItemView"/>
+        </t>
+    </t>
+
+    <t t-name="ks_loading_template">
+        <div t-att-class="'o_blockUI fixed-top d-flex justify-content-center align-items-center flex-column vh-100'">
+            <div class="o_spinner mb-4">
+                <img src="/ks_dashboard_ninja/static/images/loader.gif" alt="Loading..."/>
+            </div>
+            <div class="o_message text-center px-4">Loading...</div>
+        </div>
+    </t>
+
+    <!--  Empty Dashboard View Layout  -->
+    <t t-name="ksNoItemView">
+        <section class="overview-sec-dasboards container-fluid h-100">
+            <div t-if="!filteredDashboardsInfo" class="d-flex flex-column justify-content-center align-items-center h-100 no-data">
+                <div>
+                    <img src="/ks_dashboard_ninja/static/images/dashboardOverview/no-data.png" alt="no-data-files" class="img-fluid" loading="lazy"/>
+                </div>
+                <h3 class="mb-0">
+                    No Data Found!!
+                </h3>
+                <p class="mb-3">Your Personal Dashboard is Empty!</p>
+                <button class="dash-btn-red d-flex align-items-center" t-if="state.ks_dashboard_manager &amp;&amp; !isMobile" t-on-click="onAddItemTypeClick">
+                    <span>
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="transparent" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M12 22C17.5 22 22 17.5 22 12C22 6.5 17.5 2 12 2C6.5 2 2 6.5 2 12C2 17.5 6.5 22 12 22Z" stroke="#fff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                            <path d="M8 12H16" stroke="#fff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                            <path d="M12 16V8" stroke="#fff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                    </span>
+                    <span class="ms-2">
+                        Create New Chart
+                    </span>
+                </button>
+            </div>
+        </section>
+    </t>
+
+    <t t-name="ksNoItemChartView">
+        <div class="overview-sec-dasboards container-fluid h-100 graph_text">
+            <div t-if="!filteredDashboardsInfo" class="d-flex flex-column justify-content-center align-items-center h-100 no-data">
+                <div>
+                    <img src="/ks_dashboard_ninja/static/images/dashboardOverview/no-data.png" alt="no-data-files" class="img-fluid" loading="lazy"/>
+                </div>
+                <h3 class="mb-0">
+                    No Data Found!!
+                </h3>
+            </div>
+        </div>
+    </t>
+
+    <!--Item Layouts : -->
+    <t t-name="ks_dashboard_item_template">
+        <KsItems ks_data="ks_get_current_dashboard_data" gridStackRootRef="gridStackRootRef" domain_data_obj="dashboard_domain_data"
+                 date_filter_data="state.ksDateFilterSelection" itemsToUpdateList="state.itemsToUpdateList"/>
+    </t>
+
+
+    <t t-name="ksQuickEditButtonContainer">
+        <div class="ks_dashboard_quick_edit_action grid-stack-item" t-att-gs-x="grid.x"
+             t-att-gs-y="grid.y" t-att-gs-w="grid.w" t-att-gs-h="grid.h">
+            <button title="Quick Customize" data-bs-toggle="dropdown"
+                    class="ks_dashboard_item_action  btn dropdown-toggle btn-xs o-no-caret btn"
+                    type="button"
+                    aria-expanded="true">
+                <i class="fa fa-cog"/>
+            </button>
+            <div role="menu" class="dropdown-menu ks_qe_dropdown_menu ">
+            </div>
+        </div>
+    </t>
+
+
+    <t t-name="ks_dn_layout_container_new">
+        <t t-if="ks_multi_layout">
+            <div class="ks_am_element dash-dd-2">
+                <button id="ks_dn_layout_button" class="o_dropdown_toggler_btn dashboard_name_bg dropdown-toggle"
+                        data-bs-toggle="dropdown" aria-expanded="false">
+                    <span>
+                        <t t-esc="ks_child_boards[ks_selected_board_id][0]"/>
+                    </span>
+                    <span class="caret"/>
+                </button>
+                <ul id="ks_dashboard_layout_dropdown_container"
+                    class="dropdown-menu ks_dashboard_custom_srollbar dropdown-max-height"
+                    role="menu">
+                    <t t-foreach="Object.keys(ks_child_boards)" t-as="layout_id" t-key="layout_id_index">
+                        <li t-att-class="ks_selected_board_id === layout_id ? 'ks_dashboard_layout_event ks_layout_selected': 'ks_dashboard_layout_event'"
+                            t-att-data-ks_layout_id="layout_id" t-on-click="(ev)=>self._ksOnDnLayoutMenuSelect(ev)">
+                            <span class="df_selection_text">
+                                <t t-esc="ks_child_boards[layout_id][0]"/>
+                            </span>
+                        </li>
+                    </t>
+                </ul>
+            </div>
+        </t>
+        <t t-else="">
+            <span id="ks_dashboard_title_label" class="ks_am_element dash-dd-2">
+                <t t-esc="ks_dash_name"/>
+            </span>
+        </t>
+    </t>
+
+    <t t-name="no-data-view-without-button">
+        <div class="no-data-avilable">
+            <div class="d-flex align-items-center justify-content-center flex-column">
+                <div class="no-data-img">
+                    <img src="/ks_dashboard_ninja/static/images/dashboardOverview/no-data.png" alt="no-data-available" loading="lazy"
+                         class="img-fluid w-75"/>
+                </div>
+                <div class="title mb-1">
+                    <t t-esc="header_text"/>
+                </div>
+                <p>
+                    <t t-esc="body_text"/>
+                </p>
+            </div>
+        </div>
+    </t>
+
+
+</templates>

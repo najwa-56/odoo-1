@@ -8,8 +8,8 @@
     line-height: 9.66px !important;
     letter-spacing: 0.0015em;
     text-align: left;
-    background-color: $color-D9F1FD !important;
-    color: $color-black !important;
+    background-color: var(--color-D9F1FD) !important;
+    color: var(--color-black) !important;
     border: 1px solid transparent !important;
     border-radius: 5px;
 }
@@ -21,8 +21,8 @@
             width: auto !important;
 
             &::after {
-                top: 43% !important;
-                right: 6px !important;
+                top: 41% !important;
+                right: 13px !important;
             }
 
             select {
@@ -55,21 +55,21 @@
     padding: 0;
 
     input {
-        border: 0.81px solid $color-D1D5DB !important;
+        border: 0.81px solid var(--color-D1D5DB) !important;
         border-radius: 6px;
         padding: 12px 10px !important;
         font-size: $font-14;
         font-weight: $f-w-400;
         line-height: 18.52px;
         text-align: left;
-        color: $color-black;
+        color: var(--color-black);
 
         &::placeholder {
             font-size: $font-16;
             font-weight: $f-w-400;
             line-height: 18.52px;
             text-align: left;
-            color: $color-placeholders;
+            color: var(--color-placeholders);
         }
     }
 
@@ -81,28 +81,33 @@
 
 }
 
-.ks_form_sheet .o_form_sheet{
-    background: $color-bg-main;
+.ks_form_sheet .o_form_sheet {
+    background: var(--color-bg-main);
     padding: 16px;
     border-radius: 10px;
 }
 
-.upload-file-btn .o_select_file_button.btn-primary{
-    background-color: $color-black !important;
+.ks_create_chart_body .upload-file-btn .o_select_file_button.btn-primary {
+    background-color: var(--color-black-2E3E61) !important;
     border: 1px solid transparent !important;
+
+    &:hover {
+        background-color: var(--color-black) !important;
+    }
+
     &.btn.btn-primary span {
-        color: $color-white !important;
+        color: var(--color-white-imp) !important;
         font-weight: $f-w-500 !important;
         line-height: 21px;
     }
 }
 
-.top-inverse-5{
-        top: -5px;
-    }
+.top-inverse-5 {
+    top: -5px;
+}
 
-.o_rtl .o_field_x2many_list_row_add{
-    a:nth-child(2){
+.o_rtl .o_field_x2many_list_row_add {
+    a:nth-child(2) {
         margin-right: 16px !important;
     }
 }

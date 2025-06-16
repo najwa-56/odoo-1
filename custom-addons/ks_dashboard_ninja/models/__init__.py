@@ -12,5 +12,6 @@ from . import ks_ai_ninja_dashboard
 from . import ks_ai_whole_dashboard
 from . import ks_key_fetch
 from . import ks_chat_channel
+from . import base_model_extend
 
 

@@ -7,7 +7,7 @@
             <field name="arch" type="xml">
                 <form string="Dashboards" duplicate="false">
                     <sheet class="ks_form_sheet">
-                        <group class="column">
+                        <group class="p-2 column">
                             <group class="d-flex flex-row w-100 h-100">
                                 <field name="ks_dashboard_state" invisible="1"/>
                                 <div>
@@ -56,7 +56,7 @@
                                     <div class="row align-items-center">
                                         <field name="ks_dashboard_active" class="form-control form-input-box ps-3 validation mb-0"
                                                readonly="(ks_dashboard_state == 'Locked')"/>
-                                        <label for="ks_dashboard_active" class="form-label active-label w-auto ps-2 d-flex align-items-center mb-0">Active</label>
+                                        <label for="ks_dashboard_active" class="form-label ks-active-label w-auto ps-2 d-flex align-items-center mb-0">Active</label>
                                     </div>
                                 </div>
                             </group>
@@ -84,7 +84,7 @@
                             </page>
                             <page name="custom_defined_filters" string="Custom Filters">
                                 <field name="ks_dashboard_custom_filters_ids">
-                                    <tree editable="bottom">
+                                    <tree editable="bottom" class="encapsulated-dn-listview">
                                         <field name="name" required="1"/>
                                         <field name="ks_model_id" required="1"/>
                                         <field name="ks_domain_field_id" required="1" options="{'no_create': True, 'no_create_edit': True}"/>
@@ -125,6 +125,7 @@
                                                    readonly="(ks_date_filter_selection != 'l_custom')"
                                                    required="(ks_date_filter_selection == 'l_custom')"
                                                    placeholder="Select Start Date"
+                                                   options="{'rounding': 1}"
                                                    class="form-control start-date form-input-box validation"
                                                    nolabel="1"/>
                                         </div>
@@ -134,6 +135,7 @@
                                                    readonly="(ks_date_filter_selection != 'l_custom')"
                                                    required="(ks_date_filter_selection == 'l_custom')"
                                                    placeholder="Select End Date"
+                                                   options="{'rounding': 1}"
                                                    class="form-control end-date form-input-box validation" nolabel="1"/>
 <!--                                            <field name="ks_default_end_time"/>-->
                                         </div>
@@ -164,7 +166,7 @@
             <field name="name">ks_dashboard_ninja View</field>
             <field name="model">ks_dashboard_ninja.board</field>
             <field name="arch" type="xml">
-                <tree import="0" string="My Dashboard">
+                <tree import="0" string="My Dashboard" class="encapsulated-dn-listview">
                     <field name="ks_dashboard_state" column_invisible="True"/>
                     <!--                           invisible="1" nolabel="1"/>-->
                     <field name="id" column_invisible="True"/>
@@ -286,7 +288,7 @@
             <field name="name">Dashboard Template Tree View</field>
             <field name="model">ks_dashboard_ninja.board_template</field>
             <field name="arch" type="xml">
-                <tree string="Dashboard Template" editable="top">
+                <tree string="Dashboard Template" editable="top" class="encapsulated-dn-listview">
                     <field name="name"/>
                     <field name="ks_template_type" invisible="1"/>
                     <field name="ks_dashboard_board_id" readonly="(ks_template_type != 'ks_custom')"
@@ -300,7 +302,7 @@
             <field name="name">Dashboard Layout Tree View</field>
             <field name="model">ks_dashboard_ninja.child_board</field>
             <field name="arch" type="xml">
-                <tree string="Dashboard Layout" editable="top" create="0">
+                <tree string="Dashboard Layout" editable="top" create="0" class="encapsulated-dn-listview">
                     <field name="name"/>
                     <field name="ks_dashboard_ninja_id" string="Dashboard"/>
                     <field name="company_id" string="Company"/>

@@ -597,6 +597,15 @@
     <!--    Default dashboard Data -->
     <data noupdate="1">
 
+        <record id="ks_my_default_dashboard_board" model="ks_dashboard_ninja.board">
+            <field name="name">My Dashboard</field>
+            <field name="ks_dashboard_state">Locked</field>
+            <field name="ks_dashboard_menu_name">My Dashboard</field>
+            <field name="ks_dashboard_active">1</field>
+            <field name="ks_dashboard_default_template" ref="ks_dashboard_ninja.ks_blank"/>
+            <field name="ks_dashboard_group_access" eval="False"/>
+        </record>
+
         <record forcecreate="True" id="ks_dashboard_ninja_precision" model="decimal.precision">
             <field name="name">Dashboard Ninja Decimal Precision</field>
             <field name="digits" eval="2"/>

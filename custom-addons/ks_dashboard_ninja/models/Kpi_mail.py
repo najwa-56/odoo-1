@@ -1,4 +1,6 @@
-from odoo import models, fields, api, _
+# -*- coding: utf-8 -*-
+
+from odoo import models, fields
 
 
 class KpSendMail(models.Model):

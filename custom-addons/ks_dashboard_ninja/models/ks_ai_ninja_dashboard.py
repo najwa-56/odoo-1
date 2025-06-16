@@ -1,14 +1,18 @@
+# -*- coding: utf-8 -*-
+
+import base64
+import io
 import json
 import logging
-import requests
-from odoo import  http, api, fields, models, _
-from odoo.exceptions import ValidationError
-from gtts import gTTS
-import base64
-from odoo.tools import config
-import pandas as pd
-import io
 from urllib.parse import quote
+
+import pandas as pd
+import requests
+from gtts import gTTS
+from odoo.exceptions import ValidationError
+from odoo.tools import config
+
+from odoo import api, fields, models, _
 
 _logger = logging.getLogger(__name__)
 
@@ -39,10 +43,8 @@ class KsDashboardNInjaAI(models.TransientModel):
     @api.onchange('ks_input_keywords')
     def _compute_show_model(self):
         if self.ks_input_keywords and self.ks_type=="ks_keyword":
-            api_key = self.env['ir.config_parameter'].sudo().get_param(
-                'ks_dashboard_ninja.dn_api_key')
-            url = self.env['ir.config_parameter'].sudo().get_param(
-                'ks_dashboard_ninja.url')
+            api_key = self.env['ir.config_parameter'].sudo().get_param('ks_dashboard_ninja.dn_api_key')
+            url = self.env['ir.config_parameter'].sudo().get_param('ks_dashboard_ninja.url')
             if api_key and url:
                 json_data = {'name': api_key,
                              'type': self.ks_type,
@@ -54,6 +56,8 @@ class KsDashboardNInjaAI(models.TransientModel):
                     self.ks_model_show = True
                 else:
                     self.ks_model_show = False
+            else:
+                self.ks_model_show = False
         else:
             self.ks_model_show = False
 
@@ -254,7 +258,7 @@ class KsDashboardNInjaAI(models.TransientModel):
                         result
                 else:
                     raise ValidationError(_("Please put API key and URL"))
-            if len(result):
+            if len(result): #len(result)
                 if self.env.context.get('explain_items_with_ai', False):
                     self.env['ks_dashboard_ninja.board'].browse(dashboard_id).write({
                         'ks_ai_explain_dash': False

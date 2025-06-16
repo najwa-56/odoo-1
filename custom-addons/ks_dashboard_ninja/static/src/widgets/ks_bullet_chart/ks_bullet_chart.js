@@ -49,6 +49,8 @@ export class ks_bullet_chart extends Component{
                 } else {
                     $(self.bulletRef.el).append($("<div class='graph_text'>").text("Please choose the X-labels and Y-labels"));
                 }
+            }else if(rec.ks_data_calculation_type === "query" && this.props.record.data.ks_custom_query) {
+                    $(self.bulletRef.el).append($("<div class='graph_text'>").text("The query is invalid. Please provide a correctly structured query."));
             }else {
                     $(self.bulletRef.el).append($("<div class='graph_text'>").text("Please run the appropriate Query"));
             }

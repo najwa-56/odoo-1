@@ -1,11 +1,5 @@
 .explain-ai {
 
-    //     max-height: calc(100vh - 200px);
-    //     overflow: auto;
-    //
-    //     &.ks_ai_explain_body{
-    //         height: auto !important;
-    //         }
     .ks_ai_explain_tile {
         box-shadow: none;
     }
@@ -17,7 +11,7 @@
         row-gap: 16px;
 
         .charts-sec {
-            border: 0.82px solid $color-E5E7EB;
+            border: 0.82px solid var(--color-E5E7EB);
             border-radius: 16px;
             min-height: 290px;
             height: 100%;
@@ -30,54 +24,56 @@
             .encapsulated-tile-container {
                 position: relative !important;
                 min-height: 185px !important;
-                border-radius:16px !important;
+                border-radius: 16px !important;
+
                 &.layout-6-box {
                     padding: 0px !important;
-                    }
+                }
             }
 
             .encap-layout-2-box {
                 display: flex !important;
                 flex-direction: column !important;
- .layout-2-count {
-            font-size: $font-24;
-            font-weight: $f-w-600;
-            line-height: 32px;
-            text-align: left;
-            margin-top: 20px;
-            margin-left: 10px;
-        }
 
-        .layout-2-icon {
-            border-bottom-left-radius: 16px;
-            border-top-left-radius: 0;
-            border-top-right-radius: 0;
-            border-bottom-right-radius: 16px;
-        }
-
-        .layout-2-name {
-            font-size: $font-16;
-            font-weight: $f-w-500;
-            line-height: 24px;
-            text-align: left;
-            margin-left: 10px;
-            margin-top: 4px;
-            margin-bottom: 14px;
-        }
+                .layout-2-count {
+                    font-size: $font-24;
+                    font-weight: $f-w-600;
+                    line-height: 32px;
+                    text-align: left;
+                    margin-top: 20px;
+                    margin-left: 10px;
+                }
 
                 .layout-2-icon {
                     border-bottom-left-radius: 16px;
-        border-top-left-radius: 0;
-        border-top-right-radius: 0;
-        border-bottom-right-radius: 16px;
-        padding: 17px;
-        height: 100%;
-        width: 100%;
+                    border-top-left-radius: 0;
+                    border-top-right-radius: 0;
+                    border-bottom-right-radius: 16px;
+                }
 
-        span {
-            font-size: 4rem !important;
-        }
+                .layout-2-name {
+                    font-size: $font-16;
+                    font-weight: $f-w-500;
+                    line-height: 24px;
+                    text-align: left;
+                    margin-left: 10px;
+                    margin-top: 4px;
+                    margin-bottom: 14px;
+                }
+
+                .layout-2-icon {
+                    border-bottom-left-radius: 16px;
+                    border-top-left-radius: 0;
+                    border-top-right-radius: 0;
+                    border-bottom-right-radius: 16px;
+                    padding: 17px;
+                    height: 100%;
+                    width: 100%;
+
+                    span {
+                        font-size: 4rem !important;
                     }
+                }
             }
 
             & .ks_list_explain {
@@ -94,7 +90,7 @@
                 & .ks_explain_ai_view {
                     width: 100% !important;
                     flex: unset !important;
-                    border-radius:16px;
+                    border-radius: 16px;
                 }
             }
 
@@ -123,7 +119,7 @@
                 font-weight: $f-w-500;
                 line-height: 26.35px;
                 text-align: left;
-                color: $color-05004E;
+                color: var(--color-05004E);
                 margin-bottom: 12px;
                 padding: 12px;
             }
@@ -142,16 +138,16 @@
         }
 
         .charts-data {
-            border: 1px solid $color-E5E7EB;
+            border: 1px solid var(--color-E5E7EB);
             border-radius: 20px;
             min-height: 290px;
             font-size: $font-12;
             font-weight: $f-w-400;
             line-height: 19.2px;
             text-align: left;
-            color: $color-black;
+            color: var(--color-black);
             position: relative;
-            background-color: $color-bg-main;
+            background-color: var(--color-bg-main);
             padding: 18px 14px;
 
             .ks_ai_explanation {
@@ -159,7 +155,7 @@
             }
 
             .charts-content-box {
-                max-height: 212px;
+                max-height: 220px;
                 overflow: auto;
                 max-width: 100% !important;
 
@@ -176,7 +172,7 @@
                 height: 40px;
                 width: 40px;
                 border-radius: 50%;
-                background-color: $color-white;
+                background-color: var(--color-white);
                 display: flex;
                 justify-content: center;
                 align-items: center;
@@ -205,4 +201,3 @@
         display: none !important;
     }
 }
-

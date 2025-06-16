@@ -10,7 +10,7 @@
                         </h6>
                     </div>
                     <div class="card-body" id="ksChart">
-                        <div id="chartdiv" t-ref="graph"></div>
+                        <div id="chartdiv" t-ref="graph"/>
                     </div>
                 </div>
             </div>

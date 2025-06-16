@@ -35,8 +35,8 @@ export class KsDashboarditemtype extends Component {
             $(item).removeClass("active")
          });
          $(ev.currentTarget).addClass("active")
-         var ks_value = (ev.currentTarget).innerText
-         var ks_target =  this.state.charts.find((item)=>{
+         let ks_value = (ev.currentTarget).innerText?.trim?.()
+         let ks_target =  this.state.charts.find((item)=>{
             return item.name === ks_value
          })
         this.props.record.update({ [this.props.name]: ks_target['Tech_name']})

@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+
 import ast
 import binascii
 import csv
@@ -23,6 +24,7 @@ from odoo.exceptions import ValidationError, UserError
 from odoo.tools.misc import DEFAULT_SERVER_DATETIME_FORMAT
 from odoo.tools.safe_eval import safe_eval
 from odoo.addons.ks_dashboard_ninja.common_lib.filter_tools import replace_company_domain
+from odoo.tools.sql import SQL
 
 
 from .ks_country_bounds import get_country_code
@@ -96,32 +98,30 @@ def ks_read(self, records):
         context = {'active_test': False}
         context.update(self.context)
         comodel = records.env[self.comodel_name].with_context(**context)
+        # make the query for the lines
         domain = self.get_domain_list(records)
-        comodel._flush_search(domain)
-        wquery = comodel._where_calc(domain)
-        comodel._apply_ir_rules(wquery, 'read')
-        sql = comodel._order_to_sql(None, wquery)
-        order_by_clause = comodel.env.cr.mogrify(sql).decode()
-        order_by = order_by_clause and (' ORDER BY %s ' % order_by_clause) or ''
-        from_c, where_c, where_params = wquery.get_sql()
-        query = """ SELECT {rel}.{id1}, {rel}.{id2} FROM {rel}, {from_c}
-                            WHERE {where_c} AND {rel}.{id1} IN %s AND {rel}.{id2} = {tbl}.id
-                            {order}
-                        """.format(rel=self.relation, id1=self.column1, id2=self.column2,
-                                   tbl=comodel._table, from_c=from_c, where_c=where_c or '1=1',
-                                   order=order_by)
-        where_params.append(tuple(records.ids))
+        comodel._flush_search(domain, order=comodel._order)
+        query = comodel._where_calc(domain)
+        comodel._apply_ir_rules(query, 'read')
+        query.order = comodel._order_to_sql(comodel._order, query)
 
-        # retrieve lines and group them by record
+        # join with many2many relation table
+        sql_id1 = SQL.identifier(self.relation, self.column1)
+        sql_id2 = SQL.identifier(self.relation, self.column2)
+        query.add_join('JOIN', self.relation, None, SQL(
+            "%s = %s", sql_id2, SQL.identifier(comodel._table, 'id'),
+        ))
+        query.add_where(SQL("%s IN %s", sql_id1, tuple(records.ids)))
+
+        # retrieve pairs (record, line) and group by record
         group = defaultdict(list)
-        records._cr.execute(query, where_params)
-        for row in records._cr.fetchall():
+        records.env.cr.execute(query.select(sql_id1, sql_id2))
+        for row in records.env.cr.fetchall():
             group[row[0]].append(row[1])
 
         # store result in cache
-        cache = records.env.cache
-        for record in records:
-            cache.set(record, self, tuple(group[record.id]))
+        values = [tuple(group[id_]) for id_ in records._ids]
+        records.env.cache.insert_missing(records, self, values)
 
 
 
@@ -1675,20 +1675,12 @@ class KsDashboardNinjaItems(models.Model):
                         self.env['ks_to.do.description'].create(ks_task_line)
         return res
 
-    def name_get(self):
-        res = []
-        for rec in self:
-            name = rec.name
-            if not name:
-                name = rec.ks_model_id.name
-            res.append((rec.id, name))
-
-        return res
-
     @api.model_create_multi
     def create(self, values):
         """ Override to save list view fields ordering """
         for i in range(len(values)):
+            # if not values[i].get('ks_model_id', False):
+            #     raise ValidationError(_("Enter or create model "))
             if not values[i].get('ks_many2many_field_ordering', False):
                 ks_list_view_group_fields_name = []
                 ks_list_view_fields_name = []
@@ -1726,7 +1718,8 @@ class KsDashboardNinjaItems(models.Model):
                 }
                 values[i]['ks_many2many_field_ordering'] = json.dumps(ks_many2many_field_ordering)
         seq = self.env['ir.sequence'].next_by_code('ks_dashboard_ninja.item') or 'New'
-        values[0]['name_seq'] = seq
+        if values:
+            values[0]['name_seq'] = seq
         return super(KsDashboardNinjaItems, self).create(
             values)
 
@@ -2314,7 +2307,7 @@ class KsDashboardNinjaItems(models.Model):
                 elif rec.ks_sort_by_field:
                     if rec.ks_sort_by_field.ttype == "many2one" and rec.ks_sort_by_field.name == rec.ks_chart_relation_groupby.name:
                         ks_chart_measure_field_with_type.append(rec.ks_sort_by_field.name)
-                    elif not rec.ks_sort_by_field.ttype in ["datetime",'date']:
+                    elif not rec.ks_sort_by_field.ttype in ["datetime",'date', 'char', 'boolean', 'selection', 'html']:
                         ks_chart_measure_field_with_type.append(rec.ks_sort_by_field.name + ':' + 'sum')
                     else:
                         ks_chart_measure_field_with_type.append(rec.ks_sort_by_field.name)
@@ -2368,12 +2361,23 @@ class KsDashboardNinjaItems(models.Model):
             ks_chart_groupby_relation_field = rec.ks_chart_relation_groupby.name
             ks_chart_domain = self.ks_convert_into_proper_domain(rec.ks_domain, rec, domain)
             ks_chart_data['previous_domain'] = ks_chart_domain
-            if rec.ks_chart_data_count_type == "count" and not self.ks_fill_temporal and not rec.ks_sort_by_field:
-                orderby = 'count'
+            orderby = None
+            if rec.ks_sort_by_field.id in rec.ks_chart_measure_field.ids + rec.ks_chart_relation_groupby.ids + rec.ks_chart_relation_sub_groupby.ids:
+                if rec.ks_chart_data_count_type == "count" and not self.ks_fill_temporal and not rec.ks_sort_by_field:
+                    orderby = 'count'
+                else:
+                    orderby = rec.ks_sort_by_field.name if rec.ks_sort_by_field else False
+                if rec.ks_sort_by_order and orderby:
+                    orderby = orderby + " " + rec.ks_sort_by_order
             else:
-                orderby = rec.ks_sort_by_field.name if rec.ks_sort_by_field else False
-            if rec.ks_sort_by_order and orderby :
-                orderby = orderby + " " + rec.ks_sort_by_order
+                if rec.ks_sort_by_field and rec.ks_sort_by_order:
+                    if rec.ks_sort_by_field.ttype == 'boolean':
+                        orderby = rec.ks_sort_by_field.name + ":bool_and " + rec.ks_sort_by_order
+                    else:
+                        if rec.ks_sort_by_order == 'DESC':
+                            orderby = rec.ks_sort_by_field.name + ':max DESC'
+                        else:
+                            orderby = rec.ks_sort_by_field.name + ':min ASC'
             limit = rec.ks_record_data_limit if rec.ks_record_data_limit and rec.ks_record_data_limit > 0 else 5000
             if rec.ks_as_of_now:
                 limit=5000
@@ -2598,7 +2602,7 @@ class KsDashboardNinjaItems(models.Model):
                     chart_sub_data = []
                     for res in ks_chart_record:
                         domain = res.get('__domain', [])
-                        if res.get(ks_chart_groupby_relation_fields[0], False):
+                        if ks_chart_groupby_relation_fields[0] in res:
                             if rec.ks_chart_groupby_type == 'date_type':
                                 # x-axis modification
                                 if rec.ks_chart_date_groupby == "day" \
@@ -2610,14 +2614,17 @@ class KsDashboardNinjaItems(models.Model):
                                 elif rec.ks_chart_date_groupby == 'month_year':
                                     label = res[ks_chart_groupby_relation_fields[0]]
                                 else:
-                                    label = res[ks_chart_groupby_relation_fields[0]].split(" ")[0]
+                                    if res[ks_chart_groupby_relation_fields[0]]:
+                                        label = res[ks_chart_groupby_relation_fields[0]].split(" ")[0]
+                                    else:
+                                        label = res[ks_chart_groupby_relation_fields[0]]
                             elif rec.ks_chart_groupby_type == 'selection':
                                 selection = res[ks_chart_groupby_relation_fields[0]]
                                 label = dict(self.env[rec.ks_model_name].fields_get(
                                     allfields=[ks_chart_groupby_relation_fields[0]])
                                              [ks_chart_groupby_relation_fields[0]]['selection'])[selection]
                             elif rec.ks_chart_groupby_type == 'relational_type':
-                                label = res[ks_chart_groupby_relation_fields[0]][1]
+                                label = res[ks_chart_groupby_relation_fields[0]] and res[ks_chart_groupby_relation_fields[0]][1]
                             elif rec.ks_chart_groupby_type == 'other':
                                 label = res[ks_chart_groupby_relation_fields[0]]
 
@@ -2935,7 +2942,7 @@ class KsDashboardNinjaItems(models.Model):
     def get_list_view_record(self, orderid, sort_order, ks_chart_domain, ksoffset=0,
                              initial_count=0, ks_export_all=False):
         ks_list_view_data = {'label': [], 'fields': [], 'fields_type': [],
-                             'store': [], 'type': self.ks_list_view_type,
+                             'store': [], 'type': self.ks_list_view_type, 'fields_technical_name': [],
                              'data_rows': [], 'model': self.ks_model_name}
         ks_limit = self.ks_record_data_limit if self.ks_record_data_limit and self.ks_record_data_limit > 0 else False
         limit = self.ks_pagination_limit
@@ -2951,9 +2958,20 @@ class KsDashboardNinjaItems(models.Model):
             offset = 0
         self.ks_sort_by_field = orderid
         self.ks_sort_by_order = sort_order
-        orderby = self.ks_sort_by_field.name if self.ks_sort_by_field else False
-        if orderby and self.ks_sort_by_order:
-            orderby = orderby + " " + self.ks_sort_by_order
+        orderby = None
+        if self.ks_sort_by_field.id in self.ks_list_view_fields.ids + self.ks_list_view_group_fields.ids:
+            orderby = self.ks_sort_by_field.name if self.ks_sort_by_field else False
+            if orderby and self.ks_sort_by_order:
+                orderby = orderby + " " + self.ks_sort_by_order
+        else:
+            if self.ks_sort_by_field and self.ks_sort_by_order:
+                if self.ks_sort_by_field.ttype == 'boolean':
+                    orderby = self.ks_sort_by_field.name + ":bool_and " + self.ks_sort_by_order
+                else:
+                    if self.ks_sort_by_order == 'DESC':
+                        orderby = self.ks_sort_by_field.name + ':max DESC'
+                    else:
+                        orderby = self.ks_sort_by_field.name + ':min ASC'
         if self.ks_list_view_type == "ungrouped":
             if self.ks_list_view_fields:
                 ks_list_view_data = self.ks_fetch_list_view_data(self, ks_chart_domain, offset=ksoffset,
@@ -2969,12 +2987,14 @@ class KsDashboardNinjaItems(models.Model):
                 ks_list_view_data['fields'].append(self.ks_chart_relation_groupby.ids[0])
                 ks_list_view_data['fields_type'].append(self.ks_chart_relation_groupby.ttype)
                 ks_list_view_data['store'].append(self.ks_chart_relation_groupby.store)
+                ks_list_view_data['fields_technical_name'].append(self.ks_chart_relation_groupby.name)
                 ks_list_view_data['label'].append(self.ks_chart_relation_groupby.field_description)
                 for res in self.ks_list_view_group_fields:
                     ks_list_fields.append(res.name)
                     ks_list_view_data['label'].append(res.field_description)
                     ks_list_view_data['fields'].append(res.ids[0])
                     ks_list_view_data['fields_type'].append(res.ttype)
+                    ks_list_view_data['fields_technical_name'].append(res.name)
                     ks_list_view_data['store'].append(res.store)
 
                 try:
@@ -2985,13 +3005,13 @@ class KsDashboardNinjaItems(models.Model):
                     ks_list_view_records = []
                 for res in ks_list_view_records:
                     if all(list_fields in res for list_fields in ks_list_fields) \
-                            and res[self.ks_chart_relation_groupby.name]:
+                            and self.ks_chart_relation_groupby.name in res:
                         counter = 0
-                        data_row = {'id': res[self.ks_chart_relation_groupby.name][0], 'data': [],
+                        data_row = {'id': res[self.ks_chart_relation_groupby.name] and res[self.ks_chart_relation_groupby.name][0], 'data': [],
                                     'domain': json.dumps(res['__domain']), 'ks_column_type': []}
                         for field_rec in ks_list_fields:
                             if counter == 0:
-                                data_row['data'].append(res[field_rec][1])
+                                data_row['data'].append(res[field_rec])
                             else:
                                 data_row['data'].append(res[field_rec])
                             counter += 1
@@ -3105,12 +3125,14 @@ class KsDashboardNinjaItems(models.Model):
                 ks_list_view_data['store'].append(self.ks_chart_relation_groupby.store)
                 ks_selection_field = self.ks_chart_relation_groupby.name
                 ks_list_view_data['label'].append(self.ks_chart_relation_groupby.field_description)
+                ks_list_view_data['fields_technical_name'].append(self.ks_chart_relation_groupby.name)
                 for res in self.ks_list_view_group_fields:
                     ks_list_fields.append(res.name)
                     ks_list_view_data['label'].append(res.field_description)
                     ks_list_view_data['fields'].append(res.ids[0])
                     ks_list_view_data['fields_type'].append(res.ttype)
                     ks_list_view_data['store'].append(res.store)
+                    ks_list_view_data['fields_technical_name'].append(res.name)
 
                 try:
                     ks_list_view_records = self.env[self.ks_model_name] \
@@ -3123,9 +3145,9 @@ class KsDashboardNinjaItems(models.Model):
                         counter = 0
                         data_row = {'id': 0, 'data': [], 'domain': json.dumps(res['__domain']), 'ks_column_type': []}
                         if res[ks_selection_field]:
-                            data_row['data'].append(dict(
+                            data_row['data'].append([res[ks_selection_field], dict(
                                 self.env[self.ks_model_name].fields_get(allfields=ks_selection_field)
-                                [ks_selection_field]['selection'])[res[ks_selection_field]])
+                                [ks_selection_field]['selection'])[res[ks_selection_field]]])
                         else:
                             data_row['data'].append(" ")
                         data_row['ks_column_type'].append(self.ks_chart_relation_groupby.ttype)
@@ -3366,6 +3388,7 @@ class KsDashboardNinjaItems(models.Model):
             ks_list_view_data['groupby'] = False
             ks_list_view_data['label'] = []
             ks_list_view_data['date_index'] = []
+            ks_list_view_data['fields_technical_name'] = []
             for res in self.ks_list_view_fields:
                 if (res.ttype == "datetime" or res.ttype == "date"):
                     index = len(ks_list_view_data['label'])
@@ -3374,11 +3397,13 @@ class KsDashboardNinjaItems(models.Model):
                     ks_list_view_data['date_index'].append(index)
                     ks_list_view_data['fields_type'].append(res.ttype)
                     ks_list_view_data['store'].append(res.store)
+                    ks_list_view_data['fields_technical_name'].append(res.name)
                 else:
                     ks_list_view_data['label'].append(res.field_description)
                     ks_list_view_data['fields'].append(res.ids[0])
                     ks_list_view_data['fields_type'].append(res.ttype)
                     ks_list_view_data['store'].append(res.store)
+                    ks_list_view_data['fields_technical_name'].append(res.name)
 
             ks_list_view_fields = [res.name for res in self.ks_list_view_fields]
             ks_list_view_field_type = [res.ttype for res in self.ks_list_view_fields]
@@ -3393,14 +3418,16 @@ class KsDashboardNinjaItems(models.Model):
             counter = 0
             data_row = {'id': res['id'], 'data': [], 'ks_column_type': []}
             for field_rec in ks_list_view_fields:
-                if type(res[field_rec]) == fields.datetime or type(res[field_rec]) == fields.date:
+                if type(res[field_rec]) == fields.datetime:
                     res[field_rec] = res[field_rec].strftime("%D %T")
+                elif type(res[field_rec]) == fields.date:
+                    res[field_rec] = res[field_rec].strftime("%D")
                 elif ks_list_view_field_type[counter] == "many2one":
                     if res[field_rec]:
-                        res[field_rec] = res[field_rec][1]
+                        res[field_rec] = res[field_rec]
                 elif ks_list_view_field_type[counter] == "selection" and res.get(field_rec, False):
-                    res[field_rec] = dict(self.env[rec.ks_model_name].fields_get(allfields=[field_rec])
-                                          [field_rec]['selection'])[res[field_rec]]
+                    res[field_rec] = [res[field_rec], dict(self.env[rec.ks_model_name].fields_get(allfields=[field_rec])
+                                          [field_rec]['selection'])[res[field_rec]]]
                 data_row['data'].append(res[field_rec])
                 data_row['ks_column_type'].append(ks_list_view_field_type[counter])
                 counter += 1
@@ -3413,7 +3440,7 @@ class KsDashboardNinjaItems(models.Model):
         for rec in self:
             if rec.ks_dashboard_item_type == "ks_bar_chart" or rec.ks_dashboard_item_type == "ks_horizontalBar_chart" \
                     or rec.ks_dashboard_item_type == "ks_line_chart" or rec.ks_dashboard_item_type == "ks_area_chart":
-                rec.ks_chart_item_color = "dark"
+                rec.ks_chart_item_color = "default"
             else:
                 rec.ks_chart_item_color = "moonrise"
             if rec.ks_dashboard_item_type == 'ks_kpi' or rec.ks_dashboard_item_type == 'ks_tile':
@@ -3477,7 +3504,7 @@ class KsDashboardNinjaItems(models.Model):
 
             return json.dumps(ks_kpi_data)
         else:
-            return False
+            return json.dumps([{}])
 
     # writing separate function for fetching previous period data
     def ks_get_previous_period_data(self, rec):
@@ -3915,6 +3942,7 @@ class KsDashboardNinjaItems(models.Model):
         action_line = action_lines[sequence]
         ks_chart_type = action_line.ks_chart_type if action_line.ks_chart_type else record.ks_dashboard_item_type
         ks_list_view_data = {'label': [], 'type': 'grouped',
+                             'fields_type': [],
                              'data_rows': [], 'model': record.ks_model_name, 'previous_domain': domain, }
         ks_action_name = action_line['ks_action_item_name']
         ks_action_id = action_line['id']
@@ -3936,11 +3964,13 @@ class KsDashboardNinjaItems(models.Model):
             for ks in record.ks_action_lines:
                 ks_count += 1
             if action_line.ks_item_action_field.ttype == 'many2one':
+                ks_list_view_data['fields_type'].append(action_line.ks_item_action_field.ttype)
                 ks_list_view_data['list_view_type'] = 'relational_type'
                 ks_list_view_data['groupby'] = action_line.ks_item_action_field.name
                 ks_list_fields.append(action_line.ks_item_action_field.name)
                 ks_list_view_data['label'].append(action_line.ks_item_action_field.field_description)
                 for res in ks_chart_list_measure:
+                    ks_list_view_data['fields_type'].append(res.ttype)
                     ks_list_fields.append(res.name)
                     ks_list_view_data['label'].append(res.field_description)
 
@@ -3975,7 +4005,9 @@ class KsDashboardNinjaItems(models.Model):
                 ks_list_fields.append(action_line.ks_item_action_field.name)
                 ks_list_view_data['label'].append(
                     action_line.ks_item_action_field.field_description)
+                ks_list_view_data['fields_type'].append(action_line.ks_item_action_field.ttype)
                 for res in ks_chart_list_measure:
+                    ks_list_view_data['fields_type'].append(res.ttype)
                     ks_list_fields.append(res.name)
                     ks_list_field.append(res.name)
                     ks_list_view_data['label'].append(res.field_description)
@@ -3996,11 +4028,13 @@ class KsDashboardNinjaItems(models.Model):
                     ks_list_view_data['data_rows'].append(data_row)
 
             elif action_line.ks_item_action_field.ttype == 'selection':
+                ks_list_view_data['fields_type'].append(action_line.ks_item_action_field.ttype)
                 ks_list_view_data['list_view_type'] = 'selection'
                 ks_list_view_data['groupby'] = action_line.ks_item_action_field.name
                 ks_selection_field = action_line.ks_item_action_field.name
                 ks_list_view_data['label'].append(action_line.ks_item_action_field.field_description)
                 for res in ks_chart_list_measure:
+                    ks_list_view_data['fields_type'].append(res.ttype)
                     ks_list_fields.append(res.name)
                     ks_list_view_data['label'].append(res.field_description)
 
@@ -4026,11 +4060,13 @@ class KsDashboardNinjaItems(models.Model):
 
             else:
                 ks_list_view_data['list_view_type'] = 'other'
+                ks_list_view_data['fields_type'].append(action_line.ks_item_action_field.ttype)
                 ks_list_view_data['groupby'] = action_line.ks_item_action_field.name
                 ks_list_fields.append(action_line.ks_item_action_field.name)
                 ks_list_view_data['label'].append(action_line.ks_item_action_field.field_description)
                 for res in ks_chart_list_measure:
                     if action_line.ks_item_action_field.name != res.name:
+                        ks_list_view_data['fields_type'].append(res.ttype)
                         ks_list_view_data['label'].append(res.field_description)
                         ks_list_fields.append(res.name)
 
@@ -4055,7 +4091,7 @@ class KsDashboardNinjaItems(models.Model):
                                 else:
                                     data_row['data'].append(res[field_rec])
                             counter += 1
-                            data_row['ks_column_type'].append(self.ks_chart_relation_groupby.ttype)
+                            data_row['ks_column_type'].append(action_line.ks_item_action_field.ttype)
                         ks_list_view_data['data_rows'].append(data_row)
             if record.ks_multiplier_active:
                 for ks_multiplier in record.ks_multiplier_lines:

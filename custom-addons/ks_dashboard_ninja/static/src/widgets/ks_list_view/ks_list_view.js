@@ -1,10 +1,12 @@
 /** @odoo-module */
-
+import { markup } from "@odoo/owl";
 import { registry } from "@web/core/registry";
 import { localization } from "@web/core/l10n/localization";
 import {formatDate,formatDateTime} from "@web/core/l10n/dates";
 import { formatFloat,formatInteger } from "@web/views/fields/formatters";
 import {parseDateTime,parseDate,} from "@web/core/l10n/dates";
+import { convert_data_to_utc } from '@ks_dashboard_ninja/js/ks_global_functions'
+
 
 const { useEffect, useRef, xml, onWillUpdateProps,Component,useState} = owl;
 
@@ -13,51 +15,23 @@ class KsListViewPreview extends Component{
     setup() {
         super.setup();
         const self = this;
+        this.markup = markup;
         this.state = useState({list_view_data:""})
         this.value()
-//        useEffect(()=>{
-//            this.value()
-//        })
+        useEffect(()=>{
+            this.value()
+        })
 
 
     }
 
-    renderListViewData(item) {
-        var item_list_data = item.ks_list_view_data
-        var list_view_data = JSON.parse(item_list_data);
-        var datetime_format = localization.dateTimeFormat;
-        if (list_view_data.type === "ungrouped" && list_view_data) {
-            if (list_view_data.fields_type) {
-                var index_data = list_view_data.fields_type;
-                for (var i = 0; i < index_data.length; i++) {
-                    for (var j = 0; j < list_view_data.data_rows.length; j++) {
-                        var index = index_data[i];
-                        var date = list_view_data.data_rows[j]["data"][i];
-                        if (date) {
-                            if (index === 'date'){
-                                list_view_data.data_rows[j]["data"][index] = luxon.DateTime.fromJSDate(date).format?.(datetime_format) , {}, {timezone: false};
-                            }else if (index === 'datetime'){
-                                list_view_data.data_rows[j]["data"][i] = luxon.DateTime.fromJSDate(new Date(date + " UTC")).toFormat?.(datetime_format), {}, {timezone: false};
-
-                            }else{
-                                list_view_data.data_rows[j]["data"][index] = "";
-                            }
-                        }else{
-                            list_view_data.data_rows[j]["data"][index] = "";
-                        }
-                    }
-                }
-            }
-        }
-        return list_view_data;
-    }
 
     value() {
         var self = this;
         var field = self.props.record.data;
         var ks_list_view_name;
         if (field.ks_list_view_data){
-            var list_view_data = this.renderListViewData(field);
+            var list_view_data = convert_data_to_utc(field.ks_list_view_data);
         }else{
             var list_view_data = false
         }
@@ -65,27 +39,7 @@ class KsListViewPreview extends Component{
         if (field.name) ks_list_view_name = field.name;
         else if (field.ks_model_name) ks_list_view_name = field.ks_model_id[1];
         else ks_list_view_name = "Name";
-        if (field.ks_list_view_type === "ungrouped" && list_view_data) {
-            var index_data = list_view_data.date_index;
-            if (index_data){
-                for (var i = 0; i < index_data.length; i++) {
-                    for (var j = 0; j < list_view_data.data_rows.length; j++) {
-                        var index = index_data[i]
-                        var date = list_view_data.data_rows[j]["data"][index]
-                        if (date){
-                         if( list_view_data.fields_type[index] === 'date'){
-                                list_view_data.data_rows[j]["data"][index] = formatDate(parseDateTime(date), { format: localization.dateFormat })
-                         } else{
-                            let parsedDate = parseDateTime(date,{format: "MM-dd-yyyy HH:mm:ss"});
-                            list_view_data.data_rows[j]["data"][index] = formatDateTime(parsedDate, { format: localization.dateTimeFormat })
-                        }
 
-
-                        }else {list_view_data.data_rows[j]["data"][index] = "";}
-                    }
-                }
-            }
-        }
 
         if (field.ks_list_view_data) {
             var data_rows = list_view_data.data_rows;

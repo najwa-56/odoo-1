@@ -99,31 +99,23 @@
         <t t-foreach="state.ks_dashboard_items" t-as="items" t-key="items.id">
             <div class="col-lg-4 col-12">
                 <div class="generated-cart-box">
-<!--                    <div class="select-btn">-->
-<!--                        <button id="count_selected_btn" class="ks_chart_select">-->
-<!--                            <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">-->
-<!--                                <path-->
-<!--                                    d="M10.0001 18.3332C14.5834 18.3332 18.3334 14.5832 18.3334 9.99984C18.3334 5.4165 14.5834 1.6665 10.0001 1.6665C5.41675 1.6665 1.66675 5.4165 1.66675 9.99984C1.66675 14.5832 5.41675 18.3332 10.0001 18.3332Z"-->
-<!--                                    stroke="" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />-->
-<!--                                <path d="M6.45825 9.99993L8.81659 12.3583L13.5416 7.6416" stroke="" stroke-width="1.5"-->
-<!--                                    stroke-linecap="round" stroke-linejoin="round" />-->
-<!--                            </svg>-->
-<!--                        </button>-->
-<!--                    </div>-->
 
                     <div class="chart-preview">
                         <t t-if="items.ks_dashboard_item_type === 'ks_tile'">
 
-                            <Ksdashboardtile item="items" dashboard_data="ks_dashboard_data" ksdatefilter = "state.ksDateFilterSelection" pre_defined_filter = "state.pre_defined_filter" generate_dialog="generate_dialog" custom_filter="state.custom_filter" ks_speak="(ev)=>this.speak_once(ev,items)"/>
+                            <Ksdashboardtile item="items" dashboard_data="ks_dashboard_data" onItemClick="() => {} " itemsToUpdateList="[]"
+                                             ksdatefilter = "state.ksDateFilterSelection" pre_defined_filter = "state.pre_defined_filter" generate_dialog="generate_dialog" custom_filter="state.custom_filter" ks_speak="(ev)=>this.speak_once(ev,items)"/>
                         </t>
                         <t t-elif="items.ks_dashboard_item_type === 'ks_kpi'">
-                            <Ksdashboardkpiview item="items" dashboard_data="ks_dashboard_data" ksdatefilter = "state.ksDateFilterSelection" pre_defined_filter = "state.pre_defined_filter" generate_dialog="generate_dialog" custom_filter="state.custom_filter" ks_speak="(ev)=>this.speak_once(ev,items)"/>
+                            <Ksdashboardkpiview item="items" dashboard_data="ks_dashboard_data" onItemClick="() => {} " itemsToUpdateList="[]"
+                                                ksdatefilter = "state.ksDateFilterSelection" pre_defined_filter = "state.pre_defined_filter" generate_dialog="generate_dialog" custom_filter="state.custom_filter" ks_speak="(ev)=>this.speak_once(ev,items)"/>
                         </t>
                         <t t-elif="items.ks_dashboard_item_type === 'ks_to_do'">
                             <Ksdashboardtodo item="items" dashboard_data="ks_dashboard_data"/>
                         </t>
                         <t t-else="">
-                            <Ksdashboardgraph item="items" dashboard_data="ks_dashboard_data" ksdatefilter = "state.ksDateFilterSelection" pre_defined_filter = "state.pre_defined_filter" generate_dialog="generate_dialog" custom_filter="state.custom_filter" explain_ai_whole="true" ks_speak="(ev)=>this.speak_once(ev,items)"/>
+                            <Ksdashboardgraph item="items" dashboard_data="ks_dashboard_data" onItemClick="() => {} " itemsToUpdateList="[]"
+                                              ksdatefilter = "state.ksDateFilterSelection" pre_defined_filter = "state.pre_defined_filter" generate_dialog="generate_dialog" custom_filter="state.custom_filter" explain_ai_whole="true" ks_speak="(ev)=>this.speak_once(ev,items)"/>
                         </t>
                     </div>
                 </div>

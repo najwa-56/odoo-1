@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<templates>
+    <t t-name="Ks_items">
+        <div class="ks_dashboard_item_content grid-stack ks_dashboard_items_list m-3" gs-w="36" t-ref="gridStackRootRef"/>
+        <t t-call="items_renderer"/>
+    </t>
+    <t t-name="items_renderer">
+        <t t-foreach="Object.values(props.ks_data.ks_item_data)" t-as="item" t-key="item.id">
+            <t t-if="item.ks_dashboard_item_type === 'ks_tile'">
+                <Ksdashboardtile item="item" hideButtons="1" on_dialog="on_dialog" dashboard_data="props.ks_data"
+                                 ksdatefilter="props.date_filter_data" itemsToUpdateList="props.itemsToUpdateList"
+                                 onItemClick.bind="_onKsItemClick" ks_speak="(ev) => this.speak_once(ev, item)"/>
+            </t>
+            <t t-elif="item.ks_dashboard_item_type === 'ks_kpi'">
+                <Ksdashboardkpiview item="item" hideButtons="1" on_dialog="on_dialog" dashboard_data="props.ks_data"
+                                    ksdatefilter="props.date_filter_data" itemsToUpdateList="props.itemsToUpdateList"
+                                    onItemClick.bind="_onKsItemClick" ks_speak="(ev) => this.speak_once(ev, item)"/>
+            </t>
+            <t t-elif="item.ks_dashboard_item_type === 'ks_to_do'">
+                <Ksdashboardtodo item="item" hideButtons="1" dashboard_data="ks_dashboard_data" explain_ai_whole="explain_ai_whole"/>
+            </t>
+            <t t-else="">
+                <Ksdashboardgraph item="item" hideButtons="1" explain_ai_whole="explain_ai_whole" dashboard_data="props.ks_data"
+                                  ksdatefilter="props.date_filter_data" itemsToUpdateList="props.itemsToUpdateList" ks_speak="(ev) => this.speak_once(ev, item)"
+                                  onItemClick.bind="_onKsItemClick"/>
+            </t>
+        </t>
+    </t>
+</templates>

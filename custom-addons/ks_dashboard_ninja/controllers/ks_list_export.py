@@ -1,19 +1,21 @@
-
-import re
+import datetime
 import io
 import json
-import operator
 import logging
-from odoo.addons.web.controllers.main import ExportFormat, ExportXlsxWriter
-from odoo.tools.misc import DEFAULT_SERVER_DATETIME_FORMAT, DEFAULT_SERVER_DATE_FORMAT , xlsxwriter
-import datetime
-from odoo import http
+import operator
+import os
+from dateutil.parser import parse 
+import pytz
+from odoo.exceptions import ValidationError
 from odoo.http import content_disposition, request
 from odoo.tools import pycompat
-from ..common_lib.ks_date_filter_selections import ks_get_date, ks_convert_into_utc, ks_convert_into_local
-import os
-import pytz
+from odoo.tools.misc import DEFAULT_SERVER_DATETIME_FORMAT
 from werkzeug.exceptions import InternalServerError
+
+from odoo import http
+from odoo.addons.web.controllers.main import ExportXlsxWriter
+from ..common_lib.ks_date_filter_selections import ks_get_date, ks_convert_into_local
+
 _logger = logging.getLogger(__name__)
 
 
@@ -28,6 +30,9 @@ class KsListExport(http.Controller):
                                                                                              'context', 'params')(
             params)
         list_data = json.loads(list_data)
+        # TODO : Remove these validations - export functionalities should run through backend only
+        if not list_data or not list_data.get('label', False):
+            raise ValidationError("List data not present")
         if ks_export_boolean:
             item = request.env['ks_dashboard_ninja.item'].browse(int(item_id))
             ks_timezone = item._context.get('tz') or item.env.user.tz
@@ -57,8 +62,8 @@ class KsListExport(http.Controller):
                 query_end_date = item.ks_query_end_date
                 ks_query = str(item.ks_custom_query)
             if ks_start_date and ks_end_date:
-                ks_start_date = datetime.datetime.strptime(ks_start_date,DEFAULT_SERVER_DATETIME_FORMAT)
-                ks_end_date = datetime.datetime.strptime(ks_end_date,DEFAULT_SERVER_DATETIME_FORMAT)
+                ks_start_date = parse(ks_start_date)
+                ks_end_date = parse(ks_end_date)
             item = item.with_context(ksDateFilterStartDate=ks_start_date)
             item = item.with_context(ksDateFilterEndDate=ks_end_date)
             item = item.with_context(ksDateFilterSelection=ksDateFilterSelection)

@@ -1,8 +1,12 @@
+# -*- coding: utf-8 -*-
+
 import json
 import logging
+
 import requests
-from odoo import  http, api, fields, models, _
 from odoo.exceptions import ValidationError
+
+from odoo import fields, models, _
 
 _logger = logging.getLogger(__name__)
 
@@ -18,8 +22,8 @@ class KsAIDashboardninja(models.TransientModel):
                                          "('model','!=','mail.thread'),('model','not ilike','ks_dash%'),('model','not ilike','ks_to%')]",
                                   help="Data source to fetch and read the data for the creation of dashboard items. ", required=True)
 
-    ks_dash_name = fields.Char(string="Dashboard Name", required=True, char=35)
-    ks_menu_name = fields.Char(string="Menu Name", required=True, char=35)
+    ks_dash_name = fields.Char(string="Dashboard Name", required=True, size=35)
+    ks_menu_name = fields.Char(string="Menu Name", required=True, size=35)
     ks_top_menu_id = fields.Many2one('ir.ui.menu',
                                      domain="[('parent_id','=',False)]",
                                      string="Show Under Menu", required=True,
