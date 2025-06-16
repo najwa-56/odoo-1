@@ -38,6 +38,16 @@
                                         icon="fa-external-link"
                                         attrs="{'invisible': [('specific_visit_id', '=', False)]}"
                                         groups="salesman_manager.group_salesman_supervisor"/>
+
+                                        <button name="open_update_partner_wizard"
+                                        string="Update"
+                                        type="object"
+                                        icon="fa-pencil"
+                                        class="btn-secondary"
+                                        style="border-radius: 4px; padding: 4px;"
+                                />
+
+                                
                             </tree>
                         </field>
                     </xpath>

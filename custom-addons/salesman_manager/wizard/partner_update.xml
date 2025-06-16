@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <data>
+<record id="view_partner_update_wizard_form" model="ir.ui.view">
+    <field name="name">partner.update.wizard.form</field>
+    <field name="model">partner.update.wizard</field>
+    <field name="arch" type="xml">
+        <form string="Update Partner">
+            <group>
+                <field name="name"/>
+                <field name="vat"/>
+            </group>
+            <footer>
+                <button name="action_update_partner" string="Update" type="object" class="btn-primary"/>
+                <button string="Cancel" special="cancel" class="btn-secondary"/>
+            </footer>
+        </form>
+    </field>
+</record>
+</data>
+</odoo>

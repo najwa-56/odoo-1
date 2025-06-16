@@ -39,7 +39,10 @@ class ResPartner(models.Model):
                 visit = rec.daily_visit_ids.filtered(lambda v: v.ref == ref)
                 rec.specific_visit_id = visit[:1] if visit else False
                 if visit:
-                    rec.status = 'sale' if visit[0].is_it_sold else 'not_yet'
+                    if  visit[0].is_it_sold:
+                        rec.status = 'sale'
+                    else:
+                        rec.status = 'visit' 
                 else:
                     rec.status = 'not_yet'
             else:
@@ -134,4 +137,18 @@ class ResPartner(models.Model):
 
 
 
+    def open_update_partner_wizard(self):
+        self.ensure_one()
+        return {
+            'type': 'ir.actions.act_window',
+            'name': 'Update Partner Info',
+            'res_model': 'partner.update.wizard',
+            'view_mode': 'form',
+            'target': 'new',
+            'context': {
+                'default_partner_id': self.id,
+                'default_name': self.name,
+                'default_vat': self.vat,
+            },
+        }
 

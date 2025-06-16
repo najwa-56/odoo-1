@@ -28,6 +28,7 @@
         'views/sale_order_view.xml',
         'views/account_move_view.xml',
         'views/daily_realtime_report_views.xml',
+        'wizard/partner_update.xml',
 
 
     ],
