@@ -2,12 +2,15 @@
 <templates xml:space="preserve">
 
     <t t-name="ks_dashboard_ninja.Ksdashboardlistview">
-        <div class="grid-stack-item ks_dashboarditem_id" t-att-id="item_id" t-ref="ks_list_view">
-            <div class="grid-stack-item-content ks_list_view_container ks_dashboarditem_chart_container ks_dashboard_item_hover card shadow"
-                 t-att-title="ks_info">
-                <div class="p-3 py-3 d-flex flex-row align-items-center justify-content-between ">
-                    <div class="d-flex align-items-center  w-50">
-                        <h6 class="m-0 font-weight-bold h3 mr-3 ks_list_view_heading" t-att-title="ks_chart_title">
+
+        <div class="grid-stack-item ks_tile_carousel ks_dashboarditem_id" t-att-id="item_id" t-ref="ks_list_view">
+            <div class="grid-stack-item-content ks_list_view_container ks_dashboarditem_chart_container ks_dashboard_item_hover card border-0"
+                 t-att-title="ks_info" t-att-id="item_id">
+
+                <t t-if="!env.isExplainDashboardWithAi">
+                    <div class="p-3 py-3 d-flex flex-row align-items-center justify-content-between">
+                    <div class="d-flex align-items-center w-50">
+                        <h6 class="m-0 font-weight-bold h3 mr-3 ks_list_view_heading text-capitalize text-start " t-att-title="ks_chart_title">
                             <t t-esc="ks_chart_title"/>
                         </h6>
                         <t t-if="ks_breadcrumb.length >= 1">
@@ -29,142 +32,76 @@
                             </nav>
                         </t>
                     </div>
-                    <div class="ks_pager_name">
-                        <t t-if="ks_pager" t-call="ks_pager_template"/>
-                    </div>
 <!--                    for ai dashboard-->
-                    <img src="ks_dashboard_ninja/static/description/images/selected.svg" class="ks_img_display d-none" width="30"/>
-<!--                    -->
-                    <!--  Dashboard Item Move/Copy Feature -->
-                    <div class="ks_dashboard_item_button_container ks_dropdown_container ks_dashboard_item_header ks_dashboard_item_header_hover chart_button_container d-md-flex d-none"
-                         t-att-data-item_id="item_id">
-                        <t t-if="ksIsDashboardManager">
-                            <button title="Move/Duplicate" data-bs-toggle="dropdown" t-att-data-item-id="item_id"
-                                    class="ks_dashboard_item_action btn dropdown-toggle btn-xs" type="button"
-                                    aria-expanded="true">
-                                <i class="fa fa-files-o"/>
-                            </button>
-                            <ul role="menu" class="ks_dashboard_menu_container dropdown-menu dropdown-menu-right">
-                                <li class="ks_md_heading">
-                                    <span>Select Dashboard</span>
-                                </li>
-                                <li class="my-3">
-                                    <select class="o_input o_group_selector o_add_group ks_dashboard_select">
-                                        <t t-foreach="ks_dashboard_list" t-as="ks_dashboard" t-key="ks_dashboard_index">
-                                            <option t-att-value="ks_dashboard['id']">
-                                                <t t-esc="ks_dashboard['name']"/>
-                                            </option>
-                                        </t>
-                                    </select>
-                                </li>
-                                <li class="mt-3">
-                                    <button class="btn btn-primary o_apply_group o_add_group ks_duplicate_item"
-                                            tabindex="-1" type="button">Duplicate
-                                    </button>
-                                    <button class="btn btn-primary o_apply_group o_add_group ks_move_item" tabindex="-1"
-                                            type="button">Move
-                                    </button>
-                                </li>
-                            </ul>
-                            <button title="Quick Customize"
-                                    class="ks_dashboard_quick_edit_action_popup  btn d-sm-block d-none"
-                                    type="button" t-att-data-item-id="item_id">
-                                <i class="fa fa-pencil"/>
-                            </button>
+                    <img src="ks_dashboard_ninja/static/images/selected.svg" class="ks_img_display d-none" width="30"/>
+                    <div class="select-btn d-none">
+                        <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path
+                                d="M10.0001 18.3332C14.5834 18.3332 18.3334 14.5832 18.3334 9.99984C18.3334 5.4165 14.5834 1.6665 10.0001 1.6665C5.41675 1.6665 1.66675 5.4165 1.66675 9.99984C1.66675 14.5832 5.41675 18.3332 10.0001 18.3332Z"
+                                stroke="" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+                            <path d="M6.45825 9.99993L8.81659 12.3583L13.5416 7.6416" stroke="" stroke-width="1.5"
+                                stroke-linecap="round" stroke-linejoin="round" />
+                        </svg>
+                    </div>
+                    <KsItemButton item_data="this.item" itemRootRef="ks_list_view"/>
+                    <t t-if="ksIsDashboardManager and props.hideButtons">
+                    </t>
+                </div>
+                </t>
 
-                            <button class="ks_dashboard_item_customize d-block d-sm-none" title="Customize Item"
-                                    type="button">
-                                <i class="fa fa-pencil"/>
-                            </button>
-                            <button class="ks_dashboard_item_delete" title="Remove Item" type="button">
-                                <i class="fa fa-times"/>
-                            </button>
-                        </t>
-                        <t t-if="ksIsUser">
-                            <div class="ks_chart_inner_buttons">
-                                <button title="Export Item" data-bs-toggle="dropdown"
-                                        class="ks_dashboard_item_action_export btn dropdown-toggle btn-xs o-no-caret btn ks_next_previous_bg_color"
-                                        type="button"
-                                        aria-expanded="true">
-                                    <i class="fa fa-ellipsis-v"/>
-                                </button>
-                                <div role="menu" class="dropdown-menu dropdown-menu-right">
-                                    <!--Dynamic Rendering-->
-                                    <div class="ks_chart_export_menu">
-                                        <div class="ks_chart_export_menu_header">
-                                            <span>Export</span>
+                <t t-if="ks_ai_analysis">
+                    <div class="explain-ai pt-3">
+                        <div class="container">
+                            <div class="row ks_ai_explain_body">
+                                 <div class="col-xl-6 col-12">
+                                     <div class="charts-sec">
+                                         <h6 class="m-0 font-weight-bold h3 mr-3 ks_list_view_heading text-capitalize text-start text-black" t-att-title="ks_chart_title">
+                                            <t t-esc="ks_chart_title"/>
+                                         </h6>
+                                         <div name="ks_list_div" class="card-body table-responsive ks_list_card_body ks_list_item_table ks_list_explain">
+                                            <t t-call="ks_dashboard_ninja.ks_list_view_table"/>
+                                         </div>
+                                         <div class="d-flex justify-content-end">
+                                            <div class="ks_pager_name">
+                                                <t t-if="ks_pager" t-call="ks_pager_template"/>
+                                            </div>
+                                         </div>
+                                     </div>
+                                 </div>
+                                <div class="col-xl-6 col-12">
+                                    <div class="charts-data h-100">
+                                        <div class="charts-content-box">
+                                                <p><t t-esc="ks_ai_analysis_1"/></p>
+                                                <p><t t-esc="ks_ai_analysis_2"/></p>
                                         </div>
-                                        <div class="chart_xls_export ks_chart_xls_csv_export ks_chart_export_menu_item"
-                                             t-att-data-chart-id="item_id"
-                                             data-format="list_xls">
-                                            <i class="fa fa-file-excel-o"/>
-                                            <span>Export to Excel</span>
-                                        </div>
-                                        <div class="ks_chart_xls_csv_export ks_chart_export_menu_item"
-                                             t-att-data-chart-id="item_id"
-                                             data-format="list_csv">
-                                            <i class="fa fa-file-code-o"/>
-                                            <span>Export to CSV</span>
-                                        </div>
-                                        <div class="ks_chart_json_export ks_chart_export_menu_item"
-                                             t-att-data-item-id="item_id"
-                                             data-format="chart_xls">
-                                            <i class="fa fa-file-code-o"/>
-                                            <span>Export Item</span>
+
+                                        <div class="voice-button" t-on-click="props.ks_speak" title="Text to speech">
+                                            <div class="voice-cricle">
+                                                <img src="/ks_dashboard_ninja/static/images/voice-cricle.svg" height="24" width="24" alt="voice-img" loading="lazy"
+                                                class="img-fluid"/>
+                                            </div>
+                                            <div class="comp-gif d-none">
+                                                <img src="/ks_dashboard_ninja/static/images/Comp.gif" alt="loading gif" height="24" width="24"
+                                                     class="img-fluid"/>
+                                            </div>
+                                            <audio t-ref="aiAudioRef"/>
                                         </div>
                                     </div>
                                 </div>
                             </div>
-                        </t>
-                        <div class="ks_chart_inner_buttons dropdown">
-                        <button title="Info" data-bs-toggle="dropdown"
-                                class="ks_item_description btn dropdown-toggle btn-xs o-no-caret btn"
-                                type="button"
-                                t-att-style="'color:'+ ks_rgba_button_color + ';'"
-                                aria-expanded="true">
-                            <i class="fa fa-book"/>
-                        </button>
-                            <div role="menu" class="dropdown-menu dropdown-menu-right" style="width:20rem">
-                            <!--Dynamic Rendering-->
-                                <div class="ks_chart_export_menu">
-                                <div class="ks_chart_export_menu_header" style="margin-left:-10px">
-                                    <span>Info</span>
-                                </div>
-                                    <div class="ks_info" style="margin-left:10px">
-                                    <span>Company: <t t-esc="ks_company"/></span>
-                                </div>
-                                    <div class="ks_info" style="margin-left:10px">
-                                    <t t-if="ks_info">
-                                        <t t-foreach="ks_info" t-as="ks_description" t-key="ks_description_index">
-                                            <span><t t-esc="ks_description"/></span>
-                                            <br></br>
-                                         </t>
-                                    </t>
-                                </div>
-                            </div>
                         </div>
                     </div>
+                </t>
+                <t t-else="">
+                    <div name="ks_list_div" class="card-body table-responsive ks_list_item_table">
+                        <t t-call="ks_dashboard_ninja.ks_list_view_table"/>
                     </div>
-                    <t t-if="ksIsDashboardManager">
-                        <div class="dropdown d-md-none dn-setting-panel">
-                            <button class="btn btn-secondary border-0" type="button" id="dropdownSettingButton"
-                                    data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                             <i class="fa fa-cog"></i>
-                            </button>
-                            <div class="dropdown-menu dropdown-menu-right" aria-labelledby="dropdownSettingButton">
-                                 <a class="dropdown-item ks_dashboard_item_customize">
-                                    <i class="fa fa-pencil"></i>Customize Item
-                                 </a>
-                                 <a class="dropdown-item ks_dashboard_item_delete">
-                                    <i class="fa fa-times"></i>Remove Item
-                                 </a>
-                            </div>
+                    <div class="d-flex justify-content-end">
+                        <div class="ks_pager_name">
+                            <t t-if="ks_pager" t-call="ks_pager_template"/>
                         </div>
-                    </t>
-                </div>
-                <div class="card-body table-responsive">
-                    <t t-call="ks_dashboard_ninja.ks_list_view_table"/>
-                </div>
+                    </div>
+                </t>
             </div>
         </div>
     </t>
@@ -177,29 +114,47 @@
                 <t t-set="ks_rec_count" t-value="0"/>
                 <t t-foreach="table_row['data']" t-as="row_data" t-key="row_data_index">
                     <t t-if="table_row['ks_column_type'][ks_rec_count]=='html'">
+                        <td class="ks_list_canvas_click">
+                            <t t-out="markup(row_data)"/>
+                        </td>
+                        <t t-set="ks_rec_count" t-value="ks_rec_count+1"/>
+                    </t>
+                    <!-- TODO: No need of multiple if else , can be deduced to logic without if else , nedd to change the flow for this -->
+                    <t t-elif="['many2one', 'selection'].includes(state.list_view_data['fields_type']?.[ks_rec_count])">
+                        <td class="ks_list_canvas_click cursor-pointer"
+                            t-on-click="(ev) => this.onChartCanvasClick(ev, row_data_index, row_data, state.list_view_data['fields_type'][ks_rec_count] )">
+                            <t t-out="row_data ? row_data[1] : ''"/>
+                        </td>
+                        <t t-set="ks_rec_count" t-value="ks_rec_count+1"/>
+                    </t>
+                    <t t-elif="table_row['ks_column_type'][ks_rec_count] == 'boolean'">
                         <td class="ks_list_canvas_click" t-on-click="onChartCanvasClick">
-<!--                            <t t-out="row_data"/>-->
-                            <t t-raw="row_data"/>
+                            <t t-out="row_data"/>
                         </td>
                         <t t-set="ks_rec_count" t-value="ks_rec_count+1"/>
                     </t>
                     <t t-else="">
                         <td class="ks_list_canvas_click" t-on-click="onChartCanvasClick">
-                            <t t-esc="row_data"/>
+                            <t t-esc="row_data !== false ? row_data : ''"/>
                         </td>
                         <t t-set="ks_rec_count" t-value="ks_rec_count+1"/>
                     </t>
                 </t>
                 <td class="ks_info">
                     <t t-if="ks_show_records">
-                    <i id="ks_item_info" t-att-data-model="state.list_view_data['model']"
+                    <div id="ks_item_info" t-att-data-model="state.list_view_data['model']"
                        t-att-data-list-type="state.list_view_data['list_view_type']"
                        t-att-data-groupby="state.list_view_data['groupby']"
                        t-att-data-record-id="table_row['id']" t-att-data-item-id="item_id"
                        t-att-data-list-view-type="tmpl_list_type"
                        t-att-data-domain="table_row['domain']"
-                       t-on-click="ksOnListItemInfoClick"
-                       class="fa fa-pencil"/>
+                       t-on-click="ksOnListItemInfoClick">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 20 20" fill="none">
+                            <path d="M9.16675 1.66663H7.50008C3.33341 1.66663 1.66675 3.33329 1.66675 7.49996V12.5C1.66675 16.6666 3.33341 18.3333 7.50008 18.3333H12.5001C16.6667 18.3333 18.3334 16.6666 18.3334 12.5V10.8333" stroke="#241C1D" stroke-width="1.25" stroke-linecap="round" stroke-linejoin="round"/>
+                            <path d="M13.3666 2.51663L6.7999 9.0833C6.5499 9.3333 6.2999 9.82497 6.2499 10.1833L5.89157 12.6916C5.75823 13.6 6.3999 14.2333 7.30823 14.1083L9.81657 13.75C10.1666 13.7 10.6582 13.45 10.9166 13.2L17.4832 6.6333C18.6166 5.49997 19.1499 4.1833 17.4832 2.51663C15.8166 0.849966 14.4999 1.3833 13.3666 2.51663Z" stroke="#241C1D" stroke-width="1.25" stroke-miterlimit="10" stroke-linecap="round" stroke-linejoin="round"/>
+                            <path d="M12.425 3.45837C12.9834 5.45004 14.5417 7.00837 16.5417 7.57504" stroke="#241C1D" stroke-width="1.25" stroke-miterlimit="10" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                    </div>
                     </t>
                 </td>
             </tr>
@@ -207,7 +162,7 @@
     </t>
 
     <t t-name="ks_dashboard_ninja.ks_list_view_table">
-        <t t-if="state.list_view_data">
+        <t t-if="state.list_view_data &amp;&amp; state.list_view_data.label &amp;&amp; state.list_view_data.label.length">
             <table id="ksListViewTable" class="table table-hover ks_list_view_layout_1"
                    t-att-data-model="state.list_view_data['model']">
                 <thead>
@@ -219,10 +174,12 @@
             </table>
         </t>
         <t t-else="">
-            No Data Present
+            <div class="d-flex justify-content-center align-items-center h-100">
+                No Data Present
+            </div>
         </t>
     </t>
-        <t t-name="ks_list_view_header">
+    <t t-name="ks_list_view_header">
         <tr>
             <t t-foreach="state.list_view_data['label']" t-as="table_header" t-key="table_header_index">
                 <th>
@@ -232,7 +189,7 @@
             <th/>
         </tr>
     </t>
-        <div t-name="ks_pager_template" class="ks_pager">
+    <div t-name="ks_pager_template" class="ks_pager">
         <span class="ks_counter">
             <span class="ks_value">
                 <t t-esc="count"/>

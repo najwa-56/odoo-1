@@ -9,6 +9,7 @@ class KsToDOViewPreview extends Component {
     setup() {
         super.setup();
         const self = this;
+        this.todoPreviewRootRef = useRef("todoPreviewRootRef");
     }
 
 
@@ -39,24 +40,19 @@ class KsToDOViewPreview extends Component {
                     ks_font_color :ks_font_color
 
                 }
-//            $todoViewContainer.find('.ks_card_header').addClass('ks_bg_to_color').css({"background-color": ks_header_color });
-//            $todoViewContainer.find('.ks_card_header').addClass('ks_bg_to_color').css({"color": ks_font_color + ' !important' });
-//            $todoViewContainer.find('.ks_li_tab').addClass('ks_bg_to_color').css({"color": ks_font_color + ' !important' });
-//            $todoViewContainer.find('.ks_chart_heading').addClass('ks_bg_to_color').css({"color": ks_font_color + ' !important' });
-//            $(this.input.el.parentElement).append($todoViewContainer);
         }
         return item_info
     }
     ksOnToDoClick(ev){
             ev.preventDefault();
-            var self= this;
+            var self = this;
             var tab_id = $(ev.target).attr('href');
-            var $tab_section = $('#' + tab_id.substring(1));
+            var $tab_section = $(this.todoPreviewRootRef.el).find(tab_id + '-p')
             $(ev.target).addClass("active");
             $(ev.target).parent().siblings().each(function(){
                 $(this).children().removeClass("active");
             });
-            $('#' + tab_id.substring(1)).siblings().each(function(){
+            $(this.todoPreviewRootRef.el).find(tab_id + '-p').siblings().each(function(){
                 $(this).removeClass("active");
                 $(this).addClass("fade");
             });

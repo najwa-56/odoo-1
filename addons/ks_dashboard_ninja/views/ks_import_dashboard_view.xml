@@ -9,7 +9,7 @@
                 <group>
                     <group>
                         <field name="ks_import_dashboard" string="Upload Dashboard Json" required="1"/>
-                        <field name="ks_top_menu_id" string="Show Under Menu" required="1"/>
+                        <field name="ks_top_menu_id" string="Show Under Menu" required="1" class="form-control form-input-box"/>
                     </group>
                 </group>
                 <footer>

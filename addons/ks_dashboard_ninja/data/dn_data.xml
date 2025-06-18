@@ -3,7 +3,7 @@
     <data noupdate="1">
          <record id="config_dn_url" model="ir.config_parameter">
             <field name="key">ks_dashboard_ninja.url</field>
-            <field name="value">https://dn16ai.kappso.in</field>
-        </record>
+            <field name="value">https://dn16ai.kappso.com</field>
+         </record>
     </data>
 </odoo>

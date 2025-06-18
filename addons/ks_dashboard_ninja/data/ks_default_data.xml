@@ -178,9 +178,9 @@
             <field name="ks_domain">[["id","&gt;",150]]</field>
             <field name="ks_default_icon">bar-chart</field>
             <field name="ks_dashboard_item_theme">blue</field>
-            <field name="ks_background_color">#337ab7,0.99</field>
-            <field name="ks_font_color">#ffffff,0.99</field>
-            <field name="ks_default_icon_color">#ffffff,0.99</field>
+            <field name="ks_background_color">#FFE2E5,0.99</field>
+            <field name="ks_font_color">#000000,0.99</field>
+            <field name="ks_default_icon_color">#000000,0.99</field>
             <field name="ks_layout">layout1</field>
             <field name="ks_company_id" eval="0"/>
 
@@ -193,9 +193,9 @@
             <field name="ks_model_id" eval="ref('base.model_res_country')"/>
             <field name="ks_default_icon">users</field>
             <field name="ks_dashboard_item_theme">red</field>
-            <field name="ks_background_color">#d9534f,0.99</field>
-            <field name="ks_font_color">#ffffff,0.99</field>
-            <field name="ks_default_icon_color">#ffffff,0.99</field>
+            <field name="ks_background_color">#FFF4DE,0.99</field>
+            <field name="ks_font_color">#000000,0.99</field>
+            <field name="ks_default_icon_color">#000000,0.99</field>
             <field name="ks_layout">layout3</field>
             <field name="ks_company_id" eval="0"/>
 
@@ -209,9 +209,9 @@
             <field name="ks_domain">[["id","&lt;",50]]</field>
             <field name="ks_default_icon">money</field>
             <field name="ks_dashboard_item_theme">green</field>
-            <field name="ks_background_color">#5cb85c,0.99</field>
+            <field name="ks_background_color">#DCFCE7,0.99</field>
             <field name="ks_font_color">#000000,0.99</field>
-            <field name="ks_default_icon_color">#ffffff,0.99</field>
+            <field name="ks_default_icon_color">#000000,0.99</field>
             <field name="ks_layout">layout2</field>
             <field name="ks_company_id" eval="0"/>
 
@@ -225,9 +225,9 @@
             <field name="ks_domain">[["id","&lt;",100]]</field>
             <field name="ks_default_icon">paper-plane</field>
             <field name="ks_dashboard_item_theme">yellow</field>
-            <field name="ks_background_color">#623D0A,0.99</field>
-            <field name="ks_font_color">#ffffff,0.99</field>
-            <field name="ks_default_icon_color">#ffffff,0.99</field>
+            <field name="ks_background_color">#F3E8FF,0.99</field>
+            <field name="ks_font_color">#000000,0.99</field>
+            <field name="ks_default_icon_color">#000000,0.99</field>
             <field name="ks_layout">layout5</field>
             <field name="ks_company_id" eval="0"/>
 
@@ -335,9 +335,9 @@
             <field name="ks_domain">[["id","&lt;",50]]</field>
             <field name="ks_default_icon">shopping-cart</field>
             <field name="ks_dashboard_item_theme">red</field>
-            <field name="ks_background_color">#D9534F,0.99</field>
-            <field name="ks_font_color">#D9534F,0.99</field>
-            <field name="ks_default_icon_color">#FFFFFF,0.99</field>
+            <field name="ks_background_color">#FFE2E5,0.99</field>
+            <field name="ks_font_color">#000000,0.99</field>
+            <field name="ks_default_icon_color">#000000,0.99</field>
             <field name="ks_layout">layout4</field>
             <field name="ks_company_id" eval="0"/>
         </record>
@@ -349,9 +349,9 @@
             <field name="ks_domain">[["id","&lt;",100]]</field>
             <field name="ks_default_icon">car</field>
             <field name="ks_dashboard_item_theme">red</field>
-            <field name="ks_background_color">#D9534F,0.53</field>
-            <field name="ks_font_color">#FFFFFF,0.70</field>
-            <field name="ks_default_icon_color">#FFFFFF,0.99</field>
+            <field name="ks_background_color">#FFF4DE,0.53</field>
+            <field name="ks_font_color">#000000,0.70</field>
+            <field name="ks_default_icon_color">#000000,0.99</field>
             <field name="ks_layout">layout6</field>
             <field name="ks_company_id" eval="0"/>
         </record>
@@ -390,9 +390,9 @@
         <field name="ks_domain">[["id","&lt;",100]]</field>
         <field name="ks_default_icon">user</field>
         <field name="ks_dashboard_item_theme">blue</field>
-        <field name="ks_background_color">#03104E,0.99</field>
-        <field name="ks_font_color">#ffffff,0.99</field>
-        <field name="ks_default_icon_color">#ffffff,0.99</field>
+        <field name="ks_background_color">#DCFCE7,0.99</field>
+        <field name="ks_font_color">#000000,0.99</field>
+        <field name="ks_default_icon_color">#000000,0.99</field>
         <field name="ks_company_id" eval="0"/>
     </record>
     <record id="ks_default_item_17" model="ks_dashboard_ninja.item">
@@ -406,7 +406,7 @@
         <field name="ks_data_comparison">Percentage</field>
         <field name="ks_default_icon">paper-plane</field>
         <field name="ks_dashboard_item_theme">red</field>
-        <field name="ks_background_color">#ED9922,0.99</field>
+        <field name="ks_background_color">#F3E8FF,0.99</field>
         <field name="ks_font_color">#000000,0.99</field>
         <field name="ks_default_icon_color">#000000,0.99</field>
         <field name="ks_company_id" eval="0"/>
@@ -424,7 +424,7 @@
         <field name="ks_data_comparison">Sum</field>
         <field name="ks_default_icon">money</field>
         <field name="ks_dashboard_item_theme">green</field>
-        <field name="ks_background_color">#5CB85C,0.63</field>
+        <field name="ks_background_color">#F3E8FF,0.63</field>
         <field name="ks_font_color">#000000,0.99</field>
         <field name="ks_default_icon_color">#000000,0.99</field>
         <field name="ks_company_id" eval="0"/>
@@ -440,9 +440,9 @@
         <field name="ks_domain">[["id","&lt;",100]]</field>
         <field name="ks_default_icon">bar-chart</field>
         <field name="ks_dashboard_item_theme">yellow</field>
-        <field name="ks_background_color">#f0ad4e,0.99</field>
-        <field name="ks_font_color">#ffffff,0.99</field>
-        <field name="ks_default_icon_color">#ffffff,0.99</field>
+        <field name="ks_background_color">#FFF4DE,0.99</field>
+        <field name="ks_font_color">#000000,0.99</field>
+        <field name="ks_default_icon_color">#000000,0.99</field>
         <field name="ks_company_id" eval="0"/>
     </record>
     <record id="ks_default_item_20" model="ks_dashboard_ninja.item">
@@ -549,7 +549,7 @@
         <field name="ks_data_comparison">Sum</field>
         <field name="ks_default_icon">money</field>
         <field name="ks_dashboard_item_theme">blue</field>
-        <field name="ks_background_color">#2DC9B3,0.99</field>
+        <field name="ks_background_color">#DCFCE7,0.99</field>
         <field name="ks_font_color">#000000,0.99</field>
         <field name="ks_default_icon_color">#000000,0.99</field>
         <field name="ks_company_id" eval="0"/>
@@ -564,7 +564,7 @@
         <field name="ks_date_filter_selection">t_week</field>
         <field name="ks_default_icon">money</field>
         <field name="ks_dashboard_item_theme">green</field>
-        <field name="ks_background_color">#17D817,0.59</field>
+        <field name="ks_background_color">#FFE2E5,0.59</field>
         <field name="ks_font_color">#000000,0.99</field>
         <field name="ks_default_icon_color">#000000,0.99</field>
         <field name="ks_company_id" eval="0"/>
@@ -596,12 +596,14 @@
 
     <!--    Default dashboard Data -->
     <data noupdate="1">
+
         <record id="ks_my_default_dashboard_board" model="ks_dashboard_ninja.board">
             <field name="name">My Dashboard</field>
             <field name="ks_dashboard_state">Locked</field>
             <field name="ks_dashboard_menu_name">My Dashboard</field>
             <field name="ks_dashboard_active">1</field>
             <field name="ks_dashboard_default_template" ref="ks_dashboard_ninja.ks_blank"/>
+            <field name="ks_dashboard_group_access" eval="False"/>
         </record>
 
         <record forcecreate="True" id="ks_dashboard_ninja_precision" model="decimal.precision">

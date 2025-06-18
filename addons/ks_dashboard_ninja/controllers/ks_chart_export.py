@@ -14,14 +14,23 @@ from odoo.http import content_disposition, request
 from odoo.tools.misc import xlwt
 from odoo.exceptions import UserError
 from odoo.tools import pycompat
+
+from odoo.exceptions import ValidationError
+
 _logger = logging.getLogger(__name__)
 
 class KsChartExport(http.Controller):
 
     def base(self, data):
         params = json.loads(data)
+        if not params.get('chart_data'):
+            raise ValidationError("Chart data not present")
         header,chart_data = operator.itemgetter('header','chart_data')(params)
         chart_data = json.loads(chart_data)
+
+        if isinstance(chart_data['labels'], list):
+            chart_data['labels'] = [str(label) for label in chart_data['labels']]
+
         chart_data['labels'].insert(0,'Measure')
         columns_headers = chart_data['labels']
         import_data = []
@@ -36,9 +45,6 @@ class KsChartExport(http.Controller):
                      ('Content-Type', self.content_type)],
             # cookies={'fileToken': token}
                                      )
-
-
-
 
 class KsChartExcelExport(KsChartExport, http.Controller):
 

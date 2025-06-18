@@ -4,7 +4,6 @@
         <t t-if="props.record.data.ks_data_calculation_type == 'custom' and props.record.data.ks_model_id and props.record.data.ks_dashboard_item_type == 'ks_list_view'">
             <t t-if="props.record.data.ks_list_view_type == 'ungrouped' ">
                 <t t-if="props.record.data.ks_list_view_fields.count != 0">
-                    <t t-set="value" t-value="value()"/>
                     <t t-call="ks_dashboard_ninja.ks_list_view_container"/>
                 </t>
                 <t t-else="">
@@ -16,7 +15,6 @@
             <t t-elif="props.record.data.ks_list_view_type == 'grouped'">
                 <t t-if="props.record.data.ks_list_view_group_fields.count != 0 and props.record.data.ks_chart_relation_groupby">
                     <t t-if="props.record.data.ks_chart_groupby_type == 'relational_type' or  props.record.data.ks_chart_groupby_type == 'selection' or props.record.data.ks_chart_groupby_type == 'other' or (props.record.data.ks_chart_groupby_type == 'date_type' and props.record.data.ks_chart_date_groupby)">
-                        <t t-set="value" t-value="value()"/>
                         <t t-call="ks_dashboard_ninja.ks_list_view_container"/>
                     </t>
                     <t t-else="">
@@ -34,7 +32,6 @@
         </t>
         <t t-elif="props.record.data.ks_data_calculation_type == 'query'">
             <t t-if="props.record.data.ks_query_result">
-                <t t-set="value" t-value="value()"/>
                 <t t-call="ks_dashboard_ninja.ks_list_view_container"/>
             </t>
             <t t-else="">
@@ -54,14 +51,14 @@
         <div class="container-fluid">
 
             <div class="row">
-                <div class="card shadow col-md-9 p-0 m-0">
+                <div class="card shadow p-0 m-0">
                     <div class="p-3 py-3 d-flex flex-row align-items-center justify-content-between ">
-                        <h6 class="m-0 font-weight-bold h3 ks_chart_heading" t-att-title="ks_list_view_name">
+                        <h6 class="m-0 font-weight-bold h3 ks_chart_heading text-capitalize text-start" t-att-title="ks_list_view_name">
                             <t t-esc="ks_list_view_name"/>
                         </h6>
                     </div>
-                    <div class="card-body table-responsive ksMaxTableContent">
-                        <t t-if="state.list_view_data">
+                    <div class="card-body table-responsive ksMaxTableContent ks_list_item_table">
+                        <t t-if="state.list_view_data?.label?.length">
                             <table id="ksListViewTable" class="table table-hover"
                                    t-att-data-model="state.list_view_data['model']">
                                 <thead>
@@ -82,8 +79,19 @@
 
                                                 <t t-if="table_row['ks_column_type'][ks_rec_count]==='html'">
                                                     <td>
-<!--                                                        <t t-out="row_data"/>-->
-                                                        <t t-raw="row_data"/>
+                                                        <t t-out="markup(row_data)"/>
+                                                    </td>
+                                                    <t t-set="ks_rec_count" t-value="ks_rec_count+1"/>
+                                                </t>
+                                                <t t-elif="table_row['ks_column_type'][ks_rec_count]=='many2one'">
+                                                    <td class="ks_list_canvas_click">
+                                                        <t t-raw="row_data[1]"/>
+                                                    </td>
+                                                    <t t-set="ks_rec_count" t-value="ks_rec_count+1"/>
+                                                </t>
+                                                <t t-elif="table_row['ks_column_type'][ks_rec_count] == 'boolean'">
+                                                    <td class="ks_list_canvas_click">
+                                                        <t t-out="row_data"/>
                                                     </td>
                                                     <t t-set="ks_rec_count" t-value="ks_rec_count+1"/>
                                                 </t>
@@ -108,7 +116,9 @@
                             </table>
                         </t>
                         <t t-else="">
-                            No Data Present
+                            <div class="d-flex justify-content-center align-items-center h-100">
+                                No Data Present
+                            </div>
                         </t>
                     </div>
                 </div>

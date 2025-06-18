@@ -1,17 +1,21 @@
-from odoo import models, fields, api, _
+# -*- coding: utf-8 -*-
+
+from odoo.addons.ks_dashboard_ninja.common_lib.filter_tools import replace_company_domain
 from odoo.exceptions import ValidationError
 from odoo.tools.safe_eval import safe_eval
+
+from odoo import models, fields, api, _
 
 
 class KsDashboardNinjaTemplate(models.Model):
     _name = 'ks_dashboard_ninja.board_defined_filters'
     _description = 'Dashboard Ninja Defined Filters'
 
-    name = fields.Char("Filter Label")
+    name = fields.Char('Filter Label')
     ks_dashboard_board_id = fields.Many2one('ks_dashboard_ninja.board', string="Dashboard")
     ks_model_id = fields.Many2one('ir.model', string='Model',
                                   domain="[('access_ids','!=',False),('transient','=',False),"
-                                         "('model','not ilike','base_import%'),('model','not ilike','ir.%'),"
+                                         "('model','not ilike','base_import%'),'|',('model','not ilike','ir.%'),('model','=ilike','_%ir.%'),"
                                          "('model','not ilike','web_editor.%'),('model','not ilike','web_tour.%'),"
                                          "('model','!=','mail.thread'),('model','not ilike','ks_dash%'), ('model','not ilike','ks_to%')]",
                                   help="Data source to fetch and read the data for the creation of dashboard items. ")
@@ -33,7 +37,7 @@ class KsDashboardNinjaTemplate(models.Model):
                     if ks_domain and "%UID" in ks_domain:
                         ks_domain = ks_domain.replace('"%UID"', str(self.env.user.id))
                     if ks_domain and "%MYCOMPANY" in ks_domain:
-                        ks_domain = ks_domain.replace('"%MYCOMPANY"', str(self.env.company.id))
+                        ks_domain = replace_company_domain(ks_domain, self.env.company.id, self.env.companies.ids)
                     self.env[rec.ks_model_id.model].search_count(safe_eval(ks_domain))
                 except Exception as e:
                     raise ValidationError(_("Something went wrong . Possibly it is due to wrong input type for domain"))
@@ -54,7 +58,7 @@ class KsDashboardNinjaTemplate(models.Model):
     ks_dashboard_board_id = fields.Many2one('ks_dashboard_ninja.board', string="Dashboard")
     ks_model_id = fields.Many2one('ir.model', string='Model',
                                   domain="[('access_ids','!=',False),('transient','=',False),"
-                                         "('model','not ilike','base_import%'),('model','not ilike','ir.%'),"
+                                         "('model','not ilike','base_import%'),'|',('model','not ilike','ir.%'),('model','=ilike','_%ir.%'),"
                                          "('model','not ilike','web_editor.%'),('model','not ilike','web_tour.%'),"
                                          "('model','!=','mail.thread'),('model','not ilike','ks_dash%'), ('model','not ilike','ks_to%')]",
                                   help="Data source to fetch and read the data for the creation of dashboard items. ")
@@ -65,3 +69,24 @@ class KsDashboardNinjaTemplate(models.Model):
                                                 "'date', 'datetime', 'float', 'integer', 'html', 'many2many', "
                                                 "'many2one', 'monetary', 'one2many', 'text', 'selection'])]",
                                          string="Domain Field")
+
+    @api.onchange('ks_model_id')
+    def on_change_ks_model_id(self):
+        self.ks_domain_field_id = False
+    
+
+class KsDashboardNinjaTemplateFilters(models.Model):
+    _name = 'ks_dashboard_ninja.favourite_filters'
+    _description = 'Dashboard Ninja Favourite Filters'
+
+    name = fields.Char("Filter Label")
+    ks_dashboard_board_id = fields.Many2one('ks_dashboard_ninja.board', string="Dashboard")
+    ks_filter = fields.Char("Filter")
+    ks_access_id = fields.Integer("Access Id")
+    ks_filter_type = fields.Char(default='favourite')
+
+    _sql_constraints = [
+        ('name_uniq', 'UNIQUE (name)', 'The name of the filter must be unique!'),
+    ]
+
+

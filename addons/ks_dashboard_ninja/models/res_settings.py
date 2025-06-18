@@ -1,17 +1,24 @@
-from odoo import api, fields, models,_
-from odoo.exceptions import ValidationError
-import requests
+# -*- coding: utf-8 -*-
+
 import json
+
+import requests
+from odoo.exceptions import ValidationError
+
+from odoo import fields, models, _
+
 
 class ResConfig(models.TransientModel):
     _inherit = "res.config.settings"
 
     dn_api_key = fields.Char(string="Dashboard AI API Key",store=True,
                              config_parameter='ks_dashboard_ninja.dn_api_key')
+    enable_chart_zoom = fields.Boolean(string="Enable Zooming for charts", store=True,
+                             config_parameter='ks_dashboard_ninja.enable_chart_zoom')
     url = fields.Char(string="URL", store=True,
                       config_parameter="ks_dashboard_ninja.url")
     ks_email_id = fields.Char(string="Email ID",store=True,config_parameter="ks_dashboard_ninja.ks_email_id")
-
+    ks_analysis_word_length = fields.Selection([("50","50 words"),("100","100 words"),("150","150 words"),("200","200 words"),],default ="100", string="AI Analysis length", store=True,config_parameter="ks_dashboard_ninja.ks_analysis_word_length")
     def Open_wizard(self):
         if self.url and self.ks_email_id:
             try:

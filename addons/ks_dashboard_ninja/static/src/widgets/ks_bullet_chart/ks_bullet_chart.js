@@ -3,6 +3,7 @@
 import { registry } from "@web/core/registry";
 import { CharField } from "@web/views/fields/char/char_field";
 const { Component,reactive, onWillUnmount, onWillUpdateProps, useEffect, useRef, useState, onMounted, willStart } = owl;
+import { renderToElement, renderToString } from "@web/core/utils/render";
 
 export class ks_bullet_chart extends Component{
     setup(){
@@ -48,6 +49,8 @@ export class ks_bullet_chart extends Component{
                 } else {
                     $(self.bulletRef.el).append($("<div class='graph_text'>").text("Please choose the X-labels and Y-labels"));
                 }
+            }else if(rec.ks_data_calculation_type === "query" && this.props.record.data.ks_custom_query) {
+                    $(self.bulletRef.el).append($("<div class='graph_text'>").text("The query is invalid. Please provide a correctly structured query."));
             }else {
                     $(self.bulletRef.el).append($("<div class='graph_text'>").text("Please run the appropriate Query"));
             }
@@ -55,7 +58,7 @@ export class ks_bullet_chart extends Component{
         }
     }
     get_bullet_chart(rec){
-
+        var self = this;
         if($(this.bulletRef.el).find(".graph_text").length){
             $(this.bulletRef.el).find(".graph_text").remove();
         }
@@ -64,7 +67,7 @@ export class ks_bullet_chart extends Component{
         var ks_data = chart_data.datasets;
 
         let data=[];
-        if (ks_data.length){
+        if (ks_data.length && ks_data[0]?.data?.length){
             for (let i=0 ; i<ks_labels.length ; i++){
                 let data2={};
                 for (let j=0 ;j<ks_data.length ; j++){
@@ -93,12 +96,16 @@ export class ks_bullet_chart extends Component{
             };
 
             // Create chart
-
+            if(this.props.record.data.zoom_enabled){
+                    var wheely_val = "zoomX";
+                }else{
+                    var wheely_val = 'none';
+                }
             var chart = this.root.container.children.push(am5xy.XYChart.new(this.root, {
                 panX: true,
                 panY: false,
                 wheelX: "panX",
-                wheelY: "zoomX",
+                wheelY: wheely_val,
                 layout: this.root.verticalLayout
             }));
 
@@ -164,6 +171,19 @@ export class ks_bullet_chart extends Component{
                     tooltipY: 0,
                     strokeOpacity: 0
                 });
+
+                if (this.props.record.data.ks_show_data_value == true && series){
+                        series.bullets.push(function () {
+                            return am5.Bullet.new(self.root, {
+                                sprite: am5.Label.new(self.root, {
+                                    text:  "{valueY}",
+                                    centerX:am5.p50,
+                                    centerY:am5.p100,
+                                    populateText: true
+                                 })
+                            });
+                        });
+                    }
                 series.data.setAll(data);
             }
 
@@ -187,6 +207,7 @@ export class ks_bullet_chart extends Component{
             if (this.props.record.data.ks_show_data_value == true){
                 var cursor = chart.set("cursor", am5xy.XYCursor.new(this.root, {}));
             }
+
             var cursor = chart.set("cursor", am5xy.XYCursor.new(this.root, {
                 behavior: "none"
                 })
@@ -198,7 +219,7 @@ export class ks_bullet_chart extends Component{
             chart.appear(1000, 100);
             series.appear();
         }else{
-            $(this.bulletRef.el).append($("<div class='graph_text'>").text("No Data Available."));
+            $(this.bulletRef.el).append(renderToString("ksNoItemChartView", {}));
         }
 
     }

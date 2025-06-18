@@ -1,60 +1,84 @@
 /** @odoo-module **/
-import { Component, useState ,useEffect,onWillUpdateProps,useRef} from "@odoo/owl";
+import { Component, useState ,useEffect,onWillUpdateProps,useRef, onMounted, onWillUnmount} from "@odoo/owl";
 import {globalfunction } from '@ks_dashboard_ninja/js/ks_global_functions';
 import { loadBundle } from "@web/core/assets";
 import { useService } from "@web/core/utils/hooks";
 import { jsonrpc } from "@web/core/network/rpc_service";
 import { _t } from "@web/core/l10n/translation";
+import { onAudioEnded } from '@ks_dashboard_ninja/js/ks_global_functions';
+import { isMobileOS } from "@web/core/browser/feature_detection";
+import { KsItemButton } from '@ks_dashboard_ninja/components/chart_buttons/chart_buttons';
+
 
 export class Ksdashboardtile extends Component{
+    file_type_magic_word= {'/': 'jpg','R': 'gif','i': 'png','P': 'svg+xml'}
+
     setup(){
         var self = this;
         this._rpc = useService("rpc");
         this.actionService = useService("action");
+        this.ks_tile = useRef('ks_tile');
+        this.mailChatService = useService("mail.chat_window");
+        this.threadService = useService("mail.thread");
         this.ks_container_class = 'grid-stack-item';
+        this.aiAudioRef = useRef("aiAudioRef");
         this.ks_inner_container_class = 'grid-stack-item-content';
         this.state = useState({data_count:""})
         this.item = this.props.item
+        this.file_type_magic_word= {'/': 'jpg','R': 'gif','i': 'png','P': 'svg+xml'}
         this.ks_dashboard_data = this.props.dashboard_data
+        this.item.ksIsDashboardManager = this.props.dashboard_data.ks_dashboard_manager
+        this.item.ks_dashboard_list = this.props.dashboard_data.ks_dashboard_list
+        this.ks_ai_analysis = this.ks_dashboard_data.ks_ai_explain_dash
+        if (this.ks_ai_analysis){
+            this.ks_container_class = 'grid-stack-item ks_ai_explain_tile'
+            this.ks_inner_container_class = 'grid-stack-item-content ks_ai_dashboard_item'
+        }else{
+            this.ks_container_class = 'grid-stack-item'
+            this.ks_inner_container_class = 'encapsulated-kpi-tile grid-stack-item-content'
+        }
+        if (this.item.ks_ai_analysis && this.item.ks_ai_analysis){
+            var ks_analysis = this.item.ks_ai_analysis.split('ks_gap')
+            this.ks_ai_analysis_1 = ks_analysis[0]
+            this.ks_ai_analysis_2 = ks_analysis[1]
+        }
         this.prepare_item();
         var update_interval = this.props.dashboard_data.ks_set_interval
         onWillUpdateProps(async(nextprops)=>{
-            if(nextprops.ksdatefilter !='none'){
-                await this.ksFetchUpdateItem(this.item.id)
-            }
-            if (Object.keys(nextprops.pre_defined_filter).length){
-                if (nextprops.pre_defined_filter?.item_ids?.includes(this.item.id)){
-                    await this.ksFetchUpdateItem(this.item.id)
-                }
-            }
-             if (Object.keys(nextprops.custom_filter).length){
-                if (nextprops.custom_filter?.item_ids?.includes(this.item.id)){
+            if (nextprops.itemsToUpdateList.length){
+                if (nextprops.itemsToUpdateList?.includes(this.item.id)){
                     await this.ksFetchUpdateItem(this.item.id)
                 }
             }
 
         })
-        useEffect(()=>{
-            if (update_interval){
-                const interval = setInterval(() => {
-                    this.ksFetchUpdateItem(this.item.id);
-                }, update_interval);
-                return () => clearInterval(interval);
+
+        onMounted(()=>{
+            if (this.ks_ai_analysis){
+                $(this.ks_tile.el).find('.ks_dashboarditem_id').addClass('ks_ai_chart_body')
             }
+            this.aiAudioRef.el?.addEventListener('ended', onAudioEnded)
+
+        })
+        onWillUnmount( () => {
+            this.aiAudioRef.el?.removeEventListener('ended', onAudioEnded)
         })
 
     }
 
-     ksFetchUpdateItem(item_id) {
+    get isMobile() {
+        return isMobileOS();;
+    }
 
+     ksFetchUpdateItem(item_id) {
             var self = this;
             return jsonrpc("/web/dataset/call_kw/",{
                 model: 'ks_dashboard_ninja.board',
                 method: 'ks_fetch_item',
                 args: [
-                    [parseInt(item_id)], self.ks_dashboard_data.ks_dashboard_id,self.__owl__.parent.component.ksGetParamsForItemFetch(self.item.id)
+                    [parseInt(item_id)], self.ks_dashboard_data.ks_dashboard_id, self.env.ksGetParamsForItemFetch(self.item.id)
                 ],
-                kwargs:{context:this.props.dashboard_data.context},
+                kwargs: { context: self.env.getContext() },
             }).then(function(new_item_data) {
                 this.ks_dashboard_data.ks_item_data[item_id] = new_item_data[item_id];
                 this.item = this.ks_dashboard_data.ks_item_data[item_id] ;
@@ -63,9 +87,6 @@ export class Ksdashboardtile extends Component{
             }.bind(this));
         }
 
-
-
-
     ksStopClickPropagation(e){
         this.ksAllowItemClick = false;
     }
@@ -73,7 +94,7 @@ export class Ksdashboardtile extends Component{
     prepare_item() {
         var self = this;
         var ks_icon_url, item_view;
-        var ks_rgba_background_color, ks_rgba_font_color, ks_rgba_default_icon_color,ks_rgba_button_color;
+        var ks_rgba_background_color, ks_rgba_font_color, ks_rgba_default_icon_color, ks_rgba_button_color;
         var style_main_body, style_image_body_l2, style_domain_count_body, style_button_customize_body, style_button_delete_body;
         if (this.item.ks_multiplier_active){
             var ks_record_count = this.item.ks_record_count * this.item.ks_multiplier
@@ -81,15 +102,15 @@ export class Ksdashboardtile extends Component{
                 var ks_selection = this.item.ks_unit_selection;
                 if (ks_selection === 'monetary') {
                     var ks_currency_id = this.item.ks_currency_id;
-                    var ks_data = globalfunction._onKsGlobalFormatter(ks_record_count, this.item.ks_data_formatting, this.item.ks_precision_digits);
+                    var ks_data = globalfunction._onKsGlobalFormatter(ks_record_count, this.item.ks_data_format, this.item.ks_precision_digits);
                     ks_data = globalfunction.ks_monetary(ks_data, ks_currency_id);
                     var data_count = ks_data;
                 } else{
                     var ks_field = this.item.ks_chart_unit;
-                    var data_count= ks_field+" "+globalfunction._onKsGlobalFormatter(ks_record_count, this.item.ks_data_formatting, this.item.ks_precision_digits);
+                    var data_count= ks_field+" "+globalfunction._onKsGlobalFormatter(ks_record_count, this.item.ks_data_format, this.item.ks_precision_digits);
                 }
             }else {
-                var data_count= globalfunction._onKsGlobalFormatter(ks_record_count, this.item.ks_data_formatting, this.item.ks_precision_digits);
+                var data_count= globalfunction._onKsGlobalFormatter(ks_record_count, this.item.ks_data_format, this.item.ks_precision_digits);
             }
             var count = ks_record_count;
         }else{
@@ -98,15 +119,15 @@ export class Ksdashboardtile extends Component{
                 var ks_selection = this.item.ks_unit_selection;
                 if (ks_selection === 'monetary') {
                     var ks_currency_id = this.item.ks_currency_id;
-                    var ks_data = globalfunction._onKsGlobalFormatter(ks_record_count, this.item.ks_data_formatting, this.item.ks_precision_digits);
+                    var ks_data = globalfunction._onKsGlobalFormatter(ks_record_count, this.item.ks_data_format, this.item.ks_precision_digits);
                     ks_data = globalfunction.ks_monetary(ks_data, ks_currency_id);
                     var data_count = ks_data;
                 } else{
                     var ks_field = this.item.ks_chart_unit;
-                    var data_count= ks_field+" "+globalfunction._onKsGlobalFormatter(ks_record_count, this.item.ks_data_formatting, this.item.ks_precision_digits);
+                    var data_count= ks_field+" "+globalfunction._onKsGlobalFormatter(ks_record_count, this.item.ks_data_format, this.item.ks_precision_digits);
                 }
             }else {
-                var data_count= globalfunction._onKsGlobalFormatter(ks_record_count, this.item.ks_data_formatting, this.item.ks_precision_digits);
+                var data_count= globalfunction._onKsGlobalFormatter(ks_record_count, this.item.ks_data_format, this.item.ks_precision_digits);
             }
             var count = ks_record_count;
         }
@@ -120,16 +141,13 @@ export class Ksdashboardtile extends Component{
 
         this.item.ksIsDashboardManager = self.ks_dashboard_data.ks_dashboard_manager;
         this.item.ksIsUser = true;
-//        if (this.item.ks_tv_play){
-//            this.item.ksIsUser = false;
-//        }
-        ks_rgba_background_color = self._ks_get_rgba_format(this.item.ks_background_color);
-        ks_rgba_font_color = self._ks_get_rgba_format(this.item.ks_font_color);
+        this.ks_rgba_background_color = self._ks_get_rgba_format(this.item.ks_background_color);
+        this.ks_rgba_font_color = self._ks_get_rgba_format(this.item.ks_font_color);
         this.ks_rgba_default_icon_color = self._ks_get_rgba_format(this.item.ks_default_icon_color);
         this.ks_rgba_button_color = self._ks_get_rgba_format(this.item.ks_button_color);
         if (this.item.ks_info){
-            var ks_description = this.item.ks_info.split('\n');
-            var ks_description = ks_description.filter(element => element !== '')
+            var ks_description = this.item.ks_info.replace?.(/\\n/g, '\n').split?.('\n');
+            var ks_description = ks_description.filter(element => element !== '')?.join?.(' ') ?? false
         }else {
             var ks_description = false;
         }
@@ -138,7 +156,7 @@ export class Ksdashboardtile extends Component{
         this.count = count
         this.ks_info = ks_description
         this.ks_dashboard_list= self.ks_dashboard_data.ks_dashboard_list
-        this.style_main_body = this._ksMainBodyStyle(ks_rgba_background_color, ks_rgba_font_color, this.item).background_style;
+        this.style_main_body = this._ksMainBodyStyle(this.ks_rgba_background_color, this.ks_rgba_font_color, this.item).background_style;
     }
 
     get style_image_body_l2(){
@@ -184,11 +202,19 @@ export class Ksdashboardtile extends Component{
 };
 
 Ksdashboardtile.props = {
-    item: { type: Object, Optional:true},
-    dashboard_data: { type: Object, Optional:true},
-    ksdatefilter : {type:String,Optional:true},
-    pre_defined_filter :{type:Object, Optional:true},
-    custom_filter :{type:Object, Optional:true}
+    item: { type: Object, optional:true},
+    dashboard_data: { type: Object, optional:true},
+    ksdatefilter : {type:String,optional:true},
+    pre_defined_filter :{type:Object, optional:true},
+    custom_filter :{type:Object, optional:true},
+    itemsToUpdateList :{ type: Array, optional:true },
+    ks_speak:{type:Function , optional:true},
+    hideButtons: { type: Number, optional: true },
+    on_dialog: { type: Boolean, optional: true },
+    generate_dialog: { type: Boolean, optional: true },
+    onItemClick: { type: Function },
 };
 
 Ksdashboardtile.template = "ksdashboardtile";
+Ksdashboardtile.components = { KsItemButton };
+

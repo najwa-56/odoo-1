@@ -1,15 +1,20 @@
 # -*- coding: utf-8 -*-
 
-from odoo import models, fields, api, _
-from odoo.tools.misc import DEFAULT_SERVER_DATETIME_FORMAT
-from odoo.exceptions import ValidationError
 import datetime
 import json
-from odoo.addons.ks_dashboard_ninja.common_lib.ks_date_filter_selections import ks_get_date, ks_convert_into_local, \
-    ks_convert_into_utc
-from odoo.tools.safe_eval import safe_eval
-import locale
+from base64 import encodebytes
+from collections import defaultdict
+
 from dateutil.parser import parse
+from odoo.addons.ks_dashboard_ninja.common_lib.filter_tools import replace_company_domain
+from odoo.addons.ks_dashboard_ninja.common_lib.ks_date_filter_selections import ks_get_date
+from odoo.exceptions import ValidationError
+from odoo.tools.image import image_data_uri
+from odoo.tools.misc import DEFAULT_SERVER_DATETIME_FORMAT
+from odoo.tools.misc import file_open
+from odoo.tools.safe_eval import safe_eval
+
+from odoo import models, fields, api, _
 
 
 class KsDashboardNinjaBoard(models.Model):
@@ -19,21 +24,23 @@ class KsDashboardNinjaBoard(models.Model):
     name = fields.Char(string="Dashboard Name", required=True, size=35)
     ks_dashboard_items_ids = fields.One2many('ks_dashboard_ninja.item', 'ks_dashboard_ninja_board_id',
                                              string='Dashboard Items')
-    ks_dashboard_menu_name = fields.Char(string="Menu Name")
+    ks_dashboard_menu_name = fields.Char(string="Menu Name", size=35)
     ks_dashboard_top_menu_id = fields.Many2one('ir.ui.menu',
                                                domain="['|',('action','=',False),('parent_id','=',False)]",
                                                string="Show Under Menu",
-                                               default=lambda self: self.env['ir.ui.menu'].search(
-                                                   [('name', '=', 'My Dashboard')]))
+                                               default=lambda self: self.env.ref('ks_dashboard_ninja.dashboards_menu_root',False))
     ks_dashboard_client_action_id = fields.Many2one('ir.actions.client')
     ks_dashboard_menu_id = fields.Many2one('ir.ui.menu')
     ks_dashboard_state = fields.Char()
     ks_dashboard_active = fields.Boolean(string="Active", default=True)
     ks_dashboard_group_access = fields.Many2many('res.groups', string="Group Access")
+    ks_dashboard_favourite_filters_ids = fields.One2many('ks_dashboard_ninja.favourite_filters',
+                                                         'ks_dashboard_board_id', string="Dashboard Favourite Filters")
 
     # DateFilter Fields
     ks_dashboard_start_date = fields.Datetime(string="Start Date")
     ks_dashboard_end_date = fields.Datetime(string="End Date")
+    ks_default_end_time = fields.Boolean(string="Default End Time")
     ks_date_filter_selection = fields.Selection([
         ('l_none', 'All Time'),
         ('l_day', 'Today'),
@@ -88,7 +95,7 @@ class KsDashboardNinjaBoard(models.Model):
         ('300000', '5 minute'),
         ('600000', '10 minute'),
     ], string="Default Update Interval", help="Update Interval for new items only")
-    ks_dashboard_menu_sequence = fields.Integer(string="Menu Sequence", default=10,
+    ks_dashboard_menu_sequence = fields.Integer(string="Menu Sequence", default=20,
                                                 help="Smallest sequence give high priority and Highest sequence give "
                                                      "low priority")
     ks_child_dashboard_ids = fields.One2many('ks_dashboard_ninja.child_board', 'ks_dashboard_ninja_id')
@@ -101,6 +108,13 @@ class KsDashboardNinjaBoard(models.Model):
     multi_layouts = fields.Boolean(string='Enable Multi-Dashboard Layouts',
                                    help='Allow user to have multiple layouts of the same Dashboard')
 
+    ks_ai_explain_dash = fields.Boolean(default=False);
+    is_bookmarked = fields.Boolean(default=False)
+
+    def _default_dashboard_image(self):
+        return image_data_uri(encodebytes(file_open('ks_dashboard_ninja/static/images/dashboardOverview/defaultDashboard.png', 'rb').read()))
+
+    ks_dn_dashboard_image = fields.Binary('Dashboard Image', default=_default_dashboard_image, attachment=False)
 
     @api.constrains('ks_dashboard_start_date', 'ks_dashboard_end_date')
     def ks_date_validation(self):
@@ -117,18 +131,19 @@ class KsDashboardNinjaBoard(models.Model):
                     'name': record.ks_dashboard_menu_name + " Action",
                     'res_model': 'ks_dashboard_ninja.board',
                     'tag': 'ks_dashboard_ninja',
-                    'params': {'ks_dashboard_id': record.id},
+                    'params': {'ks_dashboard_id': record.id, 'ks_dashboard_name': record.ks_dashboard_menu_name},
                 }
                 record.ks_dashboard_client_action_id = self.env['ir.actions.client'].sudo().create(action_id)
-
+                group_ids = record.ks_dashboard_group_access.ids if record.ks_dashboard_group_access else []
                 record.ks_dashboard_menu_id = self.env['ir.ui.menu'].sudo().create({
                     'name': record.ks_dashboard_menu_name,
                     'active': record.ks_dashboard_active,
                     'parent_id': record.ks_dashboard_top_menu_id.id,
                     'action': "ir.actions.client," + str(record.ks_dashboard_client_action_id.id),
-                    'groups_id': record.ks_dashboard_group_access.ids if record.ks_dashboard_group_access else False,
-                    'sequence': record.ks_dashboard_menu_sequence if record.ks_dashboard_menu_sequence else 10
+                    'groups_id': group_ids,
+                    'sequence': record.ks_dashboard_menu_sequence
                 })
+            # self.update_group_access_of_menus()
 
             if record.ks_dashboard_default_template and record.ks_dashboard_default_template.ks_item_count:
                 ks_gridstack_config = {}
@@ -151,6 +166,7 @@ class KsDashboardNinjaBoard(models.Model):
                 rec.ks_dashboard_start_date = False
                 rec.ks_dashboard_end_date = False
 
+
     def write(self, vals):
         if vals.get('ks_date_filter_selection', False) and vals.get('ks_date_filter_selection') != 'l_custom':
             vals.update({
@@ -161,18 +177,25 @@ class KsDashboardNinjaBoard(models.Model):
         record = super(KsDashboardNinjaBoard, self).write(vals)
         for rec in self:
             if 'ks_dashboard_menu_name' in vals:
-                if self.env.ref('ks_dashboard_ninja.ks_my_default_dashboard_board') and self.env.ref(
+                if self.env.ref('ks_dashboard_ninja.ks_my_default_dashboard_board', False) and self.env.ref(
                         'ks_dashboard_ninja.ks_my_default_dashboard_board').sudo().id == rec.id:
                     if self.env.ref('ks_dashboard_ninja.board_menu_root', False):
                         self.env.ref('ks_dashboard_ninja.board_menu_root').sudo().name = vals['ks_dashboard_menu_name']
                 else:
                     rec.ks_dashboard_menu_id.sudo().name = vals['ks_dashboard_menu_name']
+                    rec.ks_dashboard_client_action_id.name = vals['ks_dashboard_menu_name'] + " Action"
             if 'ks_dashboard_group_access' in vals:
-                if self.env.ref('ks_dashboard_ninja.ks_my_default_dashboard_board').id == rec.id:
+                if self.env.ref('ks_dashboard_ninja.ks_my_default_dashboard_board', False) and self.env.ref('ks_dashboard_ninja.ks_my_default_dashboard_board').id == rec.id:
                     if self.env.ref('ks_dashboard_ninja.board_menu_root', False):
                         self.env.ref('ks_dashboard_ninja.board_menu_root').groups_id = vals['ks_dashboard_group_access']
                 else:
                     rec.ks_dashboard_menu_id.sudo().groups_id = vals['ks_dashboard_group_access']
+            admin_group_id = self.env.ref('base.group_system').id
+            menu_ids = rec.ks_dashboard_menu_id.sudo()
+            if not rec.ks_dashboard_group_access.ids:
+                menu_ids.groups_id = False
+            else:
+                menu_ids.groups_id = list(set(menu_ids.groups_id.ids + [admin_group_id]))
             if 'ks_dashboard_active' in vals and rec.ks_dashboard_menu_id:
                 rec.ks_dashboard_menu_id.sudo().active = vals['ks_dashboard_active']
 
@@ -189,7 +212,8 @@ class KsDashboardNinjaBoard(models.Model):
         return record
 
     def unlink(self):
-        if self.env.ref('ks_dashboard_ninja.ks_my_default_dashboard_board').id in self.ids:
+        if (self.env.ref('ks_dashboard_ninja.ks_my_default_dashboard_board', False) and
+                self.env.ref('ks_dashboard_ninja.ks_my_default_dashboard_board').id in self.ids):
             raise ValidationError(_("Default Dashboard can't be deleted."))
         else:
             for rec in self:
@@ -199,6 +223,32 @@ class KsDashboardNinjaBoard(models.Model):
                 rec.ks_dashboard_items_ids.unlink()
         res = super(KsDashboardNinjaBoard, self).unlink()
         return res
+
+    def ks_update_menu_id_old_db(self):
+        ks_records = self.search([('name','in',['Template1 Dashboard','Template2 Dashboard','Template3 Dashboard','My Dashboard'])])
+        ks_menu_id = self.env.ref('ks_dashboard_ninja.dashboards_menu_root').id
+        for rec in ks_records:
+            if (rec.name == "My Dashboard" and rec.ks_dashboard_state == 'Locked') or(rec.name in ['Template1 Dashboard','Template2 Dashboard','Template3 Dashboard'] and rec.ks_dashboard_top_menu_id.name == 'My Dashboard'):
+                rec.ks_dashboard_top_menu_id = ks_menu_id
+                if not rec.ks_dashboard_menu_id:
+                    action_id = {
+                        'name': rec.ks_dashboard_menu_name + " Action",
+                        'res_model': 'ks_dashboard_ninja.board',
+                        'tag': 'ks_dashboard_ninja',
+                        'params': {'ks_dashboard_id': rec.id, 'ks_dashboard_name': rec.ks_dashboard_menu_name},
+                    }
+                    rec.ks_dashboard_client_action_id = self.env['ir.actions.client'].sudo().create(action_id)
+
+                    rec.ks_dashboard_menu_id = self.env['ir.ui.menu'].sudo().create({
+                        'name': rec.ks_dashboard_menu_name,
+                        'active': rec.ks_dashboard_active,
+                        'parent_id': rec.ks_dashboard_top_menu_id.id,
+                        'action': "ir.actions.client," + str(rec.ks_dashboard_client_action_id.id),
+                        'groups_id': rec.ks_dashboard_group_access.ids if rec.ks_dashboard_group_access else False,
+                        'sequence': rec.ks_dashboard_menu_sequence if rec.ks_dashboard_menu_sequence else 10
+                    })
+
+        return True
 
     def ks_get_grid_config(self):
         default_grid_id = self.env['ks_dashboard_ninja.child_board'].search(
@@ -236,16 +286,17 @@ class KsDashboardNinjaBoard(models.Model):
 
         has_group_ks_dashboard_manager = self.env.user.has_group('ks_dashboard_ninja.ks_dashboard_ninja_group_manager')
         ks_dashboard_rec = self.browse(ks_dashboard_id)
+        zooming_enabled = self.env['ir.config_parameter'].sudo().get_param('ks_dashboard_ninja.enable_chart_zoom')
         dashboard_data = {
             'name': ks_dashboard_rec.name,
             'multi_layouts': ks_dashboard_rec.multi_layouts,
-            'ks_company_id': self.env.company.id,
+            'ks_company_id': self._context.get('allowed_company_ids')[0],
             'ks_dashboard_manager': has_group_ks_dashboard_manager,
             'ks_dashboard_list': self.search_read([], ['id', 'name']),
-            'ks_dashboard_start_date': self._context.get('ksDateFilterStartDate', False) or self.browse(
-                ks_dashboard_id).ks_dashboard_start_date,
-            'ks_dashboard_end_date': self._context.get('ksDateFilterEndDate', False) or self.browse(
-                ks_dashboard_id).ks_dashboard_end_date,
+            'ks_dashboard_start_date': self._context.get('ksDateFilterStartDate', False) or
+                                       (fields.Datetime.context_timestamp(self, ks_dashboard_rec.ks_dashboard_start_date) if ks_dashboard_rec.ks_dashboard_end_date else False),
+            'ks_dashboard_end_date': self._context.get('ksDateFilterEndDate', False) or
+                                     (fields.Datetime.context_timestamp(self, ks_dashboard_rec.ks_dashboard_end_date) if ks_dashboard_rec.ks_dashboard_end_date else False),
             'ks_date_filter_selection': self._context.get('ksDateFilterSelection', False) or self.browse(
                 ks_dashboard_id).ks_date_filter_selection,
             'ks_gridstack_config': "{}",
@@ -255,13 +306,18 @@ class KsDashboardNinjaBoard(models.Model):
             'ks_item_data': {},
             'ks_child_boards': False,
             'ks_selected_board_id': False,
+            'ks_default_end_time': ks_dashboard_rec.ks_default_end_time,
             'ks_dashboard_domain_data': ks_dashboard_rec.ks_prepare_dashboard_domain(),
             'ks_dashboard_pre_domain_filter': ks_dashboard_rec.ks_prepare_dashboard_pre_domain(),
             'ks_dashboard_custom_domain_filter': ks_dashboard_rec.ks_prepare_dashboard_custom_domain(),
+            'ks_dashboard_favourite_filter': ks_dashboard_rec.ks_prepare_dashboard_favourite_filter(),
             'ks_item_model_relation': dict([(x['id'], [x['ks_model_name'], x['ks_model_name_2']]) for x in
                                             ks_dashboard_rec.ks_dashboard_items_ids.read(
                                                 ['ks_model_name', 'ks_model_name_2'])]),
-            'ks_model_item_relation': {},
+            'ks_model_item_relation': self.calc_model_item_relation(ks_dashboard_rec),
+            'ks_ai_explain_dash':ks_dashboard_rec.ks_ai_explain_dash,
+            'is_bookmarked': ks_dashboard_rec.is_bookmarked,
+            'zooming_enabled': zooming_enabled
         }
 
         default_grid_id = ks_dashboard_rec.ks_get_grid_config()
@@ -359,35 +415,6 @@ class KsDashboardNinjaBoard(models.Model):
             action['search_view_id'] = ks_actions.search_view_id.id
             action['context'] = context
             action['target'] = 'current'
-        elif rec.ks_is_client_action and rec.ks_client_action:
-            clint_action = {}
-            try:
-                context = safe_eval(rec.ks_client_action.context)
-            except Exception:
-                context = {}
-            ks_client_action = rec.ks_client_action.sudo()
-            clint_action['name'] = ks_client_action.name
-            clint_action['type'] = ks_client_action.type
-            clint_action['res_model'] = ks_client_action.res_model
-            clint_action['xml_id'] = ks_client_action.xml_id
-            clint_action['tag'] = ks_client_action.tag
-            clint_action['binding_type'] = ks_client_action.binding_type
-            clint_action['params'] = ks_client_action.params
-            clint_action['target'] = 'current'
-            clint_action['context'] = context,
-            clint_action['report_id'] = context.get('report_id', False)
-            clint_action['resId'] = ks_client_action.id
-            context.update({
-                'resId': ks_client_action.id
-            })
-
-            clint_action['params'] = {
-                'options': context,
-                'props': {'resId': ks_client_action.id}
-            }
-
-
-            action = clint_action,
         else:
             action = False
         ks_currency_symbol = False
@@ -409,6 +436,7 @@ class KsDashboardNinjaBoard(models.Model):
             #     self.env.user.id)) if rec.ks_domain and "%UID" in rec.ks_domain else rec.ks_domain,
             'ks_domain': rec.ks_convert_into_proper_domain(rec.ks_domain, rec, item_domain1),
             'ks_dashboard_id': rec.ks_dashboard_ninja_board_id.id,
+            'ks_dashboard_name': rec.ks_dashboard_ninja_board_id.name,
             'ks_icon': rec.ks_icon,
             'ks_model_id': rec.ks_model_id.id,
             'ks_model_name': rec.ks_model_name,
@@ -462,6 +490,7 @@ class KsDashboardNinjaBoard(models.Model):
             'ks_radial_legend': rec.ks_radial_legend,
             'ks_data_calculation_type': rec.ks_data_calculation_type,
             'ks_export_all_records': rec.ks_export_all_records,
+            'ks_data_format': rec.ks_data_format,
             'ks_data_formatting': rec.ks_data_format,
             'ks_is_client_action': rec.ks_is_client_action,
             'ks_pagination_limit': rec.ks_pagination_limit,
@@ -475,7 +504,7 @@ class KsDashboardNinjaBoard(models.Model):
             'ks_multiplier': rec.ks_multiplier,
             'ks_goal_liness': True if rec.ks_goal_lines else False,
             'ks_currency_symbol': ks_currency_symbol,
-            'ks_currency_id':self.env.user.company_id.currency_id.id,
+            'ks_currency_id': self.env.user.company_id.currency_id.id,
             'ks_currency_position': ks_currency_position,
             'ks_precision_digits': ks_precision_digits if ks_precision_digits else 2,
             'ks_data_label_type': rec.ks_data_label_type,
@@ -487,10 +516,12 @@ class KsDashboardNinjaBoard(models.Model):
             'ks_is_scatter_group': rec.ks_is_scatter_group,
             'ks_bounds': rec.ks_bounds,
             'ks_partners_map': rec.ks_partners_map,
-            'ks_funnel_record_field':rec.ks_funnel_record_field,
-            'ks_map_record_field':rec.ks_map_record_field,
-            'ks_country_id':rec.ks_country_id.id,
-            'ks_action_name':ks_action_name if ks_action_name else False
+            'ks_funnel_record_field': rec.ks_funnel_record_field,
+            'ks_map_record_field': rec.ks_map_record_field,
+            'ks_country_id': rec.ks_country_id.id,
+            'ks_action_name': ks_action_name if ks_action_name else False,
+            'ks_ai_analysis': rec.ks_ai_analysis,
+            'item_data_source': rec.data_source
             # 'ks_last_index':ks_last_index
             # 'ks_id_name':','.join(ks_id_name)
         }
@@ -525,6 +556,18 @@ class KsDashboardNinjaBoard(models.Model):
 
         return self
 
+    def calc_model_item_relation(self, ks_dashboard_rec):
+        model_items_dict = defaultdict(list)
+
+        for x in ks_dashboard_rec.ks_dashboard_items_ids.read(['ks_model_name', 'ks_model_name_2']):
+            if x['ks_model_name']:
+                model_items_dict[x['ks_model_name']].append(x['id'])
+            if x['ks_model_name_2']:
+                model_items_dict[x['ks_model_name_2']].append(x['id'])
+
+        model_items_dict = dict(model_items_dict)
+        return model_items_dict
+
     @api.model
     def ks_get_list_view_data_offset(self, ks_dashboard_item_id, offset, dashboard_id, params={}):
         item_domain = params.get('ks_domain_1', [])
@@ -532,6 +575,45 @@ class KsDashboardNinjaBoard(models.Model):
         item = self.ks_dashboard_items_ids.browse(ks_dashboard_item_id)
 
         return item.ks_get_next_offset(ks_dashboard_item_id, offset, item_domain)
+
+    def fetch_dashboard_overview(self, **kwargs):
+
+        ks_board_model = self.env['ks_dashboard_ninja.board']
+        ks_board_item_model = self.env['ks_dashboard_ninja.item']
+        dashboards = ks_board_model.search_read(domain=[], fields=['name', 'is_bookmarked', 'ks_dn_dashboard_image'])
+        bookmarked_dashboards = ks_board_model.search_count([('is_bookmarked', '=', True)])
+        chart_count = 0
+        map_count = ks_board_item_model.search_count([('ks_dashboard_item_type', '=', 'ks_map_view')])
+        dashboards_info = {}
+        list_view_count = ks_board_item_model.search_count([('ks_dashboard_item_type', '=', 'ks_list_view'), ('ks_dashboard_ninja_board_id', '!=', False)])
+        chart_list = ['ks_bar_chart', 'ks_horizontalBar_chart', 'ks_line_chart', 'ks_area_chart', 'ks_pie_chart',
+                                                                                                  'ks_doughnut_chart',
+                      'ks_polarArea_chart', 'ks_radialBar_chart', 'ks_scatter_chart', 'ks_funnel_chart',
+                                                                                      'ks_bullet_chart', 'ks_flower_view', 'ks_radar_view']
+
+        for dashboard in dashboards:
+            charts = ks_board_item_model.search_count(
+                [('ks_dashboard_ninja_board_id', '=', dashboard['id']), ('ks_dashboard_item_type', 'in', chart_list)])
+            chart_count += charts
+            dashboards_info[dashboard['id']] = {
+                'chartCount': charts,
+                'name': dashboard['name'],
+                'id': dashboard['id'],
+                'is_bookmarked': dashboard['is_bookmarked'],
+                'image': dashboard['ks_dn_dashboard_image'],
+            }
+
+        return {
+            'overviewInfo': [len(dashboards), chart_count, map_count, bookmarked_dashboards, list_view_count],
+            'dashboardsInfo': dashboards_info,
+            'user_name': self.env.user.name,
+            'isManager': self.env.user.has_group('ks_dashboard_ninja.ks_dashboard_ninja_group_manager')
+        }
+
+    def update_bookmarks(self, *args):
+        self.ensure_one()
+        self.is_bookmarked = not self.is_bookmarked
+        return [self.env['ks_dashboard_ninja.board'].search_count([('is_bookmarked', '=', True)]), self.is_bookmarked]
 
     def ks_view_items_view(self):
         self.ensure_one()
@@ -666,7 +748,7 @@ class KsDashboardNinjaBoard(models.Model):
              ['company_id', '=', self.env.company.id]], limit=1)
         if rec.ks_dashboard_ninja_board_id.ks_gridstack_config:
             keys_data = json.loads(rec.ks_dashboard_ninja_board_id.ks_gridstack_config)
-        elif selecred_rec:
+        elif selecred_rec and selecred_rec.ks_gridstack_config:
             keys_data = json.loads(selecred_rec.ks_gridstack_config)
         elif rec.ks_dashboard_ninja_board_id.ks_child_dashboard_ids[0].ks_gridstack_config:
             keys_data = json.loads(rec.ks_dashboard_ninja_board_id.ks_child_dashboard_ids[0].ks_gridstack_config)
@@ -777,7 +859,6 @@ class KsDashboardNinjaBoard(models.Model):
             'ks_country_id': rec.ks_country_id.id,
             'ks_bounds': rec.ks_bounds,
             'ks_partners_map': rec.ks_partners_map,
-
         }
         if grid_corners:
             item.update({
@@ -797,18 +878,22 @@ class KsDashboardNinjaBoard(models.Model):
         # action['view_mode']='form'
         return action
 
-    def ks_delete_dashboard(self):
-        if str(self.id) in self.ks_dashboard_default_template:
-            raise ValidationError(_('You cannot delete any default template'))
-        else:
-            self.search([('id', '=', self.id)]).unlink()
-            return {
-                'type': 'ir.actions.client',
-                'name': "Dashboard Ninja",
-                'res_model': 'ks_dashboard_ninja.board',
-                'params': {'ks_dashboard_id': 1},
-                'tag': 'ks_dashboard_ninja',
-            }
+    # def ks_delete_dashboard(self):
+    #     if str(self.id) in self.ks_dashboard_default_template:
+    #         raise ValidationError(_('You cannot delete any default template'))
+    #     else:
+    #         self.search([('id', '=', self.id)]).unlink()
+    #         return {
+    #             'type': 'ir.actions.client',
+    #             'name': "My Dashboard",
+    #             'tag': 'dashboard_ninja',
+    #             # 'id': {}
+    #         }
+    def save_dashboard_image(self, *args, **kwargs):
+        self.ensure_one()
+        image = kwargs.get('image')
+        if image:
+            self.ks_dn_dashboard_image = image
 
     def ks_create_dashboard(self):
         action = self.env['ir.actions.act_window']._for_xml_id('ks_dashboard_ninja.board_form_tree_action_window')
@@ -1329,7 +1414,7 @@ class KsDashboardNinjaBoard(models.Model):
                     if ks_domain and "%UID" in ks_domain:
                         ks_domain = ks_domain.replace('"%UID"', str(self.env.user.id))
                     if ks_domain and "%MYCOMPANY" in ks_domain:
-                        ks_domain = ks_domain.replace('"%MYCOMPANY"', str(self.env.company.id))
+                        ks_domain = replace_company_domain(ks_domain, self.env.company.id, self.env.companies.ids)
                     data[rec.ks_model_id.model] = {
                         'domain': safe_eval(ks_domain) if ks_domain else [],
                         'ks_domain_index_data': [],
@@ -1353,7 +1438,7 @@ class KsDashboardNinjaBoard(models.Model):
             if ks_domain and "%UID" in ks_domain:
                 ks_domain = ks_domain.replace('"%UID"', str(self.env.user.id))
             if ks_domain and "%MYCOMPANY" in ks_domain:
-                ks_domain = ks_domain.replace('"%MYCOMPANY"', str(self.env.company.id))
+                ks_domain = replace_company_domain(ks_domain, self.env.company.id, self.env.companies.ids)
 
             data[rec['id']] = {
                 'id': rec.id,
@@ -1380,12 +1465,26 @@ class KsDashboardNinjaBoard(models.Model):
                 'model_name': rec.ks_model_id.name,
                 'field_name': rec.ks_domain_field_id.name,
                 'type': rec.ks_domain_field_id.ttype,
-                'special_data': {}
+                'relation': rec.ks_domain_field_id.relation if rec.ks_domain_field_id.ttype in ['many2many', 'many2one',
+                                                                                                'one2many'] else False,
+                'selection': []
             }
             if rec.ks_domain_field_id.ttype == 'selection':
-                data[str(rec.id)]['special_data'] = {
-                    'select_options':
-                        self.env[rec.ks_model_id.model].fields_get(allfields=[rec.ks_domain_field_id.name])[
+                selection_list = self.env[rec.ks_model_id.model].fields_get(allfields=[rec.ks_domain_field_id.name])[
                             rec.ks_domain_field_id.name]['selection']
-                }
+                data[str(rec.id)]['selection'] = selection_list
+        return data
+
+    def ks_prepare_dashboard_favourite_filter(self):
+        data = {}
+        ks_favourite_filter_ids = self.env['ks_dashboard_ninja.favourite_filters'].search(
+            [['id', 'in', self.ks_dashboard_favourite_filters_ids.ids], '|', ['ks_access_id', '=', self.env.user.id],
+             ['ks_access_id', '=', 0]], order='create_date')
+        for rec in ks_favourite_filter_ids:
+            data[rec.name] = {'id': rec.id,
+                              'ks_filter': json.loads(rec.ks_filter),
+                              'name': rec.name,
+                              'type': rec.ks_filter_type,
+                              'ks_access_id': True if rec.ks_access_id else False,
+                              }
         return data

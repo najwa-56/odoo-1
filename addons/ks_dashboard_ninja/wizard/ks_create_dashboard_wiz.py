@@ -1,20 +1,20 @@
 # -*- coding: utf-8 -*-
 
-from odoo import api, fields, models
+from odoo import fields, models
 
 
 class KSCreateDashboardWizard(models.TransientModel):
     _name = 'ks.dashboard.wizard'
     _description = 'Dashboard Creation Wizard'
 
-    name = fields.Char(string="Dashboard Name", required=True)
-    ks_menu_name = fields.Char(string="Menu Name", required=True)
+    name = fields.Char(string="Dashboard Name", required=True, size=35)
+    ks_menu_name = fields.Char(string="Menu Name", required=True, size=35)
     ks_top_menu_id = fields.Many2one('ir.ui.menu',
                                      domain="['|',('action','=',False),('parent_id','=',False)]",
                                      string="Show Under Menu", required=True,
-                                     default=lambda self: self.env['ir.ui.menu'].search(
-                                         [('name', '=', 'My Dashboard')])[0])
-    ks_sequence = fields.Integer(string="Sequence")
+                                     default=lambda self: self.env.ref('ks_dashboard_ninja.dashboards_menu_root',False))
+    ks_sequence = fields.Integer(string="Sequence", default=20)
+
     ks_template = fields.Many2one('ks_dashboard_ninja.board_template',
                                   default=lambda self: self.env.ref('ks_dashboard_ninja.ks_blank',
                                                                     False),
@@ -37,13 +37,16 @@ class KSCreateDashboardWizard(models.TransientModel):
             'ks_dashboard_default_template': self.ks_template.id,
             'ks_dashboard_top_menu_id': self.ks_top_menu_id.id,
         })
-        context = {'ks_reload_menu': True, 'ks_menu_id': ks_create_record.ks_dashboard_menu_id.id}
-        return {'type': 'ir.actions.client', 'tag': 'reload'}
-        # return {
-        #     'type': 'ir.actions.client',
-        #     'name': "Dashboard Ninja",
-        #     'res_model': 'ks_dashboard_ninja.board',
-        #     'params': {'ks_dashboard_id': ks_create_record.id},
-        #     'tag': 'ks_dashboard_ninja',
-        #     # 'context': self.with_context(context)._context
-        # }
+        # context = {'ks_reload_menu': True, 'ks_menu_id': ks_create_record.ks_dashboard_menu_id.id}
+        # return {'type': 'ir.actions.client', 'tag': 'reload'}
+        return {
+            'type': 'ir.actions.client',
+            'name': "Dashboard Ninja",
+            'res_model': 'ks_dashboard_ninja.board',
+            'params': {'ks_dashboard_id': ks_create_record.id,
+                        'isReloadOnFirstCreate': True
+                       },
+            'tag': 'ks_dashboard_ninja',
+            'id': ks_create_record.ks_dashboard_client_action_id.id,
+            # 'context': self.with_context(context)._context
+        }

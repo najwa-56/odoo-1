@@ -1,7 +1,9 @@
 /** @odoo-module **/
 
 import { getCurrency } from "@web/core/currency";
-import { formatFloat,formatInteger } from "@web/views/fields/formatters";
+import { formatFloat, formatInteger } from "@web/views/fields/formatters";
+import { localization } from "@web/core/l10n/localization";
+import { eraseSessionItem } from "@ks_dashboard_ninja/js/cookies";
 
 export const globalfunction = {
     ksNumIndianFormatter(num, digits){
@@ -192,6 +194,65 @@ export const globalfunction = {
         }
 
 }
+
+
+function onAudioEnded (ev){
+    ev.currentTarget?.parentElement?.querySelector('.voice-cricle')?.classList.toggle("d-none");
+    ev.currentTarget?.parentElement?.querySelector('.comp-gif')?.classList.toggle("d-none");
+}
+
+function ks_get_current_gridstack_config(gridstackRootElement){
+            if (gridstackRootElement && gridstackRootElement.gridstack){
+                var items = gridstackRootElement.gridstack.el.gridstack.engine.nodes;
+            }
+            let grid_config = {}
+            if (items){
+                for (var i = 0; i < items.length; i++) {
+                    grid_config[items[i].id] = {
+                        'x': items[i].x, 'y': items[i].y,
+                        'w': items[i].w, 'h': items[i].h,
+                    }
+                }
+            }
+            return grid_config;
+        }
+
+function convert_data_to_utc(list_view_data) { // TODO Can be moved to python side for faster computation
+    list_view_data = JSON.parse(list_view_data);
+    let datetime_format = localization.dateTimeFormat;
+    let date_format = localization.dateFormat;
+    if (list_view_data && list_view_data.type === "ungrouped") {
+        if (list_view_data.date_index) {
+            let index_data = list_view_data.date_index;
+            for (let i = 0; i < index_data.length; i++) {
+                for (let j = 0; j < list_view_data.data_rows.length; j++) {
+                    var index = index_data[i]
+                    var date = list_view_data.data_rows[j]["data"][index]
+                    if (date) {
+                        if (list_view_data.fields_type[index] === 'date'){
+                            list_view_data.data_rows[j]["data"][index] = luxon.DateTime.fromJSDate(new Date(date + " UTC")).toFormat?.(date_format);
+                        }else if(list_view_data.fields_type[index] === 'datetime'){
+                            list_view_data.data_rows[j]["data"][index] = luxon.DateTime.fromJSDate(new Date(date + " UTC")).toFormat?.(datetime_format);
+                        }
+                    }
+                }
+            }
+        }
+    }
+    return list_view_data;
+}
+
+
+function eraseSessionItems(dashboard_id, obj_name_list_to_be_deleted = []){
+    obj_name_list_to_be_deleted.forEach( (name) => {
+        eraseSessionItem(name + dashboard_id)
+    });
+}
+
 return {
-    globalfunction:globalfunction
+    globalfunction: globalfunction,
+    onAudioEnded,
+    ks_get_current_gridstack_config,
+    convert_data_to_utc,
+    eraseSessionItems
 }

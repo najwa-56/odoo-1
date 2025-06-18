@@ -1,0 +1,57 @@
+
+.btn-box {
+
+    .select-deselect#ks_ai_add_all_item,
+    .select-deselect#ks_ai_remove_all_item,
+    .select-deselect#ks_close_dialog {
+        svg {
+            stroke: var(--color-737791);
+        }
+
+        &.active {
+            svg {
+                fill: var(--color-6789C6);
+
+                path {
+                    &:nth-child(1) {
+                        stroke: transparent;
+                    }
+
+                    &:nth-child(2) {
+                        stroke: #241C1D;
+                    }
+                }
+            }
+        }
+    }
+
+}
+
+.generated-chart {
+
+    .select-btn {
+
+
+
+
+        svg {
+            stroke: var(--color-737791);
+        }
+
+        &.active {
+            svg {
+                fill: var(--color-6789C6);
+
+                path {
+                    &:nth-child(1) {
+                        stroke: transparent;
+                    }
+
+                    &:nth-child(2) {
+                        stroke: #241C1D;
+                    }
+                }
+            }
+        }
+    }
+}

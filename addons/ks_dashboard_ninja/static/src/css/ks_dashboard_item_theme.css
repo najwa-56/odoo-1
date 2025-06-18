@@ -3,12 +3,12 @@
     position: relative;
     width: 25px;
     height: 20px;
-    color: white;
+    color: black;
     display: flex;
     justify-content: center;
 }
 .ks_color_white::before {
-    background: #ffffff;
+    background: #DAEAF6;
     color:black;
 }
 
@@ -17,16 +17,16 @@
 }
 
 .ks_color_blue::before {
-    background: #337ab7;
+    background: #FFF4DE;
 }
 .ks_color_red::before{
-    background: #d9534f;
+    background: #DCFCE7;
 }
 .ks_color_yellow::before{
-    background: #f0ad4e;
+    background: #F3E8FF;
 }
 .ks_color_green::before{
-    background: #5cb85c;
+    background: #FFE2E5;
 }
 .ks_dashboard_theme_view_render{
     display: flex;

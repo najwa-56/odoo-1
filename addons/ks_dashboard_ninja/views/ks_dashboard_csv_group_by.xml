@@ -38,9 +38,4 @@
         <field name="view_mode">tree,form</field>
     </record>
 
-<!--    <menuitem id="menu_group_by"-->
-<!--              name="Group By"-->
-<!--              parent="ks_dashboard_ninja.configuration_menu"-->
-<!--              action="action_group_by"-->
-<!--              sequence="20"/>-->
 </odoo>

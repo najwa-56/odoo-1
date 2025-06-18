@@ -1,7 +1,11 @@
+# -*- coding: utf-8 -*-
+
 import base64
 import logging
-from odoo import api, fields, models, _
+
 from odoo.exceptions import ValidationError
+
+from odoo import fields, models, _
 
 _logger = logging.getLogger(__name__)
 
@@ -14,7 +18,7 @@ class KsDashboardNInjaImport(models.TransientModel):
     ks_top_menu_id = fields.Many2one('ir.ui.menu', string="Show Under Menu", domain="[('parent_id','=',False)]",
                                      required=True,
                                      default=lambda self: self.env['ir.ui.menu'].search(
-                                         [('name', '=', 'My Dashboard')]))
+                                         [('name', '=', 'My Dashboards')]))
 
     def ks_do_action(self):
         for rec in self:

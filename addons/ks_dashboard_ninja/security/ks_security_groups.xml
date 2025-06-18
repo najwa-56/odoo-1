@@ -14,6 +14,34 @@
             <field name="perm_write" eval="True"/>
         </record>
 
+        <record id="ir_rule_ks_accessible_dashboards" model="ir.rule">
+            <field name="name">Dashboard Record Level Groups Access: Show dashboards matching user's assigned groups.</field>
+            <field name="model_id" ref="model_ks_dashboard_ninja_board"/>
+            <field name="domain_force">['|', ('ks_dashboard_group_access', '=' , False), ('ks_dashboard_group_access','in', user.groups_id.ids)]</field>
+            <field name="groups" eval="[(4, ref('base.group_user'))]" />
+        </record>
+
+        <record id="ir_rule_ks_accessible_child_dashboards" model="ir.rule">
+            <field name="name">Child Dashboard Record Level Groups Access: Show dashboards matching user's assigned groups.</field>
+            <field name="model_id" ref="model_ks_dashboard_ninja_child_board"/>
+            <field name="domain_force">['|', ('ks_computed_group_access', '=', False), ('ks_computed_group_access', 'in', user.groups_id.ids)]</field>
+            <field name="groups" eval="[(4, ref('base.group_user'))]" />
+        </record>
+
+        <record id="ir_rule_ks_admin_accessible_dashboards" model="ir.rule">
+            <field name="name">Dashboard Record Level Groups Access: Show all dashboards to admin regardless of assigned groups.</field>
+            <field name="model_id" ref="model_ks_dashboard_ninja_board"/>
+            <field name="domain_force">[(1, '=', 1)]</field>
+            <field name="groups" eval="[Command.link(ref('base.group_system'))]"/>
+        </record>
+
+        <record id="ir_rule_ks_admin_accessible_child_dashboards" model="ir.rule">
+            <field name="name">Child Dashboard Record Level Groups Access: Show all dashboards to admin regardless of assigned groups.</field>
+            <field name="model_id" ref="model_ks_dashboard_ninja_child_board"/>
+            <field name="domain_force">[(1, '=', 1)]</field>
+            <field name="groups" eval="[Command.link(ref('base.group_system'))]"/>
+        </record>
+
         <record model="ir.module.category" id="ks_dashboard_ninja_security_groups">
             <field name="name">Dashboard Ninja Rights</field>
         </record>
