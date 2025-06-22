@@ -6,7 +6,7 @@ import base64
 
 class EmployeeTask(models.Model):
     _name = 'employee.task'
-    _description = 'Employee Evaluation Task'
+    _description = 'EmployeeTask'
     _order = 'due_date asc'
     _rec_name = 'task_code'
     _inherit = ['mail.thread', 'mail.activity.mixin']
@@ -313,7 +313,7 @@ class EmployeeTask(models.Model):
                     'employee_id': next_employee.id,
                     'task_time': task_time,
                     'due_date': due_date,
-                    'task_type': 'daily',  # Or use dep_template.task_type if you want it dynamic
+                    'task_type': 'none',  # Or use dep_template.task_type if you want it dynamic
                     'status': 'assigned',
                     'description': f"Auto-created after completing '{rec.task_id.id}'",
                     'parent_task_id': rec.id,
@@ -352,7 +352,7 @@ class EmployeeTask(models.Model):
                     'employee_id': next_employee.id,
                     'task_time': task_time,
                     'due_date': due_date,
-                    'task_type': 'daily',
+                    'task_type': 'none',
                     'status': 'assigned',
                     'description': f"Auto-created after cancellation of '{rec.task_id.name}'",
                     'parent_task_id': rec.id,
@@ -393,7 +393,7 @@ class EmployeeTask(models.Model):
                 'employee_id': next_employee.id,
                 'task_time': task_time,
                 'due_date': due_date,
-                'task_type': 'daily',
+                'task_type': 'none',
                 'status': 'assigned',
                 'description': f"Auto-created after cancellation of '{rec.task_id.name}'",
                 'parent_task_id': rec.id,

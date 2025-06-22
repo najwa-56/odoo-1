@@ -1,8 +1,8 @@
 id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
-access_employee_task_manager,employee.task.manager,model_employee_task,task_assignment.group_task_user,1,1,0,0
-access_employee_task_employee,employee.task.employee,model_employee_task,task_assignment.group_task_manager,1,1,1,1
+access_employee_task_user,employee.task.user,model_employee_task,task_assignment.group_task_user,1,1,1,0
+access_employee_task_manager,employee.task.manager,model_employee_task,task_assignment.group_task_manager,1,1,1,1
 access_employee_task,access_employee_task,model_employee_task,task_assignment.group_task_user,1,1,0,0
-access_task_name_user,access_task_name_user,model_task_name,task_assignment.group_task_user,1,1,0,0
+access_task_name_user,access_task_name_user,model_task_name,task_assignment.group_task_user,1,0,0,0
 access_task_name_manager,access_task_name_manager,model_task_name,task_assignment.group_task_manager,1,1,1,1
 access_repeat_day_user,access_repeat_day,model_repeat_day,task_assignment.group_task_user,1,1,0,0
 access_repeat_day,access_repeat_day,model_repeat_day,task_assignment.group_task_manager,1,1,1,1
