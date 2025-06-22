@@ -1,0 +1,42 @@
+<odoo>
+    <!-- Tree View -->
+    <record id="view_finger_template_tree" model="ir.ui.view">
+        <field name="name">finger.template.tree</field>
+        <field name="model">finger.template</field>
+        <field name="arch" type="xml">
+            <tree string="Finger Templates">
+                <field name="employee_id"/>
+                <field name="device_id"/>
+                <field name="device_user_id"/>
+            </tree>
+        </field>
+    </record>
+
+    <!-- Form View -->
+    <record id="view_finger_template_form" model="ir.ui.view">
+        <field name="name">finger.template.form</field>
+        <field name="model">finger.template</field>
+        <field name="arch" type="xml">
+            <form string="Finger Template">
+                <group>
+                    <field name="employee_id"/>
+                    <field name="device_id" />
+                    <field name="device_user_id" />
+                    <field name="template_data" widget="binary"/>
+                </group>
+            </form>
+        </field>
+    </record>
+
+    <!-- Action -->
+    <record id="action_finger_template" model="ir.actions.act_window">
+        <field name="name">Finger Templates</field>
+        <field name="res_model">finger.template</field>
+        <field name="view_mode">tree,form</field>
+        <field name="help" type="html">
+            <p class="oe_view_nocontent_create">
+                Create your first finger template
+            </p>
+        </field>
+    </record>
+</odoo>

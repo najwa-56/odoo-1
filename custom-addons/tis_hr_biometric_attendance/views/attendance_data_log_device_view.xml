@@ -1,0 +1,49 @@
+<odoo>
+    <record id="attendance_data_log_device_tree_view" model="ir.ui.view">
+        <field name="name">attendance.data.log.device.tree.view</field>
+        <field name="model">attendance.data.log.device</field>
+        <field name="arch" type="xml">
+            <tree>
+                <field name="device_id"/>
+                <field name="log_code"/>
+                <field name="description"/>
+                <field name="operator"/>
+                <field name="op_time"/>
+                <field name="value_1"/>
+                <field name="value_2"/>
+                <field name="value_3"/>
+                <field name="reserved"/>
+                <field name="opStamp"/>
+            </tree>
+        </field>
+    </record>
+    <record id="attendance_data_log_device_form_view" model="ir.ui.view">
+        <field name="name">attendance.data.log.device.form.view</field>
+        <field name="model">attendance.data.log.device</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <group>
+                        <field name="device_id"/>
+                        <field name="log_code"/>
+                        <field name="description"/>
+                        <field name="op_time"/>
+                    </group>
+                    <group>
+                        <field name="operator"/>
+                        <field name="value_1"/>
+                        <field name="value_2"/>
+                        <field name="value_3"/>
+                        <field name="reserved"/>
+                        <field name="opStamp"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+    <record id="action_attendance_data_log_device" model="ir.actions.act_window">
+        <field name="name">Attendance Data Log Device</field>
+        <field name="res_model">attendance.data.log.device</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+</odoo>

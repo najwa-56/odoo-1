@@ -1,0 +1,33 @@
+<odoo>
+    <record id="view_stamp_log_form" model="ir.ui.view">
+        <field name="name">stamp.log.form</field>
+        <field name="model">stamp.log</field>
+        <field name="arch" type="xml">
+            <form string="Stamp Log">
+                <sheet>
+                    <group>
+                        <field name="name"/>
+                        <field name="log_date"/>
+                        <field name="log_text"/>
+                        <field name="device_id" invisible="1"/>
+                        <field name="stamp" />
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_stamp_log_tree" model="ir.ui.view">
+        <field name="name">stamp.log.tree</field>
+        <field name="model">stamp.log</field>
+        <field name="arch" type="xml">
+            <tree string="Stamp Logs">
+                <field name="name"/>
+                <field name="log_date"/>
+                <field name="log_text"/>
+                <field name="device_id" />
+                <field name="stamp"/>
+            </tree>
+        </field>
+    </record>
+</odoo>

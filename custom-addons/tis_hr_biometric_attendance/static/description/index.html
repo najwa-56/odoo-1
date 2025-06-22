@@ -1,0 +1,395 @@
+<!--MAin Heading-->
+<section class="oe_container">
+    <div class="oe_row oe_spaced">
+        <h2 class="oe_slogan" style="color:#004a81;">Biometric Attendance</h2>
+    </div>
+</section>
+<!--Heading-->
+<section class="oe_container">
+    <div class="oe_row">
+        <div class="oe_span12">
+            <div class="shadow"
+                 style="margin-bottom:25px !important;margin: auto;display: block;max-width: 81%;border-radius: 10px;padding: 22px 13px 22px 12px;">
+                <h1 class="text-center mx-auto mb-5" style="font-size: 20px;">
+                    Our customers are using Zkteco Device such as F18, uFace202, F19, iClock 680, MA300, F16, F22, uFace800, SpeedFace-V4L, F28, MB10, iClock700, MB10-VL, MB360, F09, F21, ProBio Plus Series, Facedepot 7C, MiniAC Plus, MiniTA, MiniAC, SpeedFace M4, EFace 10, FaceDepot-7BL, SpeedFace-V5L, FaceDepot 4A etc. with this module.
+                </h1>
+                <div style="margin: 0;text-align: center;background-color: #044c82;color: #fff;padding: 13px 7px;width: 70%;margin: auto;font-size: 19px;border-radius: 16px;margin-top: -18px;">
+                    <p class="h4 text-white mb-0  mt-0 oe_slogan">IT SUPPORT
+                        ODOO.SH</p>
+                    <p class="text-center mb-0" style="font-size:12px;">For
+                        odoo sh, your device must support a domain name in the
+                        Cloud Server/ADMS Settings, as some devices only accept
+                        IP addresses</p>
+
+                </div>
+            </div>
+            <h4 class="text-center">
+                This module helps integrate Odoo HR Attendance with ZK attendance machines, enabling seamless synchronization of attendance records between the devices and Odoo. In addition, this module supports the ADMS protocol, allowing dynamic communication with attendance devices without requiring static IP configurations.
+            </h4>
+            <br/>
+            <br/>
+            <h3>Cloud/ADMS protocol</h3>
+            <p>A new feature called ADMS was introduced to enhance
+                device-to-software
+                communication. Traditionally, the system relied on obtaining
+                data from devices using static IPs and
+                modem configurations, With the ADMS feature, devices can now
+                push data directly to the software,
+                eliminating the need for static IP and modem setups.</p>
+            <p>The ADMS feature enables real-time or scheduled data
+                transmission through HTTP protocols,
+                allowing devices to actively communicate with the server. In
+                this setup, the device pushes its data to
+                the server, while any server-side commands are returned when
+                the device periodically checks for
+                updates. This new approach simplifies the configuration
+                process, reducing potential technical
+                challenges for clients.</p>
+        </div>
+    </div>
+</section>
+<!--Configuration without ADMS-->
+<section class="oe_container oe_dark">
+    <p class="text-justify">
+    <h2 class="text-left">Configure the device with Odoo (Attendances >> Biometric Device Config)</h2></p>
+    <div class="oe_row">
+        <div class="oe_span12">
+            <div class="oe_bg_img">
+                <center><img class="oe_picture oe_screenshot" src="hr_biometric_scr_01.png"></center>
+            </div>
+        </div>
+        <p class="text-justify ">
+            Configure a static IP, Port and Timezone for the system. If the biometric device has password, you can
+            configure it by enabling 'Is Password Set' field. After configuration click the 'Test Connection'
+            button.
+        </p>
+        <div class="oe_span12">
+            <div class="oe_bg_img">
+                <center><img class="oe_picture oe_screenshot" src="hr_biometric_scr_02.png"></center>
+            </div>
+        </div>
+        <p class="text-justify">
+            If your connection success, server shows a success message
+        </p>
+        <div class="oe_span12">
+            <div class="oe_bg_img">
+                <center><img class="oe_picture oe_screenshot" src="hr_biometric_scr_03.png"></center>
+            </div>
+        </div>
+        <p class="text-justify">
+            If your connection fails, server shows an error message
+        </p>
+        <div class="oe_span12">
+            <div class="oe_bg_img">
+                <center><img class="oe_picture oe_screenshot" src="hr_biometric_scr_04.png"></center>
+            </div>
+        </div>
+    </div>
+</section>
+<!--Configuration with ADMS-->
+<section class="oe_container oe_dark">
+    <p class="text-justify">
+    <h2 class="text-left">Configure the device with Odoo (Attendances >> Biometric Device Config) (IF ADMS Enabled)</h2></p>
+    <div class="oe_row">
+        <div class="oe_span12">
+            <div class="oe_bg_img">
+                <center><img class="oe_picture oe_screenshot" src="hr_biometric_scr_01_adms.png"></center>
+            </div>
+        </div>
+        <p class="text-justify ">
+            Once the serial number is set and ADMS is enabled, you will need to configure your server's IP address on the biometric device.
+
+        </p>
+        <p>Follow these step-by-step instructions for the configuration.</p>
+        <h5>Device Configuration</h5>
+        <ol>
+            <li>
+                <strong>Access Machine Settings:</strong>
+                <ul>
+                    <li>Navigate to the 'Comm' setting of the machine.</li>
+                </ul>
+            </li>
+            <li>
+                <strong>Configure Cloud Server Settings:</strong>
+                <ul>
+                    <li>Enable Domain Name: Activate this if you plan to use a
+                        domain.
+                    </li>
+                    <li>Server Address: Enter the IP (e.g., 192.168.1.1) or
+                        domain (e.g., example.com).
+                    </li>
+                    <li>You can find your IP in the internet settings.</li>
+                    <li>Server Port: Use 443 for online servers or the port
+                        your server uses (e.g., 8069 for local Odoo
+                        environments).
+                    </li>
+                    <li>Enable Proxy Server (if available): Activate it and
+                        provide the proxy server’s IP and port.
+                    </li>
+                    <li>HTTPS (if available): Enable HTTPS for secure data
+                        transfer unless using a local environment.
+                    </li>
+                </ul>
+            </li>
+        </ol>
+        <div class="reference">
+            <strong>For further reference:</strong>
+            <a href="https://zkteco.co.za/documentation/biotime8/Biotime%208%20%E2%80%93%20Communication%20Settings%20%E2%80%93%20Cloud%20or%20ADMS%20settings.pdf"
+               target="_blank">Biotime 8 – Communication Settings</a>
+        </div>
+        <br/>
+        <p class="text-justify ">
+            Once the device configuration is complete, it will send a request
+            to the server with its serial number. At that
+            point, the Odoo server will verify if the device exists by checking
+            the serial number. If the device is found, its status will
+            automatically be updated to "Connected."
+        </p>
+        <div class="oe_span12">
+            <div class="oe_bg_img">
+                <center><img class="oe_picture oe_screenshot" src="hr_biometric_scr_02_adms.png"></center>
+            </div>
+        </div>
+        <p class="text-justify">
+            After completing the device configuration, if your device fails to connect to the Odoo server, it will remain in the 'Not Connected' status. You only need to wait for a while (about 1 minute) for the connection to establish.
+        </p>
+    </div>
+</section>
+<!--Synchronize employees with biometric device-->
+<section class="oe_container oe_dark">
+    <p class="text-justify">
+    <h2>Synchronize employees with biometric device</h2></p>
+    <div class="oe_row">
+        <p class="text-justify">
+            Click the 'Sync Employees' button to synchronize employees with biometric device.
+        </p>
+        <div class="oe_span12">
+            <div class="oe_bg_img">
+                <center><img class="oe_picture oe_screenshot" src="hr_biometric_scr_05.png"></center>
+            </div>
+        </div>
+        <p class="text-justify">
+            If employees synced with biometric device, you can see a popup with success message.
+        </p>
+        <div class="oe_span12">
+            <div class="oe_bg_img">
+                <center><img class="oe_picture oe_screenshot" src="hr_biometric_scr_06.png"></center>
+            </div>
+        </div>
+
+        <p class="text-justify">
+            You can see three menus in employee form.
+            <br/>
+            1. Scan with biometric - Click to scan employee with biometric device
+            <br/>
+            2. Update with biometric - Click to update employee details with biometric device
+            <br/>
+            3. Remove from biometric - Click to remove employee details from biometric device
+        </p>
+        <div class="oe_span12">
+            <div class="oe_bg_img">
+                <center><img class="oe_picture oe_screenshot" src="hr_biometric_scr_07.png"></center>
+            </div>
+        </div>
+        <p class="text-justify">
+            Click Scan to enroll employee with biometric device.
+        </p>
+        <div class="oe_span12">
+            <div class="oe_bg_img">
+                <center><img class="oe_picture oe_screenshot" src="hr_biometric_scr_08.png"></center>
+            </div>
+        </div>
+        <p class="text-justify">
+            Click 'Update' to update employee details with biometric device.
+        </p>
+        <div class="oe_span12">
+            <div class="oe_bg_img">
+                <center><img class="oe_picture oe_screenshot" src="hr_biometric_scr_09.png"></center>
+            </div>
+        </div>
+        <p class="text-justify">
+            Click 'Remove 'to remove employee details from biometric device.
+        </p>
+        <div class="oe_span12">
+            <div class="oe_bg_img">
+                <center><img class="oe_picture oe_screenshot" src="hr_biometric_scr_10.png"></center>
+            </div>
+        </div>
+        <p class="text-justify">
+            After updating the employee details, a line will create under the 'Biometric Devices' tab. This line maps
+            the same ID present on the biometric device to the Biometric User Id field.
+        </p>
+        <div class="oe_span12">
+            <div class="oe_bg_img">
+                <center><img class="oe_picture oe_screenshot" src="hr_biometric_scr_11.png"></center>
+            </div>
+        </div>
+    </div>
+</section>
+<!--Synchronize employees with biometric device ADMS-->
+<section class="oe_container oe_dark">
+    <p class="text-justify">
+    <h2>Synchronize employees with biometric device (IF ADMS Enabled)</h2></p>
+    <div class="oe_row">
+        <p class="text-justify">
+            Click the 'Export Employees' button to synchronize employees with biometric device.
+        </p>
+        <div class="oe_span12">
+            <div class="oe_bg_img">
+                <center><img class="oe_picture oe_screenshot" src="hr_biometric_scr_05_adms.png"></center>
+            </div>
+        </div>
+        <p class="text-justify">
+            When the 'Export Employee' button is clicked, device commands are created to register users on the device. Once the command is successfully executed (which takes about 30 seconds), the employees will be synced with the device users.
+        </p>
+        <div class="oe_span12">
+            <div class="oe_bg_img">
+                <center><img class="oe_picture oe_screenshot" src="hr_biometric_scr_06_adms_1.png"></center>
+            </div>
+            <div class="oe_bg_img">
+                <center><img class="oe_picture oe_screenshot" src="hr_biometric_scr_06_adms_2.png"></center>
+            </div>
+            <div class="oe_bg_img">
+                <center><img class="oe_picture oe_screenshot" src="hr_biometric_scr_06_adms_3.png"></center>
+            </div>
+        </div>
+    </div>
+</section>
+<!--Download Attendance-->
+<section class="oe_container oe_dark">
+    <p class="text-justify">
+    <h2>Download Attendance Logs</h2></p>
+    <div class="oe_row">
+        <p class="text-justify">
+            Click the 'Download Attendance' button to download attendance log.
+        </p>
+        <div class="oe_span12">
+            <div class="oe_bg_img">
+                <center><img class="oe_picture oe_screenshot" src="hr_biometric_scr_12.png"></center>
+            </div>
+        </div>
+        <p class="text-justify">
+            After downloading attendance log server shows a success message.
+        </p>
+        <div class="oe_span12">
+            <div class="oe_bg_img">
+                <center><img class="oe_picture oe_screenshot" src="hr_biometric_scr_13.png"></center>
+            </div>
+        </div>
+        <p class="text-justify">
+            Under the Manager menu, you can see three new menus.
+            <br/>
+            <br/>
+            1. Biometric Attendance Log - shows the downloaded attendance log of employees
+            <br/>
+            2. Calculate Attendance - calculate the attendance and shows the difference in attendances menu.
+            <br/>
+            3. Attendance Report - excel report of attendance
+        </p>
+        <div class="oe_span12">
+            <div class="oe_bg_img">
+                <center><img class="oe_picture oe_screenshot" src="hr_biometric_scr_14.png"></center>
+            </div>
+        </div>
+        <p class="text-justify">
+            Biometric attendance log tree view
+        </p>
+        <div class="oe_span12">
+            <div class="oe_bg_img">
+                <center><img class="oe_picture oe_screenshot" src="hr_biometric_scr_15.png"></center>
+            </div>
+        </div>
+    </div>
+</section>
+<!--Calculate Attendance-->
+<section class="oe_container oe_dark">
+    <p class="text-justify">
+    <h2>Calculate Attendance</h2></p>
+    <div class="oe_row">
+        <p class="text-justify">
+            To calculate attendance click 'Calculate Attendance' menu. Then click on the Calculate button.
+        </p>
+        <div class="oe_span12">
+            <div class="oe_bg_img">
+                <center><img class="oe_picture oe_screenshot" src="hr_biometric_scr_16.png"></center>
+            </div>
+        </div>
+        <p class="text-justify">
+            To calculate attendance for each day only, enable 'Minimal Attendance' in settings. Then click on the Calculate button.
+        </p>
+        <div class="oe_span12">
+            <div class="oe_bg_img">
+                <center><img class="oe_picture oe_screenshot" src="hr_biometric_scr_21.png"></center>
+            </div>
+        </div>
+        <p class="text-justify">
+            Select 'Attendances' from the Manager menu to see the employees attendances.
+        </p>
+        <div class="oe_span12">
+            <div class="oe_bg_img">
+                <center><img class="oe_picture oe_screenshot" src="hr_biometric_scr_17.png"></center>
+            </div>
+        </div>
+        <p class="text-justify">
+            By clicking 'Attendance Report' menu, you can see a popup. Select the report type , From date and To date
+            from here.
+        </p>
+        <div class="oe_span12">
+            <div class="oe_bg_img">
+                <center><img class="oe_picture oe_screenshot" src="hr_biometric_scr_18.png"></center>
+            </div>
+        </div>
+        <p class="text-justify">
+            Attendance report
+        </p>
+        <div class="oe_span12">
+            <div class="oe_bg_img">
+                <center><img class="oe_picture oe_screenshot" src="hr_biometric_scr_19.png"></center>
+            </div>
+        </div>
+        <p class="text-justify">
+            Attendance log report
+        </p>
+        <div class="oe_span12">
+            <div class="oe_bg_img">
+                <center><img class="oe_picture oe_screenshot" src="hr_biometric_scr_20.png"></center>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="oe_container">
+    <div class="oe_row">
+        <h3 class="oe_slogan" style="color:#004a81;">Help and Support</h3>
+        <h4 class="oe_slogan" style="color:#004a81;">For support, new features and customizations.</h4>
+        <div class="oe_row">
+            <!--<div class="col-md-4"></div>-->
+            <div class="col-md-12">
+                <a href="http://www.technaureus.com" class="logo">
+                    <img src="Logo.png" class="mx-auto d-block"/>
+                </a>
+            </div>
+        </div>
+        <div class="oe_slogan">
+            <a class="btn btn-primary btn-lg mt8"
+               style="color: #FFFFFF !important;background-color: #004a81;" href="http://www.technaureus.com/"
+               target="_blank">
+                <i class="fa fa-globe"></i> Website </a>
+            <a class="btn btn-primary btn-lg mt8" style="color: #FFFFFF !important;background-color: #004a81;"
+               href="mailto:support@technaureus.com" target="_top">
+                <i class="fa fa-envelope"></i> Contact Us </a>
+            <a class="btn btn-primary btn-lg mt8" style="color: #FFFFFF !important;background-color: #004a81;"
+               href="skype:technaureus?call"><i
+                    class="fa fa-skype"></i> Skype </a>
+            <br/>
+            <br/>
+
+            <h2 class="oe_mt16" style="text-align: center;">
+                <a href="https://apps.odoo.com/apps/modules/browse?search=technaureus" target="_blank"
+                   style="color: #004a81; font-weight: bold; margin-top: 16px;">
+                    <i class="fa fa-star fa-spin"></i> Click here for Technaureus Odoo Apps <i
+                        class="fa fa-star fa-spin"></i></a>
+            </h2>
+        </div>
+    </div>
+</section>

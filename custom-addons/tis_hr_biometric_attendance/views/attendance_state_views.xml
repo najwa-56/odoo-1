@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <!-- Tree View -->
+    <record id="attendance_state_view_tree" model="ir.ui.view">
+        <field name="name">attendance.state.view.tree</field>
+        <field name="model">attendance.state</field>
+        <field name="arch" type="xml">
+            <tree string="Attendance States" create="0">
+                <field name="name"/>
+                <field name="code"/>
+                <field name="device_id"/>
+                <field name="activity_type"/>
+            </tree>
+        </field>
+    </record>
+
+    <!-- Form View -->
+    <record id="attendance_state_view_form" model="ir.ui.view">
+        <field name="name">attendance.state.view.form</field>
+        <field name="model">attendance.state</field>
+        <field name="arch" type="xml">
+            <form string="Attendance State" create="0">
+                <group>
+                    <field name="name"/>
+                    <field name="code"/>
+                    <field name="device_id"/>
+                    <field name="description"/>
+                    <field name="activity_type"/>
+                </group>
+            </form>
+        </field>
+    </record>
+
+    <!-- Search View -->
+    <record id="attendance_state_view_search" model="ir.ui.view">
+        <field name="name">attendance.state.view.search</field>
+        <field name="model">attendance.state</field>
+        <field name="arch" type="xml">
+            <search string="Attendance States">
+                <field name="name"/>
+                <field name="code"/>
+            </search>
+        </field>
+    </record>
+
+    <!-- Action to Open Views -->
+    <record id="action_attendance_state" model="ir.actions.act_window">
+        <field name="name">Attendance States</field>
+        <field name="res_model">attendance.state</field>
+        <field name="view_mode">tree,form</field>
+        <field name="help" type="html">
+            <p class="oe_view_nocontent_create">
+                Create the first attendance state.
+            </p>
+        </field>
+    </record>
+
+    <!-- Menu Item -->
+    <menuitem
+            action="tis_hr_biometric_attendance.action_biometric_device_config_view"
+            id="menu_biometric_device_config_sub"
+            parent="tis_hr_biometric_attendance.menu_biometric_device_config"
+            sequence="9"
+            groups="hr_attendance.group_hr_attendance_manager"/>
+    <menuitem id="menu_attendance_state" name="Attendance States"
+              parent="tis_hr_biometric_attendance.menu_biometric_device_config"
+              action="action_attendance_state" sequence="10"/>
+</odoo>
