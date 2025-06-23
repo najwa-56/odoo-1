@@ -9,8 +9,7 @@
             <field name="arch" type="xml">
                     <xpath expr="//field[@name='cust_tree_ids']" position="replace">
                         <field name="cust_tree_ids" invisible="delivery_route_link_id == False">
-                            <tree create="True">
-
+                            <tree create="True" limit="200">
                                 <field name="sequence" widget="handle"/>
                                 <field name="name"/>
                                 <button name="open_map"

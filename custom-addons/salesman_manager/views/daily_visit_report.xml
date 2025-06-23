@@ -12,11 +12,10 @@
                     <field name="is_it_sold"/>
                     <field name="creation_date"/>
                     <field name="check_out_time"/>
-                    <field name="time_spending_in_customer"
-                           decoration-danger="time_spending_in_customer &gt; avg_time_spent_per_customer"/>
+                    <field name="time_spending_in_customer" decoration-danger="time_spending_in_customer &gt; avg_time_spent_per_customer and avg_time_spent_per_customer &gt; 0"/>
                     <field name="avg_time_spent_per_customer" optional="hide"/>
-                    <field name="time_between_customers" decoration-danger="time_between_customers &gt; tag_max_value"/>
-                    <field name="tag_max_value" optional="hide"/>
+                    <field name="time_between_customers" decoration-danger="time_between_customers &gt; avg_time_between_customer and avg_time_between_customer &gt; 0"/>
+                    <field name="avg_time_between_customer" optional="hide"/>
                     <button name="action_open_specific_visit"
                             type="object"
                             string="Open visit"

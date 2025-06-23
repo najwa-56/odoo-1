@@ -11,7 +11,7 @@ class ResPartner(models.Model):
 
 
 
-    visit = fields.Many2many(comodel_name='daily.visit', string="Visits", ondelete='cascade', index=True, copy=False)
+    visit = fields.Many2many(comodel_name='daily.visit', string="Visits", index=True, copy=False)
     daily_visit_ids = fields.One2many('daily.visit','partner_id',string='Daily Visits')
     specific_visit_id = fields.Many2one('daily.visit',string='Specific Visit',compute='_compute_specific_visit',)
     
