@@ -20,7 +20,9 @@
                 'hr',
                 'om_hr_payroll',
                 'hr_holidays',
-                'hr_attendance'],
+                'hr_attendance',
+                'hr_work_entry',
+                ],
     'data': [
         'data/ir_sequence.xml',
         'data/data.xml',
