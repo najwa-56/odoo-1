@@ -14,8 +14,8 @@
             <field name="code">ATTSHOT</field>
             <field name="color">3</field>
             <field name="is_leave">False</field>
-            <field name="round_days">HALF</field>
-            <field name="round_days_type">DOWN</field>
+            <!-- <field name="round_days">HALF</field> -->
+            <!-- <field name="round_days_type">DOWN</field> -->
         </record>
 
         <record id="work_entry_type_attendance_sheet_late_in"
@@ -24,8 +24,8 @@
             <field name="code">ATTSHLI</field>
             <field name="color">3</field>
             <field name="is_leave">False</field>
-            <field name="round_days">HALF</field>
-            <field name="round_days_type">DOWN</field>
+            <!-- <field name="round_days">HALF</field> -->
+            <!-- <field name="round_days_type">DOWN</field> -->
         </record>
 
         <record id="work_entry_type_attendance_sheet_difftime"
@@ -34,8 +34,8 @@
             <field name="code">ATTSHDT</field>
             <field name="color">3</field>
             <field name="is_leave">False</field>
-            <field name="round_days">HALF</field>
-            <field name="round_days_type">DOWN</field>
+            <!-- <field name="round_days">HALF</field> -->
+            <!-- <field name="round_days_type">DOWN</field> -->
         </record>
 
         <record id="work_entry_type_attendance_sheet_absence"
@@ -44,26 +44,26 @@
             <field name="code">ATTSHAB</field>
             <field name="color">3</field>
             <field name="is_leave">False</field>
-            <field name="round_days">HALF</field>
-            <field name="round_days_type">DOWN</field>
+            <!-- <field name="round_days">HALF</field> -->
+            <!-- <field name="round_days_type">DOWN</field> -->
         </record>
 
         <record id="structure_attendance_sheet" model="hr.payroll.structure">
             <field name="name">Attendance Sheet Salary Structure</field>
-            <field name="type_id"
-                   ref="rm_hr_attendance_sheet.structure_type_attendance_sheet"/>
-            <field name="country_id" eval="False"/>
-            <field name="unpaid_work_entry_type_ids"
+            <field name="code">ATT</field>
+            <!-- <field name="type_id"
+                   ref="rm_hr_attendance_sheet.structure_type_attendance_sheet"/> -->
+            <!-- <field name="unpaid_work_entry_type_ids"
                    eval="[
                    (4, ref('rm_hr_attendance_sheet.work_entry_type_attendance_sheet_overtime')),
                    (4, ref('rm_hr_attendance_sheet.work_entry_type_attendance_sheet_late_in')),
                    (4, ref('rm_hr_attendance_sheet.work_entry_type_attendance_sheet_difftime')),
-                   (4, ref('rm_hr_attendance_sheet.work_entry_type_attendance_sheet_absence'))]"/>
+                   (4, ref('rm_hr_attendance_sheet.work_entry_type_attendance_sheet_absence'))]"/> -->
         </record>
 
          <record id="rm_hr_attendance_sheet.structure_type_attendance_sheet"
                 model="hr.payroll.structure.type">
-            <field name="default_struct_id" ref="rm_hr_attendance_sheet.structure_attendance_sheet"/>
+            <!-- <field name="default_struct_id" ref="rm_hr_attendance_sheet.structure_attendance_sheet"/> -->
         </record>
 
 
@@ -98,8 +98,8 @@
             <field name="code">ABS</field>
             <field name="name">Absence</field>
             <field name="category_id" ref="om_hr_payroll.DED"/>
-            <field name="struct_id"
-                   ref="rm_hr_attendance_sheet.structure_attendance_sheet"/>
+            <!-- <field name="struct_id"
+                   ref="rm_hr_attendance_sheet.structure_attendance_sheet"/> -->
             <field name="condition_select">python</field>
             <field name="condition_python">result =(worked_days.ATTSHAB and worked_days.ATTSHAB.number_of_hours > 0) or False</field>
             <field name="amount_select">code</field>
@@ -111,8 +111,8 @@
             <field name="code">LATE</field>
             <field name="name">Late In</field>
             <field name="category_id" ref="om_hr_payroll.DED"/>
-            <field name="struct_id"
-                   ref="rm_hr_attendance_sheet.structure_attendance_sheet"/>
+            <!-- <field name="struct_id"
+                   ref="rm_hr_attendance_sheet.structure_attendance_sheet"/> -->
             <field name="condition_select">python</field>
             <field name="condition_python">result = (worked_days.ATTSHLI and worked_days.ATTSHLI.number_of_hours > 0) or False</field>
             <field name="amount_select">code</field>
@@ -124,8 +124,8 @@
             <field name="code">DIFF</field>
             <field name="name">Difference time</field>
             <field name="category_id" ref="om_hr_payroll.DED"/>
-            <field name="struct_id"
-                   ref="rm_hr_attendance_sheet.structure_attendance_sheet"/>
+            <!-- <field name="struct_id"
+                   ref="rm_hr_attendance_sheet.structure_attendance_sheet"/> -->
             <field name="condition_select">python</field>
             <field name="condition_python">result =(worked_days.ATTSHDT and worked_days.ATTSHDT.number_of_hours > 0) or False</field>
             <field name="amount_select">code</field>
@@ -139,8 +139,8 @@
             <field name="code">OVT</field>
             <field name="name">overtime</field>
             <field name="category_id" ref="om_hr_payroll.ALW"/>
-            <field name="struct_id"
-                   ref="rm_hr_attendance_sheet.structure_attendance_sheet"/>
+            <!-- <field name="struct_id"
+                   ref="rm_hr_attendance_sheet.structure_attendance_sheet"/> -->
 
             <field name="condition_select">python</field>
             <field name="condition_python">result = (worked_days.ATTSHOT and worked_days.ATTSHOT.number_of_hours > 0 ) or False</field>
