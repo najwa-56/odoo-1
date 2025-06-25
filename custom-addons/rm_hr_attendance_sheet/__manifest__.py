@@ -18,7 +18,7 @@
 
     'depends': ['base',
                 'hr',
-                'hr_payroll',
+                'om_hr_payroll',
                 'hr_holidays',
                 'hr_attendance'],
     'data': [
