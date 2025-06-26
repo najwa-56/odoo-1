@@ -5,7 +5,6 @@
         <field name="model">sale.order</field>
         <field name="inherit_id" ref="sale.view_order_form"/>
         <field name="arch" type="xml">
-
             <xpath expr="//header" position="inside">
                 <button name="action_back_to_visit"
                         type="object"
@@ -21,4 +20,40 @@
 
         </field>
     </record>
+
+    <!-- salesman tree that only allow user to see thier today sales without creating a new one -->
+    <record id="sale.action_orders" model="ir.actions.act_window">
+        <field name="name">Today's Sales Orders</field>
+        <field name="res_model">sale.order</field>
+        <field name="domain">[('date_order', '>=', context_today()),('user_id', '=', uid)]</field>
+    </record>
+
+    <record id="view_sale_order_tree_no_create" model="ir.ui.view">
+        <field name="name">sale.order</field>
+        <field name="model">sale.order</field>
+        <field name="inherit_id" ref="sale.view_order_tree"/>
+        <field name="arch" type="xml">
+            <tree position="attributes">
+                <attribute name="create">false</attribute>
+            </tree>
+        </field>
+    </record>
+     <record id="view_sale_order_form_no_create" model="ir.ui.view">
+        <field name="name">sale.order</field>
+        <field name="model">sale.order</field>
+        <field name="inherit_id" ref="sale.view_order_form"/>
+        <field name="arch" type="xml">
+            <form position="attributes">
+                <attribute name="create">false</attribute>
+            </form>
+        </field>
+    </record>
+
+    <menuitem id="menu_custom_sale_orders"
+              name="مبيعاتي"
+              action="sale.action_orders"
+              groups="salesman_manager.group_salesman"
+    />
+
+
 </odoo>
