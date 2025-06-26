@@ -1,24 +1,36 @@
-from odoo import models, fields, api
-from odoo.exceptions import ValidationError
+"""Employee Task Management Model
+================================
+This module extends Odoo to provide a *flexible task‑assignment system* that supports
+recurring schedules, dependencies, fallback tasks, email notifications and activity
+logging.  The comments below document each public and helper method so future
+maintainers can quickly understand what it does and why it exists.
+"""
+from odoo import models, fields, api ,tools,exceptions
+from odoo.exceptions import ValidationError, UserError
 from datetime import timedelta
 from datetime import datetime,date
 import base64
+import logging
+_logger = logging.getLogger(__name__)
+
 
 class EmployeeTask(models.Model):
+    """Main model used to assign and track employee tasks."""
     _name = 'employee.task'
     _description = 'EmployeeTask'
     _order = 'due_date asc'
     _rec_name = 'task_code'
     _inherit = ['mail.thread', 'mail.activity.mixin']
-
-    # this model to assign task to employee ...
-
+    # -------------------------------------------------------------------------
+    # Core fields
+    # -------------------------------------------------------------------------
     # add id to eash asinnged task ..
     task_code = fields.Char(string="Task ID", readonly=True, copy=False, required=True, default='New')
     task_time = fields.Datetime(string="Task Time")
 
-    #####################
-    task_id = fields.Many2one( #task_id
+    # Task template – holds default rules such as delays, fallback, dependency …
+
+    task_id = fields.Many2one(
         'task.name',
         string="Task Name",
         required=True,
@@ -28,12 +40,12 @@ class EmployeeTask(models.Model):
     image = fields.Binary(string="Task Image", attachment=True)
     active = fields.Boolean(string='Active', default=True, readonly=False)
     due_date = fields.Date(string="Due Date")
-    task_type = fields.Selection([ # add None type
+    task_type = fields.Selection([
         ('none','None'),
         ('daily', 'Daily'),
         ('weekly', 'Weekly'),
         ('monthly', 'Monthly'),], string="Task Type", required=True,default='none')
-    repeat_days_ids = fields.Many2many( #repeat_days_ids
+    repeat_days_ids = fields.Many2many(
         'repeat.day',
         string="Repeat On Days",
         help="Choose days to repeat the task (weekly/monthly)")
@@ -55,7 +67,7 @@ class EmployeeTask(models.Model):
         ('cancel', 'Cancelled'),
         ('overdue', 'Overdue'),
     ], string="Display Status", compute="_compute_status_display", store=False)
-    repeat_until = fields.Date(string="Repeat Until")  # <-- Add this line
+    repeat_until = fields.Date(string="Repeat Until")
 
 
     parent_task_id = fields.Many2one(
@@ -63,7 +75,7 @@ class EmployeeTask(models.Model):
         string="Parent Task",
         help="The task that triggered this task, if any.",
         readonly=True
-    )
+          )
 
     child_task_ids = fields.One2many(
         'employee.task',
@@ -73,10 +85,68 @@ class EmployeeTask(models.Model):
         readonly=True
     )
 
+    # Convenience – formatted email cached for debugging/logging purposes
+    email_formatted = fields.Char(
+        'Formatted Email',
+        help='Format email address "Name <email@domain>"')
+    company_id = fields.Many2one('res.company', string='Company', default=lambda self: self.env.user.company_id)
 
+    # ---------------------------------------------------------------------
+    # EMAIL HELPERS
+    # ---------------------------------------------------------------------
+    def compute_email_formatted(self, receiver):
+        email_formatted = []
+        if not receiver:
+            return email_formatted
 
+        final_reciver = receiver[0]  # Note: you are only using the first group. Consider flattening if needed.
+        for partner in final_reciver:
+            if partner.email:
+                formatted = tools.formataddr((partner.name or "NoName", partner.email))
+                email_formatted.append(formatted)
+            else:
+                _logger.warning("Missing email for partner: %s", partner.name)
+        return email_formatted
+
+    def notification_message(self, group):
+        """
+        one function one modification call any time
+        :return:
+        """
+        receiver = []
+        groups = []
+        domain = None
+        for ref in group:
+            group_id = self.env.ref(ref).id
+            groups.append(group_id)
+        domain = [('id', 'in', groups)]
+        group_ids = self.env['res.groups'].search(domain)
+        if len(group_ids) > 1:
+            for group in group_ids:
+                for user in group.users:
+                    if user.partner_id not in receiver:
+                        receiver.append(user.partner_id)
+
+        else:
+            for user in group_ids.users:
+                if user.partner_id not in receiver:
+                    receiver.append(user.partner_id)
+        return [receiver] if receiver else []
+
+    def compute_user_email_formatted(self):
+        """
+        Return email formatted string from employee_id's user_id
+        """
+        if self.employee_id and self.employee_id.user_id and self.employee_id.user_id.partner_id:
+            partner = self.employee_id.user_id.partner_id
+            if partner.email:
+                return [tools.formataddr((partner.name or u"False", partner.email or u"False"))]
+        return []
+    # ---------------------------------------------------------------------
+    # RECURRING TASK GENERATORS
+    # ---------------------------------------------------------------------
     #----------------------------------------------------
-    # if task daily and status done or cancel will create tomorrow task auto
+    # 1-if task daily and status done or cancel will create tomorrow task auto
     #-------------------------------------------------
 
     def _create_tomorrow_task(self):
@@ -116,7 +186,7 @@ class EmployeeTask(models.Model):
             })
 
     #-------------------------------
-    #if task weekly and status done or cancel will create next task auto
+    #2-if task weekly and status done or cancel will create next task auto
     #--------------------------------
     def _create_weekly_tasks(self):
         for rec in self:
@@ -156,6 +226,8 @@ class EmployeeTask(models.Model):
 
                 current_date += timedelta(days=1)
 
+    #--------------------------
+    #3 create_monthly_tasks
     #--------------------------
     def _create_monthly_tasks(self):
         for rec in self:
@@ -213,6 +285,10 @@ class EmployeeTask(models.Model):
                     current_year += 1
                 else:
                     current_month += 1
+
+    # ---------------------------------------------------------------------
+    # ORM overrides
+    # ---------------------------------------------------------------------
     #-------------------------
     # creat id for task
     #--------------------------
@@ -226,6 +302,9 @@ class EmployeeTask(models.Model):
         return super().create(vals_list)
 
 
+    # ---------------------------------------------------------------------
+    # Onchange / Constraints
+    # ---------------------------------------------------------------------
     #----------------------------------------
     # if task type daily make repeat day auto
     #------------------------------------------
@@ -245,7 +324,9 @@ class EmployeeTask(models.Model):
                 raise ValidationError("Weekly tasks must have at least one weekday selected.")
             if rec.task_type == 'monthly' and not rec.repeat_month_days:
                 raise ValidationError("Monthly tasks must have at least one month day selected.")
-
+    # ---------------------------------------------------------------------
+    # Computed fields
+    # ---------------------------------------------------------------------
     #---------------------------------
     # to now if task is overdue
     #--------------------------------
@@ -258,6 +339,9 @@ class EmployeeTask(models.Model):
             else:
                 task.status_display = task.status
 
+    # ---------------------------------------------------------------------
+    # BUTTON ACTIONS
+    # ---------------------------------------------------------------------
     #-------------------------------------------
     # press button assign
     def action_assign(self):
@@ -274,7 +358,38 @@ class EmployeeTask(models.Model):
                     date_deadline=rec.due_date or fields.Date.today()
                 )
 
+            # Compute recipient email
+            email_formatted = rec.compute_user_email_formatted()
+            rec.email_formatted = email_formatted[0] if email_formatted else False
 
+            if not email_formatted:
+                continue  # Or optionally log and skip
+
+            # Get mail template
+            template = rec.env.ref('task_assignment.mail_template_task_status_notification_users',
+                                   raise_if_not_found=False)
+            if not template:
+                raise UserError("Mail template not found.")
+
+            base_url = rec.env['ir.config_parameter'].sudo().get_param('web.base.url')
+            action_id = rec.env.ref('task_assignment.action_employee_task').id
+
+            ctx = dict(self.env.context)
+            ctx.update({
+                'base_url': base_url,
+                'model': rec._name,
+                'action_id': action_id,
+            })
+
+            email_values = {
+                'email_to': ','.join(email_formatted),
+                'email_from': rec.company_id.email or self.env.user.email,
+                'subject': f"Task {rec.task_code or rec.task_id.name} Assigned",
+            }
+
+            template.sudo().with_context(ctx).send_mail(
+                rec.id, force_send=True, email_values=email_values
+            )
 
     # -------------------------------------------
     # press button  complete
@@ -282,17 +397,15 @@ class EmployeeTask(models.Model):
         for rec in self:
             rec.status = 'done'
 
-            #  First: Handle daily recurring task for the same employee
+            # 1. Handle recurring tasks
             if rec.task_type == 'daily':
                 rec._create_tomorrow_task()
-
             elif rec.task_type == 'weekly':
                 rec._create_weekly_tasks()
-
             elif rec.task_type == 'monthly':
                 rec._create_monthly_tasks()
 
-            #  Second: Handle dependent task for another employee
+            # 2. Handle dependent task
             dep_template = rec.task_id.dependent_task_id
             if dep_template:
                 delay = timedelta(
@@ -306,20 +419,81 @@ class EmployeeTask(models.Model):
                 next_employee = dep_template.default_employee_id
                 if not next_employee:
                     raise ValidationError(
-                        f"No default next employee set on dependent task '{dep_template.task_id}'.")
+                        f"No default next employee set on dependent task '{dep_template.task_id}'."
+                    )
 
-                self.env['employee.task'].create({
+                new_task =self.env['employee.task'].create({
                     'task_id': dep_template.id,
                     'employee_id': next_employee.id,
                     'task_time': task_time,
                     'due_date': due_date,
-                    'task_type': 'none',  # Or use dep_template.task_type if you want it dynamic
+                    'task_type': 'none',
                     'status': 'assigned',
                     'description': f"Auto-created after completing '{rec.task_id.id}'",
                     'parent_task_id': rec.id,
-
                 })
+                # ✅ Send email notification to assigned employee
+                try:
+                    email_formatted = new_task.compute_user_email_formatted()
+                    new_task.email_formatted = email_formatted[0] if email_formatted else False
 
+                    if email_formatted:
+                        template = new_task.env.ref('task_assignment.mail_template_task_status_notification_users',
+                                                    raise_if_not_found=False)
+                        if not template:
+                            raise UserError("Mail template not found.")
+
+                        base_url = new_task.env['ir.config_parameter'].sudo().get_param('web.base.url')
+                        action_id = new_task.env.ref('task_assignment.action_employee_task').id
+
+                        ctx = dict(self.env.context)
+                        ctx.update({
+                            'base_url': base_url,
+                            'model': new_task._name,
+                            'action_id': action_id,
+                        })
+
+                        email_values = {
+                            'email_to': ','.join(email_formatted),
+                            'email_from': new_task.company_id.email or self.env.user.email,
+                            'subject': f"New Dependent Task Assigned: {new_task.task_code or new_task.task_id.name}",
+                        }
+
+                        template.sudo().with_context(ctx).send_mail(new_task.id, force_send=True,
+                                                                    email_values=email_values)
+
+                except Exception as e:
+                    _logger.exception(f"Failed to send email for dependent task {new_task.id}: {e}")
+
+            # 3. Email Notification
+            reciver = rec.notification_message(['task_assignment.group_task_manager'])
+            email_formatted = rec.compute_email_formatted(reciver)
+            if not email_formatted:
+                raise UserError("No recipient email found.")
+
+            rec.email_formatted = email_formatted[0]  # Optional for display/debug
+
+            template = rec.env.ref('task_assignment.mail_template_task_status_notification', raise_if_not_found=False)
+            if not template:
+                raise UserError("Mail template not found.")
+
+            base_url = rec.env['ir.config_parameter'].sudo().get_param('web.base.url')
+            action_id = rec.env.ref('task_assignment.action_employee_task').id
+
+            ctx = dict(self.env.context)
+            ctx.update({
+                'base_url': base_url,
+                'model': rec._name,
+                'action_id': action_id,
+            })
+
+            email_values = {
+                'email_to': ','.join(email_formatted),
+                'email_from': rec.company_id.email or self.env.user.email,
+                'subject': f"Task {rec.task_code} Completed",
+            }
+
+            template.sudo().with_context(ctx).send_mail(rec.id, force_send=True, email_values=email_values)
 
     #-------------------------------------------
     # press button  cancel
@@ -357,11 +531,40 @@ class EmployeeTask(models.Model):
                     'description': f"Auto-created after cancellation of '{rec.task_id.name}'",
                     'parent_task_id': rec.id,
                 })
+            # 3. Email Notification
+            reciver = rec.notification_message(['task_assignment.group_task_manager'])
+            email_formatted = rec.compute_email_formatted(reciver)
+            if not email_formatted:
+                raise UserError("No recipient email found.")
+
+            rec.email_formatted = email_formatted[0]  # Optional for display/debug
+
+            template = rec.env.ref('task_assignment.mail_template_task_status_notification_cancel', raise_if_not_found=False)
+            if not template:
+                raise UserError("Mail template not found.")
+
+            base_url = rec.env['ir.config_parameter'].sudo().get_param('web.base.url')
+            action_id = rec.env.ref('task_assignment.action_employee_task').id
+
+            ctx = dict(self.env.context)
+            ctx.update({
+                'base_url': base_url,
+                'model': rec._name,
+                'action_id': action_id,
+            })
+
+            email_values = {
+                'email_to': ','.join(email_formatted),
+                'email_from': rec.company_id.email or self.env.user.email,
+                'subject': f"Task {rec.task_code} Canceled",
+            }
+
+            template.sudo().with_context(ctx).send_mail(rec.id, force_send=True, email_values=email_values)
+
 
     #---------------------------------
     #if overdue will creat task to other user
     #---------------------------------
-
     @api.model
     def create_fallback_for_overdue_tasks(self):
         overdue_tasks = self.search([
@@ -372,9 +575,11 @@ class EmployeeTask(models.Model):
             fallback_template = rec.task_id.fallback_task_id
             if not fallback_template:
                 continue
-            # check if fallback task already exists
+
+            # Skip if fallback already exists
             if rec.child_task_ids.filtered(lambda t: t.task_id == fallback_template):
                 continue
+
             delay = timedelta(
                 days=fallback_template.delay_days or 0,
                 hours=fallback_template.delay_hours or 0,
@@ -385,10 +590,10 @@ class EmployeeTask(models.Model):
 
             next_employee = fallback_template.default_employee_id
             if not next_employee:
-                raise ValidationError(
-                    f"No default employee set for fallback task '{fallback_template.name}'.")
+                raise ValidationError(f"No default employee set for fallback task '{fallback_template.name}'.")
 
-            self.env['employee.task'].create({
+            # ✅ Create fallback task
+            fallback_task = self.env['employee.task'].create({
                 'task_id': fallback_template.id,
                 'employee_id': next_employee.id,
                 'task_time': task_time,
@@ -398,5 +603,52 @@ class EmployeeTask(models.Model):
                 'description': f"Auto-created after cancellation of '{rec.task_id.name}'",
                 'parent_task_id': rec.id,
             })
+
+            # ✅ Send Email Notification
+            try:
+                reciver = rec.notification_message(['task_assignment.group_task_manager'])
+                email_formatted = rec.compute_email_formatted(reciver)
+                if not email_formatted:
+                    continue  # Or log an error
+
+                template = rec.env.ref(
+                    'task_assignment.mail_template_task_status_notification_ovedue', raise_if_not_found=False
+                )
+                if not template:
+                    continue  # Or log an error
+
+                base_url = rec.env['ir.config_parameter'].sudo().get_param('web.base.url')
+                action_id = rec.env.ref('task_assignment.action_employee_task').id
+
+                ctx = dict(self.env.context)
+                ctx.update({
+                    'base_url': base_url,
+                    'model': rec._name,
+                    'action_id': action_id,
+                })
+                email_values = {
+                    'email_to': ','.join(email_formatted),
+                    'email_from': rec.company_id.email or self.env.user.email,
+                    'subject': f"Fallback Task Created due to Overdue Task: {rec.task_code or rec.task_id.name}",
+                }
+
+                template.sudo().with_context(ctx).send_mail(rec.id, force_send=True,
+                                                            email_values=email_values)
+
+            except Exception as e:
+                _logger = self.env['ir.logging']
+                _logger.sudo().create({
+                    'name': 'Fallback Task Email Error',
+                    'type': 'server',
+                    'level': 'error',
+                    'message': f"Failed to send fallback task email for task {fallback_task.id}: {str(e)}",
+                    'path': 'employee.task',
+                    'func': 'create_fallback_for_overdue_tasks',
+                    'line': '0',
+                })
+
+
+
+
 
 

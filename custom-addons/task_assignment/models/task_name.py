@@ -3,10 +3,10 @@ from odoo import models, fields
 class TaskName(models.Model):
     _name = 'task.name'
     _description = 'task Name'
-    # to creat task
+    # to create task
     name = fields.Char(string='task Name', required=True)
     tag_ids = fields.Many2many('task.tag', string='Tags')
-    #sequence = fields.Integer(string="Sequence", default=10)
+    sequence = fields.Integer(string="Sequence", default=10)
     dependent_task_id = fields.Many2one(
         'task.name',
         string="Next Task Template",
@@ -32,7 +32,7 @@ class TaskName(models.Model):
     )
 
 
-"""
+
     def write(self, vals):
         res = super().write(vals)
         if 'sequence' in vals:
@@ -59,5 +59,4 @@ class TaskName(models.Model):
             task.dependent_task_id = next_task.id if next_task else False
 
 
-"""
 

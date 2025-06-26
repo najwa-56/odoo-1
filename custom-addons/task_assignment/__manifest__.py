@@ -20,6 +20,11 @@
       'data/repeat_month_day_data.xml',
       'data/task_sequence.xml',
       'wizard/view_employee_task_reassign_wizard.xml',
+      'data/task_mail_templates.xml',
+      'data/task_mail_cancel_templates.xml',
+      'data/task_mail_ovrdue_templates.xml',
+      'data/task_mail_templates_users.xml',
+
     ],
     
     "images": [ ],

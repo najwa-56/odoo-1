@@ -6,6 +6,7 @@
         <field name="model">task.name</field>
         <field name="arch" type="xml">
             <tree >
+                <field name="sequence" />
                 <field name="name"/>
                 <field name="dependent_task_id"/>
                 <field name="fallback_task_id"/>
@@ -84,7 +85,9 @@
                 <t t-name="kanban-box">
                     <div t-attf-class="oe_kanban_global_click o_kanban_card">
                         <div class="o_kanban_details">
-                            <strong><field name="name"/></strong>
+                            <strong><field name="sequence"/>
+                                <field name="name"/>
+                            </strong>
                             <field name="default_employee_id"/>
                             <div>
                                 <span>Next:</span>

@@ -1,0 +1,213 @@
+<odoo>
+<record id="mail_template_task_status_notification_cancel" model="mail.template">
+    <field name="name">Task Status Notification</field>
+    <field name="model_id" ref="task_assignment.model_employee_task" />
+    <field name="subject">Task canceled</field>
+    <field name="email_from">${object.company_id.email_formatted or user.email_formatted}</field>
+    <field name="email_to"></field>
+    <field name="body_html" type="html">
+                <table border="0" cellpadding="0" cellspacing="0"
+                    style="padding-top: 16px; background-color: #F1F1F1; font-family:Verdana, Arial,sans-serif; color: #454748; width: 100%; border-collapse:separate;">
+                    <tr>
+                        <td align="center">
+                            <table border="0" cellpadding="0" cellspacing="0" width="590"
+                                style="padding: 16px; background-color: white; color: #454748; border-collapse:separate;">
+                                <tbody>
+                                    <!-- HEADER -->
+                                    <tr>
+                                        <td align="center" style="min-width: 590px;">
+                                            <table dir="rtl" class="arabic_content" border="0"
+                                                cellpadding="0" cellspacing="0" width="590"
+                                                style="min-width: 590px; background-color: white; padding: 0px 8px 0px 8px; border-collapse:separate;">
+                                                <tr>
+                                                    <td valign="middle">
+                                                        <span style="font-size: 14px;">
+                                                            إلغاء المهمه </span>
+                                                        <br />
+
+                                                    </td>
+                                                    <td valign="middle" align="right">
+                                                        <t t-set="logo_url" t-value="'/logo.png?company=%s' % object.company_id.id"/>
+                                                         <img t-att-src="logo_url"
+
+                                                            style="padding: 0px; margin: 0px; height: auto; width: 80px;"
+                                                            t-att-alt="object.company_id.name" />
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <td colspan="2" style="text-align:center;">
+                                                        <hr width="100%"
+                                                            style="background-color:rgb(204,204,204);border:medium none;clear:both;display:block;font-size:0px;min-height:1px;line-height:0; margin: 16px 0px 16px 0px;" />
+                                                    </td>
+                                                </tr>
+                                            </table>
+                                        </td>
+                                    </tr>
+                                    <!-- CONTENT -->
+
+                                    <tr>
+                                        <td align="center" style="min-width: 590px;">
+                                            <table dir="rtl" class="arabic_content" border="0"
+                                                cellpadding="0" cellspacing="0" width="590"
+                                                style="min-width: 590px; background-color: white; padding: 0px 8px 0px 8px; border-collapse:separate;">
+                                                <tr>
+                                                    <td valign="top" style="font-size: 13px;">
+                                                        <div>  الزميل العزيز,<br />
+                                                            <br />
+                                                            تحية طيبة!
+                                                            <br />
+                                                            <br />
+                                                            تم إلغاء
+                                                            <strong>المهمة</strong>
+                                                            <br />
+                                                            <br />
+                                                     <table
+                                                                style="background: white; border-radius:3px; border-collapse: collapse; margin: auto;
+                                                                   padding:2.5px; width: 100%; box-shadow: 0 5px 10px rgba(0, 0, 0, 0.1); ">
+                                                                <tbody>
+                                                                    <tr
+                                                                        style="border: 2px solid #C1C3D1; color:#666B85;
+                                                                    font-weight:normal;
+                                                                    text-shadow: 0 1px 1px rgba(256, 256, 256, 0.1);">
+                                                                        <td
+                                                                            style=" background:#FFFFFF;padding:10px; text-align:center;vertical-align:middle;
+                                                                        text-shadow: -1px -1px 1px rgba(0, 0, 0, 0.1);
+                                                                        border: 2px solid #C1C3D1; width:25%;">
+                                                             إسم المهمة
+                                                                        </td>
+                                                                        <td
+                                                                            style="background:#FFFFFF;padding:10px; text-align:center;vertical-align:middle;
+                                                                        text-shadow: -1px -1px 1px rgba(0, 0, 0, 0.1);
+                                                                        border: 2px solid #C1C3D1;width:75%;">
+                                                                     <t t-esc="object.task_id.name or ''"/>
+                                                                        </td>
+                                                                    </tr>
+
+
+                                                                    <tr
+                                                                        style="border: 2px solid #C1C3D1; color:#666B85;
+                                                                    font-weight:normal;
+                                                                    text-shadow: 0 1px 1px rgba(256, 256, 256, 0.1);">
+                                                                        <td
+                                                                            style=" background:#FFFFFF;padding:10px; text-align:center;vertical-align:middle;
+                                                                        text-shadow: -1px -1px 1px rgba(0, 0, 0, 0.1);
+                                                                        border: 2px solid #C1C3D1;width:25%;">
+                                                           الحالة الحالية
+                                                                        </td>
+                                                                        <td style=" background:#FFFFFF;padding:10px; text-align:center;vertical-align:middle;
+                                                                        text-shadow: -1px -1px 1px rgba(0, 0, 0, 0.1);
+                                                                        border: 2px solid #C1C3D1;width:75%;">
+                                                            ملغاة <t t-esc="object.description or ''"/>
+
+
+                                                                        </td>
+                                                                    </tr>
+                                                                    <!--<tr
+                                                                        style="border: 2px solid #C1C3D1; color:#666B85;
+                                                                    font-weight:normal;
+                                                                    text-shadow: 0 1px 1px rgba(256, 256, 256, 0.1);">
+                                                                        <td
+                                                                            style=" background:#FFFFFF;padding:10px; text-align:center;vertical-align:middle;
+                                                                        text-shadow: -1px -1px 1px rgba(0, 0, 0, 0.1);
+                                                                        border: 2px solid #C1C3D1;width:25%;">
+                                                            الإجراء المطلوب
+                                                                        </td>
+                                                                        <td
+                                                                            style=" background:#FFFFFF;padding:10px; text-align:center;vertical-align:middle;
+                                                                        text-shadow: -1px -1px 1px rgba(0, 0, 0, 0.1);
+                                                                        border: 2px solid #C1C3D1;width:75%;">
+                                                            في إنتظار إعتماد مدير إدارة التطوير
+
+                                                                        </td>
+                                                                    </tr>-->
+
+                                                                </tbody>
+                                                            </table>
+                                                    <br />
+                                                    <br />
+                                                            <t t-if="ctx.get('base_url') and ctx.get('model') and ctx.get('action_id')">
+    <t t-set="link_url" t-value="'%s/web#id=%s&amp;view_type=form&amp;model=%s&amp;action=%s' % (
+        ctx.get('base_url'),
+        object.id,
+        ctx.get('model'),
+        ctx.get('action_id'))"/>
+    <a t-att-href="link_url" style="font-size:25px;font-weight: bold;">
+        للعرض اضغط هنا
+    </a>
+</t>
+
+                                                    <br />
+                                                    <br />
+                                                    نتمنى لكم يوماً سعيداً , <br />
+                                                    <br />
+
+                                                    <br />
+                                                        </div>
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <td style="text-align:center;">
+                                                        <hr width="100%"
+                                                            style="background-color:rgb(204,204,204);border:medium none;clear:both;display:block;font-size:0px;min-height:1px;line-height:0; margin: 16px 0px 16px 0px;" />
+                                                    </td>
+                                                </tr>
+                                            </table>
+                                        </td>
+                                    </tr> <!-- FOOTER -->
+                                    <tr>
+                                        <td align="center" style="min-width: 590px;">
+                                            <table border="0" cellpadding="0" cellspacing="0"
+                                                width="590"
+                                                style="min-width: 590px; background-color: white; font-size: 11px; padding: 0px 8px 0px 8px; border-collapse:separate;">
+                                                <tr>
+                                                    <td valign="middle" align="left"
+                                                        style="opacity: 0.7;">
+                                                        <p
+                                                            style=" text-align: justify; text-justify: inter-word;">
+                                                            CONFIDENTIALITY NOTICE: This e-mail and
+                                                            any files
+                                                            transmitted with it are intended solely
+                                                            for the use of the
+                                                            individual or entity to whom they are
+                                                            addressed and may
+                                                            contain confidential and privileged
+                                                            information protected by
+                                                            law. If you received this e-mail in
+                                                            error, any review, use,
+                                                            dissemination, distribution, or copying
+                                                            of the e-mail is
+                                                            strictly prohibited. Please notify the
+                                                            sender immediately by
+                                                            return e-mail and delete all copies from
+                                                            your system
+                                                        </p>
+                                                    </td>
+                                                </tr>
+
+                                            </table>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </td>
+                    </tr>
+                    <!-- POWERED BY -->
+                    <tr>
+                        <td align="center" style="min-width: 590px;">
+                            <table border="0" cellpadding="0" cellspacing="0" width="590"
+                                style="min-width: 590px; background-color: #F1F1F1; color: #454748; padding: 8px; border-collapse:separate;">
+                                <tr>
+                                    <td style="text-align: center; font-size: 13px;"> Powered by <a
+                                            target="_blank"
+                                            style="color: #875A7B;"></a>
+                                    </td>
+                                </tr>
+                            </table>
+                        </td>
+                    </tr>
+                </table>
+            </field>
+
+            <field name="auto_delete" eval="True" />
+
+        </record></odoo>
