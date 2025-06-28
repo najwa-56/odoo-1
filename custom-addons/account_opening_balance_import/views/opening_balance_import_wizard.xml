@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_opening_balance_import_wizard_form" model="ir.ui.view">
+        <field name="name">opening.balance.import.wizard.form</field>
+        <field name="model">opening_balance_import_wizard</field>
+        <field name="arch" type="xml">
+            <form string="Import Opening Balance">
+                <group>
+                    <field name="file_name" invisible="1"/>
+                    <field name="file_data" filename="file_name" class="oe_inline"/>
+                </group>
+                <footer>
+                    <button name="action_import" type="object" class="btn-primary" string="Import" icon="fa-upload"/>
+                    <button string="Cancel" class="btn-secondary" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_opening_balance_import_wizard" model="ir.actions.act_window">
+        <field name="name">Opening Balance Import</field>
+        <field name="res_model">opening_balance_import_wizard</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+    </record>
+
+    <menuitem id="menu_opening_balance_import_wizard"
+              name="Opening Balance Import"
+              parent="account.menu_finance_entries_accounting_miscellaneous"
+              action="action_opening_balance_import_wizard"
+              sequence="130"
+              groups="account.group_account_manager"/>
+</odoo>
