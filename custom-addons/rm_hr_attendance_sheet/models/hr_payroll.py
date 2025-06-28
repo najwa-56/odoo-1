@@ -16,7 +16,7 @@ class HrPayslip(models.Model):
 
     sheet_id = fields.Many2one(comodel_name="attendance.sheet", string="Attendance Sheet", required=False, )
 
-    def _get_workday_lines(self):
+    def _get_workday_lines(self,contract_id):
         self.ensure_one()
 
         work_entry_obj = self.env['hr.work.entry.type']
@@ -40,10 +40,11 @@ class HrPayslip(models.Model):
         overtime = [{
             'name': "Overtime",
             'code': 'OVT',
-            'work_entry_type_id': overtime_work_entry[0].id,
+            # 'work_entry_type_id': overtime_work_entry[0].id,
             'sequence': 30,
             'number_of_days': self.sheet_id.no_overtime,
             'number_of_hours': self.sheet_id.tot_overtime,
+            'contract_id': contract_id.id,
         }]
         absence = [{
             'name': "Absence",
@@ -52,6 +53,7 @@ class HrPayslip(models.Model):
             'sequence': 35,
             'number_of_days': self.sheet_id.no_absence,
             'number_of_hours': self.sheet_id.tot_absence,
+            'contract_id': contract_id.id,
         }]
         late = [{
             'name': "Late In",
@@ -60,6 +62,7 @@ class HrPayslip(models.Model):
             'sequence': 40,
             'number_of_days': self.sheet_id.no_late,
             'number_of_hours': self.sheet_id.tot_late,
+            'contract_id': contract_id.id,
         }]
         difftime = [{
             'name': "Difference time",
@@ -68,6 +71,7 @@ class HrPayslip(models.Model):
             'sequence': 45,
             'number_of_days': self.sheet_id.no_difftime,
             'number_of_hours': self.sheet_id.tot_difftime,
+            'contract_id': contract_id.id,
         }]
         worked_days_lines = overtime + late + absence + difftime
         return worked_days_lines
@@ -75,7 +79,7 @@ class HrPayslip(models.Model):
     def compute_sheet(self):
         if self.sheet_id:
 
-            worked_day_lines = self._get_workday_lines()
+            worked_day_lines = self._get_workday_lines(self.sheet_id.contract_id)
             print("ffffffffffffffffff" , self.worked_days_line_ids)
             if len(self.worked_days_line_ids)<2:
                 self.worked_days_line_ids = [(0, 0, x) for x in

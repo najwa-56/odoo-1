@@ -697,7 +697,8 @@ class AttendanceSheet(models.Model):
                 raise ValidationError(_('There is no active contract for current employee'))
             if sheet.payslip_id:
                 raise ValidationError(_('Payslip Has Been Created Before'))
-            payslip_name = contracts[0].structure_type_id.default_struct_id.payslip_name or _('Salary Slip')
+            payslip_name =  _('Salary Slip')
+            # contracts[0].structure_type_id.default_struct_id.payslip_name or
             name = '%(payslip_name)s - %(employee_name)s - %(dates)s' % {
                 'payslip_name': payslip_name,
                 'employee_name': sheet.employee_id.name,
@@ -720,8 +721,9 @@ class AttendanceSheet(models.Model):
 
             # payslip_id = payslip_obj.create(payslip_dict)
             payslip_id.onchange_employee()
-            payslip_id.onchange_employee_ref()
-            worked_day_lines = self._get_workday_lines()
+            # payslip_id.onchange_employee_ref()
+            payslip_id.onchange_employee_id(sheet.date_from, sheet.date_to, sheet.employee_id.id, contract_id=contracts[0])
+            worked_day_lines = self._get_workday_lines(contracts[0])
             payslip_id.worked_days_line_ids = [(0, 0, x) for x in
                                                worked_day_lines]
             
@@ -730,7 +732,7 @@ class AttendanceSheet(models.Model):
             payslips += payslip_id
         return payslips
 
-    def _get_workday_lines(self):
+    def _get_workday_lines(self,contract_id):
         self.ensure_one()
 
         work_entry_obj = self.env['hr.work.entry.type']
@@ -754,34 +756,38 @@ class AttendanceSheet(models.Model):
         overtime = [{
             'name': "Overtime",
             'code': 'OVT',
-            'work_entry_type_id': overtime_work_entry[0].id,
+            # 'work_entry_type_id': overtime_work_entry[0].id,
             'sequence': 30,
             'number_of_days': self.no_overtime,
             'number_of_hours': self.tot_overtime,
+            'contract_id': contract_id.id,
         }]
         absence = [{
             'name': "Absence",
             'code': 'ABS',
-            'work_entry_type_id': absence_work_entry[0].id,
+            # 'work_entry_type_id': absence_work_entry[0].id,
             'sequence': 35,
             'number_of_days': self.no_absence,
             'number_of_hours': self.tot_absence,
+            'contract_id': contract_id.id,
         }]
         late = [{
             'name': "Late In",
             'code': 'LATE',
-            'work_entry_type_id': latin_work_entry[0].id,
+            # 'work_entry_type_id': latin_work_entry[0].id,
             'sequence': 40,
             'number_of_days': self.no_late,
             'number_of_hours': self.tot_late,
+            'contract_id': contract_id.id,
         }]
         difftime = [{
             'name': "Difference time",
             'code': 'DIFFT',
-            'work_entry_type_id': difftime_work_entry[0].id,
+            # 'work_entry_type_id': difftime_work_entry[0].id,
             'sequence': 45,
             'number_of_days': self.no_difftime,
             'number_of_hours': self.tot_difftime,
+            'contract_id': contract_id.id,
         }]
         worked_days_lines = overtime + late + absence + difftime
         return worked_days_lines
