@@ -9,6 +9,7 @@
             <group>
                 <field name="name"/>
                 <field name="vat"/>
+                <field name="buyer_identification_no"/>
             </group>
             <footer>
                 <button name="action_update_partner" string="Update" type="object" class="btn-primary"/>
