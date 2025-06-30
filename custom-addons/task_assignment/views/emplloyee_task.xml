@@ -81,7 +81,9 @@
                          <field name="description"/>
                       </group>
                   </group>
-
+                <group string="Manager Evaluation" groups="task_assignment.group_task_manager">
+                  <field name="feedback_score"/>
+                </group>
                 </sheet>
 
                 <div class="oe_chatter">
@@ -112,6 +114,7 @@
        invisible="task_type != 'monthly'"/>
                 <field name="task_time"/>
                 <field name="due_date"/>
+                <field name="feedback_score"/>
             </tree>
         </field>
     </record>
@@ -140,7 +143,6 @@
               action="action_employee_task"
               sequence="10"
                groups="task_assignment.group_task_manager"
-
     />
 
    <menuitem id="menu_employee_task_today"

@@ -91,6 +91,12 @@ class EmployeeTask(models.Model):
         help='Format email address "Name <email@domain>"')
     company_id = fields.Many2one('res.company', string='Company', default=lambda self: self.env.user.company_id)
 
+    feedback_score = fields.Integer(
+        string="Evaluation (%)",
+        help="Manager rating for this task in percentage (e.g. 80%)",
+        tracking=True,
+        groups="task_assignment.group_task_manager"
+    )
     # ---------------------------------------------------------------------
     # EMAIL HELPERS
     # ---------------------------------------------------------------------
