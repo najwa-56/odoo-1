@@ -1,0 +1,13 @@
+<odoo>
+
+
+<record id="action_performance_review" model="ir.actions.act_window">
+    <field name="name">Performance Reviews</field>
+    <field name="res_model">performance.review</field>
+    <field name="view_mode">tree,form</field>
+</record>
+    <menuitem id="menu_performance_review_root" name="Performance Review" parent="task_assignment.menu_employee_task_root"  action="action_performance_review"
+/>
+
+<menuitem id="menu_performance_review" name="Reviews" parent="menu_performance_review_root" action="action_performance_review"  />
+</odoo>

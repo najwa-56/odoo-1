@@ -1,0 +1,36 @@
+<odoo>
+<record id="view_performance_review_form" model="ir.ui.view">
+    <field name="name">performance.review.form</field>
+    <field name="model">performance.review</field>
+    <field name="arch" type="xml">
+        <form string="Performance Review">
+            <sheet>
+                <group>
+                    <field name="name"/>
+                    <field name="employee_id"/>
+                    <field name="review_date"/>
+                    <field name="period_start"/>
+                    <field name="period_end"/>
+                </group>
+                <group string="Results">
+                    <field name="number_of_tasks"/>
+                    <field name="completed_tasks"/>
+                    <field name="completion_rate"/>
+                    <field name="average_score"/>
+                    <field name="status"/>
+                </group>
+                <field name="task_ids" widget="one2many_list">
+                    <tree>
+                        <field name="task_code"/>
+                        <field name="task_time"/>
+                        <field name="due_date"/>
+                        <field name="status"/>
+                        <field name="feedback_score"/>
+                    </tree>
+                </field>
+            </sheet>
+        </form>
+    </field>
+</record>
+
+</odoo>
