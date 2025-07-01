@@ -38,7 +38,7 @@
             </tree>
         </field>
     </record>
-     <record id="view_sale_order_form_no_create" model="ir.ui.view">
+    <record id="view_sale_order_form_no_create" model="ir.ui.view">
         <field name="name">sale.order</field>
         <field name="model">sale.order</field>
         <field name="inherit_id" ref="sale.view_order_form"/>
@@ -49,11 +49,22 @@
         </field>
     </record>
 
+    <record id="view_sale_order_kanban_no_create" model="ir.ui.view">
+        <field name="name">sale.order.kanban.no.create</field>
+        <field name="model">sale.order</field>
+        <field name="inherit_id" ref="sale.view_sale_order_kanban"/>
+        <field name="arch" type="xml">
+            <xpath expr="//kanban" position="attributes">
+                <attribute name="create">false</attribute>
+            </xpath>
+        </field>
+    </record>
+
+
     <menuitem id="menu_custom_sale_orders"
               name="مبيعاتي"
               action="sale.action_orders"
-              groups="salesman_manager.group_salesman"
-    />
+              groups="salesman_manager.group_salesman"/>
 
 
 </odoo>
