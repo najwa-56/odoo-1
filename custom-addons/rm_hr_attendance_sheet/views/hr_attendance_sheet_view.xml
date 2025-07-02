@@ -102,6 +102,15 @@
                                            sum="Total"/>
                                     <field name="status" optional="show"/>
                                     <field name="note" optional="show"/>
+
+                                    <button name="action_open_sanction"
+                                    class="oe_stat_button"
+                                    type="object"
+                                    string="Santion"
+                                    groups="rm_hr_attendance_sheet.group_attendance_sheet_manager"
+                                   
+                            />
+
                                     <button name="%(action_att_data_change)d"
                                             class="oe_stat_button"
                                             icon="fa-edit"

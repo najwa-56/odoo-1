@@ -909,3 +909,21 @@ class AttendanceSheetLine(models.Model):
                                          ('leave', 'Leave'), ],
                               required=False, readonly=True)
     note = fields.Text("Note", readonly=True)
+
+
+    def action_open_sanction(self):
+        self.ensure_one()
+
+        return {
+            "type": "ir.actions.act_window",
+            "name": _("Sanctions / Procedures"),
+            "res_model": "sanctions.procedures",     
+            "view_mode": "form",              
+            "domain": [("employee", "=", self.employee_id.id)],
+            "context": {
+                "default_employee": self.employee_id.id,
+                "search_default_employee": self.employee_id.id,  
+            },
+            "target": "current",
+        }
+

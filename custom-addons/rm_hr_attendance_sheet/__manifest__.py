@@ -22,6 +22,7 @@
                 'hr_holidays',
                 'hr_attendance',
                 'hr_work_entry_contract',
+                'sanctions',
                 ],
     'data': [
         'data/ir_sequence.xml',
