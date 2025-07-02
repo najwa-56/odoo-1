@@ -87,7 +87,13 @@ class PerformanceReview(models.Model):
                     'view_mode': 'form',
                     'target': 'new',
                     'context': {
-                        'default_employee_id': rec.employee_id.id,
+                        'default_date' : rec.review_date,
+                        'default_employee_ids': [
+                        (0, 0, {
+                            'employee_id': rec.employee_id.id,
+                            'email': rec.employee_id.work_email or rec.employee_id.user_id.email or ''
+                        })
+                    ],
                         'default_review_id': rec.id,
                         'default_reason': ('Excellent performance review'),
                     }
@@ -102,7 +108,8 @@ class PerformanceReview(models.Model):
                         'view_mode': 'form',
                         'target': 'new',
                         'context': {
-                            'default_employee_id': rec.employee_id.id,
+                            'default_date': rec.review_date,
+                            'default_employee': rec.employee_id.id,
                             'default_review_id': rec.id,
                             'default_reason': ('Low performance review score'),
                         }

@@ -10,6 +10,8 @@
     'license': 'LGPL-3',
     'depends': [
         'task_assignment',  # ✅ Correct name of your actual task module
+         'sanctions', 
+          'dev_hr_bonus', 
 
     ],
     'data': [
