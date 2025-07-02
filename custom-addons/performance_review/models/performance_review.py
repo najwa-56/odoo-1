@@ -1,8 +1,9 @@
 from odoo import models, fields, api
-from datetime import date
+from odoo.exceptions import UserError
 
 class PerformanceReview(models.Model):
     _name = 'performance.review'
+    _inherit = ['mail.thread']
     _description = 'Employee Performance Review'
     _order = 'review_date desc'
 
@@ -22,6 +23,31 @@ class PerformanceReview(models.Model):
         ('good', 'Good'),
         ('needs_improvement', 'Needs Improvement')
     ], compute='_compute_tasks', string="Status", store=True)
+    accepted = fields.Boolean(string="Accepted", tracking=True)
+    refused = fields.Boolean(string="Refused", tracking=True)
+    status_message = fields.Char(string="Status Message", compute="_compute_status_message")
+
+    @api.depends('average_score')
+    def _compute_status(self):
+        for rec in self:
+            if rec.average_score >= 90:
+                rec.status = 'excellent'
+            elif rec.average_score >= 70:
+                rec.status = 'good'
+            else:
+                rec.status = 'needs_improvement'
+
+    @api.depends('status')
+    def _compute_status_message(self):
+        for rec in self:
+            if rec.status == 'excellent':
+                rec.status_message = "Excellent performance. The employee deserves a bonus."
+            elif rec.status == 'good':
+                rec.status_message = "Good performance. Keep motivating the employee."
+            elif rec.status == 'needs_improvement':
+                rec.status_message = "Needs improvement. Consider coaching or training."
+            else:
+                rec.status_message = ""
 
     @api.depends('employee_id', 'period_start', 'period_end')
     def _compute_tasks(self):
@@ -46,3 +72,57 @@ class PerformanceReview(models.Model):
                 rec.status = 'good'
             else:
                 rec.status = 'needs_improvement'
+
+    def action_accept_review(self):
+        for rec in self:
+            if rec.refused or rec.accepted:
+                raise UserError("This review has already been accepted or refused.")
+            rec.accepted = True  # ✅ mark it as accepted
+            if rec.average_score >= 90:
+                # Suggest creating a bonus
+                return {
+                    'type': 'ir.actions.act_window',
+                    'name': 'Create Bonus',
+                    'res_model': 'hr.bonus',
+                    'view_mode': 'form',
+                    'target': 'new',
+                    'context': {
+                        'default_employee_id': rec.employee_id.id,
+                        'default_review_id': rec.id,
+                        'default_reason': ('Excellent performance review'),
+                    }
+                }
+            else:
+                if rec.average_score < 70:
+                    # Suggest creating a sanction
+                    return {
+                        'type': 'ir.actions.act_window',
+                        'name': 'Create Sanction',
+                        'res_model': 'sanctions.procedures',
+                        'view_mode': 'form',
+                        'target': 'new',
+                        'context': {
+                            'default_employee_id': rec.employee_id.id,
+                            'default_review_id': rec.id,
+                            'default_reason': ('Low performance review score'),
+                        }
+                    }
+                    # No bonus/sanction if score is between 70-89
+                    return {
+                        'type': 'ir.actions.client',
+                        'tag': 'display_notification',
+                        'params': {
+                            'title': "Review Accepted",
+                            'message': "Review accepted successfully. No bonus or sanction needed.",
+                            'type': 'success',
+                        }
+                    }
+
+    def action_refuse_review(self):
+        for rec in self:
+            if rec.refused or rec.accepted:
+                raise UserError("This review has already been accepted or refused.")
+            if 70 <= rec.average_score < 100:
+                rec.refused = True  # Optional tracking field
+                rec.message_post(body="❌ This review has been marked as refused .")
+                raise UserError("❌ Marked as Refused. No further action required.")
