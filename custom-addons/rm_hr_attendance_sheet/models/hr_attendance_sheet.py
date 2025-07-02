@@ -924,6 +924,6 @@ class AttendanceSheetLine(models.Model):
                 "default_employee": self.employee_id.id,
                 "search_default_employee": self.employee_id.id,  
             },
-            "target": "current",
+            "target": "new",
         }
 
