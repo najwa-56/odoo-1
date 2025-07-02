@@ -115,41 +115,85 @@ class PosOrder(models.Model):
         invoice_vals['pos_reference'] = self.pos_reference
         return invoice_vals
 
-    @api.model
-    def create_from_ui(self, orders, draft=False):
-        order_ids = super(PosOrder, self).create_from_ui(orders, draft=draft)
-        try:
-            for order_id in order_ids:
-                self_id = self.browse(order_id['id'])
+    # @api.model
+    # def create_from_ui(self, orders, draft=False):
+    #     order_ids = super(PosOrder, self).create_from_ui(orders, draft=draft)
+    #     try:
+    #         for order_id in order_ids:
+    #             self_id = self.browse(order_id['id'])
                 
-                if self_id.account_move.id:
-                    if self_id.account_move:
-                        for line in self_id.account_move.invoice_line_ids:
-                            if '&' in line.name:
-                                line.name = line.name.replace('&', 'و')
+    #             if self_id.account_move.id:
+    #                 if self_id.account_move:
+    #                     for line in self_id.account_move.invoice_line_ids:
+    #                         if '&' in line.name:
+    #                             line.name = line.name.replace('&', 'و')
                     
                     
-                    account_move = {}
-                    for x in orders:
-                        if x['data']['name'] == order_id['pos_reference']:
-                            account_move = x['data']
+    #                 account_move = {}
+    #                 for x in orders:
+    #                     if x['data']['name'] == order_id['pos_reference']:
+    #                         account_move = x['data']
                     
-                    self_id.account_move.credit_debit_reason = account_move.get('credit_debit_reason', None)
-                    if len(self_id.refunded_order_ids.account_move.ids) > 1:
-                        raise ValidationError("only 1 invoice can be returned at a time.")
-                    self_id.account_move.create_xml_file(pos_refunded_order_id=self_id.refunded_order_ids.account_move.id)
-                    self_id.account_move.send_multiple_to_zatca()
+    #                 self_id.account_move.credit_debit_reason = account_move.get('credit_debit_reason', None)
+    #                 if len(self_id.refunded_order_ids.account_move.ids) > 1:
+    #                     raise ValidationError("only 1 invoice can be returned at a time.")
+    #                 self_id.account_move.create_xml_file(pos_refunded_order_id=self_id.refunded_order_ids.account_move.id)
+    #                 self_id.account_move.send_multiple_to_zatca()
 
             
-        except Exception as e:
-            _logger.error(f"Failed to send to ZATCA for POS reference {'send to zatck'}: {str(e)}")
-                # try:
-                #     self.send_to_zatca(self_id.pos_reference)
-                # except Exception as e:
-                #     # Log the error or handle it as needed, but continue processing
-                #     _logger.error(f"Failed to send to ZATCA for POS reference {self_id.pos_reference}: {str(e)}")
+    #     except Exception as e:
+    #         _logger.error(f"Failed to send to ZATCA for POS reference {'send to zatck'}: {str(e)}")
+    #             # try:
+    #             #     self.send_to_zatca(self_id.pos_reference)
+    #             # except Exception as e:
+    #             #     # Log the error or handle it as needed, but continue processing
+    #             #     _logger.error(f"Failed to send to ZATCA for POS reference {self_id.pos_reference}: {str(e)}")
 
-        return order_ids
+    #     return order_ids
+
+
+    
+
+    @api.model
+    def create_from_ui(self, orders, draft=False):
+        new_orders = []
+        for order in orders:
+            pos_reference = order['data'].get('name')
+            existing_order = self.search([('pos_reference', '=', pos_reference)], limit=1)
+            if existing_order:
+                _logger.warning(f"Duplicate POS order avoided for reference: {pos_reference}")
+                new_orders.append({'id': existing_order.id, 'ref': pos_reference})
+                continue  # Skip creation
+
+            # Create new order using super
+            order_ids = super(PosOrder, self).create_from_ui([order], draft=draft)
+            new_orders += order_ids
+
+            try:
+                new_order = self.browse(order_ids[0]['id'])
+
+                if new_order.account_move:
+                    # Clean line names
+                    for line in new_order.account_move.invoice_line_ids:
+                        if '&' in line.name:
+                            line.name = line.name.replace('&', 'و')
+
+                    # Match input data to fetch extra info
+                    account_move_data = order['data']
+                    new_order.account_move.credit_debit_reason = account_move_data.get('credit_debit_reason','')
+
+                    # Refund safety
+                    if len(new_order.refunded_order_ids.account_move.ids) > 1:
+                        raise ValidationError("Only one invoice can be returned at a time.")
+
+                    new_order.account_move.create_xml_file(pos_refunded_order_id=new_order.refunded_order_ids.account_move.id)
+                    new_order.account_move.send_multiple_to_zatca()
+
+            except Exception as e:
+                _logger.error(f"Failed to send to ZATCA for POS reference {pos_reference}: {str(e)}")
+
+        return new_orders
+    
 
     def send_to_zatca(self, pos_reference):
         self = self.sudo().search([('pos_reference', '=', pos_reference)])
