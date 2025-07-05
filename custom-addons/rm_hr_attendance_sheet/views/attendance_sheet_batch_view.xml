@@ -18,14 +18,23 @@
                 </header>
                 <sheet>
 
-                    <div class="oe_title">
+                    <!-- <div class="oe_title">
                         <label for="department_id" class="oe_edit_only"/>
                         <h1>
                             <field name="department_id" placeholder="Department"
                                    readonly="state != 'draft'"/>
                         </h1>
-                    </div>
+                    </div> -->
                     <group>
+                        <field name="type_selection"
+                        readonly="state != 'draft'"/>
+
+
+                            <field name="department_id"  required="type_selection == 'department'" invisible="type_selection != 'department'"/>
+    
+                       
+                            <field name="tag_id"  required="type_selection == 'tag'" invisible="type_selection != 'tag'"/>
+                        
                         <label for="date_from" string="Period"/>
                         <div>
                             <field name="date_from" class="oe_inline" readonly="state != 'draft'"/>

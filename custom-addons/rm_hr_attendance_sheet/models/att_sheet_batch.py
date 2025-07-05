@@ -45,6 +45,13 @@ class AttendanceSheetBatch(models.Model):
         ('att_sub', 'Attendance Sheets Submitted'),
         ('done', 'Close')], default='draft', track_visibility='onchange',
         string='Status', required=True, readonly=True, index=True, )
+    type_selection = fields.Selection([
+        ('department', 'Department'),
+        ('tag', 'Tag')
+    ], string="Approval Type", required=True)
+
+    tag_id = fields.Many2one(
+        'hr.employee.category', string="Employee Tags")
 
     @api.onchange('department_id', 'date_from', 'date_to')
     def onchange_employee(self):
@@ -83,9 +90,13 @@ class AttendanceSheetBatch(models.Model):
             to_date = batch.date_to
             employee_ids = self.env['hr.employee'].search(
                 [('department_id', '=', batch.department_id.id)])
+            
+            if self.type_selection == 'tag':
+                employee_ids = self.env['hr.employee'].search([('category_ids', 'in', self.tag_id.id)])
+            
 
             if not employee_ids:
-                raise UserError(_("There is no  Employees In This Department"))
+                raise UserError(_("There is no  Employees"))
             for employee in employee_ids:
 
                 contract_ids = employee._get_contracts(from_date, to_date)
