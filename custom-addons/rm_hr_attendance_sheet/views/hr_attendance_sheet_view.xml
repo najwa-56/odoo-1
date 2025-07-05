@@ -107,6 +107,7 @@
                                     class="oe_stat_button"
                                     type="object"
                                     string="Santion"
+                                     invisible="diff_time &lt;= 0 and late_in &lt;= 0 and status != 'ab'"
                                     groups="rm_hr_attendance_sheet.group_attendance_sheet_manager"
                                    
                             />
