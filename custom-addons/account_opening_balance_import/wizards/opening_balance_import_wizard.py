@@ -39,7 +39,7 @@ class OpeningBalanceImportWizard(models.TransientModel):
         # --------------------------------------------------
         # Resolve journal
         # --------------------------------------------------
-        journal = self.env["account.journal"].search([("id", "=", 3)], limit=1)
+        journal = self.env["account.journal"].search([("name", "=", 'a')], limit=1)
         if not journal:
             raise UserError(_("Journal '%s' was not found.") % journal_name)
 
