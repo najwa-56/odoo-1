@@ -50,6 +50,13 @@ class HrEmployeeScheduleByTagWizard(models.TransientModel):
 
         self.employee_ids.write({"resource_calendar_id": self.schedule_id.id})
 
+        Contract = self.env["hr.contract"]
+        contracts_to_update = Contract.search([
+            ("employee_id", "in", self.employee_ids.ids), ("state", "=", "open"),  
+                
+        ])
+        contracts_to_update.write({"resource_calendar_id": self.schedule_id.id})
+
         message = _(
             "%d employee(s) now follow the '%s' working schedule."
         ) % (len(self.employee_ids), self.schedule_id.name)
