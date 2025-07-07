@@ -25,7 +25,7 @@ class AttendanceSheetBatch(models.Model):
     _name = 'attendance.sheet.batch'
     name = fields.Char("name")
     department_id = fields.Many2one('hr.department', 'Department Name',
-                                    required=True)
+                                    )
     date_from = fields.Date(string='Date From', readonly=True, required=True,
                             default=lambda self: fields.Date.to_string(
                                 date.today().replace(day=1)), )
