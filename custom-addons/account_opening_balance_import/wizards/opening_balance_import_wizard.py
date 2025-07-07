@@ -60,7 +60,21 @@ class OpeningBalanceImportWizard(models.TransientModel):
 
         for idx in range(df.shape[0]):
             row = df.iloc[idx]
-            acct_code = str(row.iloc[3]).strip() if len(row) > 3 and not pd.isna(row.iloc[3]) else ""
+            
+            raw_acct_code = row.iloc[3] if len(row) > 3 else ""
+            if pd.isna(raw_acct_code):
+                acct_code = ""
+            elif isinstance(raw_acct_code, (int, float)):
+                if isinstance(raw_acct_code, float) and raw_acct_code.is_integer():
+                    raw_acct_code = int(raw_acct_code)
+                acct_code = str(raw_acct_code)
+            else:
+                acct_code = str(raw_acct_code).strip()
+
+            if acct_code.endswith(".0"):
+                acct_code = acct_code[:-2]
+
+
             partner_name = str(row.iloc[4]).strip() if len(row) > 4 and not pd.isna(row.iloc[4]) else ""
             label = str(row.iloc[5]).strip() if len(row) > 5 and not pd.isna(row.iloc[5]) else ""
             credit = float(row.iloc[6]) if len(row) > 6 and not pd.isna(row.iloc[6]) else 0.0
@@ -123,3 +137,6 @@ class OpeningBalanceImportWizard(models.TransientModel):
             "target": "current",
             "res_id": move.id,
         }
+    
+
+    
