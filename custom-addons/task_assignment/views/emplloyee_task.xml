@@ -56,7 +56,10 @@
                    options="{'draft': 'info', 'done': 'success', 'cancel': 'danger'}"/>
             <field name="task_code" readonly="1"/>
             <field name="task_id"/>
+             <field name="employee_id" readonly="1" groups="task_assignment.group_task_user"/>
             <field name="employee_id" groups="task_assignment.group_task_manager"/>
+            <field name="supervisor_id" readonly="1" groups="task_assignment.group_task_user"/>
+            <field name="supervisor_id" groups="task_assignment.group_task_manager"/>
             </group>
                          <group>
             <field name="due_date"  groups="task_assignment.group_task_manager"/>
@@ -76,9 +79,11 @@
 
                    <field name="image" widget="Binary" class="oe_avatar"
                           options="{'preview_image': 'image'}"/>
+                       <field name ="comments"/>
                    </group>
                       <group>
-                         <field name="description"/>
+                       <field name="description" readonly="1" groups="task_assignment.group_task_user"/>
+                          <field name="description" groups="task_assignment.group_task_manager"/>
                       </group>
                   </group>
                 <group string="Manager Evaluation" groups="task_assignment.group_task_manager">

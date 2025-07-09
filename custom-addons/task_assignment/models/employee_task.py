@@ -28,6 +28,7 @@ class EmployeeTask(models.Model):
     task_code = fields.Char(string="Task ID", readonly=True, copy=False, required=True, default='New')
     task_time = fields.Datetime(string="Task Time")
 
+
     # Task template – holds default rules such as delays, fallback, dependency …
 
     task_id = fields.Many2one(
@@ -36,7 +37,15 @@ class EmployeeTask(models.Model):
         required=True,
         help="Choose a task from the list of predefined activities")
     employee_id = fields.Many2one('hr.employee', string="Assigned To", required=True)
+    supervisor_id = fields.Many2one(
+        'hr.employee',
+        string="Supervisor",
+        help="The manager or supervisor responsible for overseeing this task.",
+        tracking=True
+    )
+
     description = fields.Text(string="Description")
+    comments = fields.Text(string="Comments")
     image = fields.Binary(string="Task Image", attachment=True)
     active = fields.Boolean(string='Active', default=True, readonly=False)
     due_date = fields.Date(string="Due Date")
@@ -185,6 +194,7 @@ class EmployeeTask(models.Model):
                 'task_type': rec.task_type,
                 'status': 'assigned',
                 'description': rec.description,
+                'comments': rec.comments,
                 'repeat_days_ids': [(6, 0, rec.repeat_days_ids.ids)],
                 'repeat_month_days': [(6, 0, rec.repeat_month_days.ids)],
                 'parent_task_id': rec.id,
@@ -224,6 +234,7 @@ class EmployeeTask(models.Model):
                         'task_type': rec.task_type,
                         'status': 'assigned',
                         'description': rec.description,
+                        'comments':rec.comments,
                         'repeat_days_ids': [(6, 0, rec.repeat_days_ids.ids)],
                         'repeat_month_days': [(6, 0, rec.repeat_month_days.ids)],
                         'parent_task_id': rec.id,
@@ -279,6 +290,7 @@ class EmployeeTask(models.Model):
                         'task_type': rec.task_type,
                         'status': 'assigned',
                         'description': rec.description,
+                        'comments': rec.comments,
                         'repeat_days_ids': [(6, 0, rec.repeat_days_ids.ids)],
                         'repeat_month_days': [(6, 0, rec.repeat_month_days.ids)],
                         'parent_task_id': rec.id,

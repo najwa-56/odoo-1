@@ -12,6 +12,7 @@ access_task_name_reassign_wizard_user,access_task_name_reassign_wizard,model_tas
 access_task_name_reassign_wizard,access_task_name_reassign_wizard,model_task_name_reassign_wizard,task_assignment.group_task_manager,1,1,1,1
 access_task_tag_user,access_task_tag,model_task_tag,task_assignment.group_task_user,1,1,0,0
 access_task_tag,access_task_tag,model_task_tag,task_assignment.group_task_manager,1,1,1,1
+access_task_tag,access_task_tag,model_task_tag,task_assignment.group_task_manager,1,1,1,1
 
 
 
