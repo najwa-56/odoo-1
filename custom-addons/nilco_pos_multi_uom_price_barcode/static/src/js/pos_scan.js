@@ -191,6 +191,8 @@ patch(Orderline.prototype, {
     },
 
     set_quantity(quantity, keep_price) {
+      
+        console.log("quantity ==============================",quantity)
 
         
         keep_price = true
@@ -229,7 +231,8 @@ patch(Orderline.prototype, {
             if (unit.rounding) {
                 var decimals = this.pos.dp["Product Unit of Measure"];
                 var rounding = Math.max(unit.rounding, Math.pow(10, -decimals));
-                this.quantity = round_pr(quant, rounding);
+                // this.quantity = round_pr(quant, rounding);
+                this.quantity = Math.floor(quant * 1000) / 1000;
                 this.quantityStr = formatFloat(this.quantity, {
                     digits: [69, decimals],
                 });
