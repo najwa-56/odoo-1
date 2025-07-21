@@ -114,7 +114,7 @@
     <menuitem id="menu_custom_task_root" name="Custom task"/>
     <menuitem id="menu_custom_task_name" name="Task Names"
               parent="menu_employee_task_root" action="action_task_name"
-    groups="task_assignment.group_task_manager"/>
+    groups="task_assignment.group_task_manager,task_assignment.group_task_supervisor"/>
 
     </data>
 </odoo>

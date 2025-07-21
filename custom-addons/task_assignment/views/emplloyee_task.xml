@@ -22,7 +22,7 @@
                     class="btn-success" invisible="status != 'assigned'"/>
 
             <button name="action_cancel" type="object" string="Cancel Task"
-                    class="btn-danger" invisible="status == 'done'"/>
+                    class="btn-danger" invisible="status != 'assigned'"/>
             <field name="status" widget="statusbar" statusbar_visible="draft,assigned,done,cancel"/>
 
                 </header>
@@ -57,19 +57,19 @@
             <field name="task_code" readonly="1"/>
             <field name="task_id"/>
              <field name="employee_id" readonly="1" groups="task_assignment.group_task_user"/>
-            <field name="employee_id" groups="task_assignment.group_task_manager"/>
+            <field name="employee_id" groups="task_assignment.group_task_manager ,task_assignment.group_task_supervisor"/>
             <field name="supervisor_id" readonly="1" groups="task_assignment.group_task_user"/>
-            <field name="supervisor_id" groups="task_assignment.group_task_manager"/>
+            <field name="supervisor_id" groups="task_assignment.group_task_manager ,task_assignment.group_task_supervisor"/>
             </group>
                          <group>
-            <field name="due_date"  groups="task_assignment.group_task_manager"/>
-            <field name="task_time"  groups="task_assignment.group_task_manager"/>
-            <field name="task_type"  groups="task_assignment.group_task_manager"/>
+            <field name="due_date"  groups="task_assignment.group_task_manager,task_assignment.group_task_supervisor"/>
+            <field name="task_time"  groups="task_assignment.group_task_manager ,task_assignment.group_task_supervisor"/>
+            <field name="task_type"  groups="task_assignment.group_task_manager ,task_assignment.group_task_supervisor"/>
             <field name="repeat_days_ids" widget="many2many_tags" options="{'no_create': True}"
-                   invisible="task_type == 'daily' or task_type == 'monthly'"  groups="task_assignment.group_task_manager"/>
+                   invisible="task_type == 'daily' or task_type == 'monthly'"  groups="task_assignment.group_task_manager ,task_assignment.group_task_supervisor"/>
             <field name="repeat_month_days" widget="many2many_tags" options="{'no_create': True}"
-                   invisible="task_type != 'monthly'"  groups="task_assignment.group_task_manager"/>
-            <field name="repeat_until"  groups="task_assignment.group_task_manager"/>
+                   invisible="task_type != 'monthly'"  groups="task_assignment.group_task_manager ,task_assignment.group_task_supervisor"/>
+            <field name="repeat_until"  groups="task_assignment.group_task_manager ,task_assignment.group_task_supervisor"/>
 
                          </group>
                     </group>
@@ -83,12 +83,15 @@
                    </group>
                       <group>
                        <field name="description" readonly="1" groups="task_assignment.group_task_user"/>
-                          <field name="description" groups="task_assignment.group_task_manager"/>
+                          <field name="description" groups="task_assignment.group_task_manager,task_assignment.group_task_supervisor"/>
                       </group>
                   </group>
                 <group string="Manager Evaluation" groups="task_assignment.group_task_manager">
                   <field name="feedback_score"/>
                 </group>
+                    <group string="Manager Evaluation" groups="task_assignment.group_task_supervisor">
+                   <field name="feedback_score"/>
+                    </group>
                 </sheet>
 
                 <div class="oe_chatter">
@@ -147,7 +150,7 @@
               parent="menu_employee_task_root"
               action="action_employee_task"
               sequence="10"
-               groups="task_assignment.group_task_manager"
+              groups="task_assignment.group_task_manager,task_assignment.group_task_supervisor"
     />
 
    <menuitem id="menu_employee_task_today"

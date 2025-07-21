@@ -104,7 +104,7 @@ class EmployeeTask(models.Model):
         string="Evaluation (%)",
         help="Manager rating for this task in percentage (e.g. 80%)",
         tracking=True,
-        groups="task_assignment.group_task_manager"
+        groups="task_assignment.group_task_manager,task_assignment.group_task_supervisor"
     )
     # ---------------------------------------------------------------------
     # EMAIL HELPERS
@@ -154,6 +154,16 @@ class EmployeeTask(models.Model):
         """
         if self.employee_id and self.employee_id.user_id and self.employee_id.user_id.partner_id:
             partner = self.employee_id.user_id.partner_id
+            if partner.email:
+                return [tools.formataddr((partner.name or u"False", partner.email or u"False"))]
+        return []
+
+    def compute_supervisor_email_formatted(self):
+        """
+        Return email formatted string from supervisor_id's user_id
+        """
+        if self.supervisor_id and self.supervisor_id.user_id and self.supervisor_id.user_id.partner_id:
+            partner = self.supervisor_id.user_id.partner_id
             if partner.email:
                 return [tools.formataddr((partner.name or u"False", partner.email or u"False"))]
         return []
@@ -513,6 +523,33 @@ class EmployeeTask(models.Model):
 
             template.sudo().with_context(ctx).send_mail(rec.id, force_send=True, email_values=email_values)
 
+            # 4. Notify Supervisor (if supervisor is assigned)
+            supervisor_email = rec.compute_supervisor_email_formatted()
+            if supervisor_email:
+                supervisor_template = rec.env.ref(
+                    'task_assignment.mail_template_task_status_notification',
+                    raise_if_not_found=False
+                )
+                if not supervisor_template:
+                    raise UserError("Supervisor mail template not found.")
+
+                ctx_supervisor = dict(self.env.context)
+                ctx_supervisor.update({
+                    'base_url': base_url,
+                    'model': rec._name,
+                    'action_id': action_id,
+                })
+
+                email_values_supervisor = {
+                    'email_to': supervisor_email[0],
+                    'email_from': rec.company_id.email or self.env.user.email,
+                    'subject': f"Task {rec.task_code} Completed by {rec.employee_id.name}",
+                }
+
+                supervisor_template.sudo().with_context(ctx_supervisor).send_mail(
+                    rec.id, force_send=True, email_values=email_values_supervisor
+                )
+
     #-------------------------------------------
     # press button  cancel
     def action_cancel(self):
@@ -578,6 +615,33 @@ class EmployeeTask(models.Model):
             }
 
             template.sudo().with_context(ctx).send_mail(rec.id, force_send=True, email_values=email_values)
+
+            # 4. Notify Supervisor (if supervisor is assigned)
+            supervisor_email = rec.compute_supervisor_email_formatted()
+            if supervisor_email:
+                supervisor_template = rec.env.ref(
+                    'task_assignment.mail_template_task_status_notification',
+                    raise_if_not_found=False
+                )
+                if not supervisor_template:
+                    raise UserError("Supervisor mail template not found.")
+
+                ctx_supervisor = dict(self.env.context)
+                ctx_supervisor.update({
+                    'base_url': base_url,
+                    'model': rec._name,
+                    'action_id': action_id,
+                })
+
+                email_values_supervisor = {
+                    'email_to': supervisor_email[0],
+                    'email_from': rec.company_id.email or self.env.user.email,
+                    'subject': f"Task {rec.task_code} Completed by {rec.employee_id.name}",
+                }
+
+                supervisor_template.sudo().with_context(ctx_supervisor).send_mail(
+                    rec.id, force_send=True, email_values=email_values_supervisor
+                )
 
 
     #---------------------------------
@@ -664,6 +728,33 @@ class EmployeeTask(models.Model):
                     'func': 'create_fallback_for_overdue_tasks',
                     'line': '0',
                 })
+
+                # 4. Notify Supervisor (if supervisor is assigned)
+                supervisor_email = rec.compute_supervisor_email_formatted()
+                if supervisor_email:
+                    supervisor_template = rec.env.ref(
+                        'task_assignment.mail_template_task_status_notification',
+                        raise_if_not_found=False
+                    )
+                    if not supervisor_template:
+                        raise UserError("Supervisor mail template not found.")
+
+                    ctx_supervisor = dict(self.env.context)
+                    ctx_supervisor.update({
+                        'base_url': base_url,
+                        'model': rec._name,
+                        'action_id': action_id,
+                    })
+
+                    email_values_supervisor = {
+                        'email_to': supervisor_email[0],
+                        'email_from': rec.company_id.email or self.env.user.email,
+                        'subject': f"Task {rec.task_code} Completed by {rec.employee_id.name}",
+                    }
+
+                    supervisor_template.sudo().with_context(ctx_supervisor).send_mail(
+                        rec.id, force_send=True, email_values=email_values_supervisor
+                    )
 
 
 
