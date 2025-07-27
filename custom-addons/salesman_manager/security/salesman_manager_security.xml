@@ -20,6 +20,11 @@
             <field name="category_id" ref="module_category_sales_man"/>
         </record>
 
+         <record id="group_accountant" model="res.groups">
+            <field name="name">accountant</field>
+            <field name="category_id" ref="module_category_sales_man"/>
+        </record>
+
         <!-- Record rule to restrict access to employees based on supervisor -->
         <record id="rule_hr_employee_supervisor" model="ir.rule">
             <field name="name">Employees: supervisor sees only his salespeople</field>

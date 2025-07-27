@@ -22,6 +22,24 @@ class ResPartner(models.Model):
     ], string="Status", default='not_yet', compute='_compute_specific_visit', store=False)
 
 
+    #--------- adjustment --------------------------------------
+    status_contact = fields.Selection( [
+        ('waiting', 'قيد الانتظار'),
+        ('accepted', 'مصدق'),
+        ('rejected', 'مرفوض'),
+    ], string='الحالة', default='waiting' )
+
+    is_later = fields.Boolean( 'is_later' )
+
+    def action_accept_partner (self):
+        for rec in self:
+            rec.status_contact = 'accepted'
+            rec.is_later = True
+
+    def action_reject_partner (self):
+        for rec in self:
+            rec.status_contact = 'rejected'
+            rec.is_later = False
 
     #---------------------------------------------------------------------------------------------------------
     #once you created a new visit it is should be saved in field specific_visit_id for a spicific weekly route
@@ -104,39 +122,9 @@ class ResPartner(models.Model):
         }
 
 
-    #--------------------------------------------------------------------------------------------------------------
-    #to shows list of unpaid invoices
-    #we inhirit action_view_partner_invoices function and we add a new domain which is 'payment_state', '!=', 'paid'
-    #---------------------------------------------------------------------------------------------------------------
-
-    def action_view_partner_invoices_custom(self):
-        self.ensure_one()
-        action = super(ResPartner, self).action_view_partner_invoices()
-
-        # Add your custom domain here
-        custom_domain = [('payment_state', '!=', 'paid')]
-
-        # Check if 'domain' key exists in action and add the custom domain
-        if action.get('context'):
-            action['context'] = dict(action['context'])
-            if 'search_default_partner_id' in action['context']:
-                action['context'].pop('search_default_partner_id')
-        else:
-            action['context'] = {}
-
-        if 'domain' in action['context']:
-            action['context']['domain'].extend(custom_domain)
-        else:
-            action['context']['domain'] = custom_domain
-
-        return action
-
-
-
-
-
-
-
+    #--------------------------------------------
+    #to Update Partner Info
+    #--------------------------------------------
     def open_update_partner_wizard(self):
         self.ensure_one()
         return {

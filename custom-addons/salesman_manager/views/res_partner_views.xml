@@ -1,0 +1,53 @@
+<odoo>
+    <data>
+        <record id="view_partner_form_add_custom_header" model="ir.ui.view">
+            <field name="name">res.partner.form.add.custom.header</field>
+            <field name="model">res.partner</field>
+            <field name="inherit_id" ref="base.view_partner_form"/>
+            <field name="arch" type="xml">
+
+                <xpath expr="//field[@name='category_id']" position="after">
+                    <field name="is_later"/>
+                </xpath>
+
+                <xpath expr="//form/*[1]" position="before">
+                    <header>
+                        <button name="action_accept_partner"
+                                string="قبول"
+                                type="object"
+                                class="btn btn-success"
+                                groups="salesman_manager.group_accountant"/>
+
+                        <button name="action_reject_partner"
+                                string="رفض"
+                                type="object"
+                                class="btn btn-danger"
+                                groups="salesman_manager.group_accountant"/>
+
+                        <field name="status_contact"
+                               widget="statusbar"
+                               statusbar_visible="waiting,accepted,rejected"/>
+                    </header>
+                </xpath>
+
+            </field>
+        </record>
+
+        <record id="view_partner_tree_add_status_contact" model="ir.ui.view">
+            <field name="name">res.partner.tree.add.status.contact</field>
+            <field name="model">res.partner</field>
+            <field name="inherit_id" ref="base.view_partner_tree"/>
+            <field name="arch" type="xml">
+
+                <!-- Add status column after email -->
+                <xpath expr="//field[@name='country_id']" position="after">
+                    <field name="status_contact" string="Status" widget="badge"
+                           decoration-danger="status_contact == 'rejected'"
+                           decoration-warning="status_contact == 'waiting'"
+                           decoration-success="status_contact == 'accepted'" optional="show"/>
+                </xpath>
+
+            </field>
+        </record>
+    </data>
+</odoo>

@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <data>
+        <!-- visit_partner_adjustment_form_view.xml -->
+        <record id="view_visit_partner_adjustment_form" model="ir.ui.view">
+            <field name="name">visit.partner.adjustment.form</field>
+            <field name="model">visit.partner.adjustment</field>
+            <field name="arch" type="xml">
+                <form string="Partner Adjustment">
+                    <header>
+                        <button name="action_confirm" string="Confirm" type="object" class="oe_highlight"
+                                invisible="state != 'draft'"/>
+
+                        <button name="action_create_payment"
+                                type="object"
+                                string="payment register"
+                                class="btn btn-secondary" invisible="state != 'confirmed'"/>
+                        <field name="state" widget="statusbar" statusbar_visible="draft,confirmed"/>
+                    </header>
+                    <sheet>
+                        <group>
+                            <field name="visit_id" readonly="1"/>
+                            <field name="partner_id" readonly="1"/>
+                            <field name="amount_total" readonly="1"/>
+                            <field name="computed_difference" readonly="1"/>
+                        </group>
+
+                        <field name="line_ids">
+                            <tree editable="bottom">
+                                <field name="product_id" readonly="1"/>
+                                <field name="delivered_qty" readonly="1"/>
+                                <field name="returned_qty" readonly="1"/>
+                                <field name="last_counted_qty" readonly="1"/>
+                                <field name="counted_qty"/>
+                                <field name="uom_id" readonly="1"/>
+                                <field name="counted_qty_by_uom"/>
+
+                                <field name="sold_qty" readonly="1"/>
+                                <field name="price_unit" readonly="1"/>
+                                <field name="total" readonly="1"/>
+                            </tree>
+                        </field>
+
+
+                    </sheet>
+                </form>
+            </field>
+        </record>
+
+
+        <record id="view_visit_partner_adjustment_tree" model="ir.ui.view">
+            <field name="name">visit.partner.adjustment.tree</field>
+            <field name="model">visit.partner.adjustment</field>
+            <field name="arch" type="xml">
+                <tree>
+                    <field name="visit_id"/>
+                    <field name="partner_id"/>
+                    <field name="state"/>
+                    <field name="amount_total"/>
+                    <field name="create_date"/>
+                </tree>
+            </field>
+        </record>
+
+        <record id="action_visit_partner_adjustment" model="ir.actions.act_window">
+            <field name="name">Partner Adjustments</field>
+            <field name="res_model">visit.partner.adjustment</field>
+            <field name="view_mode">tree,form</field>
+            <field name="help" type="html">
+                <p>View all partner product adjustment forms linked to sales visits.</p>
+            </field>
+        </record>
+
+
+        <menuitem id="menu_visit_adjustment_root"
+                  name="Partner Adjustments"
+                  parent="menu_sales_man_reports"
+                  action="action_visit_partner_adjustment"
+                  sequence="100"/>
+
+    </data>
+</odoo>

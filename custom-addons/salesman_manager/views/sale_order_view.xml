@@ -21,49 +21,49 @@
         </field>
     </record>
 
-    <!-- salesman tree that only allow user to see thier today sales without creating a new one -->
-    <record id="sale.action_orders" model="ir.actions.act_window">
-        <field name="name">Today's Sales Orders</field>
-        <field name="res_model">sale.order</field>
-        <field name="domain">[('date_order', '>=', context_today()),('user_id', '=', uid)]</field>
-    </record>
 
-    <record id="view_sale_order_tree_no_create" model="ir.ui.view">
-        <field name="name">sale.order</field>
+    <record id="view_sale_order_tree_salesman" model="ir.ui.view">
+        <field name="name">sale.order.tree.salesman</field>
         <field name="model">sale.order</field>
-        <field name="inherit_id" ref="sale.view_order_tree"/>
         <field name="arch" type="xml">
-            <tree position="attributes">
-                <attribute name="create">false</attribute>
+            <tree create="false">
+                <field name="name"/>
+                <field name="date_order"/>
+                <field name="partner_id"/>
+                <field name="amount_total"/>
+                <field name="state"/>
             </tree>
         </field>
     </record>
-    <record id="view_sale_order_form_no_create" model="ir.ui.view">
-        <field name="name">sale.order</field>
+
+    <record id="view_sale_order_form_salesman_inherit" model="ir.ui.view">
+        <field name="name">sale.order.form.salesman.inherit</field>
         <field name="model">sale.order</field>
         <field name="inherit_id" ref="sale.view_order_form"/>
         <field name="arch" type="xml">
-            <form position="attributes">
-                <attribute name="create">false</attribute>
-            </form>
-        </field>
-    </record>
-
-    <record id="view_sale_order_kanban_no_create" model="ir.ui.view">
-        <field name="name">sale.order.kanban.no.create</field>
-        <field name="model">sale.order</field>
-        <field name="inherit_id" ref="sale.view_sale_order_kanban"/>
-        <field name="arch" type="xml">
-            <xpath expr="//kanban" position="attributes">
+            <xpath expr="//form" position="attributes">
                 <attribute name="create">false</attribute>
             </xpath>
         </field>
     </record>
 
 
+    <record id="action_today_sales_orders_salesman" model="ir.actions.act_window">
+        <field name="name">Today's Sales Orders</field>
+        <field name="res_model">sale.order</field>
+        <field name="view_mode">tree,form</field>
+        <field name="view_ids" eval="[(5, 0, 0),
+        (0, 0, {'view_mode': 'tree', 'view_id': ref('view_sale_order_tree_salesman')}),
+        (0, 0, {'view_mode': 'form', 'view_id': ref('view_sale_order_form_salesman_inherit')})
+    ]"/>
+        <field name="domain">[('date_order', '>=', context_today()), ('user_id', '=', uid)]</field>
+        <field name="groups_id" eval="[(4, ref('salesman_manager.group_salesman'))]"/>
+    </record>
+
+
     <menuitem id="menu_custom_sale_orders"
               name="مبيعاتي"
-              action="sale.action_orders"
+              action="action_today_sales_orders_salesman"
               groups="salesman_manager.group_salesman"/>
 
 

@@ -21,14 +21,15 @@
         'views/my_routes_views.xml',
         'views/daily_visit_views.xml',
         'views/route_line.xml',
-        'views/sale_order_line.xml',
         'views/weekly_routs_report.xml',
         'views/daily_visit_report.xml',
-        'views/res_partner_category.xml',
         'views/sale_order_view.xml',
         'views/account_move_view.xml',
         'views/daily_realtime_report_views.xml',
         'wizard/partner_update.xml',
+        'views/res_partner_views.xml',
+        'views/partner_adjustment.xml',
+        'views/account_payment.xml'
 
 
     ],

@@ -5,9 +5,9 @@ from . import weekly_routs_line
 from . import daily_visit
 from . import route_line
 from . import res_partner
-from . import sale_order_line
 from . import sale_order
-from . import res_partner_category
 from . import daily_visit_report
 from . import account_move
 from . import daily_realtime_report
+from . import partner_visit_adjutment
+from . import account_payment

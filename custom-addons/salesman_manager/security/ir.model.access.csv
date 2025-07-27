@@ -12,3 +12,10 @@ access_daily_realtime_report_supervisor,daily.realtime.report,model_daily_realti
 
 access_partner_update_wizard,partner.update.wizard,model_partner_update_wizard,,1,1,1,1
 
+access_visit_partner_adjustment,visit_partner_adjustment,model_visit_partner_adjustment,,1,1,1,1
+access_visit_partner_adjustment_line,visit_partner_adjustment_line,model_visit_partner_adjustment_line,,1,1,1,1
+
+
+
+
+

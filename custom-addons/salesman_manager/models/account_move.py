@@ -34,10 +34,10 @@ class AccountMove(models.Model):
                 vals['visit_id'] = order.visit_id.id
 
         return super().create(vals)
+
     #-------------------------------------------------------------------------------
     #Button action to navigate back to the linked visit form.
     #-------------------------------------------------------------------------------
-
     def action_back_to_visit(self):
 
         self.ensure_one()

@@ -10,26 +10,17 @@
                 <tree string="الزيارات">
                     <field name="reference"/>
                     <field name="created_by"/>
-                    <field name="creation_date" invisible="1"/>
+                    <field name="creation_date" optional="hide"/>
                     <field name="start_time"/>
                     <field name="end_time"/>
                     <field name="partner_id"/>
+                    <field name="decision_state" widget="badge"
+                           decoration-danger="decision_state == 'reject'"
+                           decoration-success="decision_state == 'accept'"/>
                 </tree>
             </field>
         </record>
 
-        <!-- step1 create a new window action with a new domain
-        <record id="new_act_res_partner_2_sale_order3" model="ir.actions.act_window">
-            <field name="name">مبيعات اليوم</field>
-            <field name="type">ir.actions.act_window</field>
-            <field name="res_model">sale.order</field>
-            <field name="view_mode">form</field>
-            <field name="target">new</field>
-            <field name="domain">[('date_order', '&gt;=', (context_today().strftime('%Y-%m-%d') + ' 00:00:00')),
-                ('date_order', '&lt;=', (context_today().strftime('%Y-%m-%d') + ' 23:59:59'))
-                ]
-            </field>
-        </record>-->
 
         <!-- Form View for Daily Visits -->
         <record id="view_daily_visit_form" model="ir.ui.view">
@@ -38,6 +29,19 @@
             <field name="arch" type="xml">
                 <form string="الزيارات">
                     <sheet>
+                        <!--  Smart Buttons Area -->
+                        <div class="oe_button_box" name="button_box">
+                            <button name="action_open_adjustmen"
+                                    type="object"
+                                    string="Partner Adjustment"
+                                    class="oe_stat_button"
+                                    icon="fa-calculator"/>
+                            <button name="action_view_related_sale_orders"
+                                    type="object"
+                                    string="Sale orders"
+                                    class="oe_stat_button"
+                                    icon="fa-file-text-o"/>
+                        </div>
 
                         <!-- Reference in Header -->
                         <div class="oe_title">
@@ -47,18 +51,37 @@
                         </div>
 
                         <!-- Main Info -->
-                        <group col="2">
+                        <group>
                             <field name="reference" invisible="1"/>
                             <field name="created_by"/>
                             <field name="partner_id" options="{'no_create': True}"/>
-                            <field name="total_consumption_amount"/>
-                            <field name="is_it_sold"/>
+                            <field name="is_it_sold" invisible="1"/>
+                            <field name="decision_state" invisible="1"/>
+                            <group invisible="not is_later">
+                                <field name="is_later" invisible="1"/>
+                                <button name="action_open_partner_adjustment"
+                                        type="object"
+                                        string="الجرد"
+                                        class="btn btn-primary"/>
+                            </group>
                             <field name="weekly_route_id" invisible="1"/>
                             <field name="ref"/>
+                            <group>
+                                <button name="action_accept_sale"
+                                        string="قبول"
+                                        type="object"
+                                        class="btn btn-success"/>
+                                <button name="action_reject_sale"
+                                        string="رفض"
+                                        type="object"
+                                        class="btn btn-danger"/>
+                            </group>
                         </group>
 
                         <notebook>
-                            <page string="تفاصيل" style="text-align: right;">
+                            <!-- don't show this page until user click on action_accept_sale or action_reject_sale button -->
+                            <page string="تفاصيل" style="text-align: right;" invisible="decision_state == False">
+
 
                                 <!-- Not Sold Section -->
                                 <group invisible="is_it_sold" col="1">
@@ -84,7 +107,8 @@
                                         />
                                     </div>
                                     <separator string="" colspan="1"/>
-                                    <field name="check_out_time" nolabel="1" groups="salesman_manager.group_salesman_supervisor"/>
+                                    <field name="check_out_time" nolabel="1"
+                                           groups="salesman_manager.group_salesman_supervisor"/>
                                 </group>
 
                                 <!-- Sold Section -->
@@ -101,11 +125,6 @@
                                                 string="------- بيع ------"
                                                 class="btn btn-primary"/>
                                     </div>
-                                    <div class="o_form_label"></div>
-                                    <field name="order_id"
-                                           widget="many2many_tags"
-                                           nolabel="1"
-                                           groups="salesman_manager.group_salesman_supervisor"/>
                                     <field name="attachment_after" widget="binary" class="oe_inline"/>
 
                                     <div class="o_form_label">Check out</div>
@@ -115,7 +134,8 @@
                                                 string="---Check out---"
                                                 class="btn btn-primary"/>
                                     </div>
-                                    <field name="check_out_time" nolabel="1" groups="salesman_manager.group_salesman_supervisor"/>
+                                    <field name="check_out_time" nolabel="1"
+                                           groups="salesman_manager.group_salesman_supervisor"/>
                                 </group>
 
 
