@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <odoo>
-    <record id="view_order_form_inherit_visit_fields_and_button" model="ir.ui.view">
+    <!-- <record id="view_order_form_inherit_visit_fields_and_button" model="ir.ui.view">
         <field name="name">sale.order.form.visit.fields.and.button</field>
         <field name="model">sale.order</field>
         <field name="inherit_id" ref="sale.view_order_form"/>
@@ -19,7 +19,7 @@
             </xpath>
 
         </field>
-    </record>
+    </record> -->
 
 
     <record id="view_sale_order_tree_salesman" model="ir.ui.view">
