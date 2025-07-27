@@ -10,4 +10,3 @@ from . import daily_visit_report
 from . import account_move
 from . import daily_realtime_report
 from . import partner_visit_adjutment
-from . import account_payment
