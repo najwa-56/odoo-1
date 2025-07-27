@@ -6,7 +6,7 @@
                 <field name="inherit_id" ref="sale.view_order_form"/>
                 <field name="arch" type="xml">
                     <xpath expr="//field[@name='payment_term_id']" position="after">
-                        <field name="payment_journal_id" domain="[('type','in',['bank','cash'])]" required="1" />
+                        <field name="payment_journal_id" domain="[('type','in',['bank','cash'])]" required="not is_later" />
                     
     
                     </xpath>

@@ -15,7 +15,7 @@
     'website': 'https://www.craftsync.com/',
     'license': 'LGPL-3',
     'support':'info@craftsync.com',
-    'depends' : ['sale_stock','ksa_zatca_integration','ks_multi_company_inventory_transfer'],
+    'depends' : ['sale_stock','ksa_zatca_integration','ks_multi_company_inventory_transfer','salesman_manager'],
     'data': [
         'views/stock_warehouse.xml',
         'views/account_jouranl.xml',

@@ -114,13 +114,14 @@ class SaleOrder(models.Model):
                                 'journal_id':journal_id.id
                             })
                     invoice.action_post()
-
-                    payment_register = self.env['account.payment.register'].with_context(active_model='account.move',active_ids=invoice.ids).create(
-                        {
-                        'payment_date': invoice.date,
-                        'journal_id':order.payment_journal_id.id
-                    })
-                    payment_register.action_create_payments()
+                    
+                    if not invoice.partner_id.is_later:
+                        payment_register = self.env['account.payment.register'].with_context(active_model='account.move',active_ids=invoice.ids).create(
+                            {
+                            'payment_date': invoice.date,
+                            'journal_id':order.payment_journal_id.id
+                        })
+                        payment_register.action_create_payments()
 
         return res  
 
