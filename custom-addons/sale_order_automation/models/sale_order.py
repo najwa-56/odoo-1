@@ -7,6 +7,7 @@ class SaleOrder(models.Model):
     _inherit = "sale.order"
     
     payment_journal_id = fields.Many2one('account.journal', string='Payment Journal')
+    is_later = fields.Boolean(related='partner_id.is_later')
 
     def action_print_standard_invoice(self):
         if self.invoice_ids:

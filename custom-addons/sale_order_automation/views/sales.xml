@@ -1,21 +1,19 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <odoo>
-               <record id="view_order_form2" model="ir.ui.view">
-                <field name="name">sale.order.form</field>
-                <field name="model">sale.order</field>
-                <field name="inherit_id" ref="sale.view_order_form"/>
-                <field name="arch" type="xml">
-                    <xpath expr="//field[@name='payment_term_id']" position="after">
-                        <field name="payment_journal_id" domain="[('type','in',['bank','cash'])]" required="not is_later" />
-                    
-    
-                    </xpath>
-                    <xpath expr="//button[@name='action_confirm']" position="after">
-                        <button name="action_print_standard_invoice" class="btn-success"  type="object" string="Print Tax Invoice" invisible="invoice_status != 'invoiced'" />
-                    
-    
-                    </xpath>
-                     
-                </field>
-        </record>
-        </odoo>
+    <record id="view_order_form2" model="ir.ui.view">
+        <field name="name">sale.order.form</field>
+        <field name="model">sale.order</field>
+        <field name="inherit_id" ref="sale.view_order_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='payment_term_id']" position="after">
+                <field name="is_later"/>
+                <field name="payment_journal_id" domain="[('type','in',['bank','cash'])]" required="is_later == False"/>
+            </xpath>
+            <xpath expr="//button[@name='action_confirm']" position="after">
+                <button name="action_print_standard_invoice" class="btn-success" type="object"
+                        string="Print Tax Invoice" invisible="invoice_status != 'invoiced'"/>
+            </xpath>
+
+        </field>
+    </record>
+</odoo>
