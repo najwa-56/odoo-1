@@ -19,7 +19,7 @@
     'data': [
         'views/stock_warehouse.xml',
         'views/account_jouranl.xml',
-        # 'views/sales.xml'
+        'views/sales.xml'
     ],
     
     'installable': True,
