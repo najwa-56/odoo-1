@@ -5,7 +5,7 @@ class AccountPayment(models.Model):
 
 
     #once user click confirm button it should print the payment recipt
-    def action_post (self):
+'''    def action_post (self):
         res = super().action_post()
         self.ensure_one()
 
@@ -17,6 +17,6 @@ class AccountPayment(models.Model):
             'report_name': 'account.report_payment_receipt',
             'report_type': 'qweb-pdf',
             'res_id': self.id,
-        }
+        }'''
 
 

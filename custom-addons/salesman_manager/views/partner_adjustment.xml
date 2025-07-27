@@ -23,6 +23,7 @@
                             <field name="partner_id" readonly="1"/>
                             <field name="amount_total" readonly="1"/>
                             <field name="computed_difference" readonly="1"/>
+                            <field name="payment_id" readonly="1"/>
                         </group>
 
                         <field name="line_ids">

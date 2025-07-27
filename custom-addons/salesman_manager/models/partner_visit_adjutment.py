@@ -1,5 +1,5 @@
 from odoo import models, fields, api, _
-from odoo.exceptions import UserError
+from odoo.exceptions import UserError , ValidationError
 class VisitPartnerAdjustment(models.Model):
     _name = 'visit.partner.adjustment'
     _description = 'Partner Adjustment'
@@ -43,28 +43,62 @@ class VisitPartnerAdjustment(models.Model):
 
             rec.computed_difference = total_adjustments - total_payments
 
-
+    def action_confirm(self):
+        self.write({'state':'confirmed'})
 
     #-------------------------------------------------------------------------------------
     #inside adjusment , user click on action_create_payment button to payment registration
     #-------------------------------------------------------------------------------------
-    def action_confirm(self):
-        self.write({'state':'confirmed'})
+
+    payment_id = fields.Many2one('account.payment', string='customer payment')
 
     def action_create_payment (self):
         self.ensure_one()
+
+        if not self.partner_id:
+            raise UserError( "Partner must be set to create a payment." )
+        if self.amount_total <= 0:
+            raise UserError( "Amount must be greater than zero." )
+        if self.payment_id:
+            raise UserError( "Payment already exists for this record." )
+
+        # Get payment method and journal
+        journal = self.env['account.journal'].search( [
+            ('type', '=', 'bank'),
+            ('company_id', '=', self.env.company.id)
+        ], limit=1 )
+        if not journal:
+            raise UserError( "No bank journal found for the current company." )
+
+
+        payment_method_line = journal.inbound_payment_method_line_ids[:1]
+        if not payment_method_line:
+            raise ValidationError( _( "No inbound payment method found on the selected journal." ) )
+
+        # Create payment
+        payment_vals = {
+            'partner_id': self.partner_id.id,
+            'amount': self.amount_total,
+            'payment_type': 'inbound',
+            'partner_type': 'customer',
+            'payment_method_line_id': payment_method_line.id,
+            'journal_id': journal.id,
+        }
+
+        payment = self.env['account.payment'].create( payment_vals )
+        payment.action_post()
+
+        # Link to current record
+        self.payment_id = payment.id
+
+        # Return payment receipt report
         return {
-            'type': 'ir.actions.act_window',
-            'name': 'Customer Payment',
-            'res_model': 'account.payment',
-            'view_mode': 'form',
-            'target': 'new',
-            'context': {
-                'default_partner_id': self.partner_id.id,
-                'default_amount': self.amount_total,
-                'default_payment_type': 'inbound',
-                'default_partner_type': 'customer',
-            }
+            'type': 'ir.actions.report',
+            'report_name': 'account.report_payment_receipt',
+            'report_type': 'qweb-pdf',
+            'res_id': payment.id,
+            'context': {'active_model': 'account.payment', 'active_ids': [payment.id]},
+
         }
 
 
