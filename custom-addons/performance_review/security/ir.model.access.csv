@@ -1,4 +1,4 @@
 id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
 access_performance_review_manager,performance_review.manager,model_performance_review,task_assignment.group_task_manager,1,1,1,1
-access_performance_review_manager,performance_review.manager,model_performance_review,task_assignment.group_task_supervisor,1,1,1,1
+access_performance_review_supervisor,performance_review.supervisor,model_performance_review,task_assignment.group_task_supervisor,1,1,1,1
 
