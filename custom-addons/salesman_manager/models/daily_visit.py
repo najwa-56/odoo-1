@@ -215,28 +215,28 @@ class DailyVisit( models.Model ):
     def action_create_sale_order (self):
         self.ensure_one()
 
-        # you cant sale if the customer status waiting or rejected
-        if self.partner_id.status_contact in ['waiting', 'rejected']:
-            raise UserError( _( 'You cannot create a sale order. This customer must be approved by the accountant.' ) )
+        # # you cant sale if the customer status waiting or rejected
+        # if self.partner_id.status_contact in ['waiting', 'rejected']:
+        #     raise UserError( _( 'You cannot create a sale order. This customer must be approved by the accountant.' ) )
 
-        adjustment = self.env['visit.partner.adjustment'].search( [
-            ('visit_id', '=', self.id),
-            ('state', '=', 'confirmed')
-        ], limit=1 )
+        # adjustment = self.env['visit.partner.adjustment'].search( [
+        #     ('visit_id', '=', self.id),
+        #     ('state', '=', 'confirmed')
+        # ], limit=1 )
 
-        previous_orders = self.env['sale.order'].search_count( [
-            ('partner_id', '=', self.partner_id.id),
-            ('state', 'in', ['sale', 'done'])
-        ], limit=1 )
+        # previous_orders = self.env['sale.order'].search_count( [
+        #     ('partner_id', '=', self.partner_id.id),
+        #     ('state', 'in', ['sale', 'done'])
+        # ], limit=1 )
 
-        # you cant sale the salesman doesn't create adjustment and this not the first time visit
-        # which means he can skip adjustment if this is the first time visit to this customer
-        if not adjustment and previous_orders  :
-            raise UserError( _( "You cannot create a sale order. No adjustment is linked to this visit." ) )
+        # # you cant sale the salesman doesn't create adjustment and this not the first time visit
+        # # which means he can skip adjustment if this is the first time visit to this customer
+        # if not adjustment and previous_orders  :
+        #     raise UserError( _( "You cannot create a sale order. No adjustment is linked to this visit." ) )
 
-        # you cant sale if there is computed_difference
-        if adjustment.computed_difference != 0:
-            raise UserError( _( "You cannot create a sale order. Customer balance is not cleared (difference ≠ 0)." ) )
+        # # you cant sale if there is computed_difference
+        # if adjustment.computed_difference != 0:
+        #     raise UserError( _( "You cannot create a sale order. Customer balance is not cleared (difference ≠ 0)." ) )
 
         return {
             'type': 'ir.actions.act_window',
