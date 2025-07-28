@@ -1,11 +1,18 @@
-from odoo import models, fields
+from datetime import timedelta
+from odoo import models, fields,api
 
 class TaskName(models.Model):
     _name = 'task.name'
     _description = 'task Name'
     # to create task
     name = fields.Char(string='task Name', required=True)
+    is_linked = fields.Selection([
+        ('linked', 'Linked'),
+        ('not_linked', 'Not Linked')
+    ], string="Linked or Not", default='not_linked')
     tag_ids = fields.Many2many('task.tag', string='Tags')
+    description = fields.Html("Description")
+    task_image = fields.Binary("Task Image")
     sequence = fields.Integer(string="Sequence", default=10)
     dependent_task_id = fields.Many2one(
         'task.name',
@@ -30,6 +37,11 @@ class TaskName(models.Model):
         string="Due Date Delay (Days)",
         help="Number of days after task_time to set the due date for generated tasks"
     )
+    priority_task = fields.Selection([
+        ('high', 'High'),
+        ('medium', 'Medium'),
+        ('low', 'Low'),
+    ], string="priority")
 
 
 
@@ -57,6 +69,5 @@ class TaskName(models.Model):
                     break
 
             task.dependent_task_id = next_task.id if next_task else False
-
 
 

@@ -25,26 +25,40 @@
         <field name="arch" type="xml">
             <form>
                 <sheet>
+                    <group string="Task Details" col="2">
+                          <!-- LEFT SIDE -->
                     <group>
                         <field name="name"/>
+                        <field name="is_linked"/>
+                         <field name="priority_task"/>
+
                         <field name="default_employee_id"/>
                         <field name="tag_ids" widget="many2many_tags"/>
+                        <field name="fallback_task_id"/>
 
                     </group>
+                         <!-- RIGHT SIDE  -->
+                    <group >
+    <field name="task_image" widget="image" class="oe_avatar" />
+    <field name="description"/>
+</group>
+                    </group>
 
-                     <group string="Follow-Up Task Logic">
-                          <field name="dependent_task_id"/>
-                         <field name="fallback_task_id"/>
-                     </group>
 
-                     <group string="Delay Before Task start ">
+
+
+                     <group string="Time Offset Before Task Start " invisible="is_linked == 'not_linked'">
                             <field name="delay_days"/>
                             <field name="delay_hours"/>
                             <field name="delay_minutes"/>
                      </group>
 
-                     <group string="time after Task start ">
+                     <group string="Mission execution deadline " invisible="is_linked == 'not_linked'">
                             <field name="due_date_delay"/>
+                     </group>
+
+                       <group string="Follow-Up Task Logic" >
+                          <field name="dependent_task_id"/>
                      </group>
 
                 </sheet>

@@ -8,7 +8,8 @@ maintainers can quickly understand what it does and why it exists.
 from odoo import models, fields, api ,tools,exceptions
 from odoo.exceptions import ValidationError, UserError
 from datetime import timedelta
-from datetime import datetime,date
+from datetime import datetime,date,time
+import pytz
 import base64
 import logging
 _logger = logging.getLogger(__name__)
@@ -47,6 +48,8 @@ class EmployeeTask(models.Model):
     description = fields.Text(string="Description")
     comments = fields.Text(string="Comments")
     image = fields.Binary(string="Task Image", attachment=True)
+    image_desc = fields.Binary("Image")
+
     active = fields.Boolean(string='Active', default=True, readonly=False)
     due_date = fields.Date(string="Due Date")
     task_type = fields.Selection([
@@ -106,9 +109,15 @@ class EmployeeTask(models.Model):
         tracking=True,
         groups="task_assignment.group_task_manager,task_assignment.group_task_supervisor"
     )
+    priority = fields.Selection([
+        ('high', 'High'),
+        ('medium', 'Medium'),
+        ('low', 'low'),
+    ], string="priority")
     # ---------------------------------------------------------------------
     # EMAIL HELPERS
     # ---------------------------------------------------------------------
+    '''
     def compute_email_formatted(self, receiver):
         email_formatted = []
         if not receiver:
@@ -147,13 +156,13 @@ class EmployeeTask(models.Model):
                 if user.partner_id not in receiver:
                     receiver.append(user.partner_id)
         return [receiver] if receiver else []
-
+'''
     def compute_user_email_formatted(self):
         """
         Return email formatted string from employee_id's user_id
         """
-        if self.employee_id and self.employee_id.user_id and self.employee_id.user_id.partner_id:
-            partner = self.employee_id.user_id.partner_id
+        if self.employee_id and self.employee_id.user_id and self.employee_id.work_email:
+            partner = self.employee_id.work_email
             if partner.email:
                 return [tools.formataddr((partner.name or u"False", partner.email or u"False"))]
         return []
@@ -162,8 +171,8 @@ class EmployeeTask(models.Model):
         """
         Return email formatted string from supervisor_id's user_id
         """
-        if self.supervisor_id and self.supervisor_id.user_id and self.supervisor_id.user_id.partner_id:
-            partner = self.supervisor_id.user_id.partner_id
+        if self.supervisor_id and self.supervisor_id.user_id and self.supervisor_id.work_email:
+            partner = self.supervisor_id.work_email
             if partner.email:
                 return [tools.formataddr((partner.name or u"False", partner.email or u"False"))]
         return []
@@ -419,6 +428,7 @@ class EmployeeTask(models.Model):
                 rec.id, force_send=True, email_values=email_values
             )
 
+
     # -------------------------------------------
     # press button  complete
     def action_done(self):
@@ -453,15 +463,20 @@ class EmployeeTask(models.Model):
                 new_task =self.env['employee.task'].create({
                     'task_id': dep_template.id,
                     'employee_id': next_employee.id,
+                    'priority': dep_template.priority_task,
+                    'image_desc':dep_template.task_image,
                     'task_time': task_time,
                     'due_date': due_date,
                     'task_type': 'none',
                     'status': 'assigned',
-                    'description': f"Auto-created after completing '{rec.task_id.id}'",
+                    'description': dep_template.description,
                     'parent_task_id': rec.id,
                 })
                 # ✅ Send email notification to assigned employee
-                try:
+
+#delete--------------------------------------------
+
+            '''
                     email_formatted = new_task.compute_user_email_formatted()
                     new_task.email_formatted = email_formatted[0] if email_formatted else False
 
@@ -522,35 +537,45 @@ class EmployeeTask(models.Model):
             }
 
             template.sudo().with_context(ctx).send_mail(rec.id, force_send=True, email_values=email_values)
+            '''
+#----------------------------------------------------------------
 
             # 4. Notify Supervisor (if supervisor is assigned)
-            supervisor_email = rec.compute_supervisor_email_formatted()
-            if supervisor_email:
-                supervisor_template = rec.env.ref(
-                    'task_assignment.mail_template_task_status_notification',
-                    raise_if_not_found=False
-                )
-                if not supervisor_template:
-                    raise UserError("Supervisor mail template not found.")
+            try:
 
-                ctx_supervisor = dict(self.env.context)
-                ctx_supervisor.update({
-                    'base_url': base_url,
-                    'model': rec._name,
-                    'action_id': action_id,
-                })
+             supervisor_email = rec.compute_supervisor_email_formatted()
+             if supervisor_email:
+                 supervisor_template = rec.env.ref(
+                     'task_assignment.mail_template_task_status_notification',
+                     raise_if_not_found=False
+                 )
+                 if not supervisor_template:
+                     raise UserError("Supervisor mail template not found.")
 
-                email_values_supervisor = {
-                    'email_to': supervisor_email[0],
-                    'email_from': rec.company_id.email or self.env.user.email,
-                    'subject': f"Task {rec.task_code} Completed by {rec.employee_id.name}",
-                }
+                 base_url = new_task.env['ir.config_parameter'].sudo().get_param('web.base.url')
+                 action_id = new_task.env.ref('task_assignment.action_employee_task').id
 
-                supervisor_template.sudo().with_context(ctx_supervisor).send_mail(
-                    rec.id, force_send=True, email_values=email_values_supervisor
-                )
+                 ctx_supervisor = dict(self.env.context)
+                 ctx_supervisor.update({
+                     'base_url': base_url,
+                     'model': rec._name,
+                     'action_id': action_id,
+                 })
 
-    #-------------------------------------------
+                 email_values_supervisor = {
+                     'email_to': supervisor_email[0],
+                     'email_from': rec.company_id.email or self.env.user.email,
+                     'subject': f"Task {rec.task_code} Completed by {rec.employee_id.name}",
+                 }
+
+                 supervisor_template.sudo().with_context(ctx_supervisor).send_mail(
+                     rec.id, force_send=True, email_values=email_values_supervisor
+                 )
+
+            except Exception as e:
+                _logger.exception(f"Failed to send email for dependent task {new_task.id}: {e}")
+
+    #-----------------------------
     # press button  cancel
     def action_cancel(self):
         for rec in self:
@@ -587,6 +612,7 @@ class EmployeeTask(models.Model):
                     'parent_task_id': rec.id,
                 })
             # 3. Email Notification
+            '''
             reciver = rec.notification_message(['task_assignment.group_task_manager'])
             email_formatted = rec.compute_email_formatted(reciver)
             if not email_formatted:
@@ -615,7 +641,7 @@ class EmployeeTask(models.Model):
             }
 
             template.sudo().with_context(ctx).send_mail(rec.id, force_send=True, email_values=email_values)
-
+              '''
             # 4. Notify Supervisor (if supervisor is assigned)
             supervisor_email = rec.compute_supervisor_email_formatted()
             if supervisor_email:
@@ -625,6 +651,9 @@ class EmployeeTask(models.Model):
                 )
                 if not supervisor_template:
                     raise UserError("Supervisor mail template not found.")
+
+                base_url = rec.env['ir.config_parameter'].sudo().get_param('web.base.url')
+                action_id = rec.env.ref('task_assignment.action_employee_task').id
 
                 ctx_supervisor = dict(self.env.context)
                 ctx_supervisor.update({
@@ -688,46 +717,6 @@ class EmployeeTask(models.Model):
 
             # ✅ Send Email Notification
             try:
-                reciver = rec.notification_message(['task_assignment.group_task_manager'])
-                email_formatted = rec.compute_email_formatted(reciver)
-                if not email_formatted:
-                    continue  # Or log an error
-
-                template = rec.env.ref(
-                    'task_assignment.mail_template_task_status_notification_ovedue', raise_if_not_found=False
-                )
-                if not template:
-                    continue  # Or log an error
-
-                base_url = rec.env['ir.config_parameter'].sudo().get_param('web.base.url')
-                action_id = rec.env.ref('task_assignment.action_employee_task').id
-
-                ctx = dict(self.env.context)
-                ctx.update({
-                    'base_url': base_url,
-                    'model': rec._name,
-                    'action_id': action_id,
-                })
-                email_values = {
-                    'email_to': ','.join(email_formatted),
-                    'email_from': rec.company_id.email or self.env.user.email,
-                    'subject': f"Fallback Task Created due to Overdue Task: {rec.task_code or rec.task_id.name}",
-                }
-
-                template.sudo().with_context(ctx).send_mail(rec.id, force_send=True,
-                                                            email_values=email_values)
-
-            except Exception as e:
-                _logger = self.env['ir.logging']
-                _logger.sudo().create({
-                    'name': 'Fallback Task Email Error',
-                    'type': 'server',
-                    'level': 'error',
-                    'message': f"Failed to send fallback task email for task {fallback_task.id}: {str(e)}",
-                    'path': 'employee.task',
-                    'func': 'create_fallback_for_overdue_tasks',
-                    'line': '0',
-                })
 
                 # 4. Notify Supervisor (if supervisor is assigned)
                 supervisor_email = rec.compute_supervisor_email_formatted()
@@ -738,7 +727,9 @@ class EmployeeTask(models.Model):
                     )
                     if not supervisor_template:
                         raise UserError("Supervisor mail template not found.")
-
+                    base_url = rec.env['ir.config_parameter'].sudo().get_param('web.base.url')
+                    action_id = rec.env.ref('task_assignment.action_employee_task').id
+                    
                     ctx_supervisor = dict(self.env.context)
                     ctx_supervisor.update({
                         'base_url': base_url,
@@ -755,6 +746,97 @@ class EmployeeTask(models.Model):
                     supervisor_template.sudo().with_context(ctx_supervisor).send_mail(
                         rec.id, force_send=True, email_values=email_values_supervisor
                     )
+
+            except Exception as e:
+                _logger = self.env['ir.logging']
+                _logger.sudo().create({
+                    'name': 'Fallback Task Email Error',
+                    'type': 'server',
+                    'level': 'error',
+                    'message': f"Failed to send fallback task email for task {fallback_task.id}: {str(e)}",
+                    'path': 'employee.task',
+                    'func': 'create_fallback_for_overdue_tasks',
+                    'line': '0',
+                })
+
+
+    def send_supervisor_task_email(self):
+        for rec in self:
+            task = rec.task_id
+            employee = rec.supervisor_id
+            if not task or not employee or not employee.email:
+                continue
+
+            calendar = employee.resource_calendar_id
+            user_tz = pytz.timezone(employee.tz or 'UTC')
+            now_utc = datetime.utcnow().replace(tzinfo=pytz.utc)
+            now_local = now_utc.astimezone(user_tz)
+
+            send_now = False
+            schedule_for = None
+
+            # ✅ Priority logic
+            if task.priority == 'high':
+                send_now = True
+
+            elif task.priority == 'medium':
+                if time(8, 0) <= now_local.time() <= time(12, 0):
+                    send_now = True
+                else:
+                    schedule_local = datetime.combine(now_local.date() + timedelta(days=1), time(8, 0))
+                    schedule_for = user_tz.localize(schedule_local).astimezone(pytz.utc)
+
+            elif task.priority == 'low':
+                weekday = now_local.weekday()
+                working_today = calendar.attendance_ids.filtered(
+                    lambda a: int(a.dayofweek) == weekday
+                )
+                is_working_time = False
+                for attend in working_today:
+                    start = time(int(attend.hour_from), int((attend.hour_from % 1) * 60))
+                    end = time(int(attend.hour_to), int((attend.hour_to % 1) * 60))
+                    if start <= now_local.time() <= end:
+                        is_working_time = True
+                        break
+                if is_working_time:
+                    send_now = True
+                else:
+                    for i in range(1, 8):
+                        check_day = now_local + timedelta(days=i)
+                        check_wd = check_day.weekday()
+                        working_hours = calendar.attendance_ids.filtered(
+                            lambda a: int(a.dayofweek) == check_wd
+                        )
+                        if working_hours:
+                            attend = working_hours[0]
+                            schedule_local = datetime.combine(
+                                check_day.date(),
+                                time(int(attend.hour_from), int((attend.hour_from % 1) * 60))
+                            )
+                            schedule_for = user_tz.localize(schedule_local).astimezone(pytz.utc)
+                            break
+
+            # ✅ Mail values
+            supervisor_template = rec.env.ref('task_assignment.mail_template_task_status_notification')
+            email_values_supervisor = {
+                'email_to': employee.email,
+                'email_from': rec.company_id.email or rec.env.user.email,
+                'subject': f"Task {rec.task_code} Completed by {rec.employee_id.name}",
+            }
+
+            if schedule_for:
+                email_values_supervisor['scheduled_date'] = schedule_for
+
+            # ✅ Create and send/schedule email
+            mail_id = supervisor_template.sudo().send_mail(
+                rec.id,
+                force_send=send_now,
+                email_values=email_values_supervisor
+            )
+
+
+
+
 
 
 
