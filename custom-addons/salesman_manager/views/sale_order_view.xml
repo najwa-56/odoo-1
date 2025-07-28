@@ -56,7 +56,7 @@
         (0, 0, {'view_mode': 'tree', 'view_id': ref('view_sale_order_tree_salesman')}),
         (0, 0, {'view_mode': 'form', 'view_id': ref('view_sale_order_form_salesman_inherit')})
     ]"/>
-        <field name="domain">[('date_order', ' &gt;=', context_today()), ('user_id', '=', uid)]</field>
+        <field name="domain">[('date_order', '>=', context_today()), ('user_id', '=', uid)]</field>
         <field name="groups_id" eval="[(4, ref('salesman_manager.group_salesman'))]"/>
     </record>
 
