@@ -13,7 +13,7 @@ class TaskName(models.Model):
     tag_ids = fields.Many2many('task.tag', string='Tags')
     description = fields.Html("Description")
     task_image = fields.Binary("Task Image")
-    sequence = fields.Integer(string="Sequence", default=10)
+    #sequence = fields.Integer(string="Sequence", default=10)
     dependent_task_id = fields.Many2one(
         'task.name',
         string="Next Task Template",
@@ -43,8 +43,7 @@ class TaskName(models.Model):
         ('low', 'Low'),
     ], string="priority")
 
-
-
+    '''
     def write(self, vals):
         res = super().write(vals)
         if 'sequence' in vals:
@@ -70,4 +69,4 @@ class TaskName(models.Model):
 
             task.dependent_task_id = next_task.id if next_task else False
 
-
+'''

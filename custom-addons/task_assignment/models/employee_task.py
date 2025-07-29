@@ -161,20 +161,17 @@ class EmployeeTask(models.Model):
         """
         Return email formatted string from employee_id's user_id
         """
-        if self.employee_id and self.employee_id.user_id and self.employee_id.work_email:
-            partner = self.employee_id.work_email
-            if partner.email:
-                return [tools.formataddr((partner.name or u"False", partner.email or u"False"))]
+        if self.employee_id and self.employee_id.work_email:
+
+                return [tools.formataddr((self.employee_id.name or u"False", self.employee_id.work_email or u"False"))]
         return []
 
     def compute_supervisor_email_formatted(self):
         """
         Return email formatted string from supervisor_id's user_id
         """
-        if self.supervisor_id and self.supervisor_id.user_id and self.supervisor_id.work_email:
-            partner = self.supervisor_id.work_email
-            if partner.email:
-                return [tools.formataddr((partner.name or u"False", partner.email or u"False"))]
+        if self.supervisor_id and self.supervisor_id.work_email:
+          return [tools.formataddr((self.supervisor_id.name or u"False", self.supervisor_id.work_email or u"False"))]
         return []
     # ---------------------------------------------------------------------
     # RECURRING TASK GENERATORS
