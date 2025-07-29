@@ -6,7 +6,7 @@ class SaleOrder(models.Model):
 
     visit_id = fields.Many2one( 'daily.visit', string='Visit Reference' )
     visit_reference = fields.Char( string='Visit Reference', related='visit_id.reference', store=True )
-
+    total_consumption_amount_perSO = fields.Float('total_consumption_amount_perSO')
     # ---------------------------------------------------------------------------------------------------------
     # Button action to navigate back to the linked visit form.
     # ---------------------------------------------------------------------------------------------------------
@@ -43,6 +43,14 @@ class SaleOrder(models.Model):
             })
 
         return order
+
+
+class SaleOrderLine(models.Model):
+    _inherit = 'sale.order.line'
+
+    inventory_counting = fields.Float('field_name')
+    consumption = fields.Float('field_name')
+
 
 
 
