@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Copyright (c) 2016-Present Webkul Software Pvt. Ltd. (<https://webkul.com/>) -->
+<!-- See LICENSE file for full copyright and licensing details. -->
+<!-- License URL : <https://store.webkul.com/license.html/> -->
+<odoo>
+    <data>
+        <record id="action_wk_report_pos_session_summary" model="ir.actions.report">
+            <field name="name">Session Summary</field>
+            <field name="model">pos.session</field>
+            <field name="report_type">qweb-pdf</field>
+            <field name="report_name">pos_session_report_analysis.report_session_summary</field>
+            <field name="report_file">pos_session_report_analysis.report_session_summary</field>
+        </record>        
+    </data>
+</odoo>

@@ -1,0 +1,147 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Copyright (c) 2016-Present Webkul Software Pvt. Ltd. (<https://webkul.com/>) -->
+<!-- See LICENSE file for full copyright and licensing details. -->
+<!-- License URL : <https://store.webkul.com/license.html/> -->
+<templates id="template" xml:space="preserve">
+
+	<t t-name="pos_session_report_analysis.SessionReportButton">
+        <button class="control-button btn btn-light rounded-0 fw-bolder" t-on-click="() => this.wk_print_session_summary()">
+            <i class="fa fa-print" />
+            <span> </span>
+            <span>Print Session Summary</span>
+        </button>
+    </t>
+
+    <t t-name="pos_session_report_analysis.SessionXmlReceipt">
+		<div class="pos-receipt">
+            <receipt align='center' width='40' value-thousands-separator=''>
+                <t t-if='company.logo'>
+                    <img t-att-src='company.logo' />
+                    <br/>
+                </t>
+                <t t-if='!company.name'>
+                    <h1><t t-esc='company.name' /></h1>
+                    <br/>
+                </t>
+                <div font='b'>
+                    <t t-if='company.contact_address'>
+                        <div>
+                            <t t-esc='company.contact_address' />
+                        </div>
+                    </t>
+                    <t t-if='company.phone'>
+                        <div>Tel:
+                            <t t-esc='company.phone' />
+                        </div>
+                    </t>
+                    <t t-if='company.vat'>
+                        <div>VAT:
+                            <t t-esc='company.vat' />
+                        </div>
+                    </t>
+                    <t t-if='company.email'>
+                        <div>
+                            <t t-esc='company.email' />
+                        </div>
+                    </t>
+                    <t t-if='company.website'>
+                        <div>
+                            <t t-esc='company.website' />
+                        </div>
+                    </t>
+                </div>
+                <br />
+                <br />
+                <h3>Session Summary</h3>
+                <br />
+                <div class='orderlines' line-ratio='1'>
+                    <t t-if="session_info.name">
+                        <line>
+                            <left>Session: <t t-esc="session_info.name"/></left>
+                        </line>
+                    </t>
+                    <t t-if="pos.config">
+                        <line>
+                            <left>Point Of Sale: <t t-esc="pos.config.name"/></left>
+                        </line>
+                    </t>
+                    <t t-if="session_info.name">
+                        <line>
+                            <left>Start Date: <t t-esc="session_info.start_date"/></left>
+                        </line>
+                    </t>
+                    <t t-if="session_info">
+                        <line>
+                            <left>Opening Balance: <t t-esc="env.utils.formatCurrency(session_info.opening_balance)"/></left>
+                        </line>
+                    </t>
+                    <t t-if="session_info.responsible">
+                        <line>
+                            <left>Responsible: <t t-esc="session_info.responsible"/></left>
+                        </line>
+                    </t>
+                    <br/>
+                </div>
+
+                <div class='orderlines' line-ratio='0.5'>
+                    <h3>Payment Details</h3>
+                    <t t-foreach='statements' t-as='statement' t-key="statement_index">
+                        <line bold='on'>
+                            <left><t t-esc="statement.name"/></left>
+                        </line>
+
+                        <line>
+                            <left>Starting Balance </left>
+                            <right><t t-esc='env.utils.formatCurrency(statement.balance_start)' /></right>
+                        </line>
+                        <line>
+                            <left>Total Transactions </left>
+                            <right><t t-esc='env.utils.formatCurrency(statement.total_trans)' /></right>
+                        </line>
+                        <line>
+                            <left>Ending Balance </left>
+                            <right><t t-esc='env.utils.formatCurrency(statement.balance_end)' /></right>
+                        </line>
+                        <br/>
+                    </t>
+                </div>
+
+                <div class='orderlines' line-ratio='0.5'>
+                    <t t-if="products">
+                        <h3>Product Summary</h3>
+                        <br/>
+                        <line bold='on'>
+                            <left>Product</left>
+                            <right >Quantity Sold</right>
+                        </line>
+                        <br/>
+                        <t t-foreach='products' t-as='product' t-key="product_key">
+                            <line>
+                                <left><t t-esc="widget.generate_wrapped_product_name(product.product_name)[0]" /></left>
+                                <right><t t-esc='product.quantity' /> <t t-esc='product.uom' /></right>
+                            </line>
+                            <br/>
+                        </t>
+                    </t>
+                </div>
+
+                <line><right>-----------</right></line>
+                <line class='total' size='double-height'>
+                    <left><pre>        TOTAL</pre></left>
+                    <right><t t-esc="env.utils.formatCurrency(total_sale)"/></right>
+                </line>
+                <br/>
+                <div>********************************************</div>
+                <t t-if="pos.get_cashier()">
+                    <div>Generated By:
+                        <t t-esc='pos.get_cashier().name' />
+                    </div>
+                </t>
+                <div font='b'>
+                    <div><t t-esc='moment().format("DD-MM-YYYY HH:mm")' /></div>
+                </div>
+                <div>********************************************</div>
+            </receipt>
+		</div>
+    </t>
+</templates>

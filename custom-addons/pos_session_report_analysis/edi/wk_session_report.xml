@@ -1,0 +1,68 @@
+<?xml version="1.0" ?>
+<!-- Copyright (c) 2016-Present Webkul Software Pvt. Ltd. (<https://webkul.com/>) -->
+<!-- See LICENSE file for full copyright and licensing details. -->
+<!-- License URL : <https://store.webkul.com/license.html/> -->
+<odoo>
+	<data noupdate="1">
+		<record id="pos_session_report_notify_email" model="mail.template">
+			<field name="name">POS Session Report By Email</field>
+			<field name="email_from">{{(object.config_id.company_id.email or 'noreply@localhost')}}</field>
+			<field name="subject">Session Report</field>
+			<field name="partner_to">{{object.user_id.partner_id.id}}</field>
+			<field name="model_id" ref="pos_session_report_analysis.model_pos_session"/>
+			<field name="auto_delete" eval="True"/>
+			<!-- <field name="report_template" ref="pos_session_report_analysis.action_wk_report_pos_session_summary"/> -->
+            <field name="report_template_ids" eval="[(4, ref('pos_session_report_analysis.action_wk_report_pos_session_summary'))]"/>
+
+			<!-- <field name="report_name">{{(object.name or '')}}</field> -->
+			<field name="lang">{{object.user_id.lang}}</field>
+			<field name="body_html" type="html">
+				<div style="font-family: 'Lucica Grande', Ubuntu, Arial, Verdana, sans-serif; font-size: 12px; color: rgb(34, 34, 34); background-color: #FFF; ">
+					<p>Hello <t t-out="object.user_id.partner_id.name"></t></p>
+					<p>Session <t t-out="object.name"></t> Report is available for you: </p>
+					<p style="border-left: 1px solid #8e0000; margin-left: 30px;">
+						<strong>References</strong><br />
+						Responsible: <strong><t t-out="object.user_id.name"></t></strong><br />
+						Point Of Sale: <strong><t t-out="object.config_id.name"></t></strong><br />
+						Opening Date: <strong><t t-out="object.wk_session_sale_details().get('start_date')"></t></strong><br />
+						<t t-if="object.stop_at">
+							Closing Date: <strong><t t-out="object.wk_session_sale_details().get('stop_date')"></t></strong><br />
+						</t>
+						Total Sale: <t t-out="object.currency_id.symbol"></t> <strong><t t-out="object.wk_session_sale_details().get('total_sale')"></t></strong><br />
+					</p>  
+				</div>
+				<br/>
+				<div style="width: 375px; margin: 0px; padding: 0px; background-color: #8E0000; border-top-left-radius: 5px 5px; border-top-right-radius: 5px 5px; background-repeat: repeat no-repeat;">
+					<h3 style="margin: 0px; padding: 2px 14px; font-size: 12px; color: #DDD;">
+					<strong style="text-transform:uppercase;"><t t-out="object.config_id.company_id.name"></t></strong></h3>
+				</div>
+				<div style="width: 347px; margin: 0px; padding: 5px 14px; line-height: 16px; background-color: #F2F2F2;">
+					<span style="color: #222; margin-bottom: 5px; display: block; ">
+						<t t-if="object.config_id.company_id.street">
+							<t t-out="object.config_id.company_id.street"></t><br/>
+						</t>
+						<t t-if="object.config_id.company_id.street2">
+							<t t-out="object.config_id.company_id.street2"></t><br/>
+						</t>
+						<t t-if="object.config_id.company_id.city or object.config_id.company_id.zip">
+							<t t-out="object.config_id.company_id.zip"></t> <t t-out="object.config_id.company_id.city"></t><br/>
+						</t>
+						<t t-if="object.config_id.company_id.country_id">
+							<t t-out="object.config_id.company_id.state_id and ('%s, ' % object.config_id.company_id.state_id.name) or ''"></t> <t t-out="object.config_id.company_id.country_id.name or ''"></t><br/>
+						</t>
+					</span>
+					<t t-if="object.config_id.company_id.phone">
+						<div style="margin-top: 0px; margin-right: 0px; margin-bottom: 0px; margin-left: 0px; padding-top: 0px; padding-right: 0px; padding-bottom: 0px; padding-left: 0px; ">
+							Phone: <t t-out="object.config_id.company_id.phone"></t>
+						</div>
+					</t>
+					<t t-if="object.config_id.company_id.website">
+						<div>
+							Web : <t t-att-href ="object.config_id.company_id.website"></t> <t t-out="object.config_id.company_id.website"></t>
+						</div>
+					</t>
+				</div>
+			</field>
+		</record>
+	</data>
+</odoo>

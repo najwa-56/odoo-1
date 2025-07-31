@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Copyright (c) 2016-Present Webkul Software Pvt. Ltd. (<https://webkul.com/>) -->
+<!-- See LICENSE file for full copyright and licensing details. -->
+<!-- License URL : <https://store.webkul.com/license.html/> -->
+<odoo>
+	<record id="view_pos_config_res_setting_form_inherit" model="ir.ui.view">
+		<field name="name">>POS Session Print Configuration</field>
+		<field name="model">res.config.settings</field>
+		<field name="inherit_id" ref="point_of_sale.res_config_settings_view_form" />
+		<field name="arch" type="xml">
+			<xpath expr="//block[@id='pos_interface_section']" position="after">
+                <block title="Session Summary">
+                    <setting string="Print Session Summary." help="Print Session Summary in running Session.">
+                        <field name="pos_wk_print_session_summary"/>
+                    </setting>
+                </block>
+			</xpath>
+		</field>
+	</record>
+</odoo>

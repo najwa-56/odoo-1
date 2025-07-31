@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Copyright (c) 2016-Present Webkul Software Pvt. Ltd. (<https://webkul.com/>) -->
+<!-- See LICENSE file for full copyright and licensing details. -->
+<!-- License URL : <https://store.webkul.com/license.html/> -->
+<odoo>
+    <data>
+        <record id="pos_session_report_inherit_pos_session_view" model="ir.ui.view">
+            <field name="name">pos.session.form.view.inherit</field>
+            <field name="model">pos.session</field>
+            <field name="inherit_id" ref="point_of_sale.view_pos_session_form"/>
+            <field name="arch" type="xml">
+                <xpath expr="//button[@name='action_pos_session_closing_control']" position="after">
+                    <button name="wk_print_session_report" string="Print" type="object"  class="oe_highlight"/>
+                    <button name="wk_send_sesssion_report" string="Send By Email" type="object" class="oe_highlight"/>
+                </xpath>
+            </field>
+        </record>
+    </data>
+</odoo>
