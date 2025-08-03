@@ -64,7 +64,7 @@ class HrEmployee(models.Model):
                              selection=[('draft','Draft'),('experiment', 'In Experiment'),
                                  ('service', 'In Service'),
                                  ],
-                             default='draft', required=False, track_visibility='onchange')
+                             default='draft', required=False, tracking=True)
 
     start_date = fields.Date('Start Date',)
     end_date = fields.Date('End Date')
@@ -78,6 +78,14 @@ class HrEmployee(models.Model):
     arabic_name = fields.Char('Arabic Name',required=True)
     emp_code = fields.Char('Employee Code' , readonly=False , required=True)
     attachment_ids = fields.One2many('hr.employee.attachment', 'employee_id', string="Attachments")
+    religion = fields.Selection([
+        ('muslim', 'Muslim'),
+        ('christian', 'Christian'),
+        ('jewish', 'Jewish'),
+        ('hindu', 'Hindu'),
+        ('buddhist', 'Buddhist'),
+        ('other', 'Other'),
+    ], string="Religion")
    
 
     def approve(self):

@@ -25,4 +25,3 @@ from . import hr_employee
 from . import hr_employee_relation
 from . import res_config_settings
 from . import hr_leave
-from . import employee_schedule_wizard

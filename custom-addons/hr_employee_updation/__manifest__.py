@@ -41,7 +41,6 @@
         'views/hr_contract_views.xml',
         'views/res_config_settings_views.xml',
         'views/hr_employee_views.xml',
-        'views/employee_schedule_wizard_view.xml',
     ],
     'images': ['static/description/banner.jpg'],
     'license': 'LGPL-3',

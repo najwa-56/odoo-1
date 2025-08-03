@@ -19,8 +19,12 @@
                             <field name="arabic_name"/>
                             <field name="emp_code"/>
                         </group>
+
                     </h3>
                 </xpath>
+         <xpath expr="//page[@name='personal_information']//group/group" position="inside">
+            <field name="religion"/>
+         </xpath>
 
 
          <xpath expr="//sheet" position="before">
