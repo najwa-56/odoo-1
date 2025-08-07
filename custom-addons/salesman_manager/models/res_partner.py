@@ -9,6 +9,29 @@ class ResPartner(models.Model):
     _inherit = 'res.partner'
     #_order = 'sequence'
 
+    weekly_route_ref = fields.Char(
+        string='Weekly Route Ref',
+        compute='_compute_weekly_route_ref',
+        store=False
+    )
+
+
+   
+
+    @api.depends('location_id')
+    def _compute_weekly_route_ref(self):
+        for partner in self:
+            default_weekly_route_ref = self._context.get('default_weekly_route_ref',False)
+            print("default_weekly_route_ref================",default_weekly_route_ref)
+            print("context=====================",self._context)
+            partner.weekly_route_ref = False
+            if default_weekly_route_ref:
+                weekly_route_id = self.env['weekly.routs'].search([
+                    ('id', '=',default_weekly_route_ref)
+                ], limit=1)
+                print("weekly_route_id============",weekly_route_id)
+                partner.weekly_route_ref = weekly_route_id and weekly_route_id.reference or False
+
 
 
     visit = fields.Many2many(comodel_name='daily.visit', string="Visits", index=True, copy=False)
@@ -48,7 +71,7 @@ class ResPartner(models.Model):
     def _compute_specific_visit(self):
         for rec in self:
             ref = None
-            active_weekly_ref = self.env.context.get('active_weekly_ref') 
+            active_weekly_ref = self._context.get('active_weekly_ref') 
             if active_weekly_ref:
                 weekly_route = self.env['weekly.routs'].browse(active_weekly_ref)
                 ref = weekly_route.reference

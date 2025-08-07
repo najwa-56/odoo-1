@@ -21,6 +21,7 @@
         <record id="view_weekly_routs_form" model="ir.ui.view">
             <field name="name">weekly.routs.form</field>
             <field name="model">weekly.routs</field>
+            <field name="groups_id" eval="[(6, 0, [ref('salesman_manager.group_salesman_supervisor')])]"/>
             <field name="arch" type="xml">
                 <form string="اسناد المسارات">
                     <sheet>
@@ -44,7 +45,8 @@
                                         <field name="day"/>
                                         <field name="day_name"/>
                                         <field name="delivery_route_id"/>
-                                        <field name="delivery_line_ids" domain="[('delivery_route_link_id', '=', delivery_route_id)]" widget="many2many_tags"/>
+                                        
+                                        <field name="delivery_line_ids"   domain="[('delivery_route_link_id', '=', delivery_route_id)]" widget="many2many_tags"/>
                                     </tree>
                                 </field>
                             </page>
@@ -53,7 +55,7 @@
                 </form>
 
             </field>
-            <field name="groups_id" eval="[(6, 0, [ref('salesman_manager.group_salesman_supervisor')])]"/>
+            
         </record>
 
         <!-- Search View for Weekly Routes -->
