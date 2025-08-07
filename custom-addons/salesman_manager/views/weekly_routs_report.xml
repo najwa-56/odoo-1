@@ -38,12 +38,10 @@
                                         <field name="day_name" groups="salesman_manager.group_salesman_supervisor"/>
                                         <field name="delivery_route_id" context="{'active_weekly_ref': parent.id}"
                                                groups="salesman_manager.group_salesman_supervisor"/>
-                                               <field name="weekly_route_id" groups="salesman_manager.group_salesman_supervisor"/>
-                                        <field name="delivery_line_ids" groups="salesman_manager.group_salesman_supervisor"  context="{'default_weekly_route_ref': weekly_route_id,'active_weekly_ref': parent.id}"  widget="many2many_tags"/>
+                                        <field name="delivery_line_ids" context="{'active_weekly_ref': parent.id}"  widget="many2many_tags"/>
                                     </tree>
                                     <form> <!-- once salesman click on delivery_line_ids (المسار) it should be open a form that have only delivery_line_ids -->
-                                        <field name="weekly_route_id" groups="salesman_manager.group_salesman_supervisor"/>
-                                        <field name="delivery_line_ids" groups="salesman_manager.group_salesman_supervisor" context="{'active_weekly_ref': parent.id,'default_weekly_route_ref': weekly_route_id}"/>
+                                        <field name="delivery_line_ids" context="{'active_weekly_ref': parent.id}"/>
                                     </form>
                                 </field>
                             </page>

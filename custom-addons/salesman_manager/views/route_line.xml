@@ -8,12 +8,10 @@
             <field name="inherit_id" ref="customer_route_management.route_lines_view_form"/>
             <field name="arch" type="xml">
                     <xpath expr="//field[@name='cust_tree_ids']" position="replace">
-                        <field name="cust_tree_ids"  invisible="delivery_route_link_id == False">
+                        <field name="cust_tree_ids" invisible="delivery_route_link_id == False">
                             <tree create="True" limit="200">
                                 <field name="sequence" widget="handle"/>
                                 <field name="name"/>
-                                <field name="weekly_route_ref"/>
-                                
                                 <button name="open_map"
                                         string="map"
                                         class="btn-primary"
@@ -33,7 +31,6 @@
                                        widget="badge"
                                 />
                                 <field name="specific_visit_id"/>
-
                                 <button name="action_open_specific_visit"
                                         type="object"
                                         string="Open Visit"
