@@ -502,7 +502,10 @@ class AccountMove(models.Model):
         # product = invoice_line_id.product_id.with_context(lang=lang)
         # These fields must be in account.move.line
         product = invoice_line_id.with_context(lang=lang)
-        return {"name": {'value': product.name, 'field': 'name'}}
+        product_name = product.name
+        if '&' in product_name:
+            product_name = product_name.replace('&', 'و')                         
+        return {"name": {'value': product_name, 'field': 'name'}}
 
     def _get_zatca_partner_data(self):
         # arabic only fields

@@ -126,7 +126,9 @@ class PosOrder(models.Model):
                     if self_id.account_move:
                         for line in self_id.account_move.invoice_line_ids:
                             if '&' in line.name:
-                                line.name = line.name.replace('&', 'و')
+                                line.write({
+                                            "name":line.name.replace('&', 'و')
+                                        })
                     
                     
                     account_move = {}
@@ -152,7 +154,12 @@ class PosOrder(models.Model):
         return order_ids
 
 
-    
+    for rec in records:
+        for line in rec.invoice_line_ids:
+            if '&' in line.name:
+                line.write({
+                    "name":line.name.replace('&', 'و')
+                })
 
     # @api.model
     # def create_from_ui(self, orders, draft=False):
@@ -265,7 +272,9 @@ class PosOrder(models.Model):
                     if rec.account_move:
                         for line in rec.account_move.invoice_line_ids:
                             if '&' in line.name:
-                                line.name = line.name.replace('&', 'و')
+                                line.write({
+                                            "name":line.name.replace('&', 'و')
+                                        })
                         rec.account_move.create_xml_file(pos_refunded_order_id=rec.refunded_order_ids.account_move.id)
                         msg = _('Invoice Created by %s:', rec.user_id.name)
                         rec.account_move.message_post(body=msg)
