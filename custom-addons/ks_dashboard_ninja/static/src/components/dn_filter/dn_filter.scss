@@ -58,3 +58,17 @@
 
     @include custom-scrollbar;
 }
+
+// FOR MOBILE VIEW CSS START
+
+@media screen and (max-width:991px) {
+  .custom-dash-collapse {
+    left: 50%;
+    transform: translateX(-50%);
+  }
+  .custom-filter-tab, .predefined-filter-tab {
+    overflow: auto;
+    max-height: 30vh;
+  }
+}
+// FOR MOBILE VIEW CSS END

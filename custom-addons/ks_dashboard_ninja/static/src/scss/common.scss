@@ -197,7 +197,7 @@ body.ks_body_class {
         }
 
         @media screen and (max-width:375.8px) {
-            font-size: $font-8;
+            font-size: $font-14;
             line-height: 15px;
             min-height: 16px;
         }
@@ -1491,3 +1491,191 @@ body.ks_body_class {
 .max-width-medium-130{
     max-width: 130px !important;
 }
+
+
+
+
+
+// FOR MOBILE VIEW CSS START
+
+@media screen and (max-width:767.98px) {
+        .ks_body_class .main-box {
+            height: calc(100vh - 150px);
+        }
+      .ks_body_class:has(.screen-info) .main-box {
+            height: calc(100vh - 180px);
+      }
+      .ks_body_class .overview-sec-dasboards .no-data{
+          max-height: 100%;
+      }
+
+    .o_popover[role="tooltip"]:not(:has(.o_datetime_picker)) {
+     display: none;
+   }
+
+  .ks_body_class .predefined-filters .dropdown-menu {
+    width: 80vw !important;
+    padding: 12px;
+  }
+  .custom-dash-collapse{
+    width: 92vw !important;
+  }
+  .o-tooltip{
+    max-width: 92vw;
+  }
+  .ks_body_class .screen-info .user-template-title span{
+    max-width: 35vw !important;
+  }
+  .ks_body_class .dash-dd-2 .dropdown-toggle:not(.ks-dropdown-no--caret)::after{
+    display: none;
+   }
+
+
+  .ks_body_class .dash-dd-2.filter {
+    position: inherit;
+  }
+  .custom-dash-collapse .dropdown-toggle.d-flex.encapsulated-link {
+    max-height: 50px;
+  }
+  .dropdown-menu {
+    max-height: 24vh;
+  }
+  .ks_body_class .dash-dd-2 .dropdown-menu .dropdown-item span{
+    max-width: 80px;
+    white-space: break-spaces;
+    word-wrap: break-word;
+  }
+  .ks_body_class .dadsh-dlt-btn{
+    margin-left: 10px;
+  }
+  .ks_body_class .dash-dd-2 .dropdown-menu {
+    max-width: 90vw !important;
+    width: auto !important;
+    min-width: 150px;
+    white-space: normal;
+    word-break: break-word;
+    overflow-wrap: break-word;
+  }
+
+  .ks_body_class .dash-dd-2 .dropdown-menu .dropdown-item {
+    white-space: normal !important;
+    word-break: break-word;
+  }
+.ks_custom_date_filter button {
+    max-width: 80px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+}
+
+
+@media screen and (max-width:575px) {
+  .encapsulated-bottom{
+    bottom: auto;
+  }
+  .ks_body_class {
+  .dash-dd-2.filter {
+    .custom-dash-collapse {
+
+      .card-body {
+        .nav {
+          display: flex;
+          justify-content: space-between;
+
+          .nav-item {
+            width: 50%;
+
+            .nav-link {
+              width: 100%;
+              text-align: center;
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
+}
+
+@media screen and (max-width:420px) {
+.max-width-medium-6vw {
+        width: 4vw !important;
+    }
+   .max-width-medium-25vw {
+        max-width: 11vw !important;
+    }
+}
+
+
+@media screen and (max-width: 991px) and (orientation: landscape) {
+   .table-custom{
+      max-height: max-content !important;
+   }
+    .o_popover[role="tooltip"]:not(:has(.o_datetime_picker)) {
+     display: none;
+   }
+
+  .ks_body_class .predefined-filters .dropdown-menu {
+    width: 80vw !important;
+    padding: 12px;
+  }
+  .custom-dash-collapse{
+    width: 92vw !important;
+  }
+  .o-tooltip{
+    max-width: 92vw;
+  }
+  .ks_body_class .screen-info .user-template-title span{
+    max-width: 41vw !important;
+  }
+
+  .ks_body_class .dash-dd-2.filter {
+    position: inherit;
+  }
+  .custom-dash-collapse .dropdown-toggle.d-flex.encapsulated-link {
+    max-height: 50px;
+  }
+  .dropdown-menu {
+    max-height: 24vh;
+  }
+  .ks_body_class .dash-dd-2 .dropdown-menu {
+    max-width: 90vw !important;
+    width: auto !important;
+    min-width: 150px;
+    white-space: normal;
+    word-break: break-word;
+    overflow-wrap: break-word;
+  }
+
+  .ks_body_class .dash-dd-2 .dropdown-menu .dropdown-item {
+    white-space: normal !important;
+    word-break: break-word;
+  }
+  .ks_body_class .dadsh-dlt-btn{
+    margin-left: 10px;
+  }
+   .ks_body_class .main-box {
+        height: calc(100vh - 65px);
+  }
+  .ks_body_class:has(.screen-info) .main-box {
+        height: calc(100vh - 130px);
+  }
+  .ks_body_class .overview-sec-dasboards .no-data{
+      max-height: 100%;
+  }
+  .bs-popover-bottom:has(.o_datetime_picker){
+        position: fixed !important;
+        top: 0 !important;
+        left: 0 !important;
+        right: 0;
+        margin: 0;
+        height: 100%;
+        overflow: auto;
+  }
+
+
+}
+
+// FOR MOBILE VIEW CSS END
