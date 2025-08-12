@@ -47,7 +47,7 @@
     </t>
     <t t-name="ks_dashboard_ninja.ks_date_filter_dropdown">
         <Dropdown class="'dash-dd-2'" tooltip="'Date Filter'">
-            <t t-set-slot="toggler"><span class="ellipsis-content d-block max-width-medium-6vw"><t t-esc="ks_date_filter_selections[state.ks_current_filter]"/></span></t>
+            <t t-set-slot="toggler"><span class="ellipsis-content d-block"><t t-esc="ks_date_filter_selections[state.ks_current_filter]"/></span></t>
             <DropdownItem t-foreach="ks_date_filter_selections" t-as="date_selection" t-key="date_selection_index"
                             class="{ 'global-active': state.ks_current_filter === date_selection , 'd-none': date_selection === 'l_custom' &amp;&amp; isMobile}"
                            onSelected="() => this._ksOnDateFilterMenuSelect(date_selection)">

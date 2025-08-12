@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <templates>
     <t t-name="ks_dashboard_ninja.dn_filter" owl="1">
-        <div class="d-flex justify-content-center align-items-center gap-2">
-            <div class="dropdown dash-dd-2 filter filters_section d-lg-block d-none"
+        <div class="d-flex justify-content-center align-items-center gap-2 ms-auto">
+            <div class="dropdown dash-dd-2 filter filters_section"
                         t-att-class="state.filters_count ? 'active' : ''">
                 <a class="text-decoration-none d-flex dropdown-toggle align-items-center" data-bs-toggle="collapse"
                     data-bs-target="#collapseExample" aria-expanded="false" aria-controls="collapseExample">

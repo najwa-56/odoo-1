@@ -78,7 +78,7 @@ Dashboard Ninja v17.0,
     'live_test_url': 'https://ksdndemo17.kappso.com/web/demo_login',
 
     'category': 'Services',
-    'version': '17.0.2.5.5',
+    'version': '17.0.2.5.6',
 
     'support': 'sales@ksolves.com',
 

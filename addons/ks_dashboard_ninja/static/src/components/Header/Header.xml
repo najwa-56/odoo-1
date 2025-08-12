@@ -3,7 +3,7 @@
     <t t-name="ks_dashboard_ninja.Ks_dashboard_ninja_header" owl="1">
         <section class="screen-info mb-2 container-fluid" t-ref="headerRootRef">
             <div class="d-flex align-items-center justify-content-between info gap-1 flex-wrap w-100 ks_dashboard_top_menu-new">
-               <div class="d-flex align-items-center gap-2">
+               <div class="d-flex align-items-center gap-2 w-md-auto w-100">
 
                     <div id="ks_dashboard_title" class="user-template-title">
                         <t t-if="['manager', 'user', 'layout'].includes(state.mode)" t-call="ks_dashboard_ninja.ks_dn_layout_container"/>
@@ -16,7 +16,7 @@
                     <t t-if="!isMobile" t-call="ks_dashboard_ninja.ks_header_dropdowns"/>
                     <KsDateFilter t-if="['manager', 'user', 'custom_date'].includes(state.mode) &amp;&amp; items_length"
                                   dashboard_data="this.ks_dashboard_data" update_mode.bind="update_mode"/>
-                    <DNFilter t-if="['manager', 'user'].includes(state.mode) &amp;&amp; !isMobile &amp;&amp; items_length"
+                    <DNFilter t-if="['manager', 'user'].includes(state.mode) &amp;&amp; items_length"
                               dashboard_data="this.ks_dashboard_data"/>
 
                    <t t-if="ks_dashboard_data.ks_dashboard_manager">
