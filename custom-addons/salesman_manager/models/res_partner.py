@@ -10,6 +10,22 @@ class ResPartner(models.Model):
     #_order = 'sequence'
 
 
+   
+    weekly_route_id = fields.Many2one('weekly.routs', string='Weekly Route' ,compute='_compute_weekly_route', store=False)
+
+
+   
+
+    def _compute_weekly_route(self):
+        for partner in self:
+            partner.weekly_route_id = False
+            default_weekly_route_id = self._context.get('default_weekly_route_id',False)
+            if default_weekly_route_id:
+                weekly_route_id = self.env['weekly.routs'].search([
+                    ('id', '=',default_weekly_route_id)
+                ], limit=1)
+                partner.weekly_route_id = weekly_route_id and weekly_route_id.id or False
+
 
     visit = fields.Many2many(comodel_name='daily.visit', string="Visits", index=True, copy=False)
     daily_visit_ids = fields.One2many('daily.visit','partner_id',string='Daily Visits')
@@ -46,26 +62,36 @@ class ResPartner(models.Model):
     #---------------------------------------------------------------------------------------------------------
     @api.depends('daily_visit_ids')
     def _compute_specific_visit(self):
-        for rec in self:
-            ref = None
-            active_weekly_ref = self.env.context.get('active_weekly_ref') 
-            if active_weekly_ref:
-                weekly_route = self.env['weekly.routs'].browse(active_weekly_ref)
-                ref = weekly_route.reference
-
-            if ref:
-                visit = rec.daily_visit_ids.filtered(lambda v: v.ref == ref)
-                rec.specific_visit_id = visit[:1] if visit else False
-                if visit:
-                    if  visit[0].is_it_sold:
-                        rec.status = 'sale'
-                    else:
-                        rec.status = 'visit' 
+        for rec in self: 
+            rec.status = False     
+            rec.specific_visit_id = False      
+            visit = rec.daily_visit_ids.filtered(lambda v: v.weekly_route_id == rec.weekly_route_id and v.partner_id.id == rec.id)
+            if visit:
+                rec.specific_visit_id = visit[0] if visit else False
+                if  visit[0].is_it_sold:
+                    rec.status = 'sale'
                 else:
-                    rec.status = 'not_yet'
-            else:
-                rec.specific_visit_id = False
-                rec.status = 'not_yet'
+                    rec.status = 'visit' 
+               
+
+            # active_weekly_ref = self.env.context.get('active_weekly_ref') 
+            # if active_weekly_ref:
+            #     weekly_route = self.env['weekly.routs'].browse(active_weekly_ref)
+            #     ref = weekly_route.reference
+
+            # if ref:
+            #     visit = rec.daily_visit_ids.filtered(lambda v: v.ref == ref)
+            #     rec.specific_visit_id = visit[:1] if visit else False
+            #     if visit:
+            #         if  visit[0].is_it_sold:
+            #             rec.status = 'sale'
+            #         else:
+            #             rec.status = 'visit' 
+            #     else:
+            #         rec.status = 'not_yet'
+            # else:
+            #     rec.specific_visit_id = False
+            #     rec.status = 'not_yet'
 
 
     def action_open_specific_visit (self):
@@ -103,10 +129,13 @@ class ResPartner(models.Model):
         self.ensure_one()
 
         # Find the first weekly route record for the current user (example ordering by creation_date desc)
+
         first_route = self.env['weekly.routs'].search(
             [('user_id', '=', self.env.uid)], order='creation_date desc, id desc', limit=1
         )
-        print("------------------------------",first_route.reference)
+        print("context------------------------------",self._context)
+
+        weekly_route_id = self._context.get("weekly_route_id",False)
 
         return {
             'type': 'ir.actions.act_window',
@@ -116,8 +145,8 @@ class ResPartner(models.Model):
             'target': 'current',
             'context': {
                 'default_partner_id': self.id,
-                'default_weekly_route_id': first_route.id if first_route else False,
-                'default_ref': first_route.reference,
+                'default_weekly_route_id':weekly_route_id or False,
+                # 'default_ref': weekly_route_ref or '',
             },
         }
 

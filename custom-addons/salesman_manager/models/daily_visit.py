@@ -160,8 +160,8 @@ class DailyVisit( models.Model ):
     status = fields.Selection( [('new', 'New'),('', '')], string="Status", default='new' )  #used for daily.realtime.report
 
     #used to link weekly.routs reference to daily.visit
-    weekly_route_id = fields.Many2one('weekly.routs',string='Weekly Route',domain="[('user_id', '=', uid)]")
-    ref = fields.Char(string="reference number WK", copy=False, required=True,default="New", readonly=True)
+    weekly_route_id = fields.Many2one('weekly.routs',string='Weekly Route' ,)
+    # ref = fields.Char(string="reference number WK", copy=False, required=False,default="New", readonly=True)
     is_later = fields.Boolean(related='partner_id.is_later')
 
     #----------------------------------------------------------
