@@ -62,7 +62,7 @@ class AccountMove(models.Model):
     def send_invoice_batch(self):
         today = date.today()
         two_days_ago = today - timedelta(days=2)
-        recipients = ['abeersalh166@gmail.com','n4ajwa4@gmail.com']
+        recipients = ['asalmushaygih@dolphin.sa','Nalhumud@dolphin.sa']
         invoices = self.sudo().search([
             ('invoice_date', '>=', two_days_ago),
             ('invoice_date', '<=', today),
