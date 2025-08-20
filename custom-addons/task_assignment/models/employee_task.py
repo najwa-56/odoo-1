@@ -65,6 +65,7 @@ class EmployeeTask(models.Model):
         'repeat.month.day',
         string="Repeat On Month Days",
         help="For monthly tasks, select days like 10, 15, 20")
+
     status = fields.Selection([
         ('draft', 'To Assign'),
         ('assigned', 'Assigned'),
@@ -117,46 +118,7 @@ class EmployeeTask(models.Model):
     # ---------------------------------------------------------------------
     # EMAIL HELPERS
     # ---------------------------------------------------------------------
-    '''
-    def compute_email_formatted(self, receiver):
-        email_formatted = []
-        if not receiver:
-            return email_formatted
 
-        final_reciver = receiver[0]  # Note: you are only using the first group. Consider flattening if needed.
-        for partner in final_reciver:
-            if partner.email:
-                formatted = tools.formataddr((partner.name or "NoName", partner.email))
-                email_formatted.append(formatted)
-            else:
-                _logger.warning("Missing email for partner: %s", partner.name)
-        return email_formatted
-
-    def notification_message(self, group):
-        """
-        one function one modification call any time
-        :return:
-        """
-        receiver = []
-        groups = []
-        domain = None
-        for ref in group:
-            group_id = self.env.ref(ref).id
-            groups.append(group_id)
-        domain = [('id', 'in', groups)]
-        group_ids = self.env['res.groups'].search(domain)
-        if len(group_ids) > 1:
-            for group in group_ids:
-                for user in group.users:
-                    if user.partner_id not in receiver:
-                        receiver.append(user.partner_id)
-
-        else:
-            for user in group_ids.users:
-                if user.partner_id not in receiver:
-                    receiver.append(user.partner_id)
-        return [receiver] if receiver else []
-'''
     def compute_user_email_formatted(self):
         """
         Return email formatted string from employee_id's user_id
@@ -454,7 +416,7 @@ class EmployeeTask(models.Model):
                 next_employee = dep_template.default_employee_id
                 if not next_employee:
                     raise ValidationError(
-                        f"No default next employee set on dependent task '{dep_template.task_id}'."
+                        f"No default next employee set on dependent task '{dep_template.id}'."
                     )
 
                 new_task =self.env['employee.task'].create({
@@ -471,71 +433,6 @@ class EmployeeTask(models.Model):
                 })
                 # ✅ Send email notification to assigned employee
 
-#delete--------------------------------------------
-
-            '''
-                    email_formatted = new_task.compute_user_email_formatted()
-                    new_task.email_formatted = email_formatted[0] if email_formatted else False
-
-                    if email_formatted:
-                        template = new_task.env.ref('task_assignment.mail_template_task_status_notification_users',
-                                                    raise_if_not_found=False)
-                        if not template:
-                            raise UserError("Mail template not found.")
-
-                        base_url = new_task.env['ir.config_parameter'].sudo().get_param('web.base.url')
-                        action_id = new_task.env.ref('task_assignment.action_employee_task').id
-
-                        ctx = dict(self.env.context)
-                        ctx.update({
-                            'base_url': base_url,
-                            'model': new_task._name,
-                            'action_id': action_id,
-                        })
-
-                        email_values = {
-                            'email_to': ','.join(email_formatted),
-                            'email_from': new_task.company_id.email or self.env.user.email,
-                            'subject': f"New Dependent Task Assigned: {new_task.task_code or new_task.task_id.name}",
-                        }
-
-                        template.sudo().with_context(ctx).send_mail(new_task.id, force_send=True,
-                                                                    email_values=email_values)
-
-                except Exception as e:
-                    _logger.exception(f"Failed to send email for dependent task {new_task.id}: {e}")
-
-            # 3. Email Notification
-            reciver = rec.notification_message(['task_assignment.group_task_manager'])
-            email_formatted = rec.compute_email_formatted(reciver)
-            if not email_formatted:
-                raise UserError("No recipient email found.")
-
-            rec.email_formatted = email_formatted[0]  # Optional for display/debug
-
-            template = rec.env.ref('task_assignment.mail_template_task_status_notification', raise_if_not_found=False)
-            if not template:
-                raise UserError("Mail template not found.")
-
-            base_url = rec.env['ir.config_parameter'].sudo().get_param('web.base.url')
-            action_id = rec.env.ref('task_assignment.action_employee_task').id
-
-            ctx = dict(self.env.context)
-            ctx.update({
-                'base_url': base_url,
-                'model': rec._name,
-                'action_id': action_id,
-            })
-
-            email_values = {
-                'email_to': ','.join(email_formatted),
-                'email_from': rec.company_id.email or self.env.user.email,
-                'subject': f"Task {rec.task_code} Completed",
-            }
-
-            template.sudo().with_context(ctx).send_mail(rec.id, force_send=True, email_values=email_values)
-            '''
-#----------------------------------------------------------------
 
             # 4. Notify Supervisor (if supervisor is assigned)
             try:
@@ -608,37 +505,7 @@ class EmployeeTask(models.Model):
                     'description': f"Auto-created after cancellation of '{rec.task_id.name}'",
                     'parent_task_id': rec.id,
                 })
-            # 3. Email Notification
-            '''
-            reciver = rec.notification_message(['task_assignment.group_task_manager'])
-            email_formatted = rec.compute_email_formatted(reciver)
-            if not email_formatted:
-                raise UserError("No recipient email found.")
 
-            rec.email_formatted = email_formatted[0]  # Optional for display/debug
-
-            template = rec.env.ref('task_assignment.mail_template_task_status_notification_cancel', raise_if_not_found=False)
-            if not template:
-                raise UserError("Mail template not found.")
-
-            base_url = rec.env['ir.config_parameter'].sudo().get_param('web.base.url')
-            action_id = rec.env.ref('task_assignment.action_employee_task').id
-
-            ctx = dict(self.env.context)
-            ctx.update({
-                'base_url': base_url,
-                'model': rec._name,
-                'action_id': action_id,
-            })
-
-            email_values = {
-                'email_to': ','.join(email_formatted),
-                'email_from': rec.company_id.email or self.env.user.email,
-                'subject': f"Task {rec.task_code} Canceled",
-            }
-
-            template.sudo().with_context(ctx).send_mail(rec.id, force_send=True, email_values=email_values)
-              '''
             # 4. Notify Supervisor (if supervisor is assigned)
             supervisor_email = rec.compute_supervisor_email_formatted()
             if supervisor_email:
