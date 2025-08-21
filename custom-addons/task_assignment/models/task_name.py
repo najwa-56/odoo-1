@@ -1,5 +1,6 @@
 from datetime import timedelta
 from odoo import models, fields,api
+from odoo.exceptions import ValidationError
 
 class TaskName(models.Model):
     _name = 'task.name'
@@ -27,7 +28,6 @@ class TaskName(models.Model):
     delay_days = fields.Integer(string="Delay (Days)", default=0)
     delay_hours = fields.Integer(string="Delay (Hours)", default=0)
     delay_minutes = fields.Integer(string="Delay (Minutes)", default=0)
-
     default_employee_id = fields.Many2one(
         'hr.employee',
         string=" Task Assigned To",
@@ -43,30 +43,4 @@ class TaskName(models.Model):
         ('low', 'Low'),
     ], string="priority")
 
-    '''
-    def write(self, vals):
-        res = super().write(vals)
-        if 'sequence' in vals:
-           self._update_next_tasks()
-        return res
-
-    def _update_next_tasks(self):
-        #Update 'dependent_task_id' based on sequence order, only if tag exists.
-        all_tasks = self.search([], order='sequence')
   
-        for index, task in enumerate(all_tasks):
-            # Skip if task has no tag
-            if not task.tag_ids:
-                task.dependent_task_id = False
-                continue
-
-            # Find the next task with a tag
-            next_task = False
-            for next_index in range(index + 1, len(all_tasks)):
-                if all_tasks[next_index].tag_ids:
-                    next_task = all_tasks[next_index]
-                    break
-
-            task.dependent_task_id = next_task.id if next_task else False
-
-'''
