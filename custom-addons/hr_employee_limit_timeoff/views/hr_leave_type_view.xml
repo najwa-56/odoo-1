@@ -6,6 +6,8 @@
         <field name="arch" type="xml">
             <xpath expr="//field[@name='time_type']" position="after">
                 <field name="leave_request_limit_days"/>
+                 <field name="is_emergency"/>
+                <field name="is_annual"/>
             </xpath>
         </field>
     </record>

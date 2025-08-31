@@ -1,0 +1,13 @@
+<odoo>
+  <record id="ir_cron_create_annual_allocation_for_emergency_leaves" model="ir.cron">
+    <field name="name">Create Annual Allocation for Emergency Leaves 1</field>
+    <field name="model_id" ref="model_report_balance_leave"/>
+    <field name="state">code</field>
+    <field name="code">model.create_annual_allocation_for_emergency_leaves()</field>
+    <field name="interval_type">days</field>
+    <field name="interval_number">1</field>
+    <field name="numbercall">-1</field>
+    <field name="active">True</field>
+  </record>
+
+</odoo>

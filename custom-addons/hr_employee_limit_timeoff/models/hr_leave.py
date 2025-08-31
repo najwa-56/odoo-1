@@ -5,6 +5,21 @@ from datetime import timedelta, date
 class HrLeaveType(models.Model):
     _inherit = 'hr.leave.type'
 
+
+    is_emergency = fields.Selection(
+        selection=[('yes', 'Yes'), ('no', 'No')],
+        string="Is Emergency Leave?",
+        default='no',
+        help="Indicate if this time off type is for emergency cases."
+    )
+    
+    is_annual = fields.Selection(
+        selection=[('yes', 'Yes'), ('no', 'No')],
+        string="Is Annual Leave?",
+        default='no',
+        help="Indicate if this time off type is annual leave."
+    )
+
     leave_request_limit_days = fields.Integer(
         string="Max Days to Request in Advance",
         default=30,
