@@ -54,10 +54,11 @@
             <field name="search_view_id" ref="view_daily_visit_report_search"/>
         </record>
 
+        <!--
         <menuitem id="menu_daily_visit_report_root"
                   name="المتابعة اللحظية"
                   parent="menu_sales_man_reports"
-                  action="action_daily_visit_report"/>
+                  action="action_daily_visit_report"/>-->
 
     </data>
 </odoo>

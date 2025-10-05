@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+  <data>
+  <record id="view_daily_visit_report_wizard_form" model="ir.ui.view">
+    <field name="name">daily.visit.report.wizard.form</field>
+    <field name="model">daily.visit.report.wizard</field>
+    <field name="arch" type="xml">
+      <form string="Daily Visit Report">
+        <group>
+          <field name="created_by"/>
+          <field name="date_from"/>
+          <field name="date_to"/>
+        </group>
+        <footer>
+          <button name="action_print_pdf" type="object" string="Print PDF" class="btn-primary"/>
+          <button name="action_export_xlsx" type="object" string="Export Excel" class="btn-secondary"/>
+          <button string="Cancel" class="btn-secondary" special="cancel"/>
+        </footer>
+      </form>
+    </field>
+  </record>
+
+  <record id="action_daily_visit_report_wizard" model="ir.actions.act_window">
+    <field name="name">Daily Visit Report</field>
+    <field name="res_model">daily.visit.report.wizard</field>
+    <field name="view_mode">form</field>
+    <field name="target">new</field>
+  </record>
+
+   <menuitem id="menu_daily_visit_report_sub"
+          name="المتابعة اللحظية"
+          parent="menu_sales_man_reports"
+          action="action_daily_visit_report_wizard"
+          sequence="60"
+          groups="salesman_manager.group_salesman_supervisor"/>
+</data>
+</odoo>

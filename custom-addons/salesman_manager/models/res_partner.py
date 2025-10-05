@@ -41,8 +41,8 @@ class ResPartner(models.Model):
     #--------- adjustment --------------------------------------
     status_contact = fields.Selection( [
         ('waiting', 'قيد الانتظار'),
-        ('accepted', 'مصدق'),
-        ('rejected', 'مرفوض'),
+        ('accepted', 'عميل آجل'),
+        ('rejected', 'عميل نقدي'),
     ], string='الحالة', default='waiting' )
 
     is_later = fields.Boolean( 'is_later' )

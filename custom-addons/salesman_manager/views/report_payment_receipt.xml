@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <template id="payment_receipt_doc_add_ar_title" inherit_id="account.report_payment_receipt_document">
+
+        <!-- Arabic title above -->
+        <xpath expr="//div[contains(@class,'page')][1]/h3[strong[@id='payment_title']]" position="before">
+            <h2 class="text-center" style="direction:rtl; font-weight:700; margin:0 0 10px;">مصنع ابراهيم سليمان العثيم للتعبئة و التغليف</h2>
+            <h2 class="text-center" style="direction:rtl; font-weight:700; margin:0 0 10px;">سند قبض</h2>
+            <br/>
+        </xpath>
+
+
+        <!-- Replace the WHOLE details block (date/method/customer/etc.) with a tidy layout -->
+        <xpath expr="//div[@class='mb-4 mt-3']" position="replace">
+            <div class="mb-4 mt-3">
+                <!-- Row 1: Date (left) / Method (right) -->
+                <div class="row">
+                    <div class="col-6" t-if="o.date">
+                        <strong>Payment Date:</strong>
+                        <span t-field="o.date"/>
+                    </div>
+                </div>
+
+                <!-- Row 2: Collected From (left) / Collected By (right) -->
+                <div class="row" style="margin-top:5px;">
+                    <div class="col-6" t-if="o.partner_id">
+                        <strong>Collected From:</strong>
+                        <span t-field="o.partner_id.name"/>
+                    </div>
+                    <div class="col-6">
+                        <strong>Collected By:</strong>
+                        <span t-esc="o.create_uid.name"/>
+                    </div>
+                </div>
+
+                <!-- Row 3: Addresses -->
+                <div class="row" style="margin-top:5px;">
+                    <div class="col-6">
+                        <strong>Address:</strong>
+                        <span t-raw="o.partner_id._display_address()"/>
+                    </div>
+                    <div class="col-6">
+                        <strong>Company Address:</strong>
+                        <span t-raw="o.company_id.partner_id._display_address()"/>
+                    </div>
+                </div>
+            </div>
+        </xpath>
+
+        <!-- Big centered Amount box AFTER the info block -->
+        <xpath expr="//div[@class='mb-4 mt-3']" position="after">
+            <div class="row">
+                <div class="col-12" t-if="o.amount" style="margin:18px 0; text-align:center;">
+                    <div style="font-size:32px; font-weight:900; border-top:1px solid #000; border-bottom:1px solid #000; padding:12px 0;">
+                        <span>Amount :</span>
+                        <span t-field="o.amount" t-options="{'widget':'monetary', 'display_currency': o.currency_id}"/>
+                    </div>
+                </div>
+            </div>
+        </xpath>
+
+        <!-- Prepare invoices BEFORE table and show table only if there are invoices -->
+        <xpath expr="//table[@name='invoices']" position="before">
+            <t t-set="partials" t-value="o.move_id._get_reconciled_invoices_partials()[0]"/>
+            <t t-set="invoices" t-value="{partial[2].move_id for partial in partials}"/>
+        </xpath>
+        <xpath expr="//table[@name='invoices']" position="attributes">
+            <attribute name="t-if">values['display_invoices'] and invoices</attribute>
+        </xpath>
+
+    </template>
+
+
+
+</odoo>

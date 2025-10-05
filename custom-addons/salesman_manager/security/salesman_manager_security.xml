@@ -14,22 +14,26 @@
             <field name="category_id" ref="module_category_sales_man"/>
         </record>
 
-         <!-- Create supervisor group -->
+        <!-- Create supervisor group -->
         <record id="group_salesman" model="res.groups">
             <field name="name">salesman</field>
             <field name="category_id" ref="module_category_sales_man"/>
         </record>
 
-         <record id="group_accountant" model="res.groups">
+        <record id="group_accountant" model="res.groups">
             <field name="name">accountant</field>
             <field name="category_id" ref="module_category_sales_man"/>
         </record>
+
+
 
         <!-- Record rule to restrict access to employees based on supervisor -->
         <record id="rule_hr_employee_supervisor" model="ir.rule">
             <field name="name">Employees: supervisor sees only his salespeople</field>
             <field name="model_id" ref="hr.model_hr_employee"/>
-            <field name="domain_force">['|', ('salesman_supervisor', '=', user.partner_id.id), ('salesman_supervisor', '=', False)]</field>
+            <field name="domain_force">['|', ('salesman_supervisor', '=', user.partner_id.id), ('salesman_supervisor',
+                '=', False)]
+            </field>
             <field name="groups" eval="[(4, ref('group_salesman_supervisor'))]"/>
             <field name="perm_read" eval="True"/>
             <field name="perm_write" eval="False"/>

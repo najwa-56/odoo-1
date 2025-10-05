@@ -13,13 +13,13 @@
                 <xpath expr="//form/*[1]" position="before">
                     <header>
                         <button name="action_accept_partner"
-                                string="قبول"
+                                string="عميل آجل"
                                 type="object"
                                 class="btn btn-success"
                                 groups="salesman_manager.group_accountant"/>
 
                         <button name="action_reject_partner"
-                                string="رفض"
+                                string="عميل نقدي"
                                 type="object"
                                 class="btn btn-danger"
                                 groups="salesman_manager.group_accountant"/>

@@ -1,0 +1,97 @@
+<odoo>
+    <template id="daily_visit_pdf_template">
+        <t t-name="salesman_manager.daily_visit_pdf_template">
+            <t t-call="web.html_container">
+                <meta charset="utf-8"/>
+                <div class="page">
+                    <h2 style="text-align:center; margin-bottom:20px;">Daily Visit Report</h2>
+                    <p style="text-align:center; margin-bottom:20px; font-size:13px;">
+                        <strong>salesman name:</strong>
+                        <t t-esc="docs and docs[0].created_by.name or ' '"/>
+
+                        <span style="margin-left:20px;">
+                            <strong>Date:</strong>
+                            <t t-set="df" t-value="data and data.get('date_from_display')"/>
+                            <t t-set="dt" t-value="data and data.get('date_to_display')"/>
+
+                            <t t-if="df or dt">
+
+                                    <t t-esc="df or ''"/>
+                                    <t t-if="dt">
+                                        <strong> to </strong>
+                                        <t t-esc="dt"/>
+                                    </t>
+
+                            </t>
+
+                            <t t-else="">All</t>
+                        </span>
+                    </p>
+
+                    <table style="width:100%; border-collapse:collapse; font-size:12px; text-align:center; border:1px solid black;">
+                        <thead>
+                            <tr>
+                                <th style="border:1px solid black; padding:4px;">Reference</th>
+                                <th style="border:1px solid black; padding:4px;">Customer</th>
+                                <th style="border:1px solid black; padding:4px;">Is Sold?</th>
+                                <th style="border:1px solid black; padding:4px;">Check In</th>
+                                <th style="border:1px solid black; padding:4px;">Check Out</th>
+                                <th style="border:1px solid black; padding:4px;">Time Spent in customer</th>
+                                <th style="border:1px solid black; padding:4px;">Time Between customers</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <t t-foreach="docs" t-as="doc">
+                                <tr>
+                                    <td style="border:1px solid black; padding:4px;">
+                                        <t t-esc="doc.reference or ''"/>
+                                    </td>
+                                    <td style="border:1px solid black; padding:4px;">
+                                        <t t-esc="doc.partner_id.name or ''"/>
+                                    </td>
+                                    <td style="border:1px solid black; padding:4px;">
+                                        <t t-esc="'Yes' if doc.is_it_sold else 'No'"/>
+                                    </td>
+                                    <td style="border:1px solid black; padding:4px;">
+                                        <span t-field="doc.creation_date"
+                                              t-options="{'widget': 'datetime', 'tz': user.tz}"/>
+                                    </td>
+
+                                    <td style="border:1px solid black; padding:4px;">
+                                        <span t-field="doc.check_out_time"
+                                              t-options="{'widget': 'datetime', 'tz': user.tz}"/>
+                                    </td>
+
+
+                                    <!-- Time Spent cell with red color condition -->
+                                    <td t-att-style="
+                                       'border:1px solid black; padding:4px;' +
+                                       (' color:red; font-weight:bold;'
+                                       if doc.time_spending_in_customer and doc.avg_time_spent_per_customer
+                                       and doc.time_spending_in_customer > doc.avg_time_spent_per_customer
+                                       else '')">
+                                        <t t-esc="'%.2f' % doc.time_spending_in_customer if doc.time_spending_in_customer is not False else ''"/>
+                                    </td>
+
+                                    <!-- Time Between cell with red color condition -->
+                                    <td t-att-style="
+                                           'border:1px solid black; padding:4px;' +
+                                           (' color:red; font-weight:bold;'
+                                           if doc.time_between_customers and doc.avg_time_between_customer
+                                           and doc.time_between_customers > doc.avg_time_between_customer
+                                           else '')
+                                           ">
+                                        <t t-esc="'%.2f' % doc.time_between_customers if doc.time_between_customers is not False else ''"/>
+                                    </td>
+
+                                </tr>
+                            </t>
+                        </tbody>
+
+
+                    </table>
+                </div>
+            </t>
+        </t>
+    </template>
+</odoo>

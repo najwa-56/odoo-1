@@ -10,10 +10,10 @@
             <field name="arch" type="xml">
 
                 <xpath expr="//header/button[@name='action_post']" position="attributes">
-                    <attribute name="invisible">1</attribute>
+                    <attribute name="groups">salesman_manager.group_salesman_supervisor</attribute>
                 </xpath>
                 <xpath expr="//header/button[@name='action_cancel']" position="attributes">
-                    <attribute name="invisible">1</attribute>
+                    <attribute name="groups">salesman_manager.group_salesman_supervisor</attribute>
                 </xpath>
                 <xpath expr="//sheet" position="after">
                     <footer>

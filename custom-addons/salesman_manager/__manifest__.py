@@ -29,9 +29,11 @@
         'wizard/partner_update.xml',
         'views/res_partner_views.xml',
         'views/partner_adjustment.xml',
-        'views/account_payment.xml'
-
-
+        'views/account_payment.xml',
+        'views/report_payment_receipt.xml',
+        'wizard/daily_visit_report_wizard_view.xml',
+        'reports/daily_visit_pdf_template.xml',
+        'reports/report_action.xml',
     ],
     'installable': True,
     'application': True,

@@ -14,7 +14,9 @@ access_partner_update_wizard,partner.update.wizard,model_partner_update_wizard,,
 
 access_visit_partner_adjustment,visit_partner_adjustment,model_visit_partner_adjustment,,1,1,1,1
 access_visit_partner_adjustment_line,visit_partner_adjustment_line,model_visit_partner_adjustment_line,,1,1,1,1
-
+access_daily_visit_report_wizard,salesman_manager.daily_visit_report_wizard,model_daily_visit_report_wizard,base.group_user,1,0,0,0
+access_daily_visit_report_wizard,access.daily.visit.report.wizard,model_daily_visit_report_wizard,base.group_user,1,1,1,1
+access_daily_visit_report,access.daily.visit.report,model_daily_visit_report,base.group_user,1,0,0,0
 
 
 

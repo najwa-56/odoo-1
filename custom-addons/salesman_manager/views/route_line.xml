@@ -7,61 +7,69 @@
             <field name="model">route.line</field>
             <field name="inherit_id" ref="customer_route_management.route_lines_view_form"/>
             <field name="arch" type="xml">
-                    <xpath expr="//field[@name='cust_tree_ids']" position="replace">
-                        <field name="cust_tree_ids" invisible="delivery_route_link_id == False">
-                            <tree create="True" limit="200">
-                                <field name="weekly_route_id" />
-                                
-                                <field name="sequence" widget="handle"/>
-                                <field name="name"/>
-                                <button name="open_map"
-                                        string="map"
-                                        class="btn-primary"
-                                        style="border-radius: 50%; padding: 10px;"
-                                        type="object"
-                                        />
-                                <button name="action_open_daily_visit"
-                                        string="تسجيل زيارة"
-                                        class="btn-primary"
-                                        style="background-color: red; border-radius: 50%; padding: 10px;"
-                                        type="object"
-                                        groups="salesman_manager.group_salesman" context="{'weekly_route_id':weekly_route_id}"/>
-                                <field name="status"
-                                       decoration-success="status == 'sale'"
-                                       decoration-danger="status == 'visit'"
-                                       decoration-warning="status == 'not_yet'"
-                                       widget="badge"
-                                />
-                                <field name="specific_visit_id"/>
-                                <button name="action_open_specific_visit"
-                                        type="object"
-                                        string="Open Visit"
-                                        icon="fa-external-link"
-                                        attrs="{'invisible': [('specific_visit_id', '=', False)]}"
-                                        groups="salesman_manager.group_salesman_supervisor"/>
+                <xpath expr="//form/sheet" position="inside">
+                    <field name="delivery_route_link_id" invisible="1"/>
+                    <field name="create_date" invisible="1"/>  <!-- this is a Datetime -->
+                    <field name="is_later" invisible="1"/>
+                </xpath>
+                <xpath expr="//field[@name='cust_tree_ids']" position="replace">
+                    <field name="cust_tree_ids" invisible="delivery_route_link_id == False" >
+                        <tree create="True" limit="200">
+                            <field name="weekly_route_id"/>
 
-                                        <button name="open_update_partner_wizard"
-                                        string="Update"
-                                        type="object"
-                                        icon="fa-pencil"
-                                        class="btn-secondary"
-                                        style="border-radius: 4px; padding: 4px;"
-                                />
+                            <field name="sequence" widget="handle"/>
+                            <field name="name" />
+                            <field name="is_later"/>
+                            <field name="create_date"/>
+                            <button name="open_map"
+                                    string="map"
+                                    class="btn-primary"
+                                    style="border-radius: 50%; padding: 10px;"
+                                    type="object"
+                                    />
+                            <button name="action_open_daily_visit"
+                                    string="تسجيل زيارة"
+                                    class="btn-primary"
+                                    style="background-color: red; border-radius: 50%; padding: 10px;"
+                                    type="object"
+                                    groups="salesman_manager.group_salesman"
+                                    context="{'weekly_route_id':weekly_route_id}"/>
+                            <field name="status"
+                                   decoration-success="status == 'sale'"
+                                   decoration-danger="status == 'visit'"
+                                   decoration-warning="status == 'not_yet'"
+                                   widget="badge"
+                            />
+                            <field name="specific_visit_id"/>
+                            <button name="action_open_specific_visit"
+                                    type="object"
+                                    string="Open Visit"
+                                    icon="fa-external-link"
+                                    attrs="{'invisible': [('specific_visit_id', '=', False)]}"
+                                    groups="salesman_manager.group_salesman_supervisor"/>
 
-                                
-                            </tree>
-                        </field>
-                    </xpath>
+                            <button name="open_update_partner_wizard"
+                                    string="Update"
+                                    type="object"
+                                    icon="fa-pencil"
+                                    class="btn-secondary"
+                                    style="border-radius: 4px; padding: 4px;"
+                            />
 
-                    <xpath expr="//form" position="inside">
-                        <group>
-                            <div class="oe_chatter">
-                                <field name="message_follower_ids" groups="base.group_user"/>
-                                <field name="activity_ids"/>
-                                <field name="message_ids"/>
-                            </div>
-                        </group>
-                    </xpath>
+
+                        </tree>
+                    </field>
+                </xpath>
+
+                <xpath expr="//form" position="inside">
+                    <group>
+                        <div class="oe_chatter">
+                            <field name="message_follower_ids" groups="base.group_user"/>
+                            <field name="activity_ids"/>
+                            <field name="message_ids"/>
+                        </div>
+                    </group>
+                </xpath>
 
             </field>
         </record>
