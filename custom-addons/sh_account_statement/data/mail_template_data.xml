@@ -1,0 +1,711 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+	<record id="sh_customer_filter_statement_mail_template" model="mail.template">
+		<field name="name">Customer Statement By Date: Send by email</field>
+        <field name="model_id" ref="base.model_res_partner"/>
+        <field name="email_from">{{object.get_company().partner_id.email_formatted}}</field>
+        <field name="partner_to">{{object.id}}</field>
+        <field name="subject">Customer Account Statement from {{object.get_company().name}} - {{object.name}}</field>
+        <field name="auto_delete" eval="False"/>
+        <field name="lang">{{object.lang}}</field>
+        <field name="report_template_ids"   eval="[(4, ref('sh_account_statement.action_report_sh_customer_filtered_statement'))]" />
+        <field name="body_html" type="html">
+        	<div style="margin: 0px; padding: 0px;">
+        		<table border="0" width="100%" cellpadding="0" bgcolor="#ededed" style="padding: 20px; background-color: #ededed; border-collapse:separate;" summary="o_mail_notification">
+                    <tbody>
+                      <!-- HEADER -->
+                      <tr>
+                        <td align="center" style="min-width: 590px;">
+                          <table width="590" border="0" cellpadding="0" bgcolor="#875A7B" style="min-width: 590px; background-color: rgb(135,90,123); padding: 20px; border-collapse:separate;">
+                            <tr>
+                              <td valign="middle">
+                                  <span style="font-size:20px; color:white; font-weight: bold;">
+                                      Customer Statement By Date
+                                  </span>
+                              </td>
+                              <td valign="middle" align="right">
+                                  <img t-att-src="'/logo.png?company=%s'%object.get_company().id" style="padding: 0px; margin: 0px; height: auto; width: 80px;" t-att-alt="'%s'%object.get_company().name"/>
+                              </td>
+                            </tr>
+                          </table>
+                        </td>
+                      </tr>
+
+                      <!-- CONTENT -->
+                      <tr>
+                        <td align="center" style="min-width: 590px;">
+                          <table width="590" border="0" cellpadding="0" bgcolor="#ffffff" style="min-width: 590px; background-color: rgb(255, 255, 255); padding: 20px; border-collapse:separate;">
+                            <tbody>
+                              <td valign="top" style="font-family:Arial,Helvetica,sans-serif; color: #555; font-size: 14px;">
+                                <p style="margin: 0px; padding: 0px; font-size: 13px;">
+							    	Dear <t t-out="object.name or ''" />,
+									<br/>
+									We have attached your account statement.
+									<br/>
+									Download your statement.
+									<br/>
+									If you have any concern regarding statement then feel free to contact us.
+									<br/>
+							    </p>
+                              </td>
+                            </tbody>
+                          </table>
+                        </td>
+                      </tr>
+
+                      <!-- FOOTER -->
+                      <tr>
+                        <td align="center" style="min-width: 590px;">
+                          <table width="590" border="0" cellpadding="0" bgcolor="#875A7B" style="min-width: 590px; background-color: rgb(135,90,123); padding: 20px; border-collapse:separate;">
+                            <tr>
+                              <td valign="middle" align="left" style="color: #fff; padding-top: 10px; padding-bottom: 10px; font-size: 12px;">
+                                <t t-out="object.get_company().name or ''" /><br/>
+                                <t t-out="object.get_company().phone or ''" />
+                  
+                              </td>
+                              <td valign="middle" align="right" style="color: #fff; padding-top: 10px; padding-bottom: 10px; font-size: 12px;">
+                                <t t-if = "object.get_company().email">
+                                  <a t-att-href="'mailto:%s'%object.get_company().email" style="text-decoration:none; color: white;"><t t-out="object.get_company().email or ''" /></a><br/>
+                                </t>
+
+                                <t t-if = "object.get_company().website">
+                                  <a t-att-href="'%s'%object.get_company().website" style="text-decoration:none; color: white;"><t t-out="object.get_company().website or ''" /></a><br/>
+                                </t>
+
+                              </td>
+                            </tr>
+                          </table>
+                        </td>
+                      </tr>
+                    </tbody>
+                </table>
+        	</div>
+        </field>
+	</record>
+	<record id="sh_customer_statement_mail_template" model="mail.template">
+		<field name="name">Customer Statement: Send by email</field>
+        <field name="model_id" ref="base.model_res_partner"/>
+        <field name="email_from">{{object.get_company().partner_id.email_formatted}}</field>
+        <field name="partner_to">{{object.id}}</field>
+        <field name="lang">{{object.lang}}</field>
+        <field name="subject">Customer Account Statement from {{object.get_company().name}} - {{object.name}}</field>
+        <field name="auto_delete" eval="False"/>
+        <field name="report_template_ids"  eval="[(4, ref('sh_account_statement.action_report_sh_customer_statement'))]" />
+        <field name="body_html" type="html">
+        	<div style="margin: 0px; padding: 0px;">
+        		<table border="0" width="100%" cellpadding="0" bgcolor="#ededed" style="padding: 20px; background-color: #ededed; border-collapse:separate;" summary="o_mail_notification">
+                    <tbody>
+                      <!-- HEADER -->
+                      <tr>
+                        <td align="center" style="min-width: 590px;">
+                          <table width="590" border="0" cellpadding="0" bgcolor="#875A7B" style="min-width: 590px; background-color: rgb(135,90,123); padding: 20px; border-collapse:separate;">
+                            <tr>
+                              <td valign="middle">
+                                  <span style="font-size:20px; color:white; font-weight: bold;">
+                                      Customer Statement
+                                  </span>
+                              </td>
+                              <td valign="middle" align="right">
+                                  <img  t-att-src="'/logo.png?company=%s'%object.get_company().id" style="padding: 0px; margin: 0px; height: auto; width: 80px;" t-att-alt="'%s'%object.get_company().name"/>
+                              </td>
+                            </tr>
+                          </table>
+                        </td>
+                      </tr>
+
+                      <!-- CONTENT -->
+                      <tr>
+                        <td align="center" style="min-width: 590px;">
+                          <table width="590" border="0" cellpadding="0" bgcolor="#ffffff" style="min-width: 590px; background-color: rgb(255, 255, 255); padding: 20px; border-collapse:separate;">
+                            <tbody>
+                              <td valign="top" style="font-family:Arial,Helvetica,sans-serif; color: #555; font-size: 14px;">
+                                <p style="margin: 0px; padding: 0px; font-size: 13px;">
+							    	Dear <t t-out="object.name or ''" />,
+									<br/>
+									We have attached your account statement.
+									<br/>
+									Download your statement.
+									<br/>
+									If you have any concern regarding statement then feel free to contact us.
+									<br/>
+									<br/>
+							    </p>
+                              </td>
+                            </tbody>
+                          </table>
+                        </td>
+                      </tr>
+
+                      <!-- FOOTER -->
+                      <tr>
+                        <td align="center" style="min-width: 590px;">
+                          <table width="590" border="0" cellpadding="0" bgcolor="#875A7B" style="min-width: 590px; background-color: rgb(135,90,123); padding: 20px; border-collapse:separate;">
+                            <tr>
+                              <td valign="middle" align="left" style="color: #fff; padding-top: 10px; padding-bottom: 10px; font-size: 12px;">
+                                <t t-out="object.get_company().name or ''" /><br/>
+                                <t t-out="object.get_company().phone or ''" />
+                              </td>
+                              <td valign="middle" align="right" style="color: #fff; padding-top: 10px; padding-bottom: 10px; font-size: 12px;">
+                                <t t-if = "object.get_company().email">
+                                  <a t-att-href="'mailto:%s'%object.get_company().email" style="text-decoration:none; color: white;"><t t-out="object.get_company().email or ''" /></a><br/>
+                                </t>
+                                <t t-if = "object.get_company().website">
+                                  <a t-att-href="'%s'%object.get_company().website" style="text-decoration:none; color: white;"><t t-out="object.get_company().website or ''" /></a><br/>
+                                </t>
+                              </td>
+                            </tr>
+                          </table>
+                        </td>
+                      </tr>
+                    </tbody>
+                </table>
+        	</div>
+        </field>
+	</record>
+	<record id="sh_customer_due_statement_mail_template" model="mail.template">
+		<field name="name">Customer Overdue Statement: Send by email</field>
+        <field name="model_id" ref="base.model_res_partner"/>
+        <field name="email_from">{{object.get_company().partner_id.email_formatted}}</field>
+        <field name="partner_to">{{object.id}}</field>
+        <field name="subject">Customer Account Overdue Statement from {{object.get_company().name}} - {{object.name}}</field>
+        <field name="auto_delete" eval="False"/>
+        <field name="lang">{{object.lang}}</field>
+        <field name="report_template_ids"  eval="[(4, ref('sh_account_statement.action_report_sh_customer_due_statement'))]" />
+        <field name="body_html" type="html">
+        	<div style="margin: 0px; padding: 0px;">
+        		<table border="0" width="100%" cellpadding="0" bgcolor="#ededed" style="padding: 20px; background-color: #ededed; border-collapse:separate;" summary="o_mail_notification">
+                    <tbody>
+                      <!-- HEADER -->
+                      <tr>
+                        <td align="center" style="min-width: 590px;">
+                          <table width="590" border="0" cellpadding="0" bgcolor="#875A7B" style="min-width: 590px; background-color: rgb(135,90,123); padding: 20px; border-collapse:separate;">
+                            <tr>
+                              <td valign="middle">
+                                  <span style="font-size:20px; color:white; font-weight: bold;">
+                                      Customer Overdue Statement
+                                  </span>
+                              </td>
+                              <td valign="middle" align="right">
+                                <img t-att-src="'/logo.png?company=%s'%object.get_company().id" style="padding: 0px; margin: 0px; height: auto; width: 80px;" t-att-alt="'%s'%object.get_company().name"/>
+                              </td>
+                            </tr>
+                          </table>
+                        </td>
+                      </tr>
+
+                      <!-- CONTENT -->
+                      <tr>
+                        <td align="center" style="min-width: 590px;">
+                          <table width="590" border="0" cellpadding="0" bgcolor="#ffffff" style="min-width: 590px; background-color: rgb(255, 255, 255); padding: 20px; border-collapse:separate;">
+                            <tbody>
+                              <td valign="top" style="font-family:Arial,Helvetica,sans-serif; color: #555; font-size: 14px;">
+                                <p style="margin: 0px; padding: 0px; font-size: 13px;">
+							    	Dear <t t-out="object.name or ''" />,
+									<br/>
+									We have attached your account overdue statement.
+									<br/>
+									Please clear of your overdue payments as soon as possible.
+									<br/>
+									Download your overdue statement.
+									<br/>
+									If you have any concern regarding overdue statement then feel free to contact us.
+									<br/>
+									<br/>
+							    </p>
+                              </td>
+                            </tbody>
+                          </table>
+                        </td>
+                      </tr>
+
+                      <!-- FOOTER -->
+                      <tr>
+                        <td align="center" style="min-width: 590px;">
+                          <table width="590" border="0" cellpadding="0" bgcolor="#875A7B" style="min-width: 590px; background-color: rgb(135,90,123); padding: 20px; border-collapse:separate;">
+                            <tr>
+                              <td valign="middle" align="left" style="color: #fff; padding-top: 10px; padding-bottom: 10px; font-size: 12px;">
+                                <t t-out="object.get_company().name or ''" /><br/>
+                                <t t-out="object.get_company().phone or ''" />
+                              </td>
+                              <td valign="middle" align="right" style="color: #fff; padding-top: 10px; padding-bottom: 10px; font-size: 12px;">
+                                <t t-if = "object.get_company().email">
+                                  <a t-att-href="'mailto:%s'%object.get_company().email" style="text-decoration:none; color: white;"><t t-out="object.get_company().email or ''" /></a><br/>
+                                </t>
+                                <t t-if = "object.get_company().website">
+                                  <a t-att-href="'%s'%object.get_company().website" style="text-decoration:none; color: white;"><t t-out="object.get_company().website or ''" /></a><br/>
+                                </t>
+                              </td>
+                            </tr>
+                          </table>
+                        </td>
+                      </tr>
+                    </tbody>
+                </table>
+        	</div>
+        </field>
+	</record>
+	<record id="sh_vendor_filter_statement_mail_template" model="mail.template">
+		<field name="name">Vendor Statement By Date: Send by email</field>
+        <field name="model_id" ref="base.model_res_partner"/>
+        <field name="email_from">{{object.get_company().partner_id.email_formatted}}</field>
+        <field name="partner_to">{{object.id}}</field>
+        <field name="subject">Vendor Account Statement from {{object.get_company().name}} - {{object.name}}</field>
+        <field name="auto_delete" eval="False"/>
+        <field name="lang">{{object.lang}}</field>
+        <field name="report_template_ids" eval="[(4, ref('sh_account_statement.action_report_sh_vendor_filtered_statement'))]" />
+        <field name="body_html" type="html">
+        	<div style="margin: 0px; padding: 0px;">
+        		<table border="0" width="100%" cellpadding="0" bgcolor="#ededed" style="padding: 20px; background-color: #ededed; border-collapse:separate;" summary="o_mail_notification">
+                    <tbody>
+                      <!-- HEADER -->
+                      <tr>
+                        <td align="center" style="min-width: 590px;">
+                          <table width="590" border="0" cellpadding="0" bgcolor="#875A7B" style="min-width: 590px; background-color: rgb(135,90,123); padding: 20px; border-collapse:separate;">
+                            <tr>
+                              <td valign="middle">
+                                  <span style="font-size:20px; color:white; font-weight: bold;">
+                                      Vendor Statement By Date
+                                  </span>
+                              </td>
+                              <td valign="middle" align="right">
+                                  <img t-att-src="'/logo.png?company=%s'%object.get_company().id" style="padding: 0px; margin: 0px; height: auto; width: 80px;" t-att-alt="'%s'%object.get_company().name"/>
+                              </td>
+                            </tr>
+                          </table>
+                        </td>
+                      </tr>
+
+                      <!-- CONTENT -->
+                      <tr>
+                        <td align="center" style="min-width: 590px;">
+                          <table width="590" border="0" cellpadding="0" bgcolor="#ffffff" style="min-width: 590px; background-color: rgb(255, 255, 255); padding: 20px; border-collapse:separate;">
+                            <tbody>
+                              <td valign="top" style="font-family:Arial,Helvetica,sans-serif; color: #555; font-size: 14px;">
+                                <p style="margin: 0px; padding: 0px; font-size: 13px;">
+							    	Dear <t t-out="object.name or ''" />,
+									<br/>
+									We have attached your account statement.
+									<br/>
+									Download your statement.
+									<br/>
+									If you have any concern regarding statement then feel free to contact us.
+									<br/>
+							    </p>
+                              </td>
+                            </tbody>
+                          </table>
+                        </td>
+                      </tr>
+
+                      <!-- FOOTER -->
+                      <tr>
+                        <td align="center" style="min-width: 590px;">
+                          <table width="590" border="0" cellpadding="0" bgcolor="#875A7B" style="min-width: 590px; background-color: rgb(135,90,123); padding: 20px; border-collapse:separate;">
+                            <tr>
+                              <td valign="middle" align="left" style="color: #fff; padding-top: 10px; padding-bottom: 10px; font-size: 12px;">
+                                <t t-out="object.get_company().name or ''" /><br/>
+                                <t t-out="object.get_company().phone or ''" />
+                              </td>
+                              <td valign="middle" align="right" style="color: #fff; padding-top: 10px; padding-bottom: 10px; font-size: 12px;">
+                                <t t-if = "object.get_company().email">
+                                  <a t-att-href="'mailto:%s'%object.get_company().email" style="text-decoration:none; color: white;"><t t-out="object.get_company().email or ''" /></a><br/>
+                                </t>
+                                <t t-if = "object.get_company().website">
+                                  <a t-att-href="'%s'%object.get_company().website" style="text-decoration:none; color: white;"><t t-out="object.get_company().website or ''" /></a><br/>
+                                </t>
+                              </td>
+                            </tr>
+                          </table>
+                        </td>
+                      </tr>
+                    </tbody>
+                </table>
+        	</div>
+        </field>
+	</record>
+	<record id="sh_vendor_statement_mail_template" model="mail.template">
+		<field name="name">Vendor Statement: Send by email</field>
+        <field name="model_id" ref="base.model_res_partner"/>
+        <field name="email_from">{{object.get_company().partner_id.email_formatted}}</field>
+        <field name="partner_to">{{object.id}}</field>
+        <field name="subject">Vendor Account Statement from {{object.get_company().name}} - {{object.name}}</field>
+        <field name="auto_delete" eval="False"/>
+        <field name="lang">{{object.lang}}</field>
+        <field name="report_template_ids" eval="[(4, ref('sh_account_statement.action_report_sh_vendor_statement'))]" />
+        <field name="body_html" type="html">
+        	<div style="margin: 0px; padding: 0px;">
+        		<table border="0" width="100%" cellpadding="0" bgcolor="#ededed" style="padding: 20px; background-color: #ededed; border-collapse:separate;" summary="o_mail_notification">
+                    <tbody>
+                      <!-- HEADER -->
+                      <tr>
+                        <td align="center" style="min-width: 590px;">
+                          <table width="590" border="0" cellpadding="0" bgcolor="#875A7B" style="min-width: 590px; background-color: rgb(135,90,123); padding: 20px; border-collapse:separate;">
+                            <tr>
+                              <td valign="middle">
+                                  <span style="font-size:20px; color:white; font-weight: bold;">
+                                      Vendor Statement
+                                  </span>
+                              </td>
+                              <td valign="middle" align="right">
+                                <img t-att-src="'/logo.png?company=%s'%object.get_company().id" style="padding: 0px; margin: 0px; height: auto; width: 80px;" t-att-alt="'%s'%object.get_company().name"/>
+                              </td>
+                            </tr>
+                          </table>
+                        </td>
+                      </tr>
+
+                      <!-- CONTENT -->
+                      <tr>
+                        <td align="center" style="min-width: 590px;">
+                          <table width="590" border="0" cellpadding="0" bgcolor="#ffffff" style="min-width: 590px; background-color: rgb(255, 255, 255); padding: 20px; border-collapse:separate;">
+                            <tbody>
+                              <td valign="top" style="font-family:Arial,Helvetica,sans-serif; color: #555; font-size: 14px;">
+                                <p style="margin: 0px; padding: 0px; font-size: 13px;">
+							    	Dear <t t-out="object.name or ''" />,
+									<br/>
+									We have attached your account statement.
+									<br/>
+									Download your statement.
+									<br/>
+									If you have any concern regarding statement then feel free to contact us.
+									<br/>
+									<br/>
+							    </p>
+                              </td>
+                            </tbody>
+                          </table>
+                        </td>
+                      </tr>
+
+                      <!-- FOOTER -->
+                      <tr>
+                        <td align="center" style="min-width: 590px;">
+                          <table width="590" border="0" cellpadding="0" bgcolor="#875A7B" style="min-width: 590px; background-color: rgb(135,90,123); padding: 20px; border-collapse:separate;">
+                            <tr>
+                              <td valign="middle" align="left" style="color: #fff; padding-top: 10px; padding-bottom: 10px; font-size: 12px;">
+                                <t t-out="object.get_company().name or ''" /><br/>
+                                <t t-out="object.get_company().phone or ''" />
+                              </td>
+                              <td valign="middle" align="right" style="color: #fff; padding-top: 10px; padding-bottom: 10px; font-size: 12px;">
+                                <t t-if = "object.get_company().email">
+                                  <a t-att-href="'mailto:%s'%object.get_company().email" style="text-decoration:none; color: white;"><t t-out="object.get_company().email or ''" /></a><br/>
+                                </t>
+
+                                <t t-if = "object.get_company().website">
+                                  <a t-att-href="'%s'%object.get_company().website" style="text-decoration:none; color: white;"><t t-out="object.get_company().website or ''" /></a><br/>
+                                </t>
+                              </td>
+                            </tr>
+                          </table>
+                        </td>
+                      </tr>
+                    </tbody>
+                </table>
+        	</div>
+        </field>
+	</record>
+	<record id="sh_vendor_due_statement_mail_template" model="mail.template">
+		<field name="name">Vendor Overdue Statement: Send by email</field>
+        <field name="model_id" ref="base.model_res_partner"/>
+        <field name="email_from">{{object.get_company().partner_id.email_formatted}}</field>
+        <field name="partner_to">{{object.id}}</field>
+        <field name="subject">Vendor Account Overdue Statement from {{object.get_company().name}} - {{object.name}}</field>
+        <field name="auto_delete" eval="False"/>
+        <field name="lang">{{object.lang}}</field>
+        <field name="report_template_ids"  eval="[(4, ref('sh_account_statement.action_report_sh_vendor_due_statement'))]" />
+        <field name="body_html" type="html">
+        	<div style="margin: 0px; padding: 0px;">
+        		<table border="0" width="100%" cellpadding="0" bgcolor="#ededed" style="padding: 20px; background-color: #ededed; border-collapse:separate;" summary="o_mail_notification">
+                    <tbody>
+                      <!-- HEADER -->
+                      <tr>
+                        <td align="center" style="min-width: 590px;">
+                          <table width="590" border="0" cellpadding="0" bgcolor="#875A7B" style="min-width: 590px; background-color: rgb(135,90,123); padding: 20px; border-collapse:separate;">
+                            <tr>
+                              <td valign="middle">
+                                  <span style="font-size:20px; color:white; font-weight: bold;">
+                                      Vendor Overdue Statement
+                                  </span>
+                              </td>
+                              <td valign="middle" align="right">
+                                <img t-att-src="'/logo.png?company=%s'%object.get_company().id" style="padding: 0px; margin: 0px; height: auto; width: 80px;" t-att-alt="'%s'%object.get_company().name"/>
+                              </td>
+                            </tr>
+                          </table>
+                        </td>
+                      </tr>
+
+                      <!-- CONTENT -->
+                      <tr>
+                        <td align="center" style="min-width: 590px;">
+                          <table width="590" border="0" cellpadding="0" bgcolor="#ffffff" style="min-width: 590px; background-color: rgb(255, 255, 255); padding: 20px; border-collapse:separate;">
+                            <tbody>
+                              <td valign="top" style="font-family:Arial,Helvetica,sans-serif; color: #555; font-size: 14px;">
+                                <p style="margin: 0px; padding: 0px; font-size: 13px;">
+							    	Dear <t t-out="object.name or ''" />,
+									<br/>
+									We have attached your account overdue statement.
+									<br/>
+									Please clear of your overdue payments as soon as possible.
+									<br/>
+									Download your overdue statement.
+									<br/>
+									If you have any concern regarding overdue statement then feel free to contact us.
+									<br/>
+									<br/>
+							    </p>
+                              </td>
+                            </tbody>
+                          </table>
+                        </td>
+                      </tr>
+
+                      <!-- FOOTER -->
+                      <tr>
+                        <td align="center" style="min-width: 590px;">
+                          <table width="590" border="0" cellpadding="0" bgcolor="#875A7B" style="min-width: 590px; background-color: rgb(135,90,123); padding: 20px; border-collapse:separate;">
+                            <tr>
+                              <td valign="middle" align="left" style="color: #fff; padding-top: 10px; padding-bottom: 10px; font-size: 12px;">
+                                <t t-out="object.get_company().name or ''" /><br/>
+                                <t t-out="object.get_company().phone or ''" />
+                              </td>
+                              <td valign="middle" align="right" style="color: #fff; padding-top: 10px; padding-bottom: 10px; font-size: 12px;">
+                                <t t-if = "object.get_company().email">
+                                  <a t-att-href="'mailto:%s'%object.get_company().email" style="text-decoration:none; color: white;"><t t-out="object.get_company().email or ''" /></a><br/>
+                                </t>
+
+                                <t t-if = "object.get_company().website">
+                                  <a t-att-href="'%s'%object.get_company().website" style="text-decoration:none; color: white;"><t t-out="object.get_company().website or ''" /></a><br/>
+                                </t>
+
+                              </td>
+                            </tr>
+                          </table>
+                        </td>
+                      </tr>
+                    </tbody>
+                </table>
+        	</div>
+        </field>
+	</record>
+	<record id="sh_send_customer_filter_whatsapp_email_template" model="mail.template">
+            <field name="name">Statement By Whatsapp: Send by email</field>
+            <field name="model_id" ref="base.model_res_partner" />
+            <field name="email_from">{{object.create_uid.email_formatted}}</field>
+            <field name="partner_to">{{object.id}}</field>
+            <field name="subject">{{object.get_company().name}} Customer Statement By Date</field>
+            <field name="body_html" type="html">
+                <div style="margin: 0px; padding: 0px;">
+                    <p style="margin: 0px; padding: 0px; font-size: 13px;">
+                        <div style="list-style-type: none;">
+							Dear <t t-out="object.name or ''" /> ,%0A%0A
+							Here is the your account statement From <t t-out="object.start_date or ''" /> To <t t-out="object.end_date or ''" /> *<t t-out="object.get_company().name or ''" />* %0A%0A 
+                            <br />
+                            <t t-if = "object.get_company().sh_statement_pdf_in_message">
+                              <span style="list-style-type: none;">*Click here to download statement* %20 :<t t-out="object.sh_cfs_statement_report_url or ''" /> %0A%0A</span>
+                            </t>
+                            <br />
+
+                            <t t-if = "object.get_company().sh_statement_url_in_message">
+                              <span style="list-style-type: none;">*Click here to See Statement History* %20 :<t t-out="object.portal_statement_url_wp or ''" /> %0A%0A</span>
+                            </t>
+                            <br />
+
+                            <span style="list-style-type: none;">Let me know if any concern.%0A</span>
+                            <span style="list-style-type: none;">Thank You.%0A</span>
+
+                            <t t-if = "object.get_company().sh_statement_signature and object.env.user.sh_company_sign">
+                              <span style="list-style-type: none;">%20 *<t t-out="object.env.user.sh_company_sign or ''" />*  %0A%0A</span>
+                            </t>
+
+                        </div>
+                    </p>
+                </div>
+            </field>
+            <field name="lang">{{object.lang}}</field>
+            <field name="auto_delete" eval="False" />
+        </record>
+        <record id="sh_send_customer_whatsapp_email_template" model="mail.template">
+            <field name="name">Statement By Whatsapp: Send by email</field>
+            <field name="model_id" ref="base.model_res_partner" />
+            <field name="email_from">{{object.create_uid.email_formatted}}</field>
+            <field name="partner_to">{{object.id}}</field>
+            <field name="subject">{{object.get_company().name}} Customer Statement</field>
+            <field name="body_html" type="html">
+                <div style="margin: 0px; padding: 0px;">
+                    <p style="margin: 0px; padding: 0px; font-size: 13px;">
+                        <div style="list-style-type: none;">
+							Dear <t t-out="object.name or ''" /> ,%0A%0A
+							Here is the your statement from *<t t-out="object.get_company().name or ''" />* %0A%0A 
+                            <br />
+                            <t t-if = "object.get_company().sh_statement_pdf_in_message">
+                              <span style="list-style-type: none;">*Click here to download statement* %20 :<t t-out="object.sh_cust_statement_report_url or ''" /> %0A%0A</span>
+                            </t>
+                            <br />
+                            <t t-if = "object.get_company().sh_statement_url_in_message">
+                              <span style="list-style-type: none;">*Click here to See Statement History* %20 :<t t-out="object.portal_statement_url_wp or ''" /> %0A%0A</span>
+                            </t>
+
+                            <span style="list-style-type: none;">Let me know if any concern.%0A</span>
+                            <span style="list-style-type: none;">Thank You.%0A</span>
+                            <t t-if = "object.get_company().sh_statement_signature and object.env.user.sh_company_sign">
+                              <span style="list-style-type: none;">%20 *<t t-out="object.env.user.sh_company_sign or ''" />* %0A%0A</span>
+                            </t>
+                        </div>
+                    </p>
+                </div>
+            </field>
+            <field name="lang">{{object.lang}}</field>
+            <field name="auto_delete" eval="False" />
+        </record>
+        <record id="sh_send_customer_due_whatsapp_email_template" model="mail.template">
+            <field name="name">Statement By Whatsapp: Send by email</field>
+            <field name="model_id" ref="base.model_res_partner" />
+            <field name="email_from">{{object.create_uid.email_formatted}}</field>
+            <field name="partner_to">{{object.id}}</field>
+            <field name="subject">{{object.get_company().name}} Customer Due/Overdue Statement</field>
+            <field name="body_html" type="html">
+                <div style="margin: 0px; padding: 0px;">
+                    <p style="margin: 0px; padding: 0px; font-size: 13px;">
+                        <div style="list-style-type: none;">
+							Dear <t t-out="object.name or ''" />  ,%0A%0A
+							Here is the your statement from *<t t-out="object.get_company().name or ''" />* %0A%0A 
+                            <br />
+
+                            <t t-if = "object.get_company().sh_statement_pdf_in_message">
+                              <span style="list-style-type: none;">*Click here to download statement* %20 :<t t-out="object.sh_cust_due_statement_report_url or ''" /> %0A%0A</span>
+                            </t>
+                            <br />
+
+                            <t t-if = "object.get_company().sh_statement_url_in_message">
+                              <span style="list-style-type: none;">*Click here to See Statement History* %20 :<t t-out="object.portal_statement_url_wp or ''" /> %0A%0A</span>
+                            </t>
+
+                            <span style="list-style-type: none;">Let me know if any concern.%0A</span>
+                            <span style="list-style-type: none;">Thank You.%0A</span>
+                            <t t-if = "object.get_company().sh_statement_signature and object.env.user.sh_company_sign">
+                              <span style="list-style-type: none;">%20 *<t t-out="object.env.user.sh_company_sign or ''" />*  %0A%0A</span>
+                            </t>
+
+                            
+                        </div>
+                    </p>
+                </div>
+            </field>
+            <field name="lang">{{object.lang}}</field>
+            <field name="auto_delete" eval="False" />
+        </record>
+        <record id="sh_send_vendor_filter_whatsapp_email_template" model="mail.template">
+            <field name="name">Statement By Whatsapp: Send by email</field>
+            <field name="model_id" ref="base.model_res_partner" />
+            <field name="email_from">{{object.create_uid.email_formatted}}</field>
+            <field name="partner_to">{{object.id}}</field>
+            <field name="subject">{{object.get_company().name}} Vendor Statement By Date</field>
+            <field name="body_html" type="html">
+                <div style="margin: 0px; padding: 0px;">
+                    <p style="margin: 0px; padding: 0px; font-size: 13px;">
+                        <div style="list-style-type: none;">
+							Dear <t t-out="object.name or ''" />  ,%0A%0A
+							Here is the your account statement From <t t-out="object.start_date or ''" /> To <t t-out="object.end_date or ''" /> *<t t-out="object.get_company().name or ''" />* %0A%0A 
+                            <br />
+
+                            <t t-if = "object.get_company().sh_statement_pdf_in_message">
+                              <span style="list-style-type: none;">*Click here to download statement* %20 :<t t-out="object.sh_vfs_statement_report_url or ''" /> %0A%0A</span>
+                            </t>
+                            <br />
+
+                            <t t-if = "object.get_company().sh_statement_url_in_message">
+                              <span style="list-style-type: none;">*Click here to See Statement History* %20 :<t t-out="object.portal_statement_url_wp or ''" /> %0A%0A</span>
+                            </t>
+
+                            <span style="list-style-type: none;">Let me know if any concern.%0A</span>
+                            <span style="list-style-type: none;">Thank You.%0A</span>
+
+                            <t t-if = "object.get_company().sh_statement_signature and object.env.user.sh_company_sign">
+                              <span style="list-style-type: none;">*<t t-out="object.env.user.sh_company_sign or ''" />*  %0A%0A</span>
+                            </t>
+
+                        </div>
+                    </p>
+                </div>
+            </field>
+            <field name="lang">{{object.lang}}</field>
+            <field name="auto_delete" eval="False" />
+        </record>
+        <record id="sh_send_vendor_whatsapp_email_template" model="mail.template">
+            <field name="name">Statement By Whatsapp: Send by email</field>
+            <field name="model_id" ref="base.model_res_partner" />
+            <field name="email_from">{{object.create_uid.email_formatted}}</field>
+            <field name="partner_to">{{object.id}}</field>
+            <field name="subject">{{object.get_company().name}} Vendor Statement</field>
+            <field name="body_html" type="html">
+                <div style="margin: 0px; padding: 0px;">
+                    <p style="margin: 0px; padding: 0px; font-size: 13px;">
+                        <div style="list-style-type: none;">
+							Dear <t t-out="object.name or ''" />,%0A%0A
+							Here is the your statement from *<t t-out="object.get_company().name or ''" />* %0A%0A 
+                            <br />
+
+                            <t t-if = "object.get_company().sh_statement_pdf_in_message">
+                              <span style="list-style-type: none;">*Click here to download statement* %20 :<t t-out="object.sh_vend_statement_report_url or ''" /> %0A%0A</span>
+                            </t>                            
+
+                            <br />
+
+                            <t t-if = "object.get_company().sh_statement_url_in_message">
+                              <span style="list-style-type: none;">*Click here to See Statement History* %20 :<t t-out="object.portal_statement_url_wp or ''" /> %0A%0A</span>
+                            </t>  
+
+                            <span style="list-style-type: none;">Let me know if any concern.%0A</span>
+                            <span style="list-style-type: none;">Thank You.%0A</span>
+
+                            <t t-if = "object.get_company().sh_statement_signature and object.env.user.sh_company_sign ">
+                              <span style="list-style-type: none;">*<t t-out="object.env.user.sh_company_sign or ''" />* %0A%0A</span>
+                            </t>  
+
+                        </div>
+                    </p>
+                </div>
+            </field>
+            <field name="lang">{{object.lang}}</field>
+            <field name="auto_delete" eval="False" />
+        </record>
+        <record id="sh_send_vend_due_whatsapp_email_template" model="mail.template">
+            <field name="name">Statement By Whatsapp: Send by email</field>
+            <field name="model_id" ref="base.model_res_partner" />
+            <field name="email_from">{{object.create_uid.email_formatted}}</field>
+            <field name="partner_to">{{object.id}}</field>
+            <field name="subject">{{object.get_company().name}} Vendor Due/Overdue Statement</field>
+            <field name="body_html" type="html">
+                <div style="margin: 0px; padding: 0px;">
+                    <p style="margin: 0px; padding: 0px; font-size: 13px;">
+                        <div style="list-style-type: none;">
+							Dear <t t-out="object.name or ''" /> ,%0A%0A
+							Here is the your statement from *<t t-out="object.get_company().name or ''" />* %0A%0A 
+                            <br />
+
+                            <t t-if = "object.get_company().sh_statement_pdf_in_message">
+                              <span style="list-style-type: none;">*Click here to download statement* %20 :<t t-out="object.sh_vend_due_statement_report_url or ''" /> %0A%0A</span>
+                            </t>
+                            <br />
+
+                            <t t-if = "object.get_company().sh_statement_url_in_message">
+                              <span style="list-style-type: none;">*Click here to See Statement History* %20 :<t t-out="object.portal_statement_url_wp or ''" /> %0A%0A</span>
+                            </t>
+
+                            <span style="list-style-type: none;">Let me know if any concern.%0A</span>
+                            <span style="list-style-type: none;">Thank You.%0A</span>
+
+                            <t t-if = "object.get_company().sh_statement_signature and object.env.user.sh_company_sign">
+                              <span style="list-style-type: none;">*<t t-out="object.env.user.sh_company_sign or ''" />*  %0A%0A</span>
+                            </t>
+
+                    
+                        </div>
+                    </p>
+                </div>
+            </field>
+            <field name="lang">{{object.lang}}</field>
+            <field name="auto_delete" eval="False" />
+        </record>
+</odoo>

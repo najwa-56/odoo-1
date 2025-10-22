@@ -1,0 +1,483 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <!-- <record id="sh_partner_tree_view" model="ir.ui.view">
+        <field name="name">res.partner</field>
+        <field name="model">res.partner</field>
+        <field name="inherit_id" ref="base.view_partner_tree"/>
+        <field name="arch" type="xml">
+            <field name="phone" position="after">
+                <field name="sh_compute_boolean" invisible="1"/>
+            </field>
+        </field>
+    </record>
+    <record id="sh_partner_kanban_view" model="ir.ui.view">
+        <field name="name">res.partner</field>
+        <field name="model">res.partner</field>
+        <field name="inherit_id" ref="base.res_partner_kanban_view"/>
+        <field name="arch" type="xml">
+            <field name="phone" position="after">
+                <field name="sh_compute_boolean" invisible="1"/>
+            </field>
+        </field>
+    </record> -->
+    <record id="sh_res_partner_view" model="ir.ui.view">
+        <field name="name">res.partner</field>
+        <field name="model">res.partner</field>
+        <field name="inherit_id" ref="base.view_partner_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='vat']" position="after">
+                <field name="sh_customer_statement_config" widget='many2many_tags' invisible="customer_rank==0"/>
+                <field name="sh_vendor_statement_config" widget='many2many_tags' invisible="supplier_rank==0"/>
+            </xpath>
+            <xpath expr="//page[last()]" position="after">
+                <page string="Customer Statement" invisible="customer_rank==0">
+                    <field name="supplier_rank" invisible="1"/>
+                    <field name="customer_rank" invisible="1"/>
+                    <field name="sh_compute_boolean" invisible="1"/>
+                    <field name="sh_cfs_statement_report_url" invisible="1"/>
+                    <field name="sh_cust_statement_report_url" invisible="1"/>
+                    <field name="sh_cust_due_statement_report_url" invisible="1"/>
+                    <field name="sh_vfs_statement_report_url" invisible="1"/>
+                    <field name="sh_vend_statement_report_url" invisible="1"/>
+                    <field name="sh_vend_due_statement_report_url" invisible="1"/>
+                    <group string="Customer Statement Filters"></group>
+
+                    <div class="o_row no-gutters d-flex">
+                        <div class="o_row">
+                            <field name="sh_date_filter"/>
+                            <field name="payment_state"/>
+                        </div>
+                        <div class="o_row" invisible="sh_date_filter!='custom'">
+                            <field name="start_date" required="sh_date_filter=='custom'"/>
+                            To
+                            <field name="end_date" required="sh_date_filter=='custom'"/>
+
+                        </div>
+
+                        <button name="action_get_customer_statement" string="Get Customer Statement" type="object"
+                                class="oe_highlight m-2"/>
+                    </div>
+                    <button name="action_send_filter_customer_whatsapp" type="object" icon="fa-whatsapp"
+                            style="float: right; margin: 10px;" string="Send By Whatsapp" class="oe_highlight m-2"
+                            groups="sh_account_statement.customer_statement_group_whatsapp"/>
+                    <button name="action_send_filter_customer_statement" icon="fa-envelope"
+                            title="Send Filter Customer Statement" string="Send Filter Customer Statement" type="object"
+                            class="oe_highlight m-2" style="float: right; margin: 10px;"/>
+                    <button name="action_print_filter_customer_statement" icon="fa-print"
+                            title="Print Filter Customer Statement" string="Print Filter Customer Statement"
+                            type="object" class="oe_highlight m-2" style="float: right; margin: 10px;"/>
+                    <button name="action_print_filter_customer_statement_xls" icon="fa-file-excel-o"
+                            title="Print Filter Customer Statement " string="Print Filter Customer Statement"
+                            type="object" class="oe_highlight m-2" style="float: right; margin: 10px;"/>
+                    <group string="Customer Statements By Filter"></group>
+                    <!--
+                    <field name="sh_filter_customer_statement_ids" readonly="True" nolabel="1">
+                        <form string="Customer Statements by Filter">
+                            <group>
+                                <group>
+                                    <field name="sh_account" column_invisible="1"  />
+                                    <field name="name" />
+                                    <field name="currency_id" column_invisible="1"  />
+                                    <field name="sh_filter_invoice_date" />
+                                    <field name="sh_filter_due_date" />
+                                </group>
+                                <group>
+                                    <field name="sh_filter_amount" />
+                                    <field name="sh_filter_paid_amount" />
+                                    <field name="sh_filter_balance" />
+                                    <field name="sh_filter_running_balance" string="Balance" />
+                                </group>
+                            </group>
+                        </form>
+                        <tree decoration-info="sh_filter_amount == sh_filter_balance and sh_filter_balance &gt; 0.0 or sh_filter_amount == sh_filter_balance and sh_filter_balance &lt; 0.0" decoration-success="sh_filter_balance == 0.0" decoration-danger="sh_filter_amount != sh_filter_balance and sh_filter_balance &gt; 0.0 or sh_filter_amount != sh_filter_balance and sh_filter_balance &lt; 0.0"
+                        default_order="sh_filter_invoice_date asc"
+                        >
+                            <field name="sh_account" column_invisible="1"  />
+                            <field name="name" />
+                            <field name="currency_id" column_invisible="1"  />
+                            <field name="sh_filter_invoice_date" widget="date"/>
+                            <field name="sh_filter_due_date" widget="remaining_days" />
+                            <field name="sh_filter_amount" sum="Total Filter Amount" />
+                            <field name="sh_filter_paid_amount" sum="Total Filter Amount" />
+                            <field name="sh_filter_balance" sum="Total Filter Amount" invisible="1" />
+                            <field name="sh_filter_running_balance" string="Balance" sum="Total Balance"/>
+                        </tree>
+                    </field>
+                    -->
+                    <!-- removing old balance-->
+                    <field name="sh_filter_customer_statement_ids" readonly="True" nolabel="1">
+                        <form string="Customer Statements by Filter">
+                            <group>
+                                <group>
+                                    <field name="sh_account" column_invisible="1"/>
+                                    <field name="name"/>
+                                    <field name="currency_id" column_invisible="1"/>
+                                    <field name="sh_filter_invoice_date"/>
+                                    <field name="sh_filter_due_date"/>
+                                </group>
+                                <group>
+                                    <field name="sh_filter_amount"/>
+                                    <field name="sh_filter_paid_amount"/>
+                                    <field name="sh_filter_running_balance" string="Balance"/>
+                                </group>
+                            </group>
+                        </form>
+
+                        <tree default_order="sh_filter_invoice_date asc">
+                            <field name="sh_account" column_invisible="1"/>
+                            <field name="name"/>
+                            <field name="currency_id" column_invisible="1"/>
+                            <field name="sh_filter_invoice_date" widget="date"/>
+                            <field name="sh_filter_due_date" widget="remaining_days"/>
+                            <field name="sh_filter_amount" sum="Total Amount"/>
+                            <field name="sh_filter_paid_amount" sum="Total Paid"/>
+                            <field name="sh_filter_running_balance" string="Balance" sum="Total Balance"/>
+                        </tree>
+                    </field>
+
+
+                    <hr style="background: #7c7bad;"/>
+                    <button name="action_send_customer_whatsapp" type="object" style="float: right; margin: 10px;"
+                            icon="fa-whatsapp" string="Send By Whatsapp" class="oe_highlight m-2"
+                            groups="sh_account_statement.customer_statement_group_whatsapp"/>
+                    <button name="action_send_customer_statement" icon="fa-envelope" title="Send Customer Statement"
+                            string="Send Customer Statement" type="object" class="oe_highlight m-2"
+                            style="float: right; margin: 10px;"/>
+                    <button name="action_print_customer_statement" icon="fa-print" title="Print Customer Statement"
+                            string="Print Customer Statement" type="object" class="oe_highlight m-2"
+                            style="float: right; margin: 10px;"/>
+                    <button name="action_print_customer_statement_xls" icon="fa-file-excel-o"
+                            title="Send Customer Statement" string="Print Customer Statement " type="object"
+                            class="oe_highlight m-2" style="float: right; margin: 10px;"/>
+                    <group string="Customer Statements"></group>
+                    <field name="sh_customer_statement_ids" nolabel="1" readonly="True">
+                        <form string="Customer Statements">
+                            <group>
+                                <group>
+                                    <field name="sh_account" column_invisible="1"/>
+                                    <field name="currency_id" column_invisible="1"/>
+                                    <field name="name"/>
+                                    <field name="sh_customer_invoice_date"/>
+                                    <field name="sh_customer_due_date"/>
+                                </group>
+                                <group>
+                                    <field name="sh_customer_amount"/>
+                                    <field name="sh_customer_paid_amount"/>
+                                    <field name="sh_customer_balance"/>
+                                </group>
+                            </group>
+                        </form>
+                        <tree decoration-info="sh_customer_amount == sh_customer_balance and sh_customer_balance &gt; 0.0 or sh_customer_amount == sh_customer_balance and sh_customer_balance &lt; 0.0"
+                              decoration-success="sh_customer_balance == 0.0"
+                              decoration-danger="sh_customer_amount != sh_customer_balance and sh_customer_balance &gt; 0.0 or sh_customer_amount != sh_customer_balance and sh_customer_balance &lt; 0.0">
+                            <field name="sh_account" column_invisible="1"/>
+                            <field name="currency_id" column_invisible="1"/>
+                            <field name="name"/>
+                            <field name="sh_customer_invoice_date"/>
+                            <field name="sh_customer_due_date" widget="remaining_days"/>
+                            <field name="sh_customer_amount" sum="Total Amount"/>
+                            <field name="sh_customer_paid_amount" sum="Total Paid Amount"/>
+                            <field name="sh_customer_balance" sum="Total Balance"/>
+                        </tree>
+                    </field>
+
+                    <table class="table mt-2">
+                        <tr>
+                            <th>Gap Between Days</th>
+                            <th>0-30(Days)</th>
+                            <th>30-60(Days)</th>
+                            <th>60-90(Days)</th>
+                            <th>90+(Days)</th>
+                            <th>Total</th>
+                        </tr>
+                        <tr>
+                            <td>
+                                <strong>Balance Amount</strong>
+                            </td>
+                            <td>
+                                <field name="sh_customer_zero_to_thiry" readonly="1"/>
+                            </td>
+                            <td>
+                                <field name="sh_customer_thirty_to_sixty" readonly="1"/>
+                            </td>
+                            <td>
+                                <field name="sh_customer_sixty_to_ninety" readonly="1"/>
+                            </td>
+                            <td>
+                                <field name="sh_customer_ninety_plus" readonly="1"/>
+                            </td>
+                            <td>
+                                <field name="sh_customer_total" readonly="1"/>
+                            </td>
+                        </tr>
+                    </table>
+                    <hr style="background: #7c7bad;"/>
+                    <button name="action_send_due_customer_whatsapp" type="object" icon="fa-whatsapp"
+                            string="Send By Whatsapp" class="oe_highlight m-2"
+                            groups="sh_account_statement.customer_statement_group_whatsapp"
+                            style="float: right; margin: 10px;"/>
+                    <button name="action_send_customer_due_statement" icon="fa-envelope"
+                            title="Send Overdue Customer Statement" string="Send Overdue Customer Statement"
+                            type="object" class="oe_highlight m-2" style="float: right; margin: 10px;"/>
+                    <button name="action_print_customer_due_statement" icon="fa-print"
+                            title="Print Overdue Customer Statement" string="Print Overdue Customer Statement"
+                            type="object" class="oe_highlight m-2" style="float: right; margin: 10px;"/>
+                    <button name="action_print_customer_due_statement_xls" icon="fa-file-excel-o"
+                            title="Print Overdue Customer Statement" string="Print Overdue Customer Statement"
+                            type="object" class="oe_highlight m-2" style="float: right; margin: 10px;"/>
+                    <group string="Customer Overdue Statements"></group>
+                    <field name="sh_customer_due_statement_ids" readonly="True" nolabel="1">
+                        <form string="Customer Due Statements">
+                            <group>
+                                <group>
+                                    <field name="sh_account" column_invisible="1"/>
+                                    <field name="name"/>
+                                    <field name="currency_id" column_invisible="1"/>
+                                    <field name="sh_due_customer_invoice_date"/>
+                                    <field name="sh_due_customer_due_date"/>
+                                </group>
+                                <group>
+                                    <field name="sh_due_customer_amount"/>
+                                    <field name="sh_due_customer_paid_amount"/>
+                                    <field name="sh_due_customer_balance"/>
+                                </group>
+                            </group>
+                        </form>
+                        <tree decoration-danger="sh_due_customer_due_date &lt; sh_today">
+                            <field name="sh_account" column_invisible="1"/>
+                            <field name="sh_today" column_invisible="1"/>
+                            <field name="currency_id" column_invisible="1"/>
+                            <field name="name"/>
+                            <field name="sh_due_customer_invoice_date"/>
+                            <field name="sh_due_customer_due_date" widget="remaining_days"/>
+                            <field name="sh_due_customer_amount" sum="Total Due Amount"/>
+                            <field name="sh_due_customer_paid_amount" sum="Total Due Paid Amount"/>
+                            <field name="sh_due_customer_balance" sum="Total Due Balance"/>
+                        </tree>
+                    </field>
+                </page>
+                <page string="Vendor Statement" invisible="supplier_rank==0">
+                    <group string="Vendor Statement Filters"></group>
+
+                    <div class="o_row no-gutters d-flex">
+                        <div class="o_row">
+                            <field name="sh_date_filter"/>
+                            <field name="payment_state"/>
+                        </div>
+
+                        <div class="o_row" invisible="sh_date_filter!='custom'">
+                            <field name="start_date" required="sh_date_filter=='custom'"/>
+                            To
+                            <field name="end_date" required="sh_date_filter=='custom'"/>
+
+                        </div>
+
+                        <button name="action_get_vendor_statement" string="Get Vendor Statement" type="object"
+                                class="oe_highlight m-2"/>
+                    </div>
+                    <button name="action_send_filter_vendor_whatsapp" type="object" icon="fa-whatsapp"
+                            string="Send By Whatsapp" class="oe_highlight m-2"
+                            groups="sh_account_statement.vendor_statement_group_whatsapp"
+                            style="float: right; margin: 10px;"/>
+                    <button name="action_send_filter_vendor_statement" icon="fa-envelope"
+                            title="Send Filter Vendor Statement" string="Send Filter Vendor Statement" type="object"
+                            class="oe_highlight m-2" style="float: right; margin: 10px;"/>
+                    <button name="action_print_filter_vendor_statement" icon="fa-print"
+                            title="Print Filter Vendor Statement" string="Print Filter Vendor Statement" type="object"
+                            class="oe_highlight m-2" style="float: right; margin: 10px;"/>
+                    <button name="action_print_filter_vendor_statement_xls" icon="fa-file-excel-o"
+                            title="Print Filter Vendor Statement " string="Print Filter Vendor Statement" type="object"
+                            class="oe_highlight m-2" style="float: right; margin: 10px;"/>
+                    <group string="Vendor Statements By Filter"></group>
+                    <field name="sh_filter_vendor_statement_ids" readonly="True" nolabel="1">
+                        <form string="Vendor Statements by Filter">
+                            <group>
+                                <group>
+                                    <field name="sh_account" column_invisible="1"/>
+                                    <field name="name"/>
+                                    <field name="currency_id" column_invisible="1"/>
+                                    <field name="sh_vendor_filter_invoice_date"/>
+                                    <field name="sh_vendor_filter_due_date"/>
+                                </group>
+                                <group>
+                                    <field name="sh_vendor_filter_amount"/>
+                                    <field name="sh_vendor_filter_paid_amount"/>
+                                    <field name="sh_vendor_filter_balance"/>
+                                </group>
+                            </group>
+                        </form>
+                        <tree decoration-info="sh_vendor_filter_amount == sh_vendor_filter_balance and sh_vendor_filter_balance &gt; 0.0 or sh_vendor_filter_amount == sh_vendor_filter_balance and sh_vendor_filter_balance &lt; 0.0"
+                              decoration-success="sh_vendor_filter_balance == 0.0"
+                              decoration-danger="sh_vendor_filter_amount != sh_vendor_filter_balance and sh_vendor_filter_balance &gt; 0.0 or sh_vendor_filter_amount != sh_vendor_filter_balance and sh_vendor_filter_balance &lt; 0.0">
+                            <field name="sh_account" column_invisible="1"/>
+                            <field name="name"/>
+                            <field name="currency_id" invisible="1"/>
+                            <field name="sh_vendor_filter_invoice_date"/>
+                            <field name="sh_vendor_filter_due_date" widget="remaining_days"/>
+                            <field name="sh_vendor_filter_amount" sum="Total Filter Amount"/>
+                            <field name="sh_vendor_filter_paid_amount" sum="Total Filter Paid Amount"/>
+                            <field name="sh_vendor_filter_balance" sum="Total Filter Balance"/>
+                        </tree>
+                    </field>
+
+                    <hr style="background: #7c7bad;"/>
+                    <button name="action_send_vendor_whatsapp" type="object" icon="fa-whatsapp"
+                            string="Send By Whatsapp" class="oe_highlight m-2"
+                            groups="sh_account_statement.vendor_statement_group_whatsapp"
+                            style="float: right; margin: 10px;"/>
+                    <button name="action_send_vendor_statement" icon="fa-envelope" title="Send Vendor Statement"
+                            string="Send Vendor Statement" type="object" class="oe_highlight m-2"
+                            style="float: right; margin: 10px;"/>
+                    <button name="action_print_vendor_statement" icon="fa-print" title="Print Vendor Statement"
+                            string="Print Vendor Statement" type="object" class="oe_highlight m-2"
+                            style="float: right; margin: 10px;"/>
+                    <button name="action_print_vendor_statement_xls" icon="fa-file-excel-o"
+                            title="Print vendor Statement " string="Print Vendor Statement" type="object"
+                            class="oe_highlight m-2" style="float: right; margin: 10px;"/>
+                    <group string="Vendor Statements"></group>
+                    <field name="sh_vendor_statement_ids" nolabel="1" readonly="True">
+                        <form string="Vendor Statements">
+                            <group>
+                                <group>
+                                    <field name="sh_account" column_invisible="1"/>
+                                    <field name="name"/>
+                                    <field name="currency_id" column_invisible="1"/>
+                                    <field name="sh_vendor_invoice_date"/>
+                                    <field name="sh_vendor_due_date"/>
+                                </group>
+                                <group>
+                                    <field name="sh_vendor_amount"/>
+                                    <field name="sh_vendor_paid_amount"/>
+                                    <field name="sh_vendor_balance"/>
+                                </group>
+                            </group>
+                        </form>
+                        <tree decoration-info="sh_vendor_amount == sh_vendor_balance and sh_vendor_balance &gt; 0.0 or sh_vendor_amount == sh_vendor_balance and sh_vendor_balance &lt; 0.0"
+                              decoration-success="sh_vendor_balance == 0.0"
+                              decoration-danger="sh_vendor_amount != sh_vendor_balance and sh_vendor_balance &gt; 0.0 or sh_vendor_amount != sh_vendor_balance and sh_vendor_balance &lt; 0.0">
+                            <field name="sh_account" column_invisible="1"/>
+                            <field name="name"/>
+                            <field name="currency_id" column_invisible="1"/>
+                            <field name="sh_vendor_invoice_date"/>
+                            <field name="sh_vendor_due_date" widget="remaining_days"/>
+                            <field name="sh_vendor_amount" sum="Total Amount"/>
+                            <field name="sh_vendor_paid_amount" sum="Total Paid Amount"/>
+                            <field name="sh_vendor_balance" sum="Total Balance"/>
+                        </tree>
+                    </field>
+                    <table class="table">
+                        <tr>
+                            <th>Gap Between Days</th>
+                            <th>0-30(Days)</th>
+                            <th>30-60(Days)</th>
+                            <th>60-90(Days)</th>
+                            <th>90+(Days)</th>
+                            <th>Total</th>
+                        </tr>
+                        <tr>
+                            <td>
+                                <strong>Balance Amount</strong>
+                            </td>
+                            <td>
+                                <field name="sh_vendor_zero_to_thiry" readonly="1"/>
+                            </td>
+                            <td>
+                                <field name="sh_vendor_thirty_to_sixty" readonly="1"/>
+                            </td>
+                            <td>
+                                <field name="sh_vendor_sixty_to_ninety" readonly="1"/>
+                            </td>
+                            <td>
+                                <field name="sh_vendor_ninety_plus" readonly="1"/>
+                            </td>
+                            <td>
+                                <field name="sh_vendor_total" readonly="1"/>
+                            </td>
+                        </tr>
+                    </table>
+                    <hr style="background: #7c7bad;"/>
+                    <button name="action_send_due_vendor_whatsapp" type="object" icon="fa-whatsapp"
+                            string="Send By Whatsapp" class="oe_highlight m-2"
+                            groups="sh_account_statement.vendor_statement_group_whatsapp"
+                            style="float: right; margin: 10px;"/>
+                    <button name="action_send_vendor_due_statement" icon="fa-envelope"
+                            title="Send Vendor Due/Overdue Statement" string="Send Overdue Vendor Statement"
+                            type="object" class="oe_highlight m-2" style="float: right; margin: 10px;"/>
+                    <button name="action_print_vendor_due_statement" icon="fa-print"
+                            title="Print Vendor Due/Overdue Statement" string="Print Overdue Vendor Statement"
+                            type="object" class="oe_highlight m-2" style="float: right; margin: 10px;"/>
+                    <button name="action_print_vendor_due_statement_xls" icon="fa-file-excel-o"
+                            title="Print vendor Due Statement " string="Print Vendor Due Statement" type="object"
+                            class="oe_highlight m-2" style="float: right; margin: 10px;"/>
+                    <group string="Vendor Overdue Statements"></group>
+                    <field name="sh_vendor_due_statement_ids" readonly="True" nolabel="1">
+                        <form string="Vendor Overdue Statements">
+                            <group>
+                                <group>
+                                    <field name="sh_account" column_invisible="1"/>
+                                    <field name="name"/>
+                                    <field name="currency_id" column_invisible="1"/>
+                                    <field name="sh_due_vendor_invoice_date"/>
+                                    <field name="sh_due_vendor_due_date"/>
+                                </group>
+                                <group>
+                                    <field name="sh_due_vendor_amount"/>
+                                    <field name="sh_due_vendor_paid_amount"/>
+                                    <field name="sh_due_vendor_balance"/>
+                                </group>
+                            </group>
+                        </form>
+                        <tree decoration-danger="sh_due_vendor_due_date &lt; sh_today and sh_due_vendor_balance > 0.0">
+                            <field name="sh_account" column_invisible="1"/>
+                            <field name="sh_today" column_invisible="1"/>
+                            <field name="name"/>
+                            <field name="currency_id" column_invisible="1"/>
+                            <field name="sh_due_vendor_invoice_date"/>
+                            <field name="sh_due_vendor_due_date" widget="remaining_days"/>
+                            <field name="sh_due_vendor_amount" sum="Total Due Amount"/>
+                            <field name="sh_due_vendor_paid_amount" sum="Total Due Paid Amount"/>
+                            <field name="sh_due_vendor_balance" sum="Total Due Balance"/>
+                        </tree>
+                    </field>
+
+                </page>
+            </xpath>
+            <xpath expr="//page[@name='accounting']//group[1]" position="after">
+                <group>
+                    <group>
+                        <field name="sh_dont_send_statement_auto"/>
+                        <field name="sh_dont_send_due_statement_auto"/>
+                    </group>
+                </group>
+            </xpath>
+            <xpath expr="//div[@name='button_box']" position="inside">
+                <button type="object" class="oe_stat_button" icon="fa-envelope" name="action_view_partner_history">
+                    <div class="o_form_field o_stat_info">
+                        <span class="o_stat_text">Log History</span>
+                    </div>
+                </button>
+            </xpath>
+        </field>
+    </record>
+    <record id="sh_res_partner_search_view" model="ir.ui.view">
+        <field name="name">res.partner</field>
+        <field name="model">res.partner</field>
+        <field name="inherit_id" ref="base.view_res_partner_filter"/>
+        <field name="arch" type="xml">
+            <filter name="inactive" position="after">
+                <filter string="Don't Send Statement Auto" name="statement_auto"
+                        domain="[('sh_dont_send_statement_auto', '=', True)]"/>
+                <filter string="Don't Send Overdue Statement Auto" name="statement_auto"
+                        domain="[('sh_dont_send_due_statement_auto', '=', True)]"/>
+                <filter string="Customer Statement" name="customer_statement"
+                        domain="[('sh_customer_statement_ids', '!=', False)]"/>
+                <filter string="Customer Overdue Statement" name="customer_due_statement"
+                        domain="[('sh_customer_due_statement_ids', '!=', False)]"/>
+                <filter string="Vendor Statement" name="vendor_statement"
+                        domain="[('sh_vendor_statement_ids', '!=', False)]"/>
+                <filter string="Vendor Overdue Statement" name="vendor_due_statement"
+                        domain="[('sh_vendor_due_statement_ids', '!=', False)]"/>
+            </filter>
+        </field>
+    </record>
+</odoo>

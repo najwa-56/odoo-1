@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+	<template id="sh_statement_assets_frontend" inherit_id="portal.assets_frontend">
+        <xpath expr="script[last()]" position="after">
+            <script type="text/javascript" src="/sh_account_statement/static/src/js/portal.js" />
+        </xpath>
+    </template>
+</odoo>

@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="sh_update_statement_config_wizard" model="ir.ui.view">
+        <field name="name">sh.partners.config.mass.update.config.wizard</field>
+        <field name="model">sh.partners.config.mass.update</field>
+        <field name="arch" type="xml">
+            <form string="Mass Update">
+                <group>
+                    <group>
+                        <field name="sh_update_config_ids" widget="many2many_tags"/>
+                        <field name="sh_partners_config_update" widget="radio" nolabel="1" />
+                        <field name="sh_selected_partner_ids" invisible="True" />
+                    </group>
+                </group>
+                <footer>
+                    <button name="update_partners_config" string="Update" type="object" class="btn-primary"/>
+                    <button string="Cancel" class="btn-secondary" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <record id="sh_update_statement_config_action_wizard" model="ir.actions.act_window">
+        <field name="name">Mass Update Config</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">sh.partners.config.mass.update</field>
+        <field name="view_mode">form</field>
+        <field name="view_id" ref="sh_update_statement_config_wizard"/>
+        <field name="target">new</field>
+    </record>
+</odoo>

@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <record id='sh_statement_form' model="ir.ui.view">
+        <field name='name'>sh.statement.config</field>
+        <field name='model'>sh.statement.config</field>
+        <field name="arch" type='xml'>
+            <form>
+                <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button name="mail_history" type="object" icon="fa-envelope" class="oe_stat_button" string="Mail History" />
+                    </div>
+                    <group>
+                        <group>
+                            <field name="name" required="True" />
+                            <field name="sh_customer_partner_ids" required="True" widget="many2many_tags" domain="[('customer_rank','>=',1)]"/>
+                            <field name="sh_cust_create_log_history" />
+                            <field name="sh_customer_statement_auto_send" />
+                            <field name="filter_only_unpaid_and_send_that" />
+                            <field name="sh_customer_statement_action" invisible="not sh_customer_statement_auto_send" required="sh_customer_statement_auto_send"  />
+                            <field name="sh_cus_daily_statement_template_id" required="sh_customer_statement_action=='daily'"   invisible="sh_customer_statement_action!='daily'"   domain="[('model','=','res.partner')]" options="{'no_create': True}"/>
+                            <field name="sh_cust_week_day" required="sh_customer_statement_action=='weekly'"  invisible="sh_customer_statement_action!='weekly'" />
+                            <field name="sh_cust_weekly_statement_template_id" required="sh_customer_statement_action=='weekly'" invisible="sh_customer_statement_action!='weekly'"  domain="[('model','=','res.partner')]" options="{'no_create': True}"/>
+                            <field name="sh_cust_monthly_end"  invisible="sh_customer_statement_action!='monthly'"  />
+                            <field name="sh_cust_monthly_date"  required="sh_customer_statement_action=='monthly'"  invisible="sh_cust_monthly_end or sh_customer_statement_action!='monthly'" />
+                            <field name="sh_cust_monthly_template_id"  required="sh_customer_statement_action=='monthly'"  invisible="sh_customer_statement_action!='monthly'"  domain="[('model','=','res.partner')]" options="{'no_create': True}"/>
+                            <field name="sh_cust_yearly_date" required="sh_customer_statement_action=='yearly'" invisible="sh_customer_statement_action!='yearly'"  />
+                            <field name="sh_cust_yearly_month"  required="sh_customer_statement_action=='yearly'"  invisible="sh_customer_statement_action!='yearly'" />
+                            <field name="sh_cust_yearly_template_id" required="sh_customer_statement_action=='yearly'" invisible="sh_customer_statement_action!='yearly'"  domain="[('model','=','res.partner')]" options="{'no_create': True}"/>
+                            <!-- </group>
+                        <group> -->
+
+                            <field name="sh_cust_due_create_log_history" />
+                            <field name="sh_customer_due_statement_auto_send" />
+                            <field name = "filter_only_unpaid_bill_and_send_that"/>
+                            <field name="sh_customer_due_statement_action" invisible="not sh_customer_due_statement_auto_send" required="sh_customer_due_statement_auto_send"  />
+                            <field name="sh_cus_due_daily_statement_template_id" required="sh_customer_due_statement_action=='daily'"  invisible="sh_customer_due_statement_action!='daily'"  domain="[('model','=','res.partner')]" options="{'no_create': True}"/>
+                            <field name="sh_cust_due_week_day" required="sh_customer_due_statement_action=='weekly'" invisible="sh_customer_due_statement_action!='weekly'" />
+                            <field name="sh_cust_due_weekly_statement_template_id" required="sh_customer_due_statement_action=='weekly'" invisible="sh_customer_due_statement_action!='weekly'"  domain="[('model','=','res.partner')]" options="{'no_create': True}"/>
+                            <field name="sh_cust_due_monthly_end"  invisible="sh_customer_due_statement_action!='monthly'"   />
+                            <field name="sh_cust_due_monthly_date" required="sh_customer_due_statement_action=='monthly'" invisible="sh_cust_due_monthly_end or sh_customer_due_statement_action!='monthly'"    />
+                            <field name="sh_cust_due_monthly_template_id" required="sh_customer_due_statement_action=='monthly'"  invisible="sh_customer_due_statement_action!='monthly'"    domain="[('model','=','res.partner')]" options="{'no_create': True}"/>
+                            <field name="sh_cust_due_yearly_date"  required="sh_customer_due_statement_action=='yearly'"  invisible="sh_customer_due_statement_action!='yearly'"  />
+                            <field name="sh_cust_due_yearly_month"  required="sh_customer_due_statement_action=='yearly'" invisible="sh_customer_due_statement_action!='yearly'"  />
+                            <field name="sh_cust_due_yearly_template_id" required="sh_customer_due_statement_action=='yearly'" invisible="sh_customer_due_statement_action!='yearly'"  domain="[('model','=','res.partner')]" options="{'no_create': True}"/>
+                        </group>
+                        <group>
+                            <field name="sh_vendor_partner_ids" required="True" widget="many2many_tags" domain="[('supplier_rank','>=',1)]"/>
+                            <field name="sh_vend_create_log_history" />
+                            <field name="sh_vendor_statement_auto_send" />
+                            <field name="sh_vendor_statement_action"  invisible="not sh_vendor_statement_auto_send" required="sh_vendor_statement_auto_send"  />
+                            <field name="sh_vend_daily_statement_template_id" required="sh_vendor_statement_action=='daily'" invisible="sh_vendor_statement_action!='daily'"   domain="[('model','=','res.partner')]" options="{'no_create': True}"/>
+                            <field name="sh_vend_week_day"   required="sh_vendor_statement_action=='weekly'"  invisible="sh_vendor_statement_action!='weekly'"  />
+                            <field name="sh_vend_weekly_statement_template_id" required="sh_vendor_statement_action=='weekly'" invisible="sh_vendor_statement_action!='weekly'"   domain="[('model','=','res.partner')]" options="{'no_create': True}"/>
+                            <field name="sh_vend_monthly_end" invisible="sh_vendor_statement_action!='monthly'"  />
+                            <field name="sh_vend_monthly_date" required="sh_vendor_statement_action=='monthly'" invisible="sh_vend_monthly_end or sh_vendor_statement_action!='monthly'"  />
+                            <field name="sh_vend_monthly_template_id" required="sh_vendor_statement_action=='monthly'" invisible="sh_vendor_statement_action!='monthly'"   domain="[('model','=','res.partner')]" options="{'no_create': True}"/>
+                            <field name="sh_vend_yearly_date"  required="sh_vendor_statement_action=='yearly'" invisible="sh_vendor_statement_action!='yearly'"  />
+                            <field name="sh_vend_yearly_month"  required="sh_vendor_statement_action=='yearly'" invisible="sh_vendor_statement_action!='yearly'" />
+                            <field name="sh_vend_yearly_template_id"  required="sh_vendor_statement_action=='yearly'" invisible="sh_vendor_statement_action!='yearly'"  domain="[('model','=','res.partner')]" options="{'no_create': True}"/>
+                            <!-- </group>
+                        <group> -->
+
+                            <field name="sh_vend_due_create_log_history" />
+                            <field name="sh_vendor_due_statement_auto_send" />
+                            <field name="sh_vendor_due_statement_action"  invisible="not sh_vendor_due_statement_auto_send" required="sh_vendor_due_statement_auto_send"   />
+                            <field name="sh_vend_due_daily_statement_template_id" required="sh_vendor_due_statement_action=='daily'" invisible="sh_vendor_due_statement_action!='daily'"  domain="[('model','=','res.partner')]" options="{'no_create': True}"/>
+                            <field name="sh_vend_due_week_day" required="sh_vendor_due_statement_action=='weekly'" invisible="sh_vendor_due_statement_action!='weekly'" />
+                            <field name="sh_vend_due_weekly_statement_template_id"  required="sh_vendor_due_statement_action=='weekly'" invisible="sh_vendor_due_statement_action!='weekly'"  domain="[('model','=','res.partner')]" options="{'no_create': True}"/>
+                            <field name="sh_vend_due_monthly_end" invisible="sh_vendor_due_statement_action!='monthly'" />
+                            <field name="sh_vend_due_monthly_date" required="sh_vendor_due_statement_action=='monthly'"  invisible="sh_vend_due_monthly_end or sh_vendor_due_statement_action!='monthly'" />
+                            <field name="sh_vend_due_monthly_template_id" required="sh_vendor_due_statement_action=='monthly'" invisible="sh_vendor_due_statement_action!='monthly'"    domain="[('model','=','res.partner')]" options="{'no_create': True}"/>
+                            <field name="sh_vend_due_yearly_date" required="sh_vendor_due_statement_action=='yearly'" invisible="sh_vendor_due_statement_action!='yearly'"    />
+                            <field name="sh_vend_due_yearly_month" required="sh_vendor_due_statement_action=='yearly'" invisible="sh_vendor_due_statement_action!='yearly'"/>
+                            <field name="sh_vend_due_yearly_template_id" required="sh_vendor_due_statement_action=='yearly'" invisible="sh_vendor_due_statement_action!='yearly'" domain="[('model','=','res.partner')]" options="{'no_create': True}"/>
+                        </group>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id='sh_statement_tree' model="ir.ui.view">
+        <field name='name'>Statement Config</field>
+        <field name='model'>sh.statement.config</field>
+        <field name="arch" type='xml'>
+            <tree>
+                <field name="name" />
+            </tree>
+        </field>
+    </record>
+
+    <record id='sh_statement_action' model="ir.actions.act_window">
+        <field name='name'>Statement Config</field>
+        <field name='res_model'>sh.statement.config</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+    <menuitem id="menu_customer_statement_config" action="sh_statement_action" parent='account.menu_finance_configuration' sequence="1" />
+
+</odoo>

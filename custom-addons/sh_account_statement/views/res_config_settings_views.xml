@@ -1,0 +1,517 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="sh_statement_config_setting_view" model="ir.ui.view">
+        <field name="name">res.config.settings</field>
+        <field name="model">res.config.settings</field>
+        <field name="inherit_id" ref="account.res_config_settings_view_form" />
+        <field name="arch" type="xml">
+            <xpath expr="//app[@name='account']" position="inside">
+            	<h2>Due/Overdue Statement Display configuration</h2>
+            	<div class="row o_settings_container">
+                    <div class="col-6 o_setting_box">
+                        <div class="o_setting_right_pane">
+                            <label for="sh_display_due_statement" />
+                            <br />
+                            <field name="sh_display_due_statement" class="oe_inline" force_save="1" />
+                        </div>
+                        <div class="o_setting_left_pane"></div>
+                    </div>
+                </div>
+            	<h2>Account Statement Menu Display in portal configuration</h2>
+            	<div class="row o_settings_container">
+                    <div class="col-6 o_setting_box">
+                        <div class="o_setting_left_pane">
+                            <field name="sh_display_customer_statement" />
+                        </div>
+                        <div class="o_setting_right_pane">
+                            <label for="sh_display_customer_statement" />
+                        </div>
+                    </div>
+                    <div class="col-6 o_setting_box">
+                        <div class="o_setting_left_pane">
+                            <field name="sh_display_vendor_statement" />
+                        </div>
+                        <div class="o_setting_right_pane">
+                            <label for="sh_display_vendor_statement" />
+                        </div>
+                    </div>
+                </div>
+                <h2>Account Statement Mail Log History Configuration</h2>
+                <div class="row o_settings_container">
+                    <div class="col-6 o_setting_box">
+                        <div class="o_setting_left_pane">
+                            <field name="sh_cust_create_log_history" />
+                        </div>
+                        <div class="o_setting_right_pane">
+                            <label for="sh_cust_create_log_history" />
+                        </div>
+                    </div>
+                    <div class="col-6 o_setting_box">
+                        <div class="o_setting_left_pane">
+                            <field name="sh_vend_create_log_history" />
+                        </div>
+                        <div class="o_setting_right_pane">
+                            <label for="sh_vend_create_log_history" />
+                        </div>
+                    </div>
+                </div>
+                <div class="row o_settings_container">
+                    <div class="col-6 o_setting_box">
+                        <div class="o_setting_left_pane">
+                            <field name="sh_cust_due_create_log_history" />
+                        </div>
+                        <div class="o_setting_right_pane">
+                            <label for="sh_cust_due_create_log_history" />
+                        </div>
+                    </div>
+                    <div class="col-6 o_setting_box">
+                        <div class="o_setting_left_pane">
+                            <field name="sh_vend_due_create_log_history" />
+                        </div>
+                        <div class="o_setting_right_pane">
+                            <label for="sh_vend_due_create_log_history" />
+                        </div>
+                    </div>
+                </div>
+                <div class="row o_settings_container">
+                    <div class="col-12 o_setting_box">
+                        <button name="%(sh_account_statement.sh_mail_history_action)d" icon="fa-arrow-right" type="action" string="See all mail log history" class="btn-link" />
+                    </div>
+                </div>
+                <h2>Account Statement Auto Send Configuration</h2>
+                <div class="row o_settings_container">
+                    <div class="col-6 o_setting_box">
+                        <div class="o_setting_left_pane">
+                            <field name="sh_customer_statement_auto_send" />
+                        </div>
+                        <div class="o_setting_right_pane">
+                            <label for="sh_customer_statement_auto_send" />
+                        </div>
+                    </div>
+                    <div class="col-6 o_setting_box">
+                        <div class="o_setting_left_pane">
+                            <field name="sh_vendor_statement_auto_send" />
+                        </div>
+                        <div class="o_setting_right_pane">
+                            <label for="sh_vendor_statement_auto_send" />
+                        </div>
+                    </div>
+                </div>
+                <div class="row o_settings_container">
+                    <div class="col-6 o_setting_box">
+                        <div class="o_setting_right_pane" invisible="not sh_customer_statement_auto_send" >
+                            <label for="sh_customer_statement_action" />
+                            <br />
+                            <field name="sh_customer_statement_action" class="oe_inline" required="sh_customer_statement_auto_send"  />
+                        </div>
+                        <div class="o_setting_left_pane"></div>
+                        <div class="o_setting_right_pane" invisible="sh_customer_statement_action!='daily'" >
+                            <label for="sh_cus_daily_statement_template_id" />
+                            <br />
+                            <field
+                                name="sh_cus_daily_statement_template_id"
+                                class="oe_inline"
+                                required="sh_customer_statement_action=='daily'"
+                                domain="[('model','=','res.partner')]"
+                                context="{'default_model':'res.partner'}"
+                            />
+                        </div>
+                        <div class="o_setting_left_pane"></div>
+                        <div class="o_setting_right_pane" invisible="sh_customer_statement_action!='weekly'" >
+                            <label for="sh_cust_week_day" />
+                            <br />
+                            <field name="sh_cust_week_day" class="oe_inline" required="sh_customer_statement_action=='weekly'"  />
+                        </div>
+                        <div class="o_setting_left_pane"></div>
+                        <div class="o_setting_right_pane" invisible="sh_customer_statement_action!='weekly'" >
+                            <label for="sh_cust_weekly_statement_template_id" />
+                            <br />
+                            <field
+                                name="sh_cust_weekly_statement_template_id"
+                                class="oe_inline"
+                                required="sh_customer_statement_action=='weekly'"
+                                domain="[('model','=','res.partner')]"
+                                context="{'default_model':'res.partner'}"
+                            />
+                        </div>
+                        <div class="o_setting_left_pane"></div>
+                        <div class="o_setting_right_pane" invisible="sh_customer_statement_action!='monthly'" >
+                            <label for="sh_cust_monthly_end" />
+                            <br />
+                            <field name="sh_cust_monthly_end" class="oe_inline" />
+                        </div>
+                        <div class="o_setting_left_pane"></div>
+                        <div class="o_setting_right_pane" invisible="sh_customer_statement_action!='monthly' or sh_cust_monthly_end" >
+                            <label for="sh_cust_monthly_date" />
+                            <br />
+                            <field name="sh_cust_monthly_date" class="oe_inline" required="sh_customer_statement_action=='monthly' or not sh_cust_monthly_end"  />
+                        </div>
+                        <div class="o_setting_left_pane"></div>
+                        <div class="o_setting_right_pane" invisible="sh_customer_statement_action!='monthly'" >
+                            <label for="sh_cust_monthly_template_id" />
+                            <br />
+                            <field
+                                name="sh_cust_monthly_template_id"
+                                class="oe_inline"
+                                required="sh_customer_statement_action=='monthly'"
+                                domain="[('model','=','res.partner')]"
+                                context="{'default_model':'res.partner'}"
+                            />
+                        </div>
+                        <div class="o_setting_left_pane"></div>
+                        <div class="o_setting_right_pane" invisible="sh_customer_statement_action!='yearly'"   >
+                            <label for="sh_cust_yearly_date" />
+                            <br />
+                            <field name="sh_cust_yearly_date" class="oe_inline" required="sh_customer_statement_action=='yearly'"  />
+                        </div>
+                        <div class="o_setting_left_pane"></div>
+                        <div class="o_setting_right_pane" invisible="sh_customer_statement_action!='yearly'" >
+                            <label for="sh_cust_yearly_month" />
+                            <br />
+                            <field name="sh_cust_yearly_month" class="oe_inline" required="sh_customer_statement_action=='yearly'"  />
+                        </div>
+                        <div class="o_setting_left_pane"></div>
+                        <div class="o_setting_right_pane" invisible="sh_customer_statement_action!='yearly'" >
+                            <label for="sh_cust_yearly_template_id" />
+                            <br />
+                            <field name="sh_cust_yearly_template_id" class="oe_inline" required="sh_customer_statement_action=='yearly'" domain="[('model','=','res.partner')]" context="{'default_model':'res.partner'}" />
+                        </div>
+                        <div class="o_setting_left_pane"></div>
+                    </div>
+                    <div class="col-6 o_setting_box">
+                        <div class="o_setting_right_pane"   invisible="not sh_vendor_statement_auto_send"  >
+                            <label for="sh_vendor_statement_action" />
+                            <br />
+                            <field name="sh_vendor_statement_action" class="oe_inline" required="sh_vendor_statement_auto_send"  />
+                        </div>
+                        <div class="o_setting_left_pane"></div>
+                        <div class="o_setting_right_pane" invisible="sh_vendor_statement_action!='daily'"  >
+                            <label for="sh_vend_daily_statement_template_id" />
+                            <br />
+                            <field
+                                name="sh_vend_daily_statement_template_id"
+                                class="oe_inline"
+
+                                required="sh_vendor_statement_action=='daily'"
+                                domain="[('model','=','res.partner')]"
+                                context="{'default_model':'res.partner'}"
+                            />
+                        </div>
+                        <div class="o_setting_left_pane"></div>
+                        <div class="o_setting_right_pane" invisible="sh_vendor_statement_action!='weekly'" >
+                            <label for="sh_vend_week_day" />
+                            <br />
+                            <field name="sh_vend_week_day" class="oe_inline" required="sh_vendor_statement_action=='weekly'" />
+                        </div>
+                        <div class="o_setting_left_pane"></div>
+                        <div class="o_setting_right_pane" invisible="sh_vendor_statement_action!='weekly'" >
+                            <label for="sh_vend_weekly_statement_template_id" />
+                            <br />
+                            <field
+                                name="sh_vend_weekly_statement_template_id"
+                                class="oe_inline"
+                                required="sh_vendor_statement_action=='weekly'"
+                                domain="[('model','=','res.partner')]"
+                                context="{'default_model':'res.partner'}"
+                            />
+                        </div>
+                        <div class="o_setting_left_pane"></div>
+                        <div class="o_setting_right_pane" invisible="sh_vendor_statement_action!='monthly'" >
+                            <label for="sh_vend_monthly_end" />
+                            <br />
+                            <field name="sh_vend_monthly_end" class="oe_inline" />
+                        </div>
+                        <div class="o_setting_left_pane"></div>
+                        <div class="o_setting_right_pane" invisible="sh_vend_monthly_end or sh_vendor_statement_action!='monthly'" >
+                            <label for="sh_vend_monthly_date" />
+                            <br />
+                            <field name="sh_vend_monthly_date" class="oe_inline"  required="not sh_vend_monthly_end or sh_vendor_statement_action=='monthly'"  />
+                        </div>
+                        <div class="o_setting_left_pane"></div>
+                        <div class="o_setting_right_pane"  invisible="sh_vendor_statement_action!='monthly'"  >
+                            <label for="sh_vend_monthly_template_id" />
+                            <br />
+                            <field name="sh_vend_monthly_template_id" class="oe_inline" required="sh_vendor_statement_action=='monthly'"  domain="[('model','=','res.partner')]" context="{'default_model':'res.partner'}" />
+                        </div>
+                        <div class="o_setting_left_pane"></div>
+                        <div class="o_setting_right_pane" invisible="sh_vendor_statement_action!='yearly'"  >
+                            <label for="sh_vend_yearly_date" />
+                            <br />
+                            <field name="sh_vend_yearly_date" class="oe_inline" required="sh_vendor_statement_action=='yearly'"  />
+                        </div>
+                        <div class="o_setting_left_pane"></div>
+                        <div class="o_setting_right_pane" invisible="sh_vendor_statement_action!='yearly'" >
+                            <label for="sh_vend_yearly_month" />
+                            <br />
+                            <field name="sh_vend_yearly_month" class="oe_inline" required="sh_vendor_statement_action=='yearly'"  />
+                        </div>
+                        <div class="o_setting_left_pane"></div>
+                        <div class="o_setting_right_pane" invisible="sh_vendor_statement_action!='yearly'"  >
+                            <label for="sh_vend_yearly_template_id" />
+                            <br />
+                            <field name="sh_vend_yearly_template_id" class="oe_inline"  required="sh_vendor_statement_action=='yearly'"  domain="[('model','=','res.partner')]" context="{'default_model':'res.partner'}" />
+                        </div>
+                        <div class="o_setting_left_pane"></div>
+                    </div>
+                </div>
+                <div class="row o_settings_container">
+                    <div class="col-6 o_setting_box">
+                        <div class="o_setting_left_pane">
+                            <field name="sh_customer_due_statement_auto_send" />
+                        </div>
+                        <div class="o_setting_right_pane">
+                            <label for="sh_customer_due_statement_auto_send" />
+                        </div>
+                    </div>
+                    <div class="col-6 o_setting_box">
+                        <div class="o_setting_left_pane">
+                            <field name="sh_vendor_due_statement_auto_send" />
+                        </div>
+                        <div class="o_setting_right_pane">
+                            <label for="sh_vendor_due_statement_auto_send" />
+                        </div>
+                    </div>
+                </div>
+                <div class="row o_settings_container">
+                    <div class="col-6 o_setting_box">
+                        <div class="o_setting_right_pane" invisible="not sh_customer_due_statement_auto_send"   >
+                            <label for="sh_customer_due_statement_action" />
+                            <br />
+                            <field name="sh_customer_due_statement_action" class="oe_inline" required="sh_customer_due_statement_auto_send"  />
+                        </div>
+                        <div class="o_setting_left_pane"></div>
+                        <div class="o_setting_right_pane"  invisible="sh_customer_due_statement_action!='daily'" >
+                            <label for="sh_cus_due_daily_statement_template_id" />
+                            <br />
+                            <field
+                                name="sh_cus_due_daily_statement_template_id"
+                                class="oe_inline"
+                                required="sh_customer_due_statement_action=='daily'"
+                                domain="[('model','=','res.partner')]"
+                                context="{'default_model':'res.partner'}"
+                            />
+                        </div>
+                        <div class="o_setting_left_pane"></div>
+                        <div class="o_setting_right_pane"  invisible="sh_customer_due_statement_action!='weekly'" >
+                            <label for="sh_cust_due_week_day" />
+                            <br />
+                            <field name="sh_cust_due_week_day" class="oe_inline" required="sh_customer_due_statement_action=='weekly'" />
+                        </div>
+                        <div class="o_setting_left_pane"></div>
+                        <div class="o_setting_right_pane"  invisible="sh_customer_due_statement_action!='weekly'"  >
+                            <label for="sh_cust_due_weekly_statement_template_id" />
+                            <br />
+                            <field
+                                name="sh_cust_due_weekly_statement_template_id"
+                                class="oe_inline"
+                                required="sh_customer_due_statement_action=='weekly'"
+                                domain="[('model','=','res.partner')]"
+                                context="{'default_model':'res.partner'}"
+                            />
+                        </div>
+                        <div class="o_setting_left_pane"></div>
+                        <div class="o_setting_right_pane" invisible="sh_customer_due_statement_action!='monthly'" >
+                            <label for="sh_cust_due_monthly_end" />
+                            <br />
+                            <field name="sh_cust_due_monthly_end" class="oe_inline" />
+                        </div>
+                        <div class="o_setting_left_pane"></div>
+                        <div class="o_setting_right_pane" invisible="sh_cust_due_monthly_end or sh_customer_due_statement_action!='monthly'" >
+                            <label for="sh_cust_due_monthly_date" />
+                            <br />
+                            <field name="sh_cust_due_monthly_date" class="oe_inline" required="not sh_cust_due_monthly_end or sh_customer_due_statement_action=='monthly'"  />
+                        </div>
+                        <div class="o_setting_left_pane"></div>
+                        <div class="o_setting_right_pane" invisible="sh_customer_due_statement_action!='monthly'" >
+                            <label for="sh_cust_due_monthly_template_id" />
+                            <br />
+                            <field
+                                name="sh_cust_due_monthly_template_id"
+                                class="oe_inline"
+                                required="sh_customer_due_statement_action=='monthly'"
+                                domain="[('model','=','res.partner')]"
+                                context="{'default_model':'res.partner'}"
+                            />
+                        </div>
+                        <div class="o_setting_left_pane"></div>
+                        <div class="o_setting_right_pane" invisible="sh_customer_due_statement_action!='yearly'" >
+                            <label for="sh_cust_due_yearly_date" />
+                            <br />
+                            <field name="sh_cust_due_yearly_date" class="oe_inline" required="sh_customer_due_statement_action=='yearly'"  />
+                        </div>
+                        <div class="o_setting_left_pane"></div>
+                        <div class="o_setting_right_pane" invisible="sh_customer_due_statement_action!='yearly'" >
+                            <label for="sh_cust_due_yearly_month" />
+                            <br />
+                            <field name="sh_cust_due_yearly_month" class="oe_inline" required="sh_customer_due_statement_action=='yearly'"  />
+                        </div>
+                        <div class="o_setting_left_pane"></div>
+                        <div class="o_setting_right_pane" invisible="sh_customer_due_statement_action!='yearly'" >
+                            <label for="sh_cust_due_yearly_template_id" />
+                            <br />
+                            <field
+                                name="sh_cust_due_yearly_template_id"
+                                class="oe_inline"
+                                required="sh_customer_due_statement_action=='yearly'"
+                                domain="[('model','=','res.partner')]"
+                                context="{'default_model':'res.partner'}"
+                            />
+                        </div>
+                        <div class="o_setting_left_pane"></div>
+                    </div>
+
+                    <div class="col-6 o_setting_box">
+                        <div class="o_setting_right_pane" invisible="not sh_vendor_due_statement_auto_send" >
+                            <label for="sh_vendor_due_statement_action" />
+                            <br />
+                            <field name="sh_vendor_due_statement_action" class="oe_inline" required="sh_vendor_due_statement_auto_send"  />
+                        </div>
+                        <div class="o_setting_left_pane"></div>
+                        <div class="o_setting_right_pane" invisible="sh_vendor_due_statement_action!='daily'" >
+                            <label for="sh_vend_due_daily_statement_template_id" />
+                            <br />
+                            <field
+                                name="sh_vend_due_daily_statement_template_id"
+                                class="oe_inline"
+                                required="sh_vendor_due_statement_action=='daily'"
+                                domain="[('model','=','res.partner')]"
+                                context="{'default_model':'res.partner'}"
+                            />
+                        </div>
+                        <div class="o_setting_left_pane"></div>
+                        <div class="o_setting_right_pane" invisible="sh_vendor_due_statement_action!='weekly'" >
+                            <label for="sh_vend_due_week_day" />
+                            <br />
+                            <field name="sh_vend_due_week_day" class="oe_inline" required="sh_vendor_due_statement_action=='weekly'"  />
+                        </div>
+                        <div class="o_setting_left_pane"></div>
+                        <div class="o_setting_right_pane" invisible="sh_vendor_due_statement_action!='weekly'" >
+                            <label for="sh_vend_due_weekly_statement_template_id" />
+                            <br />
+                            <field
+                                name="sh_vend_due_weekly_statement_template_id"
+                                class="oe_inline"
+                                required="sh_vendor_due_statement_action=='weekly'"
+                                domain="[('model','=','res.partner')]"
+                                context="{'default_model':'res.partner'}"
+                            />
+                        </div>
+                        <div class="o_setting_left_pane"></div>
+                        <div class="o_setting_right_pane" invisible="sh_vendor_due_statement_action!='monthly'" >
+                            <label for="sh_vend_monthly_end" />
+                            <br />
+                            <field name="sh_vend_monthly_end" class="oe_inline" />
+                        </div>
+                        <div class="o_setting_left_pane"></div>
+                        <div class="o_setting_right_pane" invisible="sh_vend_monthly_end or sh_vendor_due_statement_action!='monthly'" >
+                            <label for="sh_vend_due_monthly_date" />
+                            <br />
+                            <field name="sh_vend_due_monthly_date" class="oe_inline" required="not sh_vend_monthly_end or sh_vendor_due_statement_action=='monthly'"  />
+                        </div>
+                        <div class="o_setting_left_pane"></div>
+                        <div class="o_setting_right_pane" invisible="sh_vendor_due_statement_action!='monthly'"  >
+                            <label for="sh_vend_due_monthly_template_id" />
+                            <br />
+                            <field
+                                name="sh_vend_due_monthly_template_id"
+                                class="oe_inline"
+                                required="sh_vendor_due_statement_action=='monthly'"
+                                domain="[('model','=','res.partner')]"
+                                context="{'default_model':'res.partner'}"
+                            />
+                        </div>
+                        <div class="o_setting_left_pane"></div>
+                        <div class="o_setting_right_pane" invisible="sh_vendor_due_statement_action!='yearly'" >
+                            <label for="sh_vend_due_yearly_date" />
+                            <br />
+                            <field name="sh_vend_due_yearly_date" class="oe_inline" required="sh_vendor_due_statement_action=='yearly'"  />
+                        </div>
+                        <div class="o_setting_left_pane"></div>
+                        <div class="o_setting_right_pane" invisible="sh_vendor_due_statement_action!='yearly'" >
+                            <label for="sh_vend_due_yearly_month" />
+                            <br />
+                            <field name="sh_vend_due_yearly_month" class="oe_inline" required="sh_vendor_due_statement_action=='yearly'"  />
+                        </div>
+                        <div class="o_setting_left_pane"></div>
+                        <div class="o_setting_right_pane" invisible="sh_vendor_due_statement_action!='yearly'" >
+                            <label for="sh_vend_due_yearly_template_id" />
+                            <br />
+                            <field
+                                name="sh_vend_due_yearly_template_id"
+                                class="oe_inline"
+                                required="sh_vendor_due_statement_action=='yearly'"
+                                domain="[('model','=','res.partner')]"
+                                context="{'default_model':'res.partner'}"
+                            />
+                        </div>
+                        <div class="o_setting_left_pane"></div>
+                    </div>
+                    <div class="col-6 o_setting_box">
+                        <div class="o_setting_left_pane">
+                            <field name="filter_only_unpaid_and_send_that" />
+                        </div>
+                        <div class="o_setting_right_pane">
+                            <label for="filter_only_unpaid_and_send_that" />
+                        </div>
+                    </div>
+                    <div class="col-6 o_setting_box">
+                        <div class="o_setting_left_pane">
+                            <field name="filter_only_unpaid_bill_and_send_that" />
+                        </div>
+                        <div class="o_setting_right_pane">
+                            <label for="filter_only_unpaid_bill_and_send_that" />
+                        </div>
+                    </div>
+                </div>
+                <h2 id="manage_whatsapp">Statement Send Whatsapp Configuration</h2>
+					<div class="row mt16 o_settings_container">
+	                    <div class="col-12 col-lg-6 o_setting_box">
+	                        <div class="o_setting_left_pane">
+	                            <field name="sh_statement_signature" />
+	                        </div>
+	                        <div class="o_setting_right_pane">
+	                            <label for="sh_statement_signature" />
+	                            <div class="text-muted">
+	                                Show Signature
+	                            </div>
+	                        </div>
+	                    </div>
+	                    <div class="col-12 col-lg-6 o_setting_box">
+	                        <div class="o_setting_left_pane">
+	                            <field name="sh_display_message_in_chatter" />
+	                        </div>
+	                        <div class="o_setting_right_pane">
+	                            <label for="sh_display_message_in_chatter" />
+	                            <div class="text-muted">
+	                                Show Message in Chatter
+	                            </div>
+	                        </div>
+	                    </div>
+	
+	                    <div class="col-12 col-lg-6 o_setting_box">
+	                        <div class="o_setting_left_pane">
+	                            <field name="sh_statement_pdf_in_message" />
+	                        </div>
+	                        <div class="o_setting_right_pane">
+	                            <label for="sh_statement_pdf_in_message" />
+	                            <div class="text-muted">
+	                                Send Report Url in Message
+	                            </div>
+	                        </div>
+	                    </div>
+	                    <div class="col-12 col-lg-6 o_setting_box">
+	                        <div class="o_setting_left_pane">
+	                            <field name="sh_statement_url_in_message" />
+	                        </div>
+	                        <div class="o_setting_right_pane">
+	                            <label for="sh_statement_url_in_message" />
+	                            <div class="text-muted">
+	                                Send Statement Url in Message
+	                            </div>
+	                        </div>
+	                    </div>
+	                </div>
+            </xpath>
+        </field>
+    </record>
+</odoo>

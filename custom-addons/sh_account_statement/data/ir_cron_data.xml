@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="cron_send_statement_auto" model="ir.cron">
+        <field name="name">Auto Send Statements</field>
+        <field name="interval_number">1</field>
+        <field name="interval_type">days</field>
+        <field name="numbercall">-1</field>
+        <field name="doall" eval="False" />
+        <field name="model_id" ref="model_res_partner" />
+        <field name="code">model._run_auto_send_statements()</field>
+        <field name="state">code</field>
+    </record>
+    <record id="cron_send_config_statement" model="ir.cron">
+        <field name="name">Auto Send Config Statements</field>
+        <field name="interval_number">1</field>
+        <field name="interval_type">days</field>
+        <field name="numbercall">-1</field>
+        <field name="doall" eval="False" />
+        <field name="model_id" ref="model_sh_statement_config" />
+        <field name="code">model._run_auto_send_config_statements()</field>
+        <field name="state">code</field>
+    </record>
+    <record id="sh_send_statement_action" model="ir.actions.server">
+        <field name="name">Send Statement</field>
+        <field name="type">ir.actions.server</field>
+        <field name="state">code</field>
+        <field name="model_id" ref="base.model_res_partner" />
+        <field name="binding_model_id" ref="base.model_res_partner" />
+        <field name="code">
+            records.send_statement()
+        </field>
+    </record>
+    <record id="sh_send_overdue_statement_action" model="ir.actions.server">
+        <field name="name">Send Overdue Statement</field>
+        <field name="type">ir.actions.server</field>
+        <field name="state">code</field>
+        <field name="model_id" ref="base.model_res_partner" />
+        <field name="binding_model_id" ref="base.model_res_partner" />
+        <field name="code">
+            records.send_overdue_statement()
+        </field>
+    </record>
+
+    <record id="sh_statement_mass_update" model="ir.actions.server">
+        <field name="name">Mass Update</field>
+        <field name="type">ir.actions.server</field>
+        <field name="model_id" ref="sh_account_statement.model_sh_statement_config" />
+        <field name="binding_model_id" ref="sh_account_statement.model_sh_statement_config" />
+        <field name="state">code</field>
+        <field name="code">
+                action = records.add_replace_partner_manually_()
+        </field>
+    </record>
+
+    <record id="sh_statement_config_mass_update" model="ir.actions.server" >
+        <field name="name">Mass Update Config</field>
+        <field name="type">ir.actions.server</field>
+        <field name="model_id" ref="model_res_partner" />
+        <field name="binding_model_id" ref="model_res_partner" />
+        <field name="state">code</field>
+        <field name="code">
+                action = records.update_statement_config_manually_()
+        </field>
+    </record>
+</odoo>

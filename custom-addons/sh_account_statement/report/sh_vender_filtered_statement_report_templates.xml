@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <template id="sh_vendor_filtered_statement_doc">
+        <t t-call="web.external_layout">
+            <t t-set="o" t-value="o.with_context(lang=o.lang)" />
+            <div class="page">
+                <div class="oe_structure" />
+                <div>
+                    Date From - <span t-field="o.start_date" /><br />
+                    Date To - <span t-field="o.end_date" /><br />
+                </div>
+                <center>
+                    <span style="font-weight: 800;font-size: 25px;" t-field="o.name" />
+                </center>
+                <t t-if="o.sh_filter_vendor_statement_ids">
+                    <table class="table table-sm o_main_table mt-3">
+                        <thead style="display: table-row-group;">
+                            <tr>
+                                <th>Number</th>
+                                <th>Account</th>
+                                <th>Date</th>
+                                <th>Due Date</th>
+                                <th>Total Amount</th>
+                                <th>Paid Amount</th>
+                                <th>Balance</th>
+                            </tr>
+                        </thead>
+                        <tbody class="sale_tbody">
+                            <t t-set="amount" t-value="0.0" />
+                            <t t-set="paid_amount" t-value="0.0" />
+                            <t t-set="balance" t-value="0.0" />
+                            <t t-foreach="o.sh_filter_vendor_statement_ids" t-as="line">
+                                <t t-set="amount" t-value="amount+line.sh_vendor_filter_amount" />
+                                <t t-set="paid_amount" t-value="paid_amount+line.sh_vendor_filter_paid_amount" />
+                                <t t-set="balance" t-value="balance+line.sh_vendor_filter_balance" />
+                                <t t-if="line.sh_vendor_filter_amount == line.sh_vendor_filter_balance and line.sh_vendor_filter_balance &gt; 0.0 or line.sh_vendor_filter_amount == line.sh_vendor_filter_balance and line.sh_vendor_filter_balance &lt; 0.0">
+                                    <tr style="color: #0a8ea4;">
+                                        <td><span t-field="line.name" /></td>
+                                        <td><span t-field="line.sh_account" /></td>
+                                        <td><span t-field="line.sh_vendor_filter_invoice_date" /></td>
+                                        <td><span t-field="line.sh_vendor_filter_due_date" /></td>
+                                        <td><span t-field="line.sh_vendor_filter_amount" /></td>
+                                        <td><span t-field="line.sh_vendor_filter_paid_amount" /></td>
+                                        <td><span t-field="line.sh_vendor_filter_balance" /></td>
+                                    </tr>
+                                </t>
+                                <t t-if="line.sh_vendor_filter_balance == 0.0">
+                                    <tr style="color: green;">
+                                        <td><span t-field="line.name" /></td>
+                                        <td><span t-field="line.sh_account" /></td>
+                                        <td><span t-field="line.sh_vendor_filter_invoice_date" /></td>
+                                        <td><span t-field="line.sh_vendor_filter_due_date" /></td>
+                                        <td><span t-field="line.sh_vendor_filter_amount" /></td>
+                                        <td><span t-field="line.sh_vendor_filter_paid_amount" /></td>
+                                        <td><span t-field="line.sh_vendor_filter_balance" /></td>
+                                    </tr>
+                                </t>
+                                <t t-if="line.sh_vendor_filter_amount != line.sh_vendor_filter_balance and line.sh_vendor_filter_balance &gt; 0.0 or line.sh_vendor_filter_amount != line.sh_vendor_filter_balance and line.sh_vendor_filter_balance &lt; 0.0">
+                                    <tr style="color: red;">
+                                        <td><span t-field="line.name" /></td>
+                                        <td><span t-field="line.sh_account" /></td>
+                                        <td><span t-field="line.sh_vendor_filter_invoice_date" /></td>
+                                        <td><span t-field="line.sh_vendor_filter_due_date" /></td>
+                                        <td><span t-field="line.sh_vendor_filter_amount" /></td>
+                                        <td><span t-field="line.sh_vendor_filter_paid_amount" /></td>
+                                        <td><span t-field="line.sh_vendor_filter_balance" /></td>
+                                    </tr>
+                                </t>
+                            </t>
+                            <tr>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td>
+                                    <b><t t-esc="'%.2f'%amount" /></b>
+                                </td>
+                                <td>
+                                    <b><t t-esc="'%.2f'%paid_amount" /></b>
+                                </td>
+                                <td>
+                                    <b><t t-esc="'%.2f'%balance" /></b>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </t>
+            </div>
+        </t>
+    </template>
+    <template id="sh_vendor_filtered_statement_template">
+        <t t-call="web.html_container">
+            <t t-foreach="docs" t-as="o">
+                <t t-call="sh_account_statement.sh_vendor_filtered_statement_doc" t-lang="o.lang" />
+            </t>
+        </t>
+    </template>
+    <record id="action_report_sh_vendor_filtered_statement" model="ir.actions.report">
+        <field name="name">Vendor Statement Filter By Date</field>
+        <field name="model">res.partner</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="print_report_name">'Vendor Statement Filter By Date'</field>
+        <field name="report_name">sh_account_statement.sh_vendor_filtered_statement_template</field>
+        <field name="report_file">sh_account_statement.sh_vendor_filtered_statement_template</field>
+        <field name="binding_model_id" ref="model_res_partner" />
+        <field name="binding_type">report</field>
+    </record>
+</odoo>

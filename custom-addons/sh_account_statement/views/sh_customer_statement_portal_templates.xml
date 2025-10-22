@@ -1,0 +1,324 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+	<template id="portal_my_home_menu_customer_statements" name="Portal layout : customer statement menu entries" inherit_id="portal.portal_breadcrumbs" priority="20">
+        <xpath expr="//ol[hasclass('o_portal_submenu')]" position="inside">
+        	<t t-if="request.env.company.sh_display_customer_statement">
+	            <li t-if="page_name == 'sh_customer_statement_portal'" t-attf-class="breadcrumb-item #{'active'}">
+	                <a t-attf-href="/my/customer_statements?{{ keep_query() }}">Customer Statements</a>
+	            </li>
+	        </t>
+        </xpath>
+    </template>
+    <template id="portal_my_home_customer_statements" name="Customer Statement Home" inherit_id="portal.portal_my_home" priority="20">
+        <xpath expr="//div[hasclass('o_portal_docs')]" position="inside">
+	            <t t-call="portal.portal_docs_entry">
+	                <t t-set="title">Customer Statements</t>
+	                <t t-set="url" t-value="'/my/customer_statements'" />
+                	<t t-set="placeholder_count" t-value="'c_count'"/>
+	            </t>
+        </xpath>
+    </template>
+    <template id="sh_customer_statement_portal" name="Customer Statements">
+    	<t t-call="portal.portal_layout">
+            <t t-set="breadcrumbs_searchbar" t-value="True" />
+            <t t-call="portal.portal_searchbar"> </t>
+            <t t-set="title">Customer Statements</t>
+            <t t-if="not customer_statement_ids or not overdue_statement_ids">
+                <p>There are currently no statements for your account.</p>
+            </t>
+
+			<div class="row" style="margin-left:0;margin-right:0;">
+				<div class="col-2"></div>
+				<div class="col-1" style="display:flex; justify-content:center; align-items:center;">
+					<strong>From</strong>
+				</div>
+				<div class="col-2">
+					<input type="date" style="height:50px;" name="sh_start_date" id="sh_start_date" class="form-control" placeholder="Form Date" t-att-value="request.env.user.partner_id.start_date"/>
+				</div>
+				<div class="col-1" style="display:flex; justify-content:center; align-items:center;">
+					<strong>To</strong>
+				</div>
+				<div class="col-2">
+					<input type="date" style="height:50px;" name="sh_end_date" id="sh_end_date" class="form-control" placeholder="To Date" t-att-value="request.env.user.partner_id.end_date"/>
+				</div>
+				<div class="col-2 text-end">
+					<a id="filter_get_statement" class="btn btn-success" name="filter_get_statement" style="margin-bottom: 10px; margin-top:5px; font-size: 16px; color: white;" title="Get Statement" aria-label="Get Statement" role="button">
+						Get Statement
+					</a>
+				</div>
+				<div class="col-2"></div>
+			</div>
+			<br/>
+			<br/>
+			<div class="text-center" style="margin-left:0;margin-right:0;">
+				<div class="col-12">
+					<h3>Customer Statements By Filter</h3>
+				</div>
+				<div class="col-12 text-right">
+					<a id="filter_send_cust_btn" class="btn btn-success fa fa-envelope" name="filter_send_cust_btn" style="margin-bottom: 10px; font-size: 16px; color: white;" title="Send Filtered Statement" aria-label="Send Filtered Statement" role="button">
+						Send Filtered Statement
+					</a>
+					<t t-set="filter_report_url" t-value="'/report/pdf/sh_account_statement.sh_customer_filtered_statement_template'+'/'+str(request.env.user.partner_id.id)+'?download=True'"/>
+					<a id="filter_download_cust_btn" target="_blank" t-att-href="filter_report_url" class="btn btn-success fa fa-print" name="filter_download_btn" style="margin-bottom: 10px; font-size: 16px; color: white;" title="Download Filtered Statement" aria-label="Download Filterd Statement" role="button">
+						Download Filtered Statement
+					</a>
+					<a id="filter_download_cust_btn_xls" href="/my/filtered_customer_statements/xls" class="btn btn-success fa fa-file-excel-o" name="filter_download_cust_btn_xls" style="margin-bottom: 10px; font-size: 16px; color: white;" title="Download Filtered Statement XLS" aria-label="Download Filtered Statement XLS" role="button">
+						Download Filtered Statement XLS
+					</a>
+				</div>
+			</div>
+			<br/>
+			<t t-call="portal.portal_table">
+				<thead>
+           			<tr t-attf-class="{{'thead-light'}}">
+           				<th>
+                            Invoice Number
+                        </th>
+                        <th>
+                            Invoice Date
+                        </th>
+                        <th>
+                            Invoice Due Date
+                        </th>
+                        <th>
+                            Total Amount
+                        </th>
+                        <th>
+                            Paid Amount
+                        </th>
+                        <th>
+                            Balance
+                        </th>
+           			</tr>
+           		</thead>
+				<tbody id="filter_statement_body">
+					<t t-set="filter_total_amount" t-value="0.00"/>
+					<t t-set="filter_total_paid_amount" t-value="0.00"/>
+					<t t-set="filter_total_balance" t-value="0.00"/>
+					<t t-foreach="filtered_statement_ids" t-as="filter_statement">
+						<t t-set="filter_total_amount" t-value="filter_total_amount + filter_statement.sh_filter_amount"/>
+						<t t-set="filter_total_paid_amount" t-value="filter_total_paid_amount + filter_statement.sh_filter_paid_amount"/>
+						<t t-set="filter_total_balance" t-value="filter_total_balance + filter_statement.sh_filter_balance"/>
+						<t t-set="tr_style" t-value="'color:blue;'"/>
+						<t t-if="filter_statement.sh_filter_amount == filter_statement.sh_filter_balance and filter_statement.sh_filter_balance &gt; 0.0 or filter_statement.sh_filter_amount == filter_statement.sh_filter_balance and filter_statement.sh_filter_balance &lt; 0.0">
+							<t t-set="tr_style" t-value="'color: #0a8ea4;'"/>
+						</t>
+						<t t-if="filter_statement.sh_filter_balance == 0.0">
+							<t t-set="tr_style" t-value="'color: green;'"/>
+						</t>
+						<t t-if="filter_statement.sh_filter_amount != filter_statement.sh_filter_balance and filter_statement.sh_filter_balance &gt; 0.0 or filter_statement.sh_filter_amount != filter_statement.sh_filter_balance and filter_statement.sh_filter_balance &lt; 0.0">
+							<t t-set="tr_style" t-value="'color: red;'"/>
+						</t>
+						<tr t-att-style="tr_style">
+							<td><span t-field="filter_statement.name"/></td>
+							<td><span t-field="filter_statement.sh_filter_invoice_date"/></td>
+							<td><span t-field="filter_statement.sh_filter_due_date"/></td>
+							<td><span t-field="filter_statement.sh_filter_amount"/></td>
+							<td><span t-field="filter_statement.sh_filter_paid_amount"/></td>
+							<td><span t-field="filter_statement.sh_filter_balance"/></td>
+						</tr>
+					</t>
+					<tr>
+						<td></td>
+						<td></td>
+						<td></td>
+						<td><strong><span t-esc="'%.2f'%filter_total_amount"/></strong></td>
+						<td><strong><span t-esc="'%.2f'%filter_total_paid_amount"/></strong></td>
+						<td><strong><span t-esc="'%.2f'%filter_total_balance"/></strong></td>
+					</tr>
+				</tbody>
+			</t>
+			<hr/>
+            <t t-if="customer_statement_ids" t-call="portal.portal_table">
+            	<div class="text-center" style="margin-left:0;margin-right:0;">
+            		<div class="col-12">
+            			<h3>Customer Statements</h3>
+            		</div>
+            		<div class="col-12 text-center">
+            			<a id="send_cust_btn" class="btn btn-success fa fa-envelope" name="send_cust_btn" style="margin-bottom: 10px; font-size: 16px; color: white;" title="Send Statement" aria-label="Send Statement" role="button">
+                            Send Statement
+                        </a>
+                        <t t-set="report_url" t-value="'/report/pdf/sh_account_statement.sh_customer_statement_template'+'/'+str(request.env.user.partner_id.id)+'?download=True'"/>
+                        <a id="download_cust_btn" target="_blank" t-att-href="report_url" class="btn btn-success fa fa-print" name="download_btn" style="margin-bottom: 10px; font-size: 16px; color: white;" title="Download Statement" aria-label="Download Statement" role="button">
+                            Download Statement
+                        </a>
+                        <a id="download_cust_btn_xls" href="/my/customer_statements/xls" class="btn btn-success fa fa-file-excel-o" name="download_cust_btn_xls" style="margin-bottom: 10px; font-size: 16px; color: white;" title="Download Statement XLS" aria-label="Download Statement XLS" role="button">
+                            Download Statement XLS
+                        </a>
+            		</div>
+            	</div>
+           		<thead>
+           			<tr t-attf-class="{{'thead-light'}}">
+           				<th>
+                            Invoice Number
+                        </th>
+                        <th>
+                            Invoice Date
+                        </th>
+                        <th>
+                            Invoice Due Date
+                        </th>
+                        <th>
+                            Total Amount
+                        </th>
+                        <th>
+                            Paid Amount
+                        </th>
+                        <th>
+                            Balance
+                        </th>
+           			</tr>
+           		</thead>
+            		<tbody>
+            			<t t-set="total_amount" t-value="0.00"/>
+            			<t t-set="total_paid_amount" t-value="0.00"/>
+            			<t t-set="total_balance" t-value="0.00"/>
+            			<t t-foreach="customer_statement_ids" t-as="statement">
+            				<t t-set="total_amount" t-value="total_amount + statement.sh_customer_amount"/>
+            				<t t-set="total_paid_amount" t-value="total_paid_amount + statement.sh_customer_paid_amount"/>
+            				<t t-set="total_balance" t-value="total_balance + statement.sh_customer_balance"/>
+	            			<t t-set="tr_style" t-value="'color:blue;'"/>
+	            			<t t-if="statement.sh_customer_amount == statement.sh_customer_balance and statement.sh_customer_balance &gt; 0.0 or statement.sh_customer_amount == statement.sh_customer_balance and statement.sh_customer_balance &lt; 0.0">
+	            				<t t-set="tr_style" t-value="'color: #0a8ea4;'"/>
+	            			</t>
+	            			<t t-if="statement.sh_customer_balance == 0.0">
+	            				<t t-set="tr_style" t-value="'color: green;'"/>
+	            			</t>
+	            			<t t-if="statement.sh_customer_amount != statement.sh_customer_balance and statement.sh_customer_balance &gt; 0.0 or statement.sh_customer_amount != statement.sh_customer_balance and statement.sh_customer_balance &lt; 0.0">
+	            				<t t-set="tr_style" t-value="'color: red;'"/>
+	            			</t>
+	            			<tr t-att-style="tr_style">
+	            				<td><span t-field="statement.name"/></td>
+	            				<td><span t-field="statement.sh_customer_invoice_date"/></td>
+	            				<td><span t-field="statement.sh_customer_due_date"/></td>
+	            				<td><span t-field="statement.sh_customer_amount"/></td>
+	            				<td><span t-field="statement.sh_customer_paid_amount"/></td>
+	            				<td><span t-field="statement.sh_customer_balance"/></td>
+	            			</tr>
+            			</t>
+            			<tr>
+            				<td></td>
+            				<td></td>
+            				<td></td>
+            				<td><strong><span t-esc="'%.2f'%total_amount"/></strong></td>
+            				<td><strong><span t-esc="'%.2f'%total_paid_amount"/></strong></td>
+            				<td><strong><span t-esc="'%.2f'%total_balance"/></strong></td>
+            			</tr>
+            		</tbody>
+            </t>
+            <br/>
+            <t t-if="customer_statement_ids" t-call="portal.portal_table">
+            		<thead>
+		       			<tr t-attf-class="{{'thead-light'}}">
+		       				<th>Gap Between Days</th>
+		       				<th>
+		                        <strong>0-30(Days)</strong>
+		                    </th>
+		                    <th>
+		                        <strong>30-60(Days)</strong>
+		                    </th>
+		                    <th>
+		                        <strong>60-90(Days)</strong>
+		                    </th>
+		                    <th>
+		                        <strong>90+(Days)</strong>
+		                    </th>
+		                    <th>
+		                        <strong>Total</strong>
+		                    </th>
+		                    <th></th>
+		       			</tr>
+		       		</thead>
+	       			<tbody>
+	       				<td><strong>Balance Amount</strong></td>
+	       				<td><span t-esc="'%.2f'%request.env.user.partner_id.sh_customer_zero_to_thiry"/></td>
+	       				<td><span t-esc="'%.2f'%request.env.user.partner_id.sh_customer_thirty_to_sixty"/></td>
+	       				<td><span t-esc="'%.2f'%request.env.user.partner_id.sh_customer_sixty_to_ninety"/></td>
+	       				<td><span t-esc="'%.2f'%request.env.user.partner_id.sh_customer_ninety_plus"/></td>
+	       				<td><span t-esc="'%.2f'%request.env.user.partner_id.sh_customer_total"/></td>
+	       			</tbody>
+       			</t>
+       		<br/>
+			<hr/>
+            <t t-if="overdue_statement_ids" t-call="portal.portal_table">
+				<div class="text-center" style="margin-left:0;margin-right:0;">
+            		<div class="col-12">
+            			<h3>Overdue Statements</h3>
+            		</div>
+            	</div>
+            	<div class="col-12 text-center" style="margin-left:0;margin-right:0;">
+					<a id="send_cust_due_btn" class="btn btn-success fa fa-envelope" name="send_cust_due_btn" style="margin-bottom: 10px; font-size: 16px; color: white;" title="Send Overdue Statement" aria-label="Send Overdue Statement" role="button">
+						Send Overdue Statement
+					</a>
+					<t t-set="report_overdue_url" t-value="'/report/pdf/sh_account_statement.sh_customer_due_statement_template'+'/'+str(request.env.user.partner_id.id)+'?download=True'"/>
+					<a id="download_cust_due_btn" target="_blank" t-att-href="report_overdue_url" class="btn btn-success fa fa-print" name="download_cust_due_btn" style="margin-bottom: 10px; font-size: 16px; color: white;" title="Download Overdue Statement" aria-label="Download Overdue Statement" role="button">
+						Download Overdue Statement
+					</a>
+					<a id="download_cust_btn_xls_due" href="/my/customer_statements_due/xls" class="btn btn-success fa fa-file-excel-o" name="download_cust_btn_xls_due" style="margin-bottom: 10px; font-size: 16px; color: white;" title="Download Overdue Statement XLS" aria-label="Download Overdue Statement XLS" role="button">
+						Download Overdue Statement XLS
+					</a>
+           		</div>
+           		<thead>
+           			<tr t-attf-class="{{'thead-light'}}">
+           				<th>
+                            Invoice Number
+                        </th>
+                        <th>
+                            Invoice Date
+                        </th>
+                        <th>
+                            Invoice Due Date
+                        </th>
+                        <th>
+                            Total Amount
+                        </th>
+                        <th>
+                            Paid Amount
+                        </th>
+                        <th>
+                            Balance
+                        </th>
+           			</tr>
+           		</thead>
+            		<tbody>
+            			<t t-set="total_ovedue_amount" t-value="0.00"/>
+            			<t t-set="total_overdue_paid_amount" t-value="0.00"/>
+            			<t t-set="total_overdue_balance" t-value="0.00"/>
+            			<t t-foreach="overdue_statement_ids" t-as="overdue_statement">
+            				<t t-set="total_ovedue_amount" t-value="total_ovedue_amount + overdue_statement.sh_due_customer_amount"/>
+            				<t t-set="total_overdue_paid_amount" t-value="total_overdue_paid_amount + overdue_statement.sh_due_customer_paid_amount"/>
+            				<t t-set="total_overdue_balance" t-value="total_overdue_balance + overdue_statement.sh_due_customer_balance"/>
+            				<t t-if="overdue_statement.sh_due_customer_due_date and overdue_statement.sh_today and overdue_statement.sh_due_customer_due_date &lt; overdue_statement.sh_today">
+            					<tr style="color:red;">
+		            				<td><span t-field="overdue_statement.name"/></td>
+		            				<td><span t-field="overdue_statement.sh_due_customer_invoice_date"/></td>
+		            				<td><span t-field="overdue_statement.sh_due_customer_due_date"/></td>
+		            				<td><span t-field="overdue_statement.sh_due_customer_amount"/></td>
+		            				<td><span t-field="overdue_statement.sh_due_customer_paid_amount"/></td>
+		            				<td><span t-field="overdue_statement.sh_due_customer_balance"/></td>
+		            			</tr>
+            				</t>
+	            			<t t-else="">
+            					<tr>
+		            				<td><span t-field="overdue_statement.name"/></td>
+		            				<td><span t-field="overdue_statement.sh_due_customer_invoice_date"/></td>
+		            				<td><span t-field="overdue_statement.sh_due_customer_due_date"/></td>
+		            				<td><span t-field="overdue_statement.sh_due_customer_amount"/></td>
+		            				<td><span t-field="overdue_statement.sh_due_customer_paid_amount"/></td>
+		            				<td><span t-field="overdue_statement.sh_due_customer_balance"/></td>
+		            			</tr>
+            				</t>
+            			</t>
+            			<tr>
+            				<td></td>
+            				<td></td>
+            				<td></td>
+            				<td><strong><span t-esc="'%.2f'%total_ovedue_amount"/></strong></td>
+            				<td><strong><span t-esc="'%.2f'%total_overdue_paid_amount"/></strong></td>
+            				<td><strong><span t-esc="'%.2f'%total_overdue_balance"/></strong></td>
+            			</tr>
+            		</tbody>
+            </t>
+        </t>
+    </template>
+</odoo>

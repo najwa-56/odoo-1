@@ -1,0 +1,323 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+	<template id="portal_my_home_menu_vendor_statements" name="Portal layout : vendor statement menu entries" inherit_id="portal.portal_breadcrumbs" priority="20">
+        <xpath expr="//ol[hasclass('o_portal_submenu')]" position="inside">
+        	<t t-if="request.env.company.sh_display_vendor_statement">
+	            <li t-if="page_name == 'sh_vendor_statement_portal'" t-attf-class="breadcrumb-item #{'active'}">
+	                <a t-attf-href="/my/vendor_statements?{{ keep_query() }}">Vendor Statements</a>
+	            </li>
+	        </t>
+        </xpath>
+    </template>
+    <template id="portal_my_home_vendor_statements" name="Vendor Statement Home" inherit_id="portal.portal_my_home" priority="20">
+        <xpath expr="//div[hasclass('o_portal_docs')]" position="inside">
+        	<t t-call="portal.portal_docs_entry">
+				<t t-set="title">Vendor Statements</t>
+				<t t-set="url" t-value="'/my/vendor_statements'" />
+				<t t-set="placeholder_count" t-value="'v_count'"/>
+			</t>
+        </xpath>
+    </template>
+    <template id="sh_vendor_statement_portal" name="Vendor Statements">
+    	<t t-call="portal.portal_layout">
+            <t t-set="breadcrumbs_searchbar" t-value="True" />
+            <t t-call="portal.portal_searchbar"> </t>
+            <t t-set="title">Vendor Statements</t>
+            <t t-if="not vendor_statement_ids or not vendor_overdue_statement_ids">
+                <p>There are currently no statements for your account.</p>
+            </t>
+			<div class="row" style="margin-left:0;margin-right:0;">
+				<div class="col-2"></div>
+				<div class="col-1" style="display:flex; justify-content:center; align-items:center;">
+					<strong>From</strong>
+				</div>
+				<div class="col-2">
+					<input type="date" style="height:50px;" name="sh_vendor_start_date" id="sh_vendor_start_date" class="form-control" placeholder="Form Date" t-att-value="request.env.user.partner_id.start_date"/>
+				</div>
+				<div class="col-1" style="display:flex; justify-content:center; align-items:center;">
+					<strong>To</strong>
+				</div>
+				<div class="col-2">
+					<input type="date" style="height:50px;" name="sh_vendor_end_date" id="sh_vendor_end_date" class="form-control" placeholder="To Date" t-att-value="request.env.user.partner_id.end_date"/>
+				</div>
+				<div class="col-2">
+					<a id="filter_get_vendor_statement" class="btn btn-success" name="filter_get_vendor_statement" style="margin-bottom: 10px; margin-top:5px; font-size: 16px; color: white;" title="Get Statement" aria-label="Get Statement" role="button">
+						Get Statement
+					</a>
+				</div>
+				<div class="col-2"></div>
+			</div>
+
+			<br/>
+			<div class="text-center" style="margin-left:0;margin-right:0;">
+				<div class="col-12">
+					<h3>Vendor Statements By Filter</h3>
+				</div>
+				<div class="col-12 text-center">
+					<a id="filter_send_vend_btn" class="btn btn-success fa fa-envelope" name="filter_send_vend_btn" style="margin-bottom: 10px; font-size: 16px; color: white;" title="Send Filtered Statement" aria-label="Send Filtered Statement" role="button">
+						Send Filtered Statement
+					</a>
+					<t t-set="filter_vendor_report_url" t-value="'/report/pdf/sh_account_statement.sh_vendor_filtered_statement_template'+'/'+str(request.env.user.partner_id.id)+'?download=True'"/>
+					<a id="filter_download_vend_btn" target="_blank" t-att-href="filter_vendor_report_url" class="btn btn-success fa fa-print" name="filter_download_vend_btn" style="margin-bottom: 10px; font-size: 16px; color: white;" title="Download Filtered Statement" aria-label="Download Filterd Statement" role="button">
+						Download Filtered Statement
+					</a>
+					<a id="filter_download_vend_btn_xls" href="/my/filtered_vendor_statements/xls" class="btn btn-success fa fa-file-excel-o" name="filter_download_vend_btn_xls" style="margin-bottom: 10px; font-size: 16px; color: white;" title="Download Filtered Statement XLS" aria-label="Download Filtered Statement XLS" role="button">
+						Download Filtered Statement XLS
+					</a>
+				</div>
+			</div>
+			<br/>
+			<t t-call="portal.portal_table">
+				<thead>
+           			<tr t-attf-class="{{'thead-light'}}">
+           				<th>
+                            Invoice Number
+                        </th>
+                        <th>
+                            Invoice Date
+                        </th>
+                        <th>
+                            Invoice Due Date
+                        </th>
+                        <th>
+                            Total Amount
+                        </th>
+                        <th>
+                            Paid Amount
+                        </th>
+                        <th>
+                            Balance
+                        </th>
+           			</tr>
+           		</thead>
+				<tbody id="filter_statement_body">
+					<t t-set="filter_total_amount" t-value="0.00"/>
+					<t t-set="filter_total_paid_amount" t-value="0.00"/>
+					<t t-set="filter_total_balance" t-value="0.00"/>
+					<t t-foreach="filtered_statement_ids" t-as="filter_statement">
+						<t t-set="filter_total_amount" t-value="filter_total_amount + filter_statement.sh_vendor_filter_amount"/>
+						<t t-set="filter_total_paid_amount" t-value="filter_total_paid_amount + filter_statement.sh_vendor_filter_paid_amount"/>
+						<t t-set="filter_total_balance" t-value="filter_total_balance + filter_statement.sh_vendor_filter_balance"/>
+						<t t-set="tr_style" t-value="'color:blue;'"/>
+						<t t-if="filter_statement.sh_vendor_filter_amount == filter_statement.sh_vendor_filter_balance and filter_statement.sh_vendor_filter_balance &gt; 0.0 or filter_statement.sh_vendor_filter_amount == filter_statement.sh_vendor_filter_balance and filter_statement.sh_vendor_filter_balance &lt; 0.0">
+							<t t-set="tr_style" t-value="'color: #0a8ea4;'"/>
+						</t>
+						<t t-if="filter_statement.sh_vendor_filter_balance == 0.0">
+							<t t-set="tr_style" t-value="'color: green;'"/>
+						</t>
+						<t t-if="filter_statement.sh_vendor_filter_amount != filter_statement.sh_vendor_filter_balance and filter_statement.sh_vendor_filter_balance &gt; 0.0 or filter_statement.sh_vendor_filter_amount != filter_statement.sh_vendor_filter_balance and filter_statement.sh_vendor_filter_balance &lt; 0.0">
+							<t t-set="tr_style" t-value="'color: red;'"/>
+						</t>
+						<tr t-att-style="tr_style">
+							<td><span t-field="filter_statement.name"/></td>
+							<td><span t-field="filter_statement.sh_vendor_filter_invoice_date"/></td>
+							<td><span t-field="filter_statement.sh_vendor_filter_due_date"/></td>
+							<td><span t-field="filter_statement.sh_vendor_filter_amount"/></td>
+							<td><span t-field="filter_statement.sh_vendor_filter_paid_amount"/></td>
+							<td><span t-field="filter_statement.sh_vendor_filter_balance"/></td>
+						</tr>
+					</t>
+					<tr>
+						<td></td>
+						<td></td>
+						<td></td>
+						<td><strong><span t-esc="'%.2f'%filter_total_amount"/></strong></td>
+						<td><strong><span t-esc="'%.2f'%filter_total_paid_amount"/></strong></td>
+						<td><strong><span t-esc="'%.2f'%filter_total_balance"/></strong></td>
+					</tr>
+				</tbody>
+			</t>
+			<br/>
+			<hr/>
+            <t t-if="vendor_statement_ids" t-call="portal.portal_table">
+            	<div class="text-center" style="margin-left:0;margin-right:0;">
+            		<div class="col-12">
+            			<h3>Vendor Statements</h3>
+            		</div>
+            		<div class="col-12 text-center">
+            			<a id="send_vendor_btn" class="btn btn-success fa fa-envelope" name="send_vendor_btn" style="margin-bottom: 10px; font-size: 16px; color: white;" title="Send Statement" aria-label="Send Statement" role="button">
+                            Send Statement
+                        </a>
+                        <t t-set="vendor_report_url" t-value="'/report/pdf/sh_account_statement.sh_vendor_statement_template'+'/'+str(request.env.user.partner_id.id)+'?download=True'"/>
+                        <a id="download_vendor_btn" target="_blank" t-att-href="vendor_report_url" class="btn btn-success fa fa-print" name="download_vendor_btn" style="margin-bottom: 10px; font-size: 16px; color: white;" title="Download Statement" aria-label="Download Statement" role="button">
+                            Download Statement
+                        </a>
+                        <a id="download_vend_btn_xls" href="/my/vendor_statements/xls" class="btn btn-success fa fa-file-excel-o" name="download_vend_btn_xls" style="margin-bottom: 10px; font-size: 16px; color: white;" title="Download Statement XLS" aria-label="Download Statement XLS" role="button">
+                            Download Statement XLS
+                        </a>
+            		</div>
+            	</div>
+           		<thead>
+           			<tr t-attf-class="{{'thead-light'}}">
+           				<th>
+                            Invoice Number
+                        </th>
+                        <th>
+                            Invoice Date
+                        </th>
+                        <th>
+                            Invoice Due Date
+                        </th>
+                        <th>
+                            Total Amount
+                        </th>
+                        <th>
+                            Paid Amount
+                        </th>
+                        <th>
+                            Balance
+                        </th>
+           			</tr>
+           		</thead>
+            		<tbody>
+            			<t t-set="total_vendor_amount" t-value="0.00"/>
+            			<t t-set="total_vendor_paid_amount" t-value="0.00"/>
+            			<t t-set="total_vendor_balance" t-value="0.00"/>
+            			<t t-foreach="vendor_statement_ids" t-as="vendor_statement">
+            				<t t-set="total_vendor_amount" t-value="total_vendor_amount + vendor_statement.sh_vendor_amount"/>
+            				<t t-set="total_vendor_paid_amount" t-value="total_vendor_paid_amount + vendor_statement.sh_vendor_paid_amount"/>
+            				<t t-set="total_vendor_balance" t-value="total_vendor_balance + vendor_statement.sh_vendor_balance"/>
+	            			<t t-set="tr_style" t-value="'color:blue;'"/>
+	            			<t t-if="vendor_statement.sh_vendor_amount == vendor_statement.sh_vendor_balance and vendor_statement.sh_vendor_balance &gt; 0.0 or vendor_statement.sh_vendor_amount == vendor_statement.sh_vendor_balance and vendor_statement.sh_vendor_balance &lt; 0.0">
+	            				<t t-set="tr_style" t-value="'color: #0a8ea4;'"/>
+	            			</t>
+	            			<t t-if="vendor_statement.sh_vendor_balance == 0.0">
+	            				<t t-set="tr_style" t-value="'color: green;'"/>
+	            			</t>
+	            			<t t-if="vendor_statement.sh_vendor_amount != vendor_statement.sh_vendor_balance and vendor_statement.sh_vendor_balance &gt; 0.0 or vendor_statement.sh_vendor_amount != vendor_statement.sh_vendor_balance and vendor_statement.sh_vendor_balance &lt; 0.0">
+	            				<t t-set="tr_style" t-value="'color: red;'"/>
+	            			</t>
+	            			<tr t-att-style="tr_style">
+	            				<td><span t-field="vendor_statement.name"/></td>
+	            				<td><span t-field="vendor_statement.sh_vendor_invoice_date"/></td>
+	            				<td><span t-field="vendor_statement.sh_vendor_due_date"/></td>
+	            				<td><span t-field="vendor_statement.sh_vendor_amount"/></td>
+	            				<td><span t-field="vendor_statement.sh_vendor_paid_amount"/></td>
+	            				<td><span t-field="vendor_statement.sh_vendor_balance"/></td>
+	            			</tr>
+            			</t>
+            			<tr>
+            				<td></td>
+            				<td></td>
+            				<td></td>
+            				<td><strong><span t-esc="'%.2f'%total_vendor_amount"/></strong></td>
+            				<td><strong><span t-esc="'%.2f'%total_vendor_paid_amount"/></strong></td>
+            				<td><strong><span t-esc="'%.2f'%total_vendor_balance"/></strong></td>
+            			</tr>
+            		</tbody>
+            </t>
+            <br/>
+            <t t-if="vendor_statement_ids" t-call="portal.portal_table">
+            	<thead>
+       			<tr t-attf-class="{{'thead-light'}}">
+       				<th>Gap Between Days</th>
+       				<th>
+                        <strong>0-30(Days)</strong>
+                    </th>
+                    <th>
+                        <strong>30-60(Days)</strong>
+                    </th>
+                    <th>
+                        <strong>60-90(Days)</strong>
+                    </th>
+                    <th>
+                        <strong>90+(Days)</strong>
+                    </th>
+                    <th>
+                        <strong>Total</strong>
+                    </th>
+       			</tr>
+       			</thead>
+       			<tbody>
+       				<td><strong>Balance Amount</strong></td>
+       				<td><span t-esc="'%.2f'%request.env.user.partner_id.sh_vendor_zero_to_thiry"/></td>
+       				<td><span t-esc="'%.2f'%request.env.user.partner_id.sh_vendor_thirty_to_sixty"/></td>
+       				<td><span t-esc="'%.2f'%request.env.user.partner_id.sh_vendor_sixty_to_ninety"/></td>
+       				<td><span t-esc="'%.2f'%request.env.user.partner_id.sh_vendor_ninety_plus"/></td>
+       				<td><span t-esc="'%.2f'%request.env.user.partner_id.sh_vendor_total"/></td>
+       			</tbody>
+       		</t>
+       		<br/>
+			<hr/>
+            <t t-if="vendor_overdue_statement_ids" t-call="portal.portal_table">
+            	<div class="text-center" style="margin-left:0;margin-right:0;">
+            		<div class="col-12">
+            			<h3>Overdue Statements</h3>
+            		</div>
+            	</div>
+            	<div class="col-12 text-center" style="margin-left:0;margin-right:0;">
+					<a id="send_vendor_due_btn" class="btn btn-success fa fa-envelope" name="send_vendor_due_btn" style="margin-bottom: 10px; font-size: 16px; color: white;" title="Send Overdue Statement" aria-label="Send Overdue Statement" role="button">
+						Send Overdue Statement
+					</a>
+					<t t-set="report_vendor_overdue_url" t-value="'/report/pdf/sh_account_statement.sh_vendor_due_statement_template'+'/'+str(request.env.user.partner_id.id)+'?download=True'"/>
+					<a id="download_vendor_due_btn" target="_blank" t-att-href="report_vendor_overdue_url" class="btn btn-success fa fa-print" name="download_vendor_due_btn" style="margin-bottom: 10px; font-size: 16px; color: white;" title="Download Overdue Statement" aria-label="Download Overdue Statement" role="button">
+						Download Overdue Statement
+					</a>
+					<a id="download_vend_btn_xls_due" href="/my/vendor_statements_due/xls" class="btn btn-success fa fa-file-excel-o" name="download_vend_btn_xls_due" style="margin-bottom: 10px; font-size: 16px; color: white;" title="Download Overdue Statement XLS" aria-label="Download Overdue Statement XLS" role="button">
+						Download Overdue Statement XLS
+					</a>
+            	</div>
+           		<thead>
+           			<tr t-attf-class="{{'thead-light'}}">
+           				<th>
+                            Invoice Number
+                        </th>
+                        <th>
+                            Invoice Date
+                        </th>
+                        <th>
+                            Invoice Due Date
+                        </th>
+                        <th>
+                            Total Amount
+                        </th>
+                        <th>
+                            Paid Amount
+                        </th>
+                        <th>
+                            Balance
+                        </th>
+           			</tr>
+           		</thead>
+            		<tbody>
+            			<t t-set="total_vendor_ovedue_amount" t-value="0.00"/>
+            			<t t-set="total_vendor_overdue_paid_amount" t-value="0.00"/>
+            			<t t-set="total_vendor_overdue_balance" t-value="0.00"/>
+            			<t t-foreach="vendor_overdue_statement_ids" t-as="vendor_overdue_statement">
+            				<t t-set="total_vendor_ovedue_amount" t-value="total_vendor_ovedue_amount + vendor_overdue_statement.sh_due_vendor_amount"/>
+            				<t t-set="total_vendor_overdue_paid_amount" t-value="total_vendor_overdue_paid_amount + vendor_overdue_statement.sh_due_vendor_paid_amount"/>
+            				<t t-set="total_vendor_overdue_balance" t-value="total_vendor_overdue_balance + vendor_overdue_statement.sh_due_vendor_balance"/>
+            				<t t-if="vendor_overdue_statement.sh_due_vendor_due_date and vendor_overdue_statement.sh_today and vendor_overdue_statement.sh_due_vendor_due_date &lt; vendor_overdue_statement.sh_today">
+            					<tr style="color:red;">
+		            				<td><span t-field="vendor_overdue_statement.name"/></td>
+		            				<td><span t-field="vendor_overdue_statement.sh_due_vendor_invoice_date"/></td>
+		            				<td><span t-field="vendor_overdue_statement.sh_due_vendor_due_date"/></td>
+		            				<td><span t-field="vendor_overdue_statement.sh_due_vendor_amount"/></td>
+		            				<td><span t-field="vendor_overdue_statement.sh_due_vendor_paid_amount"/></td>
+		            				<td><span t-field="vendor_overdue_statement.sh_due_vendor_balance"/></td>
+		            			</tr>	
+            				</t>
+	            			<t t-else="">
+            					<tr>
+		            				<td><span t-field="vendor_overdue_statement.name"/></td>
+		            				<td><span t-field="vendor_overdue_statement.sh_due_vendor_invoice_date"/></td>
+		            				<td><span t-field="vendor_overdue_statement.sh_due_vendor_due_date"/></td>
+		            				<td><span t-field="vendor_overdue_statement.sh_due_vendor_amount"/></td>
+		            				<td><span t-field="vendor_overdue_statement.sh_due_vendor_paid_amount"/></td>
+		            				<td><span t-field="vendor_overdue_statement.sh_due_vendor_balance"/></td>
+		            			</tr>	
+            				</t>
+            			</t>
+            			<tr>
+            				<td></td>
+            				<td></td>
+            				<td></td>
+            				<td><strong><span t-esc="'%.2f'%total_vendor_ovedue_amount"/></strong></td>
+            				<td><strong><span t-esc="'%.2f'%total_vendor_overdue_paid_amount"/></strong></td>
+            				<td><strong><span t-esc="'%.2f'%total_vendor_overdue_balance"/></strong></td>
+            			</tr>
+            		</tbody>
+            </t>
+        </t>
+    </template>
+</odoo>
