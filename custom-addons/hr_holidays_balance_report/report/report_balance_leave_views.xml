@@ -8,7 +8,6 @@
             <search string="Leave Balance Report">
                    <field name="emp_id"/>
             <field name="leave_type_id"/>
-            <field name="allocation_id"/>
                 <group expand="0" string="Group By">
                     <filter name="group_employee" string="Employee" context="{'group_by': 'emp_id'}"/>
                     <filter name="group_department" string="Department"
@@ -17,12 +16,8 @@
                             context="{'group_by': 'leave_type_id'}"/>
                     <filter name="group_job" string="Job" context="{'group_by': 'job_id'}"/>
                     <filter name="group_gender" string="Gender" context="{'group_by': 'gender'}"/>
-                    <filter name="group_allocation" string="Allocation" context="{'group_by':'allocation_id'}"/>
                 </group>
-          <filter name="active_allocations"
-        string="Active Allocations"
-        domain="['|',('allocation_date_to','=',False),('allocation_date_to','>',context_today().strftime('%%Y-%%m-%%d'))]"/>
-
+         
             </search>
         </field>
     </record>
@@ -38,15 +33,15 @@
                 <field name="department_id"/>
                 <field name="job_id"/>
                 <field name="leave_type_id"/>
-                <field name="allocated_days"/>
-                <field name="taken_days"/>
-                <field name="balance_days"/>
-                  <field name="allocation_id"/>
-            <field name="allocation_date_from"/>
-            <field name="allocation_date_to"/>
+                 <field name="period_label"/>
+                <field name="allocated_in_period"/>
+                <field name="carried_balance"/>
+                <field name="taken_in_period"/>
+                <field name="balance_in_period"/>
             </tree>
         </field>
     </record>
+
     <!--Leave Balance Report Action-->
     <record id="report_balance_leave_action" model="ir.actions.act_window">
         <field name="name">Balance Leave Report</field>
@@ -61,4 +56,5 @@
               action="report_balance_leave_action"
               parent="hr_holidays.menu_hr_holidays_report"
               sequence="3"/>
+
 </odoo>

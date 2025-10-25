@@ -21,4 +21,5 @@
 ###############################################################################
 from . import report
 from . import data
-
+from . import wizard
+from . import models

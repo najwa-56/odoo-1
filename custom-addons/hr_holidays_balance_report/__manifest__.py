@@ -31,7 +31,7 @@
     'company': 'Cybrosys Techno Solutions',
     'maintainer': 'Cybrosys Techno Solutions',
     'website': 'https://www.cybrosys.com',
-    'depends': ['hr_holidays'],
+    'depends': ['hr_holidays','hr_employee_limit_timeoff'],
     'data': [
         'security/report_balance_leave_security.xml',
         'security/ir.model.access.csv',

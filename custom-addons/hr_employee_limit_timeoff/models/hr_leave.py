@@ -6,18 +6,15 @@ class HrLeaveType(models.Model):
     _inherit = 'hr.leave.type'
 
 
-    is_emergency = fields.Selection(
-        selection=[('yes', 'Yes'), ('no', 'No')],
-        string="Is Emergency Leave?",
-        default='no',
-        help="Indicate if this time off type is for emergency cases."
-    )
-    
-    is_annual = fields.Selection(
-        selection=[('yes', 'Yes'), ('no', 'No')],
-        string="Is Annual Leave?",
-        default='no',
-        help="Indicate if this time off type is annual leave."
+    leave_kind = fields.Selection(
+        selection=[
+            ('annual', 'Annual Leave'),
+            ('emergency', 'Emergency Leave'),
+        ],
+        string="Leave Kind",
+        default=False,
+        required=False,
+        help="Classify this leave type as either Annual or Emergency."
     )
 
     leave_request_limit_days = fields.Integer(
